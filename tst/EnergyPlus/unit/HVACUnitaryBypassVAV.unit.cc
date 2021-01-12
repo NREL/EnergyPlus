@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -75,7 +76,6 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -98,8 +98,8 @@ protected:
         state->dataGlobal->DayOfSim = 1;
         state->dataGlobal->HourOfDay = 1;
 
-        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
+        state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataGlobal->NumOfZones = 1;
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
         DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
@@ -119,7 +119,7 @@ protected:
         DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
         DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn();
+        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
         DataZoneEquipment::ZoneEquipList(1).Name = "ZONEEQUIPMENT";
         int maxEquipCount = 1;
         DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
@@ -193,45 +193,45 @@ protected:
         cbvav.ActualZoneNodeNum.allocate(1);
         cbvav.ActualZoneNodeNum(1) = 1;
         cbvav.DXCoolCoilIndexNum = 1;
-        DXCoils::DXCoil.allocate(1);
-        DXCoils::DXCoilNumericFields.allocate(1);
-        DXCoils::DXCoilNumericFields(1).PerfMode.allocate(1);
-        DXCoils::DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(20);
-        DXCoils::DXCoil(1).Name = "MyDXCoolCoil";
-        DXCoils::DXCoil(1).DXCoilType = "COIL:COOLING:DX:SINGLESPEED";
-        DXCoils::NumDXCoils = 1;
-        DXCoils::CheckEquipName.dimension(1, true);
-        DXCoils::GetCoilsInputFlag = false;
-        DXCoils::DXCoil(1).CCapFFlow.allocate(1);
-        DXCoils::DXCoil(1).CCapFFlow(1) = 1;
-        DXCoils::DXCoil(1).CCapFTemp.allocate(1);
-        DXCoils::DXCoil(1).CCapFTemp(1) = 1;
-        DXCoils::DXCoil(1).EIRFFlow.allocate(1);
-        DXCoils::DXCoil(1).EIRFFlow(1) = 1;
-        DXCoils::DXCoil(1).EIRFTemp.allocate(1);
-        DXCoils::DXCoil(1).EIRFTemp(1) = 1;
-        DXCoils::DXCoil(1).PLFFPLR.allocate(1);
-        DXCoils::DXCoil(1).PLFFPLR(1) = 1;
-        DXCoils::DXCoilFullLoadOutAirTemp.allocate(1);
-        DXCoils::DXCoilFullLoadOutAirHumRat.allocate(1);
-        DXCoils::DXCoil(1).RatedAirVolFlowRate.allocate(1);
-        DXCoils::DXCoil(1).RatedAirVolFlowRate(1) = 0.5;
-        DXCoils::DXCoil(1).RatedTotCap.allocate(1);
-        DXCoils::DXCoil(1).RatedTotCap(1) = 10000.0;
-        DXCoils::DXCoil(1).RatedCOP(1) = 3.3333;
-        DXCoils::DXCoil(1).RatedEIR.allocate(1);
-        DXCoils::DXCoil(1).RatedEIR(1) = 0.3;
-        DXCoils::DXCoil(1).RatedSHR.allocate(1);
-        DXCoils::DXCoil(1).RatedSHR(1) = 0.7;
-        DXCoils::DXCoil(1).SchedPtr = -1;
-        DXCoils::DXCoilOutletTemp.allocate(1);
-        DXCoils::DXCoilOutletHumRat.allocate(1);
-        DXCoils::DXCoilPartLoadRatio.allocate(1);
-        DXCoils::DXCoilFanOpMode.allocate(1);
+        state->dataDXCoils->DXCoil.allocate(1);
+        state->dataDXCoils->DXCoilNumericFields.allocate(1);
+        state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
+        state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(20);
+        state->dataDXCoils->DXCoil(1).Name = "MyDXCoolCoil";
+        state->dataDXCoils->DXCoil(1).DXCoilType = "COIL:COOLING:DX:SINGLESPEED";
+        state->dataDXCoils->NumDXCoils = 1;
+        state->dataDXCoils->CheckEquipName.dimension(1, true);
+        state->dataDXCoils->GetCoilsInputFlag = false;
+        state->dataDXCoils->DXCoil(1).CCapFFlow.allocate(1);
+        state->dataDXCoils->DXCoil(1).CCapFFlow(1) = 1;
+        state->dataDXCoils->DXCoil(1).CCapFTemp.allocate(1);
+        state->dataDXCoils->DXCoil(1).CCapFTemp(1) = 1;
+        state->dataDXCoils->DXCoil(1).EIRFFlow.allocate(1);
+        state->dataDXCoils->DXCoil(1).EIRFFlow(1) = 1;
+        state->dataDXCoils->DXCoil(1).EIRFTemp.allocate(1);
+        state->dataDXCoils->DXCoil(1).EIRFTemp(1) = 1;
+        state->dataDXCoils->DXCoil(1).PLFFPLR.allocate(1);
+        state->dataDXCoils->DXCoil(1).PLFFPLR(1) = 1;
+        state->dataDXCoils->DXCoilFullLoadOutAirTemp.allocate(1);
+        state->dataDXCoils->DXCoilFullLoadOutAirHumRat.allocate(1);
+        state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate.allocate(1);
+        state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = 0.5;
+        state->dataDXCoils->DXCoil(1).RatedTotCap.allocate(1);
+        state->dataDXCoils->DXCoil(1).RatedTotCap(1) = 10000.0;
+        state->dataDXCoils->DXCoil(1).RatedCOP(1) = 3.3333;
+        state->dataDXCoils->DXCoil(1).RatedEIR.allocate(1);
+        state->dataDXCoils->DXCoil(1).RatedEIR(1) = 0.3;
+        state->dataDXCoils->DXCoil(1).RatedSHR.allocate(1);
+        state->dataDXCoils->DXCoil(1).RatedSHR(1) = 0.7;
+        state->dataDXCoils->DXCoil(1).SchedPtr = -1;
+        state->dataDXCoils->DXCoilOutletTemp.allocate(1);
+        state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
+        state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
+        state->dataDXCoils->DXCoilFanOpMode.allocate(1);
         DataHeatBalance::HeatReclaimDXCoil.allocate(1);
 
         cbvav.DXCoolCoilName = "MyDXCoolCoil";
-        DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+        state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         HeatingCoils::HeatingCoil.allocate(1);
         HeatingCoils::HeatingCoilNumericFields.allocate(1);
         HeatingCoils::HeatingCoilNumericFields(1).FieldNames.allocate(20);
@@ -269,10 +269,10 @@ protected:
         MixedAir::OAMixer(1).RelNode = 4;
         MixedAir::OAMixer(1).RetNode = 6;
         MixedAir::OAMixer(1).MixNode = 7;
-        DXCoils::DXCoil(1).AirInNode = 7;
-        cbvav.DXCoilInletNode = DXCoils::DXCoil(1).AirInNode;
-        DXCoils::DXCoil(1).AirOutNode = 8;
-        cbvav.DXCoilOutletNode = DXCoils::DXCoil(1).AirOutNode;
+        state->dataDXCoils->DXCoil(1).AirInNode = 7;
+        cbvav.DXCoilInletNode = state->dataDXCoils->DXCoil(1).AirInNode;
+        state->dataDXCoils->DXCoil(1).AirOutNode = 8;
+        cbvav.DXCoilOutletNode = state->dataDXCoils->DXCoil(1).AirOutNode;
         HeatingCoils::HeatingCoil(1).AirInletNodeNum = 8;
         cbvav.HeatingCoilInletNode = HeatingCoils::HeatingCoil(1).AirInletNodeNum;
         HeatingCoils::HeatingCoil(1).AirOutletNodeNum = 9;
@@ -291,10 +291,10 @@ protected:
         state->dataCurveManager->PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
         state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
 
-        DataEnvironment::OutDryBulbTemp = 35.0;
-        DataEnvironment::OutHumRat = 0.0141066;
-        DataEnvironment::OutWetBulbTemp = 23.9;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutDryBulbTemp = 35.0;
+        state->dataEnvrn->OutHumRat = 0.0141066;
+        state->dataEnvrn->OutWetBulbTemp = 23.9;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         state->dataAirLoop->AirLoopFlow.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -732,8 +732,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     cbvav.HeatOutAirVolFlow = DataSizing::AutoSize;
     cbvav.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
     HeatingCoils::HeatingCoil(1).NominalCapacity = DataSizing::AutoSize;
-    DXCoils::DXCoil(1).RatedAirVolFlowRate(1) = DataSizing::AutoSize;
-    DXCoils::DXCoil(1).RatedTotCap(1) = DataSizing::AutoSize;
+    state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = DataSizing::AutoSize;
+    state->dataDXCoils->DXCoil(1).RatedTotCap(1) = DataSizing::AutoSize;
 
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil;   // must set one type of fan operating mode to initialize CalcSetPointTempTarget
     DataLoopNode::Node(cbvav.AirInNode).Temp = 24.0; // initialize inlet node temp used to initialize CalcSetPointTempTarget
@@ -752,8 +752,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     EXPECT_EQ(cbvav.NoCoolHeatOutAirVolFlow, finalSysSizing.DesOutAirVolFlow);
 
     // expect coils to size appropriately based on sizing inputs
-    EXPECT_EQ(DXCoils::DXCoil(1).RatedAirVolFlowRate(1), finalSysSizing.DesMainVolFlow);
-    EXPECT_GT(DXCoils::DXCoil(1).RatedTotCap(1), 30000.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), finalSysSizing.DesMainVolFlow);
+    EXPECT_GT(state->dataDXCoils->DXCoil(1).RatedTotCap(1), 30000.0);
     EXPECT_GT(HeatingCoils::HeatingCoil(1).NominalCapacity, 45000.0);
 }
 
@@ -776,8 +776,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
@@ -871,8 +871,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
@@ -960,8 +960,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     DataLoopNode::Node(cbvav.AirInNode).Enthalpy = 47591.3;
     DataLoopNode::Node(cbvav.AirInNode).MassFlowRate = 0.57;
 
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = DataEnvironment::OutHumRat;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).HumRat = state->dataEnvrn->OutHumRat;
     DataLoopNode::Node(MixedAir::OAMixer(1).InletNode).Enthalpy = 71299.267;
 
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;

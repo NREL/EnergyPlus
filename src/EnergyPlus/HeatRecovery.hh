@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -578,7 +579,7 @@ namespace HeatRecovery {
 
     void FrostControl(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void UpdateHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
     void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
 
@@ -706,6 +707,14 @@ namespace HeatRecovery {
     );
 
 } // namespace HeatRecovery
+
+struct HeatRecoveryData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

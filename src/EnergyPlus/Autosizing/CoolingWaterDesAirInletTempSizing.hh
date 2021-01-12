@@ -49,8 +49,12 @@
 #define CoolingWaterDesAirInletTempSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoolingWaterDesAirInletTempSizer : BaseSizerWithFanHeatInputs
 {

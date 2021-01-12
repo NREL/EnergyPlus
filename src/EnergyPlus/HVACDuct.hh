@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -110,11 +111,19 @@ namespace HVACDuct {
 
     void CalcDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
-    void UpdateDuct(int DuctNum); // number of the current duct being simulated
+    void UpdateDuct(EnergyPlusData &state, int DuctNum); // number of the current duct being simulated
 
     void ReportDuct(int DuctNum); // number of the current duct being simulated !unused1208
 
 } // namespace HVACDuct
+
+struct HVACDuctData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

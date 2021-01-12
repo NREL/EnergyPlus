@@ -57,11 +57,9 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#define EP_cache_GlycolSpecificHeat
-
 
 namespace EnergyPlus {
 
@@ -551,7 +549,8 @@ namespace FluidProperties {
         return cTsh.sh; // saturation pressure {Pascals}
     }
 #else
-    Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
+                                 std::string const &Glycol,    // carries in substance name
                                  Real64 const Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
@@ -758,6 +757,14 @@ namespace FluidProperties {
     };
 
 } // namespace FluidProperties
+
+struct FluidPropertiesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

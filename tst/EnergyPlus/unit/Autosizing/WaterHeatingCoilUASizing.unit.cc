@@ -60,7 +60,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     static std::string const routineName("WaterHeatingCoilUASizingGauntlet");
 
@@ -134,8 +134,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).ExitTemp = 60.0;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     DataSizing::ZoneSizingRunDone = true;
 

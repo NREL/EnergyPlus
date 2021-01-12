@@ -52,6 +52,7 @@
 #include <vector>
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -153,6 +154,14 @@ struct CoilCoolingDX
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;
 extern std::string const coilCoolingDXObjectName;
+
+struct CoilCoolingDXData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

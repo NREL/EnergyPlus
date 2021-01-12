@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -222,18 +221,18 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    DataEnvironment::OutDryBulbTemp = 20.0;
-    DataEnvironment::OutWetBulbTemp = 15.0;
+    state->dataEnvrn->OutDryBulbTemp = 20.0;
+    state->dataEnvrn->OutWetBulbTemp = 15.0;
 
-    SetSurfaceOutBulbTempAt();
+    SetSurfaceOutBulbTempAt(*state);
 
     InitializePsychRoutines();
 
@@ -241,9 +240,9 @@ TEST_F(EnergyPlusFixture, TranspiredCollectors_InitTranspiredCollectorTest)
     EXPECT_FALSE(ErrorsFound);
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    OutBaroPress = 101325.0;
-    SkyTemp = 24.0;
-    IsRain = false;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->SkyTemp = 24.0;
+    state->dataEnvrn->IsRain = false;
 
     InitTranspiredCollector(*state, UTSCNum);
 

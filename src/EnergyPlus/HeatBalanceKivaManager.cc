@@ -57,7 +57,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -76,6 +75,7 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
+
 namespace HeatBalanceKivaManager {
 
     void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
@@ -155,7 +155,7 @@ namespace HeatBalanceKivaManager {
         int numAccelaratedTimesteps = 3;
         int acceleratedTimestep = 30; // days
         int accDate =
-            DataEnvironment::DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
+            state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
         while (accDate < 0) {
             accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
         }
@@ -208,11 +208,11 @@ namespace HeatBalanceKivaManager {
 
         std::shared_ptr<Kiva::BoundaryConditions> bcs = instance.bcs;
 
-        bcs->outdoorTemp = kivaWeather.dryBulb[index] * weightNow + kivaWeather.dryBulb[indexPrev] * (1.0 - weightNow) + DataGlobalConstants::KelvinConv();
+        bcs->outdoorTemp = kivaWeather.dryBulb[index] * weightNow + kivaWeather.dryBulb[indexPrev] * (1.0 - weightNow) + DataGlobalConstants::KelvinConv;
 
         bcs->localWindSpeed = (kivaWeather.windSpeed[index] * weightNow + kivaWeather.windSpeed[indexPrev] * (1.0 - weightNow)) *
-                             DataEnvironment::WeatherFileWindModCoeff *
-                             std::pow(instance.ground->foundation.grade.roughness / DataEnvironment::SiteWindBLHeight, DataEnvironment::SiteWindExp);
+                             state.dataEnvrn->WeatherFileWindModCoeff *
+                             std::pow(instance.ground->foundation.grade.roughness / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
         bcs->skyEmissivity = kivaWeather.skyEmissivity[index] * weightNow + kivaWeather.skyEmissivity[indexPrev] * (1.0 - weightNow);
         bcs->solarAzimuth = 3.14;
         bcs->solarAltitude = 0.0;
@@ -220,7 +220,7 @@ namespace HeatBalanceKivaManager {
         bcs->diffuseHorizontalFlux = 0.0;
         bcs->slabAbsRadiation = 0.0;
         bcs->wallAbsRadiation = 0.0;
-        bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobalConstants::KelvinConv();
+        bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobalConstants::KelvinConv;
 
         // Estimate indoor temperature
         static const Real64 defaultFlagTemp = -999; // default sets this below -999 at -9999 so uses value if entered
@@ -230,11 +230,11 @@ namespace HeatBalanceKivaManager {
 
         Real64 Tin;
         if (zoneAssumedTemperature > defaultFlagTemp) {
-            Tin = zoneAssumedTemperature + DataGlobalConstants::KelvinConv();
+            Tin = zoneAssumedTemperature + DataGlobalConstants::KelvinConv;
         } else {
             switch (zoneControlType) {
             case KIVAZONE_UNCONTROLLED: {
-                Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv();
+                Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv;
                 break;
             }
             case KIVAZONE_TEMPCONTROL: {
@@ -244,7 +244,7 @@ namespace HeatBalanceKivaManager {
 
                 if (controlType == 0) { // Uncontrolled
 
-                    Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv();
+                    Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv;
 
                 } else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
 
@@ -252,7 +252,7 @@ namespace HeatBalanceKivaManager {
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
                     int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
-                    Tin = setpoint + DataGlobalConstants::KelvinConv();
+                    Tin = setpoint + DataGlobalConstants::KelvinConv;
 
                 } else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
 
@@ -260,7 +260,7 @@ namespace HeatBalanceKivaManager {
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
                     int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
-                    Tin = setpoint + DataGlobalConstants::KelvinConv();
+                    Tin = setpoint + DataGlobalConstants::KelvinConv;
 
                 } else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
 
@@ -268,7 +268,7 @@ namespace HeatBalanceKivaManager {
                     int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
                     int spSchId = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(schTypeId).TempSchedIndex;
                     Real64 setpoint = ScheduleManager::LookUpScheduleValue(state, spSchId, hour, timestep);
-                    Tin = setpoint + DataGlobalConstants::KelvinConv();
+                    Tin = setpoint + DataGlobalConstants::KelvinConv;
 
                 } else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
 
@@ -282,12 +282,12 @@ namespace HeatBalanceKivaManager {
                     const Real64 coolBalanceTemp = 15.0; // (assumed) degC
 
                     if (bcs->outdoorTemp < heatBalanceTemp) {
-                        Tin = heatSetpoint + DataGlobalConstants::KelvinConv();
+                        Tin = heatSetpoint + DataGlobalConstants::KelvinConv;
                     } else if (bcs->outdoorTemp > coolBalanceTemp) {
-                        Tin = coolSetpoint + DataGlobalConstants::KelvinConv();
+                        Tin = coolSetpoint + DataGlobalConstants::KelvinConv;
                     } else {
                         Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
-                        Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobalConstants::KelvinConv();
+                        Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobalConstants::KelvinConv;
                     }
 
                 } else {
@@ -302,7 +302,7 @@ namespace HeatBalanceKivaManager {
             }
             case KIVAZONE_COMFORTCONTROL: {
 
-                Tin = standardTemp + DataGlobalConstants::KelvinConv();
+                Tin = standardTemp + DataGlobalConstants::KelvinConv;
                 break;
             }
             case KIVAZONE_STAGEDCONTROL: {
@@ -314,18 +314,18 @@ namespace HeatBalanceKivaManager {
                 const Real64 heatBalanceTemp = 10.0; // (assumed) degC
                 const Real64 coolBalanceTemp = 15.0; // (assumed) degC
                 if (bcs->outdoorTemp < heatBalanceTemp) {
-                    Tin = heatSetpoint + DataGlobalConstants::KelvinConv();
+                    Tin = heatSetpoint + DataGlobalConstants::KelvinConv;
                 } else if (bcs->outdoorTemp > coolBalanceTemp) {
-                    Tin = coolSetpoint + DataGlobalConstants::KelvinConv();
+                    Tin = coolSetpoint + DataGlobalConstants::KelvinConv;
                 } else {
                     Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
-                    Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobalConstants::KelvinConv();
+                    Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobalConstants::KelvinConv;
                 }
                 break;
             }
             default: {
                 // error?
-                Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv();
+                Tin = assumedFloatingTemp + DataGlobalConstants::KelvinConv;
                 break;
             }
             }
@@ -355,14 +355,14 @@ namespace HeatBalanceKivaManager {
         std::shared_ptr<Kiva::BoundaryConditions> bcs = instance.bcs;
 
 
-        bcs->outdoorTemp = DataEnvironment::OutDryBulbTemp + DataGlobalConstants::KelvinConv();
-        bcs->localWindSpeed = DataEnvironment::WindSpeedAt(instance.ground->foundation.grade.roughness);
-        bcs->windDirection = DataEnvironment::WindDir * DataGlobalConstants::DegToRadians();
-        bcs->solarAzimuth = std::atan2(DataEnvironment::SOLCOS(1), DataEnvironment::SOLCOS(2));
-        bcs->solarAltitude = DataGlobalConstants::PiOvr2() - std::acos(DataEnvironment::SOLCOS(3));
-        bcs->directNormalFlux = DataEnvironment::BeamSolarRad;
-        bcs->diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
-        bcs->skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs->outdoorTemp);
+        bcs->outdoorTemp = state.dataEnvrn->OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+        bcs->localWindSpeed = DataEnvironment::WindSpeedAt(state, instance.ground->foundation.grade.roughness);
+        bcs->windDirection = state.dataEnvrn->WindDir * DataGlobalConstants::DegToRadians;
+        bcs->solarAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
+        bcs->solarAltitude = DataGlobalConstants::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3));
+        bcs->directNormalFlux = state.dataEnvrn->BeamSolarRad;
+        bcs->diffuseHorizontalFlux = state.dataEnvrn->DifSolarRad;
+        bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
         bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
                                DataHeatBalance::SurfQRadThermInAbs(floorSurface) + // internal gains
@@ -370,8 +370,8 @@ namespace HeatBalanceKivaManager {
                                DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
-        bcs->slabConvectiveTemp = DataHeatBalance::TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv();
-        bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv();
+        bcs->slabConvectiveTemp = DataHeatBalance::TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
+        bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
         bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
@@ -402,8 +402,8 @@ namespace HeatBalanceKivaManager {
 
         if (Atotal > 0.0) {
             bcs->wallAbsRadiation = QAtotal / Atotal;
-            bcs->wallRadiantTemp = TARadTotal / Atotal + DataGlobalConstants::KelvinConv();
-            bcs->wallConvectiveTemp = TAConvTotal / Atotal + DataGlobalConstants::KelvinConv();
+            bcs->wallRadiantTemp = TARadTotal / Atotal + DataGlobalConstants::KelvinConv;
+            bcs->wallConvectiveTemp = TAConvTotal / Atotal + DataGlobalConstants::KelvinConv;
             bcs->extWallForcedTerm = kmPtr->surfaceConvMap[wallSurfaces[0]].f;
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
             bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
@@ -613,9 +613,9 @@ namespace HeatBalanceKivaManager {
             kivaWeather.windSpeed.push_back(WindSpeed);
 
             Real64 OSky = OpaqueSkyCover;
-            Real64 TDewK = min(DryBulb, DewPoint) + DataGlobalConstants::KelvinConv();
+            Real64 TDewK = min(DryBulb, DewPoint) + DataGlobalConstants::KelvinConv;
             Real64 ESky =
-                (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv())) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+                (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
 
             kivaWeather.skyEmissivity.push_back(ESky);
 
@@ -641,7 +641,7 @@ namespace HeatBalanceKivaManager {
 
         auto &Surfaces = DataSurfaces::Surface;
         auto &Constructs = state.dataConstruction->Construct;
-        auto &Materials = dataMaterial.Material;
+        auto &Materials = state.dataMaterial->Material;
 
         int inst = 0;
         int surfNum = 1;
@@ -1101,7 +1101,7 @@ namespace HeatBalanceKivaManager {
             kv.setBoundaryConditions(state);
             kv.instance.calculate(timestep);
             kv.instance.calculate_surface_averages();
-            if (DataEnvironment::Month == 1 && DataEnvironment::DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
+            if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
                 kv.plotDomain();
             }
         }
@@ -1148,7 +1148,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        gp.createFrame(fmt::to_string(DataEnvironment::Month) + "/" + fmt::to_string(DataEnvironment::DayOfMonth) + " " +
+        gp.createFrame(fmt::to_string(state.dataEnvrn->Month) + "/" + fmt::to_string(state.dataEnvrn->DayOfMonth) + " " +
                        fmt::to_string(state.dataGlobal->HourOfDay) + ":00");
 
 #ifndef NDEBUG
@@ -1205,7 +1205,7 @@ namespace HeatBalanceKivaManager {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     }
 
-    void KivaManager::defineDefaultFoundation()
+    void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
     {
 
         Kiva::Foundation defFnd;
@@ -1217,7 +1217,7 @@ namespace HeatBalanceKivaManager {
         defFnd.grade.roughness = settings.groundRoughness;
         defFnd.farFieldWidth = settings.farFieldWidth;
 
-        Real64 waterTableDepth = 0.1022 * DataEnvironment::Elevation;
+        Real64 waterTableDepth = 0.1022 * state.dataEnvrn->Elevation;
 
         if (settings.deepGroundBoundary == Settings::AUTO) {
             if (waterTableDepth <= 40.) {

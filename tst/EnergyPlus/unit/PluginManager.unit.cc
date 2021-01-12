@@ -48,9 +48,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/PluginManager.hh>
 
 namespace EnergyPlus {
 
@@ -63,20 +64,20 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
 
     // first create a plugin variable
-    pluginManager.addGlobalVariable("my_var");
+    pluginManager.addGlobalVariable(*state, "my_var");
     int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, "my_var", true);
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
     size_t const numValues = 4;
-    PluginManagement::trends.emplace_back(*state, "TREND_VAR", numValues, globalVarIndex);
-    int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle("trend_var");
+    state->dataPluginManager->trends.emplace_back(*state, "TREND_VAR", numValues, globalVarIndex);
+    int trendVarIndex = EnergyPlus::PluginManagement::PluginManager::getTrendVariableHandle(*state, "trend_var");
     EXPECT_EQ(0, trendVarIndex);
 
     // initially it should be filled with zeroes
-    EXPECT_EQ(numValues, pluginManager.getTrendVariableHistorySize(trendVarIndex));
+    EXPECT_EQ(numValues, pluginManager.getTrendVariableHistorySize(*state, trendVarIndex));
     for (size_t i = 0; i < numValues; i++) {
-        EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, i));
+        EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, i));
     }
 
     // now pretend to run through a few simulation time steps, setting the value a few times and updating the trend
@@ -87,10 +88,10 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     }
 
     // now check the values at the end, it should still be zero at the oldest (fourth) item, and 12.0 at the recent
-    EXPECT_NEAR(fakeValues[2], pluginManager.getTrendVariableValue(trendVarIndex, 0), 0.001);
-    EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
-    EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
-    EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
+    EXPECT_NEAR(fakeValues[2], pluginManager.getTrendVariableValue(*state, trendVarIndex, 0), 0.001);
+    EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(*state, trendVarIndex, 1), 0.001);
+    EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(*state, trendVarIndex, 2), 0.001);
+    EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(*state, trendVarIndex, 3));
 
 }
 } // namespace EnergyPlus

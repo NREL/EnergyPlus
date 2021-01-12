@@ -82,8 +82,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DataGlobalConstants::DegToRadians() * Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DataGlobalConstants::DegToRadians() * Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Tilt;
+        Real64 Alpha = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Azimuth;
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 
@@ -94,15 +94,15 @@ namespace WindowManager {
         // get the corresponding local Theta, Phi for ray
         W6CoordsFromWorldVect(state, t_Ray, RadType, Gamma, Alpha, Theta, Phi);
 
-        Theta = 180 / DataGlobalConstants::Pi() * Theta;
-        Phi = 180 / DataGlobalConstants::Pi() * Phi;
+        Theta = 180 / DataGlobalConstants::Pi * Theta;
+        Phi = 180 / DataGlobalConstants::Pi * Phi;
 
         return std::make_pair(Theta, Phi);
     }
 
     std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(state, t_SurfNum, DataBSDFWindow::SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

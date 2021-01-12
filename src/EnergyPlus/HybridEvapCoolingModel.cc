@@ -57,7 +57,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
@@ -977,7 +976,7 @@ namespace HybridEvapCoolingModel {
 
             oStandBy.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
             oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate = oStandBy.ScaledSupply_Air_Mass_Flow_Rate / ScalingFactor;
-            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+            oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / state.dataEnvrn->StdRhoAir;
             oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
             oStandBy.ElectricalPower = Mode0.CalculateCurveVal(state, Tosa, Wosa, Tra, Wra, oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate, OSAF, POWER_CURVE);
             oStandBy.Outdoor_Air_Fraction = OSAF;
@@ -1288,7 +1287,7 @@ namespace HybridEvapCoolingModel {
             return -1;
         } // because it should be fractional, this should only really be possible if its called from a unit test
 
-        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, state.dataEnvrn->OutBaroPress);
         Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
         EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
@@ -1326,8 +1325,8 @@ namespace HybridEvapCoolingModel {
                         // Calculate the ventilation mass flow rate
                         Real64 Mvent = ScaledMsa * OSAF;
 
-                        if (StdRhoAir > 1) {
-                            Supply_Air_Ventilation_Volume = Mvent / StdRhoAir;
+                        if (state.dataEnvrn->StdRhoAir > 1) {
+                            Supply_Air_Ventilation_Volume = Mvent / state.dataEnvrn->StdRhoAir;
                         } else {
                             Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                         }
@@ -1400,7 +1399,7 @@ namespace HybridEvapCoolingModel {
                                     Tsa = StepIns.Tosa + FanHeatTemp;
                                 }
 
-                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / StdRhoAir;
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate / state.dataEnvrn->StdRhoAir;
                                 CandidateSetting.oMode = Mode;
                                 CandidateSetting.SupplyAirTemperature = Tsa;
                                 CandidateSetting.SupplyAirW = CheckVal_W(state, Wsa, Tsa, OutletPressure);
@@ -1521,7 +1520,7 @@ namespace HybridEvapCoolingModel {
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
             PartRuntimeFraction = CalculatePartRuntimeFraction(MinOA_Msa,
-                                                               thisSetting.Supply_Air_Ventilation_Volume * StdRhoAir,
+                                                               thisSetting.Supply_Air_Ventilation_Volume * state.dataEnvrn->StdRhoAir,
                                                                StepIns.RequestedCoolingLoad,
                                                                StepIns.RequestedHeatingLoad,
                                                                SensibleRoomORZone,
@@ -1808,11 +1807,11 @@ namespace HybridEvapCoolingModel {
         Real64 LambdaRa = Psychrometrics::PsyHfgAirFnWTdb(0, InletTemp);
         RequestedHumdificationMass = OutputRequiredToHumidify;
         RequestedHumdificationLoad = OutputRequiredToHumidify * LambdaRa;                      // [W];
-        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour(); // [j]
+        RequestedHumdificationEnergy = OutputRequiredToHumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour; // [j]
 
         RequestedDeHumdificationMass = OutputRequiredToDehumidify;
         RequestedDeHumdificationLoad = OutputRequiredToDehumidify * LambdaRa;                      // [W];
-        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour(); // [j]
+        RequestedDeHumdificationEnergy = OutputRequiredToDehumidify * LambdaRa * TimeStepSys * DataGlobalConstants::SecInHour; // [j]
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
@@ -1831,7 +1830,7 @@ namespace HybridEvapCoolingModel {
         StepIns.ZoneDehumidificationLoad = RequestedDeHumdificationLoad;
         StepIns.MinimumOA = DesignMinVR;
         // calculate W humidity ratios for outdoor air and return air
-        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, OutBaroPress);
+        Real64 Wosa = PsyWFnTdbRhPb(state, StepIns.Tosa, StepIns.RHosa, state.dataEnvrn->OutBaroPress);
         Real64 Wra = PsyWFnTdbRhPb(state, StepIns.Tra, StepIns.RHra, InletPressure);
         // Sets boolean values for each potential conditioning requirement;  CoolingRequested, HeatingRequested, VentilationRequested,
         // DehumidificationRequested, HumidificationRequested
@@ -1880,8 +1879,8 @@ namespace HybridEvapCoolingModel {
         // All powers are calculated in Watts amd energies in Joules
 
         SupplyVentilationVolume = CalculateTimeStepAverage(SYSTEMOUTPUTS::VENTILATION_AIR_V);
-        if (StdRhoAir > 1) {
-            SupplyVentilationAir = SupplyVentilationVolume * StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            SupplyVentilationAir = SupplyVentilationVolume * state.dataEnvrn->StdRhoAir;
         } else {
             SupplyVentilationAir = SupplyVentilationVolume * 1.225;
         }
@@ -1896,8 +1895,8 @@ namespace HybridEvapCoolingModel {
         OutletEnthalpy = PsyHFnTdbRhPb(state, OutletTemp, OutletRH, InletPressure);
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
-        if (StdRhoAir > 1) {
-            OutletVolumetricFlowRate = OutletMassFlowRate / StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            OutletVolumetricFlowRate = OutletMassFlowRate / state.dataEnvrn->StdRhoAir;
         } else {
             OutletVolumetricFlowRate = OutletMassFlowRate / 1.225;
         }
@@ -1949,19 +1948,19 @@ namespace HybridEvapCoolingModel {
             if (QTotZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitTotalCoolingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
+                UnitTotalCoolingEnergy = UnitTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
             } else {
                 UnitTotalHeatingRate = std::abs(QTotZoneOut);                            // Watts
-                UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
+                UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
             }
 
             if (QSensZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitSensibleCoolingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
+                UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
             } else {
                 UnitSensibleHeatingRate = std::abs(QSensZoneOut);                              // Watts
-                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour(); // J
+                UnitSensibleHeatingEnergy = UnitSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour; // J
             }
 
             if ((UnitTotalCoolingRate - UnitSensibleCoolingRate) > 0) {
@@ -1977,19 +1976,19 @@ namespace HybridEvapCoolingModel {
             if (QTotSystemOut > 0) // system cooling
             {
                 SystemTotalCoolingRate = std::abs(QTotSystemOut);
-                SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                SystemTotalCoolingEnergy = SystemTotalCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
                 SystemTotalHeatingRate = std::abs(QTotSystemOut);
-                SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                SystemTotalHeatingEnergy = SystemTotalHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
             if (QSensSystemOut > 0) // system sensible cooling
             {
                 SystemSensibleCoolingRate = std::abs(QSensSystemOut);
-                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                SystemSensibleCoolingEnergy = SystemSensibleCoolingRate * TimeStepSys * DataGlobalConstants::SecInHour;
             } else {
                 SystemSensibleHeatingRate = std::abs(QSensSystemOut);
-                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+                SystemSensibleHeatingEnergy = SystemSensibleHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
             }
             if ((SystemTotalCoolingRate - SystemSensibleCoolingRate) > 0) {
                 SystemLatentCoolingRate = SystemTotalCoolingRate - SystemSensibleCoolingRate;
@@ -2014,17 +2013,17 @@ namespace HybridEvapCoolingModel {
 
         // set timestep outputs calculated considering different runtime fractions.
         SupplyFanElectricPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
-        SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * DataGlobalConstants::SecInHour;
         SecondaryFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
-        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ThirdFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
-        ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
         WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
-        WaterConsumption = WaterConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        WaterConsumption = WaterConsumptionRate * TimeStepSys * DataGlobalConstants::SecInHour;
         ExternalStaticPressure = CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
 
         FinalElectricalPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
-        FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * DataGlobalConstants::SecInHour();
+        FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
 } // namespace HybridEvapCoolingModel

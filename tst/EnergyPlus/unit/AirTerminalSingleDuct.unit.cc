@@ -54,15 +54,12 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -633,8 +630,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataEnvironment::StdRhoAir = 1.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
@@ -644,7 +641,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
-    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataSingleDuct->sd_airterminal(SysNum).ReheatComp);
@@ -673,7 +670,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
     bool FirstHVACIteration = false;
 
-    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(ZonePtr));
+    auto &thisAirDistUnit(state->dataDefineEquipment->AirDistUnit(ZonePtr));
     // run SimulateSingleDuct(*state, ) function
     SimulateSingleDuct(*state, thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action
@@ -1020,15 +1017,15 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1048,8 +1045,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0);                       // input from VAV reheat air terminal
 
     // calculate mass flow rates
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;              // inputs from VAV reheat AT
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
@@ -1077,7 +1074,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
 
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1225,15 +1222,15 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1253,8 +1250,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0);                                        // input from VAV reheat air terminal
 
     // calculate mass flow rates
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.10 * 1.0; // min flow rate at 1.0 turndown fraction
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;              // inputs from VAV reheat AT
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10 * 1.0; // min flow rate at 1.0 turndown fraction
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
@@ -1282,7 +1279,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
 
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.10 * 0.5; // min flow rate at 0.5 turndown fraction
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10 * 0.5; // min flow rate at 0.5 turndown fraction
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1397,15 +1394,15 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1425,8 +1422,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
 
     // calculate mass flow rates
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.20 * 1.0; // min flow rate at 1.0 turndown fraction
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;              // inputs from VAV coolheat reheat AT
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.20 * 1.0; // min flow rate at 1.0 turndown fraction
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV coolheat reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
@@ -1454,7 +1451,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
 
     // test with heating load and turndown fraction schedule value set 0.5
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 2;
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.20 * 0.5; // min flow rate at 0.5 turndown fraction
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.20 * 0.5; // min flow rate at 0.5 turndown fraction
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1580,15 +1577,15 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1614,8 +1611,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     EXPECT_EQ(0.05, thisAirTerminal.ZoneMinAirFracDes);
 
     // test 1: 0.05 fraction damper position
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.05;
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.05;
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
@@ -1636,7 +1633,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
 
     // test 2: 0.10 fraction damper position
     thisAirTerminal.ZoneMinAirFracDes = 0.10; // modified user input
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.10;
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.10;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
@@ -1725,15 +1722,15 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -1764,8 +1761,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(InletNodeNum).HumRat = 0.006;
     DataLoopNode::Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
     // calculate mass flow rates
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.2;
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 1.0;
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.2;
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 1.0;
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisHeatCoolAT.AirLoopNum = 1;
@@ -1784,7 +1781,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     thisHeatCoolAT.InitSys(*state, FirstHVACIteration);
     thisHeatCoolAT.SimCBVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     thisHeatCoolAT.ReportSys(*state);
-    Real64 expect_OutdoorAirFlowRate = (SysMinMassFlowRes / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
+    Real64 expect_OutdoorAirFlowRate = (SysMinMassFlowRes / state->dataEnvrn->StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expect_OutdoorAirFlowRate, thisHeatCoolAT.OutdoorAirFlowRate);
@@ -1798,7 +1795,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
 
     thisHeatCoolAT.ZoneMinAirFracDes = 0.20;
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * thisHeatCoolAT.ZoneMinAirFracDes * 1.0;
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * thisHeatCoolAT.ZoneMinAirFracDes * 1.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -12000.0;
     DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
@@ -1810,7 +1807,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     thisHeatCoolAT.InitSys(*state, FirstHVACIteration);
     thisHeatCoolAT.SimCBVAV(*state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
     thisHeatCoolAT.ReportSys(*state);
-    expect_OutdoorAirFlowRate = (SysMaxMassFlowRes / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
+    expect_OutdoorAirFlowRate = (SysMaxMassFlowRes / state->dataEnvrn->StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expect_OutdoorAirFlowRate, thisHeatCoolAT.OutdoorAirFlowRate);

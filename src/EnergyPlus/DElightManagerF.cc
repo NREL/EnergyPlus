@@ -131,8 +131,6 @@ namespace DElightManagerF {
         using namespace DataEnvironment;   // Gives access to Site data
         using namespace DataSurfaces;      // Gives access to Surface data
         using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
-        using namespace DataDaylighting;
-
         using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
         using InternalHeatGains::GetDesignLightingLevelForZone;
 
@@ -223,15 +221,15 @@ namespace DElightManagerF {
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
         cNameWOBlanks = ReplaceBlanksWithUnderscores(BuildingName);
-        print(delightInFile, Format_902, cNameWOBlanks, Latitude, Longitude, Elevation * M2FT, BuildingAzimuth, TimeZoneNumber);
+        print(delightInFile, Format_902, cNameWOBlanks, state.dataEnvrn->Latitude, state.dataEnvrn->Longitude, state.dataEnvrn->Elevation * M2FT, BuildingAzimuth, state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
-        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians());
+        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : ZoneDaylight) {
-            if (znDayl.DaylightMethod == DElightDaylighting) {
+        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -266,8 +264,8 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : ZoneDaylight) {
-            if (znDayl.DaylightMethod == DElightDaylighting) {
+        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, Zone);
                 if (izone != 0) {
 
@@ -296,8 +294,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians());
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians());
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians);
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians);
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
@@ -335,7 +333,7 @@ namespace DElightManagerF {
                                 iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
+                                rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer).AbsorpVisible;
                             } else {
                                 rExtVisRefl = 0.0;
                             }
@@ -382,7 +380,7 @@ namespace DElightManagerF {
 
                                         // Loop through all Doppelganger Surface Names to ignore these Windows
                                         lWndoIsDoppelganger = false;
-                                        for (auto &cfs : DElightComplexFene) {
+                                        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                             // Is the current Window Surface a Doppelganger?
                                             if (wndo.Name == cfs.wndwName) {
@@ -416,7 +414,7 @@ namespace DElightManagerF {
                                             // Loop through all Doppelganger Surface Names to ignore these Windows
                                             lWndoIsDoppelganger = false;
 
-                                            for (auto &cfs : DElightComplexFene) {
+                                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                                 // Is the current Window Surface a Doppelganger?
                                                 if (wndo2.Name == cfs.wndwName) {
@@ -470,7 +468,7 @@ namespace DElightManagerF {
                             iHostedCFS = 0;
 
                             // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : DElightComplexFene) {
+                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                 // Does the current Opaque Bounding Surface host the current CFS object?
                                 if (surf.Name == cfs.surfName) {
@@ -483,7 +481,7 @@ namespace DElightManagerF {
 
                             // Now write each of the hosted CFS data
                             // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : DElightComplexFene) {
+                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                 // Does the current Opaque Bounding Surface host the current CFS object?
                                 if (surf.Name == cfs.surfName) {
@@ -538,7 +536,7 @@ namespace DElightManagerF {
                     print(delightInFile, Format_912, znDayl.TotalDaylRefPoints);
 
                     // Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-                    for (auto &refPt : DaylRefPt) {
+                    for (auto &refPt : state.dataDaylightingData->DaylRefPt) {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
@@ -692,7 +690,6 @@ namespace DElightManagerF {
         // Glazer - July 2016
 
         using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-        using namespace DataDaylighting;
         using DataSurfaces::Surface;
 
         int NumAlpha;
@@ -702,9 +699,9 @@ namespace DElightManagerF {
 
         constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
-        TotDElightCFS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        DElightComplexFene.allocate(TotDElightCFS);
-        for (auto &cfs : DElightComplexFene) {
+        state.dataDaylightingData->TotDElightCFS = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->DElightComplexFene.allocate(state.dataDaylightingData->TotDElightCFS);
+        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           ++CFSNum,
@@ -757,7 +754,6 @@ namespace DElightManagerF {
         // USE STATEMENTS:
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataDaylighting::ZoneDaylight;
         using DataSurfaces::AspectTransform;
         using DataSurfaces::WorldCoordSystem;
 

@@ -54,9 +54,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -70,7 +70,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace DualDuct;
@@ -119,7 +118,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
     DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
     DualDuct::dd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
@@ -433,15 +432,15 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -466,8 +465,8 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     int ColdInNode = thisDDAirTerminal.ColdAirInletNodeNum;
 
     // calculate mass flow rates
-    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
-    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;              // inputs from dual duct VAV AT
+    Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
+    Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from dual duct VAV AT
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 2000.0;
     DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
@@ -500,7 +499,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
 
     // test with heating load and turndown fraction schedule value set 0.5
     DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 2;
-    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
+    SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 0.5; // min flow rate at 0.5 turndown fraction
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;

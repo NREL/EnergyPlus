@@ -45,20 +45,22 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <string>
+
+// EnergyPlus Headers
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -80,7 +82,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <string>
 
 namespace EnergyPlus {
 
@@ -813,9 +814,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->HWLoopNum).FluidName,
-                                                            DataGlobalConstants::HWInitConvTemp(),
-                                                            DataPlant::PlantLoop(this->HWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                                            DataGlobalConstants::HWInitConvTemp,
+                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,
@@ -830,9 +831,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp(),
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            DataGlobalConstants::CWInitConvTemp,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,
@@ -847,9 +848,9 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidName,
-                                                            DataGlobalConstants::CWInitConvTemp(),
-                                                            DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            DataGlobalConstants::CWInitConvTemp,
+                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(0.0,
                                                        CoilMaxVolFlowRate * rho,
@@ -930,14 +931,14 @@ namespace AirLoopHVACDOAS {
         this->GetDesignDayConditions(state);
 
         if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::Fan_System_Object) {
-            HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / DataEnvironment::StdRhoAir;
+            HVACFan::fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;
         }
         bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::Fan_ComponentModel) {
-            Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, sizingMassFlow / DataEnvironment::StdRhoAir, 0);
+            Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, sizingMassFlow / state.dataEnvrn->StdRhoAir, 0);
             Fans::Fan(this->m_FanIndex).MaxAirMassFlowRate = sizingMassFlow;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;

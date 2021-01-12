@@ -15,16 +15,34 @@ else()
   add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
+if(USE_PSYCHROMETRICS_CACHING)
+  # Caching defaulted ON
+else()
+  add_definitions("-DEP_nocache_Psychrometrics")
+endif()
+
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_STATS)
+  add_definitions("-DEP_psych_stats")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
-  AirflowNetworkBalanceManager.cc
-  AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
   AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
+  AirflowNetworkBalanceManager.cc
+  AirflowNetworkBalanceManager.hh
   Autosizing/All_Simple_Sizing.cc
   Autosizing/All_Simple_Sizing.hh
   Autosizing/Base.cc
@@ -49,22 +67,22 @@ SET( SRC
   Autosizing/CoolingWaterDesAirOutletTempSizing.hh
   Autosizing/CoolingWaterDesWaterInletTempSizing.cc
   Autosizing/CoolingWaterDesWaterInletTempSizing.hh
-  Autosizing/CoolingWaterflowSizing.cc
-  Autosizing/CoolingWaterflowSizing.hh
   Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
+  Autosizing/CoolingWaterflowSizing.cc
+  Autosizing/CoolingWaterflowSizing.hh
   Autosizing/HeatingAirFlowSizing.cc
   Autosizing/HeatingAirFlowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
   Autosizing/HeatingCapacitySizing.cc
   Autosizing/HeatingCapacitySizing.hh
-  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
-  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
   Autosizing/HeatingWaterDesAirInletHumRatSizing.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.hh
   Autosizing/HeatingWaterDesAirInletTempSizing.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.hh
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.cc
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
   Autosizing/HeatingWaterflowSizing.cc
@@ -105,20 +123,20 @@ SET( SRC
   ChillerReformulatedEIR.hh
   Coils/CoilCoolingDX.cc
   Coils/CoilCoolingDX.hh
-  Coils/CoilCoolingDXCurveFitPerformance.cc
-  Coils/CoilCoolingDXCurveFitPerformance.hh
   Coils/CoilCoolingDXCurveFitOperatingMode.cc
   Coils/CoilCoolingDXCurveFitOperatingMode.hh
+  Coils/CoilCoolingDXCurveFitPerformance.cc
+  Coils/CoilCoolingDXCurveFitPerformance.hh
   Coils/CoilCoolingDXCurveFitSpeed.cc
   Coils/CoilCoolingDXCurveFitSpeed.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConfiguredFunctions.hh
   "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
-  ConvectionCoefficients.cc
-  ConvectionCoefficients.hh
   Construction.cc
   Construction.hh
+  ConvectionCoefficients.cc
+  ConvectionCoefficients.hh
   CoolTower.cc
   CoolTower.hh
   CostEstimateManager.cc
@@ -140,31 +158,21 @@ SET( SRC
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh
-  DataBSDFWindow.cc
   DataBSDFWindow.hh
   DataBranchAirLoopPlant.hh
-        DataBranchNodeConnections.hh
-  DataComplexFenestration.cc
+  DataBranchNodeConnections.hh
   DataComplexFenestration.hh
-  DataContaminantBalance.cc
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
-  DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
   DataErrorTracking.cc
   DataErrorTracking.hh
-  DataGenerators.cc
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
@@ -258,8 +266,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
-  ElectricPowerServiceManager.hh
   ElectricPowerServiceManager.cc
+  ElectricPowerServiceManager.hh
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -350,8 +358,6 @@ SET( SRC
   HWBaseboardRadiator.hh
   HeatBalFiniteDiffManager.cc
   HeatBalFiniteDiffManager.hh
-  HeatBalanceKivaManager.cc
-  HeatBalanceKivaManager.hh
   HeatBalanceAirManager.cc
   HeatBalanceAirManager.hh
   HeatBalanceHAMTManager.cc
@@ -360,6 +366,8 @@ SET( SRC
   HeatBalanceIntRadExchange.hh
   HeatBalanceInternalHeatGains.cc
   HeatBalanceInternalHeatGains.hh
+  HeatBalanceKivaManager.cc
+  HeatBalanceKivaManager.hh
   HeatBalanceManager.cc
   HeatBalanceManager.hh
   HeatBalanceMovableInsulation.cc
@@ -380,12 +388,12 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
-  HybridUnitaryAirConditioners.cc
-  HybridUnitaryAirConditioners.hh
   HybridEvapCoolingModel.cc
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -393,6 +401,8 @@ SET( SRC
   InputProcessing/DataStorage.hh
   InputProcessing/EmbeddedEpJSONSchema.hh
   "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
+  IOFiles.cc
+  IOFiles.hh
   InputProcessing/IdfParser.cc
   InputProcessing/IdfParser.hh
   InputProcessing/InputProcessor.cc
@@ -405,7 +415,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  Material.cc
   Material.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
@@ -429,10 +438,10 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
-  IOFiles.cc
-  IOFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutputReportPredefined.cc
   OutputReportPredefined.hh
   OutputReportTabular.cc
@@ -441,10 +450,12 @@ SET( SRC
   OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
-  OutputReportData.cc
-  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
+  PVWatts.cc
+  PVWatts.hh
+  PVWattsSSC.cc
+  PVWattsSSC.hh
   PackagedTerminalHeatPump.cc
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
@@ -460,29 +471,32 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
-  Plant/CallingOrder.hh
-  Plant/DataPlant.cc
-  Plant/DataPlant.hh
-  Plant/Enums.hh
-  Plant/EquipAndOperations.hh
-  Plant/LoopSidePumpInformation.hh
-  Plant/PlantAvailManager.hh
-  Plant/PlantConvergencePoint.hh
-  Plant/MeterData.hh
-  Plant/ReportBranchData.hh
-  Plant/ReportCompData.hh
-  Plant/ReportLoopData.hh
   Plant/Branch.cc
   Plant/Branch.hh
+  Plant/CallingOrder.hh
   Plant/Component.cc
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
+  Plant/DataPlant.cc
+  Plant/DataPlant.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
   Plant/Loop.cc
   Plant/Loop.hh
   Plant/LoopSide.cc
   Plant/LoopSide.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/MeterData.hh
   Plant/MixerData.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/PlantLocation.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
+  Plant/ReportLoopData.hh
   Plant/SplitterData.hh
   Plant/Subcomponents.hh
   PlantCentralGSHP.cc
@@ -500,9 +514,6 @@ SET( SRC
   PlantLoadProfile.hh
   PlantLoopHeatPumpEIR.cc
   PlantLoopHeatPumpEIR.hh
-  Plant/PlantLocation.hh
-  Plant/PlantManager.cc
-  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc
@@ -526,10 +537,6 @@ SET( SRC
   Pumps.hh
   PurchasedAirManager.cc
   PurchasedAirManager.hh
-  PVWatts.cc
-  PVWatts.hh
-  PVWattsSSC.cc
-  PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
   ReportCoilSelection.cc
@@ -550,6 +557,8 @@ SET( SRC
   RuntimeLanguageProcessor.hh
   SQLiteProcedures.cc
   SQLiteProcedures.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   ScheduleManager.cc
   ScheduleManager.hh
   SetPointManager.cc
@@ -596,8 +605,6 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
-  SZVAVModel.cc
-  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc
@@ -631,12 +638,12 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
-  UnitarySystem.cc
-  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc
   UnitVentilator.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UserDefinedComponents.cc
   UserDefinedComponents.hh
   UtilityRoutines.cc
@@ -674,10 +681,10 @@ SET( SRC
   WindowManager.hh
   WindowManagerExteriorData.cc
   WindowManagerExteriorData.hh
-  WindowManagerExteriorThermal.cc
-  WindowManagerExteriorThermal.hh
   WindowManagerExteriorOptical.cc
   WindowManagerExteriorOptical.hh
+  WindowManagerExteriorThermal.cc
+  WindowManagerExteriorThermal.hh
   WindowModel.cc
   WindowModel.hh
   ZoneAirLoopEquipmentManager.cc
@@ -784,6 +791,9 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )

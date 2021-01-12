@@ -106,7 +106,6 @@ namespace HVACSingleDuctInduc {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -219,7 +218,7 @@ namespace HVACSingleDuctInduc {
             }
         }
 
-        DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
+        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitIndUnit(state, IUNum, FirstHVACIteration);
 
@@ -273,8 +272,6 @@ namespace HVACSingleDuctInduc {
         using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
         using WaterCoils::GetCoilWaterInletNode;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
@@ -347,7 +344,7 @@ namespace HVACSingleDuctInduc {
             IndUnit(IUNum).UnitType_Num = SingleDuct_CV_FourPipeInduc;
             IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (IndUnit(IUNum).SchedPtr == 0) {
@@ -427,8 +424,8 @@ namespace HVACSingleDuctInduc {
                 IndUnit(IUNum).UnitType, IndUnit(IUNum).Name, NodeID(IndUnit(IUNum).PriAirInNode), NodeID(IndUnit(IUNum).OutAirNode), "Air Nodes");
 
             AirNodeFound = false;
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                if (IndUnit(IUNum).OutAirNode == AirDistUnit(ADUNum).OutletNodeNum) {
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                if (IndUnit(IUNum).OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
                     IndUnit(IUNum).ADUNum = ADUNum;
                 }
             }
@@ -453,9 +450,9 @@ namespace HVACSingleDuctInduc {
                             } else {
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = IndUnit(IUNum).PriAirInNode;
                                 ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = IndUnit(IUNum).OutAirNode;
-                                AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum =
+                                state.dataDefineEquipment->AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum =
                                     ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
-                                AirDistUnit(IndUnit(IUNum).ADUNum).ZoneEqNum = CtrlZone;
+                                state.dataDefineEquipment->AirDistUnit(IndUnit(IUNum).ADUNum).ZoneEqNum = CtrlZone;
                                 IndUnit(IUNum).CtrlZoneNum = CtrlZone;
                             }
                             IndUnit(IUNum).CtrlZoneInNodeIndex = SupAirIn;
@@ -510,8 +507,6 @@ namespace HVACSingleDuctInduc {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilWaterCooling;
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -554,7 +549,7 @@ namespace HVACSingleDuctInduc {
             MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(IUNum) && allocated(state.dataPlnt->PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -609,7 +604,7 @@ namespace HVACSingleDuctInduc {
                 if ((IndUnit(IUNum).CtrlZoneNum > 0) && (IndUnit(IUNum).CtrlZoneInNodeIndex > 0)) {
                     IndUnit(IUNum).AirLoopNum =
                         DataZoneEquipment::ZoneEquipConfig(IndUnit(IUNum).CtrlZoneNum).InletNodeAirLoopNum(IndUnit(IUNum).CtrlZoneInNodeIndex);
-                    AirDistUnit(IndUnit(IUNum).ADUNum).AirLoopNum = IndUnit(IUNum).AirLoopNum;
+                    state.dataDefineEquipment->AirDistUnit(IndUnit(IUNum).ADUNum).AirLoopNum = IndUnit(IUNum).AirLoopNum;
                 }
             } else {
                 MyAirDistInitFlag(IUNum) = false;
@@ -620,8 +615,8 @@ namespace HVACSingleDuctInduc {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumIndUnits; ++Loop) {
                 if (IndUnit(Loop).ADUNum == 0) continue;
-                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", AirDistUnit(IndUnit(Loop).ADUNum).Name)) continue;
-                ShowSevereError(state, "InitIndUnit: ADU=[Air Distribution Unit," + AirDistUnit(IndUnit(Loop).ADUNum).Name +
+                if (CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(IndUnit(Loop).ADUNum).Name)) continue;
+                ShowSevereError(state, "InitIndUnit: ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(IndUnit(Loop).ADUNum).Name +
                                 "] is not on any ZoneHVAC:EquipmentList.");
                 ShowContinueError(state, "...Unit=[" + IndUnit(Loop).UnitType + ',' + IndUnit(Loop).Name + "] will not be simulated.");
             }
@@ -635,7 +630,7 @@ namespace HVACSingleDuctInduc {
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(IUNum)) {
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             PriNode = IndUnit(IUNum).PriAirInNode;
             SecNode = IndUnit(IUNum).SecAirInNode;
             OutletNode = IndUnit(IUNum).OutAirNode;
@@ -656,14 +651,14 @@ namespace HVACSingleDuctInduc {
             if (HotConNode > 0 && !MyPlantScanFlag(IUNum)) {
 
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp(),
-                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                       DataGlobalConstants::HWInitConvTemp,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxHotWaterFlow = rho * IndUnit(IUNum).MaxVolHotWaterFlow;
                 IndUnit(IUNum).MinHotWaterFlow = rho * IndUnit(IUNum).MinVolHotWaterFlow;
                 // get component outlet node from plant structure
-                HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+                HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                                    .LoopSide(IndUnit(IUNum).HWLoopSide)
                                    .Branch(IndUnit(IUNum).HWBranchNum)
                                    .Comp(IndUnit(IUNum).HWCompNum)
@@ -681,14 +676,14 @@ namespace HVACSingleDuctInduc {
             ColdConNode = IndUnit(IUNum).CWControlNode;
             if (ColdConNode > 0) {
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
-                                       DataGlobalConstants::CWInitConvTemp(),
-                                       PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName,
+                                       DataGlobalConstants::CWInitConvTemp,
+                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex,
                                        RoutineName);
                 IndUnit(IUNum).MaxColdWaterFlow = rho * IndUnit(IUNum).MaxVolColdWaterFlow;
                 IndUnit(IUNum).MinColdWaterFlow = rho * IndUnit(IUNum).MinVolColdWaterFlow;
 
-                CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+                CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                                    .LoopSide(IndUnit(IUNum).CWLoopSide)
                                    .Branch(IndUnit(IUNum).CWBranchNum)
                                    .Comp(IndUnit(IUNum).CWCompNum)
@@ -761,7 +756,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -797,7 +791,7 @@ namespace HVACSingleDuctInduc {
         PltSizCoolNum = 0;
         DesPriVolFlow = 0.0;
         CpAir = 0.0;
-        RhoAir = StdRhoAir;
+        RhoAir = state.dataEnvrn->StdRhoAir;
         ErrorsFound = false;
         IsAutoSize = false;
         MaxTotAirVolFlowDes = 0.0;
@@ -899,15 +893,15 @@ namespace HVACSingleDuctInduc {
                                         (ZoneSizThermSetPtLo(CurZoneEqNum) - TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
                                 }
                                 IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
-                                Cp = GetSpecificHeatGlycol(state, PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp(),
-                                                           PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                                           DataGlobalConstants::HWInitConvTemp,
+                                                           state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 rho = GetDensityGlycol(state,
-                                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp(),
-                                                       PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidName,
+                                                       DataGlobalConstants::HWInitConvTemp,
+                                                       state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
 
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1005,10 +999,10 @@ namespace HVACSingleDuctInduc {
                                 }
                                 IndUnit(IUNum).DesCoolingLoad = DesCoilLoad;
                                 Cp = GetSpecificHeatGlycol(
-                                    state, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
+                                    state, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
 
                                 rho = GetDensityGlycol(
-                                    state, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
+                                    state, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum).FluidIndex, RoutineName);
 
                                 MaxVolColdWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                                 MaxVolColdWaterFlowDes = max(MaxVolColdWaterFlowDes, 0.0);
@@ -1108,7 +1102,6 @@ namespace HVACSingleDuctInduc {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataPlant::PlantLoop;
 
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
@@ -1160,13 +1153,13 @@ namespace HVACSingleDuctInduc {
         SecNode = IndUnit(IUNum).SecAirInNode;
         OutletNode = IndUnit(IUNum).OutAirNode;
         HotControlNode = IndUnit(IUNum).HWControlNode;
-        HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+        HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                            .LoopSide(IndUnit(IUNum).HWLoopSide)
                            .Branch(IndUnit(IUNum).HWBranchNum)
                            .Comp(IndUnit(IUNum).HWCompNum)
                            .NodeNumOut;
         ColdControlNode = IndUnit(IUNum).CWControlNode;
-        CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+        CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                            .LoopSide(IndUnit(IUNum).CWLoopSide)
                            .Branch(IndUnit(IUNum).CWBranchNum)
                            .Comp(IndUnit(IUNum).CWCompNum)
@@ -1369,7 +1362,6 @@ namespace HVACSingleDuctInduc {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using MixerComponent::SimAirMixer;
         using PlantUtilities::SetComponentFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -1409,14 +1401,14 @@ namespace HVACSingleDuctInduc {
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;
-        HWOutletNode = PlantLoop(IndUnit(IUNum).HWLoopNum)
+        HWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).HWLoopNum)
                            .LoopSide(IndUnit(IUNum).HWLoopSide)
                            .Branch(IndUnit(IUNum).HWBranchNum)
                            .Comp(IndUnit(IUNum).HWCompNum)
                            .NodeNumOut;
 
         ColdControlNode = IndUnit(IUNum).CWControlNode;
-        CWOutletNode = PlantLoop(IndUnit(IUNum).CWLoopNum)
+        CWOutletNode = state.dataPlnt->PlantLoop(IndUnit(IUNum).CWLoopNum)
                            .LoopSide(IndUnit(IUNum).CWLoopSide)
                            .Branch(IndUnit(IUNum).CWBranchNum)
                            .Comp(IndUnit(IUNum).CWCompNum)
@@ -1615,7 +1607,7 @@ namespace HVACSingleDuctInduc {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

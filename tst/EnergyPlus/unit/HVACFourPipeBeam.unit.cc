@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirTerminalUnit.hh>
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -72,7 +73,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -235,13 +235,13 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                                                                          DataLoopNode::ObjectIsNotParent,
                                                                                          "Test zone node");
 
-    DataDefineEquip::NumAirDistUnits = 1;
-    DataDefineEquip::AirDistUnit.allocate(1);
-    DataDefineEquip::AirDistUnit(1).EquipName(1) =
+    state->dataDefineEquipment->NumAirDistUnits = 1;
+    state->dataDefineEquipment->AirDistUnit.allocate(1);
+    state->dataDefineEquipment->AirDistUnit(1).EquipName(1) =
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
-    DataDefineEquip::AirDistUnit(1).OutletNodeNum = 3;
+    state->dataDefineEquipment->AirDistUnit(1).OutletNodeNum = 3;
 
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(*state, DataDefineEquip::AirDistUnit(1).EquipName(1));
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1));
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
@@ -1748,7 +1748,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool FirstHVACIteration = true;
 
     // PlantManager::InitializeLoops( FirstHVACIteration );
-    PlantUtilities::SetAllFlowLocks(DataPlant::FlowUnlocked);
+    PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
     // first run with a sensible cooling load of 5000 W and cold supply air
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
@@ -1767,7 +1767,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     // DataLoopNode::Node( 38 ).Temp = 45.0; // hot water inlet node
 
     Real64 NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 17.835648923740127, 0.00001);
@@ -1783,7 +1783,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
     DataLoopNode::Node(40).Temp = 21.0; // zone node
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);
@@ -1805,7 +1805,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(38).Temp = 45.0;    // hot water inlet node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(DataLoopNode::Node(15).Temp, 18.549803918626715, 0.00001);
     EXPECT_NEAR(DataLoopNode::Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
@@ -1826,7 +1826,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataLoopNode::Node(40).Temp = 21.0; // zone node
 
     NonAirSysOutput = 0.0;
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
+    state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).Temp, 14.0);
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(15).MassFlowRate, 0.0);

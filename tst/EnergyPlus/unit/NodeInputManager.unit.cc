@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -59,7 +60,6 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::NodeInputManager;
@@ -102,14 +102,14 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     EMSManager::CheckIfAnyEMS(*state);
 
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool anyEMSRan;
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyEMSRan, ObjexxFCL::Optional_int_const());
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(1).HumRat = 0.01;
-    DataEnvironment::OutBaroPress = 100000;
+    state->dataEnvrn->OutBaroPress = 100000;
 
     NodeInputManager::CalcMoreNodeInfo(*state);
 

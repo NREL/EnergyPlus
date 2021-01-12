@@ -61,7 +61,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("CoolingWaterDesAirInletTempSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -116,7 +116,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    EnergyPlus::DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     EnergyPlus::DataSizing::PlantSizData.allocate(1);
     EnergyPlus::DataSizing::PlantSizData(1).ExitTemp = 7.0;
     EnergyPlus::DataSizing::DataPltSizCoolNum = 1;

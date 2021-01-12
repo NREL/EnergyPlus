@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -62,7 +63,6 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACStandAloneERV;
@@ -108,7 +108,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     ZoneEquipConfig.allocate(1);
     ZoneEquipConfig(1).ZoneName = "Zone 1";
     ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -123,10 +123,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     People.allocate(TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // From dataglobals, always returns a 1 for schedule value
+    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
     People(2).ZonePtr = 1;
     People(2).NumberOfPeople = 200.0;
-    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // From dataglobals, always returns a 1 for schedule value
+    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
     StandAloneERV.allocate(1);
 
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -240,10 +240,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     People.allocate(TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 10.0;
-    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // always returns a 1 for schedule value
+    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
     People(2).ZonePtr = 1;
     People(2).NumberOfPeople = 20.0;
-    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn(); // always returns a 1 for schedule value
+    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
 
     StandAloneERV.allocate(1);
     StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;

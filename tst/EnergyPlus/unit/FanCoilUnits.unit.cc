@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -67,18 +67,15 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -126,8 +123,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -274,8 +271,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -341,13 +338,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -362,21 +359,21 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
@@ -395,13 +392,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -412,7 +409,7 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
 
-        PlantLoop.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
@@ -437,8 +434,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -587,8 +584,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -655,13 +652,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -676,21 +673,21 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
         HeatingLoad = false;
         CoolingLoad = true;
@@ -709,13 +706,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         CalcMultiStage4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QZnReq, SpeedRatio, PartLoadRatio, QUnitOut);
@@ -725,7 +722,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         state->dataGlobal->DoingSizing = false;
-        PlantLoop.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
@@ -750,8 +747,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -898,8 +895,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -972,13 +969,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -996,25 +993,25 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 2;
         FanCoil(1).HeatCoilLoopNum = 1;
@@ -1044,13 +1041,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, variable water flow
@@ -1059,7 +1056,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         FirstHVACIteration = false;
-        PlantLoop(1).LoopSide(1).FlowLock = 1;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
         Node(FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
         // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1076,7 +1073,7 @@ namespace EnergyPlus {
         // normal heating, no flow lock, heating capacity exceeded
         QZnReq = 5000.0;
         ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(4420.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
@@ -1085,7 +1082,7 @@ namespace EnergyPlus {
         // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
         QZnReq = 80.0;
         ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC hits the 80 W target load
         EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1096,7 +1093,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // Coil Off Capacity Test #2 - lock plant flow after previous call
-        PlantLoop(1).LoopSide(1).FlowLock = 1;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
         Node(OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
         Node(OAMixer(1).RetNode).Enthalpy = 39000;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1110,7 +1107,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC hits the 80 W target load
         EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1137,8 +1134,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1276,8 +1273,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", FanCoil(1).HCoilType);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1340,13 +1337,13 @@ namespace EnergyPlus {
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -1359,15 +1356,15 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(1).Name = "ChilledWaterLoop";
-        PlantLoop(1).FluidName = "ChilledWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 1;
         FanCoil(1).HeatCoilLoopNum = 0;
@@ -1397,13 +1394,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         // Normal heating simulation for fan coil with constant fan, electric heating
@@ -1420,7 +1417,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         state->dataGlobal->DoingSizing = false;
-        PlantLoop.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
@@ -1445,8 +1442,8 @@ namespace EnergyPlus {
         Real64 MaxAirMassFlow(0.0);
         Real64 LatOutputProvided(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1595,8 +1592,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1670,13 +1667,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -1694,25 +1691,25 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 2;
         FanCoil(1).HeatCoilLoopNum = 1;
@@ -1742,13 +1739,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         // normal cooling simulation for constant fan variable flow fan coil
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1757,7 +1754,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         FirstHVACIteration = false;
-        PlantLoop(2).LoopSide(1).FlowLock = 1;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
         Node(FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
         // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1776,7 +1773,7 @@ namespace EnergyPlus {
         // normal cooling, no flow lock, cooling capacity exceeded
         QZnReq = -5000.0;
         ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
@@ -1797,8 +1794,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -1951,8 +1948,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -2019,13 +2016,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2040,23 +2037,23 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
@@ -2076,13 +2073,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -2102,7 +2099,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2174,7 +2171,7 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
 
-        PlantLoop.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
         ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
@@ -2214,9 +2211,9 @@ namespace EnergyPlus {
         bool FirstHVACIteration(false);
         bool ErrorsFound(false);
         Real64 QZnReq(-1000.0);
-        DataPlant::TotNumLoops = 2;
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2281,14 +2278,14 @@ namespace EnergyPlus {
         GetFanInput(*state);
         GetFanCoilUnits(*state);
 
-        PlantLoop.allocate(TotNumLoops);
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2303,23 +2300,23 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         bool CoolingLoad = true;
         bool HeatingLoad = false;
@@ -2335,8 +2332,8 @@ namespace EnergyPlus {
         Node(5).MassFlowRateMaxAvail = 0.72;
         FanCoil(FanCoilNum).CCoilName_Index = 2;
         state->dataGlobal->BeginEnvrnFlag = true;
-        DataEnvironment::DayOfYear_Schedule = 1;
-        DataEnvironment::DayOfWeek = 2;
+        state->dataEnvrn->DayOfYear_Schedule = 1;
+        state->dataEnvrn->DayOfWeek = 2;
         state->dataGlobal->HourOfDay = 1;
         ProcessScheduleInput(*state);
         UpdateScheduleValues(*state);
@@ -2500,8 +2497,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -2661,8 +2658,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -2728,13 +2725,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2749,23 +2746,23 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
@@ -2786,13 +2783,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -2812,7 +2809,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -2905,8 +2902,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3081,8 +3078,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -3148,18 +3145,18 @@ namespace EnergyPlus {
         HWCoil.WaterLoopBranchNum = 1;
         HWCoil.WaterLoopCompNum = 1;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(2));
+        auto &CWLoop(state->dataPlnt->PlantLoop(2));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3169,7 +3166,7 @@ namespace EnergyPlus {
         CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
         CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
         // hot water plant loop
-        auto &HWLoop(PlantLoop(1));
+        auto &HWLoop(state->dataPlnt->PlantLoop(1));
         HWLoop.Name = "HotWaterLoop";
         HWLoop.FluidName = "HotWater";
         HWLoop.FluidIndex = 1;
@@ -3199,13 +3196,13 @@ namespace EnergyPlus {
         state->dataFans->LocalTurnFansOff = false;
         state->dataFans->LocalTurnFansOn = true;
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
         ZoneEqSizing.allocate(1);
@@ -3225,7 +3222,7 @@ namespace EnergyPlus {
         FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
         FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
         FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
-        StdRhoAir = 1.2;
+        state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
         InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
@@ -3309,8 +3306,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3480,8 +3477,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3529,18 +3526,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3561,14 +3558,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -3676,8 +3673,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -3847,8 +3844,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3896,18 +3893,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3928,14 +3925,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4043,8 +4040,8 @@ namespace EnergyPlus {
         Real64 AirMassFlow(0.0);
         Real64 MaxAirMassFlow(0.0);
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4214,8 +4211,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -4263,18 +4260,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -4295,14 +4292,14 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        StdRhoAir = 1.2;
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->StdRhoAir = 1.2;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -4512,8 +4509,8 @@ namespace EnergyPlus {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        DataEnvironment::OutBaroPress = 101325.0;
-        DataEnvironment::StdRhoAir = 1.20;
+        state->dataEnvrn->OutBaroPress = 101325.0;
+        state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
         //NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -4535,8 +4532,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -4575,18 +4572,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -4607,13 +4604,13 @@ namespace EnergyPlus {
         ZoneSysEnergyDemand.allocate(1);
         auto &zSysEDemand(ZoneSysEnergyDemand(1));
 
-        DataEnvironment::Month = 1;
-        DataEnvironment::DayOfMonth = 21;
+        state->dataEnvrn->Month = 1;
+        state->dataEnvrn->DayOfMonth = 21;
         state->dataGlobal->HourOfDay = 1;
-        DataEnvironment::DSTIndicator = 0;
-        DataEnvironment::DayOfWeek = 2;
-        DataEnvironment::HolidayIndex = 0;
-        DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+        state->dataEnvrn->DSTIndicator = 0;
+        state->dataEnvrn->DayOfWeek = 2;
+        state->dataEnvrn->HolidayIndex = 0;
+        state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
         CurDeadBandOrSetback.allocate(1);

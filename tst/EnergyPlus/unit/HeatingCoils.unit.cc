@@ -47,19 +47,20 @@
 
 // EnergyPlus::HeatingCoils Unit Tests
 
-#include <exception>
-
 // Google Test Headers
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 
@@ -142,7 +143,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).InletAirTemp = 0.0;
     HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat = 0.001;
     HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).InletAirTemp, HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat);
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     HeatingCoils::HeatingCoil(CoilNum).SchedPtr = 1;
     ScheduleManager::Schedule.allocate(1);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;

@@ -48,12 +48,18 @@
 // EnergyPlus::VariableSpeedCoils Unit Tests
 
 // Google Test Headers
+#include <gtest/gtest.h>
+
+// Objexx Headers
+#include <ObjexxFCL/Array1D.hh>
+
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,7 +70,6 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -74,12 +79,8 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <ObjexxFCL/Array1D.hh>
-#include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchInputManager;
@@ -448,36 +449,36 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     GetZoneEquipmentData(*state);
     GetPTUnit(*state);
 
-    TotNumLoops = 2;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
-    PlantLoop(2).Name = "ChilledWaterLoop";
-    PlantLoop(2).FluidName = "ChilledWater";
-    PlantLoop(2).FluidIndex = 1;
-    PlantLoop(2).FluidName = "WATER";
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
-    PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+    state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+    state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(1).WaterOutletNodeNum;
 
-    PlantLoop(1).Name = "HotWaterLoop";
-    PlantLoop(1).FluidName = "HotWater";
-    PlantLoop(1).FluidIndex = 1;
-    PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(2).Name;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataVariableSpeedCoils->VarSpeedCoil(2).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilVSWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneSizingRunDone = true;
@@ -487,8 +488,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
     DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
-    DataEnvironment::OutBaroPress = 101325;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
@@ -814,11 +815,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataGlobal->BeginEnvrnFlag = false;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat = 0.0075;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.20;
 
@@ -853,18 +854,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
-    DXCoil(1).RatedCBF(1) = 0.05;
-    DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
@@ -1160,11 +1161,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataGlobal->BeginEnvrnFlag = true;
 
     // set input variables
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutDryBulbTemp = 10.0;
-    DataEnvironment::OutHumRat = 0.0075;
-    DataEnvironment::OutEnthalpy = Psychrometrics::PsyHFnTdbW(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat);
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat = 0.0075;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     //		PrimaryAirMassFlowRate = 0.20;
 
@@ -1199,18 +1200,18 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // set fan parameters
     Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
     Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    Fan(1).RhoAirStdInit = DataEnvironment::StdRhoAir;
+    Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     Node(Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
     Node(Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
-    DXCoil(1).RatedCBF(1) = 0.05;
-    DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
+    state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
+    state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
 
     // primary air condition set at outdoor air condition
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = DataEnvironment::OutDryBulbTemp;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = DataEnvironment::OutHumRat;
-    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = DataEnvironment::OutEnthalpy;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Temp = state->dataEnvrn->OutDryBulbTemp;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).HumRat = state->dataEnvrn->OutHumRat;
+    Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
     Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;

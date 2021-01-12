@@ -55,10 +55,9 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SZVAVModel.hh>
@@ -82,7 +81,6 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
     int const HCoil_Water(1);
 
     // Functions

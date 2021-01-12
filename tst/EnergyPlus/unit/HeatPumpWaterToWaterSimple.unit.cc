@@ -50,6 +50,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,7 +65,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";
@@ -755,7 +755,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;
@@ -1494,15 +1494,15 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
                                                                HeatPumpWaterToWaterSimple::GSHP(1).Name));
 }
 } // namespace EnergyPlus

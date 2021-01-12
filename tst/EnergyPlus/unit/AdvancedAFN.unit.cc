@@ -53,11 +53,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
-    OutDryBulbTemp = 15.0;
+    state->dataEnvrn->OutDryBulbTemp = 15.0;
     Zone.allocate(1);
     MAT.allocate(1);
     MRT.allocate(1);

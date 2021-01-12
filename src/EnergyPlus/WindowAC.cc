@@ -60,7 +60,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -111,9 +110,6 @@ namespace WindowAC {
 
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutRelHum;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::CoilDX_CoolingHXAssisted;
     using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
@@ -326,7 +322,7 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).UnitType = state.dataWindowAC->WindowAC_UnitType; // 'ZoneHVAC:WindowAirConditioner'
             state.dataWindowAC->WindAC(WindACNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
-                state.dataWindowAC->WindAC(WindACNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataWindowAC->WindAC(WindACNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataWindowAC->WindAC(WindACNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataWindowAC->WindAC(WindACNum).SchedPtr == 0) {
@@ -713,7 +709,7 @@ namespace WindowAC {
                                 "Average",
                                 state.dataWindowAC->WindAC(WindACNum).Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Window Air Conditioner",
+                SetupEMSActuator(state, "Window Air Conditioner",
                                  state.dataWindowAC->WindAC(WindACNum).Name,
                                  "Part Load Ratio",
                                  "[fraction]",
@@ -831,7 +827,7 @@ namespace WindowAC {
             InNode = state.dataWindowAC->WindAC(WindACNum).AirInNode;
             OutNode = state.dataWindowAC->WindAC(WindACNum).AirOutNode;
             OutsideAirNode = state.dataWindowAC->WindAC(WindACNum).OutsideAirNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
             state.dataWindowAC->WindAC(WindACNum).MaxAirMassFlow = RhoAir * state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow;
             state.dataWindowAC->WindAC(WindACNum).OutAirMassFlow = RhoAir * state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow;
@@ -1261,7 +1257,7 @@ namespace WindowAC {
 
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
         state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy = state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate * ReportingConstant;
         state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy = state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;

@@ -77,7 +77,6 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
     // Reads input and creates instance of Site:GroundTemperature:BuildingSurface object
 
     // USE STATEMENTS:
-    using DataEnvironment::GroundTempObjInput;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -113,7 +112,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(EnergyPlusData &state,
             if (thisModel->buildingSurfaceGroundTemps(i) < 15.0 || thisModel->buildingSurfaceGroundTemps(i) > 25.0) genErrorMessage = true;
         }
 
-        GroundTempObjInput = true;
+        state.dataEnvrn->GroundTempObjInput = true;
 
         if (genErrorMessage) {
             ShowWarningError(state, cCurrentModuleObject + ": Some values fall outside the range of 15-25C.");
@@ -171,7 +170,7 @@ SiteBuildingSurfaceGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &sta
 
     // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay() / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

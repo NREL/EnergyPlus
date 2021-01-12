@@ -50,6 +50,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -60,9 +62,6 @@
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
@@ -1703,20 +1702,20 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Setup the plant itself manually
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
     // Dummy surface
     DataSurfaces::TotSurfaces = 1;
@@ -1894,11 +1893,11 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     Real64 Thickness;
     int MaterialIndex;
 
-    dataMaterial.Material.allocate(1);
+    state->dataMaterial->Material.allocate(1);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1908,7 +1907,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     // Test 2a: Material has a valid thickness but is R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1918,7 +1917,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
@@ -1927,7 +1926,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
 
     // Test 3: Material does not have a valid thickness and is not R-only, result should be true
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
     TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);

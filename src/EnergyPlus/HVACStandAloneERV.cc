@@ -109,15 +109,12 @@ namespace HVACStandAloneERV {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdRhoAir;
     using namespace DataHVACGlobals;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-
-    static std::string const BlankString;
 
     int const ControllerSimple(1);
     int const ControllerOutsideAir(2);
@@ -370,7 +367,7 @@ namespace HVACStandAloneERV {
             StandAloneERV(StandAloneERVNum).UnitType = CurrentModuleObject;
 
             if (lAlphaBlanks(2)) {
-                StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                StandAloneERV(StandAloneERVNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 StandAloneERV(StandAloneERVNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (StandAloneERV(StandAloneERVNum).SchedPtr == 0) {
@@ -1289,12 +1286,12 @@ namespace HVACStandAloneERV {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(StandAloneERVNum)) {
             SupInNode = StandAloneERV(StandAloneERVNum).SupplyAirInletNode;
             ExhInNode = StandAloneERV(StandAloneERVNum).ExhaustAirInletNode;
-            RhoAir = StdRhoAir;
+            RhoAir = state.dataEnvrn->StdRhoAir;
             // set the mass flow rates from the input volume flow rates
-            StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow = StdRhoAir * StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-            StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow = StdRhoAir * StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
-            StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate = StdRhoAir * StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
-            StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate = StdRhoAir * StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
+            StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+            StandAloneERV(StandAloneERVNum).MaxExhAirMassFlow = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
+            StandAloneERV(StandAloneERVNum).DesignSAFanMassFlowRate = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
+            StandAloneERV(StandAloneERVNum).DesignEAFanMassFlowRate = state.dataEnvrn->StdRhoAir * StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate;
             // set the node max and min mass flow rates
             Node(SupInNode).MassFlowRateMax = StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
             Node(SupInNode).MassFlowRateMin = 0.0;
@@ -1835,7 +1832,7 @@ namespace HVACStandAloneERV {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         StandAloneERV(StandAloneERVNum).ElecUseEnergy = StandAloneERV(StandAloneERVNum).ElecUseRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).SensCoolingEnergy = StandAloneERV(StandAloneERVNum).SensCoolingRate * ReportingConstant;
         StandAloneERV(StandAloneERVNum).LatCoolingEnergy = StandAloneERV(StandAloneERVNum).LatCoolingRate * ReportingConstant;

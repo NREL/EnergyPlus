@@ -54,22 +54,20 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -252,16 +250,16 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataGlobal->MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 1;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->DayOfSim = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfWeekTomorrow = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfWeekTomorrow = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     DataZoneEquipment::ZoneEquipAvail.allocate(6);
@@ -448,8 +446,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalance::Zone.allocate(1);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalance::MRT.allocate(1);
-    DataContaminantBalance::ZoneAirCO2.allocate(1);
-    DataContaminantBalance::ZoneCO2SetPoint.allocate(1);
+    state->dataContaminantBalance->ZoneAirCO2.allocate(1);
+    state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.allocate(1);
     ScheduleManager::Schedule.allocate(1);
@@ -504,8 +502,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 7; // CO2 control with an AirLoop
-    DataContaminantBalance::ZoneAirCO2(1) = 900.0;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 800.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = 900.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = true;
     state->dataAirLoop->PriAirSysAvailMgr(1).NumAvailManagers = 1;
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerType.allocate(1);
@@ -523,15 +521,15 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
-    DataContaminantBalance::ZoneAirCO2(1) = 500.0;
-    DataContaminantBalance::ZoneCO2SetPoint(1) = 800.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = 500.0;
+    state->dataContaminantBalance->ZoneCO2SetPoint(1) = 800.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(0, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No action
 
     DataHVACGlobals::ZoneComp(1).TotalNumComp = 1; //  CO2 control with zone equipment
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs.allocate(1);
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).AvailStatus = 2;
-    DataContaminantBalance::ZoneAirCO2(1) = 900.0;
+    state->dataContaminantBalance->ZoneAirCO2(1) = 900.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).HybridVentMgrConnectedToAirLoop = false;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).SimHybridVentSysAvailMgr = true;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
@@ -569,8 +567,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     DataHeatBalance::Zone.deallocate();
     DataHeatBalFanSys::MAT.deallocate();
     DataHeatBalance::MRT.deallocate();
-    DataContaminantBalance::ZoneAirCO2.deallocate();
-    DataContaminantBalance::ZoneCO2SetPoint.deallocate();
+    state->dataContaminantBalance->ZoneAirCO2.deallocate();
+    state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.deallocate();
     ScheduleManager::Schedule.deallocate();

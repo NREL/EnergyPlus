@@ -59,7 +59,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -148,11 +147,6 @@ namespace MixedAir {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
     using namespace DataSizing;
-    using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorCO2;
-    using DataContaminantBalance::OutdoorGC;
-    using DataContaminantBalance::ZoneAirCO2;
-    using DataContaminantBalance::ZoneCO2GainFromPeople;
     using namespace FaultsManager;
 
     // Data
@@ -170,9 +164,7 @@ namespace MixedAir {
     int const FixedDewPointAndDryBulb(5);
     int const ElectronicEnthalpy(6);
     int const DifferentialDryBulbAndEnthalpy(7);
-    // coil operation
-    int const On(1);  // normal coil operation
-    int const Off(0); // signal coil shouldn't run
+
     // component types addressed by this module
     int const OAMixer_Num(1);
     int const Fan_Simple_CV(2);
@@ -191,13 +183,13 @@ namespace MixedAir {
     int const Unglazed_SolarCollector(15);
     int const EvapCooler(16);
     int const PVT_AirBased(17);
-    int const Fan_ComponentModel(18); // cpw22Aug2010 (new)
+    int const Fan_ComponentModel(18);
     int const DXHeatPumpSystem(19);
     int const Coil_UserDefined(20);
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
-    int const VRFTerminalUnit(24); // new Jan 2020
+    int const VRFTerminalUnit(24);
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -245,8 +237,6 @@ namespace MixedAir {
     int const CMO_ERVController(6);
     int const CMO_MechVentilation(7);
     int const CMO_OAMixer(8);
-
-    static std::string const BlankString;
 
     // Type declarations in MixedAir module
 
@@ -304,11 +294,11 @@ namespace MixedAir {
 
     // Functions
 
-    Real64 OAGetFlowRate(int OAPtr)
+    Real64 OAGetFlowRate(EnergyPlusData &state, int OAPtr)
     {
         Real64 FlowRate(0);
-        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (StdRhoAir != 0)) {
-            FlowRate = OAController(OAPtr).OAMassFlow / StdRhoAir;
+        if ((OAPtr > 0) && (OAPtr <= NumOAControllers) && (state.dataEnvrn->StdRhoAir != 0)) {
+            FlowRate = OAController(OAPtr).OAMassFlow / state.dataEnvrn->StdRhoAir;
         }
         return FlowRate;
     }
@@ -326,10 +316,10 @@ namespace MixedAir {
             OAController(OAPtr).ManageDemand = aState;
         }
     }
-    void OASetDemandManagerVentilationFlow(int OAPtr, Real64 aFlow)
+    void OASetDemandManagerVentilationFlow(EnergyPlusData &state, int OAPtr, Real64 aFlow)
     {
         if ((OAPtr > 0) && (OAPtr <= NumOAControllers)) {
-            OAController(OAPtr).DemandLimitFlowRate = aFlow * StdRhoAir;
+            OAController(OAPtr).DemandLimitFlowRate = aFlow * state.dataEnvrn->StdRhoAir;
         }
     }
     int GetOAController(std::string const &OAName)
@@ -642,7 +632,6 @@ namespace MixedAir {
                 if (Sim) {
                     HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
                 }
-                // cpw22Aug2010 Add Fan:ComponentModel (new num=18)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 if (Sim) {
                     Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -918,7 +907,7 @@ namespace MixedAir {
 
         CalcOAMixer(OAMixerNum);
 
-        UpdateOAMixer(OAMixerNum);
+        UpdateOAMixer(state, OAMixerNum);
 
         ReportOAMixer(OAMixerNum);
     }
@@ -1236,7 +1225,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         // construct fan object
                         HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)));
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = HVACFan::fanObjs.size();
-                        // cpw22Aug2010 Add Fan:ComponentModel (new)
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Fan_ComponentModel;
 
@@ -1370,7 +1358,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataContaminantBalance::Contaminant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1540,7 +1527,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
                 thisVentilationMechanical.SchName = AlphArray(2);
                 if (lAlphaBlanks(2)) {
-                    thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    thisVentilationMechanical.SchPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisVentilationMechanical.SchPtr = GetScheduleIndex(state, AlphArray(2)); // convert schedule name to pointer
                     if (thisVentilationMechanical.SchPtr == 0) {
@@ -1571,7 +1558,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         thisVentilationMechanical.SystemOAMethod = SOAM_VRP;
                     } else if ((SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURE")) { // Indoor Air Quality Procedure based on ASHRAE Standard 62.1-2007
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQP;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1580,7 +1567,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "PROPORTIONALCONTROLBASEDONOCCUPANCYSCHEDULE") { // Proportional Control based on ASHRAE Standard 62.1-2004
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlSchOcc;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1589,7 +1576,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "PROPORTIONALCONTROLBASEDONDESIGNOCCUPANCY") { // Proportional Control based on ASHRAE Standard 62.1-2004
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOcc;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1597,7 +1584,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         }
                     } else if (SELECT_CASE_var == "PROPORTIONALCONTROLBASEDONDESIGNOARATE") { // Proportional Control based on design OA rate
                         thisVentilationMechanical.SystemOAMethod = SOAM_ProportionalControlDesOARate;
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1606,7 +1593,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var ==
                                "INDOORAIRQUALITYPROCEDUREGENERICCONTAMINANT") { // Indoor Air Quality Procedure based on generic contaminant setpoint
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQPGC;
-                        if (!Contaminant.GenericContamSimulation) {
+                        if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires generic contaminant simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
@@ -1615,13 +1602,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     } else if (SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURECOMBINED") { // Indoor Air Quality Procedure based on both generic
                                                                                          // contaminant and CO2 setpoint
                         thisVentilationMechanical.SystemOAMethod = SOAM_IAQPCOM;
-                        if (!Contaminant.GenericContamSimulation) {
+                        if (!state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires generic contaminant simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance");
                             ErrorsFound = true;
                         }
-                        if (!Contaminant.CO2Simulation) {
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                             ShowSevereError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" valid " + cAlphaFields(2) + "=\"" + AlphArray(2) +
                                             "\" requires CO2 simulation.");
                             ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
@@ -1864,7 +1851,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = 0.0;
                         thisVentilationMechanical.ZoneOAACHRate = 0.0;
                         thisVentilationMechanical.ZoneOAFlowMethod(ventMechZoneNum) = OAFlowPPer;
-                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn();
+                        thisVentilationMechanical.ZoneOASchPtr(ventMechZoneNum) = DataGlobalConstants::ScheduleAlwaysOn;
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name);
                         ShowContinueError(state, "Cannot locate a matching DesignSpecification:OutdoorAir object for Zone=\"" +
                                           thisVentilationMechanical.VentMechZoneName(ventMechZoneNum) + "\".");
@@ -1929,24 +1916,24 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                         for (EquipNum = 1; EquipNum <= ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                             if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipType(EquipNum),
                                                                             "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
-                                                for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
+                                                for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
-                                                                                    AirDistUnit(ADUNum).Name)) {
-                                                        if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheatVSFan) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctCBVAVReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctCBVAVNoReheat) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolCooledBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolFourPipeBeam) ||
-                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DualDuctVAVOutdoorAir)) {
+                                                                                    state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
+                                                        if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheatVSFan) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctCBVAVNoReheat) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolCooledBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam) ||
+                                                            (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::DualDuctVAVOutdoorAir)) {
                                                             ShowWarningError(state, CurrentModuleObject + "=\"" + thisVentilationMechanical.Name +
                                                                              "\", inappropriate use of Zone secondary recirculation");
                                                             ShowContinueError(state,
                                                                 "A zone secondary recirculation fraction is specified for zone served by ");
-                                                            ShowContinueError(state, "...terminal unit \"" + AirDistUnit(ADUNum).Name +
+                                                            ShowContinueError(state, "...terminal unit \"" + state.dataDefineEquipment->AirDistUnit(ADUNum).Name +
                                                                               "\" , that indicates a single path system");
                                                             ShowContinueError(state, "For Zone=\"" + thisVentilationMechanical.VentMechZoneName(jZone) +
                                                                               "\".");
@@ -2263,7 +2250,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataContaminantBalance::Contaminant;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
         using OutAirNodeManager::CheckOutAirNodeNumber;
@@ -2671,7 +2657,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         using namespace OutputReportPredefined;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
         static Array1D_bool OAControllerMyEnvrnFlag;   // One-time initialization flag
@@ -2801,7 +2786,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             SetPointErrorFlag = true;
                         } else {
                             // add call to check node in EMS
-                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, iTemperatureSetPoint, SetPointErrorFlag);
+                            CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                             if (SetPointErrorFlag) {
                                 ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                                 ShowSevereError(state, "Node Referenced (by Controller)=" + NodeID(MixedAirNode));
@@ -2848,7 +2833,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
             }
 
             if (AirLoopNum > 0) {
-                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / StdRhoAir;
+                Real64 DesSupplyVolFlowRate = state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataEnvrn->StdRhoAir;
                 if ((thisOAController.MinOA - DesSupplyVolFlowRate) > 0.0001) {
                     ShowWarningError(state, "InitOAController: Minimum Outdoor Air Flow Rate for Controller:OutdoorAir=" + thisOAController.Name +
                                      " is greater than Design Supply Air Flow Rate for AirLoopHVAC=" + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".");
@@ -2880,7 +2865,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
 
         if (state.dataGlobal->BeginEnvrnFlag && OAControllerMyEnvrnFlag(OAControllerNum)) {
             OANode = thisOAController.OANode;
-            RhoAirStdInit = StdRhoAir;
+            RhoAirStdInit = state.dataEnvrn->StdRhoAir;
             thisOAController.MinOAMassFlowRate = thisOAController.MinOA * RhoAirStdInit;
             thisOAController.MaxOAMassFlowRate = thisOAController.MaxOA * RhoAirStdInit;
             OAControllerMyEnvrnFlag(OAControllerNum) = false;
@@ -2892,40 +2877,40 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // 90.1 descriptor for economizer controls
                 // Changed by Amit for New Feature implementation
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "DifferentialEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialEnthalpy");
                 } else if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "DifferentialDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "DifferentialDryBulb");
                 } else if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "FixedEnthalpy");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedEnthalpy");
                 } else if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(pdchEcoKind, equipName, "FixedDryBulb");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "FixedDryBulb");
                 } else {
-                    PreDefTableEntry(pdchEcoKind, equipName, "Other");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoKind, equipName, "Other");
                 }
 
-                PreDefTableEntry(pdchEcoMinOA, equipName, thisOAController.MinOA);
-                PreDefTableEntry(pdchEcoMaxOA, equipName, thisOAController.MaxOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMinOA, equipName, thisOAController.MinOA);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoMaxOA, equipName, thisOAController.MaxOA);
                 // EnergyPlus input echos for economizer controls
                 // Chnged by Amit for new feature implementation
                 if (thisOAController.Econo == DifferentialDryBulb) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == DifferentialEnthalpy) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "Yes");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "Yes");
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "No");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "No");
                 }
                 if (thisOAController.Econo == FixedDryBulb) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.TempLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.TempLim);
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
                 if (thisOAController.Econo == FixedEnthalpy) {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, thisOAController.EnthLim);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, thisOAController.EnthLim);
                 } else {
-                    PreDefTableEntry(pdchEcoRetTemp, equipName, "-");
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchEcoRetTemp, equipName, "-");
                 }
             }
         }
@@ -3011,27 +2996,27 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 // predefined report
                 for (jZone = 1; jZone <= vent_mech.NumofVentMechZones; ++jZone) {
                     zoneName = Zone(vent_mech.VentMechZone(jZone)).Name;
-                    PreDefTableEntry(pdchDCVventMechName, zoneName, vent_mech.Name);
-                    PreDefTableEntry(pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
-                    PreDefTableEntry(pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVventMechName, zoneName, vent_mech.Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperZone, zoneName, vent_mech.ZoneOAFlowRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperACH, zoneName, vent_mech.ZoneOAACHRate(jZone), 6);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVMethod, zoneName, cOAFlowMethodTypes(vent_mech.ZoneOAFlowMethod(jZone)));
                     if (vent_mech.ZoneOASchPtr(jZone) > 0) {
-                        PreDefTableEntry(pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, vent_mech.ZoneOASchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(pdchDCVOASchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, "");
                     }
 
                     // added for new DCV inputs
                     if (vent_mech.ZoneADEffSchPtr(jZone) > 0) {
-                        PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, "");
-                        PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, "");
-                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, GetScheduleName(state, vent_mech.ZoneADEffSchPtr(jZone)));
                     } else {
-                        PreDefTableEntry(pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
-                        PreDefTableEntry(pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
-                        PreDefTableEntry(pdchDCVZoneADEffSchName, zoneName, "");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating(jZone), 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, "");
                     }
                 }
 
@@ -3255,7 +3240,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                             "Outdoor Air Controller Maximum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MaxOAMassFlowRate);
                         SetupEMSInternalVariable(state,
                             "Outdoor Air Controller Minimum Mass Flow Rate", loopOAController.Name, "[kg/s]", loopOAController.MinOAMassFlowRate);
-                        SetupEMSActuator("Outdoor Air Controller",
+                        SetupEMSActuator(state, "Outdoor Air Controller",
                                          loopOAController.Name,
                                          "Air Mass Flow Rate",
                                          "[kg/s]",
@@ -3847,8 +3832,8 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
-        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat) * (this->RelTemp - state.dataEnvrn->OutDryBulbTemp);
+        this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - state.dataEnvrn->OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
 
@@ -3858,7 +3843,6 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     )
     {
-        using DataContaminantBalance::ZoneSysContDemand;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -3927,7 +3911,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPGC) {
@@ -3935,7 +3919,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
             } else if (this->SystemOAMethod == SOAM_IAQPCOM) {
@@ -3943,13 +3927,13 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = SysOAMassFlow;
                 SysOAMassFlow = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    SysOAMassFlow += ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
+                    SysOAMassFlow += state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToGCSP * GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
                 }
                 MechVentOAMassFlow = max(SysOAMassFlow, MechVentOAMassFlow);
             } else {
@@ -4021,11 +4005,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                     this->SystemOAMethod == SOAM_ProportionalControlDesOcc || this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
 
                     // System supply air flow rate is always greater than or equal the system outdoor air flow rate
-                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * StdRhoAir))) SysSA = SysOAuc * StdRhoAir;
+                    if ((SysSA > 0.0) && (SysSA < (SysOAuc * state.dataEnvrn->StdRhoAir))) SysSA = SysOAuc * state.dataEnvrn->StdRhoAir;
 
                     // calc Xs - average outdoor air fraction
                     if (SysSA > 0.0) {
-                        Xs = (SysOAuc * StdRhoAir) / SysSA;
+                        Xs = (SysOAuc * state.dataEnvrn->StdRhoAir) / SysSA;
                     } else {
                         Xs = 0.0;
                     }
@@ -4162,24 +4146,24 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     }
 
                                     if (ZoneOAPeople > 0.0) {
-                                        if (ZoneCO2GainFromPeople(ZoneNum) > 0.0) {
+                                        if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ZoneNum) > 0.0) {
                                             if (curZone.ZoneMinCO2SchedIndex > 0.0) {
                                                 // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                                 // in the ZoneControl:ContaminantController
                                                 ZoneMinCO2 = GetCurrentScheduleValue(state, curZone.ZoneMinCO2SchedIndex);
                                             } else {
-                                                ZoneMinCO2 = OutdoorCO2;
+                                                ZoneMinCO2 = state.dataContaminantBalance->OutdoorCO2;
                                             }
 
                                             // Calculate zone maximum target CO2 concentration in PPM
                                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                                                ZoneMaxCO2 = OutdoorCO2 +
+                                                ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                                              (CO2PeopleGeneration * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) / ZoneOAMax;
                                             } else if (curZone.ZoneMaxCO2SchedIndex > 0.0) {
                                                 ZoneMaxCO2 = GetCurrentScheduleValue(state, curZone.ZoneMaxCO2SchedIndex);
                                             } else {
-                                                ZoneMaxCO2 = OutdoorCO2 +
-                                                             (ZoneCO2GainFromPeople(ZoneNum) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) /
+                                                ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
+                                                             (state.dataContaminantBalance->ZoneCO2GainFromPeople(ZoneNum) * curZone.Multiplier * curZone.ListMultiplier * 1.0e6) /
                                                                  ZoneOAMax;
                                             }
 
@@ -4257,11 +4241,11 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                 ZoneOA = ZoneOABZ / ZoneEz;
                                             } else {
 
-                                                if (ZoneAirCO2(ZoneNum) <= ZoneMinCO2) {
+                                                if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) <= ZoneMinCO2) {
                                                     // Zone air CO2 concentration is less than minimum zone CO2 concentration, set the Zone OA flow
                                                     // rate to minimum Zone OA flow rate when the zone is unoccupied
                                                     ZoneOA = ZoneOAMin;
-                                                } else if (ZoneAirCO2(ZoneNum) >= ZoneMaxCO2) {
+                                                } else if (state.dataContaminantBalance->ZoneAirCO2(ZoneNum) >= ZoneMaxCO2) {
                                                     // Zone air CO2 concentration is greater than maximum zone CO2 concentration, set the Zone OA flow
                                                     // rate to maximum Zone OA flow rate (i.e. ZoneOAArea + ZoneOAPeople)
                                                     ZoneOA = ZoneOAMax;
@@ -4269,7 +4253,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                                     // Zone air CO2 concentration is between maximum and minimum limits of zone CO2 concentration,
                                                     // set Zone OA flow rate by proportionally adjusting between ZoneOAMin and ZoneOAMax
                                                     ZoneOA = ZoneOAMin + (ZoneOAMax - ZoneOAMin) *
-                                                                             ((ZoneAirCO2(ZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
+                                                                             ((state.dataContaminantBalance->ZoneAirCO2(ZoneNum) - ZoneMinCO2) / (ZoneMaxCO2 - ZoneMinCO2));
                                                 }
                                             }
                                         } else {
@@ -4347,7 +4331,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total primary air to terminal units of the zone
-                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
 
                                 // or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
                                 InletNode = curZoneEquipConfig.InletNode(InNodeIndex);
@@ -4359,7 +4343,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                                     MassFlowRate = 0.0;
                                 }
                                 // total supply air to the zone
-                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, OutBaroPress, NodeTemp, NodeHumRat);
+                                if (MassFlowRate > 0.0) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, NodeHumRat);
                             }
 
                             // calc zone primary air fraction
@@ -4431,7 +4415,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
                 }
 
                 // Finally calc the system supply OA mass flow rate
-                MechVentOAMassFlow = SysOA * StdRhoAir;
+                MechVentOAMassFlow = SysOA * state.dataEnvrn->StdRhoAir;
             }
 
         } else {
@@ -5107,7 +5091,7 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         }
     }
 
-    void UpdateOAMixer(int const OAMixerNum)
+    void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5160,24 +5144,24 @@ CurrentModuleObjects(CMO_SysAvailMgrList), AvailManagerListName);
         Node(RelNode).Press = OAMixer(OAMixerNum).RelPressure;
         Node(RelNode).MassFlowRateMaxAvail = OAMixer(OAMixerNum).RelMassFlowRate;
 
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(RelNode).CO2 = Node(RetNode).CO2;
             if (OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
                 Node(MixNode).CO2 = Node(RetNode).CO2;
             } else {
                 Node(MixNode).CO2 = ((Node(RetNode).MassFlowRate - Node(RelNode).MassFlowRate) * Node(RetNode).CO2 +
-                                     OAMixer(OAMixerNum).OAMassFlowRate * OutdoorCO2) /
+                                     OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorCO2) /
                                     OAMixer(OAMixerNum).MixMassFlowRate;
             }
         }
 
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(RelNode).GenContam = Node(RetNode).GenContam;
             if (OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
                 Node(MixNode).GenContam = Node(RetNode).GenContam;
             } else {
                 Node(MixNode).GenContam = ((Node(RetNode).MassFlowRate - Node(RelNode).MassFlowRate) * Node(RetNode).GenContam +
-                                           OAMixer(OAMixerNum).OAMassFlowRate * OutdoorGC) /
+                                           OAMixer(OAMixerNum).OAMassFlowRate * state.dataContaminantBalance->OutdoorGC) /
                                           OAMixer(OAMixerNum).MixMassFlowRate;
             }
         }

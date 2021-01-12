@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -281,7 +282,7 @@ namespace HeatingCoils {
     // Beginning of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void UpdateHeatingCoil(int const CoilNum);
+    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum);
 
     //        End of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
@@ -367,6 +368,14 @@ namespace HeatingCoils {
     //        End of Utility subroutines for the HeatingCoil Module
 
 } // namespace HeatingCoils
+
+struct HeatingCoilsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -52,11 +52,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
@@ -77,8 +76,8 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     int ZNnum = 1;
 
     // Set environmental variables for all cases
-    OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
+    state->dataEnvrn->OutHumRat = 0.009;
+    state->dataEnvrn->OutBaroPress = 101400.0;
 
     // Allocate and set earth tube parameters necessary to run the tests
     EarthTubeSys.allocate(ETnum);
@@ -97,12 +96,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
     CalcEarthTubeHumRat(*state, ETnum, ZNnum);
-    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
+    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, state->dataEnvrn->OutHumRat);
 
     // Second case--condensation so inside humidity should be less than outdoor humidity ratio
     EarthTubeSys(ETnum).InsideAirTemp = 10.0;
     CalcEarthTubeHumRat(*state, ETnum, ZNnum);
-    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
+    EXPECT_GT(state->dataEnvrn->OutHumRat, EarthTubeSys(ETnum).HumRat);
 }
 
 TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)

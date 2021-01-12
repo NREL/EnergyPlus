@@ -51,11 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 
 using namespace EnergyPlus::MicroturbineElectricGenerator;
 

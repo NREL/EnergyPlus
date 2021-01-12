@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -68,9 +69,10 @@ namespace HVACDXHeatPumpSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS
     extern Real64 const MinAirMassFlow;
+
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // DERIVED TYPE DEFINITIONS
 
@@ -202,6 +204,14 @@ namespace HVACDXHeatPumpSystem {
 
 
 } // namespace HVACDXHeatPumpSystem
+
+struct HVACDXHeatPumpSystemData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

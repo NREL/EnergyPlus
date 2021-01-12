@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -171,7 +172,7 @@ namespace Humidifiers {
 
         void UpdateReportWaterSystem(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void UpdateHumidifier(); // number of the current humidifier being simulated
+        void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
         void ReportHumidifier(); // number of the current humidifier being simulated
     };
@@ -202,6 +203,15 @@ namespace Humidifiers {
     );
 
 } // namespace Humidifiers
+
+struct HumidifiersData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

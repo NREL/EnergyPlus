@@ -59,6 +59,7 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -484,6 +485,14 @@ namespace ResultsFramework {
 
     void clear_state();
 } // namespace ResultsFramework
+
+struct ResultsFrameworkData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

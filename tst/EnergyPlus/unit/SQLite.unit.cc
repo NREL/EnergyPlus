@@ -51,11 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -784,8 +784,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     roomAirModelData0->AirModelName = "test roomAirModel 1";
     auto const &roomAirModelData1 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
     roomAirModelData1->AirModelName = "test roomAirModel 2";
-    roomAirModelData1->AirModelType = 3;
-    roomAirModelData1->TempCoupleScheme = 3;
+    roomAirModelData1->AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
+    roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;  // hmm this was set to 3 which wasn't a valid option
     roomAirModelData1->SimAirModel = true;
 
     std::string const alwaysOn("always on");
@@ -981,7 +981,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
     ASSERT_EQ(2ul, roomAirModels.size());
     std::vector<std::string> roomAirModel0{"1", "test roomAirModel 1", "2", "1", "0"};
-    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "3", "3", "1"};
+    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "3", "1", "1"};
     EXPECT_EQ(roomAirModel0, roomAirModels[0]);
     EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 }

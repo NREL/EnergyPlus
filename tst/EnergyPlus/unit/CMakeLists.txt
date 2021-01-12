@@ -1,3 +1,11 @@
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -243,9 +251,10 @@ set( test_dependencies
 )
 
 if(LINK_WITH_PYTHON)
+  add_definitions("-DLINK_WITH_PYTHON")
+  find_package(PythonLibs 3 REQUIRED)
+  include_directories(${PYTHON_INCLUDE_DIRS})
   if (CMAKE_HOST_UNIX)
-    find_package(PythonLibs 3 REQUIRED)
-    include_directories(${PYTHON_INCLUDE_DIRS})
     list(APPEND test_src api/datatransfer.unit.cc)
     list(APPEND test_src PluginManager.unit.cc)
     list(APPEND test_dependencies ${PYTHON_LIBRARIES} )

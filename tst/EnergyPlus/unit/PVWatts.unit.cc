@@ -52,15 +52,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -175,17 +174,17 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     WeatherManager::AllocateWeatherData(*state); // gets us the albedo array initialized
-    DataEnvironment::Year = 1986;
-    DataEnvironment::Month = 6;
-    DataEnvironment::DayOfMonth = 15;
+    state->dataEnvrn->Year = 1986;
+    state->dataEnvrn->Month = 6;
+    state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
     state->dataWeatherManager->WeatherFileLatitude = 33.45;
     state->dataWeatherManager->WeatherFileLongitude = -111.98;
     state->dataWeatherManager->WeatherFileTimeZone = -7;
-    DataEnvironment::BeamSolarRad = 728;
-    DataEnvironment::DifSolarRad = 70;
-    DataEnvironment::WindSpeed = 3.1;
-    DataEnvironment::OutDryBulbTemp = 31.7;
+    state->dataEnvrn->BeamSolarRad = 728;
+    state->dataEnvrn->DifSolarRad = 70;
+    state->dataEnvrn->WindSpeed = 3.1;
+    state->dataEnvrn->OutDryBulbTemp = 31.7;
 
     PVWattsGenerator pvwa(*state, "PVWattsArrayA", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
     pvwa.setCellTemperature(30.345);
@@ -290,7 +289,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
                                                  ",",
                                                  ";"});
     ASSERT_TRUE(process_idf(idfTxt));
-    auto eplc(ElectPowerLoadCenter(*state,  1));
+    auto eplc(ElectPowerLoadCenter(*state, 1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
     DataHVACGlobals::TimeStepSys = 1.0;

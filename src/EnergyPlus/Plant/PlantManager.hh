@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -63,16 +64,10 @@ struct EnergyPlusData;
 
 namespace PlantManager {
 
-    // Using/Aliasing
-    using DataPlant::BranchData;
-    using DataPlant::MixerData;
-    using DataPlant::SplitterData;
-
     // MODULE PARAMETER DEFINITIONS
-    extern int const Plant;
-    extern int const Condenser;
     extern int const TempSetPt;
     extern int const FlowSetPt;
+
     extern bool InitLoopEquip;
     extern bool GetCompSizFac;
 
@@ -87,7 +82,7 @@ namespace PlantManager {
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                           bool &SimPlantLoops,       // True when some part of Plant needs to be (re)simulated
-                          bool &SimElecCircuits      // True when electic circuits need to be (re)simulated
+                          bool &SimElecCircuits      // True when electric circuits need to be (re)simulated
     );
 
     void GetPlantLoopData(EnergyPlusData &state);
@@ -104,18 +99,18 @@ namespace PlantManager {
 
     void CheckPlantOnAbort(EnergyPlusData &state);
 
-    void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
+    void InitOneTimePlantSizingInfo(EnergyPlusData &state, int LoopNum); // loop being initialized for sizing
 
     void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
 
-    void SetupInitialPlantCallingOrder();
+    void SetupInitialPlantCallingOrder(EnergyPlusData &state);
 
     void RevisePlantCallingOrder(EnergyPlusData &state);
 
-    int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
+    int FindLoopSideInCallingOrder(EnergyPlusData &state, int LoopNum, int LoopSide);
 
     void SetupBranchControlTypes(EnergyPlusData &state);
 
@@ -124,6 +119,14 @@ namespace PlantManager {
     void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
 } // namespace PlantManager
+
+struct PlantMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

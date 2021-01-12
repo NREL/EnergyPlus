@@ -109,9 +109,7 @@ namespace EnergyPlus::DataPlant {
         using DataLoopNode::Node;
         using DataLoopNode::NodeType_Steam;
         using DataLoopNode::NodeType_Water;
-        using DataPlant::DualSetPointDeadBand;
         using DataPlant::LoopDemandTol;
-        using DataPlant::SingleSetPoint;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -148,7 +146,7 @@ namespace EnergyPlus::DataPlant {
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;
@@ -158,7 +156,7 @@ namespace EnergyPlus::DataPlant {
                     // Calculate the demand on the loop
                     LoadToLoopSetPoint = MassFlowRate * Cp * DeltaTemp;
 
-                } else if (SELECT_CASE_var == DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
 
                     // Get the range of setpoints
                     LoopSetPointTemperatureHi = Node(this->TempSetPointNodeNum).TempSetPointHi;
@@ -194,7 +192,7 @@ namespace EnergyPlus::DataPlant {
             {
                 auto const SELECT_CASE_var(this->LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;

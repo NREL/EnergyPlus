@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -202,11 +203,19 @@ namespace HVACCooledBeam {
                             Real64 CWFlow, // cold water flow rate in kg/s
                             Array1D<Real64> const &Par);
 
-    void UpdateCoolBeam(int CBNum);
+    void UpdateCoolBeam(EnergyPlusData &state, int CBNum);
 
     void ReportCoolBeam(EnergyPlusData &state, int CBNum);
 
 } // namespace HVACCooledBeam
+
+struct HVACCooledBeamData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

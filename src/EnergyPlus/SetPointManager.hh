@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -224,7 +225,7 @@ namespace SetPointManager {
         }
         return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
     }
-    
+
     struct SPBase {
         std::string Name;
         iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
@@ -711,7 +712,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineFollowSysNodeTempSetPointManager : SPBase
@@ -758,7 +759,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineCondEntSetPointManager : SPBase // derived type for SetpointManager:CondenserEnteringReset data
@@ -953,12 +954,13 @@ namespace SetPointManager {
         int CtrlNodeNum;
         Real64 NonChargeCHWTemp;
         Real64 ChargeCHWTemp;
-        int CompOpType;
+        DataPlant::iCtrlType CompOpType;
         Real64 SetPt;
 
         // Default Constructor
         DefineScheduledTESSetPointManager()
-            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(0), SetPt(0.0)
+            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::iCtrlType::Unassigned),
+              SetPt(0.0)
         {
         }
 
@@ -999,7 +1001,12 @@ namespace SetPointManager {
     iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
-        int SchedPtr, int SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int CompOpType, int ControlNodeNum);
+                                      int SchedPtr,
+                                      int SchedPtrCharge,
+                                      Real64 NonChargeCHWTemp,
+                                      Real64 ChargeCHWTemp,
+                                      DataPlant::iCtrlType const &CompOpType,
+                                      int ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);
 
@@ -1043,7 +1050,7 @@ struct SetPointManagerData : BaseGlobalStruct {
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
-    
+
     bool InitSetPointManagersOneTimeFlag = true;
     bool InitSetPointManagersOneTimeFlag2 = true;
     Real64 DCESPMDsn_EntCondTemp = 0.0;

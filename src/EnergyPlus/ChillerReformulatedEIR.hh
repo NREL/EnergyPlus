@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -221,8 +221,8 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(PLR::Unassigned), RefCap(0.0), RefCapWasAutoSized(false),
-              RefCOP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
@@ -273,7 +273,7 @@ namespace ChillerReformulatedEIR {
 
         void calcHeatRecovery(EnergyPlusData &state, Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
-        void update(Real64 MyLoad, bool RunFlag);
+        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
 
