@@ -6571,7 +6571,6 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).BacLum(IL) += state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
             }
         } // End of second window loop over exterior windows associated with this zone
-        std::cout << "Day " << state.dataGlobal->DayOfSim << " hour " << state.dataGlobal->HourOfDay << " DaylIllum " << state.dataDaylightingManager->DaylIllum(1) << "\n";
 
         // Optical switching control (e.g. electrochromic glass) to adjust
         // window's vis trans downward so daylight level equals or is as
@@ -7067,7 +7066,10 @@ namespace EnergyPlus::DaylightingManager {
         for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
             if (Surface(IWin).Class != SurfaceClass::Window) continue;
             if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
-            if (SurfWinGlareControlIsActive(IWin)) SurfWinShadingFlag(IWin) = WinShadingFlag::ShadeOff;
+            if (SurfWinGlareControlIsActive(IWin)) {
+                SurfWinShadingFlag(IWin) = WinShadingFlag::ShadeOff;
+                SurfWinGlareControlIsActive(IWin) = false;
+            }
         }
 
         // Variables for reporting

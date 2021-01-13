@@ -9012,7 +9012,7 @@ namespace SolarShading {
                 }
 
                 // Set switching factor to fully switched if ShadingFlag = 2
-                if (SurfWinShadingFlag(ISurf) == WinShadingFlag::SwitchableGlazing) {
+                if (SurfWinShadingFlag(ISurf) == WinShadingFlag::SwitchableGlazing && !SurfWinGlareControlIsActive(ISurf)) {
                     SurfWinSwitchingFactor(ISurf) = 1.0;
 
                     // Added TH 1/20/2010
