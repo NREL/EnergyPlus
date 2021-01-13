@@ -302,7 +302,10 @@ double sssky_diffuse_table::compute(double surface_tilt) {
     double Asky_shade[1000];
     for (int n = 0; n < 1000; n++)
     {
-        arg[n] = (1 / tand_stilt) - (1 / (gcr * sind_stilt * (1 - n * step)));
+        if (surface_tilt != 0)
+            arg[n] = (1 / tand_stilt) - (1 / (gcr * sind_stilt * (1 - n * step)));
+        else
+            arg[n] = std::numeric_limits<double>::quiet_NaN();
         gamma[n] = (-M_PI / 2) + atan(arg[n]);
         tan_tilt_gamma[n] = tan(surface_tilt * DTOR + gamma[n]);
         Asky_shade[n] = M_PI + M_PI / pow((1 + tan_tilt_gamma[n] * tan_tilt_gamma[n]), 0.5);
