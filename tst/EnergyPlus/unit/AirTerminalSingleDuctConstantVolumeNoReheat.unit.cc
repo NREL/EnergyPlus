@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -495,7 +495,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
 
     SizingManager::GetOARequirements(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -656,7 +656,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -830,7 +830,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     SizingManager::GetOARequirements(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -1005,7 +1005,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 

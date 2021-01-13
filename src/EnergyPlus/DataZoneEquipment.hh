@@ -124,9 +124,6 @@ namespace DataZoneEquipment {
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
 
-    extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    extern Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
-    extern Array1D<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
     extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
     extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
 
@@ -318,10 +315,9 @@ namespace DataZoneEquipment {
         // Default Constructor
         EquipConfiguration()
             : ZoneName("Uncontrolled Zone"), ActualZoneNum(0), EquipListIndex(0), ZoneNode(0), NumInletNodes(0), NumExhaustNodes(0),
-              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false),
-
-              ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0),
-              TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0), TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
+              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false),
+              ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
+              TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
               ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false)
         {
         }
@@ -475,8 +471,6 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData(EnergyPlusData &state);
 
-    void GetZoneEquipmentData1(EnergyPlusData &state);
-
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
@@ -522,6 +516,9 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
+    Array1D_bool CrossMixingReportFlag;
+    Array1D_bool MixingReportFlag;
+    Array1D<Real64> VentMCP;
 
     void clear_state() override
     {
@@ -533,6 +530,9 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
         this->ZoneEquipAvail.deallocate();
+        this->CrossMixingReportFlag.deallocate(); // TRUE when Cross Mixing is active based on controls
+        this->MixingReportFlag.deallocate();      // TRUE when Mixing is active based on controls
+        this->VentMCP.deallocate();               // Product of mass rate and Cp for each Ventilation object
     }
 };
 

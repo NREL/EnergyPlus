@@ -94,9 +94,6 @@ namespace EnergyPlus::DataZoneEquipment {
                                                          "ZoneHVAC:EvaporativeCoolerUnit",
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
 
-    Array1D_bool CrossMixingReportFlag;
-    Array1D_bool MixingReportFlag;
-    Array1D<Real64> VentMCP;
     Array1D<Real64> ZMAT;
     Array1D<Real64> ZHumRat;
 
@@ -112,9 +109,6 @@ namespace EnergyPlus::DataZoneEquipment {
 
     void clear_state()
     {
-        CrossMixingReportFlag.deallocate();
-        MixingReportFlag.deallocate();
-        VentMCP.deallocate();
         ZMAT.deallocate();
         ZHumRat.deallocate();
         ZoneEquipConfig.deallocate();
@@ -128,22 +122,6 @@ namespace EnergyPlus::DataZoneEquipment {
     }
 
     void GetZoneEquipmentData(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   March 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This is a stub routine to allow an outside module (ZoneEquipmentManager) to get input while
-        // allowing the routine itself to remain PRIVATE to this module.
-
-        GetZoneEquipmentData1(state);
-    }
-
-    void GetZoneEquipmentData1(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1135,7 +1113,7 @@ namespace EnergyPlus::DataZoneEquipment {
         int ControlledZoneIndex; // Index into Controlled Zone structure
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1(state);
+            GetZoneEquipmentData(state);
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
@@ -1167,7 +1145,7 @@ namespace EnergyPlus::DataZoneEquipment {
         FoundIt = false;
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1(state);
+            GetZoneEquipmentData(state);
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
         ControlledZoneIndex = 0;
@@ -1204,7 +1182,7 @@ namespace EnergyPlus::DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1(state);
+            GetZoneEquipmentData(state);
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
@@ -1241,7 +1219,7 @@ namespace EnergyPlus::DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1(state);
+            GetZoneEquipmentData(state);
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
@@ -1293,7 +1271,7 @@ namespace EnergyPlus::DataZoneEquipment {
         int ControlledZoneIndex;
 
         if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-            GetZoneEquipmentData1(state);
+            GetZoneEquipmentData(state);
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 

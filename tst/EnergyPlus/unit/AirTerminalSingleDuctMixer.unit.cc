@@ -353,7 +353,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
 
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -934,7 +934,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -1348,7 +1348,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -1761,7 +1761,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -2433,7 +2433,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetVRFInput(*state);
@@ -3112,7 +3112,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetVRFInput(*state);
@@ -4862,7 +4862,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetVRFInput(*state);
@@ -6616,7 +6616,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetVRFInput(*state);
@@ -6863,7 +6863,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetUnitVentilatorInput(*state);
     state->dataUnitVentilators->GetUnitVentilatorInputFlag = false;
@@ -7100,7 +7100,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetUnitVentilatorInput(*state);
     state->dataUnitVentilators->GetUnitVentilatorInputFlag = false;
@@ -7341,7 +7341,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
 
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ZoneEquipmentManager::SetUpZoneSizingArrays(*state);
     GetZoneAirLoopEquipment(*state);
     GetATMixers(*state);
@@ -7539,7 +7539,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
@@ -7967,7 +7967,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);

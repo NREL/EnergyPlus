@@ -4624,7 +4624,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
@@ -5169,7 +5169,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
@@ -5504,7 +5504,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
@@ -5966,7 +5966,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
@@ -6291,7 +6291,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     HeatingCoils::GetCoilsInputFlag = true;
     HeatingCoils::HeatingCoil.deallocate();
@@ -7781,7 +7781,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
@@ -8114,7 +8114,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
@@ -11359,7 +11359,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
 
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -11508,7 +11508,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
 
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -11634,7 +11634,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
 
     // call the UnitarySystem factory
@@ -11765,7 +11765,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     UnitarySys thisSys;
 
@@ -12456,7 +12456,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
@@ -12690,7 +12690,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
@@ -14411,7 +14411,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);

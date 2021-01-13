@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
 

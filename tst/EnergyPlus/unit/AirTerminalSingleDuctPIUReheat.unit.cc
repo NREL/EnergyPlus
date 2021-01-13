@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetPIUs(*state);
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetPIUs(*state);

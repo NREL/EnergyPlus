@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -2690,7 +2690,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     DataSizing::TermUnitFinalZoneSizing.allocate(1);
     DataSizing::TermUnitSizing.allocate(1);
     DataSizing::FinalZoneSizing.allocate(1);

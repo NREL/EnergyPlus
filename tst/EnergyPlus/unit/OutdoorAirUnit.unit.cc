@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);
@@ -866,7 +866,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);

@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     bool ErrorsFound = false;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;

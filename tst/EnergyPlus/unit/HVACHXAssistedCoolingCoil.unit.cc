@@ -384,7 +384,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state); // read zone equipment configuration and list objects
+    DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);

@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
@@ -746,7 +746,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
@@ -939,7 +939,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1114,7 +1114,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1300,7 +1300,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1518,7 +1518,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -1844,7 +1844,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
@@ -2070,7 +2070,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);

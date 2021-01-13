@@ -1111,7 +1111,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
 

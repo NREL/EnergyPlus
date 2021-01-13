@@ -2300,12 +2300,6 @@ namespace HVACManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the AirHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::AirBalanceQuadrature;
         using DataHeatBalance::CrossMixing;
@@ -2331,31 +2325,13 @@ namespace HVACManager {
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-
         using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-
-        using DataZoneEquipment::CrossMixingReportFlag;
-        using DataZoneEquipment::MixingReportFlag;
-        using DataZoneEquipment::VentMCP;
-
         using DataZoneEquipment::ZoneEquipConfig;
-
         using DataHVACGlobals::FanType_ZoneExhaust;
         using Fans::Fan;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName3("ReportAirHeatBalance:3");
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;                      // Counter for the # of zones (nz)
@@ -2516,8 +2492,8 @@ namespace HVACManager {
                     //        &
                     //          *ADSCorrectionFactor
                     if (ADSCorrectionFactor > 0) {
-                        ZnAirRpt(ZoneLoop).VentilAirTemp += Ventilation(VentNum).AirTemp * VentMCP(VentNum);
-                        VentZoneMassflow += VentMCP(VentNum);
+                        ZnAirRpt(ZoneLoop).VentilAirTemp += Ventilation(VentNum).AirTemp * state.dataZoneEquip->VentMCP(VentNum);
+                        VentZoneMassflow += state.dataZoneEquip->VentMCP(VentNum);
                         VentZoneAirTemp += Ventilation(VentNum).AirTemp;
                     } else {
                         ZnAirRpt(ZoneLoop).VentilAirTemp = Zone(ZoneLoop).OutDryBulbTemp;
@@ -2525,10 +2501,10 @@ namespace HVACManager {
                     // Break the ventilation load into heat gain and loss components
                     if (MAT(ZoneLoop) > Ventilation(VentNum).AirTemp) {
                         ZnAirRpt(ZoneLoop).VentilHeatLoss +=
-                            VentMCP(VentNum) * (MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                            state.dataZoneEquip->VentMCP(VentNum) * (MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                     } else if (MAT(ZoneLoop) <= Ventilation(VentNum).AirTemp) {
                         ZnAirRpt(ZoneLoop).VentilHeatGain +=
-                            VentMCP(VentNum) * (Ventilation(VentNum).AirTemp - MAT(ZoneLoop)) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                            state.dataZoneEquip->VentMCP(VentNum) * (Ventilation(VentNum).AirTemp - MAT(ZoneLoop)) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                     }
 
                     ++VentZoneNum;
@@ -2577,7 +2553,7 @@ namespace HVACManager {
             //    MixingLoad = 0.0d0
 
             for (MixNum = 1; MixNum <= TotMixing; ++MixNum) {
-                if ((Mixing(MixNum).ZonePtr == ZoneLoop) && MixingReportFlag(MixNum)) {
+                if ((Mixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->MixingReportFlag(MixNum)) {
                     //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(Mixing(MixNum)%FromZone)
                     //        H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop))
                     //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
@@ -2603,7 +2579,7 @@ namespace HVACManager {
             }
 
             for (MixNum = 1; MixNum <= TotCrossMixing; ++MixNum) {
-                if ((CrossMixing(MixNum).ZonePtr == ZoneLoop) && CrossMixingReportFlag(MixNum)) {
+                if ((CrossMixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
                     //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(CrossMixing(MixNum)%FromZone)
                     //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //           and to recalculate the report variable using end of time step temps and humrats
@@ -2626,7 +2602,7 @@ namespace HVACManager {
                     MixLatLoad(ZoneLoop) += CrossMixing(MixNum).DesiredAirFlowRate * AirDensity *
                                             (ZoneAirHumRat(ZoneLoop) - ZoneAirHumRat(CrossMixing(MixNum).FromZone)) * H2OHtOfVap;
                 }
-                if ((CrossMixing(MixNum).FromZone == ZoneLoop) && CrossMixingReportFlag(MixNum)) {
+                if ((CrossMixing(MixNum).FromZone == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
                     AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                    (MAT(ZoneLoop) + MAT(CrossMixing(MixNum).ZonePtr)) / 2.0,
                                                    (ZoneAirHumRat(ZoneLoop) + ZoneAirHumRat(CrossMixing(MixNum).ZonePtr)) / 2.0,

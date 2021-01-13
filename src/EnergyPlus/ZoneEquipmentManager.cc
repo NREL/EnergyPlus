@@ -119,9 +119,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus {
-
-namespace ZoneEquipmentManager {
+namespace EnergyPlus::ZoneEquipmentManager {
 
     // Module containing the routines dealing with the Zone Equipment Manager.
 
@@ -4648,11 +4646,11 @@ namespace ZoneEquipmentManager {
 
         if (!allocated(ZMAT)) ZMAT.allocate(state.dataGlobal->NumOfZones);
         if (!allocated(ZHumRat)) ZHumRat.allocate(state.dataGlobal->NumOfZones);
-        if (!allocated(VentMCP)) VentMCP.allocate(TotVentilation);
+        if (!allocated(state.dataZoneEquip->VentMCP)) state.dataZoneEquip->VentMCP.allocate(TotVentilation);
 
         // Allocate module level logical arrays for MIXING and CROSS MIXING reporting
-        if (!allocated(CrossMixingReportFlag)) CrossMixingReportFlag.allocate(TotCrossMixing);
-        if (!allocated(MixingReportFlag)) MixingReportFlag.allocate(TotMixing);
+        if (!allocated(state.dataZoneEquip->CrossMixingReportFlag)) state.dataZoneEquip->CrossMixingReportFlag.allocate(TotCrossMixing);
+        if (!allocated(state.dataZoneEquip->MixingReportFlag)) state.dataZoneEquip->MixingReportFlag.allocate(TotMixing);
 
         if (!allocated(MCPTThermChim)) MCPTThermChim.allocate(state.dataGlobal->NumOfZones);
         if (!allocated(MCPThermChim)) MCPThermChim.allocate(state.dataGlobal->NumOfZones);
@@ -4663,8 +4661,8 @@ namespace ZoneEquipmentManager {
         MCPTM = 0.0;
         MixingMassFlowZone = 0.0;
         MixingMassFlowXHumRat = 0.0;
-        CrossMixingReportFlag = false;
-        MixingReportFlag = false;
+        state.dataZoneEquip->ZoneEquipInputsFilled = false;
+        state.dataZoneEquip->MixingReportFlag = false;
         if (state.dataContaminantBalance->Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowGC = 0.0;
 
@@ -4676,7 +4674,7 @@ namespace ZoneEquipmentManager {
         MCPTV = 0.0;
         MCPV = 0.0;
         VAMFL = 0.0;
-        VentMCP = 0.0;
+        state.dataZoneEquip->VentMCP = 0.0;
         MDotCPOA = 0.0;
         MDotOA = 0.0;
         MCPThermChim = 0.0;
@@ -4832,26 +4830,26 @@ namespace ZoneEquipmentManager {
                 if (Ventilation(j).EMSSimpleVentOn) VVF = Ventilation(j).EMSimpleVentFlowRate;
 
                 if (VVF < 0.0) VVF = 0.0;
-                VentMCP(j) = VVF * AirDensity * CpAir *
+                state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir *
                              (Ventilation(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Ventilation(j).TemperatureTermCoef +
                               WindSpeedExt * (Ventilation(j).VelocityTermCoef + WindSpeedExt * Ventilation(j).VelocitySQTermCoef));
-                if (VentMCP(j) < 0.0) VentMCP(j) = 0.0;
-                VAMFL_temp = VentMCP(j) / CpAir;
+                if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
+                VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
                 if (Ventilation(j).QuadratureSum) {
                     {
                         auto const SELECT_CASE_var(Ventilation(j).FanType); // ventilation type based calculation
                         if (SELECT_CASE_var == ExhaustVentilation) {
-                            ZoneAirBalance(Ventilation(j).OABalancePtr).ExhMassFlowRate += VentMCP(j) / CpAir;
+                            ZoneAirBalance(Ventilation(j).OABalancePtr).ExhMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                         } else if (SELECT_CASE_var == IntakeVentilation) {
-                            ZoneAirBalance(Ventilation(j).OABalancePtr).IntMassFlowRate += VentMCP(j) / CpAir;
+                            ZoneAirBalance(Ventilation(j).OABalancePtr).IntMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                         } else if (SELECT_CASE_var == NaturalVentilation) {
-                            ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += VentMCP(j) / CpAir;
+                            ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                         } else if (SELECT_CASE_var == BalancedVentilation) {
-                            ZoneAirBalance(Ventilation(j).OABalancePtr).BalMassFlowRate += VentMCP(j) / CpAir;
+                            ZoneAirBalance(Ventilation(j).OABalancePtr).BalMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                         }
                     }
                 } else {
-                    MCPV(NZ) += VentMCP(j);
+                    MCPV(NZ) += state.dataZoneEquip->VentMCP(j);
                     VAMFL(NZ) += VAMFL_temp;
                 }
                 if (Ventilation(j).FanEfficiency > 0.0) {
@@ -4890,7 +4888,7 @@ namespace ZoneEquipmentManager {
                 } else {
                     Ventilation(j).AirTemp = TempExt;
                 }
-                if (!Ventilation(j).QuadratureSum) MCPTV(NZ) += VentMCP(j) * Ventilation(j).AirTemp;
+                if (!Ventilation(j).QuadratureSum) MCPTV(NZ) += state.dataZoneEquip->VentMCP(j) * Ventilation(j).AirTemp;
             }
 
             if (Ventilation(j).ModelType == VentilationWindAndStack) {
@@ -4913,16 +4911,16 @@ namespace ZoneEquipmentManager {
                 VVF = std::sqrt(Qw * Qw + Qst * Qst);
                 if (Ventilation(j).EMSSimpleVentOn) VVF = Ventilation(j).EMSimpleVentFlowRate;
                 if (VVF < 0.0) VVF = 0.0;
-                VentMCP(j) = VVF * AirDensity * CpAir;
-                if (VentMCP(j) < 0.0) VentMCP(j) = 0.0;
+                state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir;
+                if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
                 if (Ventilation(j).QuadratureSum) {
-                    ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += VentMCP(j) / CpAir;
+                    ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += state.dataZoneEquip->VentMCP(j) / CpAir;
                 } else {
-                    MCPV(NZ) += VentMCP(j);
-                    VAMFL_temp = VentMCP(j) / CpAir;
+                    MCPV(NZ) += state.dataZoneEquip->VentMCP(j);
+                    VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
                     VAMFL(NZ) += VAMFL_temp;
                     Ventilation(j).AirTemp = TempExt;
-                    MCPTV(NZ) += VentMCP(j) * Ventilation(j).AirTemp;
+                    MCPTV(NZ) += state.dataZoneEquip->VentMCP(j) * Ventilation(j).AirTemp;
                 }
             }
         }
@@ -5069,7 +5067,7 @@ namespace ZoneEquipmentManager {
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
-                    MixingReportFlag(j) = true;
+                    state.dataZoneEquip->MixingReportFlag(j) = true;
                 }
             }
             if (TD > 0.0) {
@@ -5099,7 +5097,7 @@ namespace ZoneEquipmentManager {
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                         state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                     }
-                    MixingReportFlag(j) = true;
+                    state.dataZoneEquip->MixingReportFlag(j) = true;
                 }
             }
             if (TD == 0.0) {
@@ -5129,7 +5127,7 @@ namespace ZoneEquipmentManager {
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     state.dataContaminantBalance->MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirGC(m);
                 }
-                MixingReportFlag(j) = true;
+                state.dataZoneEquip->MixingReportFlag(j) = true;
             }
         }
 
@@ -5234,7 +5232,7 @@ namespace ZoneEquipmentManager {
                 if (MixingLimitFlag) continue;
 
                 if ((TD == 0.0 || (TD > 0.0 && (TZM - TZN) >= TD))) {
-                    CrossMixingReportFlag(j) = true; // set reporting flag
+                    state.dataZoneEquip->CrossMixingReportFlag(j) = true; // set reporting flag
                 }
 
                 if ((TD <= 0.0) || ((TD > 0.0) && (TZM - TZN >= TD))) {
@@ -5756,7 +5754,5 @@ namespace ZoneEquipmentManager {
         // }
         // BSLLC Finish
     }
-
-} // namespace ZoneEquipmentManager
 
 } // namespace EnergyPlus

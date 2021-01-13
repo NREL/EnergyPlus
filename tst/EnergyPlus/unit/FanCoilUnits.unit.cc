@@ -256,7 +256,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -569,7 +569,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -880,7 +880,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1258,7 +1258,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1577,7 +1577,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1933,7 +1933,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -2269,7 +2269,7 @@ namespace EnergyPlus {
         // OutputProcessor::TimeValue.allocate(2);
 
         GetZoneData(*state, ErrorsFound);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         SetPredefinedTables(*state);
@@ -2643,7 +2643,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -3061,7 +3061,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
 
@@ -3463,7 +3463,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -3830,7 +3830,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4197,7 +4197,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4519,7 +4519,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);

@@ -246,7 +246,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -484,7 +484,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -958,7 +958,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -1369,7 +1369,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);

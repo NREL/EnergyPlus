@@ -561,7 +561,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     InitializePsychRoutines();
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);

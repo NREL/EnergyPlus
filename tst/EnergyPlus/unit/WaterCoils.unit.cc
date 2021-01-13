@@ -1592,7 +1592,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanInput(*state);

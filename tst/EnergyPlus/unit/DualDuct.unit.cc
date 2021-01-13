@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     DualDuct::GetDualDuctInput(*state);
 

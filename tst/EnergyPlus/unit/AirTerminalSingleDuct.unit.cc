@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetIndUnits(*state);
 
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
@@ -621,7 +621,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     state->dataSingleDuct->GetInputFlag = false;
@@ -1032,7 +1032,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -1237,7 +1237,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -1409,7 +1409,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -1592,7 +1592,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
@@ -1737,7 +1737,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
 

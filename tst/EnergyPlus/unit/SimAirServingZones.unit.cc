@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1007,7 +1007,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1272,7 +1272,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1538,7 +1538,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);

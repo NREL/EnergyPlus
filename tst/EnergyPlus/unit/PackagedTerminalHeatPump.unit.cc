@@ -801,7 +801,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -1153,7 +1153,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
