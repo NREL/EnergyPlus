@@ -73,62 +73,56 @@ namespace DataZoneEquipment {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const PathInlet;
-    extern int const CompInlet;
-    extern int const Intermediate;
-    extern int const Outlet;
+    constexpr int PathInlet(1);
+    constexpr int CompInlet(2);
+    constexpr int Intermediate(3);
+    constexpr int Outlet(4);
 
-    extern int const ZoneSplitter_Type;
-    extern int const ZoneSupplyPlenum_Type;
-    extern int const ZoneMixer_Type;
-    extern int const ZoneReturnPlenum_Type;
+    constexpr int ZoneSplitter_Type(1);
+    constexpr int ZoneSupplyPlenum_Type(2);
+    constexpr int ZoneMixer_Type(3);
+    constexpr int ZoneReturnPlenum_Type(4);
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
-    extern int const FanCoil4Pipe_Num;
-    extern int const PkgTermHPAirToAir_Num;
-    extern int const PkgTermACAirToAir_Num;
-    extern int const PkgTermHPWaterToAir_Num;
-    extern int const WindowAC_Num;
-    extern int const UnitHeater_Num;
-    extern int const UnitVentilator_Num;
-    extern int const ERVStandAlone_Num;
-    extern int const VentilatedSlab_Num;
-    extern int const OutdoorAirUnit_Num;
-    extern int const VRFTerminalUnit_Num;
-    extern int const PurchasedAir_Num;
-    extern int const ZoneEvaporativeCoolerUnit_Num;
-    extern int const ZoneHybridEvaporativeCooler_Num; // #14, last zone equipment type to use zone availability manager. The above list must not
-                                                      // change or NumValidSysAvailZoneComponents(14) must also change.
-    extern int const AirDistUnit_Num;
-    extern int const BBWaterConvective_Num;
-    extern int const BBElectricConvective_Num;
-    extern int const HiTempRadiant_Num;
-    extern int const LoTempRadiant_Num;
-    extern int const ZoneExhaustFan_Num;
-    extern int const HeatXchngr_Num;
-    extern int const HPWaterHeater_Num;
-    extern int const BBWater_Num;
-    extern int const ZoneDXDehumidifier_Num;
-    extern int const BBSteam_Num;
-    extern int const BBElectric_Num;
-    extern int const RefrigerationAirChillerSet_Num;
-    extern int const UserDefinedZoneHVACForcedAir_Num;
-    extern int const CoolingPanel_Num;
-    extern int const ZoneUnitarySys_Num; // UnitarySystem configured as zone equipment
-    extern int const TotalNumZoneEquipType;
-    // **NOTE**... if you add another zone equipment object, then increment
-    // TotalNumZoneEquipType above to match the total number of zone equipment types
-    // End zone equip objects
+    constexpr int FanCoil4Pipe_Num(1);
+    constexpr int PkgTermHPAirToAir_Num(2);
+    constexpr int PkgTermACAirToAir_Num(3);
+    constexpr int PkgTermHPWaterToAir_Num(4);
+    constexpr int WindowAC_Num(5);
+    constexpr int UnitHeater_Num(6);
+    constexpr int UnitVentilator_Num(7);
+    constexpr int ERVStandAlone_Num(8);
+    constexpr int VentilatedSlab_Num(9);
+    constexpr int OutdoorAirUnit_Num(10);
+    constexpr int VRFTerminalUnit_Num(11);
+    constexpr int PurchasedAir_Num(12);
+    constexpr int ZoneEvaporativeCoolerUnit_Num(13);
+    constexpr int ZoneHybridEvaporativeCooler_Num(14); // #14, last zone equipment type to use zone availability manager. The above list must not
+                                                   // change or NumValidSysAvailZoneComponents(14) must also change.
+    constexpr int AirDistUnit_Num(15);
+    constexpr int BBWaterConvective_Num(16);
+    constexpr int BBElectricConvective_Num(17);
+    constexpr int HiTempRadiant_Num(18);
+    constexpr int LoTempRadiant_Num(19);
+    constexpr int ZoneExhaustFan_Num(20);
+    constexpr int HeatXchngr_Num(21);
+    constexpr int HPWaterHeater_Num(22);
+    constexpr int BBWater_Num(23);
+    constexpr int ZoneDXDehumidifier_Num(24);
+    constexpr int BBSteam_Num(25);
+    constexpr int BBElectric_Num(26);
+    constexpr int RefrigerationAirChillerSet_Num(27);
+    constexpr int UserDefinedZoneHVACForcedAir_Num(28);
+    constexpr int CoolingPanel_Num(29);
+    constexpr int ZoneUnitarySys_Num(30);
 
     // Per Person Ventilation Rate Mode
-    extern int const PerPersonDCVByCurrentLevel;
-    extern int const PerPersonByDesignLevel;
+    constexpr int PerPersonDCVByCurrentLevel(1);
+    constexpr int PerPersonByDesignLevel(2);
 
-    extern int const NumValidSysAvailZoneComponents;
+    constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
-
-    // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumSupplyAirPaths;

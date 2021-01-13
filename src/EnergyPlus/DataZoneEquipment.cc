@@ -69,9 +69,7 @@
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataZoneEquipment {
+namespace EnergyPlus::DataZoneEquipment {
 
     // MODULE INFORMATION
     //             AUTHOR:  Russ Taylor
@@ -85,55 +83,6 @@ namespace DataZoneEquipment {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const PathInlet(1);
-    int const CompInlet(2);
-    int const Intermediate(3);
-    int const Outlet(4);
-
-    int const ZoneSplitter_Type(1);
-    int const ZoneSupplyPlenum_Type(2);
-    int const ZoneMixer_Type(3);
-    int const ZoneReturnPlenum_Type(4);
-
-    // Start zone equip objects
-    // list units that are valid for zone system availability managers first
-    int const FanCoil4Pipe_Num(1);
-    int const PkgTermHPAirToAir_Num(2);
-    int const PkgTermACAirToAir_Num(3);
-    int const PkgTermHPWaterToAir_Num(4);
-    int const WindowAC_Num(5);
-    int const UnitHeater_Num(6);
-    int const UnitVentilator_Num(7);
-    int const ERVStandAlone_Num(8);
-    int const VentilatedSlab_Num(9);
-    int const OutdoorAirUnit_Num(10);
-    int const VRFTerminalUnit_Num(11);
-    int const PurchasedAir_Num(12);
-    int const ZoneEvaporativeCoolerUnit_Num(13);
-    int const ZoneHybridEvaporativeCooler_Num(14);
-    int const AirDistUnit_Num(15);
-    int const BBWaterConvective_Num(16);
-    int const BBElectricConvective_Num(17);
-    int const HiTempRadiant_Num(18);
-    int const LoTempRadiant_Num(19);
-    int const ZoneExhaustFan_Num(20);
-    int const HeatXchngr_Num(21);
-    int const HPWaterHeater_Num(22);
-    int const BBWater_Num(23);
-    int const ZoneDXDehumidifier_Num(24);
-    int const BBSteam_Num(25);
-    int const BBElectric_Num(26);
-    int const RefrigerationAirChillerSet_Num(27);
-    int const UserDefinedZoneHVACForcedAir_Num(28);
-    int const CoolingPanel_Num(29);
-    int const ZoneUnitarySys_Num(30);
-    int const TotalNumZoneEquipType(30);
-    // **NOTE**... if you add another zone equipment object, then increment
-    // TotalNumZoneEquipType above to match the total number of zone equipment types
-    // End zone equip objects
-
-    int const NumValidSysAvailZoneComponents(14);
     Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
                                                         {"ZoneHVAC:FourPipeFanCoil",
                                                          "ZoneHVAC:PackagedTerminalHeatPump",
@@ -149,14 +98,6 @@ namespace DataZoneEquipment {
                                                          "ZoneHVAC:IdealLoadsAirSystem",
                                                          "ZoneHVAC:EvaporativeCoolerUnit",
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
-
-    // Per Person Ventilation Rate Mode
-    int const PerPersonDCVByCurrentLevel(1);
-    int const PerPersonByDesignLevel(2);
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
 
     namespace {
         bool GetZoneEquipmentDataErrorsFound(false);
@@ -229,30 +170,6 @@ namespace DataZoneEquipment {
         // This is a stub routine to allow an outside module (ZoneEquipmentManager) to get input while
         // allowing the routine itself to remain PRIVATE to this module.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         GetZoneEquipmentData1(state);
     }
 
@@ -308,10 +225,6 @@ namespace DataZoneEquipment {
         int NumNodes;
         Array1D_int NodeNums;
         int Counter;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound
-        // static int found( 0 );
-        ////////////////////////////////////////////////////////////////////////////////////
         bool IsNotOK; // Flag to verify nam
         bool NodeListError;
         bool UniqueNodeError;
@@ -1078,7 +991,7 @@ namespace DataZoneEquipment {
                 } else {
                     ShowSevereError(state, RoutineName + cAlphaFields(1) + "=\"" + SupplyAirPath(PathNum).Name + "\"");
                     ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
-                    ShowContinueError(state, "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"");
+                    ShowContinueError(state, R"(Must be "AirLoopHVAC:ZoneSplitter" or "AirLoopHVAC:SupplyPlenum")");
                     GetZoneEquipmentDataErrorsFound = true;
                 }
 
@@ -1144,7 +1057,7 @@ namespace DataZoneEquipment {
                 } else {
                     ShowSevereError(state, RoutineName + cAlphaFields(1) + "=\"" + ReturnAirPath(PathNum).Name + "\"");
                     ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
-                    ShowContinueError(state, "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
+                    ShowContinueError(state, R"(Must be "AirLoopHVAC:ZoneMixer" or "AirLoopHVAC:ReturnPlenum")");
                     GetZoneEquipmentDataErrorsFound = true;
                 }
 
@@ -1181,28 +1094,6 @@ namespace DataZoneEquipment {
         // Decide a few one-time things for later
         // determination of flow regime for convection
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;
 
@@ -1236,7 +1127,7 @@ namespace DataZoneEquipment {
         CtrlZoneNumLocal = 0;
         IsOnList = false;
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {      // NumOfZoneEquipLists
-            if (ZoneEquipList(Loop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
+            if (ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
             for (ListLoop = 1; ListLoop <= ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
                 if (!UtilityRoutines::SameString(ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
                 if (ComponentName == "*") {
@@ -1390,7 +1281,7 @@ namespace DataZoneEquipment {
             {
                 auto const &thisZoneEquip(ZoneEquipConfig(ControlledZoneIndex));
                 if (thisZoneEquip.ActualZoneNum > 0) {
-                    if (NodeName == "") {
+                    if (NodeName.empty()) {
                         // If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
                         ReturnAirNodeNumber = thisZoneEquip.ReturnNode(1);
                         if (thisZoneEquip.NumReturnNodes > 1) {
@@ -1440,7 +1331,7 @@ namespace DataZoneEquipment {
         ReturnIndex = 0; // default if not found
         if (ControlledZoneIndex > 0) {
             if (ZoneEquipConfig(ControlledZoneIndex).ActualZoneNum > 0) {
-                if (NodeName == "") {
+                if (NodeName.empty()) {
                     // If NodeName is blank, return first return node number
                     ReturnIndex = 1;
                 } else {
@@ -1507,18 +1398,6 @@ namespace DataZoneEquipment {
         // Return value
         Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 DSOAFlowPeople;  // Outdoor air volume flow rate based on occupancy (m3/s)
         Real64 DSOAFlowPerZone; // Outdoor air volume flow rate (m3/s)
@@ -1565,7 +1444,7 @@ namespace DataZoneEquipment {
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
-                                "\" valid Outdoor Air Method =\" IndoorAirQualityProcedure\" requires CO2 simulation.");
+                                R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
@@ -1574,7 +1453,7 @@ namespace DataZoneEquipment {
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
-                                "\" valid Outdoor Air Method =\" ProportionalControlBasedOnDesignOccupancy\" requires CO2 simulation.");
+                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
@@ -1583,7 +1462,7 @@ namespace DataZoneEquipment {
         if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
-                                "\" valid Outdoor Air Method =\" ProportionalControlBasedonOccupancySchedule\" requires CO2 simulation.");
+                                R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
@@ -1719,17 +1598,17 @@ namespace DataZoneEquipment {
                                                             OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(
                                                 state,
-                                                format("For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target "
+                                                format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
                                                        "CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).",
                                                        ZoneMaxCO2,
                                                        ZoneMinCO2));
-                                            ShowContinueError(state, "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default "
+                                            ShowContinueError(state, "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state,
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
-                                                    "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, maximum target "
+                                                    "\", For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
                                                 OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
                                         }
@@ -1740,17 +1619,17 @@ namespace DataZoneEquipment {
                                                             OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(
                                                 state,
-                                                format("For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target "
+                                                format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
                                                        "CO2 concentration ({:.2R}), is not greater than minimum target CO2 concentration ({:.2R}).",
                                                        ZoneMaxCO2,
                                                        ZoneMinCO2));
-                                            ShowContinueError(state, "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default "
+                                            ShowContinueError(state, "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state,
                                                 "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
-                                                    "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, maximum target "
+                                                    "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
                                                 OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
                                         }
@@ -1781,16 +1660,16 @@ namespace DataZoneEquipment {
                                         if (OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
                                                             OARequirements(DSOAPtr).Name + "\".");
-                                            ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, CO2 "
+                                            ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
                                                               Zone(ActualZoneNum).Name + "\". ");
-                                            ShowContinueError(state, "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. Default "
+                                            ShowContinueError(state, "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
-                                                                               "ProportionalControlBasedonOccupancySchedule, CO2 generation from "
+                                                                               "ProportionalControlBasedOnOccupancySchedule, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",
                                                                            OARequirements(DSOAPtr).CO2GainErrorIndex);
                                         }
@@ -1799,16 +1678,16 @@ namespace DataZoneEquipment {
                                         if (OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
                                                             OARequirements(DSOAPtr).Name + "\".");
-                                            ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 "
+                                            ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
                                                               Zone(ActualZoneNum).Name + "\". ");
-                                            ShowContinueError(state, "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. Default "
+                                            ShowContinueError(state, "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
-                                                                               "ProportionalControlBasedonDesignOccupancy, CO2 generation from "
+                                                                               "ProportionalControlBasedOnDesignOccupancy, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",
                                                                            OARequirements(DSOAPtr).CO2GainErrorIndex);
                                         }
@@ -1899,7 +1778,5 @@ namespace DataZoneEquipment {
         return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
     }
 
-
-} // namespace DataZoneEquipment
 
 } // namespace EnergyPlus

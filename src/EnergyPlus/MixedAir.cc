@@ -1714,7 +1714,7 @@ namespace EnergyPlus::MixedAir {
                             ShowContinueError(state, "Inappropriate method for Design Specification Outdoor Air Object Name=\"" +
                                               thisVentilationMechanical.ZoneDesignSpecOAObjName(jZone) + "\".");
                             ShowContinueError(state, "For Zone=\"" + thisVentilationMechanical.VentMechZoneName(jZone) + "\".");
-                            ShowContinueError(state, "Since System Outdoor Air Method= ProportionalControlBasedonOccupancySchedule\", AirChanges/Hour or "
+                            ShowContinueError(state, "Since System Outdoor Air Method= ProportionalControlBasedOnOccupancySchedule\", AirChanges/Hour or "
                                               "Flow/Zone outdoor air methods are not valid. Simulation continues.... ");
                         }
                     }
@@ -1724,7 +1724,7 @@ namespace EnergyPlus::MixedAir {
                             ShowContinueError(state, "Inappropriate method for Design Specification Outdoor Air Object Name=\"" +
                                               thisVentilationMechanical.ZoneDesignSpecOAObjName(jZone) + "\".");
                             ShowContinueError(state, "For Zone=\"" + thisVentilationMechanical.VentMechZoneName(jZone) + "\".");
-                            ShowContinueError(state, "Since System Outdoor Air Method= ProportionalControlBasedonDesignOccupancy\", AirChanges/Hour or "
+                            ShowContinueError(state, "Since System Outdoor Air Method= ProportionalControlBasedOnDesignOccupancy\", AirChanges/Hour or "
                                               "Flow/Zone outdoor air methods are not valid. Simulation continues.... ");
                         }
                     }
@@ -1844,7 +1844,7 @@ namespace EnergyPlus::MixedAir {
                 } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
                     print(state.files.eio, "IndoorAirQualityProcedure,");
                 } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    print(state.files.eio, "ProportionalControlBasedonOccupancySchedule,");
+                    print(state.files.eio, "ProportionalControlBasedOnOccupancySchedule,");
                 } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                     print(state.files.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (state.dataMixedAir->VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
@@ -3992,19 +3992,19 @@ namespace EnergyPlus::MixedAir {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError(
                                                             state,
-                                                            format("For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, "
+                                                            format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, "
                                                                    "maximum target CO2 concentration ({:.2R}), is not greater than minimum target "
                                                                    "CO2 concentration ({:.2R}).",
                                                                    ZoneMaxCO2,
                                                                    ZoneMinCO2));
-                                                        ShowContinueError(state, "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. "
+                                                        ShowContinueError(state, "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
                                                                           "Default \"VentilationRateProcedure\" will be modeled. Simulation "
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
                                                         ShowRecurringWarningErrorAtEnd(state, CurrentModuleObject + " = \"" + this->Name +
                                                                                            "\", For System Outdoor Air Method = "
-                                                                                           "ProportionalControlBasedonOccupancySchedule, maximum "
+                                                                                           "ProportionalControlBasedOnOccupancySchedule, maximum "
                                                                                            "target CO2 concentration is not greater than minimum "
                                                                                            "target CO2 concentration. Error continues...",
                                                                                        this->CO2MaxMinLimitErrorIndex);
@@ -4015,19 +4015,19 @@ namespace EnergyPlus::MixedAir {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError(
                                                             state,
-                                                            format("For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, "
+                                                            format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, "
                                                                    "maximum target CO2 concentration ({:.2R}), is not greater than minimum target "
                                                                    "CO2 concentration ({:.2R}).",
                                                                    ZoneMaxCO2,
                                                                    ZoneMinCO2));
-                                                        ShowContinueError(state, "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. "
+                                                        ShowContinueError(state, "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
                                                                           "Default \"VentilationRateProcedure\" will be modeled. Simulation "
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
                                                         ShowRecurringWarningErrorAtEnd(state, CurrentModuleObject + " = \"" + this->Name +
                                                                                            "\", For System Outdoor Air Method = "
-                                                                                           "ProportionalControlBasedonDesignOccupancy, maximum "
+                                                                                           "ProportionalControlBasedOnDesignOccupancy, maximum "
                                                                                            "target CO2 concentration is not greater than minimum "
                                                                                            "target CO2 concentration. Error continues...",
                                                                                        this->CO2MaxMinLimitErrorIndex);
@@ -4081,17 +4081,17 @@ namespace EnergyPlus::MixedAir {
                                                     if (this->CO2GainErrorCount < 2) {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError(state, "For System Outdoor Air Method = "
-                                                                          "ProportionalControlBasedonOccupancySchedule, CO2 generation from people "
+                                                                          "ProportionalControlBasedOnOccupancySchedule, CO2 generation from people "
                                                                           "is not greater than zero. Occurs in Zone =\"" +
                                                                           curZone.Name + "\". ");
-                                                        ShowContinueError(state, "\"ProportionalControlBasedonOccupancySchedule\" will not be modeled. "
+                                                        ShowContinueError(state, "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. "
                                                                           "Default \"VentilationRateProcedure\" will be modeled. Simulation "
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
                                                         ShowRecurringWarningErrorAtEnd(state,
                                                             CurrentModuleObject + " = \"" + this->Name +
-                                                                "\", For System Outdoor Air Method = ProportionalControlBasedonOccupancySchedule, "
+                                                                "\", For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, "
                                                                 "CO2 generation from people is not greater than zero. Error continues...",
                                                             this->CO2GainErrorIndex);
                                                     }
@@ -4100,17 +4100,17 @@ namespace EnergyPlus::MixedAir {
                                                     if (this->CO2GainErrorCount < 2) {
                                                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                         ShowContinueError(state, "For System Outdoor Air Method = "
-                                                                          "ProportionalControlBasedonDesignOccupancy, CO2 generation from people is "
+                                                                          "ProportionalControlBasedOnDesignOccupancy, CO2 generation from people is "
                                                                           "not greater than zero. Occurs in Zone =\"" +
                                                                           curZone.Name + "\". ");
-                                                        ShowContinueError(state, "\"ProportionalControlBasedonDesignOccupancy\" will not be modeled. "
+                                                        ShowContinueError(state, "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. "
                                                                           "Default \"VentilationRateProcedure\" will be modeled. Simulation "
                                                                           "continues...");
                                                         ShowContinueErrorTimeStamp(state, "");
                                                     } else {
                                                         ShowRecurringWarningErrorAtEnd(state,
                                                             CurrentModuleObject + " = \"" + this->Name +
-                                                                "\", For System Outdoor Air Method = ProportionalControlBasedonDesignOccupancy, CO2 "
+                                                                "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
                                                                 "generation from people is not greater than zero. Error continues...",
                                                             this->CO2GainErrorIndex);
                                                     }

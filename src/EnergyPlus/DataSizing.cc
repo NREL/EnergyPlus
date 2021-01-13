@@ -99,7 +99,7 @@ namespace DataSizing {
                                              "Sum",
                                              "Maximum",
                                              "IndoorAirQualityProcedure",
-                                             "ProportionalControlBasedonOccupancySchedule",
+                                             "ProportionalControlBasedOnOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air
