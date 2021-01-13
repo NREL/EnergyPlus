@@ -98,6 +98,7 @@ namespace DataGlobals {
     bool isBSON(false);
     bool preserveIDFOrder(true);
     bool stopSimulation(false);
+    std::function<std::pair<bool, Real64> (const int)> externalSurfaceManager;
     std::function<void (void *)> externalHVACManager;
     bool externalHVACManagerInitialized(false);
 

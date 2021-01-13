@@ -6556,12 +6556,24 @@ namespace HeatBalanceSurfaceManager {
                 //   (c) standard (or interzone) opaque surface with no movable insulation, normal heat balance equation
                 //   (d) standard (or interzone) window: call to CalcWindowHeatBalance to get window layer temperatures
                 //   (e) standard opaque surface with movable insulation, special two-part equation
+                //   (f) there is an external surface manager (a callback) that provides the surface temp, however it wants
                 // In the surface calculation there are the following Algorithm types for opaque surfaces that
                 // do not have movable insulation:
                 //   (a) the regular CTF calc (SolutionAlgo = UseCTF)
                 //   (b) the EMPD calc (Solutionalgo = UseEMPD)
                 //   (c) the CondFD calc (SolutionAlgo = UseCondFD)
                 //   (d) the HAMT calc (solutionalgo = UseHAMT).
+
+                // If there is an externalSurfaceManager then let it set the surface temp and move on
+                // This is a precondition that circumvents any of the built in methods, and continues the loop early
+                if (DataGlobals::externalSurfaceManager) {
+                  auto const result = DataGlobals::externalSurfaceManager(SurfNum);
+                  // second is only valid if first is true
+                  if (result.first) {
+                    TempSurfIn(SurfNum) = result.second;
+                    continue;
+                  }
+                }
 
                 int const ZoneNum = Surface(SurfNum).Zone;
                 auto &surface(Surface(SurfNum));
@@ -7459,6 +7471,16 @@ namespace HeatBalanceSurfaceManager {
                     //                                        * TH11) * TempDiv;
 
                     // Calculate the current inside surface temperature
+
+                    // If there is an externalSurfaceManager then let it set the surface temp and move on
+                    if (DataGlobals::externalSurfaceManager) {
+                      auto const result = DataGlobals::externalSurfaceManager(surfNum);
+                      if (result.first) {
+                        TempSurfIn(surfNum) = result.second;
+                        continue;
+                      }
+                    }
+
                     TempSurfInTmp(surfNum) =
                         (IsNotPoolSurf(surfNum) * (TempTermSurf(surfNum) + NetLWRadToSurf(surfNum)) +
                          IsSource(surfNum) * CTFSourceIn0(surfNum) * QsrcHistSurf1(surfNum) + IsPoolSurf(surfNum) * CTFConstInPart(surfNum) +
