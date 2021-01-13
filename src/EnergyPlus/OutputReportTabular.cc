@@ -9026,7 +9026,7 @@ namespace EnergyPlus::OutputReportTabular {
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
                 }
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     // show the headers of the report
                     WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
                     // show the number of hours that the table applies to
@@ -9198,11 +9198,11 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 // heading for the entire sub-table
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "Source Energy End Use Components Summary");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                rowHead,
@@ -9212,7 +9212,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                                "Source Energy End Use Components Summary");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                     rowHead,
@@ -9284,16 +9284,16 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
 
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         WriteTextLine(state, "Normalized Metrics", true);
                     }
 
                     // heading for the entire sub-table
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         WriteSubtitle(state, "Source Energy End Use Components Per Conditioned Floor Area");
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (produceSQLite == true) {
+                    if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
@@ -9303,7 +9303,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                                    "Source Energy End Use Component Per Conditioned Floor Area");
                         }
                     }
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                             ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody,
@@ -9331,11 +9331,11 @@ namespace EnergyPlus::OutputReportTabular {
                     }
 
                     // heading for the entire sub-table
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         WriteSubtitle(state, "Source Energy End Use Components Per Total Floor Area");
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (produceSQLite == true) {
+                    if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
@@ -9345,7 +9345,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                                    "Source Energy End Use Components Per Total Floor Area");
                         }
                     }
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                             ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody,
@@ -9681,17 +9681,17 @@ namespace EnergyPlus::OutputReportTabular {
                 // complete the LEED end use table using the same values
                 unconvert = 1 / powerConversion;
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "End Uses");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
@@ -9796,7 +9796,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 // heading for the entire sub-table
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "End Uses By Subcategory");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
                 }
@@ -9814,7 +9814,7 @@ namespace EnergyPlus::OutputReportTabular {
                 Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
                 Array1D_string columnHeadTemp(columnHead({2, _, _}));
 
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
                                                                rowHeadTemp,
@@ -9825,7 +9825,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
                                                                                                     rowHeadTemp,
@@ -9987,7 +9987,7 @@ namespace EnergyPlus::OutputReportTabular {
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
             }
 
-            if (produceTabular == true) {
+            if (produceTabular) {
                 WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             }
 
@@ -10110,11 +10110,11 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
             tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
             
-            if (produceTabular == true) {
+            if (produceTabular) {
                 WriteSubtitle(state, "Construction Cost Estimate Summary");
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             }
-            if (produceSQLite == true) {
+            if (produceSQLite) {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody,
                                                            rowHead,
@@ -10124,7 +10124,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Construction Cost Estimate Summary");
                 }
             }
-            if (produceTabular == true) {
+            if (produceTabular) {
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
@@ -10181,17 +10181,17 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(6, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).LineSubTotal, 2);
             }
             tableBody(6, NumRows) = RealToStr(state.dataCostEstimateManager->CurntBldg.LineItemTot, 2);
-            if (produceTabular == true) {
+            if (produceTabular) {
                 WriteSubtitle(state, "Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
                 WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
             }
-            if (produceSQLite == true) {
+            if (produceSQLite) {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
                 }
             }
-            if (produceTabular = true) {
+            if (produceTabular) {
                 if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
@@ -10410,7 +10410,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 // show the headers of the report
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 }
 
@@ -10491,17 +10491,17 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);             // hours simulated
                 //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "General");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
@@ -10509,7 +10509,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 //---- Window Wall Ratio Sub-Table
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteTextLine(state, "ENVELOPE", true);
                 }
 
@@ -10563,7 +10563,7 @@ namespace EnergyPlus::OutputReportTabular {
                 kOpaque = 0;
 
                 DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (DetailedWWR) {
                         print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
                         print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
@@ -10629,7 +10629,7 @@ namespace EnergyPlus::OutputReportTabular {
                                             if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
                                         }
                                     }
-                                    if (produceTabular == true) {
+                                    if (produceTabular) {
                                         if (DetailedWWR) {
                                             print(state.files.debug,
                                                   "{},Wall,{:.1R},{:.1R}\n",
@@ -10656,7 +10656,7 @@ namespace EnergyPlus::OutputReportTabular {
                                     zoneOpeningArea(zonePt) +=
                                         curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                     zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
-                                    if (produceTabular == true) {
+                                    if (produceTabular) {
                                         if (DetailedWWR) {
                                             print(state.files.debug,
                                                   "{},Window,{:.1R},{:.1R}\n",
@@ -10674,7 +10674,7 @@ namespace EnergyPlus::OutputReportTabular {
                                     (SELECT_CASE_var == SurfaceClass::Roof)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                     roofArea += curArea * mult;
-                                    if (produceTabular == true) {
+                                    if (produceTabular) {
                                         if (DetailedWWR) {
                                             print(state.files.debug,
                                                   "{},Roof,{:.1R},{:.1R}\n",
@@ -10686,7 +10686,7 @@ namespace EnergyPlus::OutputReportTabular {
                                 } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                     skylightArea += curArea * mult;
-                                    if (produceTabular == true) {
+                                    if (produceTabular) {
                                         if (DetailedWWR) {
                                             print(state.files.debug,
                                                   "{},Skylight,{:.1R},{:.1R}\n",
@@ -10706,7 +10706,7 @@ namespace EnergyPlus::OutputReportTabular {
                 TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
                 TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
                 TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (DetailedWWR) {
                         print(state.files.debug, "{}\n", "========================");
                         print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
@@ -10754,17 +10754,17 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
                 tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "Window-Wall Ratio");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
@@ -10828,17 +10828,17 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
                 tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "Conditioned Window-Wall Ratio");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                     rowHead,
@@ -10862,7 +10862,7 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(2) = "Skylight Area " + m2_unitName;
                 rowHead(3) = "Skylight-Roof Ratio [%]";
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (DetailedWWR) {
                         print(state.files.debug, "{}\n", "========================");
                         print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
@@ -10874,17 +10874,17 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
                 tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "Skylight-Roof Ratio");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
@@ -10916,11 +10916,11 @@ namespace EnergyPlus::OutputReportTabular {
                         tableBody(2, iZone) = RealToStr(Zone(iZone).ZoneVolCapMultpSensHMAverage, 2);
                     }
 
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         WriteSubtitle(state, "Hybrid Model: Internal Thermal Mass");
                         WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (produceSQLite == true) {
+                    if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(tableBody,
                                                                    rowHead,
@@ -10939,7 +10939,7 @@ namespace EnergyPlus::OutputReportTabular {
                                      (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
                             (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
                     if (pdiff > 0.019) {
-                        if (produceTabular == true) {
+                        if (produceTabular) {
                             ShowWarningError(
                                 state,
                                 "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
@@ -10965,7 +10965,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
                 //---- Space Summary Sub-Table
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteTextLine(state, "PERFORMANCE", true);
                 }
 
@@ -11019,16 +11019,16 @@ namespace EnergyPlus::OutputReportTabular {
                     tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
                     tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
                     // no unit conversion necessary since done automatically
-                    if (produceTabular == true) {
+                    if (produceTabular) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                     }
                     if (zoneIsCond) {
-                        if (produceTabular == true) {
+                        if (produceTabular) {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
                         }
                     } else {
-                        if (produceTabular == true) {
+                        if (produceTabular) {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                         }
@@ -11149,23 +11149,23 @@ namespace EnergyPlus::OutputReportTabular {
                         tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
                 }
 
-                if (produceTabular == true) {
+                if (produceTabular) {
                     WriteSubtitle(state, "Zone Summary");
                     WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (produceSQLite == true) {
+                if (produceSQLite) {
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
                     }
                 }
-                if (produceTabular == true) {
+                if (produceTabular) {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
