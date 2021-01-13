@@ -198,7 +198,7 @@ namespace EnergyPlus::SystemReports {
                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).OutNode) {
                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
                                 if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathExists) {
-                                    for (SAPNum = 1; SAPNum <= NumSupplyAirPaths; ++SAPNum) {
+                                    for (SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
                                         for (SAPOutNode = 1; SAPOutNode <= SupplyAirPath(SAPNum).NumOutletNodes; ++SAPOutNode) {
                                             if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode ==
                                                 SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
@@ -258,7 +258,7 @@ namespace EnergyPlus::SystemReports {
                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
                                 if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathExists) {
-                                    for (SAPNum = 1; SAPNum <= NumSupplyAirPaths; ++SAPNum) {
+                                    for (SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
                                         for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
                                             if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
                                                 SupplyAirPath(SAPNum).InletNodeNum) {

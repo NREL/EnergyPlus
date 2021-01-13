@@ -124,23 +124,11 @@ namespace DataZoneEquipment {
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumSupplyAirPaths;
-    extern int NumReturnAirPaths;
-    extern bool ZoneEquipInputsFilled;
-    extern bool ZoneEquipSimulatedOnce;
-    extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
-    extern Array1D_int ZoneEquipAvail;
-
-    // moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
     extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
     extern Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
     extern Array1D<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
     extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
     extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
-    // Utility routines for module
-
-    // Types
 
     enum class LoadDist
     {
@@ -407,7 +395,7 @@ namespace DataZoneEquipment {
         }
 
         void getPrioritiesForInletNode(EnergyPlusData &state,
-                                       int const inletNodeNum, // Zone inlet node number to match
+                                       int inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
@@ -498,7 +486,7 @@ namespace DataZoneEquipment {
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
     int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
@@ -514,10 +502,10 @@ namespace DataZoneEquipment {
 
     Real64
     CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
-                                      int const ActualZoneNum,    // Zone index
-                                      bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-                                      bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                      int DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                      int ActualZoneNum,    // Zone index
+                                      bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                      bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
                                       Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
                                       Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
@@ -526,9 +514,25 @@ namespace DataZoneEquipment {
 
 struct DataZoneEquipmentData : BaseGlobalStruct {
 
+    bool GetZoneEquipmentDataErrorsFound = false;
+    int GetZoneEquipmentDataFound = 0;
+    int NumSupplyAirPaths = 0;
+    int NumReturnAirPaths = 0;
+    bool ZoneEquipInputsFilled = false;
+    bool ZoneEquipSimulatedOnce = false;
+    int NumOfZoneEquipLists = 0;
+    Array1D_int ZoneEquipAvail;
+
     void clear_state() override
     {
-
+        this->GetZoneEquipmentDataErrorsFound = false;
+        this->GetZoneEquipmentDataFound = 0;
+        this->NumSupplyAirPaths = 0;
+        this->NumReturnAirPaths = 0;
+        this->ZoneEquipInputsFilled = false;
+        this->ZoneEquipSimulatedOnce = false;
+        this->NumOfZoneEquipLists = 0;
+        this->ZoneEquipAvail.deallocate();
     }
 };
 

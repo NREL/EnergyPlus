@@ -764,7 +764,6 @@ namespace WindowAC {
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::WindowAC_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
 
         int InNode;         // inlet node number in window AC loop
         int OutNode;        // outlet node number in window AC loop
@@ -772,10 +771,6 @@ namespace WindowAC {
         int OutsideAirNode; // outside air node number in window AC loop
         int AirRelNode;     // relief air node number in window AC loop
         Real64 RhoAir;      // air density at InNode
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool MyOneTimeFlag( true );
-        // static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-        ////////////////////////////////////////////////////////////////////////////////////
         int Loop;                         // loop counter
         static Array1D_bool MyEnvrnFlag;  // one time initialization flag
         static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -804,7 +799,7 @@ namespace WindowAC {
         }
 
         // need to check all Window AC units to see if they are on Zone Equipment List or issue warning
-        if (!state.dataWindowAC->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataWindowAC->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataWindowAC->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataWindowAC->NumWindAC; ++Loop) {
                 if (CheckZoneEquipmentList(state, state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(Loop).UnitType),

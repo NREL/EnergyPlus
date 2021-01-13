@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;

@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
-    DataZoneEquipment::ZoneEquipAvail.allocate(6);
+    state->dataZoneEquip->ZoneEquipAvail.allocate(6);
 
     state->dataGlobal->NumOfZones = 6;
 
@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataZoneEquipment::ZoneEquipConfig(6).ActualZoneNum = 6;
     DataZoneEquipment::ZoneEquipConfig(6).ZoneNode = 6;
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     DataHeatBalFanSys::TempTstatAir.allocate(6);
     DataHeatBalFanSys::TempTstatAir(1) = 18.0; // all zones have different space temperature

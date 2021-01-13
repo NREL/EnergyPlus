@@ -132,7 +132,7 @@ protected:
         ZoneAirHumRat.allocate(1);
         ZoneAirHumRat(1) = 0.07;
 
-        DataZoneEquipment::ZoneEquipInputsFilled = false;
+        state->dataZoneEquip->ZoneEquipInputsFilled = false;
     }
 
     virtual void TearDown()

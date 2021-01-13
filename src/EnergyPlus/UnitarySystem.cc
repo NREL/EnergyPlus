@@ -2838,7 +2838,7 @@ namespace UnitarySystems {
                 }
 
                 // Early calls to ATMixer don't have enough info to pass GetInput. Need push_back here, and protect against the next time through.
-                if (sysNum == -1 || !DataZoneEquipment::ZoneEquipInputsFilled) {
+                if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
                     if (sysNum == -1) state.dataUnitarySystems->unitarySys.push_back(thisSys);
                     continue;
                 }

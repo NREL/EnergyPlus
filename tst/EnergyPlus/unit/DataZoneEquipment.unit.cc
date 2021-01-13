@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
     ZoneEquipConfig(2).ActualZoneNum = 2;
     ZoneEquipConfig(2).ZoneNode = 2;
 
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, "NonExistingZone"));
     EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, "Zone1"));

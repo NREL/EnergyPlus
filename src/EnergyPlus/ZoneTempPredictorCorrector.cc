@@ -2634,7 +2634,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto RoutineName("InitZoneAirSetpoints: ");
@@ -3072,7 +3071,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
+            if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Thermostatic control but is not a controlled zone.", RoutineName, TempControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
@@ -3128,7 +3127,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
+            if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Comfort control but is not a controlled zone.", RoutineName, ComfortControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
@@ -3189,7 +3188,7 @@ namespace ZoneTempPredictorCorrector {
             ShowFatalError(state, "InitZoneAirSetpoints - program terminates due to previous condition.");
         }
 
-        if (ZoneEquipInputsFilled) {
+        if (state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataZoneTempPredictorCorrector->ControlledZonesChecked = true;
         }
     }

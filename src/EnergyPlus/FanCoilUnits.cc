@@ -1111,7 +1111,6 @@ namespace FanCoilUnits {
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::FanCoil4Pipe_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1224,7 +1223,7 @@ namespace FanCoilUnits {
             MyPlantScanFlag(FanCoilNum) = false;
         }
 
-        if (!InitFanCoilUnitsCheckInZoneEquipmentListFlag && ZoneEquipInputsFilled) {
+        if (!InitFanCoilUnitsCheckInZoneEquipmentListFlag && state.dataZoneEquip->ZoneEquipInputsFilled) {
             InitFanCoilUnitsCheckInZoneEquipmentListFlag = true;
             for (Loop = 1; Loop <= NumFanCoils; ++Loop) {
                 if (CheckZoneEquipmentList(state, FanCoil(Loop).UnitType, FanCoil(Loop).Name)) continue;

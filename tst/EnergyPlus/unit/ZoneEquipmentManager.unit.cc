@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
@@ -513,7 +513,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
     int ZoneNum = 1;
@@ -647,7 +647,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
@@ -747,7 +747,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
     int ZoneNum = 1;
@@ -940,7 +940,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -1115,7 +1115,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -1301,7 +1301,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -1519,7 +1519,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -1845,7 +1845,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -2071,7 +2071,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);

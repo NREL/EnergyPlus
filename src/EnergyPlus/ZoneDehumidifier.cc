@@ -555,7 +555,6 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbRhPb;
 
@@ -590,7 +589,7 @@ namespace ZoneDehumidifier {
         }
 
         // Need to check all dehumidifiers to see if they are on Zone Equipment List or issue warning
-        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataZoneDehumidifier->ZoneEquipmentListChecked = true;
             for (LoopIndex = 1; LoopIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++LoopIndex) {
                 if (CheckZoneEquipmentList(state, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name)) continue;

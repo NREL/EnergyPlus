@@ -59,22 +59,6 @@ struct EnergyPlusData;
 
 namespace ReturnAirPathManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ReturnAirPathManager
-
-    // Functions
-
-    void clear_state();
-
     void SimReturnAirPath(EnergyPlusData &state);
 
     void GetReturnAirPathInput(EnergyPlusData &state);
@@ -89,9 +73,11 @@ namespace ReturnAirPathManager {
 
 struct ReturnAirPathMgr : BaseGlobalStruct {
 
+    bool GetInputFlag = true;
+
     void clear_state() override
     {
-
+        this->GetInputFlag = true;
     }
 };
 

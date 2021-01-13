@@ -1041,7 +1041,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using General::FindNumberInList;
 
         using ZonePlenum::GetReturnPlenumIndex;
@@ -1084,7 +1083,7 @@ namespace EnergyPlus::PurchasedAirManager {
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataPurchasedAirMgr->NumPurchAir; ++Loop) {
 

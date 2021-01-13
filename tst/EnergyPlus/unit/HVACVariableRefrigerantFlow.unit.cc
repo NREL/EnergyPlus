@@ -147,7 +147,7 @@ protected:
         state->dataEnvrn->OutWetBulbTemp =
             Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, DataEnvironment::StdPressureSeaLevel);
         state->dataEnvrn->OutBaroPress = 101325;          // sea level
-        DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+        state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
         int numZones = state->dataGlobal->NumOfZones = 5;
         int numAirloops = 5;
@@ -157,8 +157,8 @@ protected:
         DataHeatBalance::Zone.allocate(numZones);
         DataZoneEquipment::ZoneEquipConfig.allocate(numZones);
         DataZoneEquipment::ZoneEquipList.allocate(numZones);
-        DataZoneEquipment::ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
-        DataZoneEquipment::NumOfZoneEquipLists = numZones;
+        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
+        state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         DataSizing::FinalZoneSizing.allocate(numZones);
         DataSizing::FinalSysSizing.allocate(numAirloops);
         DataSizing::OASysEqSizing.allocate(numAirloops);
@@ -2243,7 +2243,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
@@ -3698,7 +3698,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     DataSizing::ZoneSizingRunDone = true;
@@ -4687,7 +4687,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
@@ -5537,7 +5537,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::ZoneSizingRunDone = true;
@@ -6430,7 +6430,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -11168,7 +11168,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
@@ -12899,7 +12899,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
@@ -14952,7 +14952,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -15576,7 +15576,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataGlobal->BeginEnvrnFlag = true;
     DataSizing::CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;

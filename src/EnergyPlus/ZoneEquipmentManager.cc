@@ -165,7 +165,7 @@ namespace ZoneEquipmentManager {
         if (state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag) {
             GetZoneEquipment(state);
             state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag = false;
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
         InitZoneEquipment(state, FirstHVACIteration);
@@ -174,7 +174,7 @@ namespace ZoneEquipmentManager {
             SizeZoneEquipment(state);
         } else {
             SimZoneEquipment(state, FirstHVACIteration, SimAir);
-            ZoneEquipSimulatedOnce = true;
+            state.dataZoneEquip->ZoneEquipSimulatedOnce = true;
         }
 
         UpdateZoneEquipment(state, SimAir);
@@ -199,7 +199,7 @@ namespace ZoneEquipmentManager {
         int Counter;
         int MaxNumOfEquipTypes;
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData(state);
         }
 
@@ -271,7 +271,7 @@ namespace ZoneEquipmentManager {
         // Do the Begin Environment initializations
         if (state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-            ZoneEquipAvail = NoAction;
+            state.dataZoneEquip->ZoneEquipAvail = NoAction;
 
             if (allocated(ZoneComp)) {
                 for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
@@ -2626,7 +2626,7 @@ namespace ZoneEquipmentManager {
         FirstCall = true;
         ErrorFlag = false;
 
-        for (SupplyAirPathNum = 1; SupplyAirPathNum <= NumSupplyAirPaths; ++SupplyAirPathNum) {
+        for (SupplyAirPathNum = 1; SupplyAirPathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SupplyAirPathNum) {
 
             for (CompNum = 1; CompNum <= SupplyAirPath(SupplyAirPathNum).NumOfComponents; ++CompNum) {
                 {
@@ -2761,14 +2761,14 @@ namespace ZoneEquipmentManager {
                         // Air loop system availability manager status only applies to PIU and exhaust fans
                         // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                         // and set fan on/off flags accordingly.
-                        if (ZoneEquipAvail(ControlledZoneNum) == CycleOn || ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
+                        if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
                             TurnFansOn = true;
                         }
-                        if (ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
+                        if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
                             // Currently used only by parallel powered induction unit
                             TurnZoneFansOnlyOn = true;
                         }
-                        if (ZoneEquipAvail(ControlledZoneNum) == ForceOff) {
+                        if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == ForceOff) {
                             TurnFansOff = true;
                         }
 
@@ -2971,10 +2971,10 @@ namespace ZoneEquipmentManager {
                         // Air loop system availability manager status only applies to PIU and exhaust fans
                         // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                         // and set fan on/off flags accordingly.
-                        if (ZoneEquipAvail(ControlledZoneNum) == CycleOn || ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
+                        if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == CycleOnZoneFansOnly) {
                             TurnFansOn = true;
                         }
-                        if (ZoneEquipAvail(ControlledZoneNum) == ForceOff) {
+                        if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == ForceOff) {
                             TurnFansOff = true;
                         }
 
@@ -3104,7 +3104,7 @@ namespace ZoneEquipmentManager {
         //  the path inlets
 
         // Process supply air path components in reverse order
-        for (SupplyAirPathNum = 1; SupplyAirPathNum <= NumSupplyAirPaths; ++SupplyAirPathNum) {
+        for (SupplyAirPathNum = 1; SupplyAirPathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SupplyAirPathNum) {
 
             SupPathInletChanged = false;
 
@@ -4559,7 +4559,6 @@ namespace ZoneEquipmentManager {
         using DataHVACGlobals::TimeStepSys;
         using DataZoneEquipment::ZHumRat;
         using DataZoneEquipment::ZMAT;
-        using DataZoneEquipment::ZoneEquipAvail;
         using EarthTube::ManageEarthTube;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4862,7 +4861,7 @@ namespace ZoneEquipmentManager {
                     if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                         // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
                         if (!state.dataGlobal->KickOffSimulation) {
-                            if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
+                            if (!(state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) ||
                                 !AirflowNetwork::AirflowNetworkZoneFlag(NZ))
                                 ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if (!AirflowNetwork::AirflowNetworkZoneFlag(NZ)) {

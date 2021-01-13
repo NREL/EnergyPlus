@@ -2333,7 +2333,6 @@ namespace HVACManager {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         using AirflowNetworkBalanceManager::ReportAirflowNetwork;
-        using DataZoneEquipment::ZoneEquipAvail;
 
         using DataZoneEquipment::CrossMixingReportFlag;
         using DataZoneEquipment::MixingReportFlag;
@@ -2391,7 +2390,7 @@ namespace HVACManager {
             H2OHtOfVap = PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
             ADSCorrectionFactor = 1.0;
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+                if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                     AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop)) {
                     ADSCorrectionFactor = 0.0;
                 }
@@ -2436,7 +2435,7 @@ namespace HVACManager {
 
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                 // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-                if ((ZoneEquipAvail(ZoneLoop) == CycleOn || ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
+                if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOn || state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == CycleOnZoneFansOnly) &&
                     AirflowNetwork::AirflowNetworkZoneFlag(ZoneLoop))
                     ADSCorrectionFactor = 0.0;
             }

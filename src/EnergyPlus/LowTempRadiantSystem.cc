@@ -1713,7 +1713,6 @@ namespace LowTempRadiantSystem {
         using DataPlant::TypeOf_LowTempRadiant_VarFlow;
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
 
         using PlantUtilities::InitComponentNodes;
@@ -1913,7 +1912,7 @@ namespace LowTempRadiantSystem {
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= TotalNumOfRadSystems; ++Loop) {
                 {

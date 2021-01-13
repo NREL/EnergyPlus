@@ -3568,7 +3568,6 @@ namespace EnergyPlus::SetPointManager {
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using namespace DataPlant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -3611,7 +3610,7 @@ namespace EnergyPlus::SetPointManager {
 
         // One time initializations
 
-        if (ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
+        if (state.dataZoneEquip->ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
 
             if (state.dataSetPointManager->InitSetPointManagersOneTimeFlag) {
 
@@ -4587,7 +4586,7 @@ namespace EnergyPlus::SetPointManager {
                 }
             }
 
-            if (ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
+            if (state.dataZoneEquip->ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     NodeNum = state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                     if (state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MassFlow) {

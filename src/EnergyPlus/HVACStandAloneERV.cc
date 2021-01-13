@@ -1152,30 +1152,12 @@ namespace EnergyPlus::HVACStandAloneERV {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //  USE Psychrometrics,     ONLY: PsyRhoAirFnPbTdbW
-        // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ERVStandAlone_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using MixedAir::SimOAController;
 
         // Locals
         static Array1D_bool MySizeFlag;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SupInNode;    // supply air inlet node number
@@ -1210,7 +1192,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++Loop) {
                 if (CheckZoneEquipmentList(state, state.dataHVACStandAloneERV->StandAloneERV(Loop).UnitType, state.dataHVACStandAloneERV->StandAloneERV(Loop).Name)) continue;

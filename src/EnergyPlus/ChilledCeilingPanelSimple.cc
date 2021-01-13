@@ -716,7 +716,6 @@ namespace CoolingPanelSimple {
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -765,7 +764,7 @@ namespace CoolingPanelSimple {
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;

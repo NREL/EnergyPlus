@@ -1222,7 +1222,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
     TempControlType.allocate(1);
     TempControlType(1) = 1;

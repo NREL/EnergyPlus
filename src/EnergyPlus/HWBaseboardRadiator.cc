@@ -120,7 +120,6 @@ namespace HWBaseboardRadiator {
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
     using DataZoneEquipment::CheckZoneEquipmentList;
     using DataZoneEquipment::ZoneEquipConfig;
-    using DataZoneEquipment::ZoneEquipInputsFilled;
     // Use statements for access to subroutines in other modules
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
@@ -816,7 +815,7 @@ namespace HWBaseboardRadiator {
         if (HWBaseboard(BaseboardNum).ZonePtr <= 0) HWBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, HWBaseboard(Loop).EquipID)) continue;

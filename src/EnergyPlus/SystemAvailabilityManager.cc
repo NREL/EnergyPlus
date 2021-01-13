@@ -130,7 +130,6 @@ namespace SystemAvailabilityManager {
         // Manage the simulation of the System Availability Managers
 
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
-        using DataZoneEquipment::ZoneEquipAvail;
         using namespace DataLoopNode;
         using namespace DataAirLoop;
         using namespace DataPlant;
@@ -197,7 +196,7 @@ namespace SystemAvailabilityManager {
             for (ZoneInSysNum = 1; ZoneInSysNum <= state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++ZoneInSysNum) {
 
                 CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
-                ZoneEquipAvail(CtrldZoneNum) = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus;
+                state.dataZoneEquip->ZoneEquipAvail(CtrldZoneNum) = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus;
             }
 
         } // end of primary air system loop

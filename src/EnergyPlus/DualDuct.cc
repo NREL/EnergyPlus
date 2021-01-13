@@ -852,7 +852,6 @@ namespace DualDuct {
         using DataHeatBalance::TotPeople;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -881,7 +880,7 @@ namespace DualDuct {
             InitDualDuctMyOneTimeFlag = false;
         }
 
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumDDAirTerminal; ++Loop) {
@@ -1855,7 +1854,8 @@ namespace DualDuct {
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr,
+                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
+                                                                     this->OARequirementsPtr,
                                                                      this->ActualZoneNum,
                                                                      state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                      UseMinOASchFlag);
@@ -2130,7 +2130,6 @@ namespace DualDuct {
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataZoneEquipment::NumSupplyAirPaths;
         using DataZoneEquipment::SupplyAirPath;
 
         // Locals
@@ -2166,7 +2165,7 @@ namespace DualDuct {
             // Determine if this damper is connected to a supply air path
             int Found = 0;
             int SupplyAirPathNum = 0;
-            for (int Count2 = 1; Count2 <= NumSupplyAirPaths; ++Count2) {
+            for (int Count2 = 1; Count2 <= state.dataZoneEquip->NumSupplyAirPaths; ++Count2) {
                 SupplyAirPathNum = Count2;
                 Found = 0;
                 for (int Count3 = 1; Count3 <= SupplyAirPath(Count2).NumOutletNodes; ++Count3) {

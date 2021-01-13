@@ -526,7 +526,6 @@ namespace FourPipeBeam {
         using DataLoopNode::Node;
         using DataPlant::TypeOf_FourPipeBeamAirTerminal;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
@@ -577,7 +576,7 @@ namespace FourPipeBeam {
             this->plantLoopScanFlag = false;
         }
 
-        if (!this->zoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!this->zoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             if (this->aDUNum != 0) {
                 if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name)) {

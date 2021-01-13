@@ -114,7 +114,6 @@ namespace SteamBaseboardRadiator {
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
     using DataZoneEquipment::ZoneEquipConfig;
-    using DataZoneEquipment::ZoneEquipInputsFilled;
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -754,7 +753,7 @@ namespace SteamBaseboardRadiator {
         if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0) state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, state.dataSteamBaseboardRadiator->SteamBaseboard(Loop).EquipID)) continue;

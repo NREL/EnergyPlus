@@ -104,9 +104,9 @@ protected:
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
         DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         DataZoneEquipment::ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
-        DataZoneEquipment::ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
-        DataZoneEquipment::NumOfZoneEquipLists = 1;
+        state->dataZoneEquip->NumOfZoneEquipLists = 1;
         DataHeatBalance::Zone(1).IsControlled = true;
         DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
         DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;

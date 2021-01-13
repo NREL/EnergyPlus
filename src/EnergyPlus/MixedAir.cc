@@ -1175,7 +1175,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::NumOfZoneEquipLists;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
 
@@ -1735,7 +1734,7 @@ namespace EnergyPlus::MixedAir {
                         if (ZoneNum > 0) {
                             EquipListIndex = ZoneEquipConfig(ZoneNum).EquipListIndex;
                             if (EquipListIndex > 0) {
-                                for (EquipListNum = 1; EquipListNum <= NumOfZoneEquipLists; ++EquipListNum) {
+                                for (EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                     if (EquipListNum == EquipListIndex) {
                                         for (EquipNum = 1; EquipNum <= ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
                                             if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipType(EquipNum),
@@ -2067,7 +2066,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::NumOfZoneEquipLists;
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
 

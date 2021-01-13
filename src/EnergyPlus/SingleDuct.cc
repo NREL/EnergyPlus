@@ -2008,7 +2008,6 @@ namespace EnergyPlus::SingleDuct {
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
@@ -2081,7 +2080,7 @@ namespace EnergyPlus::SingleDuct {
             this->PlantLoopScanFlag = false;
         }
 
-        if (!state.dataSingleDuct->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataSingleDuct->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataSingleDuct->ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {

@@ -78,46 +78,9 @@ namespace ReturnAirPathManager {
     // PURPOSE OF THIS MODULE:
     // To manage the return air path.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
-    using DataZoneEquipment::NumReturnAirPaths;
     using DataZoneEquipment::ReturnAirPath;
     using DataZoneEquipment::ZoneMixer_Type;
     using DataZoneEquipment::ZoneReturnPlenum_Type;
-
-    // Use statements for access to subroutines in other modules
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    namespace {
-        bool GetInputFlag(true);
-        bool ErrorsFound(false);
-    } // namespace
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ReturnAirPathManager
-
-    // Functions
-
-    void clear_state()
-    {
-        GetInputFlag = true;
-        ErrorsFound = false;
-    }
 
     void SimReturnAirPath(EnergyPlusData &state)
     {
@@ -126,28 +89,16 @@ namespace ReturnAirPathManager {
         //       AUTHOR:          Russ Taylor
         //       DATE WRITTEN:    Nov 1997
 
-        // PURPOSE OF THIS SUBROUTINE: This subroutine
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
         // Locals
         int ReturnAirPathNum;
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool GetInputFlag( true ); // Flag set to make sure you get input once
-        ////////////////////////////////////////////////////////////////////////////////////
 
         // Obtains and Allocates Mixer related parameters from input file
-        if (GetInputFlag) { // First time subroutine has been entered
+        if (state.dataRetAirPathMrg->GetInputFlag) { // First time subroutine has been entered
             GetReturnAirPathInput(state);
-            GetInputFlag = false;
+            state.dataRetAirPathMrg->GetInputFlag = false;
         }
 
-        for (ReturnAirPathNum = 1; ReturnAirPathNum <= NumReturnAirPaths; ++ReturnAirPathNum) {
-
+        for (ReturnAirPathNum = 1; ReturnAirPathNum <= state.dataZoneEquip->NumReturnAirPaths; ++ReturnAirPathNum) {
             CalcReturnAirPath(state, ReturnAirPathNum);
         }
     }
@@ -177,17 +128,19 @@ namespace ReturnAirPathManager {
         ////////////////////////////////////////////////////////////////////////////////////
         bool IsNotOK; // Flag to verify name
 
+        bool ErrorsFound = false;
+
         if (allocated(ReturnAirPath)) {
             return;
         }
         cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
-        NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneEquip->NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumReturnAirPaths > 0) {
+        if (state.dataZoneEquip->NumReturnAirPaths > 0) {
 
-            ReturnAirPath.allocate(NumReturnAirPaths);
+            ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
 
-            for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
+            for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);

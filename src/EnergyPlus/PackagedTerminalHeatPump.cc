@@ -3765,7 +3765,6 @@ namespace PackagedTerminalHeatPump {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
         using SteamCoils::SimulateSteamCoilComponents;
@@ -4005,7 +4004,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (ZoneEquipmentListNotChecked) {
-            if (ZoneEquipInputsFilled) {
+            if (state.dataZoneEquip->ZoneEquipInputsFilled) {
                 ZoneEquipmentListNotChecked = false;
                 for (Loop = 1; Loop <= NumPTUs; ++Loop) {
                     if (CheckZoneEquipmentList(state, PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {

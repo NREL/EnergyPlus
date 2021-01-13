@@ -10932,8 +10932,6 @@ namespace AirflowNetworkBalanceManager {
         using BranchNodeConnections::GetNumChildren;
         using BranchNodeConnections::IsParentObject;
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataZoneEquipment::NumReturnAirPaths;
-        using DataZoneEquipment::NumSupplyAirPaths;
         using DataZoneEquipment::ReturnAirPath;
         using DataZoneEquipment::SupplyAirPath;
         using SingleDuct::GetHVACSingleDuctSysIndex;
@@ -11158,7 +11156,7 @@ namespace AirflowNetworkBalanceManager {
                     return AirLoopNum;
                 }
                 // supply path
-                for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
+                for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
                     if (SupplyAirPath(SupAirPath).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum)) {
                         for (SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= SupplyAirPath(SupAirPath).NumOutletNodes; ++SupAirPathOutNodeNum) {
                             if (SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) == NodeNumber) {
@@ -11194,7 +11192,7 @@ namespace AirflowNetworkBalanceManager {
                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
-                for (int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum) {
+                for (int retPathNum = 1; retPathNum <= state.dataZoneEquip->NumReturnAirPaths; ++retPathNum) {
                     if (ReturnAirPath(retPathNum).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(1)) {
                         if (ReturnAirPath(retPathNum).OutletNodeNum == NodeNumber) {
                             return AirLoopNum;

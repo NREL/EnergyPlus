@@ -529,7 +529,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     ZoneEquipConfig(2).ReturnNodeInletNum(1) = 1;
 
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);

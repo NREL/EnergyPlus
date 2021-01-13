@@ -971,7 +971,8 @@ namespace EnergyPlus::SizingManager {
                                 bool UseMinOASchFlag = false;
                                 Real64 designOAductFlow(0.0);
                                 designOAductFlow =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
+                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
+                                                                                         DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
                                                                                          DualDuct::dd_airterminal(dualDuctATUNum).ActualZoneNum,
                                                                                          UseOccSchFlag,
                                                                                          UseMinOASchFlag);

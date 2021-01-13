@@ -1545,7 +1545,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     print(state.files.bnd, "{}\n", "! ===============================================================");
     static constexpr auto Format_700("! <#Supply Air Paths>,<Number of Supply Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
-    print(state.files.bnd, " #Supply Air Paths,{}\n", NumSupplyAirPaths);
+    print(state.files.bnd, " #Supply Air Paths,{}\n", state.dataZoneEquip->NumSupplyAirPaths);
     static constexpr auto Format_702("! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
     static constexpr auto Format_703("! <#Components on Supply Air Path>,<Number of Components>");
@@ -1558,7 +1558,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                                      "Node Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_708);
 
-    for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
+    for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
 
         // Determine which air loop this supply air path is connected to
         Found = 0;
@@ -1691,7 +1691,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     FoundZoneSplitter.dimension(state.dataSplitterComponent->NumSplitters, false);
     FoundNames.allocate(state.dataZonePlenum->NumZoneSupplyPlenums);
     for (Count1 = 1; Count1 <= state.dataZonePlenum->NumZoneSupplyPlenums; ++Count1) {
-        for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
+        for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
             for (Count = 1; Count <= SupplyAirPath(BCount).NumOfComponents; ++Count) {
                 if (state.dataZonePlenum->ZoneSupPlenCond(Count1).ZonePlenumName != SupplyAirPath(BCount).ComponentName(Count) ||
                     SupplyAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:SUPPLYPLENUM")
@@ -1711,7 +1711,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
     FoundNames.deallocate();
     FoundNames.allocate(state.dataSplitterComponent->NumSplitters);
     for (Count1 = 1; Count1 <= state.dataSplitterComponent->NumSplitters; ++Count1) {
-        for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
+        for (BCount = 1; BCount <= state.dataZoneEquip->NumSupplyAirPaths; ++BCount) {
             for (Count = 1; Count <= SupplyAirPath(BCount).NumOfComponents; ++Count) {
                 if (state.dataSplitterComponent->SplitterCond(Count1).SplitterName != SupplyAirPath(BCount).ComponentName(Count) ||
                     SupplyAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:ZONESPLITTER")
@@ -1831,7 +1831,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     print(state.files.bnd, "{}\n", "! ===============================================================");
     static constexpr auto Format_700("! <#Return Air Paths>,<Number of Return Air Paths>");
     print(state.files.bnd, "{}\n", Format_700);
-    print(state.files.bnd, " #Return Air Paths,{}\n", NumReturnAirPaths);
+    print(state.files.bnd, " #Return Air Paths,{}\n", state.dataZoneEquip->NumReturnAirPaths);
     static constexpr auto Format_702("! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>");
     print(state.files.bnd, "{}\n", Format_702);
     static constexpr auto Format_703("! <#Components on Return Air Path>,<Number of Components>");
@@ -1846,7 +1846,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
     AllNodes.allocate(NumOfNodes);
 
-    for (BCount = 1; BCount <= NumReturnAirPaths; ++BCount) {
+    for (BCount = 1; BCount <= state.dataZoneEquip->NumReturnAirPaths; ++BCount) {
         //             Determine which air loop this supply air path is connected to
         Found = 0;
         for (Count1 = 1; Count1 <= NumPrimaryAirSys; ++Count1) {
@@ -2040,7 +2040,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     FoundZoneMixer.dimension(NumMixers, false);
     FoundNames.allocate(state.dataZonePlenum->NumZoneReturnPlenums);
     for (Count1 = 1; Count1 <= state.dataZonePlenum->NumZoneReturnPlenums; ++Count1) {
-        for (BCount = 1; BCount <= NumReturnAirPaths; ++BCount) {
+        for (BCount = 1; BCount <= state.dataZoneEquip->NumReturnAirPaths; ++BCount) {
             for (Count = 1; Count <= ReturnAirPath(BCount).NumOfComponents; ++Count) {
                 if (state.dataZonePlenum->ZoneRetPlenCond(Count1).ZonePlenumName != ReturnAirPath(BCount).ComponentName(Count) ||
                     ReturnAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:RETURNPLENUM")
@@ -2061,7 +2061,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
     FoundNames.deallocate();
     FoundNames.allocate(NumMixers);
     for (Count1 = 1; Count1 <= NumMixers; ++Count1) {
-        for (BCount = 1; BCount <= NumReturnAirPaths; ++BCount) {
+        for (BCount = 1; BCount <= state.dataZoneEquip->NumReturnAirPaths; ++BCount) {
             for (Count = 1; Count <= ReturnAirPath(BCount).NumOfComponents; ++Count) {
                 if (MixerCond(Count1).MixerName != ReturnAirPath(BCount).ComponentName(Count) ||
                     ReturnAirPath(BCount).ComponentType(Count) != "AIRLOOPHVAC:ZONEMIXER")

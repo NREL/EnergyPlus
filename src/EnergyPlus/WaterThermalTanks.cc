@@ -1926,9 +1926,9 @@ namespace WaterThermalTanks {
             // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
             if ((HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) &&
                 HPWH.AmbientTempZone > 0) {
-                if (!DataZoneEquipment::ZoneEquipInputsFilled) {
+                if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
                     DataZoneEquipment::GetZoneEquipmentData(state);
-                    DataZoneEquipment::ZoneEquipInputsFilled = true;
+                    state.dataZoneEquip->ZoneEquipInputsFilled = true;
                 }
                 if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
                     bool FoundInletNode = false;

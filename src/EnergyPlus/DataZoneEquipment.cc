@@ -78,11 +78,6 @@ namespace EnergyPlus::DataZoneEquipment {
     // PURPOSE OF THIS MODULE:
     // This module contains variable declarations for zone equipment configuration data
 
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
     Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponents,
                                                         {"ZoneHVAC:FourPipeFanCoil",
                                                          "ZoneHVAC:PackagedTerminalHeatPump",
@@ -99,25 +94,11 @@ namespace EnergyPlus::DataZoneEquipment {
                                                          "ZoneHVAC:EvaporativeCoolerUnit",
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
 
-    namespace {
-        bool GetZoneEquipmentDataErrorsFound(false);
-        int GetZoneEquipmentDataFound(0);
-    } // namespace
-
-    int NumSupplyAirPaths(0);
-    int NumReturnAirPaths(0);
-    bool ZoneEquipInputsFilled(false);
-    bool ZoneEquipSimulatedOnce(false);
-    int NumOfZoneEquipLists(0); // The Number of Zone Equipment List objects
-    Array1D_int ZoneEquipAvail;
-
     Array1D_bool CrossMixingReportFlag;
     Array1D_bool MixingReportFlag;
     Array1D<Real64> VentMCP;
     Array1D<Real64> ZMAT;
     Array1D<Real64> ZHumRat;
-
-    // Utility routines for module
 
     // Object Data
     Array1D<EquipConfiguration> ZoneEquipConfig;
@@ -129,19 +110,8 @@ namespace EnergyPlus::DataZoneEquipment {
     Array1D<ReturnAir> ReturnAirPath;
     bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
 
-    // Functions
-    // Clears the global data in DataZoneEquipment.
-    // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumSupplyAirPaths = 0;
-        NumReturnAirPaths = 0;
-        ZoneEquipInputsFilled = false;
-        ZoneEquipSimulatedOnce = false;
-        NumOfZoneEquipLists = 0; // The Number of Zone Equipment List objects
-        GetZoneEquipmentDataErrorsFound = false;
-        GetZoneEquipmentDataFound = 0;
-        ZoneEquipAvail.deallocate();
         CrossMixingReportFlag.deallocate();
         MixingReportFlag.deallocate();
         VentMCP.deallocate();
@@ -264,7 +234,7 @@ namespace EnergyPlus::DataZoneEquipment {
         // Look in the input file for zones with air loop and zone equipment attached
 
         NumOfControlledZones = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentConnections");
-        NumOfZoneEquipLists = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentList"); // Look for lists of equipment data - there should
+        state.dataZoneEquip->NumOfZoneEquipLists = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:EquipmentList"); // Look for lists of equipment data - there should
         // be as many of these as there are controlled zones
         inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
@@ -290,15 +260,15 @@ namespace EnergyPlus::DataZoneEquipment {
         if (!allocated(SupplyAirPath)) {
             // Look for and read in the air supply path
             // component (splitters) information for each zone
-            NumSupplyAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPath");
-            SupplyAirPath.allocate(NumSupplyAirPaths);
+            state.dataZoneEquip->NumSupplyAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:SupplyPath");
+            SupplyAirPath.allocate(state.dataZoneEquip->NumSupplyAirPaths);
         }
 
         if (!allocated(ReturnAirPath)) {
             // Look for and read in the air return path
             // component (mixers & plenums) information for each zone
-            NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPath");
-            ReturnAirPath.allocate(NumReturnAirPaths);
+            state.dataZoneEquip->NumReturnAirPaths = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC:ReturnPath");
+            ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
         }
 
         ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
@@ -306,14 +276,14 @@ namespace EnergyPlus::DataZoneEquipment {
         // found in the input file.  This may or may not
         // be the same as the number of zones in the building
         ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
-        ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, NoAction);
+        state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, NoAction);
         UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
-        if (NumOfZoneEquipLists != NumOfControlledZones) {
+        if (state.dataZoneEquip->NumOfZoneEquipLists != NumOfControlledZones) {
             ShowSevereError(state,
                             format("{}Number of Zone Equipment lists [{}] not equal Number of Controlled Zones [{}]",
                                    RoutineName,
-                                   NumOfZoneEquipLists,
+                                   state.dataZoneEquip->NumOfZoneEquipLists,
                                    NumOfControlledZones));
             ShowContinueError(state, "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList");
             ShowFatalError(state, "GetZoneEquipment: Incorrect number of zone equipment lists");
@@ -353,14 +323,14 @@ namespace EnergyPlus::DataZoneEquipment {
             if (ControlledZoneNum == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
                 ShowContinueError(state, "..Requested Controlled Zone not among Zones, remaining items for this object not processed.");
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 continue;
             } else {
                 //    Zone(ZoneEquipConfig(ControlledZoneNum)%ActualZoneNum)%ZoneEquipConfigNum = ControlledZoneNum
                 if (Zone(ControlledZoneNum).IsControlled) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
                     ShowContinueError(state, "..Duplicate Controlled Zone entered, only one " + CurrentModuleObject + " per zone is allowed.");
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     continue;
                 }
                 Zone(ControlledZoneNum).IsControlled = true;
@@ -374,13 +344,13 @@ namespace EnergyPlus::DataZoneEquipment {
             GlobalNames::IntraObjUniquenessCheck(state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), UniqueZoneEquipListNames, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError(state, "..another Controlled Zone has been assigned that " + cAlphaFields(2) + '.');
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
             ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
             InletNodeListName = AlphArray(3);
             ExhaustNodeListName = AlphArray(4);
             ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(state, AlphArray(5),
-                                                                            GetZoneEquipmentDataErrorsFound,
+                                                                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
                                                                             NodeType_Air,
@@ -390,13 +360,13 @@ namespace EnergyPlus::DataZoneEquipment {
             if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
                 ShowContinueError(state, cAlphaFields(5) + " must be present.");
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
                 UniqueNodeError = false;
                 CheckUniqueNodes(state, cAlphaFields(5), "NodeName", UniqueNodeError, AlphArray(5), _, AlphArray(1));
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
             }
             // assigned to this node
@@ -412,7 +382,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 if (ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
                                     cAlphaFields(1) + '=' + AlphArray(1));
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
             }
             ReturnFlowBasisNodeListName = AlphArray(8);
@@ -439,7 +409,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                               lAlphaBlanks,
                                               cAlphaFields,
                                               cNumericFields); //  data for one zone
-                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+                UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
                 thisZoneEquipList.Name = AlphArray(1);
 
                 if (!lAlphaBlanks(2)) {
@@ -454,7 +424,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
                         ShowContinueError(state, "..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                 }
                 const int nAlphasInExtensible = 4;
@@ -514,7 +484,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                       CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state, "In " + CurrentModuleObject + '=' + thisZoneEquipList.Name);
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                     thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1));
                     if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
@@ -527,7 +497,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0)
                             ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
 
                     thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2));
@@ -541,7 +511,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0)
                             ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
 
                     const int coolingFractionArrayIdx = nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 3;
@@ -553,7 +523,7 @@ namespace EnergyPlus::DataZoneEquipment {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError(state, "invalid " + cAlphaFields(coolingFractionArrayIdx)  + "=[" + AlphArray(coolingFractionArrayIdx) + "].");
                             ShowContinueError(state, "Schedule does not exist.");
-                            GetZoneEquipmentDataErrorsFound = true;
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                         }
                     }
 
@@ -566,7 +536,7 @@ namespace EnergyPlus::DataZoneEquipment {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                             ShowContinueError(state, "invalid " + cAlphaFields(heatingFractionArrayIdx)  + "=[" + AlphArray(heatingFractionArrayIdx) + "].");
                             ShowContinueError(state, "Schedule does not exist.");
-                            GetZoneEquipmentDataErrorsFound = true;
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                         }
                     }
 
@@ -684,7 +654,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                             ShowContinueError(state, "..Invalid Equipment Type = " + thisZoneEquipList.EquipType(ZoneEquipTypeNum));
-                            GetZoneEquipmentDataErrorsFound = true;
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                         }
                     }
                 }
@@ -696,7 +666,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                           format("...multiple assignments for Zone Equipment Cooling Sequence={}, must be 1-1 correspondence between "
                                                  "sequence assignments and number of equipments.",
                                                  ZoneEquipTypeNum));
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError(state,
@@ -710,7 +680,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                           format("...multiple assignments for Zone Equipment Heating or No-Load Sequence={}, must be 1-1 "
                                                  "correspondence between sequence assignments and number of equipments.",
                                                  ZoneEquipTypeNum));
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
                         ShowContinueError(state,
@@ -723,7 +693,7 @@ namespace EnergyPlus::DataZoneEquipment {
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " not found = " + ZoneEquipConfig(ControlledZoneNum).EquipListName);
                 ShowContinueError(state, "In ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig(ControlledZoneNum).ZoneName);
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
             // End ZoneHVAC:EquipmentList
@@ -756,7 +726,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     CheckUniqueNodes(state,
                         "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                     ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(NodeNum) = 0;
                     ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum(NodeNum) = 0;
@@ -771,7 +741,7 @@ namespace EnergyPlus::DataZoneEquipment {
             } else {
                 ShowContinueError(state, "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " +
                                   ZoneEquipConfig(ControlledZoneNum).ZoneName);
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
             NodeListError = false;
@@ -799,13 +769,13 @@ namespace EnergyPlus::DataZoneEquipment {
                         "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                 }
             } else {
                 ShowContinueError(state, "Invalid Zone Air Exhaust Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
                                   ZoneEquipConfig(ControlledZoneNum).ZoneName);
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
             NodeListError = false;
@@ -842,13 +812,13 @@ namespace EnergyPlus::DataZoneEquipment {
                         "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                 }
             } else {
                 ShowContinueError(state, "Invalid Zone Return Air Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
                                   ZoneEquipConfig(ControlledZoneNum).ZoneName);
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
             NodeListError = false;
@@ -876,7 +846,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 ShowContinueError(state,
                     "Invalid Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
                     ZoneEquipConfig(ControlledZoneNum).ZoneName);
-                GetZoneEquipmentDataErrorsFound = true;
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
         } // end loop over controlled zones
@@ -894,7 +864,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
             }
         }
-        if (GetZoneEquipmentDataErrorsFound) {
+        if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
             ShowWarningError(state, RoutineName + CurrentModuleObject + ", duplicate items NOT CHECKED due to previous errors.");
             overallEquipCount = 0;
         }
@@ -920,7 +890,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     ShowContinueError(state, "Equipment: Type=" + ZoneEquipListAcct(Loop1).ObjectType + ", Name=" + ZoneEquipListAcct(Loop1).ObjectName);
                     ShowContinueError(state, "Found on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop1).OnListNum).Name + "\".");
                     ShowContinueError(state, "Equipment Duplicated on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop2).OnListNum).Name + "\".");
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
             }
             ZoneEquipListAcct.deallocate();
@@ -929,15 +899,15 @@ namespace EnergyPlus::DataZoneEquipment {
         // map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
         for (ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
-            GetZoneEquipmentDataFound =
+            state.dataZoneEquip->GetZoneEquipmentDataFound =
                 UtilityRoutines::FindItemInList(ZoneEquipList(ControlledZoneLoop).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName);
-            if (GetZoneEquipmentDataFound > 0) ZoneEquipConfig(GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
+            if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0) ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
         } // end loop over controlled zones
 
         EndUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
 
         CurrentModuleObject = "AirLoopHVAC:SupplyPath";
-        for (PathNum = 1; PathNum <= NumSupplyAirPaths; ++PathNum) {
+        for (PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -951,12 +921,12 @@ namespace EnergyPlus::DataZoneEquipment {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields); //  data for one zone
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
             SupplyAirPath(PathNum).Name = AlphArray(1);
             SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
             SupplyAirPath(PathNum).InletNodeNum = GetOnlySingleNode(state, AlphArray(2),
-                                                                    GetZoneEquipmentDataErrorsFound,
+                                                                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                     CurrentModuleObject,
                                                                     AlphArray(1),
                                                                     NodeType_Air,
@@ -992,7 +962,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     ShowSevereError(state, RoutineName + cAlphaFields(1) + "=\"" + SupplyAirPath(PathNum).Name + "\"");
                     ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
                     ShowContinueError(state, R"(Must be "AirLoopHVAC:ZoneSplitter" or "AirLoopHVAC:SupplyPlenum")");
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
 
                 Counter += 2;
@@ -1004,7 +974,7 @@ namespace EnergyPlus::DataZoneEquipment {
         } // end loop over supply air paths
 
         CurrentModuleObject = "AirLoopHVAC:ReturnPath";
-        for (PathNum = 1; PathNum <= NumReturnAirPaths; ++PathNum) {
+        for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -1018,12 +988,12 @@ namespace EnergyPlus::DataZoneEquipment {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields); //  data for one zone
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, GetZoneEquipmentDataErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
             ReturnAirPath(PathNum).Name = AlphArray(1);
             ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
             ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state, AlphArray(2),
-                                                                     GetZoneEquipmentDataErrorsFound,
+                                                                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                      CurrentModuleObject,
                                                                      AlphArray(1),
                                                                      NodeType_Air,
@@ -1050,7 +1020,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         ReturnAirPath(PathNum).ComponentType(CompNum), ReturnAirPath(PathNum).ComponentName(CompNum), IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state, "In " + CurrentModuleObject + " = " + ReturnAirPath(PathNum).Name);
-                        GetZoneEquipmentDataErrorsFound = true;
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
                     if (AlphArray(Counter) == "AIRLOOPHVAC:ZONEMIXER") ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneMixer_Type;
                     if (AlphArray(Counter) == "AIRLOOPHVAC:RETURNPLENUM") ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
@@ -1058,7 +1028,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     ShowSevereError(state, RoutineName + cAlphaFields(1) + "=\"" + ReturnAirPath(PathNum).Name + "\"");
                     ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
                     ShowContinueError(state, R"(Must be "AirLoopHVAC:ZoneMixer" or "AirLoopHVAC:ReturnPlenum")");
-                    GetZoneEquipmentDataErrorsFound = true;
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
 
                 Counter += 2;
@@ -1076,7 +1046,7 @@ namespace EnergyPlus::DataZoneEquipment {
         // setup zone equipment info for convection correlations
         SetupZoneEquipmentForConvectionFlowRegime(state);
 
-        if (GetZoneEquipmentDataErrorsFound) {
+        if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
             ShowFatalError(state, RoutineName + "Errors found in getting Zone Equipment input.");
         }
     }
@@ -1164,9 +1134,9 @@ namespace EnergyPlus::DataZoneEquipment {
         // Return value
         int ControlledZoneIndex; // Index into Controlled Zone structure
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData1(state);
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
         ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -1196,9 +1166,9 @@ namespace EnergyPlus::DataZoneEquipment {
 
         FoundIt = false;
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData1(state);
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
         ControlledZoneIndex = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -1233,9 +1203,9 @@ namespace EnergyPlus::DataZoneEquipment {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ControlledZoneIndex;
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData1(state);
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
         ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -1270,9 +1240,9 @@ namespace EnergyPlus::DataZoneEquipment {
         int ReturnAirNodeNumber; // Return Air node number for controlled zone
         int ControlledZoneIndex;
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData1(state);
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
         ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -1322,9 +1292,9 @@ namespace EnergyPlus::DataZoneEquipment {
 
         int ControlledZoneIndex;
 
-        if (!ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             GetZoneEquipmentData1(state);
-            ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
         ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -1372,9 +1342,6 @@ namespace EnergyPlus::DataZoneEquipment {
         // Sizing does not use occupancy or min OA schedule and will call with flags set to FALSE
         // Ventilation Rate Procedure uses occupancy schedule based on user input.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
@@ -1413,7 +1380,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                           // used for "ProportionalControl" System outdoor air method
         Real64 ZoneOAMax;                 // Maximum Zone OA flow rate (ZoneOAPeople + ZoneOAArea)
                                           // used for "ProportionalControl" System outdoor air method
-        Real64 ZoneMaxCO2;                // Breathing-zone CO2 concentartion
+        Real64 ZoneMaxCO2;                // Breathing-zone CO2 concentration
         Real64 ZoneMinCO2;                // Minimum CO2 concentration in zone
         Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level

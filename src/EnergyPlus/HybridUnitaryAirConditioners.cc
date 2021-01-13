@@ -216,7 +216,6 @@ namespace HybridUnitaryAirConditioners {
         using DataHVACGlobals::ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 
         // Locals
@@ -270,7 +269,7 @@ namespace HybridUnitaryAirConditioners {
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
@@ -389,11 +388,12 @@ namespace HybridUnitaryAirConditioners {
         EnvRelHumm = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
         RoomRelHum = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
 
-        bool UseOccSchFlag = 1;
-        bool UseMinOASchFlag = 1;
+        bool UseOccSchFlag = true;
+        bool UseMinOASchFlag = true;
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        DesignMinVR = CalcDesignSpecificationOutdoorAir(state, ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+        DesignMinVR = CalcDesignSpecificationOutdoorAir(state,
+                                                        ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
                                                         ZoneNum,
                                                         UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]

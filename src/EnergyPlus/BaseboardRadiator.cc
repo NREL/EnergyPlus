@@ -522,7 +522,6 @@ namespace BaseboardRadiator {
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -562,7 +561,7 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag = false;
         }
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!baseboard->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             baseboard->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Water, baseboard->Baseboard(Loop).EquipID)) continue;

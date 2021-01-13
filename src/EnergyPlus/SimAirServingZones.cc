@@ -546,7 +546,7 @@ namespace EnergyPlus::SimAirServingZones {
             }
             // this test depends on the controlled zone input having been "gotten"
             test = 0;
-            for (count = 1; count <= NumReturnAirPaths; ++count) {
+            for (count = 1; count <= state.dataZoneEquip->NumReturnAirPaths; ++count) {
                 if (ReturnAirPath(count).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1)) {
                     test = ReturnAirPath(count).OutletNodeNum;
                     break;
@@ -1470,7 +1470,7 @@ namespace EnergyPlus::SimAirServingZones {
 
             MassFlowSetToler = DataConvergParams::HVACFlowRateToler * 0.00001;
 
-            for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
+            for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
 
                 NumAllSupAirPathNodes = 0;
                 SupAirPathNodeNum = 0;
@@ -1619,7 +1619,7 @@ namespace EnergyPlus::SimAirServingZones {
                     // find the supply air path corresponding to each air loop outlet node
                     SupAirPathNum = 0;
                     // loop over the air loop's output nodes
-                    for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
+                    for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
                         if (ZoneSideNodeNum == SupplyAirPath(SupAirPath).InletNodeNum) {
                             SupAirPathNum = SupAirPath;
                             break;
@@ -2257,7 +2257,7 @@ namespace EnergyPlus::SimAirServingZones {
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
         // same airloop)
 
-        if (!ZoneEquipInputsFilled) return;
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) return;
 
         bool returnPathFound = false;
         // Loop over all controlled zones
@@ -2270,7 +2270,7 @@ namespace EnergyPlus::SimAirServingZones {
                 int airLoopNum = 0;
                 int thisReturnNode = thisZoneEquip.ReturnNode(zoneOutNum);
                 // Loop over all return paths
-                for (int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum) {
+                for (int retPathNum = 1; retPathNum <= state.dataZoneEquip->NumReturnAirPaths; ++retPathNum) {
                     auto const &thisRetPath(DataZoneEquipment::ReturnAirPath(retPathNum));
                     // Find which airloop this return path is on
                     for (int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum) {
