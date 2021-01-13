@@ -64,7 +64,7 @@ Split flow rate after adding return heat
 
 	The light fraction heat will be added. The outlet condition will be calculated using the total mass flow rate. Then the total mass flow rate will be split into two parts. The difference is that the return heat will impact inlet air conditions for a zone hVAC object. The original mass flow rates at exhaust node and return node will remain as is.
 
-![Figure 1](ReturnNode.PNG)
+![Figure 1](ReturnNode.png)
 
 **Figure 1 Configuration to draw air from return node**
 
@@ -85,7 +85,7 @@ Split flow rate after return plenum mix
 	The split mass flow rate = mass flow rate requested by Zone HVAC object inlet with the air properties at the return plenum outlet
 
 
-![Figure 1](ReturnPlenum.PNG)
+![Figure 1](ReturnPlenum.png)
 
 **Figure 2 Configuration to draw air from return plenum**
 
