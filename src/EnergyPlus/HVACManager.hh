@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -104,11 +105,19 @@ namespace HVACManager {
 
     void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
-    void UpdateZoneInletConvergenceLog();
+    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
 
     void CheckAirLoopFlowBalance(EnergyPlusData &state);
 
 } // namespace HVACManager
+
+struct HVACManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

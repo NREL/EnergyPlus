@@ -49,6 +49,7 @@
 #define PlantReportingMeterData_hh_INCLUDED
 
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SystemReports.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -60,7 +61,7 @@ namespace DataPlant {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        int EndUse_CompMode;
+        SystemReports::iEndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -69,7 +70,8 @@ namespace DataPlant {
 
         // Default Constructor
         MeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None), EndUse_CompMode(0), ReportVarIndex(0),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
+              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
               ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }

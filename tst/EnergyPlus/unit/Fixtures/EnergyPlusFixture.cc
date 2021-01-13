@@ -52,6 +52,7 @@
 #include "EnergyPlusFixture.hh"
 
 // A to Z order
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -59,7 +60,6 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -92,18 +92,19 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearAllStates(state);
+    this->state = new EnergyPlusData;
+    EnergyPlus::clearAllStates(*state);
     EnergyPlus::inputProcessor->clear_state();
 
     show_message();
 
-    openOutputFiles(state);
+    openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
     this->json_stream = new std::ostringstream;
 
-    state.files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    state.files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
+    state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
+    state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -111,7 +112,7 @@ void EnergyPlusFixture::SetUp()
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
 
-    UtilityRoutines::outputErrorHeader = false;
+    state->dataUtilityRoutines->outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines();
     FluidProperties::InitializeGlycRoutines();
@@ -120,17 +121,26 @@ void EnergyPlusFixture::SetUp()
 
 void EnergyPlusFixture::TearDown()
 {
-    state.files.mtd.del();
-    state.files.eso.del();
-    state.files.err_stream.reset();
-    state.files.eio.del();
-    state.files.debug.del();
-    state.files.zsz.del();
-    state.files.ssz.del();
-    state.files.mtr.del();
-    state.files.bnd.del();
-    state.files.shade.del();
-    clearAllStates(this->state);
+    state->files.mtd.del();
+    state->files.eso.del();
+    state->files.err_stream.reset();
+    state->files.eio.del();
+    state->files.debug.del();
+    state->files.zsz.del();
+    state->files.ssz.del();
+    state->files.mtr.del();
+    state->files.bnd.del();
+    state->files.shade.del();
+    clearAllStates(*this->state);
+    delete this->state;
+}
+
+void EnergyPlusFixture::show_message()
+{
+    // Gets information about the currently running test.
+    // Do NOT delete the returned object - it's managed by the UnitTest class.
+    const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+    ShowMessage(*state, "Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -164,28 +174,28 @@ bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.eso.get_output();
+    auto const stream_str = state->files.eso.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.eso.open_as_stringstream();
+    if (reset_stream) state->files.eso.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.eio.get_output();
+    auto const stream_str = state->files.eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.eio.open_as_stringstream();
+    if (reset_stream) state->files.eio.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.mtr.get_output();
+    auto const stream_str = state->files.mtr.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.mtr.open_as_stringstream();
+    if (reset_stream) state->files.mtr.open_as_stringstream();
     return are_equal;
 }
 
@@ -218,10 +228,10 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.dfs.get_output();
+    auto const stream_str = state->files.dfs.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.dfs.open_as_stringstream();
+    if (reset_stream) state->files.dfs.open_as_stringstream();
     return are_equal;
 }
 
@@ -234,22 +244,22 @@ bool EnergyPlusFixture::has_json_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = !state.files.eso.get_output().empty();
-    if (reset_stream) state.files.eso.open_as_stringstream();
+    auto const has_output = !state->files.eso.get_output().empty();
+    if (reset_stream) state->files.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = !state.files.eio.get_output().empty();
-    if (reset_stream) state.files.eio.open_as_stringstream();
+    auto const has_output = !state->files.eio.get_output().empty();
+    if (reset_stream) state->files.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = !state.files.mtr.get_output().empty();
-    if (reset_stream) state.files.mtr.open_as_stringstream();
+    auto const has_output = !state->files.mtr.get_output().empty();
+    if (reset_stream) state->files.mtr.open_as_stringstream();
     return has_output;
 }
 
@@ -276,8 +286,8 @@ bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
 {
-    auto const has_output = !state.files.dfs.get_output().empty();
-    if (reset_stream) state.files.dfs.open_as_stringstream();
+    auto const has_output = !state->files.dfs.get_output().empty();
+    if (reset_stream) state->files.dfs.open_as_stringstream();
     return has_output;
 }
 
@@ -337,10 +347,10 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors();
+    bool hasErrors = inputProcessor->processErrors(*state);
 
     inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing(state);
+    SimulationManager::PostIPProcessing(*state);
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;
@@ -389,13 +399,13 @@ bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
     return errors_found;
 }
 
-bool EnergyPlusFixture::compare_idf(std::string const &EP_UNUSED(name),
-                                    int const EP_UNUSED(num_alphas),
-                                    int const EP_UNUSED(num_numbers),
-                                    std::vector<std::string> const &EP_UNUSED(alphas),
-                                    std::vector<bool> const &EP_UNUSED(alphas_blank),
-                                    std::vector<Real64> const &EP_UNUSED(numbers),
-                                    std::vector<bool> const &EP_UNUSED(numbers_blank))
+bool EnergyPlusFixture::compare_idf([[maybe_unused]] std::string const &name,
+                                    [[maybe_unused]] int const num_alphas,
+                                    [[maybe_unused]] int const num_numbers,
+                                    [[maybe_unused]] std::vector<std::string> const &alphas,
+                                    [[maybe_unused]] std::vector<bool> const &alphas_blank,
+                                    [[maybe_unused]] std::vector<Real64> const &numbers,
+                                    [[maybe_unused]] std::vector<bool> const &numbers_blank)
 {
     // using namespace InputProcessor;
 

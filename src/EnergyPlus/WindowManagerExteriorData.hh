@@ -54,8 +54,8 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -154,7 +154,7 @@ namespace WindowManager {
     private:
         CWindowConstructionsSimplified();
 
-        IGU_Layers getLayers(FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
+        IGU_Layers getLayers(EnergyPlusData &state, FenestrationCommon::WavelengthRange const t_Range, int const t_ConstrNum) const;
 
         static std::unique_ptr<CWindowConstructionsSimplified> p_inst;
 

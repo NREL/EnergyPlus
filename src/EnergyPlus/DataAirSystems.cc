@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -91,32 +91,6 @@ namespace DataAirSystems {
 
     // MODULE VARIABLE DECLARATIONS
     // For each type of air path, define an array of DefineAirPaths
-
-    // Temporary arrays
-
-    // Object Data
-    Array1D<DefinePrimaryAirSystem> PrimaryAirSystem;
-    Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
-    Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-    Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-    Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-    Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-    Array1D<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-    Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
-
-    // Functions
-    void clear_state()
-    {
-
-        PrimaryAirSystem.deallocate();
-        DemandSideConnect.deallocate();       // Connections between loops
-        ZoneCompToPlant.deallocate();         // Connections between loops
-        ZoneSubCompToPlant.deallocate();      // Connections between loops
-        ZoneSubSubCompToPlant.deallocate();   // Connections between loops
-        AirSysCompToPlant.deallocate();       // Connections between loops
-        AirSysSubCompToPlant.deallocate();    // Connections between loops
-        AirSysSubSubCompToPlant.deallocate(); // Connections
-    }
 
     Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {

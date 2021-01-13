@@ -52,16 +52,15 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 
 namespace EnergyPlus {
@@ -77,8 +76,8 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     int ZNnum = 1;
 
     // Set environmental variables for all cases
-    OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
+    state->dataEnvrn->OutHumRat = 0.009;
+    state->dataEnvrn->OutBaroPress = 101400.0;
 
     // Allocate and set earth tube parameters necessary to run the tests
     EarthTubeSys.allocate(ETnum);
@@ -96,13 +95,13 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     EAMFL(ZNnum) = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
+    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, state->dataEnvrn->OutHumRat);
 
     // Second case--condensation so inside humidity should be less than outdoor humidity ratio
     EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
+    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    EXPECT_GT(state->dataEnvrn->OutHumRat, EarthTubeSys(ETnum).HumRat);
 }
 
 TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
@@ -124,12 +123,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
     EarthTubeSys(3).ZonePtr = 3;
 
     // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    CheckEarthTubesInZones(*state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, false);
 
     // Second case--conflict with the last earth tube and first (ErrorsFound = true)
     EarthTubeSys(3).ZonePtr = 1;
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    CheckEarthTubesInZones(*state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, true);
 
     EarthTubeSys.deallocate();

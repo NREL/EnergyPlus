@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -160,18 +161,18 @@ namespace Humidifiers {
 
         void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
-        void ControlHumidifier(Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+        void ControlHumidifier(EnergyPlusData &state, Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );
 
-        void CalcElecSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+        void CalcElecSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
         void CalcGasSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
-        void UpdateReportWaterSystem(); // number of the current humidifier being simulated
+        void UpdateReportWaterSystem(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void UpdateHumidifier(); // number of the current humidifier being simulated
+        void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
         void ReportHumidifier(); // number of the current humidifier being simulated
     };
@@ -202,6 +203,15 @@ namespace Humidifiers {
     );
 
 } // namespace Humidifiers
+
+struct HumidifiersData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

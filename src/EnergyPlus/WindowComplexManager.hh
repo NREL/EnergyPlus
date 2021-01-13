@@ -113,7 +113,8 @@ namespace WindowComplexManager {
 
     void InitBSDFWindows(EnergyPlusData &state);
 
-    void AllocateCFSStateHourlyData(int const iSurf, // Surface number
+    void AllocateCFSStateHourlyData(EnergyPlusData &state,
+                                    int const iSurf, // Surface number
                                     int const iState // Complex fenestration state number
     );
 
@@ -151,13 +152,13 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces();
+    void DetermineMaxBackSurfaces(EnergyPlusData &state);
 
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
 
-    void FillBasisElement(Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
@@ -266,7 +267,8 @@ namespace WindowComplexManager {
 
         bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
         bool InitBSDFWindowsOnce = true;
-        bool resetAbunchOfStuff = true;
+        int NumBasis = 0; // Number of unique bases (No. in BasisList)
+        int MatrixNo = 0; // Index of Basis matrix
 
         void clear_state() //override
         {
@@ -276,14 +278,15 @@ namespace WindowComplexManager {
             this->WindowStateList.deallocate();
             this->InitComplexWindowsOnce = true;
             this->InitBSDFWindowsOnce = true;
-            this->resetAbunchOfStuff = true;
+            this->NumBasis = 0;
+            this->MatrixNo = 0;
         }
 
         // Default Constructor
         WindowComplexManagerData()
             : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
-            TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
-            Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0)
+              TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
+              Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
         {
         }
 

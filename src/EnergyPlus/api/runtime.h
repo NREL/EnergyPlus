@@ -190,6 +190,7 @@ ENERGYPLUSLIB_API void registerProgressCallback(EnergyPlusState state, void (*f)
 /// \details During an EnergyPlus simulation, there are a number of output messages being sent to standard output on the
 ///          command line.  This function can be used to get copies of those messages during the simulation which could
 ///          be captured and better presented to the user during an API workflow.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] f The function to be called back during the simulation.  The function should expect one constant char *
 ///              argument, which will be the message being sent to standard output.
 /// \remark This function has limited usefulness in Python Plugin applications, but is highly valuable for being able

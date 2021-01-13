@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -155,19 +156,19 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSimpleIceStorage(EnergyPlusData &state);
 
-        void CalcIceStorageDormant();
+        void CalcIceStorageDormant(EnergyPlusData &state);
 
-        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+        void CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
         void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
-        void CalcQiceDischageMax(Real64 &QiceMin);
+        void CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin);
 
-        void CalcIceStorageCharge();
+        void CalcIceStorageCharge(EnergyPlusData &state);
 
         void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
 
@@ -175,7 +176,7 @@ namespace IceThermalStorage {
 
         void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-        void UpdateNode(Real64 myLoad, bool RunFlag);
+        void UpdateNode(EnergyPlusData &state, Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
@@ -254,13 +255,13 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitDetailedIceStorage(EnergyPlusData &state);
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
-        void UpdateDetailedIceStorage();
+        void UpdateDetailedIceStorage(EnergyPlusData &state);
 
         void ReportDetailedIceStorage();
 
@@ -296,6 +297,14 @@ namespace IceThermalStorage {
     void UpdateIceFractions();
 
 } // namespace IceThermalStorage
+
+struct IceThermalStorageData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -257,7 +258,7 @@ namespace EvaporativeFluidCoolers {
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
@@ -265,7 +266,7 @@ namespace EvaporativeFluidCoolers {
 
         void CalculateWaterUsage(EnergyPlusData &state);
 
-        void UpdateEvapFluidCooler();
+        void UpdateEvapFluidCooler(EnergyPlusData &state);
 
         void ReportEvapFluidCooler(bool RunFlag);
 
@@ -288,6 +289,14 @@ namespace EvaporativeFluidCoolers {
     void clear_state();
 
 } // namespace EvaporativeFluidCoolers
+
+struct EvaporativeFluidCoolersData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

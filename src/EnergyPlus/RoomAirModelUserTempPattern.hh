@@ -49,6 +49,7 @@
 #define RoomAirModelUserTempPattern_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -87,35 +88,43 @@ namespace RoomAirModelUserTempPattern {
 
     //****************************************************
 
-    void InitTempDistModel(int const ZoneNum); // index number for the specified zone
+    void InitTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void GetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
     void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-    void FigureSurfMapPattern(int const PattrnID, int const ZoneNum);
+    void FigureSurfMapPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
-    void FigureHeightPattern(int const PattrnID, int const ZoneNum);
+    void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, Real64 UpperBound, Real64 HiGradient, Real64 LowerBound, Real64 LowGradient);
 
-    void FigureConstGradPattern(int const PattrnID, int const ZoneNum);
+    void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const ZoneNum);
 
     //*****************************************************************************************
 
-    Real64 FigureNDheightInZone(int const thisHBsurf); // index in main Surface array
+    Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf); // index in main Surface array
 
     //***************************************************
 
-    void SetSurfHBDataForTempDistModel(int const ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
 } // namespace RoomAirModelUserTempPattern
+
+struct RoomAirModelUserTempPatternData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

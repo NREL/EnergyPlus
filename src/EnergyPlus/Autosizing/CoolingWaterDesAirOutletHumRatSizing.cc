@@ -46,30 +46,30 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitIU) {
-                Real64 TDpIn = Psychrometrics::PsyTdpFnWPb(this->dataDesInletAirHumRat, DataEnvironment::StdBaroPress);
+                Real64 TDpIn = Psychrometrics::PsyTdpFnWPb(state, this->dataDesInletAirHumRat, state.dataEnvrn->StdBaroPress);
                 if (TDpIn <= this->dataDesInletWaterTemp) {
                     this->autoSizedValue = this->dataDesInletAirHumRat;
                 } else {
-                    this->autoSizedValue = min(Psychrometrics::PsyWFnTdbRhPb(this->dataDesOutletAirTemp, 0.9, DataEnvironment::StdBaroPress),
+                    this->autoSizedValue = min(Psychrometrics::PsyWFnTdbRhPb(state, this->dataDesOutletAirTemp, 0.9, state.dataEnvrn->StdBaroPress),
                                                this->dataDesInletAirHumRat);
                 }
             } else {
@@ -101,13 +101,13 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
             std::string msg =
                 this->callingRoutine + ":" + " Coil=\"" + this->compName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
             this->addErrorMessage(msg);
-            ShowWarningError(msg);
-            msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
+            ShowWarningError(state, msg);
+            msg = format("    Wair,in =  {:.6R} [kgWater/kgDryAir]", this->dataDesInletAirHumRat);
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
-            msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
+            ShowContinueError(state, msg);
+            msg = format("    Wair,out = {:.6R} [kgWater/kgDryAir]", this->autoSizedValue);
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
             if (this->dataDesInletAirHumRat > 0.016) {
                 this->autoSizedValue = 0.5 * this->dataDesInletAirHumRat;
             } else {
@@ -115,15 +115,15 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
             }
             msg = "....coil leaving humidity ratio will be reset to:";
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
-            msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
+            ShowContinueError(state, msg);
+            msg = format("    Wair,out = {:.6R} [kgWater/kgDryAir]", this->autoSizedValue);
             this->addErrorMessage(msg);
-            ShowContinueError(msg);
+            ShowContinueError(state, msg);
         }
         // check for dry coil and reset outlet humrat if needed
         Real64 desSatEnthAtWaterInTemp = Psychrometrics::PsyHFnTdbW(
-            this->dataDesInletWaterTemp, Psychrometrics::PsyWFnTdpPb(this->dataDesInletWaterTemp, DataEnvironment::StdBaroPress));
-        Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
+            this->dataDesInletWaterTemp, Psychrometrics::PsyWFnTdpPb(state, this->dataDesInletWaterTemp, state.dataEnvrn->StdBaroPress));
+        Real64 desHumRatAtWaterInTemp = Psychrometrics::PsyWFnTdbH(state, this->dataDesInletWaterTemp, desSatEnthAtWaterInTemp, this->callingRoutine);
         if (this->autoSizedValue < this->dataDesInletAirHumRat && desHumRatAtWaterInTemp > this->dataDesInletAirHumRat) {
             if (this->autoSizedValue < this->dataDesInletAirHumRat &&
                 (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
@@ -132,35 +132,35 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state
                                   "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
                                   "temperature > design air entering humidity ratio.";
                 this->addErrorMessage(msg);
-                ShowWarningError(msg);
-                msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
+                ShowWarningError(state, msg);
+                msg = format("    Wair,in =  {:.6R} [kgWater/kgDryAir]", this->dataDesInletAirHumRat);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
+                ShowContinueError(state, msg);
+                msg = format("    Wair,out = {:.6R} [kgWater/kgDryAir]", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Inlet chilled water temperature = " + General::RoundSigDigits(this->dataDesInletWaterTemp, 3) + " [C]";
+                ShowContinueError(state, msg);
+                msg = format("    Inlet chilled water temperature = {:.3R} [C]", this->dataDesInletWaterTemp);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                      General::RoundSigDigits(desHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]";
+                ShowContinueError(state, msg);
+                msg = format("    Minimum humidity ratio at saturation for inlet chilled water temperature = {:.6R} [kgWater/kgDryAir]",
+                             desHumRatAtWaterInTemp);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
                 this->autoSizedValue = this->dataDesInletAirHumRat;
                 msg = "....coil leaving humidity ratio will be reset to:";
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
-                msg = "    Wair,out = " + General::RoundSigDigits(this->autoSizedValue, 6) + " [kgWater/kgDryAir]";
+                ShowContinueError(state, msg);
+                msg = format("    Wair,out = {:.6R} [kgWater/kgDryAir]", this->autoSizedValue);
                 this->addErrorMessage(msg);
-                ShowContinueError(msg);
+                ShowContinueError(state, msg);
             }
         }
     }
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_outlet_air_humidity_ratio [kgWater/kgDryAir]";
     }
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(state, errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

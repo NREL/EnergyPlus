@@ -51,13 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/PierceSurface.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Vector3.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/PierceSurface.hh>
 
 // C++ Headers
 #include <algorithm>

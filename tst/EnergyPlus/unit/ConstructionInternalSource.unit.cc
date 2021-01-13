@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 
@@ -83,7 +84,7 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 
     bool errorsFound(false);
 
-    GetConstructData(state, errorsFound);
+    GetConstructData(*state, errorsFound);
 
-    EXPECT_NEAR(0.1524,  state.dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
+    EXPECT_NEAR(0.1524,  state->dataConstruction->Construct(1).ThicknessPerpend, 0.0001);
 }

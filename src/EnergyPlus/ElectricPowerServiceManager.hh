@@ -54,6 +54,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -82,7 +83,7 @@ enum class GeneratorType {
     PVWatts
 };
 
-void initializeElectricPowerServiceZoneGains();
+void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -108,7 +109,7 @@ public: // Methods
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void setPVWattsDCCapacity(Real64 const dcCapacity);
+    void setPVWattsDCCapacity(EnergyPlusData &state, Real64 const dcCapacity);
 
     Real64 pvWattsDCCapacity();
 
@@ -403,13 +404,13 @@ public: // methods
     // Constructor
     ElectricTransformer(EnergyPlusData &state, std::string const &objectName);
 
-    Real64 getLossRateForOutputPower(Real64 const powerOutOfTransformer);
+    Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfTransformer);
 
-    Real64 getLossRateForInputPower(Real64 const powerIntoTransformer);
+    Real64 getLossRateForInputPower(EnergyPlusData &state, Real64 const powerIntoTransformer);
 
-    void manageTransformers(Real64 const surplusPowerOutFromLoadCenters);
+    void manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters);
 
-    void setupMeterIndices();
+    void setupMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
@@ -547,7 +548,7 @@ public: // Methods
 
     void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
-    void setupLoadCenterMeterIndices();
+    void setupLoadCenterMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
@@ -557,7 +558,7 @@ public: // Methods
 
     std::string const &generatorListName() const;
 
-    void updateLoadCenterGeneratorRecords();
+    void updateLoadCenterGeneratorRecords(EnergyPlusData &state);
 
 private: // Methods
     void dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
@@ -691,29 +692,30 @@ public: // Methods
     {
     }
 
-    void manageElectricPowerService(EnergyPlusData &state, bool const FirstHVACIteration,
+    void manageElectricPowerService(EnergyPlusData &state,
+                                    bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
                                     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
     );
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void verifyCustomMetersElecPowerMgr();
+    void verifyCustomMetersElecPowerMgr(EnergyPlusData &state);
 
 private: // Methods
     void getPowerManagerInput(EnergyPlusData &state);
 
-    void setupMeterIndices();
+    void setupMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
-    void updateWholeBuildingRecords();
+    void updateWholeBuildingRecords(EnergyPlusData &state);
 
-    void reportPVandWindCapacity();
+    void reportPVandWindCapacity(EnergyPlusData &state);
 
     void sumUpNumberOfStorageDevices();
 
-    void checkLoadCenters();
+    void checkLoadCenters(EnergyPlusData &state);
 
 public: // data
     bool newEnvironmentInternalGainsFlag;
@@ -766,6 +768,14 @@ extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 void createFacilityElectricPowerServiceObject();
 
 void clearFacilityElectricPowerServiceObject();
+
+struct ElectPwrSvcMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ElectricPowerServiceManager_hh_INCLUDED

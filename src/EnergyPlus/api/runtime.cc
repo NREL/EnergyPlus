@@ -46,13 +46,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <utility>
+
+// disabling "maybe unused" warnings for all the API functions so the IDE isn't lit up with messages
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
 //    argv[0] = "energyplus";
@@ -72,22 +73,28 @@ void stopSimulation(EnergyPlusState state) {
     thisState->dataGlobal->stopSimulation = true;
 }
 
-void issueWarning(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowWarningError(message);
+void issueWarning(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowWarningError(*thisState, message);
 }
-void issueSevere(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowSevereError(message);
+void issueSevere(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowSevereError(*thisState, message);
 }
-void issueText(EnergyPlusState, const char * message) {
-    EnergyPlus::ShowContinueError(message);
+void issueText(EnergyPlusState state, const char * message) {
+    auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::ShowContinueError(*thisState, message);
 }
 
-void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
-    EnergyPlus::DataGlobals::progressCallback = f;
+void registerProgressCallback(EnergyPlusState state, void (*f)(int const)) {
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), std::function<void (const std::string &)> f) {
-    EnergyPlus::DataGlobals::messageCallback = f;
+void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    thisState->dataGlobal->messageCallback = f; // NOLINT(performance-unnecessary-value-param)
 }
 
 void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {
@@ -99,7 +106,7 @@ void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {
 
 void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->externalHVACManager = f;
+    thisState->dataGlobal->externalHVACManager = f; // NOLINT(performance-unnecessary-value-param)
 }
 
 void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
@@ -283,3 +290,5 @@ void callbackUnitarySystemSizing(EnergyPlusState state, void (*f)(EnergyPlusStat
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::UnitarySystemSizing, f);
 }
+
+#pragma clang diagnostic pop

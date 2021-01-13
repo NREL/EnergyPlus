@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -194,17 +195,18 @@ namespace HWBaseboardRadiator {
 
     void CalcHWBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateHWBaseboard(int const BaseboardNum);
+    void UpdateHWBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void UpdateBBRadSourceValAvg(bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBRadGains();
+    void DistributeBBRadGains(EnergyPlusData &state);
 
     void ReportHWBaseboard(int const BaseboardNum);
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
-    void UpdateHWBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
+    void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
+                                          int const BaseboardTypeNum,       // type index
                                           std::string const &BaseboardName, // component name
                                           int const EquipFlowCtrl,          // Flow control mode for the equipment
                                           int const LoopNum,                // Plant loop index for where called from
@@ -217,6 +219,14 @@ namespace HWBaseboardRadiator {
     //*****************************************************************************************
 
 } // namespace HWBaseboardRadiator
+
+struct HWBaseboardRadiatorData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

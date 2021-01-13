@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace MixerComponent {
 
@@ -144,7 +148,7 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(int const MixerNum);
+    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum);
 
     //        End of Update subroutines for the Mixer Module
     // *****************************************************************************
@@ -167,6 +171,14 @@ namespace MixerComponent {
     // *****************************************************************************
 
 } // namespace MixerComponent
+
+struct MixerComponentData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -46,16 +46,17 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
 
-Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -72,14 +73,14 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state)
             } else {
                 Real64 desMassFlow = 0.0;
                 if (this->zoneEqSizing(this->curZoneEqNum).SystemAirFlow) {
-                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
-                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
+                    desMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * state.dataEnvrn->StdRhoAir;
                 } else {
                     desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
                 this->autoSizedValue =
-                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state, desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                                 this->zoneEqSizing(this->curZoneEqNum),
                                                                 this->finalZoneSizing(this->curZoneEqNum));
             }
@@ -112,8 +113,8 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state)
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
     }
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(state, errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

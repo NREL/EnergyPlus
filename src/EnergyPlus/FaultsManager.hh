@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -178,7 +179,7 @@ namespace FaultsManager {
         virtual ~FaultProperties() = default;
 
     public:
-        Real64 CalFaultOffsetAct();
+        Real64 CalFaultOffsetAct(EnergyPlusData &state);
     };
 
     struct FaultPropertiesEconomizer : public FaultProperties // Class for fault models related with economizer
@@ -255,7 +256,7 @@ namespace FaultsManager {
         // Real64 CalFaultyCoilFoulingFactor();
 
         // Calculate the Fault Fraction based on Availability and Severity Schedules
-        Real64 FaultFraction();
+        Real64 FaultFraction(EnergyPlusData &state);
     };
 
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
@@ -347,7 +348,7 @@ namespace FaultsManager {
         }
 
     public:
-        Real64 CalFaultyTowerFoulingFactor();
+        Real64 CalFaultyTowerFoulingFactor(EnergyPlusData &state);
     };
 
     struct FaultPropertiesFouling : public FaultProperties // Class for FaultModel:Fouling
@@ -361,7 +362,7 @@ namespace FaultsManager {
         }
 
     public:
-        Real64 CalFoulingFactor(); // To calculate the dynamic fouling factor
+        Real64 CalFoulingFactor(EnergyPlusData &state); // To calculate the dynamic fouling factor
     };
 
     struct FaultPropertiesBoilerFouling : public FaultPropertiesFouling // Class for FaultModel:Fouling:Boiler
@@ -423,6 +424,14 @@ namespace FaultsManager {
     void SetFaultyCoilSATSensor(std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex);
 
 } // namespace FaultsManager
+
+struct FaultsManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

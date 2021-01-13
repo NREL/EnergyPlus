@@ -53,8 +53,10 @@
 // C++ Headers
 #include <memory>
 #include <vector>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 
 using namespace EnergyPlus;

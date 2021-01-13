@@ -49,9 +49,13 @@
 #define HeatingAirFlowSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
+
+// Forward decarations
+struct EnergyPlusData;
 
 struct HeatingAirFlowSizer : BaseSizerWithScalableInputs
 {

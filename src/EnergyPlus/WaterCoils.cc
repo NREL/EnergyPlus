@@ -75,7 +75,6 @@
 #include <EnergyPlus/Autosizing/WaterHeatingCoilUASizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -91,7 +90,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACControllers.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -124,22 +122,8 @@ namespace WaterCoils {
     // To encapsulate the data and algorithms required to
     // manage the WaterCoil System Component
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataGlobals;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::StdBaroPress;
-    using DataEnvironment::StdRhoAir;
     using namespace DataHVACGlobals;
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_CoilWaterCooling;
     using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -157,15 +141,6 @@ namespace WaterCoils {
     using Psychrometrics::PsyWFnTdbTwbPb;
     using Psychrometrics::PsyWFnTdpPb;
     using namespace ScheduleManager;
-
-    // Data
-    // PRIVATE ! Everything private unless explicitly made public
-
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     void SimulateWaterCoilComponents(EnergyPlusData &state,
                                      std::string const &CompName,
@@ -186,7 +161,6 @@ namespace WaterCoils {
         // This subroutine manages WaterCoil component simulation.
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;         // The WaterCoil that you are currently loading input into
@@ -205,19 +179,26 @@ namespace WaterCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
             if (CoilNum == 0) {
-                ShowFatalError("SimulateWaterCoilComponents: Coil not found=" + CompName);
+                ShowFatalError(state, "SimulateWaterCoilComponents: Coil not found=" + CompName);
             }
             CompIndex = CoilNum;
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError("SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Water Coils=" + TrimSigDigits(state.dataWaterCoils->NumWaterCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Number of Water Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CompName));
             }
             if (state.dataWaterCoils->CheckEquipName(CoilNum)) {
                 if (CompName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                    ShowFatalError("SimulateWaterCoilComponents: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                                   ", stored Coil Name for that index=" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("SimulateWaterCoilComponents: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CompName,
+                               state.dataWaterCoils->WaterCoil(CoilNum).Name));
                 }
                 state.dataWaterCoils->CheckEquipName(CoilNum) = false;
             }
@@ -315,9 +296,9 @@ namespace WaterCoils {
         static bool ErrorsFound(false); // If errors detected in input
 
         // Flow
-        NumSimpHeat = inputProcessor->getNumObjectsFound("Coil:Heating:Water");
-        NumFlatFin = inputProcessor->getNumObjectsFound("Coil:Cooling:Water:DetailedGeometry");
-        NumCooling = inputProcessor->getNumObjectsFound("Coil:Cooling:Water");
+        NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
+        NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
+        NumCooling = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
         state.dataWaterCoils->NumWaterCoils = NumSimpHeat + NumFlatFin + NumCooling;
 
         if (state.dataWaterCoils->NumWaterCoils > 0) {
@@ -328,13 +309,13 @@ namespace WaterCoils {
             state.dataWaterCoils->CheckEquipName.dimension(state.dataWaterCoils->NumWaterCoils, true);
         }
 
-        inputProcessor->getObjectDefMaxArgs("Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water:DetailedGeometry", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
+        inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:Water", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -367,19 +348,19 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
+                    ShowSevereError(state, CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
                                     '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -437,23 +418,23 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp = false;
             }
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp <= state.dataWaterCoils->WaterCoil(CoilNum).DesOutletWaterTemp) {
-                ShowSevereError("For " + CurrentModuleObject + ", " + AlphArray(1));
-                ShowContinueError("  the " + cNumericFields(4) + " must be greater than the " + cNumericFields(6) + '.');
+                ShowSevereError(state, "For " + CurrentModuleObject + ", " + AlphArray(1));
+                ShowContinueError(state, "  the " + cNumericFields(4) + " must be greater than the " + cNumericFields(6) + '.');
                 ErrorsFound = true;
             }
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp >= state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp) {
-                ShowSevereError("For " + CurrentModuleObject + ", " + AlphArray(1));
-                ShowContinueError("  the " + cNumericFields(5) + " must be less than the " + cNumericFields(7) + '.');
+                ShowSevereError(state, "For " + CurrentModuleObject + ", " + AlphArray(1));
+                ShowContinueError(state, "  the " + cNumericFields(5) + " must be less than the " + cNumericFields(7) + '.');
                 ErrorsFound = true;
             }
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp >= state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp) {
-                ShowSevereError("For " + CurrentModuleObject + ", " + AlphArray(1));
-                ShowContinueError("  the " + cNumericFields(5) + " must be less than the " + cNumericFields(4) + '.');
+                ShowSevereError(state, "For " + CurrentModuleObject + ", " + AlphArray(1));
+                ShowContinueError(state, "  the " + cNumericFields(5) + " must be less than the " + cNumericFields(4) + '.');
                 ErrorsFound = true;
             }
 
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
             // Setup the Simple Heating Coil reporting variables
             // CurrentModuleObject = "Coil:Heating:Water"
@@ -515,19 +496,19 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
+                    ShowSevereError(state, CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
                                     '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -555,7 +536,7 @@ namespace WaterCoils {
             if (state.dataWaterCoils->WaterCoil(CoilNum).FinDiam == AutoSize) state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
             state.dataWaterCoils->WaterCoil(CoilNum).FinThickness = NumArray(8);
             if (state.dataWaterCoils->WaterCoil(CoilNum).FinThickness <= 0.0) {
-                ShowSevereError(CurrentModuleObject + ": " + cNumericFields(8) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
+                ShowSevereError(state, CurrentModuleObject + ": " + cNumericFields(8) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ErrorsFound = true;
             }
@@ -563,13 +544,13 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam = NumArray(10);
             state.dataWaterCoils->WaterCoil(CoilNum).TubeThermConductivity = NumArray(11);
             if (state.dataWaterCoils->WaterCoil(CoilNum).TubeThermConductivity <= 0.0) {
-                ShowSevereError(CurrentModuleObject + ": " + cNumericFields(11) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
+                ShowSevereError(state, CurrentModuleObject + ": " + cNumericFields(11) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ErrorsFound = true;
             }
             state.dataWaterCoils->WaterCoil(CoilNum).FinThermConductivity = NumArray(12);
             if (state.dataWaterCoils->WaterCoil(CoilNum).FinThermConductivity <= 0.0) {
-                ShowSevereError(CurrentModuleObject + ": " + cNumericFields(12) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
+                ShowSevereError(state, CurrentModuleObject + ": " + cNumericFields(12) + " must be > 0.0, for " + cAlphaFields(1) + " = " +
                                 state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ErrorsFound = true;
             }
@@ -607,8 +588,8 @@ namespace WaterCoils {
                                          state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID);
             }
 
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
             // Setup Report variables for the Detailed Flat Fin Cooling Coils
             // CurrentModuleObject = "Coil:Cooling:Water:DetailedGeometry"
@@ -697,19 +678,19 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
             state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+            VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataWaterCoils->WaterCoil(CoilNum).Name = AlphArray(1);
             state.dataWaterCoils->WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = ScheduleAlwaysOn;
+                state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
+                    ShowSevereError(state, CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + AlphArray(2) + " for " + cAlphaFields(1) +
                                     '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -793,8 +774,8 @@ namespace WaterCoils {
                                          state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID);
             }
 
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
-            TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(3), AlphArray(4), "Water Nodes");
+            TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
 
             // Setup Report variables for the Design input Cooling Coils
             // CurrentModuleObject = "Coil:Cooling:Water"
@@ -868,7 +849,7 @@ namespace WaterCoils {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, RoutineName + "Errors found in getting input.");
         }
 
         AlphArray.deallocate();
@@ -899,7 +880,7 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using General::Iterate;
-        using General::RoundSigDigits;
+
         using General::SafeDivide;
         using General::SolveRoot;
         using namespace OutputReportPredefined;
@@ -1047,18 +1028,18 @@ namespace WaterCoils {
                     WaterCoilOnAirLoop = true;
                     CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
                     if (!WaterCoilOnAirLoop) {
-                        ShowContinueError("Controller:WaterCoil = " + state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
+                        ShowContinueError(state, "Controller:WaterCoil = " + state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
                         ErrorsFound = true;
                     }
                 }
             }
             state.dataWaterCoils->WaterCoilControllerCheckOneTimeFlag = false;
             if (ErrorsFound) {
-                ShowFatalError("Program terminated for previous condition.");
+                ShowFatalError(state, "Program terminated for previous condition.");
             }
         }
 
-        if (PlantLoopScanFlag(CoilNum) && allocated(PlantLoop)) {
+        if (PlantLoopScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -1074,11 +1055,11 @@ namespace WaterCoils {
                                     _,
                                     _);
             if (errFlag) {
-                ShowFatalError("InitWaterCoil: Program terminated for previous conditions.");
+                ShowFatalError(state, "InitWaterCoil: Program terminated for previous conditions.");
             }
             PlantLoopScanFlag(CoilNum) = false;
         }
-        if (!SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataWaterCoils->MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
             SizeWaterCoil(state, CoilNum);
 
@@ -1086,11 +1067,11 @@ namespace WaterCoils {
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             rho = GetDensityGlycol(state,
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
-                                   DataGlobalConstants::InitConvTemp(),
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                   DataGlobalConstants::InitConvTemp,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                    RoutineName);
             // Initialize all report variables to a known state at beginning of simulation
             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = 0.0;
@@ -1112,9 +1093,9 @@ namespace WaterCoils {
                 Node(WaterInletNode).Temp = 5.0;
 
                 Cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                            Node(WaterInletNode).Temp,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                            RoutineName);
 
                 Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
@@ -1127,9 +1108,9 @@ namespace WaterCoils {
                 Node(WaterInletNode).Temp = 60.0;
 
                 Cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                            Node(WaterInletNode).Temp,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                            RoutineName);
 
                 Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
@@ -1139,7 +1120,7 @@ namespace WaterCoils {
                 state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum) = false;
                 // fill values for variable UA
                 CpAirStd = PsyCpAirFnW(0.0);
-                state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
+                state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = state.dataEnvrn->StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
                 state.dataWaterCoils->WaterCoil(CoilNum).LiquidSideNominalConvect = state.dataWaterCoils->WaterCoil(CoilNum).UACoil * (state.dataWaterCoils->WaterCoil(CoilNum).RatioAirSideToWaterSideConvect + 1) /
                                                               state.dataWaterCoils->WaterCoil(CoilNum).RatioAirSideToWaterSideConvect;
                 state.dataWaterCoils->WaterCoil(CoilNum).AirSideNominalConvect =
@@ -1162,7 +1143,7 @@ namespace WaterCoils {
             // effective fin diameter for detailed flat fin coil
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == state.dataWaterCoils->CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                 state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
-                                                                (DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
+                                                                (DataGlobalConstants::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
 
                 //   calculate fixed geometric parameters of the coil:
                 //   Total Area
@@ -1175,18 +1156,18 @@ namespace WaterCoils {
                 //   be less than 1
                 TubeToFinDiamRatio = state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam / state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam;
                 if (TubeToFinDiamRatio > 1.0) {
-                    ShowWarningError("InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [" + RoundSigDigits(TubeToFinDiamRatio, 4) +
-                                     ']');
+                    ShowWarningError(state, format("InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [{:.4R}]", TubeToFinDiamRatio));
                     // reset tube depth spacing and recalc dependent parameters
                     state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing *= (pow_2(TubeToFinDiamRatio) + 0.1);
                     state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth = state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows;
                     state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam = std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
-                                                                    (DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
+                                                                    (DataGlobalConstants::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow));
                     state.dataWaterCoils->WaterCoil(CoilNum).CoilEffectiveInsideDiam =
                         4.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     TubeToFinDiamRatio = state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideDiam / state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam;
-                    ShowContinueError("  Resetting tube depth spacing to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing, 4) + " meters");
-                    ShowContinueError("  Resetting coil depth to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth, 4) + " meters");
+                    ShowContinueError(
+                        state, format("  Resetting tube depth spacing to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).TubeDepthSpacing));
+                    ShowContinueError(state, format("  Resetting coil depth to {:.4R} meters", state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth));
                 }
 
                 CalcDryFinEffCoef(state, TubeToFinDiamRatio, CoefSeries);
@@ -1232,9 +1213,9 @@ namespace WaterCoils {
                 DesInletAirEnth = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
                 DesOutletAirEnth = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat);
                 DesSatEnthAtWaterInTemp =
-                    PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, PsyWFnTdpPb(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, StdBaroPress));
+                    PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, PsyWFnTdpPb(state, state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, state.dataEnvrn->StdBaroPress));
                 // check for dry coil
-                DesHumRatAtWaterInTemp = PsyWFnTdbH(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, DesSatEnthAtWaterInTemp, RoutineName);
+                DesHumRatAtWaterInTemp = PsyWFnTdbH(state, state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, DesSatEnthAtWaterInTemp, RoutineName);
                 if (DesHumRatAtWaterInTemp > state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat &&
                     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp > state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp) {
                     // if the design outlet air humrat is lower than the saturated air humrat at the design inlet water temp
@@ -1243,18 +1224,23 @@ namespace WaterCoils {
                     DesSatEnthAtWaterInTemp = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat) - 0.0001;
                 }
                 if (DesOutletAirEnth >= DesInletAirEnth || state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp >= state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) {
-                    ShowWarningError("The design cooling capacity is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                    ShowContinueError("  The maximum water flow rate for this coil will be set to zero and the coil will do no cooling.");
-                    ShowContinueError("  Check the following coil design inputs for problems: Tair,in = " +
-                                      RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, 4));
-                    ShowContinueError("                                                       Wair,in = " +
-                                      RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat, 6));
-                    ShowContinueError("                                                       Twater,in = " +
-                                      RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, 4));
-                    ShowContinueError("                                                       Tair,out = " +
-                                      RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp, 4));
-                    ShowContinueError("                                                       Wair,out = " +
-                                      RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, 6));
+                    ShowWarningError(state, "The design cooling capacity is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowContinueError(state, "  The maximum water flow rate for this coil will be set to zero and the coil will do no cooling.");
+                    ShowContinueError(state,
+                                      format("  Check the following coil design inputs for problems: Tair,in = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Wair,in = {:.6R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
+                    ShowContinueError(state,
+                                      format("                                                       Twater,in = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Tair,out = {:.4R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
+                    ShowContinueError(state,
+                                      format("                                                       Wair,out = {:.6R}",
+                                             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = 0.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = 0.0;
                 }
@@ -1273,32 +1259,37 @@ namespace WaterCoils {
                         if (!NoSatCurveIntersect && !BelowInletWaterTemp && !CBFTooLarge) {
                             goto Inlet_Conditions_Loop_exit; // coil UA calcs OK
                         } else {
-                            ShowWarningError("In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                            ShowWarningError(state, "In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                             if (NoSatCurveIntersect) {
-                                ShowContinueError("no apparatus dew-point can be found for the initial entering and leaving conditions;");
+                                ShowContinueError(state, "no apparatus dew-point can be found for the initial entering and leaving conditions;");
                             }
                             if (BelowInletWaterTemp) {
-                                ShowContinueError("the apparatus dew-point is below the coil design inlet water temperature;");
+                                ShowContinueError(state, "the apparatus dew-point is below the coil design inlet water temperature;");
                             }
                             if (CBFTooLarge) {
-                                ShowContinueError("the coil bypass factor is unrealistically large;");
+                                ShowContinueError(state, "the coil bypass factor is unrealistically large;");
                             }
                             if (!NoExitCondReset) {
-                                ShowContinueError("the coil outlet design conditions will be changed to correct the problem.");
+                                ShowContinueError(state, "the coil outlet design conditions will be changed to correct the problem.");
                             }
-                            ShowContinueError("The initial design conditions are: Tair,in = " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, 4));
-                            ShowContinueError("                                   Wair,in = " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat, 6));
-                            ShowContinueError("                                   Twater,in = " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp, 4));
-                            ShowContinueError("                                   Tair,out = " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp, 4));
-                            ShowContinueError("                                   Wair,out = " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, 6));
+                            ShowContinueError(state,
+                                              format("The initial design conditions are: Tair,in = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
+                            ShowContinueError(state,
+                                              format("                                   Wair,in = {:.6R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat));
+                            ShowContinueError(state,
+                                              format("                                   Twater,in = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp));
+                            ShowContinueError(state,
+                                              format("                                   Tair,out = {:.4R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp));
+                            ShowContinueError(state,
+                                              format("                                   Wair,out = {:.6R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat));
                             if (!NoExitCondReset) {
-                                ShowContinueError("The revised design conditions are: Tair,out = " + RoundSigDigits(TOutNew, 4));
-                                ShowContinueError("                                   Wair,out = " + RoundSigDigits(WOutNew, 6));
+                                ShowContinueError(state, format("The revised design conditions are: Tair,out = {:.4R}", TOutNew));
+                                ShowContinueError(state, format("                                   Wair,out = {:.6R}", WOutNew));
                                 state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = WOutNew;
                                 state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = TOutNew;
                                 // update outlet air conditions used for sizing
@@ -1308,15 +1299,15 @@ namespace WaterCoils {
                                 } else {
                                     CompType = cAllCoilTypes(Coil_CoolingWater);
                                 }
-                                coilSelectionReportObj->setCoilLvgAirTemp(state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
-                                coilSelectionReportObj->setCoilLvgAirHumRat(state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
+                                coilSelectionReportObj->setCoilLvgAirTemp(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, TOutNew);
+                                coilSelectionReportObj->setCoilLvgAirHumRat(state, state.dataWaterCoils->WaterCoil(CoilNum).Name, CompType, WOutNew);
                                 // end update outlet air conditions used for sizing
                             }
                         }
                     }
 
                     // Volume flow rate being converted to mass flow rate for water
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = state.dataEnvrn->StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
 
                     // Enthalpy of Air at Inlet design conditions
                     DesInletAirEnth = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
@@ -1327,22 +1318,22 @@ namespace WaterCoils {
                     // already calculated above and possibly reset if dry coil
                     //        ! Enthalpy of Water at Inlet design conditions
                     //        DesSatEnthAtWaterInTemp =PsyHFnTdbW(WaterCoil(CoilNum)%DesInletWaterTemp, &
-                    //                                             PsyWFnTdpPb(WaterCoil(CoilNum)%DesInletWaterTemp,StdBaroPress))
+                    //                                             PsyWFnTdpPb(state, WaterCoil(CoilNum)%DesInletWaterTemp,StdBaroPress))
 
                     // Total Coil Load from Inlet and Outlet Air States (which include fan heat as appropriate).
                     state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad = state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
 
                     // Enthalpy of Water at Intlet design conditions
                     Cp = GetSpecificHeatGlycol(state,
-                                               PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp,
-                                               PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                                RoutineName);
 
                     DesOutletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp +
                                          state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad / (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate * Cp);
 
-                    DesSatEnthAtWaterOutTemp = PsyHFnTdbW(DesOutletWaterTemp, PsyWFnTdpPb(DesOutletWaterTemp, StdBaroPress));
+                    DesSatEnthAtWaterOutTemp = PsyHFnTdbW(DesOutletWaterTemp, PsyWFnTdpPb(state, DesOutletWaterTemp, state.dataEnvrn->StdBaroPress));
                     DesEnthAtWaterOutTempAirInHumRat = PsyHFnTdbW(DesOutletWaterTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
                     DesEnthWaterOut = min(DesSatEnthAtWaterOutTemp, DesEnthAtWaterOutTempAirInHumRat);
 
@@ -1356,14 +1347,14 @@ namespace WaterCoils {
                                               max((state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat - state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat), SmallNo);
 
                         // Initialize iteration parameters
-                        DesAirTempApparatusDewPt = PsyTdpFnWPb(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, OutBaroPress);
+                        DesAirTempApparatusDewPt = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, state.dataEnvrn->OutBaroPress);
 
                         // Iterating to calculate Apparatus Dew Point Temperature at Design Conditions
                         for (iter = 1; iter <= itmax; ++iter) {
 
                             // Calculate apparatus dewpoint and compare with predicted value
                             // using entering conditions and SlopeTempVsHumRatio
-                            DesAirHumRatApparatusDewPt = PsyWFnTdpPb(DesAirTempApparatusDewPt, OutBaroPress);
+                            DesAirHumRatApparatusDewPt = PsyWFnTdpPb(state, DesAirTempApparatusDewPt, state.dataEnvrn->OutBaroPress);
 
                             // Initial Estimate for apparatus Dew Point Temperature
                             TempApparatusDewPtEstimate = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp -
@@ -1382,8 +1373,8 @@ namespace WaterCoils {
                             // If not converged due to low Humidity Ratio approximate value at outlet conditions
                             if (iter == itmax) {
                                 NoSatCurveIntersect = true;
-                                DesAirTempApparatusDewPt = PsyTdpFnWPb(state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, OutBaroPress);
-                                DesAirHumRatApparatusDewPt = PsyWFnTdpPb(DesAirTempApparatusDewPt, OutBaroPress);
+                                DesAirTempApparatusDewPt = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat, state.dataEnvrn->OutBaroPress);
+                                DesAirHumRatApparatusDewPt = PsyWFnTdpPb(state, DesAirTempApparatusDewPt, state.dataEnvrn->OutBaroPress);
                                 goto App_DewPoint_Loop1_exit;
                             }
 
@@ -1404,17 +1395,18 @@ namespace WaterCoils {
                         }
 
                         if (DesEnthWaterOut > DesInletAirEnth) {
-                            ShowWarningError("In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                            ShowContinueError("the outlet chilled water design enthalpy is greater than the inlet air design enthalpy.");
-                            ShowContinueError("To correct this condition the design chilled water flow rate will be increased from " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate, 5));
+                            ShowWarningError(state, "In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                            ShowContinueError(state, "the outlet chilled water design enthalpy is greater than the inlet air design enthalpy.");
+                            ShowContinueError(state,
+                                              format("To correct this condition the design chilled water flow rate will be increased from {:.5R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             EnthCorrFrac = (DesEnthWaterOut - DesInletAirEnth) / (DesEnthWaterOut - DesSatEnthAtWaterInTemp);
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate *= (1.0 + 2.0 * EnthCorrFrac);
-                            ShowContinueError("to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate, 5) + " m3/s");
+                            ShowContinueError(state, format("to {:.5R} m3/s", state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
                             DesOutletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp +
                                                  state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad / (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate * Cp);
-                            DesSatEnthAtWaterOutTemp = PsyHFnTdbW(DesOutletWaterTemp, PsyWFnTdpPb(DesOutletWaterTemp, StdBaroPress));
+                            DesSatEnthAtWaterOutTemp = PsyHFnTdbW(DesOutletWaterTemp, PsyWFnTdpPb(state, DesOutletWaterTemp, state.dataEnvrn->StdBaroPress));
                             DesEnthAtWaterOutTempAirInHumRat = PsyHFnTdbW(DesOutletWaterTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
                             DesEnthWaterOut = min(DesSatEnthAtWaterOutTemp, DesEnthAtWaterOutTempAirInHumRat);
                         }
@@ -1433,8 +1425,8 @@ namespace WaterCoils {
 
                         if (Ipass == 1 && (NoSatCurveIntersect || CBFTooLarge || BelowInletWaterTemp)) {
                             // reset outlet conditions to 90% relative humidity at the same outlet enthalpy
-                            TOutNew = TdbFnHRhPb(DesOutletAirEnth, 0.9, StdBaroPress);
-                            WOutNew = PsyWFnTdbH(TOutNew, DesOutletAirEnth);
+                            TOutNew = TdbFnHRhPb(state, DesOutletAirEnth, 0.9, state.dataEnvrn->StdBaroPress);
+                            WOutNew = PsyWFnTdbH(state, TOutNew, DesOutletAirEnth);
                             if (WOutNew >= state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat || TOutNew > state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp) {
                                 NoExitCondReset = true;
                             }
@@ -1448,14 +1440,15 @@ namespace WaterCoils {
                     } else { // dry coil
 
                         if (DesOutletWaterTemp > state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) {
-                            ShowWarningError("In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                            ShowContinueError("the outlet chilled water design temperature is greater than the inlet air design temperature.");
-                            ShowContinueError("To correct this condition the design chilled water flow rate will be increased from " +
-                                              RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate, 5));
+                            ShowWarningError(state, "In calculating the design coil UA for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                            ShowContinueError(state, "the outlet chilled water design temperature is greater than the inlet air design temperature.");
+                            ShowContinueError(state,
+                                              format("To correct this condition the design chilled water flow rate will be increased from {:.5R}",
+                                                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             TempCorrFrac = (DesOutletWaterTemp - state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp) /
                                            (DesOutletWaterTemp - state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp);
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate *= (1.0 + 2.0 * TempCorrFrac);
-                            ShowContinueError("to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate, 5) + " m3/s");
+                            ShowContinueError(state, format("to {:.5R} m3/s", state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate));
                             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
                             DesOutletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp +
                                                  state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad / (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate * Cp);
@@ -1508,9 +1501,9 @@ namespace WaterCoils {
                 TempSolveRoot::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
-                    ShowSevereError("Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                    ShowContinueError("  Iteration limit exceeded in calculating coil UA");
-                    // CALL ShowFatalError('Preceeding error causes program termination')
+                    ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowContinueError(state, "  Iteration limit exceeded in calculating coil UA");
+                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
@@ -1518,11 +1511,11 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea;
-                    ShowContinueError(" Coil design UA set to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal, 6) + " [W/C]");
+                    ShowContinueError(state, format(" Coil design UA set to {:.6R} [W/C]", state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal));
                 } else if (SolFla == -2) {
-                    ShowSevereError("Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                    ShowContinueError("  Bad starting values for UA");
-                    // CALL ShowFatalError('Preceeding error causes program termination')
+                    ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowContinueError(state, "  Bad starting values for UA");
+                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
@@ -1530,7 +1523,7 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternalPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
                     state.dataWaterCoils->WaterCoil(CoilNum).UADryExtPerUnitArea = state.dataWaterCoils->WaterCoil(CoilNum).UAWetExtPerUnitArea;
-                    ShowContinueError(" Coil design UA set to " + RoundSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal, 6) + " [W/C]");
+                    ShowContinueError(state, format(" Coil design UA set to {:.6R} [W/C]", state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal));
                 }
 
                 // cooling coil surface area
@@ -1549,22 +1542,22 @@ namespace WaterCoils {
             // Calculate rated Total, latent, sensible capacity, SHR, effectiveness
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = 16.6;
-                state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbRhPb(16.6, 0.5, StdBaroPress, RoutineName);
+                state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbRhPb(state, 16.6, 0.5, state.dataEnvrn->StdBaroPress, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = 82.2;
             } else {
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = 26.67;
-                state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbTwbPb(26.67, 19.44, StdBaroPress, RoutineName);
+                state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbTwbPb(state, 26.67, 19.44, state.dataEnvrn->StdBaroPress, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = 6.67;
             }
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy = PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
             state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate;
-            state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
+            state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataEnvrn->StdRhoAir * state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
             CapacitanceAir = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
 
             Cp = GetSpecificHeatGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
 
             CapacitanceWater = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate * Cp;
@@ -1599,11 +1592,11 @@ namespace WaterCoils {
 
         } // End If for the Begin Environment initializations
 
-        if (!BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             MyEnvrnFlag(CoilNum) = true;
         }
 
-        if (!DoingSizing) {
+        if (!state.dataGlobal->DoingSizing) {
             if (MyCoilReportFlag(CoilNum)) {
                 // create predefined report entries
                 MyCoilReportFlag(CoilNum) = false;
@@ -1616,23 +1609,23 @@ namespace WaterCoils {
                                   "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
-                        PreDefTableEntry(pdchHeatCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Heating:Water");
-                        PreDefTableEntry(pdchHeatCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate);
-                        PreDefTableEntry(pdchHeatCoilNomCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
-                        PreDefTableEntry(pdchHeatCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        addFootNoteSubTable(
-                            pdstHeatCoil,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Heating:Water");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        addFootNoteSubTable(state,
+                            state.dataOutRptPredefined->pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,
                               "{},{},{:.2R}\n",
                               "Water Heating Coil Capacity Information,Coil:Heating:Water",
                               state.dataWaterCoils->WaterCoil(CoilNum).Name,
                               state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate);
-                        coilSelectionReportObj->setCoilAirFlow(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Heating:Water",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize);
-                        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                                    "Coil:Heating:Water",
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                                                    state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1650,15 +1643,15 @@ namespace WaterCoils {
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water:DetailedGeometry");
-                        PreDefTableEntry(pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
-                        PreDefTableEntry(pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
-                        PreDefTableEntry(pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        addFootNoteSubTable(
-                            pdstCoolCoil,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water:DetailedGeometry");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        addFootNoteSubTable(state,
+                            state.dataOutRptPredefined->pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,
                               "{},{},{:.2R},{:.2R},{:.2R},{:.2R}\n",
@@ -1668,11 +1661,11 @@ namespace WaterCoils {
                               state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate,
                               RatedLatentCapacity,
                               RatedSHR);
-                        coilSelectionReportObj->setCoilAirFlow(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water:DetailedGeometry",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize); // Coil Report
-                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                             "Coil:Cooling:Water:DetailedGeometry",
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1690,17 +1683,17 @@ namespace WaterCoils {
                         }
                         RatedLatentCapacity = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate - state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate;
                         RatedSHR = SafeDivide(state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water");
-                        PreDefTableEntry(pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
-                        PreDefTableEntry(pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
-                        PreDefTableEntry(pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
-                        PreDefTableEntry(pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
-                        PreDefTableEntry(pdchCoolCoilUATotal, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal);
-                        PreDefTableEntry(pdchCoolCoilArea, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea);
-                        addFootNoteSubTable(
-                            pdstCoolCoil,
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterCoils->WaterCoil(CoilNum).Name, "Coil:Cooling:Water");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilDesCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilTotCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSensCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilLatCap, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedLatentCapacity);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilSHR, state.dataWaterCoils->WaterCoil(CoilNum).Name, RatedSHR);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilNomEff, state.dataWaterCoils->WaterCoil(CoilNum).Name, "-");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilUATotal, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilArea, state.dataWaterCoils->WaterCoil(CoilNum).Name, state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea);
+                        addFootNoteSubTable(state,
+                            state.dataOutRptPredefined->pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
                         print(state.files.eio,
                               "{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
@@ -1712,11 +1705,11 @@ namespace WaterCoils {
                               RatedSHR,
                               UATotal,
                               SurfaceArea);
-                        coilSelectionReportObj->setCoilAirFlow(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilAirFlow(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize); // Coil Report
-                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilWaterCoolingCapacity(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                             "Coil:Cooling:Water",
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                                             state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize,
@@ -1736,21 +1729,21 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat; // fixed in sizing routine
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy =
                     Psychrometrics::PsyHFnTdbW(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat);
-                Real64 DesInletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                Real64 DesInletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat, DataEnvironment::StdPressureSeaLevel, "InitWaterCoils");
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate;
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
                 Real64 cp = GetSpecificHeatGlycol(state,
-                                                  PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                                  state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                                   state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp,
-                                                  PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                                  state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                                   "InitWaterCoil");
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy = cp * state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
 
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable = state.dataWaterCoils->WaterCoil(CoilNum).UACoil;
                 state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0.0;
-                Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
-                DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
+                Real64 holdOutBaroPress = state.dataEnvrn->OutBaroPress;
+                state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
                 CalcAdjustedCoilUA(state, CoilNum);
 
                 std::string coilTypeName(" ");
@@ -1768,13 +1761,14 @@ namespace WaterCoils {
 
                 // coil outlets
                 Real64 RatedOutletWetBulb(0.0);
-                RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                RatedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
                     state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp, state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat, DataEnvironment::StdPressureSeaLevel, "InitWaterCoil");
 
                 // call set routine in coil report
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_DetFlatFinCooling ||
                     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
-                    coilSelectionReportObj->setRatedCoilConditions(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setRatedCoilConditions(state,
+                                                                   state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate, // this is the report variable
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).SenWaterCoolingCoilRate, // this is the report variable
@@ -1790,7 +1784,8 @@ namespace WaterCoils {
                                                                    -999.0,
                                                                    -999.0); // coil effectiveness
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
-                    coilSelectionReportObj->setRatedCoilConditions(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setRatedCoilConditions(state,
+                                                                   state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                    coilTypeName,
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, // this is the report variable
                                                                    state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate, // this is the report variable
@@ -1807,7 +1802,7 @@ namespace WaterCoils {
                                                                    -999.0); // coil effectiveness
                 }
                 // now replace the outdoor air conditions set above for one time rating point calc
-                DataEnvironment::OutBaroPress = holdOutBaroPress;
+                state.dataEnvrn->OutBaroPress = holdOutBaroPress;
             }
         }
 
@@ -1879,7 +1874,7 @@ namespace WaterCoils {
             // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1888,7 +1883,7 @@ namespace WaterCoils {
 
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
                 FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
-                Real64 FaultFrac = fouling.FaultFraction();
+                Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
                     // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
@@ -1942,7 +1937,7 @@ namespace WaterCoils {
             // If Fouling
             if (state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
                 // The fault shouldn't apply during sizing.
-                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation) &&
                 // This was preexisting
                 !(state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum)))
             {
@@ -1957,7 +1952,7 @@ namespace WaterCoils {
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
 
                 FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
-                Real64 FaultFrac = fouling.FaultFraction();
+                Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
                     // Adjust the External (air) UA and Internal (water) UA accordingly
@@ -2043,9 +2038,6 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataEnvironment::StdBaroPress;
-        using General::RoundSigDigits;
-        using General::TrimSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2085,7 +2077,7 @@ namespace WaterCoils {
         // cooling coils
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
             // find the appropriate Plant Sizing object
-            PltSizCoolNum = PlantUtilities::MyPlantSizingIndex("chilled water coil",
+            PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(state, "chilled water coil",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -2125,7 +2117,7 @@ namespace WaterCoils {
                 CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 Real64 autoSizedValue = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * autoSizedValue; // inlet air mass flow rate is the autosized value
+                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataEnvrn->StdRhoAir * autoSizedValue; // inlet air mass flow rate is the autosized value
 
                 // Check if the air volume flow rate is defined in parent HVAC equipment and set water coil design air volume flow rate accordingly
                 if (CurZoneEqNum > 0) {
@@ -2144,7 +2136,7 @@ namespace WaterCoils {
 
                 if (CurSysNum > 0 && CurOASysNum == 0) {
                     Real64 DesCoilExitHumRat(0.0); // fix coil sizing inconsistency
-                    DataSizing::GetCoilDesFlowT(CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+                    DataSizing::GetCoilDesFlowT(state, CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
                     DataAirFlowUsedForSizing = DesCoilAirFlow;
                     DataFlowUsedForSizing = DesCoilAirFlow;
                     DataDesOutletAirTemp = DesCoilExitTemp;
@@ -2280,7 +2272,7 @@ namespace WaterCoils {
                 sizerCoolingCapacity2.overrideSizingString(SizingString);
                 sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate = sizerCoolingCapacity2.size(state, TempSize, ErrorsFound);
-                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
+                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataEnvrn->StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
                 DataCapacityUsedForSizing = state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate;
 
                 // Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is
@@ -2305,12 +2297,12 @@ namespace WaterCoils {
                 // sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = sizingCoolingAirFlow2.size(state, TempSize, errorsFound);
-                state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
+                state.dataWaterCoils->WaterCoil(CoilNum).DesAirMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * state.dataEnvrn->StdRhoAir;
 
                 if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
                     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = 0.0;
-                    ShowWarningError("The design air flow rate is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                    ShowContinueError("The autosize value for max air volume flow rate is zero");
+                    ShowWarningError(state, "The design air flow rate is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
                 }
 
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == state.dataWaterCoils->CoilModel_Detailed) {
@@ -2350,9 +2342,10 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea = sizerMinAirFlowArea.size(state, TempSize, ErrorsFound);
 
                     if (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea <= 0.0) {
-                        ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
-                        ShowContinueError("Coil Minimum Airflow Area must be greater than 0. Coil area = " +
-                                          TrimSigDigits(state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea, 6));
+                        ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
+                        ShowContinueError(state,
+                                          format("Coil Minimum Airflow Area must be greater than 0. Coil area = {:.6T}",
+                                                 state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea));
                         ErrorsFound = true;
                     }
 
@@ -2398,9 +2391,12 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea = sizerTubeOutsideArea.size(state, TempSize, ErrorsFound);
 
                     if ((state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea + state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea) <= 0.0) {
-                        ShowSevereError("Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
-                        ShowContinueError("Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0. Total surface area = " +
-                                          TrimSigDigits((state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea + state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea), 6));
+                        ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry: \"" + state.dataWaterCoils->WaterCoil(CoilNum).Name + "\"");
+                        ShowContinueError(
+                            state,
+                            format("Coil Fin Surface Area plus Coil Tube Outside Surface Area must be greater than 0. Total surface area = {:.6T}",
+                                   (state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea +
+                                    state.dataWaterCoils->WaterCoil(CoilNum).TubeOutsideSurfArea)));
                         ErrorsFound = true;
                     }
 
@@ -2434,8 +2430,8 @@ namespace WaterCoils {
             } else {
                 // If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
                 if (state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
-                    ShowSevereError("Autosizing of water coil requires a cooling loop Sizing:Plant object");
-                    ShowContinueError("Occurs in water coil object= " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowSevereError(state, "Autosizing of water coil requires a cooling loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in water coil object= " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -2445,7 +2441,7 @@ namespace WaterCoils {
         // if this is a heating coil
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Heating && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
             // find the appropriate heating Plant Sizing object
-            PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("hot water coil",
+            PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state, "hot water coil",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                                                state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -2468,12 +2464,12 @@ namespace WaterCoils {
                 DataPltSizHeatNum = PltSizHeatNum;
                 DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum;
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
-                                       DataGlobalConstants::HWInitConvTemp(),
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       DataGlobalConstants::HWInitConvTemp,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
                 Cp = GetSpecificHeatGlycol(
-                    state, PlantLoop(DataWaterLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp(), PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(DataWaterLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, state.dataPlnt->PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
                 if (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
                 } else if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
@@ -2518,7 +2514,7 @@ namespace WaterCoils {
                 TempSize = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 // reset the design air volume flow rate for air loop coils only
                 if (CurSysNum > 0) state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
-                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is not the autosized value
+                state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataEnvrn->StdRhoAir * TempSize; // inlet air mass flow rate is not the autosized value
                 DataAirFlowUsedForSizing = TempSize;
                 DataFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air flow rate, save this value
 
@@ -2555,7 +2551,7 @@ namespace WaterCoils {
                 if (state.dataWaterCoils->WaterCoil(CoilNum).CoilPerfInpMeth == state.dataWaterCoils->NomCap && NomCapUserInp) {
                     state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad /
                                                               (CpAirStd * (state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp));
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / StdRhoAir;
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
                     DataAirFlowUsedForSizing = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
                     DataFlowUsedForSizing = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
                 }
@@ -2592,11 +2588,11 @@ namespace WaterCoils {
                 DataFractionUsedForSizing = 0.0;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate <= 0.0) {
                     //					MaxWaterVolFlowRateDes = 0.0;
-                    ShowWarningError("The design coil load is zero for Coil:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                    ShowContinueError("The autosize value for maximum water flow rate is zero");
-                    ShowContinueError("To change this, input a value for UA, change the heating design day, or raise the");
-                    ShowContinueError("  system heating design supply air temperature. Also check to make sure the Preheat");
-                    ShowContinueError("  Design Temperature is not the same as the Central Heating Design Supply Air Temperature. ");
+                    ShowWarningError(state, "The design coil load is zero for Coil:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowContinueError(state, "The autosize value for maximum water flow rate is zero");
+                    ShowContinueError(state, "To change this, input a value for UA, change the heating design day, or raise the");
+                    ShowContinueError(state, "  system heating design supply air temperature. Also check to make sure the Preheat");
+                    ShowContinueError(state, "  Design Temperature is not the same as the Central Heating Design Supply Air Temperature. ");
                 }
 
                 // initialize the water coil inlet conditions
@@ -2604,10 +2600,10 @@ namespace WaterCoils {
                 DataFlowUsedForSizing = DataAirFlowUsedForSizing;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).CoilPerfInpMeth == state.dataWaterCoils->NomCap && NomCapUserInp) {
                     state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp;
-                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbRhPb(state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, 0.5, StdBaroPress, RoutineName);
-                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir;               // don't need this
+                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = PsyWFnTdbRhPb(state, state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp, 0.5, state.dataEnvrn->StdBaroPress, RoutineName);
+                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * state.dataEnvrn->StdRhoAir;               // don't need this
                     DataDesOutletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp;                                   // for error messages
-                    DataDesOutletAirHumRat = PsyWFnTdbRhPb(DataDesOutletAirTemp, 0.5, StdBaroPress, RoutineName); // for error messages
+                    DataDesOutletAirHumRat = PsyWFnTdbRhPb(state, DataDesOutletAirTemp, 0.5, state.dataEnvrn->StdBaroPress, RoutineName); // for error messages
                     state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * DataWaterFlowUsedForSizing;
                     state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
@@ -2620,7 +2616,7 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat;
 
                     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = DataAirFlowUsedForSizing;                // coil report
-                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * StdRhoAir; // this is stiil volume flow!
+                    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = DataAirFlowUsedForSizing * state.dataEnvrn->StdRhoAir; // this is stiil volume flow!
                 } else {
                     HeatingWaterDesAirInletTempSizer sizerHWDesInletTemp;
                     sizerHWDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
@@ -2642,7 +2638,7 @@ namespace WaterCoils {
                 // zone coils use water side capacity
                 DataDesInletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;               // used in error mesages
                 DataDesInletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;           // used in error mesages
-                DataFlowUsedForSizing = DataAirFlowUsedForSizing * StdRhoAir;        // used in error mesages
+                DataFlowUsedForSizing = DataAirFlowUsedForSizing * state.dataEnvrn->StdRhoAir;        // used in error mesages
                 state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataWaterFlowUsedForSizing; // why is this here?
                 if (!(state.dataWaterCoils->WaterCoil(CoilNum).CoilPerfInpMeth == state.dataWaterCoils->NomCap && NomCapUserInp)) {
                     // get the design coil load used to size UA
@@ -2685,11 +2681,11 @@ namespace WaterCoils {
                 sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
                 if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
-                    ShowWarningError("Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
-                    ShowContinueError(" Plant design loop exit temperature = " + TrimSigDigits(PlantSizData(DataPltSizHeatNum).ExitTemp, 2) + " C");
-                    ShowContinueError(" Plant design loop exit temperature is low for design load and leaving air temperature anticipated.");
+                    ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
+                    ShowContinueError(state, format(" Plant design loop exit temperature = {:.2T} C", PlantSizData(DataPltSizHeatNum).ExitTemp));
+                    ShowContinueError(state, " Plant design loop exit temperature is low for design load and leaving air temperature anticipated.");
                     ShowContinueError(
-                        " Heating coil UA-value is sized using coil water inlet temperature = " + TrimSigDigits(DesCoilInletWaterTempUsed, 2) + " C");
+                        state, format(" Heating coil UA-value is sized using coil water inlet temperature = {:.2T} C", DesCoilInletWaterTempUsed));
                     state.dataWaterCoils->WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
                 }
                 // if coil UA did not size due to one of these variables being 0, must set UACoilVariable to avoid crash later on
@@ -2722,8 +2718,8 @@ namespace WaterCoils {
             } else {
                 // if there is no heating Plant Sizing object and autosizng was requested, issue an error message
                 if (state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
-                    ShowSevereError("Autosizing of water coil requires a heating loop Sizing:Plant object");
-                    ShowContinueError("Occurs in water coil object= " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowSevereError(state, "Autosizing of water coil requires a heating loop Sizing:Plant object");
+                    ShowContinueError(state, "Occurs in water coil object= " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -2736,7 +2732,7 @@ namespace WaterCoils {
         }
 
         if (ErrorsFound || DataErrorsFound) {
-            ShowFatalError("Preceding water coil sizing errors cause program termination");
+            ShowFatalError(state, "Preceding water coil sizing errors cause program termination");
         }
     }
 
@@ -2774,7 +2770,6 @@ namespace WaterCoils {
         // See for instance ASHRAE HVAC 2 Toolkit, page 4-4, formula (4-7)
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2832,11 +2827,11 @@ namespace WaterCoils {
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
 
-        if (WaterMassFlowRate > MassFlowTolerance) { // If the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // If the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);
@@ -2852,10 +2847,10 @@ namespace WaterCoils {
         if (((CapacitanceAir > 0.0) && (CapacitanceWater > 0.0)) && (CalcMode == state.dataWaterCoils->DesignCalc ||
                                                                      state.dataWaterCoils->MySizeFlag(CoilNum) ||
                                                                      state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum) ||
-                                                                     GetCurrentScheduleValue(state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0)) {
+                                                                     GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0)) {
 
             if (UA <= 0.0) {
-                ShowFatalError("UA is zero for COIL:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowFatalError(state, "UA is zero for COIL:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
             }
             NTU = UA / CapacitanceMin;
             ETA = std::pow(NTU, 0.22);
@@ -2948,7 +2943,6 @@ namespace WaterCoils {
         // Re-engineered for EnergyPlus by Richard Liesen PhD in 1998
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3086,30 +3080,33 @@ namespace WaterCoils {
         InletAirEnthalpy = 0.0;
 
         // Warning and error messages for large flow rates for the given user input geometry
-        AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempAirIn, InletAirHumRat, RoutineName);
+        AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempAirIn, InletAirHumRat, RoutineName);
         if (AirMassFlow > (5.0 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity) && state.dataWaterCoils->CoilWarningOnceFlag(CoilNum)) {
-            ShowWarningError("Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-            ShowContinueError("Air Flow Rate Velocity has greatly exceeded upper design guidelines of ~2.5 m/s");
-            ShowContinueError("Air MassFlowRate[kg/s]=" + TrimSigDigits(AirMassFlow, 6));
-            AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
-            ShowContinueError("Air Face Velocity[m/s]=" + TrimSigDigits(AirVelocity, 6));
-            ShowContinueError("Approximate MassFlowRate limit for Face Area[kg/s]=" +
-                              TrimSigDigits(2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity, 6));
-            ShowContinueError("Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity");
+            ShowWarningError(state, "Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            ShowContinueError(state, "Air Flow Rate Velocity has greatly exceeded upper design guidelines of ~2.5 m/s");
+            ShowContinueError(state, format("Air Mass Flow Rate[kg/s]={:.6T}", AirMassFlow));
+            // [m/s] = [kg/s] / ([m2] * [kg/m3])
+            AirVelocity = AirMassFlow / (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity);
+            ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
+            ShowContinueError(state,
+                              format("Approximate Mass Flow Rate limit for Face Area[kg/s]={:.6T}",
+                                     2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity));
+            ShowContinueError(state, "Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity");
             state.dataWaterCoils->CoilWarningOnceFlag(CoilNum) = false;
-        } else if (AirMassFlow > (44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity)) {
-            ShowSevereError("Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-            ShowContinueError("Air Flow Rate Velocity is > 100MPH (44.7m/s) and simulation cannot continue");
-            ShowContinueError("Air Mass Flow Rate[kg/s]=" + TrimSigDigits(AirMassFlow, 6));
-            AirVelocity = AirMassFlow * AirDensity / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
-            ShowContinueError("Air Face Velocity[m/s]=" + TrimSigDigits(AirVelocity, 6));
-            ShowContinueError("Approximate MassFlowRate limit for Face Area[kg/s]=" +
-                              TrimSigDigits(2.5 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea / AirDensity, 6));
-            ShowFatalError("Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity");
+        } else if (AirMassFlow > (44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity)) {
+            ShowSevereError(state, "Coil:Cooling:Water:DetailedGeometry in Coil =" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            ShowContinueError(state, "Air Flow Rate Velocity is > 100MPH (44.7m/s) and simulation cannot continue");
+            ShowContinueError(state, format("Air Mass Flow Rate[kg/s]={:.6T}", AirMassFlow));
+            AirVelocity = AirMassFlow / (state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity);
+            ShowContinueError(state, format("Air Face Velocity[m/s]={:.6T}", AirVelocity));
+            ShowContinueError(state,
+                              format("Approximate Mass Flow Rate limit for Face Area[kg/s]={:.6T}",
+                                     44.7 * state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea * AirDensity));
+            ShowFatalError(state, "Coil:Cooling:Water:DetailedGeometry needs to be resized/autosized to handle capacity");
         }
 
         // If Coil is Scheduled ON then do the simulation
-        if (((GetCurrentScheduleValue(state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (WaterMassFlowRate > 0.0) && (AirMassFlow >= state.dataWaterCoils->MinAirMassFlow)) ||
+        if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (WaterMassFlowRate > 0.0) && (AirMassFlow >= state.dataWaterCoils->MinAirMassFlow)) ||
             (CalcMode == state.dataWaterCoils->DesignCalc)) {
             //        transfer inputs to simulation variables and calculate
             //        known thermodynamic functions
@@ -3119,17 +3116,17 @@ namespace WaterCoils {
             MoistAirSpecificHeat = PsyCpAirFnW(InletAirHumRat) * ConvK;
             InletAirEnthalpy = state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy * ConvK;
 
-            EnterAirDewPoint = PsyTdpFnWPb(InletAirHumRat, OutBaroPress, RoutineName);
+            EnterAirDewPoint = PsyTdpFnWPb(state, InletAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
             //       Ratio of secondary (fin) to total (secondary plus primary) surface areas
             FinToTotSurfAreaRatio = state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             //      known water and air flow parameters:
-            rho = GetDensityGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                    TempWaterIn,
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                    RoutineName);
             //      water flow velocity - assuming number of water circuits = NumOfTubesPerRow
             TubeWaterVel = WaterMassFlowRate * 4.0 /
-                           (state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow * rho * DataGlobalConstants::Pi() * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam);
+                           (state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubesPerRow * rho * DataGlobalConstants::Pi * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam * state.dataWaterCoils->WaterCoil(CoilNum).TubeInsideDiam);
             //      air mass flow rate per unit area
             ScaledAirMassFlowRate = (1.0 + InletAirHumRat) * AirMassFlow / state.dataWaterCoils->WaterCoil(CoilNum).MinAirFlowArea;
             //      air flow Reynold's Number
@@ -3167,7 +3164,7 @@ namespace WaterCoils {
                 RaisedInletWaterTemp = TempAirIn - 0.3;
             }
 
-            RsdInletWaterTempSatAirHumRat = PsyWFnTdbRhPb(RaisedInletWaterTemp, unity, OutBaroPress, RoutineName);
+            RsdInletWaterTempSatAirHumRat = PsyWFnTdbRhPb(state, RaisedInletWaterTemp, unity, state.dataEnvrn->OutBaroPress, RoutineName);
             AirEnthAtRsdInletWaterTemp = PsyHFnTdbW(RaisedInletWaterTemp, RsdInletWaterTempSatAirHumRat) * ConvK;
 
             SensToTotEnthDiffRatio = DryAirSpecHeat * (TempAirIn - RaisedInletWaterTemp) / (InletAirEnthalpy - AirEnthAtRsdInletWaterTemp);
@@ -3239,9 +3236,9 @@ namespace WaterCoils {
             //       dry coil outside thermal resistance = [1/UA] (dry coil)
             CoilToAirThermResistDrySurf = 1.0 / (state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea * AirSideDrySurfFilmCoef * DryCoilEfficiency);
             //       definitions made to simplify some of the expressions used below
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             ScaledWaterSpecHeat = WaterMassFlowRate * Cp * ConvK / AirMassFlow;
             DryCoilCoeff1 = 1.0 / (AirMassFlow * MoistAirSpecificHeat) - 1.0 / (WaterMassFlowRate * Cp * ConvK);
@@ -3290,8 +3287,8 @@ namespace WaterCoils {
 
                 if (std::abs(MeanWaterTemp - WetSideEffctvWaterTemp) > 0.01) {
                     WetSideEffctvWaterTemp = MeanWaterTemp;
-                    InSurfTempSatAirEnthl = PsyHFnTdbRhPb(InCoilSurfTemp, unity, OutBaroPress, RoutineName) * ConvK;
-                    OutSurfTempSatAirEnthl = PsyHFnTdbRhPb(OutCoilSurfTemp, unity, OutBaroPress, RoutineName) * ConvK;
+                    InSurfTempSatAirEnthl = PsyHFnTdbRhPb(state, InCoilSurfTemp, unity, state.dataEnvrn->OutBaroPress, RoutineName) * ConvK;
+                    OutSurfTempSatAirEnthl = PsyHFnTdbRhPb(state, OutCoilSurfTemp, unity, state.dataEnvrn->OutBaroPress, RoutineName) * ConvK;
 
                     state.dataWaterCoils->WaterCoil(CoilNum).SatEnthlCurveSlope = (OutSurfTempSatAirEnthl - InSurfTempSatAirEnthl) / (OutCoilSurfTemp - InCoilSurfTemp);
                     state.dataWaterCoils->WaterCoil(CoilNum).SatEnthlCurveConstCoef = InSurfTempSatAirEnthl - state.dataWaterCoils->WaterCoil(CoilNum).SatEnthlCurveSlope * InCoilSurfTemp;
@@ -3303,14 +3300,14 @@ namespace WaterCoils {
             //      predicted coil surface temperature at the outlet is less than
             //      the dew point coil is apparently all wet but a solution
             //      cannot be obtained
-            if (!WaterTempConvg && !WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
+            if (!WaterTempConvg && !state.dataGlobal->WarmupFlag && (OutCoilSurfTemp < EnterAirDewPoint)) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name + " not converged (8 iterations) due to \"Wet Convergence\" conditions.",
                                                state.dataWaterCoils->WaterTempCoolCoilErrs(CoilNum),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp),
                                                std::abs(MeanWaterTemp - WetSideEffctvWaterTemp));
                 //       CoolCoilErrs = CoolCoilErrs + 1
                 //       IF (CoolCoilErrs .LE. MaxCoolCoilErrs) THEN
-                //          CALL ShowWarningError('tp12c0:  not converged in 8 CoolCoilErrs')
+                //          CALL ShowWarningError(state, 'tp12c0:  not converged in 8 CoolCoilErrs')
                 //       END IF
             }
             state.dataWaterCoils->WaterCoil(CoilNum).MeanWaterTempSaved = MeanWaterTemp;
@@ -3475,13 +3472,13 @@ namespace WaterCoils {
                         state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction = 0.0;
                         WetDryInterfcWaterTemp = TempWaterIn;
                     }
-                    InSurfTempSatAirEnthl = PsyHFnTdbRhPb(InCoilSurfTemp, unity, OutBaroPress, RoutineName) * ConvK;
+                    InSurfTempSatAirEnthl = PsyHFnTdbRhPb(state, InCoilSurfTemp, unity, state.dataEnvrn->OutBaroPress, RoutineName) * ConvK;
                     if ((EnterAirDewPoint - InCoilSurfTemp) >= 0.0001) {
-                        AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb(EnterAirDewPoint, unity, OutBaroPress, RoutineName) * ConvK;
+                        AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb(state, EnterAirDewPoint, unity, state.dataEnvrn->OutBaroPress, RoutineName) * ConvK;
                         state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveAppxSlope =
                             (AirEnthAtWetDryIntrfcSurfTemp - InSurfTempSatAirEnthl) / (EnterAirDewPoint - InCoilSurfTemp);
                     } else {
-                        AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb(InCoilSurfTemp + 0.0001, unity, OutBaroPress, RoutineName) * ConvK;
+                        AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb(state, InCoilSurfTemp + 0.0001, unity, state.dataEnvrn->OutBaroPress, RoutineName) * ConvK;
                         state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveAppxSlope = (AirEnthAtWetDryIntrfcSurfTemp - InSurfTempSatAirEnthl) / 0.0001;
                     }
                     state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveConst = InSurfTempSatAirEnthl - state.dataWaterCoils->WaterCoil(CoilNum).EnthVsTempCurveAppxSlope * InCoilSurfTemp;
@@ -3490,13 +3487,13 @@ namespace WaterCoils {
                 }
             }
             //      error checking to see if convergence has been achieved
-            if (!CoilPartWetConvg && !WarmupFlag) {
-                ShowRecurringWarningErrorAtEnd(state.dataWaterCoils->WaterCoil(CoilNum).Name +
+            if (!CoilPartWetConvg && !state.dataGlobal->WarmupFlag) {
+                ShowRecurringWarningErrorAtEnd(state, state.dataWaterCoils->WaterCoil(CoilNum).Name +
                                                    " not converged (40 iterations) due to \"Partial Wet Convergence\" conditions.",
                                                state.dataWaterCoils->PartWetCoolCoilErrs(CoilNum));
                 //      CoolCoilErrs = CoolCoilErrs + 1
                 //      IF (CoolCoilErrs .LE. MaxCoolCoilErrs) THEN
-                //        CALL ShowWarningError('tp12c0:  not converged in 20 CoolCoilErrs')
+                //        CALL ShowWarningError(state, 'tp12c0:  not converged in 20 CoolCoilErrs')
                 //      END IF
             }
             if (state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction > 0 && state.dataWaterCoils->WaterCoil(CoilNum).SurfAreaWetFraction < 1) {
@@ -3516,10 +3513,10 @@ namespace WaterCoils {
                 if (expon < 20.0) y = std::exp(-expon);
                 AirExitEnthlAtCoilSurfTemp = WetDryInterfcAirEnthl - (WetDryInterfcAirEnthl - OutletAirEnthalpy) / (1.0 - y);
                 AirExitCoilSurfTemp = AirExitEnthlAtCoilSurfTemp / ConvK; // TEmporary calc
-                AirExitCoilSurfTemp = PsyTsatFnHPb(AirExitCoilSurfTemp, OutBaroPress);
+                AirExitCoilSurfTemp = PsyTsatFnHPb(state, AirExitCoilSurfTemp, state.dataEnvrn->OutBaroPress);
                 //       Implementation of epsilon*NTU method
                 TempAirOut = AirExitCoilSurfTemp + (AirWetDryInterfcTemp - AirExitCoilSurfTemp) * y;
-                OutletAirHumRat = PsyWFnTdbH(TempAirOut, 1000.0 * OutletAirEnthalpy, RoutineName);
+                OutletAirHumRat = PsyWFnTdbH(state, TempAirOut, 1000.0 * OutletAirEnthalpy, RoutineName);
                 SenWaterCoilLoad = AirMassFlow * (PsyCpAirFnW(InletAirHumRat) * TempAirIn - PsyCpAirFnW(OutletAirHumRat) * TempAirOut) * ConvK;
             }
 
@@ -3642,13 +3639,13 @@ namespace WaterCoils {
         }
 
         // If Coil is Scheduled ON then do the simulation
-        if (((GetCurrentScheduleValue(state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
+        if (((GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr) > 0.0) && (state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate > 0.0) &&
              (AirMassFlowRate >= state.dataWaterCoils->MinAirMassFlow) && (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
              (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) ||
             (CalcMode == state.dataWaterCoils->DesignCalc)) {
 
             // Calculate Temperature Dew Point at operating conditions.
-            AirDewPointTemp = PsyTdpFnWPb(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, OutBaroPress);
+            AirDewPointTemp = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, state.dataEnvrn->OutBaroPress);
 
             {
                 auto const SELECT_CASE_var(state.dataWaterCoils->WaterCoil(CoilNum).CoolingCoilAnalysisMode);
@@ -3868,7 +3865,7 @@ namespace WaterCoils {
         CapacitanceAir = AirMassFlow * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
         // Water Capacity Rate
         Cp = GetSpecificHeatGlycol(
-            state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
 
         CapacitanceWater = WaterMassFlowRate * Cp;
 
@@ -3995,21 +3992,21 @@ namespace WaterCoils {
         EnthAirInlet = PsyHFnTdbW(AirTempIn, AirHumRat);
 
         // Saturation Enthalpy of Air at inlet water temperature
-        EnthSatAirInletWaterTemp = PsyHFnTdbW(WaterTempIn, PsyWFnTdpPb(WaterTempIn, OutBaroPress));
+        EnthSatAirInletWaterTemp = PsyHFnTdbW(WaterTempIn, PsyWFnTdpPb(state, WaterTempIn, state.dataEnvrn->OutBaroPress));
 
         // Estimate IntermediateCpSat using entering air dewpoint and water temperature
-        EnteringAirDewPt = PsyTdpFnWPb(AirHumRat, OutBaroPress);
+        EnteringAirDewPt = PsyTdpFnWPb(state, AirHumRat, state.dataEnvrn->OutBaroPress);
 
         // An intermediate value of Specific heat . EnthSat1-EnthSat2 = IntermediateCpSat*(TSat1-TSat2)
         IntermediateCpSat =
-            (PsyHFnTdbW(EnteringAirDewPt, PsyWFnTdpPb(EnteringAirDewPt, OutBaroPress)) - EnthSatAirInletWaterTemp) / (EnteringAirDewPt - WaterTempIn);
+            (PsyHFnTdbW(EnteringAirDewPt, PsyWFnTdpPb(state, EnteringAirDewPt, state.dataEnvrn->OutBaroPress)) - EnthSatAirInletWaterTemp) / (EnteringAirDewPt - WaterTempIn);
 
         // Determine air and water enthalpy outlet conditions by modeling
         // coil as counterflow enthalpy heat exchanger
         UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
         CapacityRateAirWet = AirMassFlow;
         Cp = GetSpecificHeatGlycol(
-            state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
         CapacityRateWaterWet = WaterMassFlowRate * (Cp / IntermediateCpSat);
         CoilOutletStreamCondition(state, CoilNum,
                                   CapacityRateAirWet,
@@ -4027,7 +4024,7 @@ namespace WaterCoils {
         EnthSatAirCoilSurfaceExitTemp = EnthSatAirInletWaterTemp + ResistRatio * (EnthAirOutlet - EnthSatAirInletWaterTemp);
 
         // Calculate Coil Surface Temperature at air entry to the coil
-        AirInletCoilSurfTemp = PsyTsatFnHPb(EnthSatAirCoilSurfaceEntryTemp, OutBaroPress);
+        AirInletCoilSurfTemp = PsyTsatFnHPb(state, EnthSatAirCoilSurfaceEntryTemp, state.dataEnvrn->OutBaroPress);
 
         // Calculate outlet air temperature and humidity from enthalpies and surface conditions.
         TotWaterCoilLoad = AirMassFlow * (EnthAirInlet - EnthAirOutlet);
@@ -4229,9 +4226,9 @@ namespace WaterCoils {
 
             // Wet Dry Interface temperature not converged after maximum specified iterations.
             // Print error message, set return error flag
-            if ((itT > itmax) && (!WarmupFlag)) {
-                ShowWarningError("For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-                ShowContinueError("CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
+            if ((itT > itmax) && (!state.dataGlobal->WarmupFlag)) {
+                ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowContinueError(state, "CoilPartWetPartDry: Maximum iterations exceeded for Liq Temp, at Interface");
             }
 
             // If Following condition prevails then surface is dry, calculate dry coil performance and return
@@ -4353,10 +4350,10 @@ namespace WaterCoils {
 
         // Error Message
         if ((std::abs(DesTotalHeatTransfer) - MaxHeatTransfer) / max(MaxHeatTransfer, SmallNo) > SmallNo) {
-            ShowWarningError("For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-            ShowContinueError("CalcCoilUAbyEffectNTU:Given Q impossible for given inlet states, proceeding with MaxHeat Transfer");
-            ShowContinueError("Check the Sizing:System and Sizing:Zone cooling design supply air temperature and ");
-            ShowContinueError("the Sizing:Plant design Loop exit temperature.  There must be sufficient difference between these two temperatures.");
+            ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            ShowContinueError(state, "CalcCoilUAbyEffectNTU:Given Q impossible for given inlet states, proceeding with MaxHeat Transfer");
+            ShowContinueError(state, "Check the Sizing:System and Sizing:Zone cooling design supply air temperature and ");
+            ShowContinueError(state, "the Sizing:Plant design Loop exit temperature.  There must be sufficient difference between these two temperatures.");
         }
 
         // Design Heat Transfer cannot exceed Max heat Transfer , setting it value such that effectiveness<1.0
@@ -4396,9 +4393,9 @@ namespace WaterCoils {
         }
 
         // If not converged after itmax iterations, return error code
-        if ((iter > itmax) && (!WarmupFlag)) {
-            ShowWarningError("For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
-            ShowContinueError("CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation");
+        if ((iter > itmax) && (!state.dataGlobal->WarmupFlag)) {
+            ShowWarningError(state, "For Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+            ShowContinueError(state, "CalcCoilUAbyEffectNTU: Maximum iterations exceeded:Coil UA calculation");
             CalcCoilUAbyEffectNTU = 0.0; // Autodesk:Return Line added to set return value: Using non-converged CoilUA value may be preferred but
                                          // that was not happening
         } else {
@@ -4622,16 +4619,16 @@ namespace WaterCoils {
 
         // Calculate condensate temperature as the saturation temperature
         // at given saturation enthalpy
-        TempCondensation = PsyTsatFnHPb(EnthAirCondensateTemp, OutBaroPress);
+        TempCondensation = PsyTsatFnHPb(state, EnthAirCondensateTemp, state.dataEnvrn->OutBaroPress);
 
-        TempAirDewPoint = PsyTdpFnWPb(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, OutBaroPress);
+        TempAirDewPoint = PsyTdpFnWPb(state, state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat, state.dataEnvrn->OutBaroPress);
 
         if ((TempAirDewPoint - TempCondensation) > 0.1) {
 
             // Calculate Outlet Air Temperature using effectivness
             OutletAirTemp = AirTempIn - (AirTempIn - TempCondensation) * effectiveness;
             // Calculate Outlet air humidity ratio from PsyWFnTdbH routine
-            OutletAirHumRat = PsyWFnTdbH(OutletAirTemp, EnthAirOutlet);
+            OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, EnthAirOutlet);
 
         } else {
             OutletAirHumRat = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
@@ -4664,7 +4661,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataContaminantBalance::Contaminant;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
@@ -4706,10 +4702,10 @@ namespace WaterCoils {
         Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
         Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
         Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
-        if (Contaminant.CO2Simulation) {
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
         }
-        if (Contaminant.GenericContamSimulation) {
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
         }
     }
@@ -4739,7 +4735,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataWater::WaterStorage;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4761,11 +4756,11 @@ namespace WaterCoils {
         Real64 ReportingConstant;
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes) {
-            if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+            if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingHVACSizingSimulations && !state.dataGlobal->DoingSizing) {
                 std::string coilObjClassName;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) {
                     coilObjClassName = "Coil:Heating:Water";
-                    coilSelectionReportObj->setCoilFinalSizes(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate,
@@ -4774,7 +4769,7 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_DetFlatFinCooling) {
                     coilObjClassName = "Coil:Cooling:Water:DetailedGeometry";
-                    coilSelectionReportObj->setCoilFinalSizes(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                               -999.0,
@@ -4783,7 +4778,7 @@ namespace WaterCoils {
                     state.dataWaterCoils->WaterCoil(CoilNum).reportCoilFinalSizes = false;
                 } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
                     coilObjClassName = "Coil:Cooling:Water";
-                    coilSelectionReportObj->setCoilFinalSizes(state.dataWaterCoils->WaterCoil(CoilNum).Name,
+                    coilSelectionReportObj->setCoilFinalSizes(state, state.dataWaterCoils->WaterCoil(CoilNum).Name,
                                                               coilObjClassName,
                                                               state.dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate,
                                                               -999.0,
@@ -4793,7 +4788,7 @@ namespace WaterCoils {
                 }
             }
         }
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         // report the WaterCoil energy from this component
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilRate * ReportingConstant;
         state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilEnergy = state.dataWaterCoils->WaterCoil(CoilNum).TotWaterCoolingCoilRate * ReportingConstant;
@@ -4808,7 +4803,7 @@ namespace WaterCoils {
             Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
 
             RhoWater = GetDensityGlycol(
-                state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, Tavg, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+                state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, Tavg, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
             //   CR9155 Remove specific humidity calculations
             SpecHumIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
             SpecHumOut = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
@@ -4816,9 +4811,9 @@ namespace WaterCoils {
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot = max(0.0, (state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * (SpecHumIn - SpecHumOut) / RhoWater));
             state.dataWaterCoils->WaterCoil(CoilNum).CondensateVol = state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot * ReportingConstant;
 
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).VdotAvailSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).CondensateVdot;
-            WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
+            state.dataWaterData->WaterStorage(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankID).TwaterSupply(state.dataWaterCoils->WaterCoil(CoilNum).CondensateTankSupplyARRID) =
                 state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp;
         }
     }
@@ -4977,7 +4972,7 @@ namespace WaterCoils {
             IBessFunc = 1.0;
             for (LoopCount = 1; LoopCount <= 30; ++LoopCount) { // Start of 1st LoopCount Loop
                 if (std::abs(TERM) <= std::abs(ErrorTol * IBessFunc)) {
-                    IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * DataGlobalConstants::Pi() * BessFuncArg);
+                    IBessFunc *= std::exp(BessFuncArg) / std::sqrt(2.0 * DataGlobalConstants::Pi * BessFuncArg);
                     return;
                 }
                 TERM *= 0.125 / BessFuncArg * (pow_2(2 * LoopCount - 1) - 4 * BessFuncOrd * BessFuncOrd) / double(LoopCount);
@@ -5596,7 +5591,8 @@ namespace WaterCoils {
         }
     }
 
-    void CheckWaterCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckWaterCoilSchedule(EnergyPlusData &state,
+                                [[maybe_unused]] std::string const &CompType, // unused1208
                                 std::string const &CompName,
                                 Real64 &Value,
                                 int &CompIndex)
@@ -5612,7 +5608,6 @@ namespace WaterCoils {
         // <description>
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
@@ -5627,21 +5622,27 @@ namespace WaterCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
             if (CoilNum == 0) {
-                ShowFatalError("CheckWaterCoilSchedule: Coil not found=" + CompName);
+                ShowFatalError(state, "CheckWaterCoilSchedule: Coil not found=" + CompName);
             }
             CompIndex = CoilNum;
-            Value = GetCurrentScheduleValue(state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError("CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Heating Coils=" + TrimSigDigits(state.dataWaterCoils->NumWaterCoils) + ", Coil name=" + CompName);
+                ShowFatalError(state,
+                               format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Number of Heating Coils={}, Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CompName));
             }
             if (CompName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                ShowFatalError("CheckWaterCoilSchedule: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) + ", Coil name=" + CompName +
-                               ", stored Coil Name for that index=" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowFatalError(state,
+                               format("CheckWaterCoilSchedule: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                                      CoilNum,
+                                      CompName,
+                                      state.dataWaterCoils->WaterCoil(CoilNum).Name));
             }
-            Value = GetCurrentScheduleValue(state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
         }
     }
 
@@ -5688,8 +5689,8 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
-            ShowContinueError("... Max Water Flow rate returned as -1000.");
+            ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowContinueError(state, "... Max Water Flow rate returned as -1000.");
             ErrorsFound = true;
             MaxWaterFlowRate = -1000.0;
         }
@@ -5741,7 +5742,7 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -5793,7 +5794,7 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName +
+            ShowSevereError(state, "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName +
                             "\" when accessing coil outlet node number.");
             ErrorsFound = true;
             NodeNumber = 0;
@@ -5845,7 +5846,7 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilWaterInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetCoilWaterInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -5896,7 +5897,7 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilWaterOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetCoilWaterOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -5941,7 +5942,7 @@ namespace WaterCoils {
                     //WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
                 }
             } else {
-                ShowSevereError("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+                ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
                 ErrorsFound = true;
             }
         }
@@ -5980,11 +5981,11 @@ namespace WaterCoils {
             if (WhichCoil != 0) {
                 CoilDesAirFlow = state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate;
             } else {
-                ShowSevereError("GetWaterCoilDesAirFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+                ShowSevereError(state, "GetWaterCoilDesAirFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
                 ErrorsFound = true;
             }
         } else {
-            ShowSevereError("GetWaterCoilDesAirFlowRate: Funciton not valid for Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetWaterCoilDesAirFlowRate: Funciton not valid for Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             ErrorsFound = true;
         }
 
@@ -6054,10 +6055,7 @@ namespace WaterCoils {
 
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
-        using EMSManager::iTemperatureSetPoint;
-        using SetPointManager::iCtrlVarType_MaxHumRat;
-        using SetPointManager::iCtrlVarType_Temp;
+        using SetPointManager::iCtrlVarType;
         using SetPointManager::NodeHasSPMCtrlVarType;
 
         // USE HVACControllers,     ONLY: iTemperature, iHumidityRatio, iTemperatureAndHumidityRatio
@@ -6113,51 +6111,51 @@ namespace WaterCoils {
                 {
                     auto const SELECT_CASE_var(ControlledVar);
                     if (SELECT_CASE_var == iTemperature) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
-                                ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
-                                ShowContinueError(
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                                ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                                ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
-                                ShowContinueError(" ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
+                                ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
-                                ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
-                                ShowContinueError(
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                                ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                                ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
-                                ShowContinueError(" ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
+                                ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                     } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_Temp)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
-                                ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
-                                ShowContinueError(
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                                ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                                ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
-                                ShowContinueError(" ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
+                                ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                         EMSSetPointErrorFlag = false;
-                        CheckIfNodeSetPointManagedByEMS(SensorNodeNum, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
-                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType_MaxHumRat)) {
-                                ShowWarningError(RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
-                                ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
-                                ShowContinueError(
+                            if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                                ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                                ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
+                                ShowContinueError(state,
                                     " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
-                                ShowContinueError(" ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
+                                ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
                     }
@@ -6166,7 +6164,7 @@ namespace WaterCoils {
         }
     }
 
-    Real64 TdbFnHRhPb(Real64 const H,  // specific enthalpy {J/kg}
+    Real64 TdbFnHRhPb(EnergyPlusData &state, Real64 const H,  // specific enthalpy {J/kg}
                       Real64 const RH, // relative humidity value (0.0-1.0)
                       Real64 const PB  // barometric pressure {Pascals}
     )
@@ -6189,7 +6187,7 @@ namespace WaterCoils {
         // none
 
         // Using/Aliasing
-        using General::RoundSigDigits;
+
         using General::SolveRoot;
 
         // Return value
@@ -6222,16 +6220,16 @@ namespace WaterCoils {
         Par(1) = H;
         Par(2) = RH;
         Par(3) = PB;
-        SolveRoot(Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
+        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
         // if the numerical inversion failed, issue error messages.
         if (SolFla == -1) {
-            ShowSevereError("Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
-            ShowContinueError("   Iteration limit exceeded");
-            ShowContinueError("   H=[" + RoundSigDigits(H, 6) + "], RH=[" + RoundSigDigits(RH, 4) + "], PB=[" + RoundSigDigits(PB, 5) + "].");
+            ShowSevereError(state, "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
+            ShowContinueError(state, "   Iteration limit exceeded");
+            ShowContinueError(state, format("   H=[{:.6R}], RH=[{:.4R}], PB=[{:.5R}].", H, RH, PB));
         } else if (SolFla == -2) {
-            ShowSevereError("Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
-            ShowContinueError("  Bad starting values for Tdb");
-            ShowContinueError("   H=[" + RoundSigDigits(H, 6) + "], RH=[" + RoundSigDigits(RH, 4) + "], PB=[" + RoundSigDigits(PB, 5) + "].");
+            ShowSevereError(state, "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");
+            ShowContinueError(state, "  Bad starting values for Tdb");
+            ShowContinueError(state, format("   H=[{:.6R}], RH=[{:.4R}], PB=[{:.5R}].", H, RH, PB));
         }
         if (SolFla < 0) {
             T = 0.0;
@@ -6242,7 +6240,7 @@ namespace WaterCoils {
         return T;
     }
 
-    Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
+    Real64 EnthalpyResidual(EnergyPlusData &state, Real64 const Tprov,        // test value of Tdb [C]
                             Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     )
     {
@@ -6285,7 +6283,7 @@ namespace WaterCoils {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        Residuum = Par(1) - PsyHFnTdbRhPb(Tprov, Par(2), Par(3));
+        Residuum = Par(1) - PsyHFnTdbRhPb(state, Tprov, Par(2), Par(3));
 
         return Residuum;
     }
@@ -6400,7 +6398,7 @@ namespace WaterCoils {
         }
 
         if (IndexNum == 0) {
-            ShowSevereError("GetWaterCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetWaterCoilIndex: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
         }
 
@@ -6452,20 +6450,21 @@ namespace WaterCoils {
         }
 
         if (IndexNum == 0) {
-            ShowSevereError("GetWaterCoilCapacity: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetWaterCoilCapacity: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"");
             ErrorsFound = true;
         }
 
         return Capacity;
     }
 
-    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state, int const CoilTypeNum,
+    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
+                                             int const CoilTypeNum,
                                              std::string const &CoilName,
-                                             int const EP_UNUSED(EquipFlowCtrl), // Flow control mode for the equipment
-                                             int const LoopNum,                  // Plant loop index for where called from
-                                             int const LoopSide,                 // Plant loop side index for where called from
-                                             int &CompIndex,                     // Chiller number pointer
-                                             bool const EP_UNUSED(FirstHVACIteration),
+                                             [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
+                                             int const LoopNum,                        // Plant loop index for where called from
+                                             int const LoopSide,                       // Plant loop side index for where called from
+                                             int &CompIndex,                           // Chiller number pointer
+                                             [[maybe_unused]] bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
@@ -6480,13 +6479,10 @@ namespace WaterCoils {
         // update sim routine called from plant
 
         // Using/Aliasing
-        using DataGlobals::KickOffSimulation;
         using DataHVACGlobals::SimAirLoopsFlag;
         using DataHVACGlobals::SimZoneEquipmentFlag;
         using DataLoopNode::Node;
         using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::PlantLoop;
-        using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -6499,23 +6495,34 @@ namespace WaterCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
             if (CoilNum == 0) {
-                ShowFatalError("UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName);
+                ShowFatalError(state, "UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils=" + CoilName);
             }
             CompIndex = CoilNum;
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataWaterCoils->NumWaterCoils || CoilNum < 1) {
-                ShowFatalError("UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                               ", Number of Coils=" + TrimSigDigits(state.dataWaterCoils->NumWaterCoils) + ", Entered Coil name=" + CoilName);
+                ShowFatalError(state,
+                               format("UpdateWaterToAirCoilPlantConnection:  Invalid CompIndex passed={}, Number of Coils={}, Entered Coil name={}",
+                                      CoilNum,
+                                      state.dataWaterCoils->NumWaterCoils,
+                                      CoilName));
             }
-            if (KickOffSimulation) {
+            if (state.dataGlobal->KickOffSimulation) {
                 if (CoilName != state.dataWaterCoils->WaterCoil(CoilNum).Name) {
-                    ShowFatalError("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                   ", Coil name=" + CoilName + ", stored Coil Name for that index=" + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                    ShowFatalError(
+                        state,
+                        format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CoilName,
+                               state.dataWaterCoils->WaterCoil(CoilNum).Name));
                 }
                 if (CoilTypeNum != state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num) {
-                    ShowFatalError("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed=" + TrimSigDigits(CoilNum) +
-                                   ", Coil name=" + CoilName + ", stored Coil Name for that index=" + ccSimPlantEquipTypes(CoilTypeNum));
+                    ShowFatalError(
+                        state,
+                        format("UpdateWaterToAirCoilPlantConnection: Invalid CompIndex passed={}, Coil name={}, stored Coil Name for that index={}",
+                               CoilNum,
+                               CoilName,
+                               ccSimPlantEquipTypes(CoilTypeNum)));
                 }
             }
         }
@@ -6542,13 +6549,13 @@ namespace WaterCoils {
 
         if (DidAnythingChange) {
             // set sim flag for this loop
-            PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
             // set sim flags for air side users of coils
 
             SimAirLoopsFlag = true;
             SimZoneEquipmentFlag = true;
         } else { // nothing changed so turn off sim flag
-            PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
         }
     }
 
@@ -6596,7 +6603,7 @@ namespace WaterCoils {
         }
 
         if (WhichCoil == 0) {
-            ShowSevereError("GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, "GetCoilAvailScheduleIndex: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             AvailSchIndex = 0;
         }
@@ -6621,7 +6628,6 @@ namespace WaterCoils {
         // This function sets data to water Heating Coil using the coil index and arguments passed
 
         // Using/Aliasing
-        using General::TrimSigDigits;
 
         if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
             GetWaterCoilInput(state);
@@ -6629,8 +6635,10 @@ namespace WaterCoils {
         }
 
         if (CoilNum <= 0 || CoilNum > state.dataWaterCoils->NumWaterCoils) {
-            ShowSevereError("SetHeatingCoilData: called with heating coil Number out of range=" + TrimSigDigits(CoilNum) + " should be >0 and <" +
-                            TrimSigDigits(state.dataWaterCoils->NumWaterCoils));
+            ShowSevereError(state,
+                            format("SetHeatingCoilData: called with heating coil Number out of range={} should be >0 and <{}",
+                                   CoilNum,
+                                   state.dataWaterCoils->NumWaterCoils));
             ErrorsFound = true;
             return;
         }
@@ -6665,7 +6673,6 @@ namespace WaterCoils {
         // na
 
         // Using/Aliasing
-        using DataBranchAirLoopPlant::MassFlowTolerance;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6720,12 +6727,12 @@ namespace WaterCoils {
             AirMassFlow = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate;
             WaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
-        if (WaterMassFlowRate > MassFlowTolerance) { // if the coil is operating
+        if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // if the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);
@@ -6739,7 +6746,7 @@ namespace WaterCoils {
         if (((CapacitanceAir > 0.0) && (CapacitanceWater > 0.0))) {
 
             if (UA <= 0.0) {
-                ShowWarningError("UA is zero for COIL:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowWarningError(state, "UA is zero for COIL:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 return;
             }
             NTU = UA / CapacitanceMin;

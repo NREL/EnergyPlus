@@ -91,7 +91,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
     std::shared_ptr<KusudaGroundTempsModel> thisModel(new KusudaGroundTempsModel());
 
     std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
-    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+    int numCurrModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
@@ -110,7 +110,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 // Use Kusuda Parameters
                 thisModel->aveGroundTemp = rNumericArgs(4);
                 thisModel->aveGroundTempAmplitude = rNumericArgs(5);
-                thisModel->phaseShiftInSecs = rNumericArgs(6) * DataGlobalConstants::SecsInDay();
+                thisModel->phaseShiftInSecs = rNumericArgs(6) * DataGlobalConstants::SecsInDay;
             } else {
                 // Use data from Site:GroundTemperature:Shallow to generate parameters
 
@@ -152,7 +152,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
                 // Assign to KA Model
                 thisModel->aveGroundTemp = averageGroundTemp;
                 thisModel->aveGroundTempAmplitude = amplitudeOfGroundTemp;
-                thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * DataGlobalConstants::SecsInDay();
+                thisModel->phaseShiftInSecs = phaseShiftOfMinGroundTempDays * DataGlobalConstants::SecsInDay;
             }
 
             found = true;
@@ -164,7 +164,7 @@ std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {
-        ShowFatalError("Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
+        ShowFatalError(state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach--Errors getting input for ground temperature model");
         return nullptr;
     }
 }
@@ -191,10 +191,10 @@ Real64 KusudaGroundTempsModel::getGroundTemp(EnergyPlusData& state)
     Real64 secsInYear;
     Real64 retVal;
 
-    secsInYear = DataGlobalConstants::SecsInDay() * state.dataWeatherManager->NumDaysInYear;
+    secsInYear = DataGlobalConstants::SecsInDay * state.dataWeatherManager->NumDaysInYear;
 
-    term1 = -depth * std::sqrt(DataGlobalConstants::Pi() / (secsInYear * groundThermalDiffisivity));
-    term2 = (2 * DataGlobalConstants::Pi() / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (DataGlobalConstants::Pi() * groundThermalDiffisivity)));
+    term1 = -depth * std::sqrt(DataGlobalConstants::Pi / (secsInYear * groundThermalDiffisivity));
+    term2 = (2 * DataGlobalConstants::Pi / secsInYear) * (simTimeInSeconds - phaseShiftInSecs - (depth / 2) * std::sqrt(secsInYear / (DataGlobalConstants::Pi * groundThermalDiffisivity)));
 
     retVal = aveGroundTemp - aveGroundTempAmplitude * std::exp(term1) * std::cos(term2);
 
@@ -216,7 +216,7 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData& stat
 
     // Using/Aliasing
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secondsInYear = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay();
+    Real64 secondsInYear = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay;
 
     depth = _depth;
 
@@ -245,8 +245,8 @@ Real64 KusudaGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData& state
     // Returns the ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveSecondsInMonth = (state.dataWeatherManager->NumDaysInYear / 12) * DataGlobalConstants::SecsInDay();
-    Real64 const secondsPerYear = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay();
+    Real64 const aveSecondsInMonth = (state.dataWeatherManager->NumDaysInYear / 12) * DataGlobalConstants::SecsInDay;
+    Real64 const secondsPerYear = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay;
 
     depth = _depth;
 

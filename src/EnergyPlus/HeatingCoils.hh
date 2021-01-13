@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -246,7 +247,8 @@ namespace HeatingCoils {
                                  Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CalcMultiStageElectricHeatingCoil(int &CoilNum,            // the number of the electric heating coil to be simulated
+    void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
+                                           int &CoilNum,            // the number of the electric heating coil to be simulated
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
@@ -280,7 +282,7 @@ namespace HeatingCoils {
     // Beginning of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void UpdateHeatingCoil(int const CoilNum);
+    void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum);
 
     //        End of Update subroutines for the HeatingCoil Module
     // *****************************************************************************
@@ -288,7 +290,7 @@ namespace HeatingCoils {
     // Beginning of Reporting subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void ReportHeatingCoil(int const CoilNum, bool const coilIsSuppHeater);
+    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const coilIsSuppHeater);
 
     //        End of Reporting subroutines for the HeatingCoil Module
 
@@ -366,6 +368,14 @@ namespace HeatingCoils {
     //        End of Utility subroutines for the HeatingCoil Module
 
 } // namespace HeatingCoils
+
+struct HeatingCoilsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

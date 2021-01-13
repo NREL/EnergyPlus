@@ -49,12 +49,12 @@
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state), Real64 _originalValue, bool &errorsFound)
+Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _originalValue, bool &errorsFound)
 {
-    if (!this->checkInitialized(errorsFound)) {
+    if (!this->checkInitialized(state, errorsFound)) {
         return 0.0;
     }
-    this->preSize(_originalValue);
+    this->preSize(state, _originalValue);
 
     if (this->curZoneEqNum > 0) {
         if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
@@ -65,7 +65,9 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state)
             } else if (this->zoneEqFanCoil) {
                 Real64 desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
                 this->autoSizedValue =
-                    this->setCoolCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->setCoolCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(state,
+                                                                                                        desMassFlow,
+                                                                                               this->zoneEqSizing(this->curZoneEqNum)),
                                                                 this->zoneEqSizing(this->curZoneEqNum),
                                                                 this->finalZoneSizing(this->curZoneEqNum));
             } else {
@@ -104,8 +106,8 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(EnergyPlusData &EP_UNUSED(state)
     if (this->overrideSizeString) {
         if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
     }
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    this->selectSizerOutput(state, errorsFound);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(state, this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

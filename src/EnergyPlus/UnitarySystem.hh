@@ -48,8 +48,12 @@
 #ifndef ENERGYPLUS_UNITARYSYSTEM_HH
 #define ENERGYPLUS_UNITARYSYSTEM_HH
 
+// C++ headers
 #include <string>
 #include <vector>
+
+// EnergyPlus headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 
 namespace EnergyPlus {
@@ -82,7 +86,7 @@ namespace UnitarySystems {
         bool m_SingleModeFlag;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
-        static void getDesignSpecMSHPdata(EnergyPlusData &EP_UNUSED(state), bool errorsFound);
+        static void getDesignSpecMSHPdata([[maybe_unused]] EnergyPlusData &state, bool errorsFound);
     };
 
     struct UnitarySys : HVACSystemData
@@ -550,7 +554,7 @@ namespace UnitarySystems {
                                Real64 const OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
         );
 
-        void frostControlSetPointLimit(Real64 &TempSetPoint,       // temperature setpoint of the sensor node
+        void frostControlSetPointLimit(EnergyPlusData &state, Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                        Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
                                        Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
                                        Real64 const TfrostControl, // minimum temperature limit for forst control
@@ -807,6 +811,9 @@ struct UnitarySystemsData : BaseGlobalStruct {
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
+    bool myOneTimeFlag = true;
+    bool getInputFlag = true;
+
     void clear_state() override
     {
         numUnitarySystems = 0;
@@ -837,6 +844,8 @@ struct UnitarySystemsData : BaseGlobalStruct {
         getInputOnceFlag = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
+        myOneTimeFlag = true;
+        getInputFlag = true;
     }
 
     // Default Constructor

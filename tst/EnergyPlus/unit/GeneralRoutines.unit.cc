@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 

@@ -57,23 +57,12 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GeneratorDynamicsManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Functions
-
-    void SetupGeneratorControlStateManager(int const GenNum); // index of generator to setup
+    void SetupGeneratorControlStateManager(EnergyPlusData &state, int const GenNum); // index of generator to setup
 
     void ManageGeneratorControlState(EnergyPlusData &state,
                                      GeneratorType const GeneratorType,           // type of Generator
@@ -84,13 +73,13 @@ namespace GeneratorDynamicsManager {
                                      Real64 const ElecLoadRequest,      // Generator Electrical power demand
                                      Real64 const ThermalLoadRequest,   // cogenerator Thermal power demand
                                      Real64 &ElecLoadProvided,          // power allowed
-                                     int &OperatingMode,                // operating mode
+                                     DataGenerators::OperatingMode &OperatingMode,                // operating mode
                                      Real64 &PLRforSubtimestepStartUp,  // part load ratio for switch to normal from start up
                                      Real64 &PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
                                      bool const FirstHVACIteration      // True is this is first HVAC iteration
     );
 
-    void ManageGeneratorFuelFlow(GeneratorType const GeneratorType,          // type of Generator
+    void ManageGeneratorFuelFlow(EnergyPlusData &state, GeneratorType const GeneratorType,          // type of Generator
                                  std::string const &GeneratorName, // user specified name of Generator
                                  int const GeneratorNum,           // Generator number
                                  bool const RunFlag,               // TRUE when Generator operating

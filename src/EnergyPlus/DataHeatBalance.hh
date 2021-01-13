@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -339,8 +340,7 @@ namespace DataHeatBalance {
     extern bool AnyCondFD;                  // CondFD used
     extern bool AnyHAMT;                    // HAMT used
     extern bool AnyKiva;                    // Kiva used
-    extern bool AnyAirBoundary;             // Construction:AirBoundary used
-    extern bool AnyAirBoundaryGroupedSolar; // Construction:AirBoundary with GroupedZones for solar used somewhere
+    extern bool AnyAirBoundary;             // Construction:AirBoundary used (implies grouped solar and radiant is present)
     extern bool AnyBSDF;                    // True if any WindowModelType == WindowBSDFModel
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
@@ -682,6 +682,7 @@ namespace DataHeatBalance {
         int PlenumCondNum;                        // Supply or return plenum conditions number, 0 if this is not a plenum zone
         int TempControlledZoneIndex;              // this is the index number for TempControlledZone structure for lookup
         //            Pointers to Surface Data Structure
+        int AllSurfaceFirst;       // First surface in zone including air boundaries
         int SurfaceFirst;          // First Heat Transfer Surface in Zone
         int SurfaceLast;           // Last  Heat Transfer Surface in Zone
         int NonWindowSurfaceFirst; // First Non-Window Heat Transfer Surface in Zone
@@ -704,6 +705,7 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
         int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
         int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
@@ -777,13 +779,14 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneData()
-            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0), CeilingHeight(DataGlobalConstants::AutoCalculate()),
-              Volume(DataGlobalConstants::AutoCalculate()), OfType(1), UserEnteredFloorArea(DataGlobalConstants::AutoCalculate()), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0),
-              HasFloor(false), HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0),
-              ExtGrossWallArea(0.0), ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0),
-              ExteriorTotalSurfArea(0.0), ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0),
-              SystemZoneNodeNumber(0), IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0),
-              TempControlledZoneIndex(0), SurfaceFirst(0), SurfaceLast(0), NonWindowSurfaceFirst(0), NonWindowSurfaceLast(0), WindowSurfaceFirst(0),
+            : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
+              CeilingHeight(DataGlobalConstants::AutoCalculate), Volume(DataGlobalConstants::AutoCalculate), OfType(1),
+              UserEnteredFloorArea(DataGlobalConstants::AutoCalculate), FloorArea(0.0), CalcFloorArea(0.0), CeilingArea(0.0), HasFloor(false),
+              HasRoof(false), HasInterZoneWindow(false), HasWindow(false), AirCapacity(0.0), ExtWindowArea(0.0), ExtGrossWallArea(0.0),
+              ExtWindowArea_Multiplied(0.0), ExtGrossWallArea_Multiplied(0.0), ExtNetWallArea(0.0), TotalSurfArea(0.0), ExteriorTotalSurfArea(0.0),
+              ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
+              IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
+              AllSurfaceFirst(0), SurfaceFirst(0), SurfaceLast(0), NonWindowSurfaceFirst(0), NonWindowSurfaceLast(0), WindowSurfaceFirst(0),
               WindowSurfaceLast(0), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
               OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
               MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
@@ -807,9 +810,9 @@ namespace DataHeatBalance {
         {
         }
 
-        void SetOutBulbTempAt();
+        void SetOutBulbTempAt(EnergyPlusData &state);
 
-        void SetWindSpeedAt(Real64 fac);
+        void SetWindSpeedAt(EnergyPlusData &state, Real64 fac);
 
         void SetWindDirAt(Real64 fac);
     };
@@ -2202,13 +2205,13 @@ namespace DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetZoneOutBulbTempAt();
+    void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void CheckZoneOutBulbTempAt();
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state);
 
-    void SetZoneWindSpeedAt();
+    void SetZoneWindSpeedAt(EnergyPlusData &state);
 
-    void SetZoneWindDirAt();
+    void SetZoneWindDirAt(EnergyPlusData &state);
 
     void CheckAndSetConstructionProperties(EnergyPlusData &state,
                                            int ConstrNum, // Construction number to be set/checked
@@ -2219,12 +2222,14 @@ namespace DataHeatBalance {
                                         int ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound);
 
-    void AddVariableSlatBlind(int inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     );
 
-    void CalcScreenTransmittance(int SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int SurfaceNum,
                                  Optional<Real64 const> Phi = _,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta = _,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber = _ // Optional screen number
@@ -2239,6 +2244,14 @@ namespace DataHeatBalance {
     void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state);
 
 } // namespace DataHeatBalance
+
+struct HeatBalanceData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

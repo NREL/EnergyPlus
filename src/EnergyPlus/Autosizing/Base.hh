@@ -48,7 +48,9 @@
 #ifndef Base_hh_INCLUDED
 #define Base_hh_INCLUDED
 
+// EnergyPlus headers
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -273,31 +275,32 @@ protected:
 
     void addErrorMessage(std::string const &s);
 
-    void initializeFromAPI(Real64 elevation); // don't accidentally call this direct component from outside
+    void initializeFromAPI(EnergyPlusData &state, Real64 elevation); // don't accidentally call this direct component from outside
 
-    void preSize(Real64 originalValue);
+    void preSize(EnergyPlusData &state, Real64 originalValue);
 
-    void selectSizerOutput(bool &errorsFound);
+    void selectSizerOutput(EnergyPlusData &state, bool &errorsFound);
 
-    void select2StgDXHumCtrlSizerOutput(bool &errorsFound);
+    void select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &errorsFound);
 
     bool isValidCoilType(std::string const &compType);
 
     bool isValidFanType(std::string const &compType);
 
-    bool checkInitialized(bool &errorsFound);
+    bool checkInitialized(EnergyPlusData &state, bool &errorsFound);
 
     void clearState();
 
 public:
-    static void reportSizerOutput(std::string const &CompType,
+    static void reportSizerOutput(EnergyPlusData &state,
+                                  std::string const &CompType,
                                   std::string const &CompName,
                                   std::string const &VarDesc,
                                   Real64 VarValue,
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
     Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);
@@ -315,6 +318,14 @@ public:
 void autosizing_clear_state();
 
 extern bool oneTimeCompRptHeaderFlag;
+
+struct AutoSizingBaseData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

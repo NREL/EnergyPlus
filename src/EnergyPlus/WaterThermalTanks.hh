@@ -53,8 +53,11 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -375,10 +378,10 @@ namespace WaterThermalTanks {
               ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
               WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0),
               ControlSensor2Height(-1.0), ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
-              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0),
-              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels(), 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0),
-              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels(), 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
+              AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              HPWHAirMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HPWHWaterVolFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              HPWHWaterMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSAirSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSWaterSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true),
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
@@ -387,9 +390,9 @@ namespace WaterThermalTanks {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterThermalTankData : PlantComponent
@@ -438,7 +441,7 @@ namespace WaterThermalTanks {
         Real64 OnCycParaLoad;                  // Rate for on-cycle parasitic load (W)
         std::string OnCycParaFuelType;         // Fuel type for on-cycle parasitic load
         Real64 OnCycParaFracToTank;            // Fraction of on-cycle parasitic energy ending up in tank (W)
-        int UseCurrentFlowLock;                // current flow lock setting on use side
+        DataPlant::iFlowLock UseCurrentFlowLock;  // current flow lock setting on use side
         int UseInletNode;                      // Inlet node on the use side; colder water returning to a hottank
         Real64 UseInletTemp;                   // Use side inlet temperature (C)
         int UseOutletNode;                     // Outlet node on the use side; hot tank water
@@ -449,7 +452,7 @@ namespace WaterThermalTanks {
         Real64 SavedUseOutletTemp;             // Use side outlet temp saved for demand-side flow control (C)
         Real64 UseDesignVolFlowRate;           // Use side plant volume flow rate (input data, autosizable) m3/s
         bool UseDesignVolFlowRateWasAutoSized; // true if use flow rate was autosize on input
-        int UseBranchControlType;              // Use side plant branch control type e.g active, passive, bypass
+        DataBranchAirLoopPlant::ControlTypeEnum UseBranchControlType;              // Use side plant branch control type e.g active, passive, bypass
         int UseSidePlantSizNum;                // index in plant sizing that the use side is on
         bool UseSideSeries;
         int UseSideAvailSchedNum;    // use side availability schedule
@@ -465,7 +468,7 @@ namespace WaterThermalTanks {
         Real64 SavedSourceOutletTemp;             // Source side outlet temp saved for demand-side flow control (C)
         Real64 SourceDesignVolFlowRate;           // Source side plant volume flow rate (input, autosizable) m3/s
         bool SourceDesignVolFlowRateWasAutoSized; // true if source flow rate was autosize on input
-        int SourceBranchControlType;              // source side plant branch control type e.g active, passive, bypass
+        DataBranchAirLoopPlant::ControlTypeEnum SourceBranchControlType;              // source side plant branch control type e.g active, passive, bypass
         int SourceSidePlantSizNum;                // index in plant sizing that the source side is on
         bool SourceSideSeries;
         int SourceSideAvailSchedNum; // source side availability schedule.
@@ -594,6 +597,7 @@ namespace WaterThermalTanks {
         bool scanPlantLoopsFlag;
 
         int callerLoopNum;
+        int waterIndex;
 
         // Default Constructor
         WaterThermalTankData()
@@ -603,32 +607,34 @@ namespace WaterThermalTanks {
               OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(ControlTypeEnum::Cycle), MaxCapacity(0.0),
               MaxCapacityWasAutoSized(false), MinCapacity(0.0), Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0),
               DeadBandDeltaTemp(0.0), TankTempLimit(0.0), IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0),
-              OnCycParaFracToTank(0.0), UseCurrentFlowLock(0), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0), UseOutletTemp(0.0),
-              UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0), SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0),
-              UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(2), UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0),
-              UseSideLoadRequested(0.0), SourceInletNode(0), SourceInletTemp(0.0), SourceOutletNode(0), SourceOutletTemp(0.0),
-              SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0),
-              SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false), SourceBranchControlType(2), SourceSidePlantSizNum(0),
-              SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint),
-              SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
-              FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
-              HeightWasAutoSized(false), Perimeter(0.0), Shape(TankShapeEnum::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false),
-              SavedHeaterOn1(false), HeaterHeight2(0.0), HeaterNode2(0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0),
-              SetPointTemp2(0.0), SetPointTempSchedule2(0), DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0),
-              SkinLossCoeff(0.0), SkinLossFracToZone(0.0), OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0),
-              UseOutletHeight(0.0), UseOutletHeightWasAutoSized(false), SourceInletHeight(0.0), SourceInletHeightWasAutoSized(false),
-              SourceOutletHeight(0.0), UseInletStratNode(0), UseOutletStratNode(0), SourceInletStratNode(0), SourceOutletStratNode(0),
-              InletMode(InletModeEnum::Fixed), InversionMixingRate(0.0), Nodes(0), VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0),
-              LossRate(0.0), FlueLossRate(0.0), UseRate(0.0), TotalDemandRate(0.0), SourceRate(0.0), HeaterRate(0.0), HeaterRate1(0.0),
-              HeaterRate2(0.0), FuelRate(0.0), FuelRate1(0.0), FuelRate2(0.0), VentRate(0.0), OffCycParaFuelRate(0.0), OffCycParaRateToTank(0.0),
-              OnCycParaFuelRate(0.0), OnCycParaRateToTank(0.0), NetHeatTransferRate(0.0), CycleOnCount(0), CycleOnCount1(0), CycleOnCount2(0),
-              RuntimeFraction(0.0), RuntimeFraction1(0.0), RuntimeFraction2(0.0), PartLoadRatio(0.0), UnmetEnergy(0.0), LossEnergy(0.0),
-              FlueLossEnergy(0.0), UseEnergy(0.0), TotalDemandEnergy(0.0), SourceEnergy(0.0), HeaterEnergy(0.0), HeaterEnergy1(0.0),
-              HeaterEnergy2(0.0), FuelEnergy(0.0), FuelEnergy1(0.0), FuelEnergy2(0.0), VentEnergy(0.0), OffCycParaFuelEnergy(0.0),
-              OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0), NetHeatTransferEnergy(0.0), FirstRecoveryDone(false),
-              FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0), ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0),
-              FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true), MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true),
-              AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true), CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true), callerLoopNum(0)
+              OnCycParaFracToTank(0.0), UseCurrentFlowLock(DataPlant::iFlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0),
+              UseOutletTemp(0.0), UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0), SavedUseOutletTemp(0.0),
+              UseDesignVolFlowRate(0.0), UseDesignVolFlowRateWasAutoSized(false),
+              UseBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), UseSidePlantSizNum(0), UseSideSeries(true),
+              UseSideAvailSchedNum(0), UseSideLoadRequested(0.0), SourceInletNode(0), SourceInletTemp(0.0), SourceOutletNode(0),
+              SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0),
+              SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
+              SourceBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), SourceSidePlantSizNum(0), SourceSideSeries(true),
+              SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideEnum::IndirectHeatAltSetpoint), SourceSideAltSetpointSchedNum(0),
+              SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0), FlowRateSchedule(0), UseInletTempSchedule(0),
+              TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0), HeightWasAutoSized(false), Perimeter(0.0),
+              Shape(TankShapeEnum::VertCylinder), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false), HeaterHeight2(0.0),
+              HeaterNode2(0), HeaterOn2(false), SavedHeaterOn2(false), AdditionalCond(0.0), SetPointTemp2(0.0), SetPointTempSchedule2(0),
+              DeadBandDeltaTemp2(0.0), MaxCapacity2(0.0), OffCycParaHeight(0.0), OnCycParaHeight(0.0), SkinLossCoeff(0.0), SkinLossFracToZone(0.0),
+              OffCycFlueLossCoeff(0.0), OffCycFlueLossFracToZone(0.0), UseInletHeight(0.0), UseOutletHeight(0.0), UseOutletHeightWasAutoSized(false),
+              SourceInletHeight(0.0), SourceInletHeightWasAutoSized(false), SourceOutletHeight(0.0), UseInletStratNode(0), UseOutletStratNode(0),
+              SourceInletStratNode(0), SourceOutletStratNode(0), InletMode(InletModeEnum::Fixed), InversionMixingRate(0.0), Nodes(0),
+              VolFlowRate(0.0), VolumeConsumed(0.0), UnmetRate(0.0), LossRate(0.0), FlueLossRate(0.0), UseRate(0.0), TotalDemandRate(0.0),
+              SourceRate(0.0), HeaterRate(0.0), HeaterRate1(0.0), HeaterRate2(0.0), FuelRate(0.0), FuelRate1(0.0), FuelRate2(0.0), VentRate(0.0),
+              OffCycParaFuelRate(0.0), OffCycParaRateToTank(0.0), OnCycParaFuelRate(0.0), OnCycParaRateToTank(0.0), NetHeatTransferRate(0.0),
+              CycleOnCount(0), CycleOnCount1(0), CycleOnCount2(0), RuntimeFraction(0.0), RuntimeFraction1(0.0), RuntimeFraction2(0.0),
+              PartLoadRatio(0.0), UnmetEnergy(0.0), LossEnergy(0.0), FlueLossEnergy(0.0), UseEnergy(0.0), TotalDemandEnergy(0.0), SourceEnergy(0.0),
+              HeaterEnergy(0.0), HeaterEnergy1(0.0), HeaterEnergy2(0.0), FuelEnergy(0.0), FuelEnergy1(0.0), FuelEnergy2(0.0), VentEnergy(0.0),
+              OffCycParaFuelEnergy(0.0), OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0),
+              NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
+              ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0), FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true),
+              MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), AlreadyReported(false), AlreadyRated(false), MyHPSizeFlag(true),
+              CheckWTTEquipName(true), myOneTimeInitFlag(true), scanPlantLoopsFlag(true), callerLoopNum(0), waterIndex(1)
         {
         }
 
@@ -636,7 +642,7 @@ namespace WaterThermalTanks {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void setupZoneInternalGains();
+        void setupZoneInternalGains(EnergyPlusData &state);
 
         void setupChilledWaterTankOutputVars(EnergyPlusData &state);
 
@@ -660,7 +666,7 @@ namespace WaterThermalTanks {
 
         void SizeTankForDemandSide(EnergyPlusData &state);
 
-        void MinePlantStructForInfo();
+        void MinePlantStructForInfo(EnergyPlusData &state);
 
         void SizeSupplySidePlantConnections(EnergyPlusData &state, Optional_int_const LoopNum = _);
 
@@ -691,7 +697,7 @@ namespace WaterThermalTanks {
                                       SideEnum WaterThermalTankSide,
                                       int PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
-                                      int BranchControlType,
+                                      DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,
                                       Real64 OutletTemp,
                                       Real64 DeadBandTemp,
                                       Real64 SetPointTemp);
@@ -773,9 +779,9 @@ namespace WaterThermalTanks {
 
         static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
 
     struct WaterHeaterDesuperheaterData

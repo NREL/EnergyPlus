@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -76,8 +77,8 @@ namespace FanCoilUnits {
     extern std::string const cMO_FanCoil;
 
     // coil operation
-    extern int const On;  // normal coil operation
-    extern int const Off; // signal coil shouldn't run
+    constexpr int On(1);  // normal coil operation
+    constexpr int Off(0); // signal coil shouldn't run
 
     // coil type units supported in this module
     extern int const FanCoilUnit_4Pipe;
@@ -371,7 +372,7 @@ namespace FanCoilUnits {
                                     Real64 &PowerMet               // Sensible power supplied (W)
     );
 
-    void ReportFanCoilUnit(int const FanCoilNum); // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum); // number of the current fan coil unit being simulated
 
     int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
 
@@ -432,6 +433,14 @@ namespace FanCoilUnits {
                                            Array1D<Real64> const &Par // Function parameters
     );
 } // namespace FanCoilUnits
+
+struct FanCoilUnitsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 
