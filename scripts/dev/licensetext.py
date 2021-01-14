@@ -305,10 +305,18 @@ class FileVisitor:
         else:
             self.extensions = extensions
 
-    def files(self, path):
+    def files(self, path, exclude_patterns=None):
         results = []
         for ext in self.extensions:
             results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+        if exclude_patterns is not None:
+            for pattern in exclude_patterns:
+                matcher = re.compile(pattern)
+                # original = results[:]
+                results = [el for el in results if not matcher.match(el)]
+                # for file in original:
+                #    if not file in results:
+                #        print('Skipping ' + file)
         return results
 
     def visit_file(self, filepath):
@@ -317,9 +325,22 @@ class FileVisitor:
     def error(self, file, line_number, mesg):
         pass
 
-    def visit(self, path):
+    def visit(self, path, exclude_patterns=None):
         overall_success = True
-        for file in self.files(path):
+        #exclude = []
+        #if exclude_patterns is not None:
+        #    for pattern in exclude_patterns:
+        #        exclude.append(re.compile(pattern))
+        for file in self.files(path, exclude_patterns=exclude_patterns):
+            #if exclude:
+            #    skip = False
+            #    for pattern in exclude:
+            #        skip = pattern.match(file)
+            #        if skip:
+            #            break
+            #    if skip:
+            #        print('Skipping ' + file)
+            #        continue
             file_success = self.visit_file(file)
             if not file_success:
                 overall_success = False

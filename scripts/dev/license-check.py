@@ -65,9 +65,13 @@ TOOL_NAME = 'license-check'
 cpp_dirs = ["./src/EnergyPlus/",
             "./tst/EnergyPlus/unit/"]
 
-python_dirs = ["./src/EnergyPlus/",
+python_dirs = ["./src/",
+               "./tst/",
+               "./testfiles/",
                "./scripts/dev/",
                "./workflows/"]
+
+python_dirs = ["./"]
 
 current = licensetext.current()
 
@@ -102,7 +106,10 @@ checker = licensetext.Checker(licensetext.current_python(), offset=2,
 # Check files
 python_file_license_success = True
 for base in python_dirs:
-    file_success = checker.visit(base)
+    file_success = checker.visit(base, exclude_patterns=[r'.*third_party.*',
+                                                         r'^\.\\build.*',
+                                                         r'^\.\\bin.*',
+                                                         r'.*readthedocs.*'])
     if not file_success:
         python_file_license_success = False
 
