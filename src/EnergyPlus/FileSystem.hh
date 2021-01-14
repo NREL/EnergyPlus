@@ -67,39 +67,51 @@ namespace FileSystem {
 
     extern std::string const exeExtension;
 
-    void makeNativePath(std::string &path);
+    // Similar to fs::path::make_preferred, but also does '\\' => '/' conversion on POSIX, which make_preferred does not do
+    void makeNativePath(fs::path &path);
 
-    std::string getFileName(std::string const &filePath);
+    [[no_discard]] fs::path getFileName(fs::path const &filePath);
 
-    // Returns the parent directory of a path, with the trailing pathChar included
-    std::string getParentDirectoryPath(std::string const &filePath);
+    // Returns the parent directory of a path. This implementation differs from filesystem::path::parent_path because it treats trailing separators
+    // differently.
+    // | s      | getParentDirectoryPath(s) | fs::path(s).parent_path() |
+    // |--------|---------------------------|---------------------------|
+    // | a/b/c  | "a/b"                     | "a/b"                     |
+    // | a/b/c/ | "a/b"                     | "a/b/c"                   |
+    // | a.idf  | "./"                      | ""                        |
+    [[no_discard]] fs::path getParentDirectoryPath(fs::path const &filePath);
 
-    std::string getAbsolutePath(std::string const &filePath);
+    [[no_discard]] fs::path getAbsolutePath(fs::path const &filePath);
 
-    std::string getProgramPath();
+    [[no_discard]] fs::path getProgramPath();
 
-    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
-    std::string getFileExtension(std::string const &fileName);
+    // For `a/b/c.txt.idf` it returns `idf`, i.e. anything after last dot, **not including the dot** (unlike fs::path::extension() which includes it)
+    [[no_discard]] fs::path getFileExtension(fs::path const &fileName);
 
     // Turns a/b/c.txt.idf into a/b/c.txt
-    std::string removeFileExtension(std::string const &fileName);
+    [[no_discard]] fs::path removeFileExtension(fs::path const &fileName);
 
-    void makeDirectory(std::string const &directoryPath);
+    // Creates a directory if it doesn't already exists
+    void makeDirectory(fs::path const &directoryPath);
 
-    bool pathExists(std::string const &path);
+    bool pathExists(fs::path const &path);
 
-    bool directoryExists(std::string const &directoryPath);
+    bool directoryExists(fs::path const &directoryPath);
 
-    bool fileExists(std::string const &filePath);
+    bool fileExists(fs::path const &filePath);
 
-    void moveFile(std::string const &filePath, std::string const &destination);
+    // Checks that fileExists(filePath), if so tries to rename to destination, falling back on copy+remove if failed (if trying to do move accross
+    // devices for eg)
+    void moveFile(fs::path const &filePath, fs::path const &destination);
 
-    int systemCall(std::string const &command);
+    int systemCall(fs::path const &command);
 
-    void removeFile(std::string const &fileName);
+    // Returns false if not fileExists(filePath), or if filePath cannot be removed
+    bool removeFile(fs::path const &filePath);
 
     // On Windows, this just copies the file. On Unix, it creates a symlink
-    void linkFile(std::string const &fileName, std::string const &link);
+    // Starts by checking that fileExists(filePath) is true
+    void linkFile(fs::path const &fileName, fs::path const &link);
 
 } // namespace FileSystem
 } // namespace EnergyPlus

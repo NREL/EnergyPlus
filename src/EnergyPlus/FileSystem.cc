@@ -79,43 +79,41 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
-    void makeNativePath(std::string &path)
+    void makeNativePath(fs::path &path)
     {
-        // fs::path(path).make_preferred().string();
-        std::replace(path.begin(), path.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
+        // path.make_preferred() on windows will change "/" to "\\", because '/' is a fallback separator
+        // but on Unix it will *not* change "\\" to "/", because POSIX doesn't define it as a fallback separator. In fact, it's even allowed in a
+        // filename. Do we really need that though?
+        // path.make_preferred();
+        std::string tempPathAsStr = path.make_preferred().string();
+        std::replace(tempPathAsStr.begin(), tempPathAsStr.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
+        path = fs::path(tempPathAsStr);
     }
 
-    std::string getFileName(std::string const &filePath)
+    // TODO: remove as providing little benefit over calling fs::path::filename directly?
+    fs::path getFileName(fs::path const &filePath)
     {
-        return fs::path(filePath).filename().string();
+        return filePath.filename();
     }
 
-    std::string getParentDirectoryPath(std::string const &path)
+    fs::path getParentDirectoryPath(fs::path const &path)
     {
-        std::string tempPath = path;
-        if (path.at(path.size() - 1) == DataStringGlobals::pathChar) tempPath = path.substr(0, path.size() - 1);
-
-        fs::path p(tempPath);
-        tempPath = p.parent_path().string();
-
-
-        // Is that below really needed? Perhaps the best way would be just to use actual fs::path (instead of std::string) and the operator/ ...
-        if (tempPath.empty()) {
-            tempPath = ".";
+        // Remove trailing separator
+        std::string pathStr = path.string();
+        while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
+            pathStr.erase(pathStr.size()-1);
         }
-        tempPath += '/';
-        return tempPath;
 
-        //int pathCharPosition = tempPath.find_last_of(DataStringGlobals::pathChar);
-        //tempPath = tempPath.substr(0, pathCharPosition + 1);
+        // If empty, return "./" instead
+        fs::path parent_path = fs::path(pathStr).parent_path();
+        if (parent_path.empty()) {
+            parent_path = "./";
+        }
+        return parent_path;
 
-        //// If empty, then current dir, but with trailing separator too: eg `./`
-        //if (tempPath == "") tempPath = {'.',DataStringGlobals:: pathChar};
-
-        //return tempPath;
     }
 
-    std::string getAbsolutePath(std::string const &path)
+    fs::path getAbsolutePath(fs::path const &path)
     {
         /*
          * Returns the absolute path for a given relative path.
@@ -131,13 +129,13 @@ namespace FileSystem {
         }
 
         // Not available in experimental/filesystem
-        // return fs::weakly_canonical(fs::absolute(p)).string();
+        // return fs::weakly_canonical(fs::absolute(p));
 
         p = fs::absolute(p);
 
         fs::path result;
         // `p` now is absolute, but it isn't necessarilly canonical.
-        // If you have <filesystem>, you can use `fs::weakly_canonical`
+        // If you have <filesystem>, you can use `fs::weakly_canonical`. <experimental/filesystem> does **not** have `weakly_canonical` though
         // This block resolves a canonical path, even if it doesn't exist (yet?) on disk.
         for (fs::path::iterator it = p.begin(); it != p.end(); ++it) {
             if (*it == fs::path("..")) {
@@ -151,15 +149,16 @@ namespace FileSystem {
             }
         }
 
+        return result;
         // Workaround to maintain std::string & backward compat
-        std::string s = result.string();
-        if (fs::is_directory(s)) {
-            s += '/';
-        }
-        return s;
+        //std::string s = result.string();
+        //if (fs::is_directory(s)) {
+            //s += '/';
+        //}
+        //return s;
     }
 
-    std::string getProgramPath()
+    fs::path getProgramPath()
     {
         /*
          * Returns the relative path to the executable file (including symlinks).
@@ -183,30 +182,34 @@ namespace FileSystem {
         GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
 
-        return std::string(executableRelativePath);
+        return fs::path(executableRelativePath);
     }
 
-    std::string getFileExtension(std::string const &fileName) {
+    // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
+    // just compare to ".EPJSON" instead of "EPJSON"...
+    fs::path getFileExtension(fs::path const &fileName) {
         std::string pext = fs::path(fileName).extension().string();
         if (!pext.empty()) {
             // remove '.'
             pext = std::string(++pext.begin(), pext.end());
         }
-        return pext;
+        return fs::path{pext};
     }
 
-    std::string removeFileExtension(std::string const &fileName)
+    // TODO: remove for fs::path::replace_extension directly?
+    fs::path removeFileExtension(fs::path const &fileName)
     {
         // return fs::path(fileName).stem().string();
         return fs::path(fileName).replace_extension().string();
     }
 
-    void makeDirectory(std::string const &directoryPath)
+    // TODO: remove? `fs::create_directory` for a single or `fs::create_directories` for nested directory creation
+    void makeDirectory(fs::path const &directoryPath)
     {
         // Create a directory if doesn't already exist
         if (pathExists(directoryPath)) { // path already exists
             if (!directoryExists(directoryPath)) {
-                std::cout << "ERROR: " + getAbsolutePath(directoryPath) + " already exists and is not a directory." << std::endl;
+                std::cout << "ERROR: " << getAbsolutePath(directoryPath).string() << " already exists and is not a directory." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         } else { // directory does not already exist
@@ -215,29 +218,31 @@ namespace FileSystem {
         }
     }
 
-    bool pathExists(std::string const &path)
+    // TODO: remove?
+    bool pathExists(fs::path const &path)
     {
-        return fs::exists(fs::path(path));
+        return fs::exists(path);
     }
 
-    bool directoryExists(std::string const &directoryPath)
+    // TODO: I think we want to keep this one
+    bool directoryExists(fs::path const &directoryPath)
     {
-        fs::path p(directoryPath);
-        return fs::exists(p) && fs::is_directory(p);
+        return fs::exists(directoryPath) && fs::is_directory(directoryPath);
     }
 
-    bool fileExists(std::string const &filePath)
+    bool fileExists(fs::path const &filePath)
     {
-        fs::path p(filePath);
-        return fs::exists(p) && !fs::is_directory(p);
+        return fs::exists(filePath) && !fs::is_directory(filePath);
     }
 
-    void moveFile(std::string const &filePath, std::string const &destination)
+    void moveFile(fs::path const &filePath, fs::path const &destination)
     {
-        if (!fs::exists(filePath)) {
+        // TODO: should we throw? Or return false?
+        if (!fileExists(filePath)) {
             return;
         }
 
+        // rename would fail if copying accross devices
         try {
             fs::rename(fs::path(filePath), destination);
         } catch (fs::filesystem_error&) {
@@ -246,7 +251,7 @@ namespace FileSystem {
         }
     }
 
-    int systemCall(std::string const &command)
+    int systemCall(fs::path const &command)
     {
 #ifdef _WIN32
         // Wrap in double quotes and pass that to system
@@ -260,22 +265,25 @@ namespace FileSystem {
 #endif
     }
 
-    void removeFile(std::string const &fileName)
+    bool removeFile(fs::path const &filePath)
     {
-        fs::path p(fileName);
-        if (!fs::exists(p)) {
+        if (!fileExists(filePath)) {
+            return false;
+        }
+
+        return fs::remove(filePath);
+    }
+
+    void linkFile(fs::path const &filePath, fs::path const &linkPath)
+    {
+        if (!fileExists(filePath)) {
             return;
         }
 
-        fs::remove(p);
-    }
-
-    void linkFile(std::string const &fileName, std::string const &link)
-    {
 #ifdef _WIN32
-        fs::copy(filePath, destination, fs::copy_options::update_existing);
+        fs::copy(filePath, linkPath, fs::copy_options::update_existing);
 #else
-        return fs::create_symlink(fileName, link);
+        return fs::create_symlink(filePath, linkPath);
 #endif
     }
 
