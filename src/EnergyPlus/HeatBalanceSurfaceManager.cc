@@ -7476,7 +7476,8 @@ namespace HeatBalanceSurfaceManager {
                     if (DataGlobals::externalSurfaceManager) {
                       auto const result = DataGlobals::externalSurfaceManager(surfNum);
                       if (result.first) {
-                        TempSurfIn(surfNum) = result.second;
+                        TempSurfInTmp(surfNum) = result.second;
+                        TempSurfIn(surfNum) = TempSurfInTmp(surfNum);
                         continue;
                       }
                     }
