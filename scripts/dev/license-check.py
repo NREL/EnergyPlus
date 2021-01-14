@@ -100,13 +100,10 @@ checker = licensetext.Checker(licensetext.current_python(), offset=2,
 
 # Check files
 python_file_license_success = True
-patterns = ['.*third_party.*', '^\\.'+os.path.sep+'build.*',
-            '^\\.'+os.path.sep+'bin.*', '.*readthedocs.*']
+patterns = [r'.*third_party.*', r'^\.(\\|/)build.*',
+            r'^\.(\\|/)bin.*', r'.*readthedocs.*']
 for base in python_dirs:
-    file_success = checker.visit(base, exclude_patterns=[r'.*third_party.*',
-                                                         r'^\.\\build.*',
-                                                         r'^\.\\bin.*',
-                                                         r'.*readthedocs.*'])
+    file_success = checker.visit(base, exclude_patterns=patterns)
     if not file_success:
         python_file_license_success = False
 
