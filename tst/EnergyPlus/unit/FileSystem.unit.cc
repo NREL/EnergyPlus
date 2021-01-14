@@ -178,10 +178,8 @@ TEST(FileSystem, make_and_remove_Directory)
     EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(dirName));
     EXPECT_FALSE(EnergyPlus::FileSystem::directoryExists(dirName));
 
-    // This fails, because it can't make intermediate directories... which I think is a weird unwanted limitation
-    // eg: energyplus -d out/a/b/c/ sould be possible. It would create out, out/a, out/a/b/ and out/a/b/c/ as needed
-    // Anyways, for now to avoid a failed test, let's create the intermediate directory manually
-    EnergyPlus::FileSystem::makeDirectory("sandbox");
+    // This used to fail, because it can't make intermediate directories... which I think is a weird unwanted limitation
+    // eg: energyplus -d out/a/b/c/ should be possible. It would create out, out/a, out/a/b/ and out/a/b/c/ as needed
     EnergyPlus::FileSystem::makeDirectory("sandbox/a");
 
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists("sandbox"));
@@ -218,17 +216,15 @@ TEST(FileSystem, Elaborate)
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox"));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
     EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).size(), pathName.size());
-    // Fails, ..../sandbox/ versus ..../sandbox
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
-              //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox"),
-              //EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/"));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
+              EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox"),
+              EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/"));
 
     EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("./"), EnergyPlus::FileSystem::getAbsolutePath("sandbox/../"));
 
-    // Fails, "/home/julien/Software/Others/EnergyPlus-build/." versus "/home/julien/Software/Others/EnergyPlus-build"
-    //EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("."), EnergyPlus::FileSystem::getAbsolutePath("sandbox/.."));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("."), EnergyPlus::FileSystem::getAbsolutePath("sandbox/.."));
 
     EnergyPlus::FileSystem::removeFile(pathName);
     EXPECT_FALSE(EnergyPlus::FileSystem::pathExists(pathName));
