@@ -3606,7 +3606,6 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
@@ -3775,9 +3774,9 @@ namespace EvaporativeCoolers {
 
                 // get the zone numer served by the zoneHVAC evaporative cooler
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (ZoneEvapUnit(UnitLoop).UnitOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (ZoneEvapUnit(UnitLoop).UnitOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             ZoneEvapUnit(UnitLoop).ZonePtr = CtrlZone;
                             break;
                         }
@@ -4043,7 +4042,6 @@ namespace EvaporativeCoolers {
         using DataHVACGlobals::ZoneComp;
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
         using Fans::GetFanVolFlow;
 
@@ -4064,7 +4062,7 @@ namespace EvaporativeCoolers {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneEvapUnits; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit(Loop).Name)) {
-                    ZoneEvapUnit(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
+                    ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(Loop).Name +
                                     ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");

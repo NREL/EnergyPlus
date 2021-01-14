@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.092756, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -978,7 +978,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.08);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();

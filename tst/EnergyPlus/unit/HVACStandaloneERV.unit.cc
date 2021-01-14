@@ -109,12 +109,12 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     Zone.allocate(1);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -219,12 +219,12 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     Zone.allocate(1);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     Zone(1).Multiplier = 1.0;
     Zone(1).FloorArea = 100.0;
 

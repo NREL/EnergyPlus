@@ -331,7 +331,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     int const SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+    int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
@@ -507,7 +507,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     int const SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+    int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
 
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     int const SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+    int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
     Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -849,9 +849,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
 
     int const InletNode = thisAirTerminal.InletNodeNum;
     int const ZonePtr = thisAirTerminal.ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
-    ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1) = 1;
-    thisAirTerminal.AirLoopNum = ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1);
+    int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
+    state->dataZoneEquip->ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1) = 1;
+    thisAirTerminal.AirLoopNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).InletNodeAirLoopNum(1);
 
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -1022,7 +1022,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     int const InletNode = thisAirTerminal.InletNodeNum;
     int const OutletNode = thisAirTerminal.OutletNodeNum;
     int const ZonePtr = thisAirTerminal.ActualZoneNum;
-    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+    int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
 
     Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
     ;

@@ -106,13 +106,13 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalance::CrossMixing(1).ZonePtr = 1;
     DataHeatBalance::CrossMixing(1).FromZone = 2;
     DataHeatBalance::CrossMixing(1).DesiredAirFlowRate = 0.1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);
@@ -173,13 +173,13 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     DataHeatBalance::Ventilation(1).ZonePtr = 1;
     DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
     state->dataZoneEquip->VentMCP(1) = DataHeatBalFanSys::MCPV(1);
@@ -235,15 +235,15 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
     state->dataFans->NumFans = 1;

@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 199.86, 0.01);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -556,7 +556,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -792,7 +792,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 85.97495, 0.01);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -1029,7 +1029,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     EXPECT_NEAR(state->dataWaterCoils->WaterCoil(1).UACoil, 300.00, 0.01);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();

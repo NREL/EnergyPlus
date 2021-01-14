@@ -99,7 +99,6 @@ namespace FourPipeBeam {
         using DataLoopNode::NodeType_Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataLoopNode::ObjectIsParent;
-        using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using CurveManager::GetCurveIndex;
@@ -440,20 +439,20 @@ namespace FourPipeBeam {
 
             // Fill the Zone Equipment data with the supply air inlet node number of this unit.
             for (ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                if (!ZoneEquipConfig(ctrlZone).IsControlled) continue;
-                for (supAirIn = 1; supAirIn <= ZoneEquipConfig(ctrlZone).NumInletNodes; ++supAirIn) {
-                    if (thisBeam->airOutNodeNum == ZoneEquipConfig(ctrlZone).InletNode(supAirIn)) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(ctrlZone).IsControlled) continue;
+                for (supAirIn = 1; supAirIn <= state.dataZoneEquip->ZoneEquipConfig(ctrlZone).NumInletNodes; ++supAirIn) {
+                    if (thisBeam->airOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(ctrlZone).InletNode(supAirIn)) {
                         thisBeam->zoneIndex = ctrlZone;
-                        thisBeam->zoneNodeIndex = ZoneEquipConfig(ctrlZone).ZoneNode;
+                        thisBeam->zoneNodeIndex = state.dataZoneEquip->ZoneEquipConfig(ctrlZone).ZoneNode;
                         thisBeam->ctrlZoneInNodeIndex = supAirIn;
-                        ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).InNode = thisBeam->airInNodeNum;
-                        ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).OutNode = thisBeam->airOutNodeNum;
-                        state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum = ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).TermUnitSizingIndex;
+                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).InNode = thisBeam->airInNodeNum;
+                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).OutNode = thisBeam->airOutNodeNum;
+                        state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).TermUnitSizingIndex;
                         thisBeam->termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum;
                         state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).ZoneEqNum = ctrlZone;
                         if (thisBeam->beamHeatingPresent) {
-                            ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).InNode = thisBeam->airInNodeNum;
-                            ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).OutNode = thisBeam->airOutNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).InNode = thisBeam->airInNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).OutNode = thisBeam->airOutNodeNum;
                         }
                         airNodeFound = true;
                         break;
@@ -590,7 +589,7 @@ namespace FourPipeBeam {
 
         if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
             //	if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
-            this->airLoopNum = DataZoneEquipment::ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
+            this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
@@ -647,7 +646,7 @@ namespace FourPipeBeam {
 
             if (this->airLoopNum == 0) { // fill air loop index
                 if (this->zoneIndex > 0 && this->ctrlZoneInNodeIndex > 0) {
-                    this->airLoopNum = DataZoneEquipment::ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
+                    this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
                 }
             }
 

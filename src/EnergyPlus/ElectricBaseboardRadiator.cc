@@ -590,7 +590,6 @@ namespace ElectricBaseboardRadiator {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
@@ -615,7 +614,7 @@ namespace ElectricBaseboardRadiator {
             MyOneTimeFlag = false;
         }
 
-        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
@@ -660,7 +659,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         ElecBaseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
         ElecBaseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
 
@@ -795,7 +794,6 @@ namespace ElectricBaseboardRadiator {
         using DataHVACGlobals::SmallLoad;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
@@ -1052,7 +1050,6 @@ namespace ElectricBaseboardRadiator {
         using DataHeatBalFanSys::QElecBaseboardSurf;
         using DataHeatBalFanSys::QElecBaseboardToPerson;
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)

@@ -1175,7 +1175,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
 
         using NodeInputManager::GetOnlySingleNode;
@@ -1732,7 +1731,7 @@ namespace EnergyPlus::MixedAir {
                     if (thisVentilationMechanical.ZoneSecondaryRecirculation(jZone) > 0.0) {
                         ZoneNum = thisVentilationMechanical.VentMechZone(jZone);
                         if (ZoneNum > 0) {
-                            EquipListIndex = ZoneEquipConfig(ZoneNum).EquipListIndex;
+                            EquipListIndex = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex;
                             if (EquipListIndex > 0) {
                                 for (EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                     if (EquipListNum == EquipListIndex) {
@@ -2066,7 +2065,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
 
         using NodeInputManager::GetOnlySingleNode;
@@ -2236,9 +2234,9 @@ namespace EnergyPlus::MixedAir {
                 AirLoopFound = false;
                 OASysFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum) continue;
                     //           Find the controlled zone number for the specified humidistat location
-                    state.dataMixedAir->OAController(OutAirNum).NodeNumofHumidistatZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    state.dataMixedAir->OAController(OutAirNum).NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     //           Determine which OA System uses this OA Controller
                     OASysIndex = 0;
                     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
@@ -2253,8 +2251,8 @@ namespace EnergyPlus::MixedAir {
                         if (OASysFound) break;
                     }
                     //           Determine if controller is on air loop served by the humidistat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0 && OASysIndex > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -3664,7 +3662,6 @@ namespace EnergyPlus::MixedAir {
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneIntGain;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -3839,7 +3836,7 @@ namespace EnergyPlus::MixedAir {
 
                         // Assign references
                         auto &curZone(Zone(ZoneNum));
-                        auto &curZoneEquipConfig(ZoneEquipConfig(ZoneEquipConfigNum));
+                        auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
                         auto &curZoneSysEnergyDemand(ZoneSysEnergyDemand(ZoneEquipConfigNum));
                         ZoneName = curZone.Name;
                         Real64 curZoneOASchValue = GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));

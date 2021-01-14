@@ -84,7 +84,6 @@ using namespace EnergyPlus::RoomAirModelAirflowNetwork;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
-using DataZoneEquipment::ZoneEquipConfig;
 using DataZoneEquipment::ZoneEquipList;
 
 class RoomAirflowNetworkTest : public EnergyPlusFixture
@@ -103,7 +102,7 @@ protected:
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         Zone.allocate(state->dataGlobal->NumOfZones);
-        ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
@@ -236,16 +235,16 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     ZoneEquipList(ZoneNum).EquipName.allocate(1);
     ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
 
-    ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
-    ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
-    ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
-    ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
     NodeID.allocate(NumOfNodes);
     Node.allocate(NumOfNodes);
-    ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
-    ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Zone(ZoneNum).Volume = 100;
     Zone(ZoneNum).IsControlled = true;

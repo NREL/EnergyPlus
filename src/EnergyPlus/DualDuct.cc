@@ -262,7 +262,6 @@ namespace DualDuct {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataHeatBalance;
 
@@ -396,26 +395,26 @@ namespace DualDuct {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                                if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                     ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                     ShowContinueError(state, NodeID(dd_airterminal(DDNum).OutletNodeNum) + " already connects to another zone");
                                     ShowContinueError(state, "Occurs for terminal unit " + CurrentModuleObject + " = " + dd_airterminal(DDNum).Name);
                                     ShowContinueError(state, "Check terminal unit node names for errors");
                                     ErrorsFound = true;
                                 } else {
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                     state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
-                                        ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                     state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
                                 }
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                                 dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -537,19 +536,19 @@ namespace DualDuct {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).HotAirInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                 state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                                 dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -719,23 +718,23 @@ namespace DualDuct {
 
                     // Fill the Zone Equipment data with the inlet node numbers of this unit.
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                            if (dd_airterminal(DDNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                            if (dd_airterminal(DDNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                                 if (dd_airterminal(DDNum).RecircIsUsed) {
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).RecircAirInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).RecircAirInletNodeNum;
                                 } else {
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
                                 }
-                                ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).InNode = dd_airterminal(DDNum).OAInletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitHeat(SupAirIn).OutNode = dd_airterminal(DDNum).OutletNodeNum;
                                 state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(dd_airterminal(DDNum).ADUNum).ZoneEqNum = CtrlZone;
 
                                 dd_airterminal(DDNum).CtrlZoneNum = CtrlZone;
-                                dd_airterminal(DDNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                dd_airterminal(DDNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                                 dd_airterminal(DDNum).CtrlZoneInNodeIndex = SupAirIn;
                             }
                         }
@@ -851,7 +850,6 @@ namespace DualDuct {
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -975,7 +973,7 @@ namespace DualDuct {
         if (this->MyAirLoopFlag) {
             if (this->AirLoopNum == 0) {
                 if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeIndex > 0)) {
-                    this->AirLoopNum = ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+                    this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
                     state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
                     // Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
                 }
@@ -1834,7 +1832,6 @@ namespace DualDuct {
         // User input defines method used to calculate OA.
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.

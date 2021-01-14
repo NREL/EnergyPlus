@@ -324,7 +324,6 @@ namespace FanCoilUnits {
         using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using MixedAir::GetOAMixerIndex;
         using MixedAir::GetOAMixerNodeNumbers;
@@ -827,9 +826,9 @@ namespace FanCoilUnits {
                 // check that the fan coil inlet node is the same as one of the zone exhaust nodes
                 ZoneExNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (FanCoil(FanCoilNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (FanCoil(FanCoilNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                             ZoneExNodeNotFound = false;
                         }
                     }
@@ -844,11 +843,11 @@ namespace FanCoilUnits {
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
                 ZoneInNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (FanCoil(FanCoilNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (FanCoil(FanCoilNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             FanCoil(FanCoilNum).ControlZoneNum = CtrlZone;
-                            FanCoil(FanCoilNum).NodeNumOfControlledZone = ZoneEquipConfig(CtrlZone).ZoneNode;
+                            FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                             ZoneInNodeNotFound = false;
                         }
                     }
@@ -3567,7 +3566,6 @@ namespace FanCoilUnits {
         // Using/Aliasing
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
-        using DataZoneEquipment::ZoneEquipConfig;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
@@ -3608,7 +3606,7 @@ namespace FanCoilUnits {
 
         OutletNode = FanCoil(FanCoilNum).AirOutNode;
         InletNode = FanCoil(FanCoilNum).AirInNode;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
 
         // Assume the unit is able to vary the flow. A cycling unit is treated as
         // if it were variable flow, with the flow being the averaqe flow over the time step

@@ -3567,7 +3567,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::NumPlantLoops;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
-        using DataZoneEquipment::ZoneEquipConfig;
         using namespace DataPlant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -3622,7 +3621,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3632,15 +3631,15 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                     }
@@ -3654,7 +3653,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3664,15 +3663,15 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                     }
@@ -3684,9 +3683,9 @@ namespace EnergyPlus::SetPointManager {
                     for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
                         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                                 break;
                             }
                         }
@@ -3720,9 +3719,9 @@ namespace EnergyPlus::SetPointManager {
                     for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
                         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                                 break;
                             }
                         }
@@ -3765,7 +3764,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3775,16 +3774,16 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
-                                AirLoopNum = ZoneEquipConfig(ConZoneNum).InletNodeAirLoopNum(zoneInNode);
+                                AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNodeAirLoopNum(zoneInNode);
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                         if (AirLoopNum == 0) {
@@ -5849,7 +5848,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5883,8 +5881,8 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
             ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
@@ -5930,7 +5928,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5966,8 +5963,8 @@ namespace EnergyPlus::SetPointManager {
             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
                 CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
                 ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
-                ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-                ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+                ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+                ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
                 ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
@@ -5986,8 +5983,8 @@ namespace EnergyPlus::SetPointManager {
             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
                 CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
                 ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
-                ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-                ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+                ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+                ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
                 ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
@@ -6034,7 +6031,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6082,8 +6078,8 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
             ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
@@ -6234,7 +6230,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6287,7 +6282,7 @@ namespace EnergyPlus::SetPointManager {
 
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
@@ -6333,7 +6328,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6377,7 +6371,7 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
@@ -6425,7 +6419,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6465,7 +6458,7 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
@@ -6508,7 +6501,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6549,7 +6541,7 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
@@ -6593,7 +6585,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6625,7 +6616,7 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
@@ -6672,7 +6663,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6704,7 +6694,7 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;

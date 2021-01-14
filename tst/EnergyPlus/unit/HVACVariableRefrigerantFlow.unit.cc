@@ -155,7 +155,7 @@ protected:
         DataLoopNode::NodeID.allocate(50);
 
         DataHeatBalance::Zone.allocate(numZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(numZones);
+        state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         DataZoneEquipment::ZoneEquipList.allocate(numZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
@@ -226,7 +226,7 @@ protected:
         ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
         ZoneEqSizing(zoneNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-        auto &thisZoneEqConfig(DataZoneEquipment::ZoneEquipConfig(zoneNum));
+        auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;
         thisZoneEqConfig.ActualZoneNum = 1;
         thisZoneEqConfig.ZoneName = "ZONE1";
@@ -2253,14 +2253,14 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 2;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     GetVRFInputData(*state, ErrorsFound); // read VRF
     EXPECT_FALSE(ErrorsFound);
@@ -3768,7 +3768,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(ZoneInletAirNode,
-              ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
+              state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
     EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
     EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
@@ -11197,7 +11197,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    auto &thisZoneEquip(ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
     // set zone air node properties
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
@@ -12929,7 +12929,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    auto &thisZoneEquip(ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
     // set zone air node properties
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
@@ -15605,7 +15605,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    auto &thisZoneEquip(ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
     // set zone air node properties
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;

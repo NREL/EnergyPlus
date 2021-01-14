@@ -216,16 +216,16 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state, "Zone 1 Node",
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state, "Zone 1 Node",
                                                                                          ErrorsFound,
                                                                                          "Zone",
                                                                                          "BeamTest",
@@ -245,9 +245,9 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
-    EXPECT_EQ(2, DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat(1).InNode);
+    EXPECT_EQ(2, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).InNode);
 
-    EXPECT_EQ(3, DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat(1).OutNode);
+    EXPECT_EQ(3, state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat(1).OutNode);
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->aDUNum, 1 );
 }
 

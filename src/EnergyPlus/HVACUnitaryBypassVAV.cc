@@ -1239,9 +1239,9 @@ namespace HVACUnitaryBypassVAV {
                         state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
                     if (CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) > 0) {
                         CBVAV(CBVAVNum).ActualZoneNodeNum(AirLoopZoneNum) =
-                            DataZoneEquipment::ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
                         CBVAV(CBVAVNum).ActualZoneNum(AirLoopZoneNum) =
-                            DataZoneEquipment::ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ActualZoneNum;
+                            state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ActualZoneNum;
                         CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum) =
                             state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
                         // check for thermostat in controlled zone
@@ -1254,7 +1254,7 @@ namespace HVACUnitaryBypassVAV {
                         if (!FoundTstatZone) {
                             ShowWarningError(state, CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\"");
                             ShowContinueError(state, "Thermostat not found in zone = " +
-                                              DataZoneEquipment::ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneName +
+                                              state.dataZoneEquip->ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneName +
                                               " and the simulation continues.");
                             ShowContinueError(state, "This zone will not be controlled to a temperature setpoint.");
                         }
@@ -1263,8 +1263,8 @@ namespace HVACUnitaryBypassVAV {
                         int coolingPriority = 0;
                         int heatingPriority = 0;
                         // setup zone equipment sequence information based on finding matching air terminal
-                        if (DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex)
+                        if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                                 .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
@@ -1273,7 +1273,7 @@ namespace HVACUnitaryBypassVAV {
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) == 0) {
                             ShowSevereError(state, "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV(CBVAVNum).Name +
                                             "\": Airloop air terminal in the zone equipment list for zone = " +
-                                            DataZoneEquipment::ZoneEquipConfig(zoneNum).ZoneName +
+                                            state.dataZoneEquip->ZoneEquipConfig(zoneNum).ZoneName +
                                             " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                             ErrorsFound = true;
                         }

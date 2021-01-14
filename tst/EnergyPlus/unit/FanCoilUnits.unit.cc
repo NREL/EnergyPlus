@@ -412,7 +412,7 @@ namespace EnergyPlus {
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -725,7 +725,7 @@ namespace EnergyPlus {
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -1420,7 +1420,7 @@ namespace EnergyPlus {
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -2174,7 +2174,7 @@ namespace EnergyPlus {
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }

@@ -2649,8 +2649,8 @@ namespace SimulationManager {
         print(state.files.bnd, "{}\n", "! ===============================================================");
         int NumOfControlledZones = 0;
         for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
-            if (!allocated(ZoneEquipConfig)) continue;
-            if (ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
+            if (!allocated(state.dataZoneEquip->ZoneEquipConfig)) continue;
+            if (state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
         }
 
         if (NumOfControlledZones > 0) {
@@ -2667,41 +2667,41 @@ namespace SimulationManager {
             print(state.files.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
 
             for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
-                if (!ZoneEquipConfig(Count).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) continue;
 
                 print(state.files.bnd,
                       " Controlled Zone,{},{},{},{},{},{},{}\n",
-                      ZoneEquipConfig(Count).ZoneName,
-                      ZoneEquipConfig(Count).EquipListName,
-                      ZoneEquipConfig(Count).ControlListName,
-                      NodeID(ZoneEquipConfig(Count).ZoneNode),
-                      ZoneEquipConfig(Count).NumInletNodes,
-                      ZoneEquipConfig(Count).NumExhaustNodes,
-                      ZoneEquipConfig(Count).NumReturnNodes);
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    auto ChrName = NodeID(ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).EquipListName,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ControlListName,
+                      NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNode),
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
+                    auto ChrName = NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).InletNode(Count1)),
-                          NodeID(ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).InletNode(Count1)),
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
                           ChrName);
                 }
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Exhaust,{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).ExhaustNode(Count1)));
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNode(Count1)));
                 }
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Return,{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).ReturnNode(Count1)));
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNode(Count1)));
                 }
             }
 
@@ -2715,13 +2715,13 @@ namespace SimulationManager {
             for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
                 // Zone equipment list array parallels controlled zone equipment array, so
                 // same index finds corresponding data from both arrays
-                if (!ZoneEquipConfig(Count).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) continue;
 
                 print(state.files.bnd,
                       " Zone Equipment List,{},{},{},{}\n",
                       Count,
                       ZoneEquipList(Count).Name,
-                      ZoneEquipConfig(Count).ZoneName,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                       ZoneEquipList(Count).NumOfEquipTypes);
 
                 for (int Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
@@ -2730,7 +2730,7 @@ namespace SimulationManager {
                           Count1,
                           ZoneEquipList(Count).EquipType(Count1),
                           ZoneEquipList(Count).EquipName(Count1),
-                          ZoneEquipConfig(Count).ZoneName,
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                           ZoneEquipList(Count).CoolingPriority(Count1),
                           ZoneEquipList(Count).HeatingPriority(Count1));
                 }

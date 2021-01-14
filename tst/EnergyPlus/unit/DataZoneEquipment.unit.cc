@@ -69,22 +69,22 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestGetSystemNodeNumberForZone)
 {
 
     state->dataGlobal->NumOfZones = 2;
-    ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
-    ZoneEquipConfig(1).ZoneName = "Zone1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    ZoneEquipConfig(2).ZoneName = "Zone2";
-    ZoneEquipConfig(2).ActualZoneNum = 2;
-    ZoneEquipConfig(2).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone2";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 2;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     EXPECT_EQ(0, GetSystemNodeNumberForZone(*state, "NonExistingZone"));
     EXPECT_EQ(1, GetSystemNodeNumberForZone(*state, "Zone1"));
 
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAir)

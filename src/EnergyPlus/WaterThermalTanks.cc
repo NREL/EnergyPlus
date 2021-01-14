@@ -1930,20 +1930,20 @@ namespace WaterThermalTanks {
                     DataZoneEquipment::GetZoneEquipmentData(state);
                     state.dataZoneEquip->ZoneEquipInputsFilled = true;
                 }
-                if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
+                if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                     bool FoundInletNode = false;
                     bool FoundOutletNode = false;
                     int ZoneNum;
                     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        if (HPWH.AmbientTempZone == DataZoneEquipment::ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
+                        if (HPWH.AmbientTempZone == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum) break;
                     }
                     if (ZoneNum <= state.dataGlobal->NumOfZones) {
-                        for (int SupAirIn = 1; SupAirIn <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
-                            if (HPWH.HeatPumpAirOutletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
+                        for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++SupAirIn) {
+                            if (HPWH.HeatPumpAirOutletNode != state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(SupAirIn)) continue;
                             FoundOutletNode = true;
                         }
-                        for (int ExhAirOut = 1; ExhAirOut <= DataZoneEquipment::ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhAirOut) {
-                            if (HPWH.HeatPumpAirInletNode != DataZoneEquipment::ZoneEquipConfig(ZoneNum).ExhaustNode(ExhAirOut)) continue;
+                        for (int ExhAirOut = 1; ExhAirOut <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhAirOut) {
+                            if (HPWH.HeatPumpAirInletNode != state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(ExhAirOut)) continue;
                             FoundInletNode = true;
                         }
                         if (!FoundInletNode) {
@@ -4182,14 +4182,14 @@ namespace WaterThermalTanks {
 
                         // Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
                         if (HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-                            if (allocated(DataZoneEquipment::ZoneEquipConfig) && allocated(DataZoneEquipment::ZoneEquipList)) {
+                            if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(DataZoneEquipment::ZoneEquipList)) {
                                 bool FoundTankInList = false;
                                 bool TankNotLowestPriority = false;
                                 for (int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != HPWH.AmbientTempZone) continue;
+                                    if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != HPWH.AmbientTempZone) continue;
                                     if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
                                         for (int ZoneEquipListNum = 1; ZoneEquipListNum <= state.dataGlobal->NumOfZones; ++ZoneEquipListNum) {
-                                            if (DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).EquipListName !=
+                                            if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListName !=
                                                 DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).Name)
                                                 continue;
                                             int TankCoolingPriority = 0;

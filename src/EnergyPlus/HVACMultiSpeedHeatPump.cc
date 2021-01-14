@@ -549,7 +549,6 @@ namespace HVACMultiSpeedHeatPump {
         using DataZoneControls::NumComfortControlledZones;
         using DataZoneControls::NumTempControlledZones;
         using DataZoneControls::TempControlledZone;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
         using Fans::GetFanOutletNode;
@@ -716,12 +715,12 @@ namespace HVACMultiSpeedHeatPump {
                 AirNodeFound = false;
                 AirLoopFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                     // Find the controlled zone number for the specified thermostat location
-                    MSHeatPump(MSHPNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    MSHeatPump(MSHPNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     // Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -734,7 +733,7 @@ namespace HVACMultiSpeedHeatPump {
                                     MSHeatPump(MSHPNum).AirLoopNumber = AirLoopNumber;
                                     break;
                                 }
-                                MSHeatPump(MSHPNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                MSHeatPump(MSHPNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                 if (AirLoopFound) break;
                             }
                             for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
@@ -1785,7 +1784,6 @@ namespace HVACMultiSpeedHeatPump {
         using DataSizing::AutoSize;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipList;
         using Fans::GetFanIndex;
         using Fans::GetFanVolFlow;
@@ -2031,14 +2029,14 @@ namespace HVACMultiSpeedHeatPump {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
         }
 
-        if (allocated(ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
             int zoneNum = DataHeatBalance::Zone(MSHeatPump(MSHeatPumpNum).ControlZoneNum).ZoneEqNum;
             int zoneInlet = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
             int coolingPriority = 0;
             int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
-            if (ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                ZoneEquipList(ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
+            if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum = coolingPriority;
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum = heatingPriority;
             }
@@ -2696,7 +2694,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;
 

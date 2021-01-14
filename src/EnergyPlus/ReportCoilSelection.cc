@@ -489,7 +489,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
     c->zoneNum.resize(1);
-    c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
+    c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
     c->zoneName.resize(1);
     c->zoneName[0] = DataHeatBalance::Zone(c->zoneNum[0]).Name;
     c->typeHVACname = "Zone Equipment"; // init
@@ -1331,8 +1331,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).CoolDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak;
@@ -1555,8 +1555,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak;

@@ -215,7 +215,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
         using DataHVACGlobals::ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 
         // Locals
@@ -273,7 +272,7 @@ namespace HybridUnitaryAirConditioners {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
-                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
+                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state,
                         "InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +

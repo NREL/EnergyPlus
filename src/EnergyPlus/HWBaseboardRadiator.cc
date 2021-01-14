@@ -119,8 +119,7 @@ namespace HWBaseboardRadiator {
     using DataHVACGlobals::TimeStepSys;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ZoneEquipConfig;
-    // Use statements for access to subroutines in other modules
+
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
     using Psychrometrics::PsyCpAirFnW;
@@ -812,7 +811,7 @@ namespace HWBaseboardRadiator {
             }
         }
 
-        if (HWBaseboard(BaseboardNum).ZonePtr <= 0) HWBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (HWBaseboard(BaseboardNum).ZonePtr <= 0) HWBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -914,7 +913,7 @@ namespace HWBaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = HWBaseboard(BaseboardNum).WaterInletNode;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         HWBaseboard(BaseboardNum).WaterMassFlowRate = Node(WaterInletNode).MassFlowRate;
         HWBaseboard(BaseboardNum).WaterInletTemp = Node(WaterInletNode).Temp;
         HWBaseboard(BaseboardNum).WaterInletEnthalpy = Node(WaterInletNode).Enthalpy;

@@ -95,7 +95,6 @@ namespace EnergyPlus::DataZoneEquipment {
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
 
     // Object Data
-    Array1D<EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<EquipList> ZoneEquipList;
     Array1D<ControlList> HeatingControlList;
@@ -106,7 +105,6 @@ namespace EnergyPlus::DataZoneEquipment {
 
     void clear_state()
     {
-        ZoneEquipConfig.deallocate();
         ZoneEquipList.deallocate();
         HeatingControlList.deallocate();
         CoolingControlList.deallocate();
@@ -244,7 +242,7 @@ namespace EnergyPlus::DataZoneEquipment {
             ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
         }
 
-        ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
+        state.dataZoneEquip->ZoneEquipConfig.allocate(state.dataGlobal->NumOfZones); // Allocate the array containing the configuration
         // data for each zone to the number of controlled zones
         // found in the input file.  This may or may not
         // be the same as the number of zones in the building
@@ -308,10 +306,10 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
                 Zone(ControlledZoneNum).IsControlled = true;
                 Zone(ControlledZoneNum).ZoneEqNum = ControlledZoneNum;
-                ZoneEquipConfig(ControlledZoneNum).IsControlled = true;
-                ZoneEquipConfig(ControlledZoneNum).ActualZoneNum = ControlledZoneNum;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled = true;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum = ControlledZoneNum;
             }
-            ZoneEquipConfig(ControlledZoneNum).ZoneName = AlphArray(1); // for x-referencing with the geometry data
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName = AlphArray(1); // for x-referencing with the geometry data
 
             IsNotOK = false;
             GlobalNames::IntraObjUniquenessCheck(state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), UniqueZoneEquipListNames, IsNotOK);
@@ -319,10 +317,10 @@ namespace EnergyPlus::DataZoneEquipment {
                 ShowContinueError(state, "..another Controlled Zone has been assigned that " + cAlphaFields(2) + '.');
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
-            ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
             InletNodeListName = AlphArray(3);
             ExhaustNodeListName = AlphArray(4);
-            ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(state, AlphArray(5),
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode = GetOnlySingleNode(state, AlphArray(5),
                                                                             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
@@ -330,7 +328,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                                             NodeConnectionType_ZoneNode,
                                                                             1,
                                                                             ObjectIsNotParent); // all zone air state variables are
-            if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
+            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
                 ShowContinueError(state, cAlphaFields(5) + " must be present.");
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -343,16 +341,16 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
             }
             // assigned to this node
-            if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum > 0) {
-                Zone(ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).SystemZoneNodeNumber = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum > 0) {
+                Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
             } // This error already detected and program will be terminated.
 
             ReturnNodeListName = AlphArray(6);
             if (lAlphaBlanks(7)) {
-                ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(state, AlphArray(7));
-                if (ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(state, AlphArray(7));
+                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
                                     cAlphaFields(1) + '=' + AlphArray(1));
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -365,7 +363,7 @@ namespace EnergyPlus::DataZoneEquipment {
 
             CurrentModuleObject = "ZoneHVAC:EquipmentList";
 
-            ZoneEquipListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, ZoneEquipConfig(ControlledZoneNum).EquipListName);
+            ZoneEquipListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
             if (ZoneEquipListNum > 0) {
 
                 EquipList &thisZoneEquipList = ZoneEquipList(ControlledZoneNum);
@@ -664,8 +662,8 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
 
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + " not found = " + ZoneEquipConfig(ControlledZoneNum).EquipListName);
-                ShowContinueError(state, "In ZoneHVAC:EquipmentConnections object, for Zone = " + ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                ShowSevereError(state, RoutineName + CurrentModuleObject + " not found = " + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
+                ShowContinueError(state, "In ZoneHVAC:EquipmentConnections object, for Zone = " + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
@@ -679,41 +677,41 @@ namespace EnergyPlus::DataZoneEquipment {
                         NodeListError,
                         NodeType_Air,
                         "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                         NodeConnectionType_ZoneInlet,
                         1,
                         ObjectIsNotParent);
 
             if (!NodeListError) {
-                ZoneEquipConfig(ControlledZoneNum).NumInletNodes = NumNodes;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes = NumNodes;
 
-                ZoneEquipConfig(ControlledZoneNum).InletNode.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat.allocate(NumNodes);
 
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
-                    ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNum) = NodeNums(NodeNum);
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
                     CheckUniqueNodes(state,
-                        "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                        "Zone Air Inlet Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
-                    ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(NodeNum) = 0;
-                    ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum(NodeNum) = 0;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).InNode = 0;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).InNode = 0;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).OutNode = 0;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).OutNode = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(NodeNum) = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum(NodeNum) = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).InNode = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).InNode = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).OutNode = 0;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).OutNode = 0;
                     ++locTermUnitSizingCounter;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
-                    ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
                 }
             } else {
                 ShowContinueError(state, "Invalid Zone Air Inlet Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone = " +
-                                  ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
@@ -725,21 +723,21 @@ namespace EnergyPlus::DataZoneEquipment {
                         NodeListError,
                         NodeType_Air,
                         "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                         NodeConnectionType_ZoneExhaust,
                         1,
                         ObjectIsNotParent);
 
             if (!NodeListError) {
-                ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes = NumNodes;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes = NumNodes;
 
-                ZoneEquipConfig(ControlledZoneNum).ExhaustNode.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode.allocate(NumNodes);
 
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
-                    ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNum) = NodeNums(NodeNum);
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
                     CheckUniqueNodes(state,
-                        "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                        "Zone Air Exhaust Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -747,7 +745,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
             } else {
                 ShowContinueError(state, "Invalid Zone Air Exhaust Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
-                                  ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
@@ -759,30 +757,30 @@ namespace EnergyPlus::DataZoneEquipment {
                         NodeListError,
                         NodeType_Air,
                         "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                         NodeConnectionType_ZoneReturn,
                         1,
                         ObjectIsNotParent);
 
             if (!NodeListError) {
-                ZoneEquipConfig(ControlledZoneNum).NumReturnNodes = NumNodes;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes = NumNodes;
 
-                ZoneEquipConfig(ControlledZoneNum).ReturnNode.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
-                ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
-                ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode = 0;           // initialize to zero here
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeAirLoopNum = 0; // initialize to zero here
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeInletNum = 0;   // initialize to zero here
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;  // initialize to false here
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;  // initialize to zero here
 
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
-                    ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
                     UniqueNodeError = false;
                     CheckUniqueNodes(state,
-                        "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                        "Zone Return Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum), state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     if (UniqueNodeError) {
                         // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -790,7 +788,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
             } else {
                 ShowContinueError(state, "Invalid Zone Return Air Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
-                                  ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                                  state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
@@ -802,23 +800,23 @@ namespace EnergyPlus::DataZoneEquipment {
                         NodeListError,
                         NodeType_Air,
                         "ZoneHVAC:EquipmentConnections",
-                        ZoneEquipConfig(ControlledZoneNum).ZoneName,
+                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                         NodeConnectionType_Sensor,
                         1,
                         ObjectIsNotParent);
 
             if (!NodeListError) {
-                ZoneEquipConfig(ControlledZoneNum).NumReturnFlowBasisNodes = NumNodes;
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnFlowBasisNodes = NumNodes;
 
-                ZoneEquipConfig(ControlledZoneNum).ReturnFlowBasisNode.allocate(NumNodes);
+                state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowBasisNode.allocate(NumNodes);
 
                 for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
-                    ZoneEquipConfig(ControlledZoneNum).ReturnFlowBasisNode(NodeNum) = NodeNums(NodeNum);
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowBasisNode(NodeNum) = NodeNums(NodeNum);
                 }
             } else {
                 ShowContinueError(state,
                     "Invalid Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name in ZoneHVAC:EquipmentConnections object, for Zone=" +
-                    ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
 
@@ -830,7 +828,7 @@ namespace EnergyPlus::DataZoneEquipment {
             DataSizing::TermUnitSizing.allocate(DataSizing::NumAirTerminalUnits);
             for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
-                    auto &thisZoneEqConfig(ZoneEquipConfig(loopZoneNum));
+                    auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
                     for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
                         DataSizing::TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
                     }
@@ -873,8 +871,8 @@ namespace EnergyPlus::DataZoneEquipment {
 
         for (ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
             state.dataZoneEquip->GetZoneEquipmentDataFound =
-                UtilityRoutines::FindItemInList(ZoneEquipList(ControlledZoneLoop).Name, ZoneEquipConfig, &EquipConfiguration::EquipListName);
-            if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0) ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
+                UtilityRoutines::FindItemInList(ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
+            if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0) state.dataZoneEquip->ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
         } // end loop over controlled zones
 
         EndUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
@@ -1112,7 +1110,7 @@ namespace EnergyPlus::DataZoneEquipment {
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
-        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
+        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 
         return ControlledZoneIndex;
     }
@@ -1145,11 +1143,11 @@ namespace EnergyPlus::DataZoneEquipment {
         }
         ControlledZoneIndex = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (ZoneEquipConfig(ZoneNum).ActualZoneNum > 0) {
-                if (TrialZoneNodeNum == ZoneEquipConfig(ZoneNum).ZoneNode) {
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum > 0) {
+                if (TrialZoneNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode) {
                     // found it.
                     FoundIt = true;
-                    ControlledZoneIndex = ZoneEquipConfig(ZoneNum).ActualZoneNum;
+                    ControlledZoneIndex = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum;
                 }
             }
         }
@@ -1181,11 +1179,11 @@ namespace EnergyPlus::DataZoneEquipment {
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
-        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
+        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
         SystemZoneNodeNumber = 0; // default is not found
         if (ControlledZoneIndex > 0) {
-            if (ZoneEquipConfig(ControlledZoneIndex).ActualZoneNum > 0) {
-                SystemZoneNodeNumber = ZoneEquipConfig(ControlledZoneIndex).ZoneNode;
+            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ActualZoneNum > 0) {
+                SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ZoneNode;
             }
         }
 
@@ -1218,11 +1216,11 @@ namespace EnergyPlus::DataZoneEquipment {
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
-        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
+        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
         ReturnAirNodeNumber = 0; // default is not found
         if (ControlledZoneIndex > 0) {
             {
-                auto const &thisZoneEquip(ZoneEquipConfig(ControlledZoneIndex));
+                auto const &thisZoneEquip(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex));
                 if (thisZoneEquip.ActualZoneNum > 0) {
                     if (NodeName.empty()) {
                         // If NodeName is blank, return first return node number, but warn if there are multiple return nodes for this zone
@@ -1270,16 +1268,16 @@ namespace EnergyPlus::DataZoneEquipment {
             state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
 
-        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
+        ControlledZoneIndex = UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
         ReturnIndex = 0; // default if not found
         if (ControlledZoneIndex > 0) {
-            if (ZoneEquipConfig(ControlledZoneIndex).ActualZoneNum > 0) {
+            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ActualZoneNum > 0) {
                 if (NodeName.empty()) {
                     // If NodeName is blank, return first return node number
                     ReturnIndex = 1;
                 } else {
-                    for (int nodeCount = 1; nodeCount <= ZoneEquipConfig(ControlledZoneIndex).NumReturnNodes; ++nodeCount) {
-                        int curNodeNum = ZoneEquipConfig(ControlledZoneIndex).ReturnNode(nodeCount);
+                    for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).NumReturnNodes; ++nodeCount) {
+                        int curNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ReturnNode(nodeCount);
                         if (NodeName == DataLoopNode::NodeID(curNodeNum)) {
                             ReturnIndex = nodeCount;
                         }

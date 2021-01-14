@@ -245,7 +245,6 @@ namespace EnergyPlus::SingleDuct {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using SteamCoils::GetCoilAirOutletNode;
         using SteamCoils::GetCoilSteamInletNode;
@@ -553,10 +552,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -564,16 +563,16 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
 
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -832,10 +831,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -843,15 +842,15 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -1060,10 +1059,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -1071,15 +1070,15 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -1195,10 +1194,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -1206,15 +1205,15 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).OutletNodeNum;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -1410,10 +1409,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -1421,16 +1420,16 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
 
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -1578,10 +1577,10 @@ namespace EnergyPlus::SingleDuct {
 
                 // Fill the Zone Equipment data with the inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -1589,15 +1588,15 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -1866,11 +1865,11 @@ namespace EnergyPlus::SingleDuct {
                 // what if not found?  error?
                 IsNotOK = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
                             IsNotOK = false;
-                            if (ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode > 0) {
                                 ShowSevereError(state, "Error in connecting a terminal unit to a zone");
                                 ShowContinueError(state, NodeID(state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode) + " already connects to another zone");
                                 ShowContinueError(state, "Occurs for terminal unit " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " +
@@ -1878,15 +1877,15 @@ namespace EnergyPlus::SingleDuct {
                                 ShowContinueError(state, "Check terminal unit node names for errors");
                                 ErrorsFound = true;
                             } else {
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = state.dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = state.dataSingleDuct->sd_airterminal(SysNum).ReheatAirOutletNode;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).TermUnitSizingNum =
-                                    ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(SysNum).ADUNum).ZoneEqNum = CtrlZone;
                             }
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                             state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
                                                                    Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
@@ -2007,7 +2006,6 @@ namespace EnergyPlus::SingleDuct {
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
@@ -2195,7 +2193,7 @@ namespace EnergyPlus::SingleDuct {
             }
             // Find air loop associated with terminal unit
             if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeIndex > 0)) {
-                this->AirLoopNum = ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+                this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
                 state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
             }
 
@@ -3689,7 +3687,6 @@ namespace EnergyPlus::SingleDuct {
 
         // Using/Aliasing
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
@@ -5373,7 +5370,6 @@ namespace EnergyPlus::SingleDuct {
         // Using/Aliasing
         using DataZoneEquipment::EquipmentData;
         using DataZoneEquipment::SubEquipmentData;
-        using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
         using namespace DataIPShortCuts;
@@ -5541,13 +5537,13 @@ namespace EnergyPlus::SingleDuct {
                     // Air Terminal inlet node must be the same as a zone exhaust node
                     ZoneNodeNotFound = true;
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                            if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                            if (state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                                 ZoneNodeNotFound = false;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                                 // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet
                                 // for inlet side mixers
                                 if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
@@ -5573,13 +5569,13 @@ namespace EnergyPlus::SingleDuct {
                 if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType == ATMixer_SupplySide) {
                     ZoneNodeNotFound = true;
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                                 ZoneNodeNotFound = false;
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneEqNum = CtrlZone;
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = ZoneEquipConfig(CtrlZone).ActualZoneNum;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
                                 // Wait until InitATMixer to fill other zone equip config data
 
                                 if (!state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser) {
@@ -5643,7 +5639,7 @@ namespace EnergyPlus::SingleDuct {
             {
                 auto &thisADU(state.dataDefineEquipment->AirDistUnit(this->ADUNum));
                 {
-                    auto &thisZoneEqConfig(DataZoneEquipment::ZoneEquipConfig(thisADU.ZoneEqNum));
+                    auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(thisADU.ZoneEqNum));
                     for (int SupAirIn = 1; SupAirIn <= thisZoneEqConfig.NumInletNodes; ++SupAirIn) {
                         if (this->ZoneInletNode == thisZoneEqConfig.InletNode(SupAirIn)) {
                             thisZoneEqConfig.AirDistUnitCool(SupAirIn).InNode = this->PriInNode;
@@ -5677,7 +5673,7 @@ namespace EnergyPlus::SingleDuct {
 
         // Keep trying until we find it, the airloopnum, that is
         if (this->OneTimeInitFlag2) {
-            this->AirLoopNum = DataZoneEquipment::ZoneEquipConfig(state.dataDefineEquipment->AirDistUnit(this->ADUNum).ZoneEqNum)
+            this->AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(state.dataDefineEquipment->AirDistUnit(this->ADUNum).ZoneEqNum)
                                    .InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
             state.dataDefineEquipment->AirDistUnit(this->ADUNum).AirLoopNum = this->AirLoopNum;
             if (this->AirLoopNum > 0) {
@@ -6001,7 +5997,7 @@ namespace EnergyPlus::SingleDuct {
         // proceed to set ATMixer properties used for sizing coils
 
         int airLoopIndex = // find air loop associated with ATMixer
-            DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).InletNodeAirLoopNum(state.dataSingleDuct->SysATMixer(inletATMixerIndex).CtrlZoneInNodeIndex);
+            state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).InletNodeAirLoopNum(state.dataSingleDuct->SysATMixer(inletATMixerIndex).CtrlZoneInNodeIndex);
 
         // must be a system sizing run or calculations are not possible
         bool SizingDesRunThisAirSys = false;                               // Sizing:System object found flag

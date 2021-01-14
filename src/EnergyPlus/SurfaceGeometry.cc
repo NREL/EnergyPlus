@@ -9112,7 +9112,7 @@ namespace SurfaceGeometry {
                     SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_ReturnAir;
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
-                        DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
+                        state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
                         DataHeatBalance::Zone(Surface(SurfNum).Zone).HasAirFlowWindowReturn = true;
                     }
 

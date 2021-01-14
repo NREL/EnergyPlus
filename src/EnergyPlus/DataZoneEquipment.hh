@@ -454,7 +454,6 @@ namespace DataZoneEquipment {
     };
 
     // Object Data
-    extern Array1D<EquipConfiguration> ZoneEquipConfig;
     extern Array1D<EquipList> ZoneEquipList;
     extern Array1D<ControlList> HeatingControlList;
     extern Array1D<ControlList> CoolingControlList;
@@ -518,6 +517,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     Array1D<Real64> VentMCP;            // Product of mass rate and Cp for each Ventilation object
     Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
     Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
+    Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
 
     void clear_state() override
     {
@@ -534,6 +534,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->VentMCP.deallocate();
         this->ZMAT.deallocate();
         this->ZHumRat.deallocate();
+        this->ZoneEquipConfig.deallocate();
     }
 };
 

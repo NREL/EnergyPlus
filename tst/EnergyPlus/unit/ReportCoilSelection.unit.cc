@@ -454,9 +454,9 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     DataSizing::CurTermUnitSizingNum = curZoneEqNum;
     DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
     DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
     DataSizing::FinalZoneSizing.allocate(1);
     DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
     DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;

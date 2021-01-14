@@ -824,10 +824,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = false;
@@ -868,9 +868,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(PTUnit(1).AirInNode).HumRat = Node(ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(PTUnit(1).AirInNode).Enthalpy = Node(ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    Node(PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    Node(PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    Node(PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
@@ -1170,10 +1170,10 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = false;
@@ -1214,9 +1214,9 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(PTUnit(1).AirInNode).HumRat = Node(ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(PTUnit(1).AirInNode).Enthalpy = Node(ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    Node(PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    Node(PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    Node(PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;

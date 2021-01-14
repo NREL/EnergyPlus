@@ -11594,7 +11594,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11617,7 +11616,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (state.dataGlobal->CompLoadReportIsReq) {
             if (ort->displayZoneComponentLoadSummary) {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     AddTOCEntry(state, "Zone Component Load Summary", Zone(iZone).Name);
                 }
             }
@@ -11813,7 +11812,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSizing::CalcFinalZoneSizing;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11842,7 +11840,7 @@ namespace EnergyPlus::OutputReportTabular {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (ZoneNum == 0) continue;
-            if (!ZoneEquipConfig(ZoneNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             CoolDesSelected = CalcFinalZoneSizing(ZoneNum).CoolDDNum;
             // loop over timesteps after pulse occurred
             if (CoolDesSelected != 0) {
@@ -11948,7 +11946,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::SurfWinGainConvGlazToZoneRep;
         using DataSurfaces::SurfWinGainConvShadeToZoneRep;
         using DataSurfaces::SurfWinGainFrameDividerToZoneRep;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12148,7 +12145,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSizing::CalcFinalZoneSizing;
         using DataSizing::SysSizPeakDDNum;
         using DataSurfaces::TotSurfaces;
-        using DataZoneEquipment::ZoneEquipConfig;
         auto &ort(state.dataOutRptTab);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
@@ -12307,7 +12303,7 @@ namespace EnergyPlus::OutputReportTabular {
         // ZoneComponentLoadSummary
         if (ort->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
                     coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
                     ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
@@ -12460,7 +12456,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute
                 // them for specific design day and time of max
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
                     if (ort->displayZoneComponentLoadSummary &&
                         (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
@@ -12581,7 +12577,7 @@ namespace EnergyPlus::OutputReportTabular {
             timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
 
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
                 // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
@@ -12678,7 +12674,7 @@ namespace EnergyPlus::OutputReportTabular {
         // ZoneComponentLoadSummary: Now we convert and Display
         if (ort->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
                     LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
                     LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));

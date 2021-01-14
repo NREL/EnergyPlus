@@ -598,7 +598,6 @@ namespace PackagedTerminalHeatPump {
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
-        using DataZoneEquipment::ZoneEquipConfig;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using SingleDuct::GetATMixer;
         using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
@@ -1145,9 +1144,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -1165,9 +1164,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             PTUnit(PTUnitNum).ZonePtr = CtrlZone;
                             ZoneNodeNotFound = false;
                             break;
@@ -1979,9 +1978,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -1999,9 +1998,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             PTUnit(PTUnitNum).ZonePtr = CtrlZone;
                             ZoneNodeNotFound = false;
                             break;
@@ -2871,9 +2870,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -2891,9 +2890,9 @@ namespace PackagedTerminalHeatPump {
             if (!PTUnit(PTUnitNum).ATMixerExists || PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (PTUnit(PTUnitNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (PTUnit(PTUnitNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             PTUnit(PTUnitNum).ZonePtr = CtrlZone;
                             ZoneNodeNotFound = false;
                             break;
@@ -3773,7 +3772,6 @@ namespace PackagedTerminalHeatPump {
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
@@ -4011,10 +4009,10 @@ namespace PackagedTerminalHeatPump {
                         // save the ZoneEquipConfig index for this unit
                         PTUnit(Loop).ControlZoneNum = CtrlZoneNum;
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneExhNum = 1; ZoneExhNum <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
-                                if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != PTUnit(Loop).AirInNode) continue;
+                            for (int ZoneExhNum = 1; ZoneExhNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != PTUnit(Loop).AirInNode) continue;
                                 // Find the controlled zone number for the specified thermostat location
-                                PTUnit(Loop).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                                PTUnit(Loop).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                 break;
                             }
                         }
@@ -5869,7 +5867,6 @@ namespace PackagedTerminalHeatPump {
         // Simulates the unit components sequentially in the air flow direction.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
 
         using General::SolveRoot;
@@ -5927,7 +5924,7 @@ namespace PackagedTerminalHeatPump {
         OutletNode = PTUnit(PTUnitNum).AirOutNode;
         InletNode = PTUnit(PTUnitNum).AirInNode;
         ControlledZoneNum = PTUnit(PTUnitNum).ControlZoneNum;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OpMode = PTUnit(PTUnitNum).OpMode;
         if (PTUnit(PTUnitNum).CondenserNodeNum == 0) {
             OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -8106,7 +8103,6 @@ namespace PackagedTerminalHeatPump {
         //  This routine will calcultes MSHP performance based on given system load
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
 
         using General::SolveRoot;
@@ -8151,7 +8147,7 @@ namespace PackagedTerminalHeatPump {
         OutletNode = PTUnit(PTUnitNum).AirOutNode;
         InletNode = PTUnit(PTUnitNum).AirInNode;
         ControlledZoneNum = PTUnit(PTUnitNum).ControlZoneNum;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OpMode = PTUnit(PTUnitNum).OpMode;
 
         OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;

@@ -626,7 +626,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     GetSysInput(*state);
     state->dataSingleDuct->GetInputFlag = false;
 
-    auto &thisZoneEquip(ZoneEquipConfig(state->dataGlobal->NumOfZones));
+    auto &thisZoneEquip(state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones));
 
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1752,7 +1752,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
     int ZoneNodeNum = 1;
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
-    ZoneEquipConfig(thisHeatCoolAT.ActualZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.ActualZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
     DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
     DataLoopNode::Node(ZoneNodeNum).HumRat = 0.005;

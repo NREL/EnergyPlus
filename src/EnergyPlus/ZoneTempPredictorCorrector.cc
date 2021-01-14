@@ -3072,7 +3072,7 @@ namespace ZoneTempPredictorCorrector {
 
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
-                if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
+                if (!VerifyControlledZoneForThermostat(state, TempControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Thermostatic control but is not a controlled zone.", RoutineName, TempControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     state.dataZoneTempPredictorCorrector->ErrorsFound = true;
@@ -3128,7 +3128,7 @@ namespace ZoneTempPredictorCorrector {
 
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
-                if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
+                if (!VerifyControlledZoneForThermostat(state, ComfortControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Comfort control but is not a controlled zone.", RoutineName, ComfortControlledZone(Loop).ZoneName));
                     ShowContinueError(state, "...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
                     state.dataZoneTempPredictorCorrector->ErrorsFound = true;
@@ -5396,9 +5396,6 @@ namespace ZoneTempPredictorCorrector {
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
 
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
@@ -5446,12 +5443,12 @@ namespace ZoneTempPredictorCorrector {
         if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
             ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
             // Calculate moisture flow rate into each zone
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
 
-                MoistureMassFlowRate += (Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                         Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
+                MoistureMassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                                         Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat) /
                                         ZoneMult;
-                ZoneMassFlowRate += Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                ZoneMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
             } // NodeNum
 
             // Do the calculations for the plenum zone
@@ -6114,7 +6111,6 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using DataLoopNode::Node;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         //using ZonePlenum::ZoneRetPlenCond;
@@ -6187,7 +6183,7 @@ namespace ZoneTempPredictorCorrector {
             // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
             if (ControlledZoneAirFlag) {
                 ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-                auto const &zec(ZoneEquipConfig(ZoneEquipConfigNum));
+                auto const &zec(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
                 for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                     // Get node conditions
                     //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
@@ -6403,7 +6399,6 @@ namespace ZoneTempPredictorCorrector {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using DataLoopNode::Node;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -6494,14 +6489,14 @@ namespace ZoneTempPredictorCorrector {
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (ControlledZoneAirFlag) {
             ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                 // Get node conditions
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
                 SumMCpDTsystem += QSensRate;
 
-                ADUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
+                ADUNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
                     NodeTemp = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
                     MassFlowRate = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
@@ -6576,10 +6571,10 @@ namespace ZoneTempPredictorCorrector {
                         return;
                     }
                     // determine supply air temperature as a weighted average of the inlet temperatures.
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         // Get node conditions
-                        NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                         SumSysMCp += MassFlowRate * CpAir;
@@ -6731,7 +6726,7 @@ namespace ZoneTempPredictorCorrector {
         return HasThermostat;
     }
 
-    bool VerifyControlledZoneForThermostat(std::string const &ZoneName) // Zone to verify
+    bool VerifyControlledZoneForThermostat(EnergyPlusData &state, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6746,9 +6741,8 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
         using DataZoneEquipment::EquipConfiguration;
-        using DataZoneEquipment::ZoneEquipConfig;
 
-        return (UtilityRoutines::FindItemInList(ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName) > 0);
+        return (UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName) > 0);
     }
 
     void DetectOscillatingZoneTemp(EnergyPlusData &state)

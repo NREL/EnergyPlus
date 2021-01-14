@@ -380,7 +380,6 @@ namespace MundtSimMgr {
         using DataHeatBalSurface::TempSurfIn;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
@@ -441,16 +440,16 @@ namespace MundtSimMgr {
             // determine supply air conditions
             SumSysMCp = 0.0;
             SumSysMCpT = 0.0;
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
             // prevent dividing by zero due to zero supply air flow rate
             if (SumSysMCp <= 0.0) {
-                SupplyAirTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
+                SupplyAirTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
             } else {
                 // a weighted average of the inlet temperatures
                 SupplyAirTemp = SumSysMCpT / SumSysMCp;
@@ -772,7 +771,6 @@ namespace MundtSimMgr {
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::Surface;
         using DataSurfaces::ZoneMeanAirTemp;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;      // index for surfaces

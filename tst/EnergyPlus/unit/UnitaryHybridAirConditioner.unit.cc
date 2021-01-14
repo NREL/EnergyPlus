@@ -419,7 +419,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataSysRpts->MaxOvercoolingByVent.allocate(state->dataGlobal->NumOfZones);
     ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     DeadBandOrSetback(1) = false;
-    ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
+    ZoneEquipList(state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
     CreateEnergyReportStructure(*state);
 
     SizingManager::GetOARequirements(*state);

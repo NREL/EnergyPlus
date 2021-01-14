@@ -2441,10 +2441,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     state->dataGlobal->HourOfDay = 24;
     state->dataGlobal->CurrentTime = 24.0;
     // set zone air node condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.005;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
     // set the zone loads
     ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
     ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 15000.0;

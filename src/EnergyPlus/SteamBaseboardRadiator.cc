@@ -113,7 +113,6 @@ namespace SteamBaseboardRadiator {
     using DataLoopNode::ObjectIsNotParent;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ZoneEquipConfig;
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -750,7 +749,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SetLoopIndexFlag = true;
         }
 
-        if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0) state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0) state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
         if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -838,7 +837,7 @@ namespace SteamBaseboardRadiator {
 
         // Do the every time step initializations
         SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate = Node(SteamInletNode).MassFlowRate;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletTemp = Node(SteamInletNode).Temp;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy = Node(SteamInletNode).Enthalpy;

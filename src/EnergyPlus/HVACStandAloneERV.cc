@@ -203,7 +203,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         using DataSizing::AutoSize;
         using DataZoneControls::HumidityControlZone;
         using DataZoneControls::NumHumidityControlZones;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -507,8 +506,8 @@ namespace EnergyPlus::HVACStandAloneERV {
             ZoneExhaustNodeFound = false;
             for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                 if (!ZoneInletNodeFound) {
-                    for (NodeNumber = 1; NodeNumber <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
-                        if (ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNumber) == state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode) {
+                    for (NodeNumber = 1; NodeNumber <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++NodeNumber) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNumber) == state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode) {
                             ZoneInletNodeFound = true;
                             ZoneInletCZN = ControlledZoneNum;
                             break; // found zone inlet node
@@ -516,8 +515,8 @@ namespace EnergyPlus::HVACStandAloneERV {
                     }
                 }
                 if (!ZoneExhaustNodeFound) {
-                    for (NodeNumber = 1; NodeNumber <= ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++NodeNumber) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNumber) == state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode) {
+                    for (NodeNumber = 1; NodeNumber <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++NodeNumber) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNumber) == state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode) {
                             ZoneExhaustNodeFound = true;
                             ZoneExhaustCZN = ControlledZoneNum;
                             break; // found zone exhaust node
@@ -544,9 +543,9 @@ namespace EnergyPlus::HVACStandAloneERV {
                     ShowContinueError(state, "... Node name of supply air outlet node and exhasut air inlet node must appear in the same "
                                       "ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(state, "... Supply air outlet node = " + NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode));
-                    ShowContinueError(state, "... ZoneHVAC:EquipmentConnections Zone Name = " + ZoneEquipConfig(ZoneInletCZN).ZoneName);
+                    ShowContinueError(state, "... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneInletCZN).ZoneName);
                     ShowContinueError(state, "... Exhaust air inlet node = " + NodeID(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode));
-                    ShowContinueError(state, "... ZoneHVAC:EquipmentConnections Zone Name = " + ZoneEquipConfig(ZoneExhaustCZN).ZoneName);
+                    ShowContinueError(state, "... ZoneHVAC:EquipmentConnections Zone Name = " + state.dataZoneEquip->ZoneEquipConfig(ZoneExhaustCZN).ZoneName);
                     ErrorsFound = true;
                 }
             }
@@ -914,9 +913,9 @@ namespace EnergyPlus::HVACStandAloneERV {
                     ZoneNodeFound = false;
                     HStatFound = false;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != HStatZoneNum) continue;
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != HStatZoneNum) continue;
                         //         Find the controlled zone number for the specified humidistat location
-                        thisOAController.NodeNumofHumidistatZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                        thisOAController.NodeNumofHumidistatZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                         ZoneNodeFound = true;
                         break; // found zone node
                     }
@@ -1327,7 +1326,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CurZoneEqNum;
         using DataSizing::ZoneEqSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::SetFanData;
         using Fans::SimulateFanComponents;
 
@@ -1374,8 +1372,8 @@ namespace EnergyPlus::HVACStandAloneERV {
 
             //      Sizing objects are not required for stand alone ERV
             //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
-            ZoneName = ZoneEquipConfig(CurZoneEqNum).ZoneName;
-            ActualZoneNum = ZoneEquipConfig(CurZoneEqNum).ActualZoneNum;
+            ZoneName = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ZoneName;
+            ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ActualZoneNum;
             ZoneMult = Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
             FloorArea = 0.0;
             if (UtilityRoutines::SameString(ZoneName, Zone(ActualZoneNum).Name)) {
@@ -1541,7 +1539,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneAirMassFlow;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::SimulateFanComponents;
 
         using HeatRecovery::SimHeatRecovery;

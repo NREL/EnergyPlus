@@ -210,8 +210,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     thisUnit.ControlZoneNum = 1;
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     ScheduleManager::Schedule.allocate(1);
     Schedule(1).CurrentValue = 1.0;

@@ -217,7 +217,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using namespace DataIPShortCuts;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using ZonePlenum::GetReturnPlenumIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -551,9 +550,9 @@ namespace EnergyPlus::PurchasedAirManager {
                 PurchAir(PurchAirNum).HtRecLatEff = rNumericArgs(11);
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             PurchAir(PurchAirNum).ZonePtr = CtrlZone;
                         }
                     }
@@ -1040,7 +1039,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataLoopNode::NodeID;
         using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using General::FindNumberInList;
 
         using ZonePlenum::GetReturnPlenumIndex;
@@ -1114,11 +1112,11 @@ namespace EnergyPlus::PurchasedAirManager {
             SupplyNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
             if (SupplyNodeNum > 0) {
                 NodeIndex =
-                    FindNumberInList(SupplyNodeNum, ZoneEquipConfig(ControlledZoneNum).InletNode, ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
+                    FindNumberInList(SupplyNodeNum, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
                 if (NodeIndex == 0) {
                     ShowSevereError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "Zone Supply Air Node Name=" + NodeID(SupplyNodeNum) + " is not a zone inlet node.");
-                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -1130,11 +1128,11 @@ namespace EnergyPlus::PurchasedAirManager {
             if (PurchAir(PurchAirNum).ZoneExhaustAirNodeNum > 0) {
                 ExhaustNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
                 NodeIndex = FindNumberInList(
-                    ExhaustNodeNum, ZoneEquipConfig(ControlledZoneNum).ExhaustNode, ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
+                    ExhaustNodeNum, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
                 if (NodeIndex == 0) {
                     ShowSevereError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "Zone Exhaust Air Node Name=" + NodeID(ExhaustNodeNum) + " is not a zone exhaust node.");
-                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     ShowContinueError(state, "Zone return air node will be used for ideal loads recirculation air.");
                     UseReturnNode = true;
                 } else {
@@ -1144,13 +1142,13 @@ namespace EnergyPlus::PurchasedAirManager {
                 UseReturnNode = true;
             }
             if (UseReturnNode) {
-                if (ZoneEquipConfig(ControlledZoneNum).NumReturnNodes == 1) {
-                    PurchAir(PurchAirNum).ZoneRecircAirNodeNum = ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
-                } else if (ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
+                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes == 1) {
+                    PurchAir(PurchAirNum).ZoneRecircAirNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
+                } else if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
                     ShowWarningError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state,
                         "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node.");
-                    ShowContinueError(state, "Using the first return air node =" + NodeID(ZoneEquipConfig(ControlledZoneNum).ReturnNode(1)));
+                    ShowContinueError(state, "Using the first return air node =" + NodeID(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1)));
                 } else {
                     ShowFatalError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state,
@@ -1934,7 +1932,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using DataZoneEquipment::PurchasedAir_Num;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcPurchAirLoads");
@@ -1990,7 +1987,7 @@ namespace EnergyPlus::PurchasedAirManager {
         // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
         //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
         InNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
-        ZoneNodeNum = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OANodeNum = PurchAir(PurchAirNum).OutdoorAirNodeNum;
         RecircNodeNum = PurchAir(PurchAirNum).ZoneRecircAirNodeNum;
         SupplyMassFlowRate = 0.0;

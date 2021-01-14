@@ -386,7 +386,6 @@ namespace BaseboardElectric {
 
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
@@ -427,7 +426,7 @@ namespace BaseboardElectric {
         baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         baseboard->Baseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }

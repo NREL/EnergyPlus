@@ -521,7 +521,6 @@ namespace BaseboardRadiator {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -538,7 +537,7 @@ namespace BaseboardRadiator {
 
         auto &baseboard = state.dataBaseboardRadiator;
 
-        if (baseboard->Baseboard(BaseboardNum).ZonePtr <= 0) baseboard->Baseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (baseboard->Baseboard(BaseboardNum).ZonePtr <= 0) baseboard->Baseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         if (baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
@@ -617,7 +616,7 @@ namespace BaseboardRadiator {
 
         // Do the every time step initializations
         WaterInletNode = baseboard->Baseboard(BaseboardNum).WaterInletNode;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         baseboard->Baseboard(BaseboardNum).WaterMassFlowRate = Node(WaterInletNode).MassFlowRate;
         baseboard->Baseboard(BaseboardNum).WaterInletTemp = Node(WaterInletNode).Temp;
         baseboard->Baseboard(BaseboardNum).WaterInletEnthalpy = Node(WaterInletNode).Enthalpy;

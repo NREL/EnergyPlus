@@ -477,7 +477,7 @@ namespace ConvectionCoefficients {
                                     Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
     );
 
-    Real64 CalcZoneSupplyAirTemp(int ZoneNum);
+    Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int ZoneNum);
 
     Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int ZoneNum);
 

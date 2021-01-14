@@ -252,7 +252,6 @@ namespace RoomAirModelManager {
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using DataZoneEquipment::EquipConfiguration;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         using RoomAirModelUserTempPattern::FigureNDheightInZone;
         using ScheduleManager::GetScheduleIndex;
@@ -562,13 +561,13 @@ namespace RoomAirModelManager {
         for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             if (state.dataRoomAirMod->AirPatternZoneInfo(i).IsUsed) {
                 // first get return and exhaust air node index
-                found = UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneName, ZoneEquipConfig, &EquipConfiguration::ZoneName);
+                found = UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (found != 0) {
 
-                    state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneNodeID = ZoneEquipConfig(found).ZoneNode;
-                    if (allocated(ZoneEquipConfig(found).ExhaustNode)) {
-                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID.allocate(ZoneEquipConfig(found).NumExhaustNodes);
-                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID = ZoneEquipConfig(found).ExhaustNode;
+                    state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNode;
+                    if (allocated(state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode)) {
+                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID.allocate(state.dataZoneEquip->ZoneEquipConfig(found).NumExhaustNodes);
+                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode;
                     } // exhaust nodes present
                 }     // found ZoneEquipConf
 
@@ -1813,7 +1812,6 @@ namespace RoomAirModelManager {
         using namespace DataHeatBalFanSys;
         using namespace DataSurfaces;
         using DataHeatBalance::Zone;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
@@ -2388,7 +2386,7 @@ namespace RoomAirModelManager {
 
                     // set zone equip pointer in the UCSDUI data structure
                     for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
                             state.dataRoomAirMod->ZoneUCSDUI(state.dataRoomAirMod->ZoneUFPtr(Loop)).ZoneEquipPtr = ZoneEquipConfigNum;
                             break;
                         }
@@ -2441,7 +2439,7 @@ namespace RoomAirModelManager {
                                         Zone(Loop).Name);
                     // set zone equip pointer in the UCSDUE data structure
                     for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
-                        if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum == Loop) {
                             state.dataRoomAirMod->ZoneUCSDUE(state.dataRoomAirMod->ZoneUFPtr(Loop)).ZoneEquipPtr = ZoneEquipConfigNum;
                             break;
                         }
@@ -2497,7 +2495,7 @@ namespace RoomAirModelManager {
                     if (state.dataRoomAirMod->AirModel(Loop).AirModelType != DataRoomAirModel::RoomAirModel::UCSDCV) continue; // don't set these up if they don't make sense
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
-                    if (ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
+                    if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
                         state.dataRoomAirMod->IsZoneCV(Loop) = false;
                         state.dataRoomAirMod->AirModel(Loop).SimAirModel = false;
                         ShowSevereError(state, "Unmixed Flow: Cross Ventilation cannot be applied for Zone=" + Zone(Loop).Name);

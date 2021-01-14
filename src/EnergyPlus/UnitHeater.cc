@@ -238,7 +238,6 @@ namespace UnitHeater {
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
         using Fans::GetFanOutletNode;
@@ -545,9 +544,9 @@ namespace UnitHeater {
             // check that unit heater air inlet node must be the same as a zone exhaust node
             ZoneNodeNotFound = true;
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
                         ZoneNodeNotFound = false;
                         break;
                     }
@@ -563,9 +562,9 @@ namespace UnitHeater {
             // check that unit heater air outlet node is a zone inlet node.
             ZoneNodeNotFound = true;
             for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).ZonePtr = CtrlZone;
                         ZoneNodeNotFound = false;
                         break;

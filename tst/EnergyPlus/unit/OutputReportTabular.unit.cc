@@ -7003,8 +7003,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
     DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;

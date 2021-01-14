@@ -186,40 +186,40 @@ namespace EnergyPlus::SystemReports {
             // GetChildrenData will put all of the subcomponents in order for us
 
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-                if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
-                    UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
-                ListNum = ZoneEquipConfig(CtrlZoneNum).EquipListIndex;
-                for (ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInletNodeNum) {
-                    AirLoopNum = ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInletNodeNum);
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
+                    UtilityRoutines::FindItemInList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
+                ListNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex;
+                for (ZoneInletNodeNum = 1; ZoneInletNodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInletNodeNum) {
+                    AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInletNodeNum);
                     for (CompNum = 1; CompNum <= ZoneEquipList(ListNum).NumOfEquipTypes; ++CompNum) {
                         for (NodeCount = 1; NodeCount <= ZoneEquipList(ListNum).EquipData(CompNum).NumOutlets; ++NodeCount) {
                             if (ZoneEquipList(ListNum).EquipData(CompNum).OutletNodeNums(NodeCount) ==
-                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).OutNode) {
-                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
-                                if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathExists) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).OutNode) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
+                                if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathExists) {
                                     for (SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
                                         for (SAPOutNode = 1; SAPOutNode <= SupplyAirPath(SAPNum).NumOutletNodes; ++SAPOutNode) {
-                                            if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode ==
+                                            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode ==
                                                 SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
-                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
+                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
                                                 for (OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
                                                     if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
                                                         SupplyAirPath(SAPNum).InletNodeNum) {
-                                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex =
+                                                        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex =
                                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).OutletBranchNum(OutNum);
                                                         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                                  ++MainBranchNum) {
                                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(MainBranchNum).NodeNumOut ==
                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
-                                                                    ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
+                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
                                                                         MainBranchNum;
                                                                 }
                                                             }
                                                         } else { // no splitter
-                                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
-                                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex;
+                                                            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
+                                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex;
                                                         }
                                                     }
                                                 }
@@ -230,23 +230,23 @@ namespace EnergyPlus::SystemReports {
                                     if (AirLoopNum > 0) {
                                         for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
                                             if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
-                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode) {
+                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode) {
                                                 for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
                                                         state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
-                                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
+                                                        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                                  ++MainBranchNum) {
                                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(MainBranchNum).NodeNumOut ==
                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
-                                                                    ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
+                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
                                                                         MainBranchNum;
                                                                 }
                                                             }
                                                         } else { // no splitter
-                                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
-                                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex;
+                                                            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex =
+                                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex;
                                                         }
                                                     }
                                                 }
@@ -255,9 +255,9 @@ namespace EnergyPlus::SystemReports {
                                     }
                                 }
                             } else if (ZoneEquipList(ListNum).EquipData(CompNum).OutletNodeNums(NodeCount) ==
-                                       ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
-                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
-                                if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathExists) {
+                                       state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
+                                if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathExists) {
                                     for (SAPNum = 1; SAPNum <= state.dataZoneEquip->NumSupplyAirPaths; ++SAPNum) {
                                         for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
                                             if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
@@ -265,19 +265,19 @@ namespace EnergyPlus::SystemReports {
                                                 for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
                                                         state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
-                                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
+                                                        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                                  ++MainBranchNum) {
                                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(MainBranchNum).NodeNumOut ==
                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
-                                                                    ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
+                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
                                                                         MainBranchNum;
                                                                 }
                                                             }
                                                         } else { // no splitter
-                                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
-                                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex;
+                                                            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
+                                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex;
                                                         }
                                                     }
                                                 }
@@ -286,7 +286,7 @@ namespace EnergyPlus::SystemReports {
 
                                         for (SAPOutNode = 1; SAPOutNode <= SupplyAirPath(SAPNum).NumOutletNodes; ++SAPOutNode) {
                                             if (ZoneInletNodeNum == SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
-                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
+                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
                                             }
                                         }
                                     }
@@ -294,23 +294,23 @@ namespace EnergyPlus::SystemReports {
                                     if (AirLoopNum > 0) {
                                         for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
                                             if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
-                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
+                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
                                                 for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).NodeNumOut ==
                                                         state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
-                                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
+                                                        state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches;
                                                                  ++MainBranchNum) {
                                                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(MainBranchNum).NodeNumOut ==
                                                                     state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Splitter.NodeNumIn) {
-                                                                    ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
+                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
                                                                         MainBranchNum;
                                                                 }
                                                             }
                                                         } else { // no splitter
-                                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
-                                                                ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex;
+                                                            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex =
+                                                                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex;
                                                         }
                                                     }
                                                 }
@@ -328,25 +328,25 @@ namespace EnergyPlus::SystemReports {
             }
 
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-                if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
-                    UtilityRoutines::FindItemInList(ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
-                ListNum = ZoneEquipConfig(CtrlZoneNum).EquipListIndex;
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+                state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex =
+                    UtilityRoutines::FindItemInList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListName, ZoneEquipList);
+                ListNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex;
                 // loop over the zone supply air path inlet nodes
-                for (ZoneInletNodeNum = 1; ZoneInletNodeNum <= ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInletNodeNum) {
-                    AirLoopNum = ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInletNodeNum);
+                for (ZoneInletNodeNum = 1; ZoneInletNodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInletNodeNum) {
+                    AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInletNodeNum);
 
                     // 1. Find HVAC component plant loop connections
-                    MainBranchNum = ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex;
-                    MainBranchNum = max(MainBranchNum, ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex);
+                    MainBranchNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).MainBranchIndex;
+                    MainBranchNum = max(MainBranchNum, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).MainBranchIndex);
                     if (MainBranchNum > 0) MatchPlantSys(state, AirLoopNum, MainBranchNum);
-                    SupplyCoolBranchNum = ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex;
+                    SupplyCoolBranchNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex;
                     if (SupplyCoolBranchNum > 0 && (SupplyCoolBranchNum != MainBranchNum)) MatchPlantSys(state, AirLoopNum, SupplyCoolBranchNum);
-                    SupplyHeatBranchNum = ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex;
+                    SupplyHeatBranchNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex;
                     if (SupplyHeatBranchNum > 0 && (SupplyHeatBranchNum != MainBranchNum)) MatchPlantSys(state, AirLoopNum, SupplyHeatBranchNum);
 
-                    AirDistUnitNum = ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex;
-                    AirDistUnitNum = max(AirDistUnitNum, ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex);
+                    AirDistUnitNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).AirDistUnitIndex;
+                    AirDistUnitNum = max(AirDistUnitNum, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex);
                     if (ListNum > 0 && AirDistUnitNum > 0) {
                         for (VarNum = 1; VarNum <= ZoneEquipList(ListNum).EquipData(AirDistUnitNum).NumMeteredVars; ++VarNum) {
                             if (ZoneEquipList(ListNum).EquipData(AirDistUnitNum).MeteredVar(VarNum).ResourceType == DataGlobalConstants::ResourceType::EnergyTransfer) {
@@ -965,7 +965,7 @@ namespace EnergyPlus::SystemReports {
 
         // On every iteration, load the zone equipment energy data
         for (ListNum = 1; ListNum <= state.dataGlobal->NumOfZones; ++ListNum) {
-            if (!ZoneEquipConfig(ListNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(ListNum).IsControlled) continue;
             auto &zel = ZoneEquipList(ListNum);
             for (CompNum = 1; CompNum <= zel.NumOfEquipTypes; ++CompNum) {
                 auto &zelEquipData = zel.EquipData(CompNum);
@@ -1663,7 +1663,6 @@ namespace EnergyPlus::SystemReports {
         // na
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Subroutine Variable Declaration
 
@@ -2043,7 +2042,7 @@ namespace EnergyPlus::SystemReports {
             }
         }
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
-            if (!ZoneEquipConfig(ZoneIndex).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).IsControlled) continue;
             // CurrentModuleObject='Zones(Controlled)'
             if (state.dataSysRpts->VentLoadsReportEnabled) {
                 // Cooling Loads
@@ -2052,56 +2051,56 @@ namespace EnergyPlus::SystemReports {
                                     state.dataSysRpts->MaxNoLoadCoolingByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Cooling Load Increase Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxCoolingLoadAddedByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxOverheatingByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Cooling Load Decrease Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxCoolingLoadMetByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
                 // Heating Loads
                 SetupOutputVariable(state, "Zone Mechanical Ventilation No Load Heat Addition Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxNoLoadHeatingByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Heating Load Increase Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxHeatingLoadAddedByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxOvercoolingByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
                 SetupOutputVariable(state, "Zone Mechanical Ventilation Heating Load Decrease Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->MaxHeatingLoadMetByVent(ZoneIndex),
                                     "HVAC",
                                     "Sum",
-                                    ZoneEquipConfig(ZoneIndex).ZoneName);
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
             }
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Mass Flow Rate",
@@ -2109,49 +2108,49 @@ namespace EnergyPlus::SystemReports {
                                 state.dataSysRpts->ZoneOAMassFlow(ZoneIndex),
                                 "HVAC",
                                 "Average",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Mass",
                                 OutputProcessor::Unit::kg,
                                 state.dataSysRpts->ZoneOAMass(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Standard Density Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->ZoneOAVolFlowStdRho(ZoneIndex),
                                 "HVAC",
                                 "Average",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Standard Density Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataSysRpts->ZoneOAVolStdRho(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Current Density Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->ZoneOAVolFlowCrntRho(ZoneIndex),
                                 "HVAC",
                                 "Average",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Current Density Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataSysRpts->ZoneOAVolCrntRho(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Mechanical Ventilation Air Changes per Hour",
                                 OutputProcessor::Unit::ach,
                                 state.dataSysRpts->ZoneMechACH(ZoneIndex),
                                 "HVAC",
                                 "Average",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
         }
     }
 
@@ -2578,7 +2577,7 @@ namespace EnergyPlus::SystemReports {
 
         // Allocate the system serving zone equipment component arrays
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             // Set index of air loop serving zone
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 TypeOfComp = ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
@@ -2756,7 +2755,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             for (CompNum = 1; CompNum <= ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
                 for (SubCompNum = 1; SubCompNum <= ZoneEquipList(CtrlZoneNum).EquipData(CompNum).NumSubEquip; ++SubCompNum) {
                     {
@@ -3426,7 +3425,7 @@ namespace EnergyPlus::SystemReports {
         }
 
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            auto const &zecCtrlZone = ZoneEquipConfig(CtrlZoneNum);
+            auto const &zecCtrlZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!zecCtrlZone.IsControlled) continue;
 
             // retrieve the zone load for each zone
@@ -4210,7 +4209,7 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->MaxNoLoadCoolingByVent = 0.0;
 
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-            if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
             Real64 ZAirSysOutAirFlow = 0.0;   // outside air flow rate for zone from all primary air systems serving thezone [kg/s]
             // first clear out working variables from previous zone.
@@ -4221,7 +4220,7 @@ namespace EnergyPlus::SystemReports {
             ZoneFlowFrac = 0.0;
 
             // retrieve the zone load for each zone
-            ActualZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+            ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneLoad = ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
             ZoneVolume = Zone(ActualZoneNum).Volume * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
@@ -4231,23 +4230,23 @@ namespace EnergyPlus::SystemReports {
             //  IF(AirLoopNum == 0 ) CYCLE   !orig line (BG 12-8-06 changed, zone forced air equipment seems to get excluded here...)
 
             // first deal with any (and all) Zone Forced Air Units that might have outside air.
-            for (thisZoneEquipNum = 1; thisZoneEquipNum <= ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).NumOfEquipTypes;
+            for (thisZoneEquipNum = 1; thisZoneEquipNum <= ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).NumOfEquipTypes;
                  ++thisZoneEquipNum) {
                 {
-                    auto const SELECT_CASE_var(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
+                    auto const SELECT_CASE_var(ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
                     // case statement to cover all possible zone forced air units that could have outside air
 
                     if (SELECT_CASE_var == WindowAC_Num) { // Window Air Conditioner
-                        OutAirNode = GetWindowACOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        OutAirNode = GetWindowACOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetWindowACZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetWindowACMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACMixedAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetWindowACReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4258,14 +4257,14 @@ namespace EnergyPlus::SystemReports {
                         }
 
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) {
-                        OutAirNode = GetVRFTUOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        OutAirNode = GetVRFTUOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
                         ZoneInletAirNode =
-                            GetVRFTUZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetVRFTUZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
-                        MixedAirNode = GetVRFTUMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        MixedAirNode = GetVRFTUMixedAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetVRFTUReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetVRFTUReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4277,20 +4276,20 @@ namespace EnergyPlus::SystemReports {
 
                     } else if ((SELECT_CASE_var == PkgTermHPAirToAir_Num) || (SELECT_CASE_var == PkgTermACAirToAir_Num) ||
                                (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) {
-                        OutAirNode = GetPTUnitOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
-                                                         ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
+                        OutAirNode = GetPTUnitOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
+                                                         ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetPTUnitZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
-                                                      ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
+                            GetPTUnitZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
+                                                      ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetPTUnitMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
-                                                  ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
+                            GetPTUnitMixedAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
+                                                  ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetPTUnitReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
-                                                   ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
+                            GetPTUnitReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum),
+                                                   ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipType_Num(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4301,16 +4300,16 @@ namespace EnergyPlus::SystemReports {
                         }
 
                     } else if (SELECT_CASE_var == FanCoil4Pipe_Num) {
-                        OutAirNode = GetFanCoilOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        OutAirNode = GetFanCoilOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetFanCoilZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetFanCoilZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetFanCoilMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetFanCoilMixedAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetFanCoilReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetFanCoilReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4322,16 +4321,16 @@ namespace EnergyPlus::SystemReports {
 
                     } else if (SELECT_CASE_var == UnitVentilator_Num) {
                         OutAirNode =
-                            GetUnitVentilatorOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetUnitVentilatorOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode = GetUnitVentilatorZoneInletAirNode(state,
-                            ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetUnitVentilatorMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetUnitVentilatorMixedAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetUnitVentilatorReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetUnitVentilatorReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4343,16 +4342,16 @@ namespace EnergyPlus::SystemReports {
 
                     } else if (SELECT_CASE_var == PurchasedAir_Num) {
                         ZFAUOutAirFlow +=
-                            GetPurchasedAirOutAirMassFlow(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetPurchasedAirOutAirMassFlow(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ZoneInletAirNode =
-                            GetPurchasedAirZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetPurchasedAirZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         ZFAUTempMixedAir =
-                            GetPurchasedAirMixedAirTemp(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetPurchasedAirMixedAirTemp(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ZFAUHumRatMixedAir =
-                            GetPurchasedAirMixedAirHumRat(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetPurchasedAirMixedAirHumRat(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetPurchasedAirReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetPurchasedAirReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((ZFAUFlowRate > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(ZFAUTempMixedAir, ZFAUHumRatMixedAir);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4364,15 +4363,15 @@ namespace EnergyPlus::SystemReports {
 
                     } else if (SELECT_CASE_var == ERVStandAlone_Num) {
                         OutAirNode =
-                            GetStandAloneERVOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetStandAloneERVZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVZoneInletAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode = ZoneInletAirNode;
                         ReturnAirNode =
-                            GetStandAloneERVReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4387,14 +4386,14 @@ namespace EnergyPlus::SystemReports {
 
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) {
                         OutAirNode =
-                            OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                                OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                                OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         ReturnAirNode =
-                                OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                                OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
                             //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
                             //).HumRat
@@ -4409,15 +4408,15 @@ namespace EnergyPlus::SystemReports {
 
                     } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
                         OutAirNode =
-                            GetHybridUnitaryACOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACOutAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetHybridUnitaryACZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACZoneInletNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
 
                         ReturnAirNode =
-                            GetHybridUnitaryACReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACReturnAirNode(state, ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
                             //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
                             //).HumRat
@@ -4454,7 +4453,7 @@ namespace EnergyPlus::SystemReports {
             }
 
             // loop over the zone supply air path inlet nodes
-            for (ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInNum) {
+            for (ZoneInNum = 1; ZoneInNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).NumInletNodes; ++ZoneInNum) {
                 Real64 AirSysEnthReturnAir = 0.0;    // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
                 Real64 AirSysEnthMixedAir = 0.0;     // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
                 Real64 AirSysZoneVentLoad = 0.0;     // ventilation load attributed to a particular zone from primary air system [J]
@@ -4463,30 +4462,30 @@ namespace EnergyPlus::SystemReports {
                 Real64 AirSysTotalMixFlowRate = 0.0; // Mixed air mass flow rate [kg/s]
                 Real64 AirSysOutAirFlow = 0.0;       // outside air flow rate for zone from primary air system [kg/s]
                 // retrieve air loop index
-                AirLoopNum = ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum);
+                AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum);
                 MixedAirNode = 0;
                 ReturnAirNode = 0;
                 AirDistCoolInletNodeNum = 0;
                 AirDistHeatInletNodeNum = 0;
                 if (AirLoopNum != 0) { // deal with primary air system
-                    AirDistCoolInletNodeNum = max(ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode, 0);
-                    AirDistHeatInletNodeNum = max(ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode, 0);
+                    AirDistCoolInletNodeNum = max(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode, 0);
+                    AirDistHeatInletNodeNum = max(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode, 0);
                     // Set for cooling or heating path
                     if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum == 0) {
-                        ADUCoolFlowrate = max(Node(ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
+                        ADUCoolFlowrate = max(Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
                                               0.0); // CR7244 need to accumulate flow across multiple inlets
                     } else if (AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum == 0) {
-                        ADUHeatFlowrate = max(Node(ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
+                        ADUHeatFlowrate = max(Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
                                               0.0); // CR7244 need to accumulate flow across multiple inlets
                     } else if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0 && AirDistCoolInletNodeNum != AirDistHeatInletNodeNum) {
                         // dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-                        ADUHeatFlowrate = max(Node(ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
+                        ADUHeatFlowrate = max(Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode).MassFlowRate,
                                               0.0); // CR7244 need to accumulate flow across multiple inlets
-                        ADUCoolFlowrate = max(Node(ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
+                        ADUCoolFlowrate = max(Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
                                               0.0); // CR7244 need to accumulate flow across multiple inlets
                     } else if (AirDistCoolInletNodeNum > 0 && AirDistHeatInletNodeNum > 0) {
                         // dual ducts! CR7244 need to accumulate flow across multiple inlets (don't count same inlet twice)
-                        ADUCoolFlowrate = max(Node(ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
+                        ADUCoolFlowrate = max(Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode).MassFlowRate,
                                               0.0); // CR7244 need to accumulate flow across multiple inlets
                     } else {
                         // do nothing (already inits)
@@ -4948,7 +4947,7 @@ namespace EnergyPlus::SystemReports {
 
             for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesCooled; ++Count1) {
                 const auto CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).CoolCtrlZoneNums(Count1);
-                const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
+                const auto ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                 print(state.files.bnd, "   Cooled Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
                 if (state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1) > 0) {
                     print(state.files.bnd,
@@ -4962,7 +4961,7 @@ namespace EnergyPlus::SystemReports {
             }
             for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
                 const auto CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).HeatCtrlZoneNums(Count1);
-                const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
+                const auto ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                 print(state.files.bnd, "   Heated Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
                 if (state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1) > 0) {
                     print(state.files.bnd,

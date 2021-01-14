@@ -887,7 +887,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalance::ZnRpt.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;

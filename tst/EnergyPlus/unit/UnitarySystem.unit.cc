@@ -117,24 +117,24 @@ protected:
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataGlobal->NumOfZones = 1;
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-        DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         DataZoneEquipment::ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
         DataHeatBalance::Zone(1).IsControlled = true;
-        DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-        DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
-        DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "EAST ZONE";
-        DataZoneEquipment::ZoneEquipConfig(1).EquipListName = "ZONE2EQUIPMENT";
-        DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 20;
-        DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 21;
-        DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
-        DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
-            DataZoneEquipment::ZoneEquipConfig(1).ZoneNode;
-        DataZoneEquipment::ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+        state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+        state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+        state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "EAST ZONE";
+        state->dataZoneEquip->ZoneEquipConfig(1).EquipListName = "ZONE2EQUIPMENT";
+        state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 20;
+        state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+        state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+        state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
+        state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+        DataHeatBalance::Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
+            state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
+        state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
         DataZoneEquipment::ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
         int maxEquipCount = 1;
         DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
@@ -151,15 +151,15 @@ protected:
         DataZoneEquipment::ZoneEquipList(1).CoolingPriority(1) = 1;
         DataZoneEquipment::ZoneEquipList(1).HeatingPriority(1) = 1;
         DataZoneEquipment::ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
-        DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = NumNodes;
-        DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(NumNodes);
-        DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
-        DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(NumNodes);
-        DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 2;
-        DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = NumNodes;
-        DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(NumNodes);
-        DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
-        DataZoneEquipment::ZoneEquipConfig(1).EquipListIndex = 1;
+        state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
+        state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
+        state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
+        state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(NumNodes);
+        state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 2;
+        state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = NumNodes;
+        state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(NumNodes);
+        state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
+        state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex = 1;
 
         DataSizing::CurSysNum = 0;
         DataSizing::CurZoneEqNum = 1;
@@ -9905,8 +9905,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataLoopNode::Node.allocate(10);
     DataSizing::ZoneEqSizing.deallocate();
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
@@ -9973,7 +9973,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataGlobal->SysSizingCalc = true;
 
-    thisSys->m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(1).InletNode(1);
+    thisSys->m_ZoneInletNode = state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1);
 
     ScheduleManager::Schedule(thisSys->m_SysAvailSchedPtr).CurrentValue = 1.0;
 
@@ -14065,7 +14065,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     bool zoneEquipment = false;
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
     bool FirstHVACIteration = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 

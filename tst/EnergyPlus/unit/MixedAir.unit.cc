@@ -782,12 +782,12 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataContaminantBalance->OutdoorCO2 = 400;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 10;
-    ZoneEquipConfig(1).InletNode.allocate(1);
-    ZoneEquipConfig(1).InletNode(1) = 10;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 10;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 10;
     Node.allocate(10);
     Node(10).Temp = 13.00;
     Node(10).HumRat = 0.008;
@@ -1464,12 +1464,12 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
     state->dataGlobal->NumOfZones = 1;
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEquipConfig(1).ZoneNode = 2;
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
@@ -1596,12 +1596,12 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     Zone.allocate(1);
     Zone(1).Name = "ZONE1";
     state->dataGlobal->NumOfZones = 1;
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEquipConfig(1).ZoneNode = 2;
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -1657,7 +1657,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     // Set up conditions
     DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).TotalOutputRequired = -1.0; // dehumidification requested by humidistat
-    EXPECT_EQ(state->dataMixedAir->OAController(ControllerNum).NodeNumofHumidistatZone, ZoneEquipConfig(1).ZoneNode);
+    EXPECT_EQ(state->dataMixedAir->OAController(ControllerNum).NodeNumofHumidistatZone, state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode);
     int airLoopNum = 1;
     int outAirMinFrac = 0.0;
     Real64 OASignal = 0.0;
@@ -1670,28 +1670,28 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     state->dataMixedAir->OAController(ControllerNum).MaxOAMassFlowRate = 2.5;
 
     // Case 1 - OA humrat = zone humrat - no high humidity operation
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
     state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006;
     state->dataMixedAir->OAController(ControllerNum).CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_FALSE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
     EXPECT_NEAR(OASignal, 0.0, 0.00001);
 
     // Case 2 - OA humrat < zone humrat - high humidity operation
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
     state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff;
     state->dataMixedAir->OAController(ControllerNum).CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_TRUE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
     EXPECT_NEAR(OASignal, 0.8, 0.00001);
 
     // Case 3 - OA humrat within tolerance of zone humrat - no high humidity operation
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
     state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff / 2.0;
     state->dataMixedAir->OAController(ControllerNum).CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_FALSE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
     EXPECT_NEAR(OASignal, 0.0, 0.00001);
 
     // Case 4 - OA humrat slightly above zone humrat - no high humidity operation
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
     state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 + DataHVACGlobals::SmallHumRatDiff / 2.0;
     state->dataMixedAir->OAController(ControllerNum).CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_FALSE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
@@ -5647,12 +5647,12 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataContaminantBalance->OutdoorCO2 = 400;
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2(1) = 600.0;
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 10;
-    ZoneEquipConfig(1).InletNode.allocate(1);
-    ZoneEquipConfig(1).InletNode(1) = 10;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 10;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 10;
     Node.allocate(10);
     Node(10).Temp = 13.00;
     Node(10).HumRat = 0.008;
@@ -5694,7 +5694,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataAirLoop->AirLoopFlow.deallocate();
     People.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
     ZoneSysEnergyDemand.deallocate();
     state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();

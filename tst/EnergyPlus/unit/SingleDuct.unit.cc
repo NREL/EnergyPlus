@@ -1307,7 +1307,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     state->dataSingleDuct->sd_airterminal.allocate(1);
     Zone.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::OARequirements.allocate(1);
@@ -1320,8 +1320,8 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataSingleDuct->sd_airterminal(1).OARequirementsPtr = 1;
     state->dataSingleDuct->sd_airterminal(1).AirLoopNum = 1;
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.4;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
@@ -1339,7 +1339,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     // Cleanup
     state->dataSingleDuct->sd_airterminal.deallocate();
     Zone.deallocate();
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
     DataSizing::OARequirements.deallocate();
@@ -2496,7 +2496,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     DataHeatBalance::TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
@@ -2541,7 +2541,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 1.32, 0.0001);
 
     state->dataSingleDuct->SysATMixer.deallocate();
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
@@ -2559,7 +2559,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     DataHeatBalance::TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
@@ -2575,8 +2575,8 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     state->dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
@@ -2624,7 +2624,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     EXPECT_NEAR(DataLoopNode::Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
     state->dataSingleDuct->SysATMixer.deallocate();
 
-    DataZoneEquipment::ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
@@ -2720,9 +2720,9 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
 
 TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 {
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     SysSizingRunDone = true;
     SysSizInput.allocate(1);
     NumSysSizInput = 1;

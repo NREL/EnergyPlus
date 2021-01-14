@@ -1481,8 +1481,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     EXPECT_EQ("SERIES PIU ELEC RHT", PIU(PIUNum).Name);                               // PIU series name
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum,
-              ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex));
-    ASSERT_TRUE(ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
+              state->dataZoneEquip->ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex));
+    ASSERT_TRUE(state->dataZoneEquip->ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
 }
 
 } // namespace EnergyPlus
