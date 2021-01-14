@@ -4555,8 +4555,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::CycleOn;
         using DataHVACGlobals::CycleOnZoneFansOnly;
         using DataHVACGlobals::TimeStepSys;
-        using DataZoneEquipment::ZHumRat;
-        using DataZoneEquipment::ZMAT;
         using EarthTube::ManageEarthTube;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -4644,8 +4642,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Allocate the ZMAT and ZHumRat arrays
 
-        if (!allocated(ZMAT)) ZMAT.allocate(state.dataGlobal->NumOfZones);
-        if (!allocated(ZHumRat)) ZHumRat.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataZoneEquip->ZMAT)) state.dataZoneEquip->ZMAT.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataZoneEquip->ZHumRat)) state.dataZoneEquip->ZHumRat.allocate(state.dataGlobal->NumOfZones);
         if (!allocated(state.dataZoneEquip->VentMCP)) state.dataZoneEquip->VentMCP.allocate(TotVentilation);
 
         // Allocate module level logical arrays for MIXING and CROSS MIXING reporting
@@ -4695,12 +4693,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Assign zone air temperature
         for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
-            ZMAT(j) = MAT(j);
-            ZHumRat(j) = ZoneAirHumRat(j);
+            state.dataZoneEquip->ZMAT(j) = MAT(j);
+            state.dataZoneEquip->ZHumRat(j) = ZoneAirHumRat(j);
             // This is only temporary fix for CR8867.  (L. Gu 8/12)
             if (SysTimestepLoop == 1) {
-                ZMAT(j) = XMPT(j);
-                ZHumRat(j) = WZoneTimeMinusP(j);
+                state.dataZoneEquip->ZMAT(j) = XMPT(j);
+                state.dataZoneEquip->ZHumRat(j) = WZoneTimeMinusP(j);
             }
         }
 
@@ -4805,11 +4803,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Ventilation(I).DelTemperature = GetCurrentScheduleValue(state, Ventilation(I).DeltaTempSchedPtr);
             }
             // Skip this if the zone is below the minimum indoor temperature limit
-            if ((ZMAT(NH) < Ventilation(I).MinIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+            if ((state.dataZoneEquip->ZMAT(NH) < Ventilation(I).MinIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
             // Skip this if the zone is above the maximum indoor temperature limit
-            if ((ZMAT(NH) > Ventilation(I).MaxIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+            if ((state.dataZoneEquip->ZMAT(NH) > Ventilation(I).MaxIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
             // Skip if below the temperature difference limit (3/12/03 Negative DelTemperature allowed now)
-            if (((ZMAT(NH) - TempExt) < Ventilation(I).DelTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+            if (((state.dataZoneEquip->ZMAT(NH) - TempExt) < Ventilation(I).DelTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
             // Skip this if the outdoor temperature is below the minimum outdoor temperature limit
             if ((TempExt < Ventilation(I).MinOutdoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
             // Skip this if the outdoor temperature is above the maximum outdoor temperature limit
@@ -4831,7 +4829,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 if (VVF < 0.0) VVF = 0.0;
                 state.dataZoneEquip->VentMCP(j) = VVF * AirDensity * CpAir *
-                             (Ventilation(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Ventilation(j).TemperatureTermCoef +
+                             (Ventilation(j).ConstantTermCoef + std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) * Ventilation(j).TemperatureTermCoef +
                               WindSpeedExt * (Ventilation(j).VelocityTermCoef + WindSpeedExt * Ventilation(j).VelocitySQTermCoef));
                 if (state.dataZoneEquip->VentMCP(j) < 0.0) state.dataZoneEquip->VentMCP(j) = 0.0;
                 VAMFL_temp = state.dataZoneEquip->VentMCP(j) / CpAir;
@@ -4903,11 +4901,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (Ventilation(j).DiscCoef != DataGlobalConstants::AutoCalculate) {
                     Cd = Ventilation(j).DiscCoef;
                 } else {
-                    Cd = 0.40 + 0.0045 * std::abs(TempExt - ZMAT(NZ));
+                    Cd = 0.40 + 0.0045 * std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ));
                 }
                 Qw = Cw * Ventilation(j).OpenArea * GetCurrentScheduleValue(state, Ventilation(j).OpenAreaSchedPtr) * WindSpeedExt;
                 Qst = Cd * Ventilation(j).OpenArea * GetCurrentScheduleValue(state, Ventilation(j).OpenAreaSchedPtr) *
-                      std::sqrt(2.0 * 9.81 * Ventilation(j).DH * std::abs(TempExt - ZMAT(NZ)) / (ZMAT(NZ) + 273.15));
+                      std::sqrt(2.0 * 9.81 * Ventilation(j).DH * std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) / (state.dataZoneEquip->ZMAT(NZ) + 273.15));
                 VVF = std::sqrt(Qw * Qw + Qst * Qst);
                 if (Ventilation(j).EMSSimpleVentOn) VVF = Ventilation(j).EMSimpleVentFlowRate;
                 if (VVF < 0.0) VVF = 0.0;
@@ -4934,8 +4932,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             if (Mixing(j).DeltaTempSchedPtr > 0) {
                 TD = GetCurrentScheduleValue(state, Mixing(j).DeltaTempSchedPtr);
             }
-            TZN = ZMAT(n);
-            TZM = ZMAT(m);
+            TZN = state.dataZoneEquip->ZMAT(n);
+            TZM = state.dataZoneEquip->ZMAT(m);
 
             // Hybrid ventilation controls
             if (Mixing(j).HybridControlType == HybridControlTypeClose) continue;
@@ -5043,8 +5041,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                     //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
-                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0);
-                    CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0); // Use average conditions
+                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);
+                    CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0); // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                     if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -5060,7 +5058,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
-                    MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+                    MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
@@ -5074,8 +5072,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (TZM > TZN + TD) {
                     //             RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                     //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
-                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0); // Use avg conditions
-                    CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                             // Use average conditions
+                    AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0); // Use avg conditions
+                    CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                             // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                     if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -5090,7 +5088,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MCPTM(n) += MCP * TZM;
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
-                    MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+                    MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                     }
@@ -5104,8 +5102,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 //          RhoAirM = PsyRhoAirFnPbTdbW(state, OutBaroPress,tzm,ZHumRat(m))
                 //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
                 AirDensity =
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
-                CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                                       // Use average conditions
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, (TZN + TZM) / 2.0, (state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
+                CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                                       // Use average conditions
 
                 Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                 if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -5120,7 +5118,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 MCPTM(n) += MCP * TZM;
                 // Now to determine the moisture conditions
                 MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
-                MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+                MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     state.dataContaminantBalance->MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
                 }
@@ -5143,8 +5141,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
 
             if (TD >= 0.0) {
-                TZN = ZMAT(n);
-                TZM = ZMAT(m);
+                TZN = state.dataZoneEquip->ZMAT(n);
+                TZM = state.dataZoneEquip->ZMAT(m);
                 // Check temperature limit
                 MixingLimitFlag = false;
                 // Ensure the minimum indoor temperature <= the maximum indoor temperature
@@ -5238,7 +5236,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if ((TD <= 0.0) || ((TD > 0.0) && (TZM - TZN >= TD))) {
                     //                                      SET COEFFICIENTS .
                     Tavg = (TZN + TZM) / 2.0;
-                    Wavg = (ZHumRat(n) + ZHumRat(m)) / 2.0;
+                    Wavg = (state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0;
                     AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
                     CpAir = PsyCpAirFnW(Wavg);
                     MCPxN = CrossMixing(j).DesiredAirFlowRate * CpAir * AirDensity;
@@ -5251,10 +5249,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     // Now to determine the moisture conditions
                     MixingMassFlowZone(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                    MixingMassFlowXHumRat(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(n);
+                    MixingMassFlowXHumRat(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(n);
 
                     MixingMassFlowZone(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity;
-                    MixingMassFlowXHumRat(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+                    MixingMassFlowXHumRat(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataZoneEquip->ZHumRat(m);
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         state.dataContaminantBalance->MixingMassFlowCO2(m) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(n);
                         state.dataContaminantBalance->MixingMassFlowCO2(n) += CrossMixing(j).DesiredAirFlowRate * AirDensity * state.dataContaminantBalance->ZoneAirCO2(m);
@@ -5275,10 +5273,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (!RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
                 for (j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
                     ZoneB = RefDoorMixing(ZoneA).MateZonePtr(j);
-                    TZoneA = ZMAT(ZoneA);
-                    TZoneB = ZMAT(ZoneB);
-                    HumRatZoneA = ZHumRat(ZoneA);
-                    HumRatZoneB = ZHumRat(ZoneB);
+                    TZoneA = state.dataZoneEquip->ZMAT(ZoneA);
+                    TZoneB = state.dataZoneEquip->ZMAT(ZoneB);
+                    HumRatZoneA = state.dataZoneEquip->ZHumRat(ZoneA);
+                    HumRatZoneB = state.dataZoneEquip->ZHumRat(ZoneB);
                     AirDensityZoneA = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
                     CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
                     AirDensityZoneB = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
@@ -5381,7 +5379,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     // CR6845 if calculated < 0.0, don't propagate
                     if (IVF < 0.0) IVF = 0.0;
                     MCpI_temp = IVF * AirDensity * CpAir *
-                                (Infiltration(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Infiltration(j).TemperatureTermCoef +
+                                (Infiltration(j).ConstantTermCoef + std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) * Infiltration(j).TemperatureTermCoef +
                                  WindSpeedExt * (Infiltration(j).VelocityTermCoef + WindSpeedExt * Infiltration(j).VelocitySQTermCoef));
 
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
@@ -5404,7 +5402,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     // Sherman Grimsrud model as formulated in ASHRAE HoF
                     WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
                     IVF = GetCurrentScheduleValue(state, Infiltration(j).SchedPtr) * Infiltration(j).LeakageArea / 1000.0 *
-                          std::sqrt(Infiltration(j).BasicStackCoefficient * std::abs(TempExt - ZMAT(NZ)) +
+                          std::sqrt(Infiltration(j).BasicStackCoefficient * std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)) +
                                     Infiltration(j).BasicWindCoefficient * pow_2(WindSpeedExt));
                     if (IVF < 0.0) IVF = 0.0;
                     MCpI_temp = IVF * AirDensity * CpAir;
@@ -5428,7 +5426,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     // Walker Wilson model as formulated in ASHRAE HoF
                     IVF = GetCurrentScheduleValue(state, Infiltration(j).SchedPtr) *
                           std::sqrt(pow_2(Infiltration(j).FlowCoefficient * Infiltration(j).AIM2StackCoefficient *
-                                          std::pow(std::abs(TempExt - ZMAT(NZ)), Infiltration(j).PressureExponent)) +
+                                          std::pow(std::abs(TempExt - state.dataZoneEquip->ZMAT(NZ)), Infiltration(j).PressureExponent)) +
                                     pow_2(Infiltration(j).FlowCoefficient * Infiltration(j).AIM2WindCoefficient *
                                           std::pow(Infiltration(j).ShelterFactor * WindSpeedExt, 2.0 * Infiltration(j).PressureExponent)));
                     if (IVF < 0.0) IVF = 0.0;

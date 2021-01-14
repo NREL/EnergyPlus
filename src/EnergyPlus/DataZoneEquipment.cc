@@ -94,9 +94,6 @@ namespace EnergyPlus::DataZoneEquipment {
                                                          "ZoneHVAC:EvaporativeCoolerUnit",
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
 
-    Array1D<Real64> ZMAT;
-    Array1D<Real64> ZHumRat;
-
     // Object Data
     Array1D<EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
@@ -109,8 +106,6 @@ namespace EnergyPlus::DataZoneEquipment {
 
     void clear_state()
     {
-        ZMAT.deallocate();
-        ZHumRat.deallocate();
         ZoneEquipConfig.deallocate();
         ZoneEquipList.deallocate();
         HeatingControlList.deallocate();

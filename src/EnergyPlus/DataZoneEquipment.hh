@@ -124,9 +124,6 @@ namespace DataZoneEquipment {
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
 
-    extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
-    extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
-
     enum class LoadDist
     {
         SequentialLoading,
@@ -516,9 +513,11 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
-    Array1D_bool CrossMixingReportFlag;
-    Array1D_bool MixingReportFlag;
-    Array1D<Real64> VentMCP;
+    Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+    Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
+    Array1D<Real64> VentMCP;            // Product of mass rate and Cp for each Ventilation object
+    Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
+    Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
 
     void clear_state() override
     {
@@ -530,9 +529,11 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
         this->ZoneEquipAvail.deallocate();
-        this->CrossMixingReportFlag.deallocate(); // TRUE when Cross Mixing is active based on controls
-        this->MixingReportFlag.deallocate();      // TRUE when Mixing is active based on controls
-        this->VentMCP.deallocate();               // Product of mass rate and Cp for each Ventilation object
+        this->CrossMixingReportFlag.deallocate();
+        this->MixingReportFlag.deallocate();
+        this->VentMCP.deallocate();
+        this->ZMAT.deallocate();
+        this->ZHumRat.deallocate();
     }
 };
 
