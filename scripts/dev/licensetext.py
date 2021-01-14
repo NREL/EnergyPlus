@@ -327,20 +327,7 @@ class FileVisitor:
 
     def visit(self, path, exclude_patterns=None):
         overall_success = True
-        #exclude = []
-        #if exclude_patterns is not None:
-        #    for pattern in exclude_patterns:
-        #        exclude.append(re.compile(pattern))
         for file in self.files(path, exclude_patterns=exclude_patterns):
-            #if exclude:
-            #    skip = False
-            #    for pattern in exclude:
-            #        skip = pattern.match(file)
-            #        if skip:
-            #            break
-            #    if skip:
-            #        print('Skipping ' + file)
-            #        continue
             file_success = self.visit_file(file)
             if not file_success:
                 overall_success = False
