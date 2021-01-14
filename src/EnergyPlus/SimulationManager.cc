@@ -2720,19 +2720,19 @@ namespace SimulationManager {
                 print(state.files.bnd,
                       " Zone Equipment List,{},{},{},{}\n",
                       Count,
-                      ZoneEquipList(Count).Name,
+                      state.dataZoneEquip->ZoneEquipList(Count).Name,
                       state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                      ZoneEquipList(Count).NumOfEquipTypes);
+                      state.dataZoneEquip->ZoneEquipList(Count).NumOfEquipTypes);
 
-                for (int Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
                     print(state.files.bnd,
                           "   Zone Equipment Component,{},{},{},{},{},{}\n",
                           Count1,
-                          ZoneEquipList(Count).EquipType(Count1),
-                          ZoneEquipList(Count).EquipName(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipType(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipName(Count1),
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
-                          ZoneEquipList(Count).CoolingPriority(Count1),
-                          ZoneEquipList(Count).HeatingPriority(Count1));
+                          state.dataZoneEquip->ZoneEquipList(Count).CoolingPriority(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).HeatingPriority(Count1));
                 }
             }
         }

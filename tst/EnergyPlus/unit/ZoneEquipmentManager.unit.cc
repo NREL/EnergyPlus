@@ -1323,7 +1323,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
     DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
-    auto &thisZEqList(DataZoneEquipment::ZoneEquipList(ZoneNum));
+    auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
     thisZEqList.HeatingCapacity(3) = 500.0;
@@ -1354,13 +1354,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1368,7 +1368,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1541,7 +1541,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
     DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
-    auto &thisZEqList(DataZoneEquipment::ZoneEquipList(ZoneNum));
+    auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
     thisZEqList.HeatingCapacity(3) = 500.0;
@@ -1572,13 +1572,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1586,7 +1586,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1889,14 +1889,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -1904,7 +1904,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2120,14 +2120,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2135,7 +2135,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading

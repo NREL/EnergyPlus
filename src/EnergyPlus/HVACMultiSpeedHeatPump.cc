@@ -1784,7 +1784,6 @@ namespace HVACMultiSpeedHeatPump {
         using DataSizing::AutoSize;
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipList;
         using Fans::GetFanIndex;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
@@ -2036,7 +2035,7 @@ namespace HVACMultiSpeedHeatPump {
             int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
             if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
+                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum = coolingPriority;
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum = heatingPriority;
             }

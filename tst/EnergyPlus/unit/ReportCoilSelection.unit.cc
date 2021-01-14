@@ -305,17 +305,17 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     int curSysNum = 0;
     int curZoneEqNum = 2;
     int curOASysNum = 0;
-    DataZoneEquipment::ZoneEquipList.allocate(3);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num(1) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num(2) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
+    state->dataZoneEquip->ZoneEquipList.allocate(3);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(1) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(2) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
 
     Real64 totGrossCap = 500.0;
     Real64 sensGrossCap = 500.0;

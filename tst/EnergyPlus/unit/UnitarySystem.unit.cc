@@ -118,7 +118,7 @@ protected:
         state->dataGlobal->NumOfZones = 1;
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
         DataHeatBalance::Zone(1).Name = "EAST ZONE";
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
@@ -135,22 +135,22 @@ protected:
         DataHeatBalance::Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
-        DataZoneEquipment::ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
+        state->dataZoneEquip->ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
         int maxEquipCount = 1;
-        DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
-        DataZoneEquipment::ZoneEquipList(1).EquipType.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipType_Num.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipName.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipIndex = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipData.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).CoolingPriority.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).HeatingPriority.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM";
-        DataZoneEquipment::ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
-        DataZoneEquipment::ZoneEquipList(1).CoolingPriority(1) = 1;
-        DataZoneEquipment::ZoneEquipList(1).HeatingPriority(1) = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+        state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
+        state->dataZoneEquip->ZoneEquipList(1).EquipData.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).CoolingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).HeatingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = "AIRLOOPHVAC:UNITARYSYSTEM";
+        state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
+        state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
+        state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
@@ -4627,8 +4627,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -5171,8 +5171,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -5507,8 +5507,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
@@ -5969,8 +5969,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
@@ -7784,8 +7784,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -8118,8 +8118,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
 
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -9930,7 +9930,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     DataZoneControls::TempControlledZone.allocate(DataZoneControls::NumTempControlledZones);
     DataZoneControls::TempControlledZone(DataZoneControls::NumTempControlledZones).ActualZoneNum = 1;
 
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11365,7 +11365,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     UnitarySys mySys;
-    HVACSystemData *thisSys = DataZoneEquipment::ZoneEquipList(1).compPointer[2];    // UnitarySystem is the 2nd in the zone equipment list
+    HVACSystemData *thisSys = state->dataZoneEquip->ZoneEquipList(1).compPointer[2];    // UnitarySystem is the 2nd in the zone equipment list
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                 // indicate zone data is available
     mySys.getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     mySys = state->dataUnitarySystems->unitarySys[0];
@@ -11514,7 +11514,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     UnitarySys mySys;
-    HVACSystemData *thisSys = DataZoneEquipment::ZoneEquipList(1).compPointer[2];    // UnitarySystem is the 2nd in the zone equipment list
+    HVACSystemData *thisSys = state->dataZoneEquip->ZoneEquipList(1).compPointer[2];    // UnitarySystem is the 2nd in the zone equipment list
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                 // indicate zone data is available
     mySys.getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     mySys = state->dataUnitarySystems->unitarySys[0];
@@ -12459,8 +12459,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -12692,8 +12692,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     EXPECT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
 
     UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -14103,7 +14103,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
     DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
 
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
@@ -14414,8 +14414,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -15305,7 +15305,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      DataHeatBalFanSys::MAT.allocate(1);
      DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
      DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
-     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
      DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
 
      DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;

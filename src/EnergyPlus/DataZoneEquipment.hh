@@ -48,6 +48,9 @@
 #ifndef DataZoneEquipment_hh_INCLUDED
 #define DataZoneEquipment_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -453,8 +456,6 @@ namespace DataZoneEquipment {
         }
     };
 
-    // Object Data
-    extern Array1D<EquipList> ZoneEquipList;
     extern Array1D<ControlList> HeatingControlList;
     extern Array1D<ControlList> CoolingControlList;
     extern Array1D<SupplyAir> SupplyAirPath;
@@ -518,6 +519,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
     Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
+    std::unordered_set<std::string> UniqueZoneEquipListNames;
+    Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
 
     void clear_state() override
     {
@@ -535,6 +538,8 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->ZMAT.deallocate();
         this->ZHumRat.deallocate();
         this->ZoneEquipConfig.deallocate();
+        this->UniqueZoneEquipListNames.clear();
+        this->ZoneEquipList.deallocate();
     }
 };
 

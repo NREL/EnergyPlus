@@ -5182,7 +5182,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::VRFTerminalUnit_Num;
-        using DataZoneEquipment::ZoneEquipList;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
 
@@ -5397,12 +5396,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     std::string const thisObjectName = state.dataHVACVarRefFlow->VRFTU(TUIndex).Name;
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).isInZone) goto EquipList_exit;   // already found previously
                     for (ELLoop = 1; ELLoop <= state.dataGlobal->NumOfZones; ++ELLoop) {  // NumOfZoneEquipLists
-                        if (ZoneEquipList(ELLoop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
-                        for (ListLoop = 1; ListLoop <= ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
-                            if (!UtilityRoutines::SameString(ZoneEquipList(ELLoop).EquipType(ListLoop),
+                        if (state.dataZoneEquip->ZoneEquipList(ELLoop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
+                        for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
+                            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipType(ListLoop),
                                                              DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
                                 continue;
-                            if (!UtilityRoutines::SameString(ZoneEquipList(ELLoop).EquipName(ListLoop), state.dataHVACVarRefFlow->VRFTU(TUIndex).Name)) continue;
+                            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipName(ListLoop), state.dataHVACVarRefFlow->VRFTU(TUIndex).Name)) continue;
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum = ELLoop;
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).isInZone = true;
                             if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZonePtr == ELLoop) {
@@ -5546,18 +5545,18 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex > 0) {
                                 for (int EquipNum = 1;
                                      EquipNum <=
-                                     DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
+                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
                                      ++EquipNum) {
-                                    if ((DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                    if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                              .EquipType_Num(EquipNum) != sysType_Num) ||
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != sysName)
                                         continue;
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).zoneSequenceCoolingNum =
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).zoneSequenceHeatingNum =
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
                                     break;
                                 }

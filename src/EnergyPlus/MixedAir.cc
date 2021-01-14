@@ -1175,7 +1175,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::ZoneEquipList;
 
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
@@ -1735,11 +1734,11 @@ namespace EnergyPlus::MixedAir {
                             if (EquipListIndex > 0) {
                                 for (EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                     if (EquipListNum == EquipListIndex) {
-                                        for (EquipNum = 1; EquipNum <= ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
-                                            if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipType(EquipNum),
+                                        for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
+                                            if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipType(EquipNum),
                                                                             "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
                                                 for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
-                                                    if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
+                                                    if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),
                                                                                     state.dataDefineEquipment->AirDistUnit(ADUNum).Name)) {
                                                         if ((state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat) ||
                                                             (state.dataDefineEquipment->AirDistUnit(ADUNum).EquipType_Num(EquipNum) == DataDefineEquip::iZnAirLoopEquipType::SingleDuctConstVolNoReheat) ||
@@ -2065,7 +2064,6 @@ namespace EnergyPlus::MixedAir {
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
-        using DataZoneEquipment::ZoneEquipList;
 
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;

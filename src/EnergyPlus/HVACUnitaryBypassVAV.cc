@@ -1264,7 +1264,7 @@ namespace HVACUnitaryBypassVAV {
                         int heatingPriority = 0;
                         // setup zone equipment sequence information based on finding matching air terminal
                         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
+                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                                 .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;

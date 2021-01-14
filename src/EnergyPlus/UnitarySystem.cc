@@ -3211,23 +3211,23 @@ namespace UnitarySystems {
                             thisSys.m_AirLoopEquipment = false;
                             thisSys.m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
                             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
+                                for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
                                                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                        .NumOfEquipTypes;
                                      ++EquipNum) {
-                                    if ((DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                    if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                              .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != thisObjectName)
                                         continue;
                                     // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                     // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
                                     // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                     thisSys.m_ZoneSequenceCoolingNum =
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     thisSys.m_ZoneSequenceHeatingNum =
-                                        DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
                                     break;
                                 }
@@ -3283,23 +3283,23 @@ namespace UnitarySystems {
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.AirOutNode;
                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
+                                    for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
                                                                            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                            .NumOfEquipTypes;
                                          ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                  .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                         // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
                                         // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
                                     }
                                 }
@@ -3352,23 +3352,23 @@ namespace UnitarySystems {
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
+                                    for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
                                                                            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                            .NumOfEquipTypes;
                                          ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                  .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                         // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
                                         // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
                                     }
                                 }
@@ -9561,7 +9561,7 @@ namespace UnitarySystems {
                 int heatingPriority = 0;
                 // setup zone equipment sequence information based on finding matching air terminal
                 if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                    DataZoneEquipment::ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
+                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                         .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                     this->m_ZoneSequenceCoolingNum = coolingPriority;
                     this->m_ZoneSequenceHeatingNum = heatingPriority;

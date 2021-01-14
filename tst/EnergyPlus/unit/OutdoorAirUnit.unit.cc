@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     SetPredefinedTables(*state);
     OutdoorAirUnit::SimOutdoorAirUnit(*state,
-        "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+        "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirVolFlow);
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirMassFlow);

@@ -84,7 +84,6 @@ using namespace EnergyPlus::RoomAirModelAirflowNetwork;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
-using DataZoneEquipment::ZoneEquipList;
 
 class RoomAirflowNetworkTest : public EnergyPlusFixture
 {
@@ -103,7 +102,7 @@ protected:
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-        ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
@@ -231,9 +230,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW = 0.01;
     AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
 
-    ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
-    ZoneEquipList(ZoneNum).EquipName.allocate(1);
-    ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
 
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;

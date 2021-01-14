@@ -156,7 +156,7 @@ protected:
 
         DataHeatBalance::Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
-        DataZoneEquipment::ZoneEquipList.allocate(numZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(numZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         DataSizing::FinalZoneSizing.allocate(numZones);
@@ -252,7 +252,7 @@ protected:
         thisZone.IsControlled = true;
         thisZone.SystemZoneNodeNumber = zoneNode;
 
-        auto &thisZoneEqList(DataZoneEquipment::ZoneEquipList(zoneNum));
+        auto &thisZoneEqList(state->dataZoneEquip->ZoneEquipList(zoneNum));
         thisZoneEqList.Name = "ZONE1EQUIPMENT";
         int maxEquipCount1 = 1;
         thisZoneEqList.NumOfEquipTypes = maxEquipCount1;
@@ -3757,7 +3757,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3791,7 +3791,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3878,7 +3878,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3964,7 +3964,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4036,7 +4036,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4060,7 +4060,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4077,7 +4077,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4096,7 +4096,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5613,7 +5613,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5647,7 +5647,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5692,7 +5692,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5714,7 +5714,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5734,7 +5734,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -11243,7 +11243,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -12976,7 +12976,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -15651,7 +15651,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,

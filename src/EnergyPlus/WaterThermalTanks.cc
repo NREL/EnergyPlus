@@ -4182,7 +4182,7 @@ namespace WaterThermalTanks {
 
                         // Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
                         if (HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) {
-                            if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(DataZoneEquipment::ZoneEquipList)) {
+                            if (allocated(state.dataZoneEquip->ZoneEquipConfig) && allocated(state.dataZoneEquip->ZoneEquipList)) {
                                 bool FoundTankInList = false;
                                 bool TankNotLowestPriority = false;
                                 for (int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
@@ -4190,21 +4190,21 @@ namespace WaterThermalTanks {
                                     if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
                                         for (int ZoneEquipListNum = 1; ZoneEquipListNum <= state.dataGlobal->NumOfZones; ++ZoneEquipListNum) {
                                             if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).EquipListName !=
-                                                DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).Name)
+                                                state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).Name)
                                                 continue;
                                             int TankCoolingPriority = 0;
                                             int TankHeatingPriority = 0;
                                             if (ZoneEquipConfigNum <= state.dataGlobal->NumOfZones) {
                                                 for (int EquipmentTypeNum = 1;
-                                                     EquipmentTypeNum <= DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                                     EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
                                                      ++EquipmentTypeNum) {
-                                                    if (DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name)
+                                                    if (state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipName(EquipmentTypeNum) != HPWH.Name)
                                                         continue;
                                                     FoundTankInList = true;
                                                     TankCoolingPriority =
-                                                        DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
+                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum);
                                                     TankHeatingPriority =
-                                                        DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
+                                                        state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum);
                                                     break;
                                                 } // EquipmentTypeNum
                                                 if (!FoundTankInList) {
@@ -4217,16 +4217,16 @@ namespace WaterThermalTanks {
                                                 //                     check that tank has lower priority than all other non-HPWH objects in Zone
                                                 //                     Equipment List
                                                 for (int EquipmentTypeNum = 1;
-                                                     EquipmentTypeNum <= DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
+                                                     EquipmentTypeNum <= state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).NumOfEquipTypes;
                                                      ++EquipmentTypeNum) {
                                                     if (UtilityRoutines::SameString(
-                                                            DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
+                                                            state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).EquipType(EquipmentTypeNum),
                                                             DataIPShortCuts::cCurrentModuleObject))
                                                         continue;
                                                     if (TankCoolingPriority >
-                                                            DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
+                                                            state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).CoolingPriority(EquipmentTypeNum) ||
                                                         TankHeatingPriority >
-                                                            DataZoneEquipment::ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
+                                                            state.dataZoneEquip->ZoneEquipList(ZoneEquipListNum).HeatingPriority(EquipmentTypeNum)) {
                                                         TankNotLowestPriority = true;
                                                     }
                                                 } // EquipmentTypeNum

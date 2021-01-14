@@ -172,7 +172,6 @@ namespace BaseboardElectric {
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
         using DataZoneEquipment::BBElectricConvective_Num;
-        using DataZoneEquipment::ZoneEquipList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
@@ -320,9 +319,9 @@ namespace BaseboardElectric {
                 }
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                        if (ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
-                            ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
+                    for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
+                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
+                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
                             thisBaseboard.ZonePtr = CtrlZone;
                         }
                     }

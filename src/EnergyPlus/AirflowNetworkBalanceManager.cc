@@ -10314,7 +10314,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine validate zone exhaust fan and associated surface
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipList;
         using DataZoneEquipment::ZoneExhaustFan_Num;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -10396,8 +10395,8 @@ namespace AirflowNetworkBalanceManager {
             // Ensure all zone exhaust fans are defined
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
-                for (EquipTypeNum = 1; EquipTypeNum <= ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
-                    if (ZoneEquipList(j).EquipType_Num(EquipTypeNum) == ZoneExhaustFan_Num) {
+                for (EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
+                    if (state.dataZoneEquip->ZoneEquipList(j).EquipType_Num(EquipTypeNum) == ZoneExhaustFan_Num) {
                         found = false;
                         for (k = 1; k <= state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {

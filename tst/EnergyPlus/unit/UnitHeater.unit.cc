@@ -2422,7 +2422,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 
     ManageSimulation(*state);
 
-    EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipType, "ZONEHVAC:AIRDISTRIBUTIONUNIT");
     EXPECT_EQ(state->dataZoneEquipmentManager->PrioritySimOrder(1).EquipName, "MAIN ZONE ATU");

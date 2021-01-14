@@ -96,7 +96,7 @@ protected:
         state->dataGlobal->NumOfZones = 1;
         DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-        DataZoneEquipment::ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         DataLoopNode::Node.allocate(NumOfNodes);
         DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
         DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate(1);
@@ -123,20 +123,20 @@ protected:
             state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         DataHeatBalance::Zone(1).ZoneVolCapMultpMoist = 1.0;
 
-        DataZoneEquipment::ZoneEquipList(1).Name = "ZONEHVACEVAPEQUIPMENT";
-        DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipType.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipType_Num.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipName.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipIndex = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipData.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).CoolingPriority.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).HeatingPriority.allocate(DataZoneEquipment::ZoneEquipList(1).NumOfEquipTypes);
-        DataZoneEquipment::ZoneEquipList(1).EquipType(1) = "ZoneHVAC:EvaporativeCoolerUnit";
-        DataZoneEquipment::ZoneEquipList(1).CoolingPriority(1) = 1;
-        DataZoneEquipment::ZoneEquipList(1).HeatingPriority(1) = 1;
-        DataZoneEquipment::ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
+        state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEHVACEVAPEQUIPMENT";
+        state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = 1;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
+        state->dataZoneEquip->ZoneEquipList(1).EquipData.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).CoolingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).HeatingPriority.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipType(1) = "ZoneHVAC:EvaporativeCoolerUnit";
+        state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
+        state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
+        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
     }
 
     virtual void TearDown()
@@ -228,7 +228,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    DataZoneEquipment::ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
+    state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
@@ -351,7 +351,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     DataHeatBalFanSys::ZoneThermostatSetPointHi(1) = 23.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    DataZoneEquipment::ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
+    state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
@@ -488,7 +488,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     DataHeatBalFanSys::ZoneThermostatSetPointHi(1) = 23.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    DataZoneEquipment::ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
+    state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);

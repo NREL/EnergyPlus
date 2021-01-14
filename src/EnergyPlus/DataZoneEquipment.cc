@@ -94,9 +94,6 @@ namespace EnergyPlus::DataZoneEquipment {
                                                          "ZoneHVAC:EvaporativeCoolerUnit",
                                                          "ZoneHVAC:HybridUnitaryHVAC"});
 
-    // Object Data
-    std::unordered_set<std::string> UniqueZoneEquipListNames;
-    Array1D<EquipList> ZoneEquipList;
     Array1D<ControlList> HeatingControlList;
     Array1D<ControlList> CoolingControlList;
     Array1D<SupplyAir> SupplyAirPath;
@@ -105,12 +102,10 @@ namespace EnergyPlus::DataZoneEquipment {
 
     void clear_state()
     {
-        ZoneEquipList.deallocate();
         HeatingControlList.deallocate();
         CoolingControlList.deallocate();
         SupplyAirPath.deallocate();
         ReturnAirPath.deallocate();
-        UniqueZoneEquipListNames.clear();
         CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
     }
 
@@ -141,7 +136,7 @@ namespace EnergyPlus::DataZoneEquipment {
         using namespace ScheduleManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetZoneEquipmentData1: "); // include trailing blank space
+        static std::string const RoutineName("GetZoneEquipmentData: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -246,9 +241,9 @@ namespace EnergyPlus::DataZoneEquipment {
         // data for each zone to the number of controlled zones
         // found in the input file.  This may or may not
         // be the same as the number of zones in the building
-        ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
+        state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
         state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, NoAction);
-        UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
+        state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
         if (state.dataZoneEquip->NumOfZoneEquipLists != NumOfControlledZones) {
             ShowSevereError(state,
@@ -312,7 +307,8 @@ namespace EnergyPlus::DataZoneEquipment {
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName = AlphArray(1); // for x-referencing with the geometry data
 
             IsNotOK = false;
-            GlobalNames::IntraObjUniquenessCheck(state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), UniqueZoneEquipListNames, IsNotOK);
+            GlobalNames::IntraObjUniquenessCheck(
+                state, AlphArray(2), CurrentModuleObject, cAlphaFields(2), state.dataZoneEquip->UniqueZoneEquipListNames, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError(state, "..another Controlled Zone has been assigned that " + cAlphaFields(2) + '.');
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -366,7 +362,7 @@ namespace EnergyPlus::DataZoneEquipment {
             ZoneEquipListNum = inputProcessor->getObjectItemNum(state, CurrentModuleObject, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
             if (ZoneEquipListNum > 0) {
 
-                EquipList &thisZoneEquipList = ZoneEquipList(ControlledZoneNum);
+                EquipList &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(ControlledZoneNum);
 
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
@@ -843,10 +839,10 @@ namespace EnergyPlus::DataZoneEquipment {
             ZoneEquipListAcct.allocate(overallEquipCount);
             overallEquipCount = 0;
             for (Loop1 = 1; Loop1 <= NumOfControlledZones; ++Loop1) {
-                for (Loop2 = 1; Loop2 <= ZoneEquipList(Loop1).NumOfEquipTypes; ++Loop2) {
+                for (Loop2 = 1; Loop2 <= state.dataZoneEquip->ZoneEquipList(Loop1).NumOfEquipTypes; ++Loop2) {
                     ++overallEquipCount;
-                    ZoneEquipListAcct(overallEquipCount).ObjectType = ZoneEquipList(Loop1).EquipType(Loop2);
-                    ZoneEquipListAcct(overallEquipCount).ObjectName = ZoneEquipList(Loop1).EquipName(Loop2);
+                    ZoneEquipListAcct(overallEquipCount).ObjectType = state.dataZoneEquip->ZoneEquipList(Loop1).EquipType(Loop2);
+                    ZoneEquipListAcct(overallEquipCount).ObjectName = state.dataZoneEquip->ZoneEquipList(Loop1).EquipName(Loop2);
                     ZoneEquipListAcct(overallEquipCount).OnListNum = Loop1;
                 }
             }
@@ -859,8 +855,8 @@ namespace EnergyPlus::DataZoneEquipment {
                     // Duplicated -- not allowed
                     ShowSevereError(state, RoutineName + CurrentModuleObject + ", duplicate items in ZoneHVAC:EquipmentList.");
                     ShowContinueError(state, "Equipment: Type=" + ZoneEquipListAcct(Loop1).ObjectType + ", Name=" + ZoneEquipListAcct(Loop1).ObjectName);
-                    ShowContinueError(state, "Found on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop1).OnListNum).Name + "\".");
-                    ShowContinueError(state, "Equipment Duplicated on List=\"" + ZoneEquipList(ZoneEquipListAcct(Loop2).OnListNum).Name + "\".");
+                    ShowContinueError(state, "Found on List=\"" + state.dataZoneEquip->ZoneEquipList(ZoneEquipListAcct(Loop1).OnListNum).Name + "\".");
+                    ShowContinueError(state, "Equipment Duplicated on List=\"" + state.dataZoneEquip->ZoneEquipList(ZoneEquipListAcct(Loop2).OnListNum).Name + "\".");
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
             }
@@ -871,7 +867,7 @@ namespace EnergyPlus::DataZoneEquipment {
 
         for (ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
             state.dataZoneEquip->GetZoneEquipmentDataFound =
-                UtilityRoutines::FindItemInList(ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
+                UtilityRoutines::FindItemInList(state.dataZoneEquip->ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
             if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0) state.dataZoneEquip->ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
         } // end loop over controlled zones
 
@@ -1068,15 +1064,15 @@ namespace EnergyPlus::DataZoneEquipment {
         CtrlZoneNumLocal = 0;
         IsOnList = false;
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {      // NumOfZoneEquipLists
-            if (ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
-            for (ListLoop = 1; ListLoop <= ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
-                if (!UtilityRoutines::SameString(ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
+            if (state.dataZoneEquip->ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
+            for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
+                if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
                 if (ComponentName == "*") {
                     IsOnList = true;
                     CtrlZoneNumLocal = Loop;
                     goto EquipList_exit;
                 }
-                if (!UtilityRoutines::SameString(ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
+                if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
                 IsOnList = true;
                 CtrlZoneNumLocal = Loop;
                 goto EquipList_exit;

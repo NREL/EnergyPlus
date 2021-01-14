@@ -1468,7 +1468,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // OutputProcessor::TimeValue.allocate(2);
     state->dataGlobal->DDOnlySimulation = true;
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
