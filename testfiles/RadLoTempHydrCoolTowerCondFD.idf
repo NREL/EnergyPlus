@@ -1350,16 +1350,24 @@
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW ===========
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-   JermyDesignObject1, !- Name
+   JermyDesignObject1,      !- Name
    2.0,                     !- Heating Control Throttling Range {deltaC}
-    2.0,                     !- Cooling Control Throttling Range {deltaC}
-    ,                        !- Condensation Control Type
-       ;                        !- Condensation Control Dewpoint Offset {C}
+   CoolingDesignCapacity,   !- Cooling Design Capacity Method
+   Autosize,                !- Cooling Design Capacity {W}
+   ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+   ,                        !- Fraction of Autosized Cooling Design Capacity
+   2.0,                     !- Cooling Control Throttling Range {deltaC}
+   ,                        !- Condensation Control Type
+   ;                        !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-   JermyDesignObject2, !- Name
+   JermyDesignObject2,      !- Name
    2.0,                     !- Heating Control Throttling Range {deltaC}
-    2.0,                     !- Cooling Control Throttling Range {deltaC}
+   CoolingDesignCapacity,   !- Cooling Design Capacity Method
+   Autosize,                !- Cooling Design Capacity {W}
+   ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+   ,                        !- Fraction of Autosized Cooling Design Capacity
+   2.0,                     !- Cooling Control Throttling Range {deltaC}
    SimpleOff,                        !- Condensation Control Type
    1;                        !- Condensation Control Dewpoint Offset {C}
 
@@ -1385,10 +1393,6 @@
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     ,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1419,10 +1423,6 @@
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1452,10 +1452,6 @@
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
     0.0035,                  !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name

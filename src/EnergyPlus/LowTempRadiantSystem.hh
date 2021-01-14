@@ -312,16 +312,12 @@ namespace LowTempRadiantSystem {
                                       // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,
                                       // {-}, or {W/m2}
-        int CoolingCapMethod;         // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity,
-                                      // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
-        Real64 ScaledCoolingCapacity; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
-                                      // {-}, or {W/m2}
 
         // Default Constructor
             VariableFlowRadiantSystemData()
                 : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), HotSetptSchedPtr(0), WaterVolFlowMaxCool(0.0),
                   WaterFlowMaxCool(0.0), ColdSetptSchedPtr(0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
-                  ScaledHeatingCapacity(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
+                  ScaledHeatingCapacity(0.0)
             {
             }
 
@@ -345,11 +341,17 @@ namespace LowTempRadiantSystem {
         Array1D_string FieldNames;
         int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
+        bool CoolingWaterNodePresentCheckFlag; // Checks if the cooling water nodes are present or not
+        int CoolingCapMethod;           // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity,
+                                        // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
+        Real64 ScaledCoolingCapacity;   // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
+                                        // {-}, or {W/m2}
 
         // Default Constructor
         VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
+                HotThrottlRange(0.0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
+                CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
         {
         }
     };
