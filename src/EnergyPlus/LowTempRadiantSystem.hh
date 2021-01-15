@@ -305,8 +305,6 @@ namespace LowTempRadiantSystem {
         int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
-        std::string ColdSetptSched; // Schedule name for the zone setpoint temperature
-        int ColdSetptSchedPtr;      // Schedule index for the zone setpoint temperature
         Real64 WaterMassFlowRate;     // water mass flow rate
         int HeatingCapMethod;         // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
                                       // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
@@ -316,7 +314,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
             VariableFlowRadiantSystemData()
                 : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), HotSetptSchedPtr(0), WaterVolFlowMaxCool(0.0),
-                  WaterFlowMaxCool(0.0), ColdSetptSchedPtr(0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
+                  WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
                   ScaledHeatingCapacity(0.0)
             {
             }
@@ -342,6 +340,8 @@ namespace LowTempRadiantSystem {
         int CondCtrlType;         // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT;   // Diff between surface temperature and dew point for cond. shut-off
         bool CoolingWaterNodePresentCheckFlag; // Checks if the cooling water nodes are present or not
+        std::string ColdSetptSched; // Schedule name for the zone setpoint temperature
+        int ColdSetptSchedPtr;      // Schedule index for the zone setpoint temperature
         int CoolingCapMethod;           // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity,
                                         // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
         Real64 ScaledCoolingCapacity;   // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
@@ -351,7 +351,7 @@ namespace LowTempRadiantSystem {
         VarFlowRadDesignData()
         :
                 HotThrottlRange(0.0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
-                CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
+                ColdSetptSchedPtr(0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
         {
         }
     };

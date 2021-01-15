@@ -1357,6 +1357,7 @@
    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
    ,                        !- Fraction of Autosized Cooling Design Capacity
    2.0,                     !- Cooling Control Throttling Range {deltaC}
+   Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
    ,                        !- Condensation Control Type
    ;                        !- Condensation Control Dewpoint Offset {C}
 
@@ -1368,8 +1369,9 @@
    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
    ,                        !- Fraction of Autosized Cooling Design Capacity
    2.0,                     !- Cooling Control Throttling Range {deltaC}
-   SimpleOff,                        !- Condensation Control Type
-   1;                        !- Condensation Control Dewpoint Offset {C}
+   Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
+   SimpleOff,               !- Condensation Control Type
+   1;                       !- Condensation Control Dewpoint Offset {C}
 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
@@ -1396,7 +1398,6 @@
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object
@@ -1426,7 +1427,6 @@
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object
@@ -1455,7 +1455,6 @@
     0.0035,                  !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
     ,                        !- Number of Circuits
     ,                   !- Circuit Length {m}
     JermyDesignObject2;                        !- Design Object
