@@ -833,9 +833,6 @@ namespace Furnaces {
         using DataLoopNode::NodeID;
         using DataZoneControls::ComfortControlledZone;
         using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumComfortControlledZones;
-        using DataZoneControls::NumHumidityControlZones;
-        using DataZoneControls::NumTempControlledZones;
         using DataZoneControls::TempControlledZone;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetWtoAHPSimpleCoilCapacity(WaterToAirHeatPumpSimple::GetCoilCapacity);
@@ -1143,11 +1140,11 @@ namespace Furnaces {
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                 if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -1689,11 +1686,11 @@ namespace Furnaces {
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                 if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -2217,7 +2214,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                         if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
@@ -2888,11 +2885,11 @@ namespace Furnaces {
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                 if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -3427,7 +3424,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                         if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
@@ -3810,11 +3807,11 @@ namespace Furnaces {
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                 if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -4238,7 +4235,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                         if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }

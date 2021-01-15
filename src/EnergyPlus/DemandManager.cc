@@ -1704,7 +1704,6 @@ namespace EnergyPlus::DemandManager {
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataZoneControls::ComfortControlledZone;
-        using DataZoneControls::NumComfortControlledZones;
         using DataZoneControls::TempControlledZone;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
@@ -1767,7 +1766,7 @@ namespace EnergyPlus::DemandManager {
                 } else if (Action == DemandAction::ClearLimit) {
                     TempControlledZone(LoadPtr).ManageDemand = false;
                 }
-                if (NumComfortControlledZones > 0) {
+                if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
                     if (ComfortControlType(TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
                         if (Action == DemandAction::CheckCanReduce) {
                             if (ZoneThermostatSetPointLo(ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||

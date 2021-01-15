@@ -334,7 +334,7 @@ namespace ZoneTempPredictorCorrector {
                                                         int const ActualZoneNum // controlled zone actual zone number
     );
 
-    void OverrideAirSetPointsforEMSCntrl();
+    void OverrideAirSetPointsforEMSCntrl(EnergyPlusData& state);
 
     void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData& state);
 

@@ -482,24 +482,24 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     GetZoneAirSetPoints(*state);
 
-    DeadBandOrSetback.allocate(NumTempControlledZones);
-    CurDeadBandOrSetback.allocate(NumTempControlledZones);
-    TempControlType.allocate(NumTempControlledZones);
-    ZoneSysEnergyDemand.allocate(NumTempControlledZones);
-    TempZoneThermostatSetPoint.allocate(NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(NumTempControlledZones);
-    Setback.allocate(NumTempControlledZones);
-    ZoneThermostatSetPointLo.allocate(NumTempControlledZones);
-    ZoneThermostatSetPointHi.allocate(NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(NumTempControlledZones);
-    state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(NumTempControlledZones);
+    DeadBandOrSetback.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    CurDeadBandOrSetback.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    TempControlType.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    ZoneSysEnergyDemand.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    TempZoneThermostatSetPoint.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    Setback.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    ZoneThermostatSetPointLo.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    ZoneThermostatSetPointHi.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
     state->dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
 
-    SNLoadPredictedRate.allocate(NumTempControlledZones);
-    LoadCorrectionFactor.allocate(NumTempControlledZones);
-    SNLoadPredictedHSPRate.allocate(NumTempControlledZones);
-    SNLoadPredictedCSPRate.allocate(NumTempControlledZones);
+    SNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    LoadCorrectionFactor.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    SNLoadPredictedHSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    SNLoadPredictedCSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
 
     LoadCorrectionFactor(HeatZoneNum) = 1.0;
     LoadCorrectionFactor(CoolZoneNum) = 1.0;
@@ -1069,8 +1069,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     // DATE WRITTEN: Jun. 2017
     // #5870 EMS actuators for Zone Temperature Control not working
 
-    NumTempControlledZones = 1;
-    NumComfortControlledZones = 0;
+    state->dataZoneCtrls->NumTempControlledZones = 1;
+    state->dataZoneCtrls->NumComfortControlledZones = 0;
     TempControlledZone.allocate(1);
     TempControlledZone(1).EMSOverrideHeatingSetPointOn = true;
     TempControlledZone(1).EMSOverrideCoolingSetPointOn = true;
@@ -1084,12 +1084,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     ZoneThermostatSetPointHi.allocate(1);
     TempControlType(1) = DualSetPointWithDeadBand;
 
-    OverrideAirSetPointsforEMSCntrl();
+    OverrideAirSetPointsforEMSCntrl(*state);
     EXPECT_EQ(23.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(26.0, ZoneThermostatSetPointHi(1));
 
-    NumTempControlledZones = 0;
-    NumComfortControlledZones = 1;
+    state->dataZoneCtrls->NumTempControlledZones = 0;
+    state->dataZoneCtrls->NumComfortControlledZones = 1;
     ComfortControlledZone.allocate(1);
     ComfortControlType.allocate(1);
     ComfortControlledZone(1).ActualZoneNum = 1;
@@ -1099,7 +1099,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
     ComfortControlledZone(1).EMSOverrideHeatingSetPointValue = 22;
     ComfortControlledZone(1).EMSOverrideCoolingSetPointValue = 25;
 
-    OverrideAirSetPointsforEMSCntrl();
+    OverrideAirSetPointsforEMSCntrl(*state);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(25.0, ZoneThermostatSetPointHi(1));
 }
@@ -1212,10 +1212,10 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     // On/Off thermostat
     Schedule.allocate(3);
 
-    DataZoneControls::NumTempControlledZones = 1;
+    state->dataZoneCtrls->NumTempControlledZones = 1;
 
     // SingleHeatingSetPoint
-    TempControlledZone.allocate(NumTempControlledZones);
+    TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
     TempZoneThermostatSetPoint.allocate(1);
     MAT.allocate(1);
     ZoneThermostatSetPointLo.allocate(1);
@@ -1347,10 +1347,10 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
 TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
 {
     Schedule.allocate(3);
-    DataZoneControls::NumTempControlledZones = 1;
+    state->dataZoneCtrls->NumTempControlledZones = 1;
 
     // SingleHeatingSetPoint
-    TempControlledZone.allocate(NumTempControlledZones);
+    TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
     TempZoneThermostatSetPoint.allocate(1);
     MAT.allocate(1);
     ZoneThermostatSetPointLo.allocate(1);

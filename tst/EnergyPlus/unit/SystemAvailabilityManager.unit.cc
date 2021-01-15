@@ -316,11 +316,11 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataHeatBalFanSys::ZoneThermostatSetPointLo = 19.0; // all zones use same set point temperature
     DataHeatBalFanSys::ZoneThermostatSetPointHi = 24.0;
 
-    DataZoneControls::OccRoomTSetPointHeat.allocate(6);
-    DataZoneControls::OccRoomTSetPointCool.allocate(6);
+    state->dataZoneCtrls->OccRoomTSetPointHeat.allocate(6);
+    state->dataZoneCtrls->OccRoomTSetPointCool.allocate(6);
 
-    DataZoneControls::OccRoomTSetPointHeat = 19.0; // all zones use same set point temperature
-    DataZoneControls::OccRoomTSetPointCool = 24.0;
+    state->dataZoneCtrls->OccRoomTSetPointHeat = 19.0; // all zones use same set point temperature
+    state->dataZoneCtrls->OccRoomTSetPointCool = 24.0;
 
     SystemAvailabilityManager::ManageSystemAvailability(*state); // 1st time through just gets input
 

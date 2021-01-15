@@ -48,9 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataZoneControls.hh>
 
-namespace EnergyPlus {
-
-namespace DataZoneControls {
+namespace EnergyPlus::DataZoneControls {
 
     // Module containing the routines dealing with the zone controls.
 
@@ -65,39 +63,6 @@ namespace DataZoneControls {
     // (humidity, temperature, comfort) within the zones.  This data was formerly
     // public data in ZoneTempPredictorCorrector.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumTempControlledZones(0);
-    int NumHumidityControlZones(0);
-    int NumComfortControlledZones(0);
-    int NumTStatStatements(0);
-    int NumComfortTStatStatements(0);
-    int NumOpTempControlledZones(0);           // number of zones with operative temp control
-    int NumTempAndHumidityControlledZones(0);  // number of zones with over cool control
-    bool AnyOpTempControl(false);              // flag set true if any zones have op temp control
-    bool AnyZoneTempAndHumidityControl(false); // flag set true if any zones have over cool control
-    Array1D_bool StageZoneLogic;               // Logical array, A zone with staged thermostat = .TRUE.
-    Array1D<Real64> OccRoomTSetPointHeat;      // occupied heating set point for optimum start period
-    Array1D<Real64> OccRoomTSetPointCool;      // occupied cooling set point for optimum start period
-    bool GetZoneAirStatsInputFlag(true);       // True when need to get input
-
     // Object Data
     Array1D<ZoneHumidityControls> HumidityControlZone;
     Array1D<ZoneTempControls> TempControlledZone;
@@ -111,19 +76,6 @@ namespace DataZoneControls {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumTempControlledZones = 0;
-        NumHumidityControlZones = 0;
-        NumComfortControlledZones = 0;
-        NumTStatStatements = 0;
-        NumComfortTStatStatements = 0;
-        NumOpTempControlledZones = 0;          // number of zones with operative temp control
-        NumTempAndHumidityControlledZones = 0; // number of zones with over cool control
-        AnyOpTempControl = false;              // flag set true if any zones have op temp control
-        AnyZoneTempAndHumidityControl = false; // flag set true if any zones have over cool control
-        GetZoneAirStatsInputFlag = true;       // True when need to get input
-        StageZoneLogic.deallocate();
-        OccRoomTSetPointHeat.deallocate();
-        OccRoomTSetPointCool.deallocate();
         HumidityControlZone.deallocate();
         TempControlledZone.deallocate();
         ComfortControlledZone.deallocate();
@@ -132,7 +84,5 @@ namespace DataZoneControls {
         StagedTStatObjects.deallocate();
         StageControlledZone.deallocate();
     }
-
-} // namespace DataZoneControls
 
 } // namespace EnergyPlus

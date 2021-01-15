@@ -2294,8 +2294,6 @@ namespace SystemAvailabilityManager {
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataZoneControls::OccRoomTSetPointCool;
-        using DataZoneControls::OccRoomTSetPointHeat;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2513,9 +2511,9 @@ namespace SystemAvailabilityManager {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
-                                if (allocated(OccRoomTSetPointHeat) && allocated(OccRoomTSetPointCool)) {
-                                    TempDiffHi = TempTstatAir(ZoneNum) - OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = TempTstatAir(ZoneNum) - OccRoomTSetPointHeat(ZoneNum);
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
                                 } else {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
@@ -2588,7 +2586,7 @@ namespace SystemAvailabilityManager {
                                 AvailStatus = NoAction;
                                 CycleOnFlag = false;
                             }
-                        } else if (OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
+                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
                             TempDiff = TempDiffHi;
                             DeltaTime = TempDiff / OptStartMgr.ConstTGradCool;
                             if (DeltaTime > OptStartMgr.MaxOptStartTime) {
@@ -2657,13 +2655,13 @@ namespace SystemAvailabilityManager {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
-                                if (allocated(OccRoomTSetPointHeat) && allocated(OccRoomTSetPointCool)) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
                                     for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffHi = max(TempDiffHi, TempDiff);
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffLo = min(TempDiffLo, TempDiff);
                                     }
                                 } else {
@@ -2813,9 +2811,9 @@ namespace SystemAvailabilityManager {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
-                                if (allocated(OccRoomTSetPointHeat) && allocated(OccRoomTSetPointCool)) {
-                                    TempDiffHi = TempTstatAir(ZoneNum) - OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = TempTstatAir(ZoneNum) - OccRoomTSetPointHeat(ZoneNum);
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+                                    TempDiffHi = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
                                 } else {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
@@ -2882,7 +2880,7 @@ namespace SystemAvailabilityManager {
                                                 ATGUpdateTemp1 = TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag1 = false;
                                             }
-                                            if (TempTstatAir(ZoneNum) >= OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
+                                            if (TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
                                                 ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                                 ATGUpdateTemp2 = TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag2 = false;
@@ -2926,7 +2924,7 @@ namespace SystemAvailabilityManager {
                                                 ATGUpdateTemp1 = TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag1 = false;
                                             }
-                                            if (TempTstatAir(ZoneNum) >= OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
+                                            if (TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
                                                 ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                                 ATGUpdateTemp2 = TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag2 = false;
@@ -2959,7 +2957,7 @@ namespace SystemAvailabilityManager {
                                 AvailStatus = NoAction;
                                 CycleOnFlag = false;
                             }
-                        } else if (OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
+                        } else if (state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) < 50.0) { // Cooling Mode
                             TempDiff = TempDiffHi;
                             DeltaTime = TempDiff / AdaTempGradCool;
                             if (DeltaTime > OptStartMgr.MaxOptStartTime) {
@@ -2992,7 +2990,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ZoneNum);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ZoneNum) <= OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ZoneNum);
                                             ATGUpdateFlag2 = false;
@@ -3028,7 +3026,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ZoneNum);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ZoneNum) <= OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ZoneNum);
                                             ATGUpdateFlag2 = false;
@@ -3070,19 +3068,19 @@ namespace SystemAvailabilityManager {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
-                                if (allocated(OccRoomTSetPointHeat) && allocated(OccRoomTSetPointCool)) {
+                                if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
                                     ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
                                     ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
                                     for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffHi = max(TempDiffHi, TempDiff);
                                         // Store the worse case zone number for actual temperature gradient calculation
                                         if (TempDiff == TempDiffHi) {
                                             ATGWCZoneNumHi = OptStartMgr.ZonePtrs(ZoneNum);
                                         }
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffLo = min(TempDiffLo, TempDiff);
                                         if (TempDiff == TempDiffLo) {
                                             ATGWCZoneNumLo = OptStartMgr.ZonePtrs(ZoneNum);
@@ -3154,7 +3152,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumLo) >= OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag2 = false;
@@ -3196,7 +3194,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumLo) >= OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag2 = false;
@@ -3261,7 +3259,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumHi) <= OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag2 = false;
@@ -3304,7 +3302,7 @@ namespace SystemAvailabilityManager {
                                             ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumHi) <= OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
+                                        if (TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
                                             ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag2 = false;
@@ -4500,7 +4498,6 @@ namespace SystemAvailabilityManager {
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumHumidityControlZones;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -4514,8 +4511,7 @@ namespace SystemAvailabilityManager {
         Real64 ZoneAirDewPoint; // Zone air dew point temperature
         Real64 ZoneAirRH;       // Zone air relative humidity
         Real64 TempExt;         // Outdoor dry bulb temperature at zone height
-        Real64 WindExt;         // Outdoor wind spped at zone height
-        // unused  REAL(r64)    :: RHSetPoint      ! RH setpoint from a given schedule
+        Real64 WindExt;         // Outdoor wind speed at zone height
         Real64 WSetPoint;                   // Humidity ratio setpoint from a given RH setpoint schedule
         Real64 OASetPoint;                  // Outdoor air setpoint from a given OA setpoint schedule
         Real64 ACH;                         // Zone air change per hour
@@ -4735,7 +4731,7 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
                     ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
                     ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
-                    if (NumHumidityControlZones == 0) {
+                    if (state.dataZoneCtrls->NumHumidityControlZones == 0) {
                         ++state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount;
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount < 2) {
                             ShowWarningError(state, "Hybrid ventilation control: Dew point control mode is selected, but no ZoneControl:Humidistat object=" +
@@ -4752,7 +4748,7 @@ namespace SystemAvailabilityManager {
                         }
                     }
                     found = false;
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                         if (HumidityControlZone(HStatZoneNum).ActualZoneNum == ZoneNum) {
                             found = true;
                             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HStatZoneNum).HumidifyingSchedIndex);
@@ -4768,7 +4764,7 @@ namespace SystemAvailabilityManager {
                             }
                         }
                     }
-                    if (!found && NumHumidityControlZones > 0) {
+                    if (!found && state.dataZoneCtrls->NumHumidityControlZones > 0) {
                         ++state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointErrCount;
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointErrCount < 2) {
                             ShowWarningError(state, "Hybrid ventilation control: The zone for dew point control mode is different from the zone for "

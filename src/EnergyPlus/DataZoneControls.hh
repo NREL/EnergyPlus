@@ -60,33 +60,6 @@ namespace EnergyPlus {
 
 namespace DataZoneControls {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumTempControlledZones;
-    extern int NumHumidityControlZones;
-    extern int NumComfortControlledZones;
-    extern int NumTStatStatements;
-    extern int NumComfortTStatStatements;
-    extern int NumOpTempControlledZones;          // number of zones with operative temp control
-    extern int NumTempAndHumidityControlledZones; // number of zones with over cool control
-    extern bool AnyOpTempControl;                 // flag set true if any zones have op temp control
-    extern bool AnyZoneTempAndHumidityControl;    // flag set true if any zones have over cool control
-    extern Array1D_bool StageZoneLogic;           // Logical array, A zone with staged thermostat = .TRUE.
-    extern Array1D<Real64> OccRoomTSetPointHeat;  // occupied heating set point for optimum start period
-    extern Array1D<Real64> OccRoomTSetPointCool;  // occupied cooling set point for optimum start period
-    extern bool GetZoneAirStatsInputFlag;         // True when need to get input
-
-    // Types
-
-    // Clears the global data in DataZoneControls.
-    // Needed for unit tests, should not be normally called.
     void clear_state();
 
     struct ZoneTempControls
@@ -298,11 +271,37 @@ namespace DataZoneControls {
 
 } // namespace DataZoneControls
 
-struct DataZoneControlsData : BaseGlobalStruct {
+struct DataZoneControlsData : BaseGlobalStruct
+{
+    int NumTempControlledZones = 0;
+    int NumHumidityControlZones = 0;
+    int NumComfortControlledZones = 0;
+    int NumTStatStatements = 0;
+    int NumComfortTStatStatements = 0;
+    int NumOpTempControlledZones = 0;           // number of zones with operative temp control
+    int NumTempAndHumidityControlledZones = 0;  // number of zones with over cool control
+    bool AnyOpTempControl = false;              // flag set true if any zones have op temp control
+    bool AnyZoneTempAndHumidityControl = false; // flag set true if any zones have over cool control
+    Array1D_bool StageZoneLogic;                // Logical array, A zone with staged thermostat = .TRUE.
+    Array1D<Real64> OccRoomTSetPointHeat;       // occupied heating set point for optimum start period
+    Array1D<Real64> OccRoomTSetPointCool;       // occupied cooling set point for optimum start period
+    bool GetZoneAirStatsInputFlag = true;       // True when need to get input
 
     void clear_state() override
     {
-
+        this->NumTempControlledZones = 0;
+        this->NumHumidityControlZones = 0;
+        this->NumComfortControlledZones = 0;
+        this->NumTStatStatements = 0;
+        this->NumComfortTStatStatements = 0;
+        this->NumOpTempControlledZones = 0;
+        this->NumTempAndHumidityControlledZones = 0;
+        this->AnyOpTempControl = false;
+        this->AnyZoneTempAndHumidityControl = false;
+        this->StageZoneLogic.deallocate();
+        this->OccRoomTSetPointHeat.deallocate();
+        this->OccRoomTSetPointCool.deallocate();
+        this->GetZoneAirStatsInputFlag = true;
     }
 };
 

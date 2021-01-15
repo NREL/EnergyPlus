@@ -1487,7 +1487,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     state->dataAirLoop->NumOASystems = 1;
     HumidityControlZone.allocate(1);
     HumidityControlZone(1).ActualZoneNum = 1;
-    NumHumidityControlZones = 1;
+    state->dataZoneCtrls->NumHumidityControlZones = 1;
 
     inputProcessor->getObjectItem(*state, CurrentModuleObject,
                                   ControllerNum,
@@ -1620,7 +1620,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     state->dataAirLoop->NumOASystems = 1;
     HumidityControlZone.allocate(1);
     HumidityControlZone(1).ActualZoneNum = 1;
-    NumHumidityControlZones = 1;
+    state->dataZoneCtrls->NumHumidityControlZones = 1;
 
     inputProcessor->getObjectItem(*state, CurrentModuleObject,
                                   ControllerNum,

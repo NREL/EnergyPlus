@@ -1246,7 +1246,7 @@ namespace HVACUnitaryBypassVAV {
                             state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
                         // check for thermostat in controlled zone
                         bool FoundTstatZone = false;
-                        for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
+                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                             if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum))
                                 continue;
                             FoundTstatZone = true;

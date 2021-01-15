@@ -92,20 +92,27 @@ namespace HeatBalanceKivaManager {
         }
     }
 
-    KivaInstanceMap::KivaInstanceMap(
-        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, KivaManager* kmPtr)
+    KivaInstanceMap::KivaInstanceMap(EnergyPlusData &state,
+                                     Kiva::Foundation &foundation,
+                                     int floorSurface,
+                                     std::vector<int> wallSurfaces,
+                                     int zoneNum,
+                                     Real64 zoneAssumedTemperature,
+                                     Real64 floorWeight,
+                                     int constructionNum,
+                                     KivaManager *kmPtr)
         : instance(foundation), floorSurface(floorSurface), wallSurfaces(wallSurfaces), zoneNum(zoneNum), zoneControlType(KIVAZONE_UNCONTROLLED),
           zoneControlNum(0), zoneAssumedTemperature(zoneAssumedTemperature), floorWeight(floorWeight), constructionNum(constructionNum), kmPtr(kmPtr)
     {
 
-        for (int i = 1; i <= DataZoneControls::NumTempControlledZones; ++i) {
+        for (int i = 1; i <= state.dataZoneCtrls->NumTempControlledZones; ++i) {
             if (DataZoneControls::TempControlledZone(i).ActualZoneNum == zoneNum) {
                 zoneControlType = KIVAZONE_TEMPCONTROL;
                 zoneControlNum = i;
                 break;
             }
         }
-        for (int i = 1; i <= DataZoneControls::NumComfortControlledZones; ++i) {
+        for (int i = 1; i <= state.dataZoneCtrls->NumComfortControlledZones; ++i) {
             if (DataZoneControls::ComfortControlledZone(i).ActualZoneNum == zoneNum) {
                 zoneControlType = KIVAZONE_COMFORTCONTROL;
                 zoneControlNum = i;
@@ -632,9 +639,9 @@ namespace HeatBalanceKivaManager {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
-        if (DataZoneControls::GetZoneAirStatsInputFlag) {
+        if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
             ZoneTempPredictorCorrector::GetZoneAirSetPoints(state);
-            DataZoneControls::GetZoneAirStatsInputFlag = false;
+            state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
         }
 
         readWeatherData(state);
@@ -984,10 +991,10 @@ namespace HeatBalanceKivaManager {
 
                     fnd.polygon = floorPolygon;
 
-                    // point surface to associated ground intance(s)
-                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, foundationInputs[surface.OSCPtr].assumedIndoorTemperature, floorWeight, constructionNum, this);
+                    // point surface to associated ground instance(s)
+                    kivaInstances.emplace_back(state, fnd, surfNum, wallIDs, surface.Zone, foundationInputs[surface.OSCPtr].assumedIndoorTemperature, floorWeight, constructionNum, this);
 
-                    // Floors can point to any number of foundaiton surfaces
+                    // Floors can point to any number of foundation surfaces
                     floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);
 
                     // Walls can only have one associated ground instance

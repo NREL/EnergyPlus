@@ -546,8 +546,6 @@ namespace HVACMultiSpeedHeatPump {
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::AutoSize;
         using DataZoneControls::ComfortControlledZone;
-        using DataZoneControls::NumComfortControlledZones;
-        using DataZoneControls::NumTempControlledZones;
         using DataZoneControls::TempControlledZone;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
@@ -736,11 +734,11 @@ namespace HVACMultiSpeedHeatPump {
                                 MSHeatPump(MSHPNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                 if (TempControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
@@ -1797,7 +1795,6 @@ namespace HVACMultiSpeedHeatPump {
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
         auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-        using DataZoneControls::StageZoneLogic;
         using DXCoils::GetDXCoilAvailSchPtr;
         using WaterCoils::GetCoilMaxWaterFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -2413,8 +2410,8 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Determine the staged status
-        if (allocated(StageZoneLogic)) {
-            if (StageZoneLogic(ZoneNum)) {
+        if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+            if (state.dataZoneCtrls->StageZoneLogic(ZoneNum)) {
                 MSHeatPump(MSHeatPumpNum).Staged = true;
                 MSHeatPump(MSHeatPumpNum).StageNum = ZoneSysEnergyDemand(ZoneNum).StageNum;
             } else {

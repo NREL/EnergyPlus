@@ -3161,7 +3161,7 @@ namespace UnitarySystems {
                 }
                 if (thisSys.m_Humidistat && thisSys.m_ControlType == ControlType::Load) {
                     bool AirNodeFound = false;
-                    for (int HStatZoneNum = 1; HStatZoneNum <= DataZoneControls::NumHumidityControlZones; ++HStatZoneNum) {
+                    for (int HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                         if (DataZoneControls::HumidityControlZone(HStatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
@@ -3436,11 +3436,11 @@ namespace UnitarySystems {
                                             }
                                         }
                                         // if (thisSys.m_ZoneInletNode == 0) AirLoopFound = false;
-                                        for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                             if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                                             AirNodeFound = true;
                                         }
-                                        for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones; ++TstatZoneNum) {
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
                                             if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum)
                                                 continue;
                                             AirNodeFound = true;
@@ -9836,8 +9836,8 @@ namespace UnitarySystems {
         }
 
         // Determine the m_Staged status
-        if (allocated(DataZoneControls::StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
-            if (DataZoneControls::StageZoneLogic(this->ControlZoneNum)) {
+        if (allocated(state.dataZoneCtrls->StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
+            if (state.dataZoneCtrls->StageZoneLogic(this->ControlZoneNum)) {
                 this->m_Staged = true;
                 this->m_StageNum = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
             } else {

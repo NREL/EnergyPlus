@@ -9926,9 +9926,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "UNITARY SYSTEM MODEL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:UnitarySystem";
 
-    DataZoneControls::NumTempControlledZones = 1;
-    DataZoneControls::TempControlledZone.allocate(DataZoneControls::NumTempControlledZones);
-    DataZoneControls::TempControlledZone(DataZoneControls::NumTempControlledZones).ActualZoneNum = 1;
+    state->dataZoneCtrls->NumTempControlledZones = 1;
+    DataZoneControls::TempControlledZone.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    DataZoneControls::TempControlledZone(state->dataZoneCtrls->NumTempControlledZones).ActualZoneNum = 1;
 
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 

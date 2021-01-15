@@ -202,7 +202,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumHumidityControlZones;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -926,7 +925,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                         ShowContinueError(state, "... A ZoneHVAC:EquipmentConnections object must be specified for this zone.");
                         ErrorsFound = true;
                     } else {
-                        for (NumHstatZone = 1; NumHstatZone <= NumHumidityControlZones; ++NumHstatZone) {
+                        for (NumHstatZone = 1; NumHstatZone <= state.dataZoneCtrls->NumHumidityControlZones; ++NumHstatZone) {
                             if (HumidityControlZone(NumHstatZone).ActualZoneNum != HStatZoneNum) continue;
                             HStatFound = true;
                             break;

@@ -242,7 +242,6 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneControls::StageZoneLogic;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
         using General::FindNumberInList;
 
@@ -3070,8 +3069,8 @@ namespace EnergyPlus::SetPointManager {
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
-                if (allocated(StageZoneLogic)) {
-                    if (!StageZoneLogic(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
+                if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+                    if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
@@ -3168,8 +3167,8 @@ namespace EnergyPlus::SetPointManager {
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
-                if (allocated(StageZoneLogic)) {
-                    if (!StageZoneLogic(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
+                if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+                    if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
@@ -3566,7 +3565,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
         using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumHumidityControlZones;
         using namespace DataPlant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -3697,7 +3695,7 @@ namespace EnergyPlus::SetPointManager {
                         } else {
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 if (HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
                                 HstatZoneFound = true;
                                 break;
@@ -3733,7 +3731,7 @@ namespace EnergyPlus::SetPointManager {
                         } else {
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 if (HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
                                 HstatZoneFound = true;
                                 break;
@@ -4033,7 +4031,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
@@ -4075,7 +4073,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
@@ -4116,7 +4114,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
@@ -4156,7 +4154,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {

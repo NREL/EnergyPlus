@@ -5465,7 +5465,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
                                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                     continue;
-                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
                                                     if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                         continue;
                                                     state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
@@ -5473,7 +5473,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                     ctrlZoneNum = ControlledZoneNum;
                                                     goto EquipList_exit;
                                                 }
-                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones;
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones;
                                                      ++TstatZoneNum) {
                                                     if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                         continue;

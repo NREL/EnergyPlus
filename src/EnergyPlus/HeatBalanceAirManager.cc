@@ -4368,31 +4368,11 @@ namespace HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the AirHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::MRT;
-        using DataZoneControls::AnyOpTempControl;
         using DataZoneControls::TempControlledZone;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;             // Counter for the # of zones (nz)
@@ -4410,7 +4390,7 @@ namespace HeatBalanceAirManager {
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period
-            if (AnyOpTempControl) { // dig further...
+            if (state.dataZoneCtrls->AnyOpTempControl) { // dig further...
                 // find TempControlledZoneID from ZoneLoop index
                 TempControlledZoneID = Zone(ZoneLoop).TempControlledZoneIndex;
                 if (Zone(ZoneLoop).IsControlled) {

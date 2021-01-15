@@ -195,7 +195,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 
     Real64 zoneAssumedTemperature1 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv1(fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv1(*state, fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
 
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
@@ -210,7 +210,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 coolingSetpoint2 = 24.0;
     Real64 zoneAssumedTemperature2 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv2(fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv2(*state, fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
 
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
@@ -228,7 +228,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv3(fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv3(*state, fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
 
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv4(*state, fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
 
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature

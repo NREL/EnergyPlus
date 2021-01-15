@@ -203,9 +203,9 @@ namespace ZoneTempPredictorCorrector {
         // depending on the simulation status and determines the correct
         // temperature setpoint for each zone from the schedule manager.
 
-        if (GetZoneAirStatsInputFlag) {
+        if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
             GetZoneAirSetPoints(state);
-            GetZoneAirStatsInputFlag = false;
+            state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
         }
 
         InitZoneAirSetPoints(state);
@@ -345,12 +345,12 @@ namespace ZoneTempPredictorCorrector {
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
-        NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        TStatObjects.allocate(NumTStatStatements);
+        state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
-        NumTempControlledZones = 0;
-        for (Item = 1; Item <= NumTStatStatements; ++Item) {
+        state.dataZoneCtrls->NumTempControlledZones = 0;
+        for (Item = 1; Item <= state.dataZoneCtrls->NumTStatStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -370,14 +370,14 @@ namespace ZoneTempPredictorCorrector {
             ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-                ++NumTempControlledZones;
+                TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+                ++state.dataZoneCtrls->NumTempControlledZones;
                 TStatObjects(Item).NumOfZones = 1;
                 TStatObjects(Item).ZoneListActive = false;
                 TStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                TStatObjects(Item).TempControlledZoneStartPtr = NumTempControlledZones + 1;
-                NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
+                TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+                state.dataZoneCtrls->NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
                 TStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 TStatObjects(Item).ZoneListActive = true;
                 TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -391,17 +391,17 @@ namespace ZoneTempPredictorCorrector {
         if (ErrorsFound) {
             ShowSevereError(state, "GetZoneAirSetpoints: Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            NumTempControlledZones = 0;
+            state.dataZoneCtrls->NumTempControlledZones = 0;
         }
 
-        if (NumTempControlledZones > 0) {
-            TempControlledZone.allocate(NumTempControlledZones);
-            TStatControlTypes.allocate(NumTempControlledZones); // Number of set point types
-            CTSchedMapToControlledZone.dimension(NumTempControlledZones, 0);
+        if (state.dataZoneCtrls->NumTempControlledZones > 0) {
+            TempControlledZone.allocate(state.dataZoneCtrls->NumTempControlledZones);
+            TStatControlTypes.allocate(state.dataZoneCtrls->NumTempControlledZones); // Number of set point types
+            CTSchedMapToControlledZone.dimension(state.dataZoneCtrls->NumTempControlledZones, 0);
 
             TempControlledZoneNum = 0;
             state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 0;
-            for (Item = 1; Item <= NumTStatStatements; ++Item) {
+            for (Item = 1; Item <= state.dataZoneCtrls->NumTStatStatements; ++Item) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
@@ -665,7 +665,7 @@ namespace ZoneTempPredictorCorrector {
         } // DualTempHeatCoolControlNum
 
         // Finish filling in Schedule pointing indexes
-        for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+        for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
             TempIndex = UtilityRoutines::FindItem(ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)),
                                                   TempControlledZone(TempControlledZoneNum).ControlType,
                                                   TempControlledZone(TempControlledZoneNum).NumControlTypes);
@@ -709,7 +709,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Now, Check the schedule values/indices for validity
 
-        for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+        for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
             ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
             CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -718,7 +718,7 @@ namespace ZoneTempPredictorCorrector {
             SchedMax = GetScheduleMaxValue(state, CTIndex);
 
             if (SchedMin == 0 && SchedMax == 0) {
-                if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, NumTempControlledZones) == 0) {
+                if (FindNumberInList(CTIndex, CTSchedMapToControlledZone, state.dataZoneCtrls->NumTempControlledZones) == 0) {
                     ShowSevereError(state, "Control Type Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                     ShowContinueError(state, "..specifies control type 0 for all entries.");
                     ShowContinueError(state, "All zones using this Control Type Schedule have no heating or cooling available.");
@@ -834,7 +834,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        for (TempControlledZoneNum = 1; TempControlledZoneNum <= NumTempControlledZones; ++TempControlledZoneNum) {
+        for (TempControlledZoneNum = 1; TempControlledZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TempControlledZoneNum) {
 
             ActualZoneNum = TempControlledZone(TempControlledZoneNum).ActualZoneNum;
             CTIndex = TempControlledZone(TempControlledZoneNum).CTSchedIndex;
@@ -885,14 +885,14 @@ namespace ZoneTempPredictorCorrector {
         if (allocated(TStatControlTypes)) TStatControlTypes.deallocate();
         // This starts the Humidity Control Get Input section
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::HStat));
-        NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumHumidityControlZones > 0) {
-            HumidityControlZone.allocate(NumHumidityControlZones);
-            state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames.reserve(static_cast<unsigned>(NumHumidityControlZones));
+        if (state.dataZoneCtrls->NumHumidityControlZones > 0) {
+            HumidityControlZone.allocate(state.dataZoneCtrls->NumHumidityControlZones);
+            state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames.reserve(static_cast<unsigned>(state.dataZoneCtrls->NumHumidityControlZones));
         }
 
-        for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum) {
+        for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           HumidControlledZoneNum,
@@ -942,13 +942,13 @@ namespace ZoneTempPredictorCorrector {
 
         // Start to read Thermal comfort control objects
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
-        NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        ComfortTStatObjects.allocate(NumComfortTStatStatements);
+        state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
-        NumComfortControlledZones = 0;
+        state.dataZoneCtrls->NumComfortControlledZones = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumComfortTStatStatements; ++Item) {
+        for (Item = 1; Item <= state.dataZoneCtrls->NumComfortTStatStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -968,14 +968,14 @@ namespace ZoneTempPredictorCorrector {
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             ComfortTStatObjects(Item).Name = cAlphaArgs(1);
             if (Item1 > 0) {
-                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = NumComfortControlledZones + 1;
-                ++NumComfortControlledZones;
+                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+                ++state.dataZoneCtrls->NumComfortControlledZones;
                 ComfortTStatObjects(Item).NumOfZones = 1;
                 ComfortTStatObjects(Item).ZoneListActive = false;
                 ComfortTStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = NumComfortControlledZones + 1;
-                NumComfortControlledZones += ZoneList(ZLItem).NumOfZones;
+                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+                state.dataZoneCtrls->NumComfortControlledZones += ZoneList(ZLItem).NumOfZones;
                 ComfortTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 ComfortTStatObjects(Item).ZoneListActive = true;
                 ComfortTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -990,16 +990,16 @@ namespace ZoneTempPredictorCorrector {
         if (errFlag) {
             ShowSevereError(state, "GetZoneAirSetpoints: Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            NumComfortControlledZones = 0;
+            state.dataZoneCtrls->NumComfortControlledZones = 0;
         }
 
-        if (NumComfortControlledZones > 0) {
-            ComfortControlledZone.allocate(NumComfortControlledZones);
-            TComfortControlTypes.allocate(NumComfortControlledZones); // Number of set point types
-            CCmSchedMapToControlledZone.dimension(NumComfortControlledZones, 0);
+        if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
+            ComfortControlledZone.allocate(state.dataZoneCtrls->NumComfortControlledZones);
+            TComfortControlTypes.allocate(state.dataZoneCtrls->NumComfortControlledZones); // Number of set point types
+            CCmSchedMapToControlledZone.dimension(state.dataZoneCtrls->NumComfortControlledZones, 0);
 
             ComfortControlledZoneNum = 0;
-            for (Item = 1; Item <= NumComfortTStatStatements; ++Item) {
+            for (Item = 1; Item <= state.dataZoneCtrls->NumComfortTStatStatements; ++Item) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Item,
@@ -1415,7 +1415,7 @@ namespace ZoneTempPredictorCorrector {
         } // DualFangerHeatCoolControlNum
 
         // Finish filling in Schedule pointing indexes for Thermal Comfort Control
-        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum) {
+        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++ComfortControlledZoneNum) {
             ComfortIndex = UtilityRoutines::FindItem(ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)),
                                                      ComfortControlledZone(ComfortControlledZoneNum).ControlType,
                                                      ComfortControlledZone(ComfortControlledZoneNum).NumControlTypes);
@@ -1459,7 +1459,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Now, Check the schedule values/indices for validity for Thermal Comfort Control
 
-        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum) {
+        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++ComfortControlledZoneNum) {
 
             ActualZoneNum = ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum;
             CTIndex = ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex;
@@ -1468,7 +1468,7 @@ namespace ZoneTempPredictorCorrector {
             SchedMax = GetScheduleMaxValue(state, CTIndex);
 
             if (SchedMin == 0 && SchedMax == 0) {
-                if (FindNumberInList(CTIndex, CCmSchedMapToControlledZone, NumComfortControlledZones) == 0) {
+                if (FindNumberInList(CTIndex, CCmSchedMapToControlledZone, state.dataZoneCtrls->NumComfortControlledZones) == 0) {
                     ShowWarningError(state, "Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
                     ShowContinueError(state, "..specifies control type 0 for all entries.");
                     ShowContinueError(state, "All zones using this Control Type Schedule have no thermal comfort control.");
@@ -1590,7 +1590,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= NumComfortControlledZones; ++ComfortControlledZoneNum) {
+        for (ComfortControlledZoneNum = 1; ComfortControlledZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++ComfortControlledZoneNum) {
 
             ActualZoneNum = ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum;
             CTIndex = ComfortControlledZone(ComfortControlledZoneNum).ComfortSchedIndex;
@@ -1757,12 +1757,12 @@ namespace ZoneTempPredictorCorrector {
         print(state.files.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
-        NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumOpTempControlledZones > 0) {
-            AnyOpTempControl = true;
+        if (state.dataZoneCtrls->NumOpTempControlledZones > 0) {
+            state.dataZoneCtrls->AnyOpTempControl = true;
 
-            for (OpTempContrlNum = 1; OpTempContrlNum <= NumOpTempControlledZones; ++OpTempContrlNum) {
+            for (OpTempContrlNum = 1; OpTempContrlNum <= state.dataZoneCtrls->NumOpTempControlledZones; ++OpTempContrlNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               OpTempContrlNum,
@@ -1875,7 +1875,7 @@ namespace ZoneTempPredictorCorrector {
                 } else {
                     for (Item = 1; Item <= TStatObjects(found).NumOfZones; ++Item) {
                         TempControlledZoneNum = TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
-                        if (NumTempControlledZones == 0) continue;
+                        if (state.dataZoneCtrls->NumTempControlledZones == 0) continue;
                         TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
                         if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
                             TempControlledZone(TempControlledZoneNum).OpTempCntrlModeScheduled = true;
@@ -1978,12 +1978,12 @@ namespace ZoneTempPredictorCorrector {
 
         // Overcool dehumidificaton GetInput starts here
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
-        NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataZoneCtrls->NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumTempAndHumidityControlledZones > 0) {
-            AnyZoneTempAndHumidityControl = true;
+        if (state.dataZoneCtrls->NumTempAndHumidityControlledZones > 0) {
+            state.dataZoneCtrls->AnyZoneTempAndHumidityControl = true;
 
-            for (TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum) {
+            for (TempHumidityCntrlNum = 1; TempHumidityCntrlNum <= state.dataZoneCtrls->NumTempAndHumidityControlledZones; ++TempHumidityCntrlNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               TempHumidityCntrlNum,
@@ -2227,7 +2227,7 @@ namespace ZoneTempPredictorCorrector {
 
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
             StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
-            StageZoneLogic.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataZoneCtrls->StageZoneLogic.dimension(state.dataGlobal->NumOfZones, false);
 
             StageControlledZoneNum = 0;
             for (Item = 1; Item <= NumStageControlledZones; ++Item) {
@@ -2261,7 +2261,7 @@ namespace ZoneTempPredictorCorrector {
                             //           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex =
                             //           StageControlledZoneNum
                         }
-                        StageZoneLogic(StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
+                        state.dataZoneCtrls->StageZoneLogic(StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
                     } else {
                         StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
@@ -2656,7 +2656,7 @@ namespace ZoneTempPredictorCorrector {
 
             LoadCorrectionFactor.dimension(state.dataGlobal->NumOfZones, 0.0); // PH 3/3/04
             TempControlType.dimension(state.dataGlobal->NumOfZones, 0);
-            if (NumComfortControlledZones > 0) {
+            if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
                 ComfortControlType.dimension(state.dataGlobal->NumOfZones, 0);
                 ZoneComfortControlsFanger.allocate(state.dataGlobal->NumOfZones);
             }
@@ -2894,8 +2894,8 @@ namespace ZoneTempPredictorCorrector {
                                     "Average",
                                     Zone(Loop).Name);
 
-                if (allocated(StageZoneLogic)) {
-                    if (StageZoneLogic(Loop)) {
+                if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+                    if (state.dataZoneCtrls->StageZoneLogic(Loop)) {
                         SetupOutputVariable(state, "Zone Thermostat Staged Number",
                                             OutputProcessor::Unit::None,
                                             ZoneSysEnergyDemand(Loop).StageNum,
@@ -2908,9 +2908,9 @@ namespace ZoneTempPredictorCorrector {
             } // Loop
 
             // Thermal comfort control output
-            if (NumComfortControlledZones > 0) {
+            if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
                 // CurrentModuleObject='ZoneControl:Thermostat:ThermalComfort'
-                for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
+                for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
                     ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
                     SetupOutputVariable(state, "Zone Thermal Comfort Control Type",
                                         OutputProcessor::Unit::None,
@@ -3070,7 +3070,7 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneTempPredictorCorrector->MyDayFlag = true;
         }
 
-        for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(state, TempControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Thermostatic control but is not a controlled zone.", RoutineName, TempControlledZone(Loop).ZoneName));
@@ -3126,7 +3126,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled && !state.dataZoneTempPredictorCorrector->ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(state, ComfortControlledZone(Loop).ZoneName)) {
                     ShowSevereError(state, format("{}Zone=\"{}\" has specified a Comfort control but is not a controlled zone.", RoutineName, ComfortControlledZone(Loop).ZoneName));
@@ -3340,7 +3340,7 @@ namespace ZoneTempPredictorCorrector {
         if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
             Real64 TempTole = 0.02;
             Real64 Tprev;
-            for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
+            for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++RelativeZoneNum) {
                 if (TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     if (ShortenTimeStepSys) {
                         TempControlledZone(RelativeZoneNum).HeatModeLast = TempControlledZone(RelativeZoneNum).HeatModeLastSave;
@@ -3709,7 +3709,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
-            for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
+            for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++RelativeZoneNum) {
                 if (TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     ZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
                     if (TempControlledZone(RelativeZoneNum).CoolOffFlag && ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
@@ -3741,10 +3741,6 @@ namespace ZoneTempPredictorCorrector {
         // This routine sets what the setpoints for each controlled zone should be based on schedules.
         // This is called each time step.
 
-        // Using/Aliasing
-        using DataZoneControls::OccRoomTSetPointCool;
-        using DataZoneControls::OccRoomTSetPointHeat;
-
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleValuesForDay;
 
@@ -3765,17 +3761,17 @@ namespace ZoneTempPredictorCorrector {
         TempControlType = 0; // Default
 
         // Place holder for occupied heating and cooling set points - for optimum start
-        if (!allocated(OccRoomTSetPointHeat)) {
-            OccRoomTSetPointHeat.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataZoneCtrls->OccRoomTSetPointHeat)) {
+            state.dataZoneCtrls->OccRoomTSetPointHeat.allocate(state.dataGlobal->NumOfZones);
         }
-        if (!allocated(OccRoomTSetPointCool)) {
-            OccRoomTSetPointCool.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
+            state.dataZoneCtrls->OccRoomTSetPointCool.allocate(state.dataGlobal->NumOfZones);
         }
-        OccRoomTSetPointHeat = 0.0;
-        OccRoomTSetPointCool = 100.0;
+        state.dataZoneCtrls->OccRoomTSetPointHeat = 0.0;
+        state.dataZoneCtrls->OccRoomTSetPointCool = 100.0;
         DeltaT = 0.0;
 
-        for (RelativeZoneNum = 1; RelativeZoneNum <= NumTempControlledZones; ++RelativeZoneNum) {
+        for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++RelativeZoneNum) {
 
             // What if this zone not controlled???
             ActualZoneNum = TempControlledZone(RelativeZoneNum).ActualZoneNum;
@@ -3899,14 +3895,14 @@ namespace ZoneTempPredictorCorrector {
                         if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
                             OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
-                            OccRoomTSetPointCool(ActualZoneNum) = DaySPValues(1, OccStartTime);
+                            state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum) = DaySPValues(1, OccStartTime);
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexHot, DaySPValues);
-                            OccRoomTSetPointHeat(ActualZoneNum) = DaySPValues(1, OccStartTime);
+                            state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
                         if (OptStartData.OptStartFlag(ActualZoneNum)) {
-                            ZoneThermostatSetPointHi(ActualZoneNum) = OccRoomTSetPointCool(ActualZoneNum);
-                            ZoneThermostatSetPointLo(ActualZoneNum) = OccRoomTSetPointHeat(ActualZoneNum);
+                            ZoneThermostatSetPointHi(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum);
+                            ZoneThermostatSetPointLo(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum);
                         }
                     }
                     //--------------------------------------------------------------------------------------------
@@ -3954,8 +3950,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(state);
-        OverrideAirSetPointsforEMSCntrl();
+        if (state.dataZoneCtrls->NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(state);
+        OverrideAirSetPointsforEMSCntrl(state);
     }
 
     void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac)
@@ -4220,7 +4216,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Staged control zone
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
-            if (StageZoneLogic(ZoneNum)) {
+            if (state.dataZoneCtrls->StageZoneLogic(ZoneNum)) {
                 if (ZoneSysEnergyDemand(ZoneNum).StageNum == 0) { // No load
                     LoadToHeatingSetPoint = 0.0;
                     LoadToCoolingSetPoint = 0.0;
@@ -4396,7 +4392,7 @@ namespace ZoneTempPredictorCorrector {
         // Check to see if this is a "humidity controlled zone"
         ControlledHumidZoneFlag = false;
         // Check all the controlled zones to see if it matches the zone simulated
-        for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum) {
+        for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
             if (HumidityControlZone(HumidControlledZoneNum).ActualZoneNum != ZoneNum) continue;
             ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex);
@@ -6710,11 +6706,11 @@ namespace ZoneTempPredictorCorrector {
         // Return value
         bool HasThermostat; // True if does, false if not.
 
-        if (GetZoneAirStatsInputFlag) {
+        if (state.dataZoneCtrls->GetZoneAirStatsInputFlag) {
             GetZoneAirSetPoints(state);
-            GetZoneAirStatsInputFlag = false;
+            state.dataZoneCtrls->GetZoneAirStatsInputFlag = false;
         }
-        if (NumTempControlledZones > 0) {
+        if (state.dataZoneCtrls->NumTempControlledZones > 0) {
             if (UtilityRoutines::FindItemInList(ZoneName, TempControlledZone, &ZoneTempControls::ZoneName) > 0) {
                 HasThermostat = true;
             } else {
@@ -6910,7 +6906,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 thisMRT;         // local variable for mean radiant temperature in this zone
         Real64 thisMRTFraction; // local variable for fraction that MRT is in Op Temp definition
 
-        if (!(AnyOpTempControl)) return; // do nothing to setpoint
+        if (!(state.dataZoneCtrls->AnyOpTempControl)) return; // do nothing to setpoint
 
         if (!(TempControlledZone(TempControlledZoneID).OperativeTempControl)) return; // do nothing to setpoint
 
@@ -7035,7 +7031,7 @@ namespace ZoneTempPredictorCorrector {
 
         ComfortControlType = 0; // Default
 
-        for (RelativeZoneNum = 1; RelativeZoneNum <= NumComfortControlledZones; ++RelativeZoneNum) {
+        for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++RelativeZoneNum) {
 
             ActualZoneNum = ComfortControlledZone(RelativeZoneNum).ActualZoneNum;
             ComfortControlSchedIndex = ComfortControlledZone(RelativeZoneNum).ComfortSchedIndex;
@@ -7499,7 +7495,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneOvercoolRange;
         Real64 ZoneOvercoolControlRatio;
 
-        if (!(AnyZoneTempAndHumidityControl)) return; // do nothing to setpoint
+        if (!(state.dataZoneCtrls->AnyZoneTempAndHumidityControl)) return; // do nothing to setpoint
 
         if (!(TempControlledZone(TempControlledZoneID).ZoneOvercoolControl)) return; // do nothing to setpoint
 
@@ -7526,7 +7522,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void OverrideAirSetPointsforEMSCntrl()
+    void OverrideAirSetPointsforEMSCntrl(EnergyPlusData& state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7538,13 +7534,9 @@ namespace ZoneTempPredictorCorrector {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine overrides the air temperature setpoint based on EMS
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;    // index of temp control
-        int ZoneNum; // Zone index
-
-        for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
             if (TempControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
-                ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+                int ZoneNum = TempControlledZone(Loop).ActualZoneNum;
 
                 {
                     auto const SELECT_CASE_var(TempControlType(ZoneNum));
@@ -7567,7 +7559,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
             if (TempControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
-                ZoneNum = TempControlledZone(Loop).ActualZoneNum;
+                int ZoneNum = TempControlledZone(Loop).ActualZoneNum;
 
                 {
                     auto const SELECT_CASE_var(TempControlType(ZoneNum));
@@ -7591,9 +7583,9 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
             if (ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
-                ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
                 {
                     auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
 
@@ -7615,7 +7607,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
             if (ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
-                ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
+                int ZoneNum = ComfortControlledZone(Loop).ActualZoneNum;
                 {
                     auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
 
