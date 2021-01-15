@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,18 +99,18 @@ namespace PlantManager {
 
     void CheckPlantOnAbort(EnergyPlusData &state);
 
-    void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
+    void InitOneTimePlantSizingInfo(EnergyPlusData &state, int LoopNum); // loop being initialized for sizing
 
     void SizePlantLoop(EnergyPlusData &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(EnergyPlusData &state, int LoopNum);
 
-    void SetupInitialPlantCallingOrder();
+    void SetupInitialPlantCallingOrder(EnergyPlusData &state);
 
     void RevisePlantCallingOrder(EnergyPlusData &state);
 
-    int FindLoopSideInCallingOrder(int LoopNum, int LoopSide);
+    int FindLoopSideInCallingOrder(EnergyPlusData &state, int LoopNum, int LoopSide);
 
     void SetupBranchControlTypes(EnergyPlusData &state);
 
