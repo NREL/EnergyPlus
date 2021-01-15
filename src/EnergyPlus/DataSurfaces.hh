@@ -65,6 +65,13 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
 
+
+#define BITF(B) (1 << (int(B)))
+#define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
+
+#define IS_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
+
+
 namespace EnergyPlus {
 
 // Forward declarations
@@ -122,7 +129,7 @@ namespace DataSurfaces {
     };
 
     enum class WinShadingFlag : int {
-        NoShade = -1,
+        NoShade = 10,
         ShadeOff = 0,
         IntShadeOn = 1,
         SwitchableGlazing = 2,

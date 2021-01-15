@@ -6810,7 +6810,9 @@ namespace EnergyPlus::DaylightingManager {
                             }
                         }
 
-                        if (SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing || SurfWinGlareControlIsActive(IWin) ) SurfWinGlareControlIsActive = false;
+                        if (SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing || SurfWinGlareControlIsActive(IWin)) {
+                            SurfWinGlareControlIsActive(IWin) = false;
+                        }
 
                         // For switchable glazings, it is switched to fully dark state,
                         // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
@@ -7069,6 +7071,7 @@ namespace EnergyPlus::DaylightingManager {
             if (SurfWinGlareControlIsActive(IWin)) {
                 SurfWinShadingFlag(IWin) = WinShadingFlag::ShadeOff;
                 SurfWinGlareControlIsActive(IWin) = false;
+                SurfWinShaded(IWin) = false;
             }
         }
 
