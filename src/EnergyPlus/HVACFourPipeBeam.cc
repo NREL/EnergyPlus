@@ -1145,9 +1145,9 @@ namespace FourPipeBeam {
         }
 
         // get zone loads
-        this->qDotZoneReq = ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputRequired;
-        this->qDotZoneToHeatSetPt = ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputReqToHeatSP;
-        this->qDotZoneToCoolSetPt = ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputReqToCoolSP;
+        this->qDotZoneReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputRequired;
+        this->qDotZoneToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputReqToHeatSP;
+        this->qDotZoneToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->zoneIndex).RemainingOutputReqToCoolSP;
 
         // decide if beam is in heating or cooling
 

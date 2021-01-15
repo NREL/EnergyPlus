@@ -133,9 +133,6 @@ namespace ZoneDehumidifier {
         // Call appropriate subroutines to get input values, initialize variables, model performanc
         // update node information, report model outputs.
 
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
         Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
@@ -173,7 +170,7 @@ namespace ZoneDehumidifier {
             }
         }
 
-        QZnDehumidReq = ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
+        QZnDehumidReq = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
 
         InitZoneDehumidifier(state, ZoneDehumidNum);
 

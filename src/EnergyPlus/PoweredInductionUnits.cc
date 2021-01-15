@@ -1577,8 +1577,8 @@ namespace PoweredInductionUnits {
         PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
         PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
         SecAirMassFlow = Node(SecNode).MassFlowRate;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
 
         // On the first HVAC iteration the system values are given to the controller, but after that
@@ -1612,7 +1612,7 @@ namespace PoweredInductionUnits {
                 } else {
                     SecAirMassFlow = PIU(PIUNum).MaxTotAirMassFlow;
                 }
-            } else if (CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
+            } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
                 PriAirMassFlow = PriAirMassFlowMin;
                 SecAirMassFlow = max(0.0, PIU(PIUNum).MaxTotAirMassFlow - PriAirMassFlow);
@@ -1855,8 +1855,8 @@ namespace PoweredInductionUnits {
         PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
         PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
         SecAirMassFlow = Node(SecNode).MassFlowRate;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
@@ -1895,7 +1895,7 @@ namespace PoweredInductionUnits {
                     SecAirMassFlow = PIU(PIUNum).MaxSecAirMassFlow;
                     PIUTurnFansOn = (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn);
                 }
-            } else if (CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
+            } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
                 PriAirMassFlow = PriAirMassFlowMin;
                 // PIU fan off if reheat is not needed, also reset fan flag if fan should be off

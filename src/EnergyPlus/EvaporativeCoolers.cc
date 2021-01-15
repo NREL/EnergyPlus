@@ -4354,30 +4354,9 @@ namespace EvaporativeCoolers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneCoolingLoad;
@@ -4414,7 +4393,7 @@ namespace EvaporativeCoolers {
                         ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
                         CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                     } else {
-                        ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                        ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                         // calculate part load ratio for cycling fan/unit first
                         ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
                         PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
@@ -4431,7 +4410,7 @@ namespace EvaporativeCoolers {
             } else if (SELECT_CASE_var == ZoneCoolingLoadOnOffCycling) {
 
                 // get zone loads
-                ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
 
                 if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
@@ -4456,7 +4435,7 @@ namespace EvaporativeCoolers {
 
             } else if (SELECT_CASE_var == ZoneCoolingLoadVariableSpeedFan) {
                 // get zone loads
-                ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
                 if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
 

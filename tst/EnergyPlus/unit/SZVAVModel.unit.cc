@@ -638,8 +638,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataFans->LocalTurnFansOff = false;
     state->dataFans->LocalTurnFansOn = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    auto &zSysEDemand(ZoneSysEnergyDemand(1));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;

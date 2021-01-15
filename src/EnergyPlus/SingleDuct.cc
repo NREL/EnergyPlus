@@ -3255,8 +3255,8 @@ namespace EnergyPlus::SingleDuct {
 
         // The calculated load from the Heat Balance
         LeakLoadMult = state.dataDefineEquipment->AirDistUnit(this->ADUNum).LeakLoadMult;
-        QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
+        QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = this->ReheatAirOutletNode;
         SysInletNode = this->InletNodeNum;
         CpAirAvg = PsyCpAirFnW(0.5 * (Node(ZoneNodeNum).HumRat + this->sd_airterminalInlet.AirHumRat));
@@ -3283,8 +3283,8 @@ namespace EnergyPlus::SingleDuct {
             }
 
             // Apply the zone maximum outdoor air fraction FOR VAV boxes - a TRACE feature
-            if (ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
-                MassFlow *= ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
+            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
+                MassFlow *= state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
             }
 
             // calculate supply air flow rate based on user specified OA requirement
@@ -3321,8 +3321,8 @@ namespace EnergyPlus::SingleDuct {
             //     END IF
 
             // Apply the zone maximum outdoor air fraction for VAV boxes - a TRACE feature
-            if (ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
-                MassFlow *= ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
+            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
+                MassFlow *= state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
             }
 
             // calculate supply air flow rate based on user specified OA requirement
@@ -3804,8 +3804,8 @@ namespace EnergyPlus::SingleDuct {
 
         // The calculated load from the Heat Balance
         LeakLoadMult = state.dataDefineEquipment->AirDistUnit(this->ADUNum).LeakLoadMult;
-        QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
+        QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = this->ReheatAirOutletNode;
         SysInletNode = this->InletNodeNum;
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
@@ -4180,7 +4180,7 @@ namespace EnergyPlus::SingleDuct {
         bool ErrorsFound;   // returned from mining function call
 
         // The calculated load from the Heat Balance
-        QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         SysOutletNode = this->ReheatAirOutletNode;
         SysInletNode = this->InletNodeNum;
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
@@ -4192,7 +4192,7 @@ namespace EnergyPlus::SingleDuct {
         UnitFlowToler = 0.001 * DataConvergParams::HVACFlowRateToler;
         QDelivered = 0.0;
         HWFlow = 0.0;
-        if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || CurDeadBandOrSetback(ZoneNum)) {
+        if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             MassFlow = 0.0;
             FanOp = 0;
             this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
@@ -4262,7 +4262,7 @@ namespace EnergyPlus::SingleDuct {
 
         // Active cooling with fix for issue #5592
         if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
-            !CurDeadBandOrSetback(ZoneNum)) {
+            !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             // check that it can meet the load
             FanOp = 1;
             if (QCoolFanOnMax < QTotLoad - SmallLoad) {
@@ -4312,7 +4312,7 @@ namespace EnergyPlus::SingleDuct {
             // no active heating or cooling
         } else if ((QTotLoad >= QCoolFanOnMin - SmallLoad && QTotLoad <= QNoHeatFanOff + SmallLoad &&
                     this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) ||
-                   (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 && CurDeadBandOrSetback(ZoneNum))) {
+                   (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 && state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum))) {
             MassFlow = MinMassFlow;
             FanOp = 0;
             if (HCType == HeatingCoilType::SteamAirHeating) {
@@ -4323,7 +4323,7 @@ namespace EnergyPlus::SingleDuct {
 
             // active heating
         } else if (QTotLoad > QNoHeatFanOff + SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
-                   !CurDeadBandOrSetback(ZoneNum)) {
+                   !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             // hot water coil
             if (HCType == HeatingCoilType::SimpleHeating) {
                 if (QTotLoad < QHeatFanOffMax - SmallLoad) {
@@ -4581,7 +4581,7 @@ namespace EnergyPlus::SingleDuct {
         static Real64 QMax2(0.0);
         Real64 DummyMdot; // local fluid mass flow rate
 
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // The calculated load from the Heat Balance
         MassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;           // System massflow is set to the Available
         QMax2 = QToHeatSetPt;
         ZoneTemp = Node(ZoneNodeNum).Temp;

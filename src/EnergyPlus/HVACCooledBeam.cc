@@ -964,9 +964,9 @@ namespace HVACCooledBeam {
         InAirNode = CoolBeam(CBNum).AirInNode;
         ControlNode = CoolBeam(CBNum).CWInNode;
         AirMassFlow = Node(InAirNode).MassFlowRateMaxAvail;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         CpAirSys = PsyCpAirFnW(Node(InAirNode).HumRat);
         MaxColdWaterFlow = CoolBeam(CBNum).MaxCoolWaterMassFlow;

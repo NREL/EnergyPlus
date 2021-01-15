@@ -110,11 +110,11 @@ protected:
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
         ZoneSizingRunDone = true;
 
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).TotalOutputRequired = 1000.0;
-        ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
-        ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
-        ZoneSysMoistureDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
+        state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
         NonAirSystemResponse.allocate(1);
         SysDepZoneLoads.allocate(1);
         MassConservation.allocate(1);
@@ -125,9 +125,9 @@ protected:
 
         TempControlType.allocate(1);
         TempControlType(1) = DataHVACGlobals::SingleHeatingSetPoint;
-        CurDeadBandOrSetback.allocate(1);
-        DeadBandOrSetback.allocate(1);
-        DeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
         ZoneAirHumRat.allocate(1);
         ZoneAirHumRat(1) = 0.07;

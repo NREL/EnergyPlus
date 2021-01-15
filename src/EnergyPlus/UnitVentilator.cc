@@ -1454,7 +1454,7 @@ namespace UnitVentilator {
         OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode;
         AirRelNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirReliefNode;
 
-        state.dataUnitVentilators->QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // zone load needed
+        state.dataUnitVentilators->QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // zone load needed
         state.dataUnitVentilators->UnitVent(UnitVentNum).FanPartLoadRatio = 0.0;
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanSchedPtr > 0) {
@@ -1467,7 +1467,7 @@ namespace UnitVentilator {
 
         if (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) > 0) {
             if ((GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
-                if ((std::abs(ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < SmallLoad) || (CurDeadBandOrSetback(ZoneNum))) {
+                if ((std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum))) {
                     SetMassFlowRateToZero = true;
                 }
             } else {
@@ -2722,7 +2722,7 @@ namespace UnitVentilator {
         OpMode = state.dataUnitVentilators->UnitVent(UnitVentNum).OpMode;
         PartLoadFrac = 0.0;
 
-        if ((std::abs(state.dataUnitVentilators->QZnReq) < SmallLoad) || (CurDeadBandOrSetback(ZoneNum)) || (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) <= 0) ||
+        if ((std::abs(state.dataUnitVentilators->QZnReq) < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) || (GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr) <= 0) ||
             ((GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then

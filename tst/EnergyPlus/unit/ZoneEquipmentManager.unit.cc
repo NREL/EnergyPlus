@@ -942,20 +942,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(3);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
@@ -1117,20 +1117,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // UniformLoad Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -1303,20 +1303,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
     DataSizing::FinalZoneSizing.allocate(1);
@@ -1521,20 +1521,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
     DataSizing::FinalZoneSizing.allocate(1);
@@ -1847,24 +1847,24 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     int NumEquip = 4;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
@@ -2073,24 +2073,24 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     int NumEquip = 4;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;

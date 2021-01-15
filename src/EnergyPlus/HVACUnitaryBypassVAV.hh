@@ -352,7 +352,7 @@ namespace HVACUnitaryBypassVAV {
     void GetZoneLoads(EnergyPlusData &state, int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
-    Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system
+    Real64 CalcSetPointTempTarget(EnergyPlusData &state, int const CBVAVNumber); // Index to changeover-bypass VAV system
 
     Real64 DOE2DXCoilResidual(EnergyPlusData &state,
                               Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)

@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(*state);   // read schedules
     GetCurveInput(*state);          // read curves
@@ -311,9 +311,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     // Test coil sizing
 
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
-    ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
@@ -626,8 +626,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     UpdateScheduleValues(*state);
 
     ZoneEqSizing.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
 
@@ -932,8 +932,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     UpdateScheduleValues(*state);
 
     ZoneEqSizing.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
 

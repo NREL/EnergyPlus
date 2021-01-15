@@ -1268,31 +1268,31 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
 
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
-    CurDeadBandOrSetback.allocate(2);
-    CurDeadBandOrSetback(1) = false;
-    CurDeadBandOrSetback(2) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(2);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
 
-    ZoneSysEnergyDemand.allocate(2);
-    ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500;
-    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000;
-    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -2500;
-    ZoneSysEnergyDemand(2).RemainingOutputRequired = -2500;
-    ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -20000;
-    ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -2500;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -2500;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputRequired = -2500;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -20000;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -2500;
 
-    ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(1);
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(1);
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(1);
-    ZoneSysEnergyDemand(2).SequencedOutputRequired.allocate(1);
-    ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP.allocate(1);
-    ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequired.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP.allocate(1);
 
-    ZoneSysEnergyDemand(1).SequencedOutputRequired(1) = ZoneSysEnergyDemand(1).RemainingOutputRequired;
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP;
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP;
-    ZoneSysEnergyDemand(2).SequencedOutputRequired(1) = ZoneSysEnergyDemand(2).RemainingOutputRequired;
-    ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP;
-    ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequired(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP;
 
     HVACMultiSpeedHeatPump::GetMSHeatPumpInput(*state);
 
@@ -1395,8 +1395,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1530992, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = false;
-    ZoneSysEnergyDemand.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)

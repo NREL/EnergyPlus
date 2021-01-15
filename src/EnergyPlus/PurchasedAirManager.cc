@@ -1929,8 +1929,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::ZoneComp;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using DataZoneEquipment::PurchasedAir_Num;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2007,8 +2005,8 @@ namespace EnergyPlus::PurchasedAirManager {
         UnitOn = true;
         EconoOn = false;
         // get current zone requirements
-        QZnHeatSP = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
-        QZnCoolSP = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+        QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
         if (allocated(ZoneComp)) {
             ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ActualZoneNum;
@@ -2138,7 +2136,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 SupplyMassFlowRateForDehum = 0.0;
                 if (CoolOn) {
                     if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
-                        MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                        MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                             SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2153,7 +2151,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 if (HeatOn) {
                     if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                            MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                             DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                             if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                                 SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2236,7 +2234,7 @@ namespace EnergyPlus::PurchasedAirManager {
                             // But don't let it be higher than incoming MixedAirHumRat
                             SupplyHumRat = min(SupplyHumRat, MixedAirHumRat);
                         } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                            MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                             SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                             SupplyHumRat = min(MixedAirHumRat, SupplyHumRatForDehum);
@@ -2253,7 +2251,7 @@ namespace EnergyPlus::PurchasedAirManager {
                     if (HeatOn) {
                         if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                             if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                                MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                                MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                                 SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                                 SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
                                 SupplyHumRat = max(SupplyHumRat, SupplyHumRatForHumid);
@@ -2405,7 +2403,7 @@ namespace EnergyPlus::PurchasedAirManager {
                     if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) ||
                             (OperatingMode == OpMode::DeadBand)) {
-                            MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                             DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                             if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                                 SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2418,7 +2416,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 SupplyMassFlowRateForHumid = 0.0;
                 if (HeatOn) {
                     if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
-                        MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                        MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                             SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2483,7 +2481,7 @@ namespace EnergyPlus::PurchasedAirManager {
                         if (SELECT_CASE_var == HumControl::None) {
                             SupplyHumRat = MixedAirHumRat;
                         } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                            MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                             SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
                             SupplyHumRat = max(SupplyHumRat, SupplyHumRatForHumid);
@@ -2528,7 +2526,7 @@ namespace EnergyPlus::PurchasedAirManager {
                         if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                             if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) ||
                                 (OperatingMode == OpMode::DeadBand)) {
-                                MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                                MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                                 SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                                 SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                                 SupplyHumRat = min(SupplyHumRat, SupplyHumRatForDehum);

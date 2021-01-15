@@ -312,7 +312,7 @@ namespace HVACUnitaryBypassVAV {
         }
         if (CBVAV(CBVAVNum).modeChanged) {
             // set outlet node SP for mixed air SP manager
-            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(CBVAVNum);
+            DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
             if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) {                                          // update mixed air SPM if exists
                 state.dataSetPointManager->MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex).calculate(state); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
@@ -1930,7 +1930,7 @@ namespace HVACUnitaryBypassVAV {
 
         SetAverageAirFlow(state, CBVAVNum, OnOffAirFlowRatio);
 
-        if (FirstHVACIteration) CBVAV(CBVAVNum).OutletTempSetPoint = CalcSetPointTempTarget(CBVAVNum);
+        if (FirstHVACIteration) CBVAV(CBVAVNum).OutletTempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
 
         // The setpoint is used to control the DX coils at their respective outlet nodes (not the unit outlet), correct
         // for fan heat for draw thru units only (fan heat is included at the outlet of each coil when blowthru is used)
@@ -3553,9 +3553,9 @@ namespace HVACUnitaryBypassVAV {
             int heatSeqNum = CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum);
             if (coolSeqNum > 0 && heatSeqNum > 0) {
                 Real64 ZoneLoadToCoolSPSequenced =
-                    DataZoneEnergyDemands::ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToCoolingSP(coolSeqNum);
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToCoolingSP(coolSeqNum);
                 Real64 ZoneLoadToHeatSPSequenced =
-                    DataZoneEnergyDemands::ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToHeatingSP(heatSeqNum);
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToHeatingSP(heatSeqNum);
                 if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0) {
                     ZoneLoad = ZoneLoadToHeatSPSequenced;
                 } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0) {
@@ -3564,10 +3564,10 @@ namespace HVACUnitaryBypassVAV {
                     ZoneLoad = 0.0;
                 }
             } else {
-                ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(actualZoneNum).RemainingOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(actualZoneNum).RemainingOutputRequired;
             }
 
-            if (!DataZoneEnergyDemands::CurDeadBandOrSetback(actualZoneNum)) {
+            if (!state.dataZoneEnergyDemand->CurDeadBandOrSetback(actualZoneNum)) {
                 if (ZoneLoad > DataHVACGlobals::SmallLoad) {
                     QZoneReqHeat += ZoneLoad;
                     ++CBVAV(CBVAVNum).NumZonesHeated;
@@ -3648,7 +3648,7 @@ namespace HVACUnitaryBypassVAV {
         }
     }
 
-    Real64 CalcSetPointTempTarget(int const CBVAVNumber) // Index to changeover-bypass VAV system
+    Real64 CalcSetPointTempTarget(EnergyPlusData &state, int const CBVAVNumber) // Index to changeover-bypass VAV system
     {
 
         // FUNCTION INFORMATION:
@@ -3689,9 +3689,9 @@ namespace HVACUnitaryBypassVAV {
             int ZoneNodeNum = CBVAV(CBVAVNumber).ActualZoneNodeNum(ZoneNum);
             int BoxOutletNodeNum = CBVAV(CBVAVNumber).CBVAVBoxOutletNode(ZoneNum);
             if ((CBVAV(CBVAVNumber).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNumber).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
-                QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
+                QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
                                    .SequencedOutputRequiredToCoolingSP(CBVAV(CBVAVNumber).ZoneSequenceCoolingNum(ZoneNum));
-                QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
+                QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum))
                                    .SequencedOutputRequiredToHeatingSP(CBVAV(CBVAVNumber).ZoneSequenceHeatingNum(ZoneNum));
                 if (QToHeatSetPt > 0.0 && QToCoolSetPt > 0.0) {
                     ZoneLoad = QToHeatSetPt;
@@ -3701,9 +3701,9 @@ namespace HVACUnitaryBypassVAV {
                     ZoneLoad = 0.0;
                 }
             } else {
-                ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
-                QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToCoolingSP;
-                QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
+                QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToCoolingSP;
+                QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
             }
 
             Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(OutAirHumRat);
@@ -3934,9 +3934,9 @@ namespace HVACUnitaryBypassVAV {
             int ZoneNodeNum = CBVAV(CBVAVNum).ActualZoneNodeNum(ZoneNum);
             int BoxOutletNodeNum = CBVAV(CBVAVNum).CBVAVBoxOutletNode(ZoneNum); // Zone supply air inlet node number
             if ((CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
-                Real64 QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
+                Real64 QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
                                           .SequencedOutputRequiredToCoolingSP(CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum));
-                Real64 QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
+                Real64 QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
                                           .SequencedOutputRequiredToHeatingSP(CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum));
                 if (QToHeatSetPt > 0.0 && QToCoolSetPt > 0.0) {
                     ZoneLoad = QToHeatSetPt;
@@ -3946,7 +3946,7 @@ namespace HVACUnitaryBypassVAV {
                     ZoneLoad = 0.0;
                 }
             } else {
-                ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
             }
             Real64 CpZoneAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(ZoneNodeNum).HumRat);
             Real64 DeltaCpTemp = CpSupplyAir * DataLoopNode::Node(OutletNode).Temp - CpZoneAir * DataLoopNode::Node(ZoneNodeNum).Temp;

@@ -9715,7 +9715,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
                 }
             } else if (SELECT_CASE_var == iThermostatCtrlType::MasterThermostatPriority) {
-                ZoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
                            state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
                 if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
                     SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
@@ -9731,9 +9731,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             .CalcVRF(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
-                    LoadToCoolingSP = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
+                    LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
                                       state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-                    LoadToHeatingSP = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
+                    LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
                                       state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
                     if (TempOutput < LoadToHeatingSP) {
                         state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
@@ -10038,10 +10038,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
             // air loop equipment uses sequenced variables
-            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+            LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToCoolingSP(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+            LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToHeatingSP(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
@@ -10065,16 +10065,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 // this will need more investigation. Using Remaining* variable during the initial load calculation seems wrong.
                 // This may also have implications when VRF TUs are in the air loop or if SP control is used
                 // another question is whether initialization of the opeating mode should look at TotalOutputRequired or RemainingOutputRequired
-                zoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToCoolingSP /
+                zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+                LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToCoolingSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToHeatingSP /
+                LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToHeatingSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             } else {
-                zoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP /
+                zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+                LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP /
+                LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) {

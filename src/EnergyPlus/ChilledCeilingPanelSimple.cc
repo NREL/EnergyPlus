@@ -125,7 +125,6 @@ namespace CoolingPanelSimple {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // Index of unit in baseboard array
@@ -172,7 +171,7 @@ namespace CoolingPanelSimple {
 
             InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1175,8 +1174,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -1225,7 +1222,7 @@ namespace CoolingPanelSimple {
 
         ModifiedWaterInletTemp = false;
         ZoneNum = this->ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         waterInletTemp = this->WaterInletTemp;
         waterOutletTemp = waterInletTemp;
         waterMassFlowRateMax = this->WaterMassFlowRateMax;
@@ -1301,7 +1298,7 @@ namespace CoolingPanelSimple {
 
         if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
 
-            if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
+            if (QZnReq < -SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
                 Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 

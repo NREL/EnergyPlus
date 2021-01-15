@@ -147,7 +147,6 @@ namespace WindowAC {
         // Manages the simulation of a window AC unit. Called from SimZone Equipment
 
         using DataHeatBalFanSys::TempControlType;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         int WindACNum;                     // index of window AC unit being simulated
         Real64 QZnReq;                     // zone load (W)
@@ -187,7 +186,7 @@ namespace WindowAC {
             }
         }
 
-        RemainingOutputToCoolingSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
@@ -759,8 +758,6 @@ namespace WindowAC {
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::WindowAC_Num;
 
@@ -878,7 +875,7 @@ namespace WindowAC {
         }
 
         // Original thermostat control logic (works only for cycling fan systems)
-        if (QZnReq < (-1.0 * SmallLoad) && !CurDeadBandOrSetback(ZoneNum) && state.dataWindowAC->WindAC(WindACNum).PartLoadFrac > 0.0) {
+        if (QZnReq < (-1.0 * SmallLoad) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && state.dataWindowAC->WindAC(WindACNum).PartLoadFrac > 0.0) {
             state.dataWindowAC->CoolingLoad = true;
         } else {
             state.dataWindowAC->CoolingLoad = false;
@@ -890,10 +887,10 @@ namespace WindowAC {
 
             CalcWindowACOutput(state, WindACNum, FirstHVACIteration, state.dataWindowAC->WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
 
-            QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+            QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
             // If the unit has a net heating capacity and the zone temp is below the Tstat cooling setpoint
-            if (NoCompOutput > (-1.0 * SmallLoad) && QToCoolSetPt > (-1.0 * SmallLoad) && CurDeadBandOrSetback(ZoneNum)) {
+            if (NoCompOutput > (-1.0 * SmallLoad) && QToCoolSetPt > (-1.0 * SmallLoad) && state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 if (NoCompOutput > QToCoolSetPt) {
                     QZnReq = QToCoolSetPt;
                     state.dataWindowAC->CoolingLoad = true;

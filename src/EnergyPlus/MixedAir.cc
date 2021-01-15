@@ -3657,8 +3657,6 @@ namespace EnergyPlus::MixedAir {
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneIntGain;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         static std::string const RoutineName("CalcMechVentController: ");
@@ -3833,7 +3831,7 @@ namespace EnergyPlus::MixedAir {
                         // Assign references
                         auto &curZone(Zone(ZoneNum));
                         auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
-                        auto &curZoneSysEnergyDemand(ZoneSysEnergyDemand(ZoneEquipConfigNum));
+                        auto &curZoneSysEnergyDemand(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneEquipConfigNum));
                         ZoneName = curZone.Name;
                         Real64 curZoneOASchValue = GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
 
@@ -3896,7 +3894,7 @@ namespace EnergyPlus::MixedAir {
                             // Get schedule value for the zone air distribution effectiveness
                             ZoneEz = GetCurrentScheduleValue(state, ADEffSchPtr);
                         } else {
-                            ZoneLoad = ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
+                            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneEquipConfig.ActualZoneNum).TotalOutputRequired;
 
                             // Zone in cooling mode
                             if (ZoneLoad < 0.0) ZoneEz = this->ZoneADEffCooling(ZoneIndex);
@@ -4240,7 +4238,6 @@ namespace EnergyPlus::MixedAir {
                                              bool const FirstHVACIteration)
     {
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using General::SolveRoot;
         using SetPointManager::GetCoilFreezingCheckFlag;
         using TempSolveRoot::SolveRoot;
@@ -4402,7 +4399,7 @@ namespace EnergyPlus::MixedAir {
             // (HumidistatZoneNum is greater than 0 IF High Humidity Control Flag = YES, checked in GetInput)
             if (this->HumidistatZoneNum > 0) {
                 //   IF humidistat senses a moisture load check to see if modifying air flow is appropriate, otherwise disable modified air flow
-                if (ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
+                if (state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
                     if (!this->ModifyDuringHighOAMoisture &&

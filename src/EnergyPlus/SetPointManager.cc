@@ -4869,25 +4869,25 @@ namespace EnergyPlus::SetPointManager {
         // The Single Zone Heating Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZHtSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Cooling Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Minimum Humidity Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Maximum Humidity Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Warmest Setpoint Managers
@@ -4975,12 +4975,12 @@ namespace EnergyPlus::SetPointManager {
 
         // the single zone cooling on/off staged control setpoint managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // the single zone heating on/off staged control setpoint managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // return water reset
@@ -5222,10 +5222,10 @@ namespace EnergyPlus::SetPointManager {
         AirLoopNum = this->AirLoopNum;
         OAFrac = state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
-        ZoneLoadToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
-        ZoneLoadToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
-        DeadBand = DeadBandOrSetback(ZoneNum);
+        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+        ZoneLoadToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
+        ZoneLoadToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
+        DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
         ZoneTemp = Node(ZoneNode).Temp;
         LoopInNode = this->LoopInNode;
         if (OAMixOAInNode > 0) {
@@ -5299,7 +5299,7 @@ namespace EnergyPlus::SetPointManager {
         this->SetPt = TSetPt;
     }
 
-    void DefineSZHeatingSetPointManager::calculate()
+    void DefineSZHeatingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5315,7 +5315,6 @@ namespace EnergyPlus::SetPointManager {
 
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         Real64 ZoneLoadtoHeatSP; // required zone load to zone heating setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -5329,7 +5328,7 @@ namespace EnergyPlus::SetPointManager {
         ZoneNum = this->ControlZoneNum;
         ZoneNode = this->ZoneNodeNum;
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoadtoHeatSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
+        ZoneLoadtoHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
         ZoneTemp = Node(ZoneNode).Temp;
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MinSetTemp;
@@ -5341,7 +5340,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZCoolingSetPointManager::calculate()
+    void DefineSZCoolingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5357,7 +5356,6 @@ namespace EnergyPlus::SetPointManager {
 
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         Real64 ZoneLoadtoCoolSP; // required zone load to zone Cooling setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -5371,7 +5369,7 @@ namespace EnergyPlus::SetPointManager {
         ZoneNum = this->ControlZoneNum;
         ZoneNode = this->ZoneNodeNum;
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoadtoCoolSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
+        ZoneLoadtoCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
         ZoneTemp = Node(ZoneNode).Temp;
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MaxSetTemp;
@@ -5383,7 +5381,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZOneStageCoolinggSetPointManager::calculate()
+    void DefineSZOneStageCoolinggSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5398,35 +5396,14 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (ZoneSysEnergyDemand(this->ControlZoneNum).StageNum >= 0) {
+        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum >= 0) {
             this->SetPt = this->CoolingOffTemp;
         } else { // negative so a cooling stage is set
             this->SetPt = this->CoolingOnTemp;
         }
     }
 
-    void DefineSZOneStageHeatingSetPointManager::calculate()
+    void DefineSZOneStageHeatingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5441,34 +5418,14 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-        if (ZoneSysEnergyDemand(this->ControlZoneNum).StageNum <= 0) {
+        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum <= 0) {
             this->SetPt = this->HeatingOffTemp;
         } else { // positive so a heating stage is set
             this->SetPt = this->HeatingOnTemp;
         }
     }
 
-    void DefineSZMinHumSetPointManager::calculate()
+    void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5487,25 +5444,9 @@ namespace EnergyPlus::SetPointManager {
         // is used to calculate the minimum supply air humidity ratio
         // needed to meet minimum zone relative humidity requirement
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using Psychrometrics::PsyWFnTdbRhPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNode;
         Real64 ZoneMassFlow;
@@ -5522,7 +5463,7 @@ namespace EnergyPlus::SetPointManager {
 
         if (ZoneMassFlow > SmallMassFlow) {
 
-            MoistureLoad = ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
 
             SupplyAirHumRat = max(0.0, Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
 
@@ -5532,7 +5473,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZMaxHumSetPointManager::calculate()
+    void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5550,25 +5491,9 @@ namespace EnergyPlus::SetPointManager {
         // is used to calculate the maximum supply air humidity ratio
         // needed to meet maximum zone relative humidity requirement
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using Psychrometrics::PsyWFnTdbRhPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNode;        // Control zone air node number
         Real64 ZoneMassFlow; // Zone air mass flow rate (kg/s)
@@ -5584,7 +5509,7 @@ namespace EnergyPlus::SetPointManager {
 
         if (ZoneMassFlow > SmallMassFlow) {
 
-            MoistureLoad = ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
 
             SystemMassFlow = Node(this->CtrlNodes(1)).MassFlowRate;
 
@@ -5838,23 +5763,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -5881,7 +5792,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             ZoneSetPointTemp = this->MaxSetTemp;
             if (ZoneLoad < 0.0) {
@@ -5918,23 +5829,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -5963,7 +5860,7 @@ namespace EnergyPlus::SetPointManager {
                 ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
                 ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-                ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
@@ -5983,7 +5880,7 @@ namespace EnergyPlus::SetPointManager {
                 ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
                 ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-                ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
@@ -6021,23 +5918,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -6078,7 +5961,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             ZoneSetPointTemp = MaxSetPointTemp;
             ZoneFracFlow = MinFracFlow;
@@ -6220,23 +6103,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible (heating load) heat balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -6281,7 +6150,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
@@ -6318,23 +6187,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible (cooling load) heat balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -6370,7 +6225,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
@@ -6409,23 +6264,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone latent load balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -6457,7 +6298,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             SumMdotTot += ZoneMassFlowRate;
             SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
@@ -6491,23 +6332,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone latent load balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -6540,7 +6367,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             SumMdotTot += ZoneMassFlowRate;
             SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
@@ -6575,24 +6402,12 @@ namespace EnergyPlus::SetPointManager {
         // over all the zones that a central air system can humidify and calculates the setpoint based
         // on a zone with the highest humidity ratio setpoint requirement:
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -6615,7 +6430,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             ZoneSetPointHum = this->MinSetHum;
             // For humidification the moisture load is positive
@@ -6653,24 +6468,12 @@ namespace EnergyPlus::SetPointManager {
         // over all the zones that a central air system can dehumidify and calculates the setpoint
         // based on a zone with the lowest humidity ratio setpoint requirement:
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -6693,7 +6496,7 @@ namespace EnergyPlus::SetPointManager {
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             ZoneSetPointHum = this->MaxSetHum;
 

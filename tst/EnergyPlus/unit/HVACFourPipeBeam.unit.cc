@@ -1750,9 +1750,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     // PlantManager::InitializeLoops( FirstHVACIteration );
     PlantUtilities::SetAllFlowLocks(*state, DataPlant::iFlowLock::Unlocked);
     // first run with a sensible cooling load of 5000 W and cold supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
     // indexes values has been changed according to new input_processor output
     // node indexes may be viewed in NodeID array
@@ -1778,9 +1778,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     EXPECT_NEAR(NonAirSysOutput, -857.50347269476481, 0.01);
 
     // next run with a sensible heating load of 5000 W and cold supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
     DataLoopNode::Node(40).Temp = 21.0; // zone node
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
@@ -1793,9 +1793,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     EXPECT_NEAR(NonAirSysOutput, 8079.991302700485, 0.01);
 
     // next run with cooling load and neutral supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -4000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
 
     DataLoopNode::Node(14).Temp = 14.0;    // chilled water inlet node
     DataLoopNode::Node(40).HumRat = 0.008; // zone node
@@ -1819,9 +1819,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     EXPECT_NEAR(NonAirSysOutput, -4307.106339390215, 0.01);
 
     // next run with heating load and neutral supply air
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 6000.0;
 
     DataLoopNode::Node(40).Temp = 21.0; // zone node
 

@@ -1737,9 +1737,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     HeatingLoad = false;
     CoolingLoad = true;
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
     FanCoil(1).SpeedFanSel = 2;
     QUnitOut = 0.0;
     QZnReq = -4000.0;

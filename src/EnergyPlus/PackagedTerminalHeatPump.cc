@@ -315,8 +315,8 @@ namespace PackagedTerminalHeatPump {
 
         OnOffAirFlowRatio = 0.0;
 
-        RemainingOutputToHeatingSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        RemainingOutputToCoolingSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        RemainingOutputToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
@@ -4446,8 +4446,8 @@ namespace PackagedTerminalHeatPump {
                 CalcPTUnit(state, PTUnitNum, FirstHVACIteration, 0.0, NoCompOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, false);
             }
 
-            QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-            QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+            QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+            QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
 
             //   If the PTUnit has a net cooling capacity (NoCompOutput < 0) and
             //   the zone temp is above the Tstat heating setpoint (QToHeatSetPt < 0)
@@ -7300,7 +7300,7 @@ namespace PackagedTerminalHeatPump {
         // set the on/off flags
         if (PTUnit(PTUnitNum).OpMode == CycFanCycCoil) {
             // cycling unit only runs if there is a cooling or heating load.
-            if (std::abs(QZnReq) < SmallLoad || AirMassFlow < SmallMassFlow || CurDeadBandOrSetback(ZoneNum)) {
+            if (std::abs(QZnReq) < SmallLoad || AirMassFlow < SmallMassFlow || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 UnitOn = false;
             }
         } else if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
@@ -7422,14 +7422,7 @@ namespace PackagedTerminalHeatPump {
         // METHODOLOGY EMPLOYED:
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
         using General::SolveRoot;
-
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyCpAirFnW;
@@ -7494,7 +7487,7 @@ namespace PackagedTerminalHeatPump {
         // If cooling and NoCompOutput < QZnReq, the coil needs to be off
         // If heating and NoCompOutput > QZnReq, the coil needs to be off
         if ((QZnReq < (-1.0 * SmallLoad) && NoCompOutput < QZnReq) || (QZnReq > SmallLoad && NoCompOutput > QZnReq) ||
-            (std::abs(QZnReq) <= SmallLoad && std::abs(QLatReq) <= SmallLoad) || CurDeadBandOrSetback(ZoneNum)) {
+            (std::abs(QZnReq) <= SmallLoad && std::abs(QLatReq) <= SmallLoad) || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             return;
         }
 
@@ -7541,7 +7534,7 @@ namespace PackagedTerminalHeatPump {
                 return;
             }
             ErrorToler = 0.001; // Error tolerance for convergence from input deck
-        } else if (QZnReq < (-1.0 * SmallLoad) && !CurDeadBandOrSetback(ZoneNum)) {
+        } else if (QZnReq < (-1.0 * SmallLoad) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCompOutput
             // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
             if (FullOutput >= 0.0 || FullOutput >= NoCompOutput) {
@@ -7560,7 +7553,7 @@ namespace PackagedTerminalHeatPump {
                 return;
             }
             ErrorToler = 0.001; // Error tolerance for convergence from input deck
-        } else if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum)) {
+        } else if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             // Since we are heating, we expect FullOutput to be > 0 and FullOutput > NoCompOutput
             // Check that this is the case; if not set PartLoadFrac = 0.0 (off)
             if (FullOutput <= 0.0 || FullOutput <= NoCompOutput) {
@@ -7583,7 +7576,7 @@ namespace PackagedTerminalHeatPump {
 
         // Calculate the part load fraction
         if (((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput) || (QLatReq < (-1.0 * SmallLoad))) &&
-            !CurDeadBandOrSetback(ZoneNum)) {
+            !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
 
             Par(1) = PTUnitNum;
             Par(2) = ZoneNum;
@@ -7621,7 +7614,7 @@ namespace PackagedTerminalHeatPump {
                                  HXUnitOn);
             if (((QZnReq > SmallLoad && QZnReq <= LowOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq >= LowOutput) ||
                  (QLatReq < (-1.0 * SmallLoad) && QLatReq > LatOutput)) &&
-                !CurDeadBandOrSetback(ZoneNum)) {
+                !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 SpeedRatio = 0.0;
                 SpeedNum = 1;
 
@@ -7654,7 +7647,7 @@ namespace PackagedTerminalHeatPump {
                 PartLoadFrac = 1.0;
                 SpeedRatio = 1.0;
                 // Cooling
-                if (((QZnReq < (-1.0 * SmallLoad)) || (QLatReq < (-1.0 * SmallLoad))) && !CurDeadBandOrSetback(ZoneNum)) {
+                if (((QZnReq < (-1.0 * SmallLoad)) || (QLatReq < (-1.0 * SmallLoad))) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                     for (i = 2; i <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++i) {
                         CalcVarSpeedHeatPump(state,
                                              PTUnitNum,
@@ -8571,27 +8564,6 @@ namespace PackagedTerminalHeatPump {
         // Set the average air mass flow rates using the part load fraction of the heat pump for this time step
         // Set OnOffAirFlowRatio to be used by DX coils
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVMS TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;                          // inlet node number for PTUnitNum
         int OutsideAirNode;                     // outside air node number in PTHP loop
@@ -8754,24 +8726,6 @@ namespace PackagedTerminalHeatPump {
         // air flow rates. Use these flow rates during the Calc routines to set the average mass flow rates
         // based on PLR.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;  // Inlet node number in MSHP loop
         int OutNode; // Outlet node number in MSHP loop
@@ -8795,11 +8749,11 @@ namespace PackagedTerminalHeatPump {
         // Set the inlet node mass flow rate
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
             // constant fan mode
-            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
                 PTUnit(PTUnitNum).LastMode = HeatingMode;
-            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
                 PTUnit(PTUnitNum).LastMode = CoolingMode;
@@ -8811,10 +8765,10 @@ namespace PackagedTerminalHeatPump {
             CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
         } else {
             // cycling fan mode
-            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
-            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
             } else {

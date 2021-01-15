@@ -1240,7 +1240,7 @@ namespace DualDuct {
         Real64 CpAirSysCold;
 
         // Get the calculated load from the Heat Balance from ZoneSysEnergyDemand
-        QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Need the design MassFlowRate for calculations
         if (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0) {
             MassFlow = this->dd_airterminalHotAirInlet.AirMassFlowRateMaxAvail / 2.0 + this->dd_airterminalColdAirInlet.AirMassFlowRateMaxAvail / 2.0;
@@ -1377,7 +1377,7 @@ namespace DualDuct {
         Real64 AirLoopOAFrac;     // fraction of outdoor air entering air loop outside air system
 
         // The calculated load from the Heat Balance
-        QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QTotLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Calculate all of the required Cp's
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
         // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DDNum)%AirHumRat,DamperHotAirInlet(DDNum)%AirTemp)
@@ -1414,8 +1414,8 @@ namespace DualDuct {
             }
 
             // Apply the zone maximum outdoor air fraction for VAV boxes - a TRACE feature
-            if (ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
-                MassFlow *= ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
+            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
+                MassFlow *= state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
             }
 
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
@@ -1442,8 +1442,8 @@ namespace DualDuct {
             }
 
             // Apply the zone maximum outdoor air fraction for VAV boxes - a TRACE feature
-            if (ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
-                MassFlow *= ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
+            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
+                MassFlow *= state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
             }
 
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
@@ -1456,8 +1456,8 @@ namespace DualDuct {
                        this->dd_airterminalColdAirInlet.AirMassFlowRateMax / 2.0 * this->ZoneMinAirFrac;
 
             // Apply the zone maximum outdoor air fraction for VAV boxes - a TRACE feature
-            if (ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
-                MassFlow *= ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
+            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor > 1.0) {
+                MassFlow *= state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SupplyAirAdjustFactor;
             }
 
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
@@ -1619,9 +1619,9 @@ namespace DualDuct {
         this->CalcOAOnlyMassFlow(state, OAMassFlow);
 
         // The calculated load from the Heat Balance, adjusted for any equipment sequenced before terminal
-        QTotLoadRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QtoHeatSPRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        QtoCoolSPRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QTotLoadRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QtoHeatSPRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QtoCoolSPRemain = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         // Calculate all of the required Cp's
         CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);

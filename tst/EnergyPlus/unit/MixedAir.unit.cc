@@ -793,7 +793,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     Node(10).HumRat = 0.008;
     Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataEnvrn->OutBaroPress = 101325;
-    ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     state->dataMixedAir->OAController(1).CalcOAController(*state, 1, true);
 
@@ -1655,8 +1655,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     EXPECT_EQ(state->dataMixedAir->OAController(ControllerNum).HumidistatZoneNum, 1);
 
     // Set up conditions
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).TotalOutputRequired = -1.0; // dehumidification requested by humidistat
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).TotalOutputRequired = -1.0; // dehumidification requested by humidistat
     EXPECT_EQ(state->dataMixedAir->OAController(ControllerNum).NodeNumofHumidistatZone, state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode);
     int airLoopNum = 1;
     int outAirMinFrac = 0.0;
@@ -5658,7 +5658,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Node(10).HumRat = 0.008;
     Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataEnvrn->OutBaroPress = 101325;
-    ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ZoneIntGain.allocate(1);
     ZoneIntGain(1).NOFOCC = 0.1;
     Schedule(5).CurrentValue = 900.0;
@@ -5696,7 +5696,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
-    ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
     state->dataContaminantBalance->ContaminantControlledZone.deallocate();
     ZoneIntGain.deallocate();

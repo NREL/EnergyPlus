@@ -852,14 +852,14 @@ namespace UnitHeater {
         InNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
         OutNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
 
-        state.dataUnitHeaters->QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // zone load needed
+        state.dataUnitHeaters->QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // zone load needed
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr > 0) {
             if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr) == 0.0 && state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = CycFanCycCoil;
             } else {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = ContFanCycCoil;
             }
-            if ((state.dataUnitHeaters->QZnReq < SmallLoad) || CurDeadBandOrSetback(ZoneNum)) {
+            if ((state.dataUnitHeaters->QZnReq < SmallLoad) || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 // Unit is available, but there is no load on it or we are in setback/deadband
                 if (!state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating && GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr) > 0.0) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = ContFanCycCoil;
@@ -871,7 +871,7 @@ namespace UnitHeater {
         if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) > 0) {
             if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating &&
-                    ((ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP < SmallLoad) || (CurDeadBandOrSetback(ZoneNum)))) {
+                    ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)))) {
                     state.dataUnitHeaters->SetMassFlowRateToZero = true;
                 }
             } else {
@@ -1470,7 +1470,7 @@ namespace UnitHeater {
                 }
                 CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut);
 
-            } else if ((state.dataUnitHeaters->QZnReq < SmallLoad) || CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((state.dataUnitHeaters->QZnReq < SmallLoad) || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 // Unit is available, but there is no load on it or we are in setback/deadband
                 if (!state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating) {
 
@@ -1587,7 +1587,7 @@ namespace UnitHeater {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanPartLoadRatio = Node(InletNode).MassFlowRate / Node(InletNode).MassFlowRateMax;
             }
         } else { // OnOff fan and cycling
-            if ((state.dataUnitHeaters->QZnReq < SmallLoad) || (CurDeadBandOrSetback(ZoneNum)) || GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
+            if ((state.dataUnitHeaters->QZnReq < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) || GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
                 ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
                 // Case 1: OFF-->unit schedule says that it it not available
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager

@@ -600,8 +600,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysOutletNodeNum = NodeInputManager::GetOnlySingleNode(*state, "FAN INLET NODE",
@@ -715,11 +715,11 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataLoopNode::Node(zoneInletNode).HumRat = 0.0008;
     DataLoopNode::Node(zoneInletNode).Temp = 20.0;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
     // pick these next values so ExtrRateNoHC doesn't exceed loat to sp
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
 
     DataLoopNode::Node(zoneAirNode).Temp = 22.0; // zone air node
     DataLoopNode::Node(zoneAirNode).HumRat = 0.0008;
@@ -1218,8 +1218,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     state->dataSetPointManager->ColdestSetPtMgr(1).AirLoopNum = 1;
 
     SetPointManager::InitSetPointManagers(*state);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
 
     EXPECT_EQ(DataLoopNode::NodeID(2), "SPACE1-1 IN NODE");
     EXPECT_EQ(DataLoopNode::NodeID(5), "SPACE1-1 NODE");
@@ -1240,7 +1240,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(2).HumRat);
     ZoneSetPointTemp = DataLoopNode::Node(5).Temp +
-                       DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
+                       state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
     EXPECT_EQ(DataLoopNode::NodeID(12), "HCOIL OUTLET NODE");
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
@@ -1535,9 +1535,9 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     auto &coolSPNode(DataLoopNode::Node(coolSPNodeNum));
     auto &heatSPNode(DataLoopNode::Node(heatSPNodeNum));
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
@@ -1547,8 +1547,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 1 - No load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, zoneNode.Temp, 0.001);
     EXPECT_NEAR(heatSPNode.TempSetPoint, zoneNode.Temp, 0.001);
@@ -1556,8 +1556,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 2 - Small heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 20.994, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 20.497, 0.01);
@@ -1565,8 +1565,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 3 - Large heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 99.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 45.0, 0.01);
@@ -1574,8 +1574,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 4 - Small cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 19.50, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 19.01, 0.01);
@@ -1583,8 +1583,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 5 - Large cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);

@@ -351,32 +351,21 @@ namespace HybridUnitaryAirConditioners {
         //       MODIFIED
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        //
-
-        // METHODOLOGY EMPLOYED:
-        //
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using namespace DataLoopNode;
         using namespace Psychrometrics;
+
         Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 
         Real64 ZoneCoolingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
         Real64 ZoneHeatingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
         Real64 OutputRequiredToHumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
 
         Real64 OutputRequiredToDehumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
 
         SensibleOutputProvided = 0;

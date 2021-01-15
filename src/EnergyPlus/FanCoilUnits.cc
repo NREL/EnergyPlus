@@ -2355,8 +2355,8 @@ namespace FanCoilUnits {
                 }
 
                 // then calculate the loads at the coils
-                QCoilHeatSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP - QUnitOutNoHC;
-                QCoilCoolSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP - QUnitOutNoHC;
+                QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP - QUnitOutNoHC;
+                QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
                 // if cooling
                 if (UnitOn && QCoilCoolSP < (-1.0 * SmallLoad) && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
@@ -2386,7 +2386,7 @@ namespace FanCoilUnits {
                         QUnitOutMaxC = FanCoil(FanCoilNum).QUnitOutMaxC;
                         MdotLockC = mdot; // save locked flow
                     }
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     if (QUnitOutMaxC < QZnReq) {
                         // more cooling than required, find reduced water flow rate to meet the load
                         // solve for the cold water flow rate with no limit set by flow rate lockdown
@@ -2533,7 +2533,7 @@ namespace FanCoilUnits {
                         // not HW coil
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxH, 1.0);
                     }
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
                     if (QUnitOutMaxH > QZnReq) {
                         // more heating than required, find reduced water flow rate to meet the load
                         if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
@@ -2687,7 +2687,7 @@ namespace FanCoilUnits {
                 // cycling fan constant water flow AND VarFanVarFlow
             } else if ((SELECT_CASE_var == CCM_CycFan) || (SELECT_CASE_var == CCM_VarFanVarFlow)) {
 
-                if (CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
+                if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
 
                 // zero the hot & cold water flows
                 mdot = 0.0;
@@ -2719,12 +2719,12 @@ namespace FanCoilUnits {
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutNoHC, 0.0);
 
                 // get the loads at the coil
-                QCoilHeatSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP - QUnitOutNoHC;
-                QCoilCoolSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP - QUnitOutNoHC;
+                QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP - QUnitOutNoHC;
+                QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP - QUnitOutNoHC;
 
                 // speed fan selection only for multispeed cycling fan
                 if (UnitOn && (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_CycFan)) {
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
 
                     // set water side mass flow rate
                     if (QCoilCoolSP < 0) {
@@ -2764,7 +2764,7 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).CoolCoilBranchNum,
                                          FanCoil(FanCoilNum).CoolCoilCompNum);
 
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
 
                     // get the maximum output of the fcu
@@ -2874,7 +2874,7 @@ namespace FanCoilUnits {
                                              FanCoil(FanCoilNum).HeatCoilCompNum);
                     }
 
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
                     ControlOffset = FanCoil(FanCoilNum).HotControlOffset;
 
                     // get the maximum output of the fcu
@@ -3069,8 +3069,8 @@ namespace FanCoilUnits {
                                      QUnitOutNoHC,
                                      0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
-                    QCoilCoolSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-                    QCoilHeatSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+                    QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                    QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
 
                     if (QCoilHeatSP > 0.0 && QCoilCoolSP > 0.0 && TempControlType(ZoneNum) != SingleCoolingSetPoint) {
                         QZnReq = QCoilHeatSP;
@@ -3180,7 +3180,7 @@ namespace FanCoilUnits {
                 // cycling fan constant water flow AND VarFanVarFlow
             } else if (SELECT_CASE_var == CCM_VarFanConsFlow) {
 
-                if (CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
+                if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
 
                 //  zero the hot & cold water flows
                 //    Node(FanCoil(FanCoilNum)%CoolCoilFluidInletNode)%MassFlowRate = 0.0
@@ -3211,7 +3211,7 @@ namespace FanCoilUnits {
                                  QUnitOutNoHC,
                                  0.0); // needs PLR=0 for electric heating coil, otherwise will run at full capacity
 
-                if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
+                if (UnitOn && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP < (-1.0 * SmallLoad) &&
                     TempControlType(ZoneNum) != SingleHeatingSetPoint) {
                     // cooling coil action, maximum cold water flow
                     mdot = FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
@@ -3222,7 +3222,7 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).CoolCoilLoopSide,
                                          FanCoil(FanCoilNum).CoolCoilBranchNum,
                                          FanCoil(FanCoilNum).CoolCoilCompNum);
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
 
                     // get the maximum output of the fcu
@@ -3260,7 +3260,7 @@ namespace FanCoilUnits {
                     // at the end calculate output with adjusted PLR
                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
 
-                } else if (UnitOn && ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP > SmallLoad &&
+                } else if (UnitOn && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP > SmallLoad &&
                            TempControlType(ZoneNum) != SingleCoolingSetPoint) {
                     // heating coil action, maximun hot water flow
                     if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
@@ -3273,7 +3273,7 @@ namespace FanCoilUnits {
                                              FanCoil(FanCoilNum).HeatCoilBranchNum,
                                              FanCoil(FanCoilNum).HeatCoilCompNum);
                     }
-                    QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+                    QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
                     ControlOffset = FanCoil(FanCoilNum).HotControlOffset;
 
                     // get the maximum output of the fcu
@@ -3903,7 +3903,7 @@ namespace FanCoilUnits {
         InletNode = FanCoil(FanCoilNum).AirInNode;
         AirMassFlow = Node(InletNode).MassFlowRate;
 
-        if (CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
+        if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || AirMassFlow < SmallMassFlow) UnitOn = false;
 
         FanCoil(FanCoilNum).SpeedFanSel = 1;
         FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
@@ -3935,8 +3935,8 @@ namespace FanCoilUnits {
         // no load output, requires setting eHeatCoilCyclingR = 0.0, for electric heating coils
         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutNoHC, _, 0.0);
 
-        QCoilCoolSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        QCoilHeatSP = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QCoilCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QCoilHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         HeatingLoad = false;
         CoolingLoad = false;
 

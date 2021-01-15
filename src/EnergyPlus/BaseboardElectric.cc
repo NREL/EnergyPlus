@@ -96,8 +96,6 @@ namespace BaseboardElectric {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Electric Baseboard units.
 
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
         int BaseboardNum; // index of unit in baseboard array
         Real64 QZnReq;    // zone load not yet satisfied
 
@@ -138,7 +136,7 @@ namespace BaseboardElectric {
 
         InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
-        QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
         SimElectricConvective(state, BaseboardNum, QZnReq);

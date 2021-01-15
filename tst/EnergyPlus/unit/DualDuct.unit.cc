@@ -442,7 +442,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from dual duct VAV AT
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 2000.0;
     DataLoopNode::Node(ZoneNodeNum).Temp = 20.0;
     DataLoopNode::Node(HotInNode).Temp = 35.0;
     DataLoopNode::Node(HotInNode).HumRat = 0.0075;

@@ -7781,9 +7781,9 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->CoolingLoad = false;
                 if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 and this->m_AirLoopEquipment) {
                     // air loop equipment uses sequenced variables
-                    state.dataUnitarySystems->QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToCoolingSP(this->m_ZoneSequenceCoolingNum);
-                    state.dataUnitarySystems->QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToHeatingSP(this->m_ZoneSequenceHeatingNum);
                     if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
                         DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
@@ -7802,14 +7802,14 @@ namespace UnitarySystems {
                     } else if (state.dataUnitarySystems->QToHeatSetPt <= 0.0 && state.dataUnitarySystems->QToCoolSetPt >= 0.0) {
                         ZoneLoad = 0.0;
                     }
-                    state.dataUnitarySystems->MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToDehumidSP(this->m_ZoneSequenceCoolingNum);
                 } else {
                     // zone equipment uses Remaining* variables
-                    ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
-                    state.dataUnitarySystems->QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
-                    state.dataUnitarySystems->QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
-                    state.dataUnitarySystems->MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
+                    ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
+                    state.dataUnitarySystems->QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
+                    state.dataUnitarySystems->QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
+                    state.dataUnitarySystems->MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
                 }
 
                 if (ZoneLoad < 0.0 && state.dataUnitarySystems->MoistureLoad <= 0.0 && (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
@@ -9839,7 +9839,7 @@ namespace UnitarySystems {
         if (allocated(state.dataZoneCtrls->StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
             if (state.dataZoneCtrls->StageZoneLogic(this->ControlZoneNum)) {
                 this->m_Staged = true;
-                this->m_StageNum = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
+                this->m_StageNum = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
             } else {
                 if (this->m_MyStagedFlag) {
                     ShowWarningError(state, "ZoneControl:Thermostat:StagedDualSetpoint is found, but is not applied to this UnitarySystem "
@@ -9857,7 +9857,7 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->CoolingLoad = false;
                 QZnReq = 0.0;
             } else {
-                QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired / this->ControlZoneMassFlowFrac;
+                QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired / this->ControlZoneMassFlowFrac;
                 if (this->m_StageNum > 0) {
                     state.dataUnitarySystems->HeatingLoad = true;
                     state.dataUnitarySystems->CoolingLoad = false;

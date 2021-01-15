@@ -2257,10 +2257,10 @@ namespace UserDefinedComponents {
             this->myOneTimeFlag = false;
         }
         // fill internal variable targets
-        this->RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        this->RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
-        this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
+        this->RemainingOutputToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        this->RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        this->RemainingOutputReqToDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
+        this->RemainingOutputReqToHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
         this->ZoneAir.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp,
@@ -2344,10 +2344,10 @@ namespace UserDefinedComponents {
             this->myOneTimeFlag = false;
         }
         // fill internal variable targets
-        this->RemainingOutputToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        this->RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        this->RemainingOutputReqToDehumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
-        this->RemainingOutputReqToHumidSP = DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
+        this->RemainingOutputToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        this->RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        this->RemainingOutputReqToDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP;
+        this->RemainingOutputReqToHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToHumidSP;
 
         this->AirLoop.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp,

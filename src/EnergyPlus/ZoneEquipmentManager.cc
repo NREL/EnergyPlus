@@ -229,8 +229,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::NumOfSizingTypes;
         using DataHVACGlobals::ZoneComp;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;
@@ -253,14 +251,14 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex == 0) continue;
                 ZoneEquipCount = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex).NumOfEquipTypes;
-                ZoneSysEnergyDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
-                ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
-                ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
-                ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
-                ZoneSysMoistureDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
-                ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
-                ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
-                ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToHeatingSP.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).SequencedOutputRequiredToCoolingSP.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).NumZoneEquipment = ZoneEquipCount;
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequired.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToHumidSP.allocate(ZoneEquipCount);
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).SequencedOutputRequiredToDehumidSP.allocate(ZoneEquipCount);
                 ZoneEqSizing(ControlledZoneNum).SizingMethod.allocate(NumOfSizingTypes);
                 ZoneEqSizing(ControlledZoneNum).SizingMethod = 0;
             }
@@ -427,8 +425,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallTempDiff;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::DeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         // Parameters
         static std::string const RoutineName("SizeZoneEquipment");
@@ -539,9 +535,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
             //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
-            if (!DeadBandOrSetback(ActualZoneNum) && std::abs(ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired) > SmallLoad) {
+            if (!state.dataZoneEnergyDemand->DeadBandOrSetback(ActualZoneNum) && std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired) > SmallLoad) {
                 // Determine design supply air temperture and design supply air temperature difference
-                if (ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired < 0.0) { // Cooling case
+                if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired < 0.0) { // Cooling case
                     // If the user specify the design cooling supply air temperature, then
                     if (CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).ZnCoolDgnSAMethod == SupplyAirTemperature) {
                         Temp = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTemp;
@@ -574,7 +570,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 }
 
                 Enthalpy = PsyHFnTdbW(Temp, HumRat);
-                SysOutputProvided = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired;
+                SysOutputProvided = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired;
                 CpAir = PsyCpAirFnW(HumRat);
                 if (std::abs(DeltaTemp) > SmallTempDiff) {
                     //!!PH/WFB/LKL (UCDV model)        MassFlowRate = SysOutputProvided / (CpAir*DeltaTemp)
@@ -3165,9 +3161,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Set simulation priorities based on user specified priorities and
         // required conditions (heating or cooling).
 
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
         int CurEqCoolingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
@@ -3201,8 +3194,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             for (int ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum) {
                 auto &psc(state.dataZoneEquipmentManager->PrioritySimOrder(ComparedEquipTypeNum));
 
-                if ((CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired < 0.0) ||
-                    (CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired >= 0.0)) {
+                if ((CurEqCoolingPriority > psc.CoolingPriority && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired < 0.0) ||
+                    (CurEqHeatingPriority > psc.HeatingPriority && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired >= 0.0)) {
 
                     // Tuned C++ string swap avoids copying
                     pso.EquipType.swap(psc.EquipType);
@@ -3233,8 +3226,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // METHODOLOGY EMPLOYED:
         // Initialize remaining output variables using predictor calculations
 
-        auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-        auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum));
+        auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
+        auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
 
         energy.RemainingOutputRequired = energy.TotalOutputRequired;
         energy.UnadjRemainingOutputRequired = energy.TotalOutputRequired;
@@ -3319,7 +3312,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
         }
 
-        DataZoneEnergyDemands::CurDeadBandOrSetback(ZoneNum) = DataZoneEnergyDemands::DeadBandOrSetback(ZoneNum);
+        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
 
         DistributeSystemOutputRequired(state, ZoneNum, FirstHVACIteration);
     }
@@ -3339,8 +3332,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             return;
         }
 
-        auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ActualZoneNum));
-        auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ActualZoneNum));
+        auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum));
+        auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum));
         auto &thisZEqList(state.dataZoneEquip->ZoneEquipList(ctrlZoneNum));
         Real64 heatLoadRatio = 1.0;
         Real64 coolLoadRatio = 1.0;
@@ -3629,14 +3622,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::SingleCoolingSetPoint;
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::DeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 
         int ctrlZoneNum = DataHeatBalance::Zone(ZoneNum).ZoneEqNum;
-        auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
-        auto &moisture(DataZoneEnergyDemands::ZoneSysMoistureDemand(ZoneNum));
+        auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
+        auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
 
         // If zone is uncontrolled use original method for remaining output
         if (!DataHeatBalance::Zone(ZoneNum).IsControlled) {
@@ -3659,30 +3648,30 @@ namespace EnergyPlus::ZoneEquipmentManager {
             {
                 auto const SELECT_CASE_var(TempControlType(ZoneNum));
                 if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
-                    CurDeadBandOrSetback(ZoneNum) = false;
+                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
                     if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
                     if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
                     if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
                     if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 }
             }
@@ -3762,30 +3751,30 @@ namespace EnergyPlus::ZoneEquipmentManager {
             {
                 auto const SELECT_CASE_var(TempControlType(ZoneNum));
                 if (SELECT_CASE_var == 0) { // uncontrolled zone; shouldn't ever get here, but who knows
-                    CurDeadBandOrSetback(ZoneNum) = false;
+                    state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                 } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
                     if ((energy.RemainingOutputRequired - 1.0) < 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
                     if ((energy.RemainingOutputRequired + 1.0) > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
                     if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
                     if (energy.RemainingOutputReqToHeatSP < 0.0 && energy.RemainingOutputReqToCoolSP > 0.0) {
-                        CurDeadBandOrSetback(ZoneNum) = true;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = true;
                     } else {
-                        CurDeadBandOrSetback(ZoneNum) = false;
+                        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
                     }
                 }
             }
@@ -4331,10 +4320,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataLoopNode::Node;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::DeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
 

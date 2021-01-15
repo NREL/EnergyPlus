@@ -1433,7 +1433,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1) / state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
     EXPECT_NEAR(
         10.0,
-        (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
+        (state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).TotalOutputRequired / state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired),
         0.00001);
 
     state->dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters

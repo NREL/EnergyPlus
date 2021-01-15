@@ -73,7 +73,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -187,7 +186,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
-    DataZoneEnergyDemands::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();

@@ -788,12 +788,10 @@ namespace ElectricBaseboardRadiator {
 
         // METHODOLOGY EMPLOYED:
         // This is primarily modified from Convective Electric Baseboard. An existing algorithm of radiant
-        // heat transfer calculation in the High Tmeperature Radiant System module is implemented.
+        // heat transfer calculation in the High Temperature Radiant System module is implemented.
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
@@ -815,7 +813,7 @@ namespace ElectricBaseboardRadiator {
         Real64 LoadMet;
 
         ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = ElecBaseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
         CpAir = PsyCpAirFnW(ElecBaseboard(BaseboardNum).AirInletHumRat);
@@ -826,7 +824,7 @@ namespace ElectricBaseboardRadiator {
         // thermal loss that could be accounted for with this efficiency input.
         Effic = ElecBaseboard(BaseboardNum).BaseboardEfficiency;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(state, ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
+        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(state, ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
 
             // If the load exceeds the capacity than the capacity is set to the BB limit.
             if (QZnReq > ElecBaseboard(BaseboardNum).NominalCapacity) {

@@ -60,8 +60,6 @@ namespace EnergyPlus {
 
 namespace DataZoneControls {
 
-    void clear_state();
-
     struct ZoneTempControls
     {
         // Members

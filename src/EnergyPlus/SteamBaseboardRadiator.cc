@@ -134,10 +134,6 @@ namespace SteamBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the steam baseboards or radiators.
 
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -185,9 +181,9 @@ namespace SteamBaseboardRadiator {
 
             InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
-            if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ActualZoneNum) &&
+            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ActualZoneNum) &&
                 (GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0.0)) {
 
                 // On the first HVAC iteration the system values are given to the controller, but after that
@@ -1075,8 +1071,6 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSatDensityRefrig;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatSpecificHeatRefrig;
@@ -1109,13 +1103,13 @@ namespace SteamBaseboardRadiator {
         Real64 Cp;
 
         ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         SteamInletTemp = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).Temp;
         SteamOutletTemp = SteamInletTemp;
         SteamMassFlowRate = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRate;
         SubcoolDeltaT = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DegOfSubcooling;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && SteamMassFlowRate > 0.0 &&
+        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && SteamMassFlowRate > 0.0 &&
             GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0) {
             // Unit is on
             EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, SteamInletTemp, 1.0, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FluidIndex, RoutineName);

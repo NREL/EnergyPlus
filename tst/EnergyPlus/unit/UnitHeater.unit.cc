@@ -1326,8 +1326,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
 
     ZoneSizingRunDone = true;
     ZoneEqSizing.allocate(1);
@@ -1338,8 +1338,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     ZoneCompTurnFansOff = false;
 
     Schedule(1).CurrentValue = 1;
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(ZoneNum) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
     Node(Fan(1).InletNodeNum).Temp = 16.6;
     Node(Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
@@ -2446,9 +2446,9 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
     // set the zone loads
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
-    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 15000.0;
-    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 20000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 15000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 20000.0;
     // local variables
     bool SimZoneEquipment = true;
     bool SimAirLoops = true;
@@ -2462,5 +2462,5 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // check the unit heater heating coil is handling the remaining load
     EXPECT_NEAR(HeatingCoils::HeatingCoil(2).HeatingCoilRate, 213.9, 1.0);
     // finaly check that RemaingingOutputRequired is zero
-    EXPECT_EQ(ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
+    EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired, 0.0);
 }

@@ -1164,9 +1164,9 @@ namespace HVACSingleDuctInduc {
                            .NodeNumOut;
         PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
         SecAirMassFlow = InducRat * PriAirMassFlow;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
-        QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // On the first HVAC iteration the system values are given to the controller, but after that
         // the demand limits are in place and there needs to be feedback to the Zone Equipment
 

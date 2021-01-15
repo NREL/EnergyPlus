@@ -673,10 +673,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -1004,10 +1004,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -1418,10 +1418,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -1831,10 +1831,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -2512,10 +2512,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -3188,10 +3188,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -4940,10 +4940,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -6692,10 +6692,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -6929,11 +6929,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
-    state->dataUnitVentilators->QZnReq = ZoneSysEnergyDemand(1).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
+    state->dataUnitVentilators->QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
 
     Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -7166,11 +7166,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 5000.0;
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputRequired;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 5000.0;
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
 
     Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
     Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
@@ -7639,8 +7639,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(ZoneEqSizing(1));
     zoneEqSizing.SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
     ZoneSizingRunDone = true;
@@ -7671,8 +7671,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     // heating mode tests
     FanCoilUnits::CoolingLoad = false;
     FanCoilUnits::HeatingLoad = true;
-    ZoneSysEnergyDemand.allocate(1);
-    auto &zoneSysEnergyDemand(ZoneSysEnergyDemand(1));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zoneSysEnergyDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
     auto &zoneEquipConfig(state->dataZoneEquip->ZoneEquipConfig(1));
 
     // set zone air node conditions
@@ -8070,8 +8070,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     ZoneEqSizing.allocate(1);
     auto &zoneEqSizing(ZoneEqSizing(1));
     zoneEqSizing.SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    CurDeadBandOrSetback.allocate(1);
-    CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
     ZoneSizingRunDone = true;
@@ -8102,8 +8102,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     // heating mode tests
     FanCoilUnits::CoolingLoad = false;
     FanCoilUnits::HeatingLoad = true;
-    ZoneSysEnergyDemand.allocate(1);
-    auto &zoneSysEnergyDemand(ZoneSysEnergyDemand(1));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zoneSysEnergyDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
     auto &zoneEquipConfig(state->dataZoneEquip->ZoneEquipConfig(1));
 
     // set zone air node conditions

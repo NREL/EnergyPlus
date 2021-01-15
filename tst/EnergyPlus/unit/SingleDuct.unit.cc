@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     //  3   Zone 1 Supply Inlet
     //  4   Zone 1 Zone Equip Inlet
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     // Setup for Zone 1 VAV No Reheat
     int SysNum = 1;
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     Real64 SysMaxMassFlow = 2.0 * state->dataEnvrn->StdRhoAir; // From inputs for Zone 1 VAV
 
     // Test with heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Test with cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
@@ -227,7 +227,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     //  4   Zone 1 VAV Reheat Coil Air Inlet
     //  5   Zone 1 Zone Equip Inlet
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
     // Setup for Zone 1 VAV No Reheat
     int SysNum = 1;
@@ -338,7 +338,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     Real64 SysMaxMassFlow = 1.0 * state->dataEnvrn->StdRhoAir;  // From inputs for Zone 1 VAV
 
     // Test with heating load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // Heating load - expect min flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
@@ -368,7 +368,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     EXPECT_EQ(SysMinMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Test with cooling load
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.0; // Cooling load - expect max flow rate
 
     // First test - AlwaysOff Schedule - expecting no flow
     state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr = 1;
@@ -399,7 +399,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     // Cleanup
     DataHeatBalFanSys::TempControlType.deallocate();
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)

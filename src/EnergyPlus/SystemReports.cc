@@ -3364,10 +3364,10 @@ namespace EnergyPlus::SystemReports {
 
             // retrieve the zone load for each zone
             ActualZoneNum = zecCtrlZone.ActualZoneNum;
-            ZoneLoad = ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
 
             // if system operating in deadband reset zone load
-            if (DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
+            if (state.dataZoneEnergyDemand->DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
 
             // loop over the zone supply air path inlet nodes
             for (ZoneInNum = 1; ZoneInNum <= zecCtrlZone.NumInletNodes; ++ZoneInNum) {
@@ -4144,11 +4144,11 @@ namespace EnergyPlus::SystemReports {
 
             // retrieve the zone load for each zone
             ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
-            ZoneLoad = ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).TotalOutputRequired;
             ZoneVolume = Zone(ActualZoneNum).Volume * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier; // CR 7170
 
             // if system operating in deadband reset zone load
-            if (DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
+            if (state.dataZoneEnergyDemand->DeadBandOrSetback(ActualZoneNum)) ZoneLoad = 0.0;
 
             // first deal with any (and all) Zone Forced Air Units that might have outside air.
             for (thisZoneEquipNum = 1; thisZoneEquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).EquipListIndex).NumOfEquipTypes;

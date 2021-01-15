@@ -123,11 +123,6 @@ namespace ZoneTempPredictorCorrector {
     using namespace DataHVACGlobals;
     using namespace DataHeatBalance;
     using namespace DataHeatBalFanSys;
-    using DataZoneEnergyDemands::CurDeadBandOrSetback;
-    using DataZoneEnergyDemands::DeadBandOrSetback;
-    using DataZoneEnergyDemands::Setback;
-    using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-    using DataZoneEnergyDemands::ZoneSysMoistureDemand;
     using namespace Psychrometrics;
     using namespace DataRoomAirModel;
     using namespace DataZoneControls;
@@ -2661,9 +2656,9 @@ namespace ZoneTempPredictorCorrector {
                 ZoneComfortControlsFanger.allocate(state.dataGlobal->NumOfZones);
             }
             state.dataZoneTempPredictorCorrector->ZoneSetPointLast.dimension(state.dataGlobal->NumOfZones, 0.0);
-            Setback.dimension(state.dataGlobal->NumOfZones, false);
-            DeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
-            CurDeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataZoneEnergyDemand->Setback.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataZoneEnergyDemand->DeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
+            state.dataZoneEnergyDemand->CurDeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
             SNLoadHeatEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
             SNLoadCoolEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
             SNLoadHeatRate.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -2721,8 +2716,8 @@ namespace ZoneTempPredictorCorrector {
             PreviousMeasuredHumRat3.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Allocate Derived Types
-            ZoneSysEnergyDemand.allocate(state.dataGlobal->NumOfZones);
-            ZoneSysMoistureDemand.allocate(state.dataGlobal->NumOfZones);
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state.dataGlobal->NumOfZones);
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state.dataGlobal->NumOfZones);
 
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 FirstSurfFlag = true;
@@ -2809,19 +2804,19 @@ namespace ZoneTempPredictorCorrector {
                 //Second, these report variable ARE multiplied by zone and group multipliers
                 SetupOutputVariable(state, "Zone System Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    ZoneSysEnergyDemand(Loop).TotalOutputRequired,
+                                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Loop).TotalOutputRequired,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    ZoneSysEnergyDemand(Loop).OutputRequiredToHeatingSP,
+                                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Loop).OutputRequiredToHeatingSP,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    ZoneSysEnergyDemand(Loop).OutputRequiredToCoolingSP,
+                                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Loop).OutputRequiredToCoolingSP,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
@@ -2850,19 +2845,19 @@ namespace ZoneTempPredictorCorrector {
                 //Second, these report variable ARE multiplied by zone and group multipliers
                 SetupOutputVariable(state, "Zone System Predicted Moisture Load Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    ZoneSysMoistureDemand(Loop).TotalOutputRequired,
+                                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(Loop).TotalOutputRequired,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone System Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
+                                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone System Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
+                                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
@@ -2898,7 +2893,7 @@ namespace ZoneTempPredictorCorrector {
                     if (state.dataZoneCtrls->StageZoneLogic(Loop)) {
                         SetupOutputVariable(state, "Zone Thermostat Staged Number",
                                             OutputProcessor::Unit::None,
-                                            ZoneSysEnergyDemand(Loop).StageNum,
+                                            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Loop).StageNum,
                                             "System",
                                             "Average",
                                             Zone(Loop).Name);
@@ -3002,28 +2997,28 @@ namespace ZoneTempPredictorCorrector {
 
             LoadCorrectionFactor = 1.0; // PH 3/3/04
             TempControlType = 0;
-            for (auto &e : ZoneSysEnergyDemand) {
+            for (auto &e : state.dataZoneEnergyDemand->ZoneSysEnergyDemand) {
                 e.RemainingOutputRequired = 0.0;
                 e.TotalOutputRequired = 0.0;
             }
-            for (auto &e : ZoneSysMoistureDemand) {
+            for (auto &e : state.dataZoneEnergyDemand->ZoneSysMoistureDemand) {
                 e.RemainingOutputRequired = 0.0;
                 e.TotalOutputRequired = 0.0;
             }
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired)) ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = 0.0;
-                if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP = 0.0;
-                if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
-                    ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP = 0.0;
-                if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired)) ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = 0.0;
-                if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-                    ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP = 0.0;
-                if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-                    ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired)) state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired)) state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
+                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP = 0.0;
+                if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
+                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP = 0.0;
             }
 
-            DeadBandOrSetback = false;
+            state.dataZoneEnergyDemand->DeadBandOrSetback = false;
             SNLoadHeatEnergy = 0.0;
             SNLoadCoolEnergy = 0.0;
             SNLoadHeatRate = 0.0;
@@ -3300,7 +3295,7 @@ namespace ZoneTempPredictorCorrector {
                             Itemp = -I;
                         }
                     }
-                    ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
                     if (SetpointOffset >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
                         ZoneThermostatSetPointHi(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
@@ -3317,7 +3312,7 @@ namespace ZoneTempPredictorCorrector {
                             Itemp = I;
                         }
                     }
-                    ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
                     if (std::abs(SetpointOffset) >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
                         ZoneThermostatSetPointLo(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
@@ -3331,7 +3326,7 @@ namespace ZoneTempPredictorCorrector {
                         state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     ZoneThermostatSetPointLo(ActualZoneNum) =
                         state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
-                    ZoneSysEnergyDemand(ActualZoneNum).StageNum = 0;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = 0;
                 }
             }
         }
@@ -3712,12 +3707,12 @@ namespace ZoneTempPredictorCorrector {
             for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++RelativeZoneNum) {
                 if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet > 0.0) {
                     ZoneNum = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ActualZoneNum;
-                    if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag && ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
+                    if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired >= 0.0) {
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolModeLast = true;
                     } else {
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolModeLast = false;
                     }
-                    if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag && ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired <= 0.0) {
+                    if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag && state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired <= 0.0) {
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatModeLast = true;
                     } else {
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatModeLast = false;
@@ -3977,7 +3972,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneSetPoint;
 
         // FLOW:
-        DeadBandOrSetback(ZoneNum) = false;
+        state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = false;
         ZoneSetPoint = 0.0;
         LoadToHeatingSetPoint = 0.0;
         LoadToCoolingSetPoint = 0.0;
@@ -3989,7 +3984,7 @@ namespace ZoneTempPredictorCorrector {
                 // Uncontrolled Zone
                 LoadToHeatingSetPoint = 0.0;
                 LoadToCoolingSetPoint = 0.0;
-                ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
@@ -4011,12 +4006,12 @@ namespace ZoneTempPredictorCorrector {
                         state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
-                ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
                 ZoneSetPoint = TempZoneThermostatSetPoint(ZoneNum);
                 LoadToCoolingSetPoint = LoadToHeatingSetPoint;
                 // for consistency with the other cases, use LE instead of LT and don't subtract 1.0 Watt as a way of pushing the zero load
                 // case over the threshold
-                if ((ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) <= 0.0) DeadBandOrSetback(ZoneNum) = true;
+                if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) <= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
 
             } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
 
@@ -4040,12 +4035,12 @@ namespace ZoneTempPredictorCorrector {
                 if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
-                ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
                 ZoneSetPoint = TempZoneThermostatSetPoint(ZoneNum);
                 LoadToHeatingSetPoint = LoadToCoolingSetPoint;
                 // for consistency with the other cases, use GE instead of GT and don't add 1.0 Watt as a way of pushing the zero load
                 // case over the threshold
-                if ((ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) DeadBandOrSetback(ZoneNum) = true;
+                if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
 
             } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
 
@@ -4107,17 +4102,17 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
                 } else if (LoadToHeatingSetPoint < 0.0 && LoadToCoolingSetPoint < 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
                 } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
-                    DeadBandOrSetback(ZoneNum) = true;
+                    state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
                     ShowSevereError(state,
                         "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
@@ -4183,20 +4178,20 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
                     ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum);
                 } else if (LoadToHeatingSetPoint < 0.0 && LoadToCoolingSetPoint < 0.0) {
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
                     ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum);
                 } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
                     // this turns out to cause instabilities sometimes? that lead to setpoint errors if predictor is off.
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
-                    DeadBandOrSetback(ZoneNum) = true;
+                    state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
                     ShowSevereError(state,
                         "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team");
@@ -4217,17 +4212,17 @@ namespace ZoneTempPredictorCorrector {
         // Staged control zone
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
             if (state.dataZoneCtrls->StageZoneLogic(ZoneNum)) {
-                if (ZoneSysEnergyDemand(ZoneNum).StageNum == 0) { // No load
+                if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).StageNum == 0) { // No load
                     LoadToHeatingSetPoint = 0.0;
                     LoadToCoolingSetPoint = 0.0;
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(Zone(ZoneNum).SystemZoneNodeNumber).Temp;
                         ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
                         ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
-                    DeadBandOrSetback(ZoneNum) = true;
-                } else if (ZoneSysEnergyDemand(ZoneNum).StageNum < 0) { // Cooling load
+                    state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
+                } else if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).StageNum < 0) { // Cooling load
                     if (ZoneAirSolutionAlgo == Use3rdOrder) {
                         LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
@@ -4243,10 +4238,10 @@ namespace ZoneTempPredictorCorrector {
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
                                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
                     ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum);
                     LoadToHeatingSetPoint = LoadToCoolingSetPoint;
-                    if ((ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) DeadBandOrSetback(ZoneNum) = true;
+                    if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // Heating load
                     if (ZoneAirSolutionAlgo == Use3rdOrder) {
                         LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
@@ -4264,10 +4259,10 @@ namespace ZoneTempPredictorCorrector {
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
                                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                    ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
                     ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum);
                     LoadToCoolingSetPoint = LoadToHeatingSetPoint;
-                    if ((ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) <= 0.0) DeadBandOrSetback(ZoneNum) = true;
+                    if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) <= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 }
             }
         }
@@ -4278,32 +4273,32 @@ namespace ZoneTempPredictorCorrector {
         }
 
         if (ZoneSetPoint > state.dataZoneTempPredictorCorrector->ZoneSetPointLast(ZoneNum)) {
-            Setback(ZoneNum) = true;
+            state.dataZoneEnergyDemand->Setback(ZoneNum) = true;
         } else {
-            Setback(ZoneNum) = false;
+            state.dataZoneEnergyDemand->Setback(ZoneNum) = false;
         }
 
         state.dataZoneTempPredictorCorrector->ZoneSetPointLast(ZoneNum) = ZoneSetPoint;
         TempZoneThermostatSetPoint(ZoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
-        CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
+        state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
 
         // Apply the Zone Multiplier and Load Correction factor as needed
-        ReportSensibleLoadsZoneMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
-                                          ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
-                                          ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
+        ReportSensibleLoadsZoneMultiplier(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
+                                          state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
+                                          state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
                                           SNLoadPredictedRate(ZoneNum),SNLoadPredictedHSPRate(ZoneNum),SNLoadPredictedCSPRate(ZoneNum),
                                           LoadToHeatingSetPoint,LoadToCoolingSetPoint,
                                           LoadCorrectionFactor(ZoneNum),Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
-        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
-            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired; // array assignment
-        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
-            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
-                ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP; // array assignment
-        if (allocated(ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
-            ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
-                ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP))
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToHeatingSP =
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP))
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequiredToCoolingSP =
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP; // array assignment
     }
 
     void ReportSensibleLoadsZoneMultiplier(Real64 &TotalLoad,
@@ -4385,9 +4380,9 @@ namespace ZoneTempPredictorCorrector {
         LoadToHumidifySetPoint = 0.0;
         LoadToDehumidifySetPoint = 0.0;
         SingleSetPoint = false;
-        ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = 0.0;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = 0.0;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP = 0.0;
+        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = 0.0;
+        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = 0.0;
+        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP = 0.0;
 
         // Check to see if this is a "humidity controlled zone"
         ControlledHumidZoneFlag = false;
@@ -4615,7 +4610,7 @@ namespace ZoneTempPredictorCorrector {
                 LoadToHumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
-            ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
             WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             if (ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
@@ -4632,22 +4627,22 @@ namespace ZoneTempPredictorCorrector {
                 LoadToDehumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
-            ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
 
             // The load is added to the TotalOutputRequired as in the Temperature Predictor.  There is also the remaining
             // output variable for those who will use this for humidity control and stored in DataZoneEnergyDemands with the
             // analogous temperature terms.
             if (SingleSetPoint) {
-                ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToHumidifySetPoint;
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToHumidifySetPoint;
             } else {
                 if (LoadToHumidifySetPoint > 0.0 && LoadToDehumidifySetPoint > 0.0) {
-                    ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToHumidifySetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToHumidifySetPoint;
                     RHSetPoint = ZoneRHHumidifyingSetPoint;
                 } else if (LoadToHumidifySetPoint < 0.0 && LoadToDehumidifySetPoint < 0.0) {
-                    ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToDehumidifySetPoint;
+                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = LoadToDehumidifySetPoint;
                     RHSetPoint = ZoneRHDehumidifyingSetPoint;
                 } else if (LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0) { // deadband includes zero loads
-                    ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = 0.0;
+                    state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired = 0.0;
                 } else { // this should never occur!
                     ShowSevereError(state,
                         "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team");
@@ -4663,21 +4658,21 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Apply zone multipliers as needed
-        ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
-                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
-                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
+        ReportMoistLoadsZoneMultiplier(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
+                                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
+                                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
                                        MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
                                        Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
-        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
-            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
-        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
-            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
-                ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
-        if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
-            ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
-                ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP))
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToHumidSP =
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP; // array assignment
+        if (allocated(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP))
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
+                state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
     }
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
@@ -6770,8 +6765,6 @@ namespace ZoneTempPredictorCorrector {
         bool isAnyZoneOscillatingDuringOccupancy;
         bool isAnyZoneOscillatingInDeadband;
 
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
         // first time run allocate arrays and setup output variable
         if (state.dataZoneTempPredictorCorrector->SetupOscillationOutputFlag) {
             state.dataZoneTempPredictorCorrector->ZoneTempHist.allocate(4, state.dataGlobal->NumOfZones);
@@ -6851,7 +6844,7 @@ namespace ZoneTempPredictorCorrector {
                             isAnyZoneOscillatingDuringOccupancy = true;
                         }
                     }
-                    if (CurDeadBandOrSetback(iZone)) {
+                    if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(iZone)) {
                         state.dataZoneTempPredictorCorrector->ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
                         isAnyZoneOscillatingInDeadband = true;
                     }
