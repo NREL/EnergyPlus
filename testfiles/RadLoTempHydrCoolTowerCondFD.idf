@@ -1352,6 +1352,7 @@
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject1,      !- Name
    2.0,                     !- Heating Control Throttling Range {deltaC}
+    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
    CoolingDesignCapacity,   !- Cooling Design Capacity Method
    Autosize,                !- Cooling Design Capacity {W}
    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
@@ -1364,6 +1365,7 @@
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject2,      !- Name
    2.0,                     !- Heating Control Throttling Range {deltaC}
+    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
    CoolingDesignCapacity,   !- Cooling Design Capacity Method
    Autosize,                !- Cooling Design Capacity {W}
    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
@@ -1394,7 +1396,6 @@
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     ,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1423,7 +1424,6 @@
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     0.0025,                  !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1451,7 +1451,6 @@
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     0.0035,                  !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name

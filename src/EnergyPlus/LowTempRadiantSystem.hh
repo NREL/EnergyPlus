@@ -299,10 +299,8 @@ namespace LowTempRadiantSystem {
         Real64 WaterVolFlowMaxHeat;      // maximum water flow rate for heating, m3/s
         Real64 WaterFlowMaxHeat;         // maximum water flow rate for heating, kg/s
         Real64 HotThrottlRange;          // Throttling range for heating [C]
-        std::string HotSetptSched;       // Schedule name for the zone setpoint temperature
         std::string designObjectName;   // Design Object
         int DesignObjectPtr;
-        int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
         Real64 WaterMassFlowRate;     // water mass flow rate
@@ -313,7 +311,7 @@ namespace LowTempRadiantSystem {
 
         // Default Constructor
             VariableFlowRadiantSystemData()
-                : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), HotSetptSchedPtr(0), WaterVolFlowMaxCool(0.0),
+                : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), DesignObjectPtr(0), WaterVolFlowMaxCool(0.0),
                   WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
                   ScaledHeatingCapacity(0.0)
             {
@@ -335,6 +333,8 @@ namespace LowTempRadiantSystem {
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
         Real64 HotThrottlRange;          // Throttling range for heating [C]
+        std::string HotSetptSched;       // Schedule name for the zone setpoint temperature
+        int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
         Real64 ColdThrottlRange;    // Throttling range for cooling [C]
         Array1D_string FieldNames;
         int CondCtrlType;         // Condensation control type (initialize to simple off)
@@ -350,7 +350,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
+                HotThrottlRange(0.0), HotSetptSchedPtr(0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
                 ColdSetptSchedPtr(0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
         {
         }
