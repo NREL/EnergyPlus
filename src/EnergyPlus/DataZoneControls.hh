@@ -260,7 +260,6 @@ namespace DataZoneControls {
         }
     };
 
-    extern Array1D<ZoneComfortControls> ComfortControlledZone;
     extern Array1D<TStatObject> TStatObjects;
     extern Array1D<TStatObject> ComfortTStatObjects;
     extern Array1D<TStatObject> StagedTStatObjects;
@@ -285,6 +284,8 @@ struct DataZoneControlsData : BaseGlobalStruct
     bool GetZoneAirStatsInputFlag = true;       // True when need to get input
     Array1D<DataZoneControls::ZoneHumidityControls> HumidityControlZone;
     Array1D<DataZoneControls::ZoneTempControls> TempControlledZone;
+    Array1D<DataZoneControls::ZoneComfortControls> ComfortControlledZone;
+
     void clear_state() override
     {
         this->NumTempControlledZones = 0;
@@ -302,6 +303,7 @@ struct DataZoneControlsData : BaseGlobalStruct
         this->GetZoneAirStatsInputFlag = true;
         this->HumidityControlZone.deallocate();
         this->TempControlledZone.deallocate();
+        this->ComfortControlledZone.deallocate();
     }
 };
 

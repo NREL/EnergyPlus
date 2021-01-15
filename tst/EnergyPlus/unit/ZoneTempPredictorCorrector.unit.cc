@@ -1090,14 +1090,14 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_EMSOverrideSetpointTest)
 
     state->dataZoneCtrls->NumTempControlledZones = 0;
     state->dataZoneCtrls->NumComfortControlledZones = 1;
-    ComfortControlledZone.allocate(1);
+    state->dataZoneCtrls->ComfortControlledZone.allocate(1);
     ComfortControlType.allocate(1);
-    ComfortControlledZone(1).ActualZoneNum = 1;
-    ComfortControlledZone(1).EMSOverrideHeatingSetPointOn = true;
-    ComfortControlledZone(1).EMSOverrideCoolingSetPointOn = true;
+    state->dataZoneCtrls->ComfortControlledZone(1).ActualZoneNum = 1;
+    state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointOn = true;
+    state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointOn = true;
     ComfortControlType(1) = DualSetPointWithDeadBand;
-    ComfortControlledZone(1).EMSOverrideHeatingSetPointValue = 22;
-    ComfortControlledZone(1).EMSOverrideCoolingSetPointValue = 25;
+    state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideHeatingSetPointValue = 22;
+    state->dataZoneCtrls->ComfortControlledZone(1).EMSOverrideCoolingSetPointValue = 25;
 
     OverrideAirSetPointsforEMSCntrl(*state);
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));

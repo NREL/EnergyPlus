@@ -1701,7 +1701,6 @@ namespace EnergyPlus::DemandManager {
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataZoneControls::ComfortControlledZone;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
         using MixedAir::OASetDemandManagerVentilationFlow;
@@ -1766,15 +1765,15 @@ namespace EnergyPlus::DemandManager {
                 if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
                     if (ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
                         if (Action == DemandAction::CheckCanReduce) {
-                            if (ZoneThermostatSetPointLo(ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
-                                ZoneThermostatSetPointHi(ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
+                            if (ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
+                                ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
                                 CanReduceDemand = true; // Heating
                         } else if (Action == DemandAction::SetLimit) {
-                            ComfortControlledZone(LoadPtr).ManageDemand = true;
-                            ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                            ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
                         } else if (Action == DemandAction::ClearLimit) {
-                            ComfortControlledZone(LoadPtr).ManageDemand = false;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = false;
                         }
                     }
                 }

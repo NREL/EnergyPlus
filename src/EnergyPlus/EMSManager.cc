@@ -1990,17 +1990,17 @@ namespace EMSManager {
 
         for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
             SetupEMSActuator(state, "Zone Comfort Control",
-                             ComfortControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).ZoneName,
                              "Heating Setpoint",
                              "[]",
-                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn,
-                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
             SetupEMSActuator(state, "Zone Comfort Control",
-                             ComfortControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).ZoneName,
                              "Cooling Setpoint",
                              "[]",
-                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn,
-                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
         }
     }
 

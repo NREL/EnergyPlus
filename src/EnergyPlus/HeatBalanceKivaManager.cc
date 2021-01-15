@@ -74,9 +74,7 @@
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus {
-
-namespace HeatBalanceKivaManager {
+namespace EnergyPlus::HeatBalanceKivaManager {
 
     void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
     {
@@ -113,7 +111,7 @@ namespace HeatBalanceKivaManager {
             }
         }
         for (int i = 1; i <= state.dataZoneCtrls->NumComfortControlledZones; ++i) {
-            if (DataZoneControls::ComfortControlledZone(i).ActualZoneNum == zoneNum) {
+            if (state.dataZoneCtrls->ComfortControlledZone(i).ActualZoneNum == zoneNum) {
                 zoneControlType = KIVAZONE_COMFORTCONTROL;
                 zoneControlNum = i;
                 break;
@@ -343,7 +341,7 @@ namespace HeatBalanceKivaManager {
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
         bcs->slabConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].in;
 
-        if (wallSurfaces.size() > 0) {
+        if (!wallSurfaces.empty()) {
             bcs->extWallForcedTerm = kmPtr->surfaceConvMap[wallSurfaces[0]].f;
             bcs->extWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].out;
             bcs->intWallConvectionAlgorithm = kmPtr->surfaceConvMap[wallSurfaces[0]].in;
@@ -769,7 +767,7 @@ namespace HeatBalanceKivaManager {
                 // list of wall surface numbers.
                 std::map<std::pair<int, Real64>, WallGroup> combinationMap;
 
-                if (wallSurfaces.size() != 0) {
+                if (!wallSurfaces.empty()) {
                     for (auto &wl : wallSurfaces) {
 
                         auto &v = Surfaces(wl).Vertex;
@@ -1068,7 +1066,7 @@ namespace HeatBalanceKivaManager {
                 constructionName = state.dataConstruction->Construct(kv.constructionNum).Name;
             }
 
-            std::string wallSurfaceString = "";
+            std::string wallSurfaceString;
             for (auto &wl : kv.wallSurfaces) {
                 wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
             }
@@ -1276,7 +1274,7 @@ namespace HeatBalanceKivaManager {
     void KivaManager::addDefaultFoundation()
     {
         foundationInputs.push_back(defaultFoundation);
-        defaultIndex = foundationInputs.size() - 1;
+        defaultIndex = static_cast<int>(foundationInputs.size() - 1u);
         defaultSet = true;
     }
 
@@ -1293,5 +1291,4 @@ namespace HeatBalanceKivaManager {
         return (int)foundationInputs.size();
     }
 
-} // namespace HeatBalanceKivaManager
 } // namespace EnergyPlus
