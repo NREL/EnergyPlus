@@ -78,7 +78,6 @@ namespace ReturnAirPathManager {
     // PURPOSE OF THIS MODULE:
     // To manage the return air path.
 
-    using DataZoneEquipment::ReturnAirPath;
     using DataZoneEquipment::ZoneMixer_Type;
     using DataZoneEquipment::ZoneReturnPlenum_Type;
 
@@ -130,7 +129,7 @@ namespace ReturnAirPathManager {
 
         bool ErrorsFound = false;
 
-        if (allocated(ReturnAirPath)) {
+        if (allocated(state.dataZoneEquip->ReturnAirPath)) {
             return;
         }
         cCurrentModuleObject = "AirLoopHVAC:ReturnPath";
@@ -138,51 +137,51 @@ namespace ReturnAirPathManager {
 
         if (state.dataZoneEquip->NumReturnAirPaths > 0) {
 
-            ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
+            state.dataZoneEquip->ReturnAirPath.allocate(state.dataZoneEquip->NumReturnAirPaths);
 
             for (PathNum = 1; PathNum <= state.dataZoneEquip->NumReturnAirPaths; ++PathNum) {
 
                 inputProcessor->getObjectItem(state, cCurrentModuleObject, PathNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                ReturnAirPath(PathNum).Name = cAlphaArgs(1);
-                ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
+                state.dataZoneEquip->ReturnAirPath(PathNum).Name = cAlphaArgs(1);
+                state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
+                state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
                     cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
-                ReturnAirPath(PathNum).ComponentType.allocate(ReturnAirPath(PathNum).NumOfComponents);
-                ReturnAirPath(PathNum).ComponentType = "";
-                ReturnAirPath(PathNum).ComponentType_Num.allocate(ReturnAirPath(PathNum).NumOfComponents);
-                ReturnAirPath(PathNum).ComponentType_Num = 0;
-                ReturnAirPath(PathNum).ComponentName.allocate(ReturnAirPath(PathNum).NumOfComponents);
-                ReturnAirPath(PathNum).ComponentName = "";
-                ReturnAirPath(PathNum).ComponentIndex.allocate(ReturnAirPath(PathNum).NumOfComponents);
-                ReturnAirPath(PathNum).ComponentIndex = 0;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num = 0;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName = "";
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex = 0;
                 Counter = 3;
 
-                for (CompNum = 1; CompNum <= ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
+                for (CompNum = 1; CompNum <= state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents; ++CompNum) {
 
                     if ((UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer")) ||
                         (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))) {
 
-                        ReturnAirPath(PathNum).ComponentType(CompNum) = cAlphaArgs(Counter);
-                        ReturnAirPath(PathNum).ComponentName(CompNum) = cAlphaArgs(Counter + 1);
-                        ValidateComponent(state, ReturnAirPath(PathNum).ComponentType(CompNum),
-                                          ReturnAirPath(PathNum).ComponentName(CompNum),
+                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType(CompNum) = cAlphaArgs(Counter);
+                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName(CompNum) = cAlphaArgs(Counter + 1);
+                        ValidateComponent(state, state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType(CompNum),
+                                          state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName(CompNum),
                                           IsNotOK,
                                           "AirLoopHVAC:ReturnPath");
                         if (IsNotOK) {
-                            ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + ReturnAirPath(PathNum).Name);
+                            ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(PathNum).Name);
                             ErrorsFound = true;
                         }
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ZoneMixer"))
-                            ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneMixer_Type;
+                            state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneMixer_Type;
                         if (UtilityRoutines::SameString(cAlphaArgs(Counter), "AirLoopHVAC:ReturnPlenum"))
-                            ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
+                            state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType_Num(CompNum) = ZoneReturnPlenum_Type;
                     } else {
                         ShowSevereError(state, "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs(Counter));
-                        ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath(PathNum).Name);
+                        ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath = " + state.dataZoneEquip->ReturnAirPath(PathNum).Name);
                         ShowContinueError(state, "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"");
                         ErrorsFound = true;
                     }
@@ -233,28 +232,28 @@ namespace ReturnAirPathManager {
         // Locals
         int ComponentNum;
 
-        for (ComponentNum = 1; ComponentNum <= ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
+        for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
 
             {
-                auto const SELECT_CASE_var(ReturnAirPath(ReturnAirPathNum).ComponentType_Num(ComponentNum));
+                auto const SELECT_CASE_var(state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType_Num(ComponentNum));
 
                 if (SELECT_CASE_var == ZoneMixer_Type) { // 'AirLoopHVAC:ZoneMixer'
 
                     if (!(AirflowNetwork::AirflowNetworkFanActivated &&
                           AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                    ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+                        SimAirMixer(state, state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                     }
 
                 } else if (SELECT_CASE_var == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
 
-                    SimAirZonePlenum(state, ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                    SimAirZonePlenum(state, state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
                                      ZoneReturnPlenum_Type,
-                                     ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
 
                 } else {
-                    ShowSevereError(state, "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath(ReturnAirPathNum).Name);
+                    ShowSevereError(state, "Invalid AirLoopHVAC:ReturnPath Component=" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }

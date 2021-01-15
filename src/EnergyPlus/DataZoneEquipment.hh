@@ -175,24 +175,13 @@ namespace DataZoneEquipment {
         Real64 Capacity;
         Real64 Efficiency;
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
 
         // Default Constructor
         SubSubEquipmentData()
-            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0), OpMode(0),
-              Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0),
-              PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0),
-              TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0)
+            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0), OpMode(0),
+              Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0)
         {
         }
     };
@@ -217,24 +206,14 @@ namespace DataZoneEquipment {
         Real64 Capacity;
         Real64 Efficiency;
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
 
         // Default Constructor
         SubEquipmentData()
             : Parent(false), NumSubSubEquip(0), EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0),
-              ZoneEqToPlantPtr(0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0),
-              PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0),
-              PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0)
+              ZoneEqToPlantPtr(0.0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0),
+              TotPlantSupplyPurch(0.0)
         {
         }
     };
@@ -250,13 +229,12 @@ namespace DataZoneEquipment {
         int AirDistUnitIndex;    // equipment number in EquipList
         int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         int SupplyAirPathIndex;
-        Real64 NetBranchCoilDemand;
         Array1D<SubSubEquipmentData> Coil;
 
         // Default Constructor
         AirIn()
             : InNode(0), OutNode(0), SupplyAirPathExists(false), MainBranchIndex(0), SupplyBranchIndex(0), AirDistUnitIndex(0),
-              TermUnitSizingIndex(0), SupplyAirPathIndex(0), NetBranchCoilDemand(0.0)
+              TermUnitSizingIndex(0), SupplyAirPathIndex(0)
         {
         }
     };
@@ -341,25 +319,14 @@ namespace DataZoneEquipment {
         int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
         int OpMode;
 
         // Default Constructor
         EquipmentData()
-            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0),
-              TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0),
-              PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0),
-              PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0), OpMode(0)
+            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0),
+              TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0), OpMode(0)
         {
         }
     };
@@ -456,16 +423,6 @@ namespace DataZoneEquipment {
         }
     };
 
-    extern Array1D<ControlList> HeatingControlList;
-    extern Array1D<ControlList> CoolingControlList;
-    extern Array1D<SupplyAir> SupplyAirPath;
-    extern Array1D<ReturnAir> ReturnAirPath;
-
-    // Functions
-    // Clears the global data in DataZoneEquipment.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void GetZoneEquipmentData(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
@@ -521,6 +478,9 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
+    Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
+    Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
+    bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
 
     void clear_state() override
     {
@@ -540,6 +500,9 @@ struct DataZoneEquipmentData : BaseGlobalStruct {
         this->ZoneEquipConfig.deallocate();
         this->UniqueZoneEquipListNames.clear();
         this->ZoneEquipList.deallocate();
+        this->SupplyAirPath.deallocate();
+        this->ReturnAirPath.deallocate();
+        this->CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
     }
 };
 

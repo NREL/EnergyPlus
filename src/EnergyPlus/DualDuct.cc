@@ -2119,28 +2119,8 @@ namespace DualDuct {
         // PURPOSE OF THIS SUBROUTINE:
         // Report dual duct damper connections to the BND file.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataZoneEquipment::SupplyAirPath;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // Formats
         static constexpr auto Format_100("! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>");
@@ -2165,11 +2145,11 @@ namespace DualDuct {
             for (int Count2 = 1; Count2 <= state.dataZoneEquip->NumSupplyAirPaths; ++Count2) {
                 SupplyAirPathNum = Count2;
                 Found = 0;
-                for (int Count3 = 1; Count3 <= SupplyAirPath(Count2).NumOutletNodes; ++Count3) {
-                    if (dd_airterminal(Count1).HotAirInletNodeNum == SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).ColdAirInletNodeNum == SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).OAInletNodeNum == SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
-                    if (dd_airterminal(Count1).RecircAirInletNodeNum == SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                for (int Count3 = 1; Count3 <= state.dataZoneEquip->SupplyAirPath(Count2).NumOutletNodes; ++Count3) {
+                    if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (dd_airterminal(Count1).OAInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
+                    if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataZoneEquip->SupplyAirPath(Count2).OutletNode(Count3)) Found = Count3;
                 }
                 if (Found != 0) break;
             }
@@ -2183,7 +2163,7 @@ namespace DualDuct {
                 Found = 0;
                 for (int Count3 = 1; Count3 <= state.dataAirLoop->AirToZoneNodeInfo(Count2).NumSupplyNodes; ++Count3) {
                     if (SupplyAirPathNum != 0) {
-                        if (SupplyAirPath(SupplyAirPathNum).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                     } else {
                         if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                         if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;

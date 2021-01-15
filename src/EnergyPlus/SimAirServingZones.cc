@@ -547,8 +547,8 @@ namespace EnergyPlus::SimAirServingZones {
             // this test depends on the controlled zone input having been "gotten"
             test = 0;
             for (count = 1; count <= state.dataZoneEquip->NumReturnAirPaths; ++count) {
-                if (ReturnAirPath(count).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1)) {
-                    test = ReturnAirPath(count).OutletNodeNum;
+                if (state.dataZoneEquip->ReturnAirPath(count).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1)) {
+                    test = state.dataZoneEquip->ReturnAirPath(count).OutletNodeNum;
                     break;
                 }
             }
@@ -1481,27 +1481,27 @@ namespace EnergyPlus::SimAirServingZones {
 
                 // each supply air path may have up to one splitter and one plenum.  Check for all combinations count
                 // all nodes (including duplicates)
-                for (CompNum = 1; CompNum <= SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
-                    if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
+                for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
+                    if (UtilityRoutines::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:ZoneSplitter")) {
                         SplitterNum = UtilityRoutines::FindItemInList(
-                            SupplyAirPath(SupAirPath).ComponentName(CompNum), state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+                            state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum), state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
                         if (SplitterNum == 0) {
-                            ShowSevereError(state, "AirLoopHVAC:ZoneSplitter not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
-                            ShowContinueError(state, "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
+                            ShowSevereError(state, "AirLoopHVAC:ZoneSplitter not found=" + state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum));
+                            ShowContinueError(state, "Occurs in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(SupAirPath).Name);
                             ErrorsFound = true;
                         }
-                        SupplyAirPath(SupAirPath).SplitterIndex(CompNum) = SplitterNum;
+                        state.dataZoneEquip->SupplyAirPath(SupAirPath).SplitterIndex(CompNum) = SplitterNum;
                         NumAllSupAirPathNodes += state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes + 1;
-                    } else if (UtilityRoutines::SameString(SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
-                        PlenumNum = UtilityRoutines::FindItemInList(SupplyAirPath(SupAirPath).ComponentName(CompNum),
+                    } else if (UtilityRoutines::SameString(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentType(CompNum), "AirLoopHVAC:SupplyPlenum")) {
+                        PlenumNum = UtilityRoutines::FindItemInList(state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum),
                                                                     state.dataZonePlenum->ZoneSupPlenCond,
                                                                     &ZoneSupplyPlenumConditions::ZonePlenumName);
                         if (PlenumNum == 0) {
-                            ShowSevereError(state, "AirLoopHVAC:SupplyPlenum not found=" + SupplyAirPath(SupAirPath).ComponentName(CompNum));
-                            ShowContinueError(state, "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath(SupAirPath).Name);
+                            ShowSevereError(state, "AirLoopHVAC:SupplyPlenum not found=" + state.dataZoneEquip->SupplyAirPath(SupAirPath).ComponentName(CompNum));
+                            ShowContinueError(state, "Occurs in AirLoopHVAC:SupplyPath=" + state.dataZoneEquip->SupplyAirPath(SupAirPath).Name);
                             ErrorsFound = true;
                         }
-                        SupplyAirPath(SupAirPath).PlenumIndex(CompNum) = PlenumNum;
+                        state.dataZoneEquip->SupplyAirPath(SupAirPath).PlenumIndex(CompNum) = PlenumNum;
                         NumAllSupAirPathNodes += state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes + 1;
                     }
                 }
@@ -1510,9 +1510,9 @@ namespace EnergyPlus::SimAirServingZones {
 
                 // figure out the order of the splitter and plenum in the path, by flagging the first node of the component
                 // as either a 'pathinlet' or a 'compinlet'
-                for (CompNum = 1; CompNum <= SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
-                    SplitterNum = SupplyAirPath(SupAirPath).SplitterIndex(CompNum);
-                    PlenumNum = SupplyAirPath(SupAirPath).PlenumIndex(CompNum);
+                for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOfComponents; ++CompNum) {
+                    SplitterNum = state.dataZoneEquip->SupplyAirPath(SupAirPath).SplitterIndex(CompNum);
+                    PlenumNum = state.dataZoneEquip->SupplyAirPath(SupAirPath).PlenumIndex(CompNum);
                     if (SplitterNum > 0) {
                         ++SupAirPathNodeNum;
                         SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
@@ -1567,24 +1567,24 @@ namespace EnergyPlus::SimAirServingZones {
                 //  eliminate the duplicates to find the number of nodes in the supply air path
                 NumSupAirPathNodes = NumAllSupAirPathNodes - NumSupAirPathIntNodes;
                 SupAirPathNodeNum = 0;
-                SupplyAirPath(SupAirPath).OutletNode.allocate(NumSupAirPathOutNodes);
-                SupplyAirPath(SupAirPath).Node.allocate(NumSupAirPathNodes);
-                SupplyAirPath(SupAirPath).NodeType.allocate(NumSupAirPathNodes);
-                SupplyAirPath(SupAirPath).NumNodes = NumSupAirPathNodes;
-                SupplyAirPath(SupAirPath).NumOutletNodes = NumSupAirPathOutNodes;
+                state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode.allocate(NumSupAirPathOutNodes);
+                state.dataZoneEquip->SupplyAirPath(SupAirPath).Node.allocate(NumSupAirPathNodes);
+                state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType.allocate(NumSupAirPathNodes);
+                state.dataZoneEquip->SupplyAirPath(SupAirPath).NumNodes = NumSupAirPathNodes;
+                state.dataZoneEquip->SupplyAirPath(SupAirPath).NumOutletNodes = NumSupAirPathOutNodes;
 
                 // transfer data from the local SupNode array to the SupplyAirPath data structure
                 for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
                     if (SupNodeType(SupNodeIndex) == PathInlet || SupNodeType(SupNodeIndex) == Intermediate || SupNodeType(SupNodeIndex) == Outlet) {
                         ++SupAirPathNodeNum;
                         // map the local node numbers to the HVAC (global) node numbers
-                        SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = SupNode(SupNodeIndex);
-                        SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) = SupNodeType(SupNodeIndex);
+                        state.dataZoneEquip->SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = SupNode(SupNodeIndex);
+                        state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) = SupNodeType(SupNodeIndex);
                     }
                     if (SupNodeType(SupNodeIndex) == Outlet) {
                         ++SupAirPathOutNodeNum;
                         // map the outlet node number to the HVAC (global) node number
-                        SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) = SupNode(SupNodeIndex);
+                        state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) = SupNode(SupNodeIndex);
                     }
                 }
                 SupNode.deallocate();
@@ -1620,13 +1620,13 @@ namespace EnergyPlus::SimAirServingZones {
                     SupAirPathNum = 0;
                     // loop over the air loop's output nodes
                     for (SupAirPath = 1; SupAirPath <= state.dataZoneEquip->NumSupplyAirPaths; ++SupAirPath) {
-                        if (ZoneSideNodeNum == SupplyAirPath(SupAirPath).InletNodeNum) {
+                        if (ZoneSideNodeNum == state.dataZoneEquip->SupplyAirPath(SupAirPath).InletNodeNum) {
                             SupAirPathNum = SupAirPath;
                             break;
                         }
                     }
                     if (SupAirPathNum > 0) {
-                        NumSupAirPathOutNodes = SupplyAirPath(SupAirPathNum).NumOutletNodes;
+                        NumSupAirPathOutNodes = state.dataZoneEquip->SupplyAirPath(SupAirPathNum).NumOutletNodes;
                     } else {
                         NumSupAirPathOutNodes = 0;
                     }
@@ -1647,7 +1647,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                                 // BEGIN COOLING: Check for a match between the cooling air distribution unit inlet
                                 // and the supply air path outlet
-                                if (SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
+                                if (state.dataZoneEquip->SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode) {
                                     ++NumZonesCool;
                                     // Set Duct Type for branch for dual duct
@@ -1683,7 +1683,7 @@ namespace EnergyPlus::SimAirServingZones {
                                 // distribution inlet
 
                                 // BEGIN HEATING: If we don't get a match, check for a heating match
-                                if (SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
+                                if (state.dataZoneEquip->SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
                                     state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode) {
                                     ++NumZonesHeat;
                                     // Set Duct Type for branch for dual duct
@@ -1717,9 +1717,9 @@ namespace EnergyPlus::SimAirServingZones {
                         // If the supply air path is not connected to either a heating or a cooling air distribution
                         // unit...we have a problem!
                         if (!FoundSupPathZoneConnect) {
-                            ShowSevereError(state, "Node " + NodeID(SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum)) +
+                            ShowSevereError(state, "Node " + NodeID(state.dataZoneEquip->SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum)) +
                                             " connects to no component");
-                            ShowContinueError(state, "Occurs in Supply Air Path=" + SupplyAirPath(SupAirPathNum).Name);
+                            ShowContinueError(state, "Occurs in Supply Air Path=" + state.dataZoneEquip->SupplyAirPath(SupAirPathNum).Name);
                             ShowContinueError(state, "Check the connection to a ZoneHVAC:EquipmentConnections object");
                             ShowContinueError(state, "Check if this component is missing from the Supply Air Path");
                             ErrorsFound = true;
@@ -2271,7 +2271,7 @@ namespace EnergyPlus::SimAirServingZones {
                 int thisReturnNode = thisZoneEquip.ReturnNode(zoneOutNum);
                 // Loop over all return paths
                 for (int retPathNum = 1; retPathNum <= state.dataZoneEquip->NumReturnAirPaths; ++retPathNum) {
-                    auto const &thisRetPath(DataZoneEquipment::ReturnAirPath(retPathNum));
+                    auto const &thisRetPath(state.dataZoneEquip->ReturnAirPath(retPathNum));
                     // Find which airloop this return path is on
                     for (int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum) {
                         if (state.dataAirLoop->AirToZoneNodeInfo(sysNum).NumReturnNodes > 0) {
