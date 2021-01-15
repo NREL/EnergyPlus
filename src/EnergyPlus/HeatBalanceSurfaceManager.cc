@@ -672,6 +672,7 @@ namespace HeatBalanceSurfaceManager {
                 } else {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
                 }
+                SurfaceWindow(SurfNum).NumOfIter = 0;
             }
         }
 

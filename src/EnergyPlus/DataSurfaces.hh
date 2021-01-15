@@ -1016,12 +1016,13 @@ namespace DataSurfaces {
         // for floor/wall/ceiling (m2)
 
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
+        int NumOfIter;
 
         // Default Constructor
         SurfaceWindowCalc()
                 : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0),
                   InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(MaxSlatAngs, 0.0),
-                  EffGlassEmiss(MaxSlatAngs, 0.0),ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0)
+              EffGlassEmiss(MaxSlatAngs, 0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0), NumOfIter(0)
         {
         }
     };

@@ -214,6 +214,8 @@ namespace WindowManager {
                     Array1D<Real64> &b       // Matrix and vector in a.x = b;
     );
 
+    void TriDiagonal_Matrix_Algorithm(int const N, Array1D<Real64> A, Array1D<Real64> &B, Array1D<Real64> C, Array1D<Real64> &D, Array1D<Real64> &X);
+
     //******************************************************************************
 
     void WindowGasConductance(EnergyPlusData &state,

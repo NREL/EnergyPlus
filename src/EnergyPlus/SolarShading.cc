@@ -1160,6 +1160,13 @@ namespace SolarShading {
 
             if (Surface(SurfLoop).Class == SurfaceClass::Window) {
                 // CurrentModuleObject='Windows/GlassDoors'
+                SetupOutputVariable(state,
+                                    "Surface Window Iteration Number to Solve Window Temperature",
+                                    OutputProcessor::Unit::None,
+                                    SurfaceWindow(SurfLoop).NumOfIter,
+                                    "Zone",
+                                    "Sum",
+                                    Surface(SurfLoop).Name);
                 if (Surface(SurfLoop).ExtSolar) {
                     SetupOutputVariable(state, "Surface Window Total Glazing Layers Absorbed Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
