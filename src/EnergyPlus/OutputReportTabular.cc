@@ -13466,8 +13466,11 @@ namespace EnergyPlus::OutputReportTabular {
                     // JY 2020-01-12 Use the reloaded version instead for dual units adaption
                     LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_temp);
 
+                    // OutputCompLoadSummary(
+                       // state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
+                    // JY 2020-01-15 Use reloaded version for dual units
                     OutputCompLoadSummary(
-                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
+                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop, unitsStyle_temp, produceSQLite);
                 }
             }
 
@@ -13576,7 +13579,9 @@ namespace EnergyPlus::OutputReportTabular {
                 // JY 2020-01-12 Use the reloaded version instead for dual units adaption
                 LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_temp);
 
-                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+                // OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+                // JY 2020-01-15 Use reloade version for dual units
+                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0, unitsStyle_temp,produceSQLite);
             }
 
             // ZoneComponentLoadSummary: Now we convert and Display
@@ -13591,7 +13596,9 @@ namespace EnergyPlus::OutputReportTabular {
                         // JY 2020-01-12 Use the reloaded version instead for dual units adaption
                         LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_temp);
 
-                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
+                        // OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
+                        // JY 2020-01-15 Use reloade version for dual units
+                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone, unitsStyle_temp, produceSQLite);
                     }
                 }
             }
@@ -14771,6 +14778,337 @@ namespace EnergyPlus::OutputReportTabular {
                     if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
                         ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                    }
+                }
+            }
+        }
+    }
+
+        // provide output from the load component summary tables
+    void OutputCompLoadSummary(EnergyPlusData &state,
+                               iOutputType const &kind,
+                               CompLoadTablesType const &compLoadCool,
+                               CompLoadTablesType const &compLoadHeat,
+                               int const &zoneOrAirLoopIndex,
+                               iUnitsStyle unitsStyle_para, 
+        bool produceSQLite_para)
+    {
+        CompLoadTablesType curCompLoad;
+        bool writeOutput;
+        Array1D_string columnHead;
+        Array1D_int columnWidth;
+        Array1D_string rowHead;
+        Array2D_string tableBody; //(row, column)
+
+        std::string reportName;
+        std::string zoneAirLoopFacilityName;
+
+        auto &ort(state.dataOutRptTab);
+
+        if (kind == iOutputType::zoneOutput && ort->displayZoneComponentLoadSummary) {
+            reportName = "Zone Component Load Summary";
+            zoneAirLoopFacilityName = Zone(zoneOrAirLoopIndex).Name;
+            writeOutput = true;
+        } else if (kind == iOutputType::airLoopOutput && ort->displayAirLoopComponentLoadSummary) {
+            reportName = "AirLoop Component Load Summary";
+            zoneAirLoopFacilityName = DataSizing::FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
+            writeOutput = true;
+        } else if (kind == iOutputType::facilityOutput && ort->displayFacilityComponentLoadSummary) {
+            reportName = "Facility Component Load Summary";
+            zoneAirLoopFacilityName = "Facility";
+            writeOutput = true;
+        } else {
+            writeOutput = false;
+        }
+        if (writeOutput) {
+            if (!produceSQLite_para) {
+                WriteReportHeaders(state, reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Averaged);
+            }
+            std::string peakLoadCompName;
+            std::string peakCondName;
+            std::string zonesIncludedName;
+            std::string engineeringCheckName;
+            for (int coolHeat = 1; coolHeat <= 2; ++coolHeat) {
+                tableBody.allocate(cPerArea, rGrdTot);
+                tableBody = "";
+                if (coolHeat == 1) {
+                    curCompLoad = compLoadCool;
+                    peakLoadCompName = "Estimated Cooling Peak Load Components";
+                    peakCondName = "Cooling Peak Conditions";
+                    zonesIncludedName = "Zones Included for Cooling";
+                    engineeringCheckName = "Engineering Checks for Cooling";
+                } else {
+                    curCompLoad = compLoadHeat;
+                    peakLoadCompName = "Estimated Heating Peak Load Components";
+                    peakCondName = "Heating Peak Conditions";
+                    zonesIncludedName = "Zones Included for Heating";
+                    engineeringCheckName = "Engineering Checks for Heating";
+                }
+                // move number array into string array
+                for (int c = 1; c <= cPerArea; ++c) {
+                    for (int r = 1; r <= rGrdTot; ++r) { // to last row before total
+                        if (curCompLoad.cellUsed(c, r)) {
+                            tableBody(c, r) = RealToStr(curCompLoad.cells(c, r), 2);
+                        }
+                    }
+                }
+                rowHead.allocate(rGrdTot);
+                // internal gains
+                rowHead(rPeople) = "People";
+                rowHead(rLights) = "Lights";
+                rowHead(rEquip) = "Equipment";
+                rowHead(rRefrig) = "Refrigeration Equipment";
+                rowHead(rWaterUse) = "Water Use Equipment";
+                rowHead(rPowerGen) = "Power Generation Equipment";
+                rowHead(rHvacLoss) = "HVAC Equipment Losses";
+                rowHead(rRefrig) = "Refrigeration";
+                // misc
+                rowHead(rDOAS) = "DOAS Direct to Zone";
+                rowHead(rInfil) = "Infiltration";
+                rowHead(rZoneVent) = "Zone Ventilation";
+                rowHead(rIntZonMix) = "Interzone Mixing";
+                // opaque surfaces
+                rowHead(rRoof) = "Roof";
+                rowHead(rIntZonCeil) = "Interzone Ceiling";
+                rowHead(rOtherRoof) = "Other Roof";
+                rowHead(rExtWall) = "Exterior Wall";
+                rowHead(rIntZonWall) = "Interzone Wall";
+                rowHead(rGrdWall) = "Ground Contact Wall";
+                rowHead(rOtherWall) = "Other Wall";
+                rowHead(rExtFlr) = "Exterior Floor";
+                rowHead(rIntZonFlr) = "Interzone Floor";
+                rowHead(rGrdFlr) = "Ground Contact Floor";
+                rowHead(rOtherFlr) = "Other Floor";
+                // subsurfaces
+                rowHead(rFeneCond) = "Fenestration Conduction";
+                rowHead(rFeneSolr) = "Fenestration Solar";
+                rowHead(rOpqDoor) = "Opaque Door";
+                rowHead(rGrdTot) = "Grand Total";
+
+                columnHead.allocate(cPerArea);
+                // if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
+                        columnHead(cSensInst) = "Sensible - Instant [W]";
+                    columnHead(cSensDelay) = "Sensible - Delayed [W]";
+                    columnHead(cSensRA) = "Sensible - Return Air [W]";
+                    columnHead(cLatent) = "Latent [W]";
+                    columnHead(cTotal) = "Total [W]";
+                    columnHead(cPerc) = "%Grand Total";
+                    columnHead(cArea) = "Related Area [m2]";
+                    columnHead(cPerArea) = "Total per Area [W/m2]";
+
+                } else {
+                    columnHead(cSensInst) = "Sensible - Instant [Btu/h]";
+                    columnHead(cSensDelay) = "Sensible - Delayed [Btu/h]";
+                    columnHead(cSensRA) = "Sensible - Return Air [Btu/h]";
+                    columnHead(cLatent) = "Latent [Btu/h]";
+                    columnHead(cTotal) = "Total [Btu/h]";
+                    columnHead(cPerc) = "%Grand Total";
+                    columnHead(cArea) = "Related Area [ft2]";
+                    columnHead(cPerArea) = "Total per Area [Btu/h-ft2]";
+                }
+                columnWidth.dimension(cPerArea, 14); // array assignment - same for all columns
+
+                if (!produceSQLite_para) {
+                    WriteSubtitle(state, peakLoadCompName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                    }
+                }
+                if (!produceSQLite_para) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                    }
+                }
+
+                //---- Peak Conditions
+
+                rowHead.allocate(16);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+
+                tableBody.allocate(1, 16);
+                tableBody = "";
+
+                columnHead(1) = "Value";
+                // if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
+                    rowHead(1) = "Time of Peak Load";
+                    rowHead(2) = "Outside Dry Bulb Temperature [C]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [C]";
+                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
+                    rowHead(5) = "Zone Dry Bulb Temperature [C]";
+                    rowHead(6) = "Zone Relative Humidity [%]";
+                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
+
+                    rowHead(8) = "Supply Air Temperature [C]";
+                    rowHead(9) = "Mixed Air Temperature [C]";
+                    rowHead(10) = "Main Fan Air Flow [m3/s]";
+                    rowHead(11) = "Outside Air Flow [m3/s]";
+                    rowHead(12) = "Peak Sensible Load with Sizing Factor [W]";
+                    rowHead(13) = "Difference Due to Sizing Factor [W]";
+
+                    rowHead(14) = "Peak Sensible Load [W]";
+                    rowHead(15) = "Estimated Instant + Delayed Sensible Load [W]";
+                    rowHead(16) = "Difference Between Peak and Estimated Sensible Load [W]";
+                } else {
+                    rowHead(1) = "Time of Peak Load";
+                    rowHead(2) = "Outside Dry Bulb Temperature [F]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [F]";
+                    rowHead(4) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
+                    rowHead(5) = "Zone Dry Bulb Temperature [F]";
+                    rowHead(6) = "Zone Relative Humidity [%]";
+                    rowHead(7) = "Zone Humidity Ratio at Peak [lbWater/lbAir]";
+
+                    rowHead(8) = "Supply Air Temperature [F]";
+                    rowHead(9) = "Mixed Air Temperature [F]";
+                    rowHead(10) = "Main Fan Air Flow [ft3/min]";
+                    rowHead(11) = "Outside Air Flow [ft3/min]";
+                    rowHead(12) = "Peak Sensible Load with Sizing Factor [Btu/h]";
+                    rowHead(13) = "Difference Due to Sizing Factor [Btu/h]";
+
+                    rowHead(14) = "Peak Sensible Load  [Btu/h]";
+                    rowHead(15) = "Estimated Instant + Delayed Sensible Load [Btu/h]";
+                    rowHead(16) = "Difference Between Peak and Estimated Sensible Load [Btu/h]";
+                }
+
+                if (curCompLoad.timeStepMax != 0) {
+                    tableBody(1, 1) = curCompLoad.peakDateHrMin;                  // Time of Peak Load
+                    tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside Dry Bulb Temperature
+                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside Wet Bulb Temperature
+                    tableBody(1, 4) = RealToStr(curCompLoad.outsideHumRatio, 5);  // Outside Humidity Ratio at Peak
+                    tableBody(1, 5) = RealToStr(curCompLoad.zoneDryBulb, 2);      // Zone Dry Bulb Temperature
+                    tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humdity
+                    tableBody(1, 7) = RealToStr(curCompLoad.zoneHumRatio, 5);     // Zone Humidity Ratio at Peak
+                }
+                tableBody(1, 8) = RealToStr(curCompLoad.supAirTemp, 2); // supply air temperature
+                if (kind == iOutputType::airLoopOutput) {
+                    tableBody(1, 9) = RealToStr(curCompLoad.mixAirTemp, 2); // mixed air temperature - not for zone or facility
+                }
+                tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 2);     // main fan air flow
+                tableBody(1, 11) = RealToStr(curCompLoad.outsideAirFlow, 2);     // outside air flow
+                tableBody(1, 12) = RealToStr(curCompLoad.designPeakLoad, 2);     // design peak load
+                tableBody(1, 13) = RealToStr(curCompLoad.diffDesignPeak, 2);     // difference between Design and Peak Load
+                tableBody(1, 14) = RealToStr(curCompLoad.peakDesSensLoad, 2);    // Peak Design Sensible Load
+                tableBody(1, 15) = RealToStr(curCompLoad.estInstDelSensLoad, 2); // Estimated Instant + Delayed Sensible Load
+                tableBody(1, 16) = RealToStr(curCompLoad.diffPeakEst, 2);        // Difference
+
+                if (!produceSQLite_para) {
+                    WriteSubtitle(state, peakCondName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                    }
+                }
+                if (!produceSQLite_para) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                    }
+                }
+
+                //---- Engineering Checks
+
+                rowHead.allocate(6);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+
+                tableBody.allocate(1, 6);
+                tableBody = "";
+
+                columnHead(1) = "Value";
+                // if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
+                        rowHead(1) = "Outside Air Fraction [fraction]";
+                    rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
+                    rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
+                    rowHead(4) = "Floor Area per Total Capacity [m2/W]";
+                    rowHead(5) = "Total Capacity per Floor Area [W/m2]";
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+                    // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
+                    rowHead(6) = "Number of People";
+                } else {
+                    rowHead(1) = "Outside Air Fraction [fraction]";
+                    rowHead(2) = "Airflow per Floor Area [ft3/min-ft2]";
+                    rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
+                    rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
+                    rowHead(5) = "Total Capacity per Floor Area [Btu/h-ft2]";
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
+                    // rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
+                    rowHead(6) = "Number of People";
+                }
+
+                tableBody(1, 1) = fmt::format("{:.{}f}", curCompLoad.outsideAirRatio, 4); // outside Air
+                tableBody(1, 2) = fmt::format("{:0.3E}", curCompLoad.airflowPerFlrArea);  // airflow per floor area
+                tableBody(1, 3) = fmt::format("{:0.3E}", curCompLoad.airflowPerTotCap);   // airflow per total capacity
+                tableBody(1, 4) = fmt::format("{:0.3E}", curCompLoad.areaPerTotCap);      // area per total capacity
+                tableBody(1, 5) = fmt::format("{:0.3E}", curCompLoad.totCapPerArea);      // total capacity per area
+                tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1);       // number of people
+
+                if (!produceSQLite_para) {
+                    WriteSubtitle(state, engineeringCheckName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                    }
+                }
+                if (!produceSQLite_para) {
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                    }
+                }
+
+                // write the list of zone for the AirLoop level report
+                if (kind == iOutputType::airLoopOutput && curCompLoad.zoneIndices.allocated()) {
+                    int maxRow = 0;
+                    for (size_t zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi) {
+                        if (curCompLoad.zoneIndices(zi) > 0) {
+                            maxRow = zi;
+                        }
+                    }
+
+                    rowHead.allocate(maxRow);
+                    columnHead.allocate(1);
+                    columnWidth.allocate(1);
+                    columnWidth = 14; // array assignment - same for all columns
+                    tableBody.allocate(1, maxRow);
+                    tableBody = "";
+
+                    columnHead(1) = "Zone Name";
+                    for (int zi = 1; zi <= maxRow; ++zi) {
+                        rowHead(zi) = fmt::to_string(zi);
+                        if (curCompLoad.zoneIndices(zi) > 0) {
+                            tableBody(1, zi) = Zone(curCompLoad.zoneIndices(zi)).Name;
+                        }
+                    }
+
+                    if (!produceSQLite_para) {
+                        WriteSubtitle(state, zonesIncludedName);
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite_para) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                        }
+                    }
+                    if (!produceSQLite_para) {
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                        }
                     }
                 }
             }

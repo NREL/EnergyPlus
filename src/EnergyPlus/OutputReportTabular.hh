@@ -693,6 +693,14 @@ namespace OutputReportTabular {
                                CompLoadTablesType const &compLoadHeat,
                                int const &zoneOrAirLoopIndex);
 
+    void OutputCompLoadSummary(EnergyPlusData &state,
+                               iOutputType const &kind,
+                               CompLoadTablesType const &compLoadCool,
+                               CompLoadTablesType const &compLoadHeat,
+                               int const &zoneOrAirLoopIndex,
+                               iUnitsStyle unitsStyle_para,
+                               bool produceSQLite_para);
+
     void WriteReportHeaders(EnergyPlusData &state, std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
 
     void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
