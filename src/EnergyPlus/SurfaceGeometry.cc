@@ -160,7 +160,6 @@ namespace SurfaceGeometry {
         SurfWinProfileAngVert.dimension(NumSurfaces, 0);
 
         SurfWinShadingFlag.dimension(NumSurfaces, WinShadingFlag::ShadeOff);
-        SurfWinShaded.dimension(NumSurfaces, false);
         SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
         SurfWinShadingFlagEMSValue.dimension(NumSurfaces, WinShadingFlag::ShadeOff);
         SurfWinGlareControlIsActive.dimension(NumSurfaces, false);

@@ -495,7 +495,6 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
     Array1D<WinShadingFlag> SurfWinShadingFlag;             // -1: window has no shading device
-    Array1D<bool> SurfWinShaded;                            // Window shading flag is not shadeoff or noshade
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<WinShadingFlag> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
@@ -1310,7 +1309,6 @@ namespace DataSurfaces {
         SurfWinProfileAngVert.clear();
 
         SurfWinShadingFlag.clear();
-        SurfWinShaded.clear();
         SurfWinShadingFlagEMSOn.clear();
         SurfWinShadingFlagEMSValue.clear();
         SurfWinGlareControlIsActive.clear();

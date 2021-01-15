@@ -69,7 +69,7 @@
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
-#define IS_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
+#define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
 
 
 namespace EnergyPlus {
@@ -523,7 +523,6 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
     extern Array1D<WinShadingFlag> SurfWinShadingFlag;                       // -1: window has no shading device
-    extern Array1D<bool> SurfWinShaded;                            // Window shading flag is not shadeoff or noshade
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     extern Array1D<WinShadingFlag> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
