@@ -4370,7 +4370,6 @@ namespace HeatBalanceAirManager {
 
         // Using/Aliasing
         using DataHeatBalance::MRT;
-        using DataZoneControls::TempControlledZone;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4394,12 +4393,12 @@ namespace HeatBalanceAirManager {
                 // find TempControlledZoneID from ZoneLoop index
                 TempControlledZoneID = Zone(ZoneLoop).TempControlledZoneIndex;
                 if (Zone(ZoneLoop).IsControlled) {
-                    if ((TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
+                    if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
                         // is operative temp radiative fraction scheduled or fixed?
-                        if (TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
-                            thisMRTFraction = GetCurrentScheduleValue(state, TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
+                        if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
+                            thisMRTFraction = GetCurrentScheduleValue(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
                         } else {
-                            thisMRTFraction = TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
+                            thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
                         ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * MRT(ZoneLoop);
                     }

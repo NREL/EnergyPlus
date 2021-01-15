@@ -260,9 +260,6 @@ namespace DataZoneControls {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneHumidityControls> HumidityControlZone;
-    extern Array1D<ZoneTempControls> TempControlledZone;
     extern Array1D<ZoneComfortControls> ComfortControlledZone;
     extern Array1D<TStatObject> TStatObjects;
     extern Array1D<TStatObject> ComfortTStatObjects;
@@ -286,7 +283,8 @@ struct DataZoneControlsData : BaseGlobalStruct
     Array1D<Real64> OccRoomTSetPointHeat;       // occupied heating set point for optimum start period
     Array1D<Real64> OccRoomTSetPointCool;       // occupied cooling set point for optimum start period
     bool GetZoneAirStatsInputFlag = true;       // True when need to get input
-
+    Array1D<DataZoneControls::ZoneHumidityControls> HumidityControlZone;
+    Array1D<DataZoneControls::ZoneTempControls> TempControlledZone;
     void clear_state() override
     {
         this->NumTempControlledZones = 0;
@@ -302,6 +300,8 @@ struct DataZoneControlsData : BaseGlobalStruct
         this->OccRoomTSetPointHeat.deallocate();
         this->OccRoomTSetPointCool.deallocate();
         this->GetZoneAirStatsInputFlag = true;
+        this->HumidityControlZone.deallocate();
+        this->TempControlledZone.deallocate();
     }
 };
 

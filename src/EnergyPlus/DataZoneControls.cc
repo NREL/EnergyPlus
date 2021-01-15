@@ -64,8 +64,6 @@ namespace EnergyPlus::DataZoneControls {
     // public data in ZoneTempPredictorCorrector.
 
     // Object Data
-    Array1D<ZoneHumidityControls> HumidityControlZone;
-    Array1D<ZoneTempControls> TempControlledZone;
     Array1D<ZoneComfortControls> ComfortControlledZone;
     Array1D<TStatObject> TStatObjects;
     Array1D<TStatObject> ComfortTStatObjects;
@@ -76,8 +74,7 @@ namespace EnergyPlus::DataZoneControls {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        HumidityControlZone.deallocate();
-        TempControlledZone.deallocate();
+
         ComfortControlledZone.deallocate();
         TStatObjects.deallocate();
         ComfortTStatObjects.deallocate();

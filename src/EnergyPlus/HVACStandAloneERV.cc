@@ -201,7 +201,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         using BranchNodeConnections::SetUpCompSets;
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
-        using DataZoneControls::HumidityControlZone;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -926,7 +925,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                         ErrorsFound = true;
                     } else {
                         for (NumHstatZone = 1; NumHstatZone <= state.dataZoneCtrls->NumHumidityControlZones; ++NumHstatZone) {
-                            if (HumidityControlZone(NumHstatZone).ActualZoneNum != HStatZoneNum) continue;
+                            if (state.dataZoneCtrls->HumidityControlZone(NumHstatZone).ActualZoneNum != HStatZoneNum) continue;
                             HStatFound = true;
                             break;
                         }

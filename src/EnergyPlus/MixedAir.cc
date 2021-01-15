@@ -2068,7 +2068,6 @@ namespace EnergyPlus::MixedAir {
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
-        using DataZoneControls::HumidityControlZone;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         using SetPointManager::GetMixedAirNumWithCoilFreezingCheck;
@@ -2264,7 +2263,7 @@ namespace EnergyPlus::MixedAir {
                                 if (AirLoopFound) break;
                             }
                             for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
-                                if (HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum) continue;
+                                if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum) continue;
                                 AirNodeFound = true;
                                 break;
                             }

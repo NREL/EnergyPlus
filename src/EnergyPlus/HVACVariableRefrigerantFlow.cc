@@ -5466,7 +5466,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                     continue;
                                                 for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
-                                                    if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                    if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                         continue;
                                                     state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
                                                     AirNodeFound = true;
