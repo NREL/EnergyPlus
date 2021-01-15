@@ -304,16 +304,12 @@ namespace LowTempRadiantSystem {
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
         Real64 WaterMassFlowRate;     // water mass flow rate
-        int HeatingCapMethod;         // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                                      // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,
-                                      // {-}, or {W/m2}
+
 
         // Default Constructor
             VariableFlowRadiantSystemData()
                 : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), DesignObjectPtr(0), WaterVolFlowMaxCool(0.0),
-                  WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0), HeatingCapMethod(0),
-                  ScaledHeatingCapacity(0.0)
+                  WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0)
             {
             }
 
@@ -332,6 +328,11 @@ namespace LowTempRadiantSystem {
         // Members
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
+        bool HeatingWaterNodePresentCheckFlag; // Checks if the heating water nodes are present or not
+        int HeatingCapMethod;         // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
+        // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment,
+        // {-}, or {W/m2}
         Real64 HotThrottlRange;          // Throttling range for heating [C]
         std::string HotSetptSched;       // Schedule name for the zone setpoint temperature
         int HotSetptSchedPtr;            // Schedule index for the zone setpoint temperature
@@ -350,7 +351,8 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         VarFlowRadDesignData()
         :
-                HotThrottlRange(0.0), HotSetptSchedPtr(0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
+                HeatingWaterNodePresentCheckFlag(false),  HeatingCapMethod(0), ScaledHeatingCapacity(0.0), HotThrottlRange(0.0),
+                HotSetptSchedPtr(0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
                 ColdSetptSchedPtr(0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
         {
         }

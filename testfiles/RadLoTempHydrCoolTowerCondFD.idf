@@ -1351,6 +1351,10 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject1,      !- Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
    2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
    CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1364,6 +1368,10 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject2,      !- Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
    2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
    CoolingDesignCapacity,   !- Cooling Design Capacity Method
@@ -1388,10 +1396,6 @@
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     HalfFlowPower,           !- Setpoint Control Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
@@ -1416,10 +1420,6 @@
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     HalfFlowPower,           !- Setpoint Control Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
@@ -1443,10 +1443,6 @@
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     HalfFlowPower,           !- Setpoint Control Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     0.00010,                 !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
