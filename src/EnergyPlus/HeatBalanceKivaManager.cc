@@ -117,8 +117,8 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                 break;
             }
         }
-        for (size_t i = 1; i <= DataZoneControls::StageControlledZone.size(); ++i) {
-            if (DataZoneControls::StageControlledZone(i).ActualZoneNum == zoneNum) {
+        for (size_t i = 1; i <= state.dataZoneCtrls->StageControlledZone.size(); ++i) {
+            if (state.dataZoneCtrls->StageControlledZone(i).ActualZoneNum == zoneNum) {
                 zoneControlType = KIVAZONE_STAGEDCONTROL;
                 zoneControlNum = i;
                 break;
@@ -312,8 +312,8 @@ namespace EnergyPlus::HeatBalanceKivaManager {
             }
             case KIVAZONE_STAGEDCONTROL: {
 
-                int heatSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).HSBchedIndex;
-                int coolSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).CSBchedIndex;
+                int heatSpSchId = state.dataZoneCtrls->StageControlledZone(zoneControlNum).HSBchedIndex;
+                int coolSpSchId = state.dataZoneCtrls->StageControlledZone(zoneControlNum).CSBchedIndex;
                 Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, heatSpSchId, hour, timestep);
                 Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, coolSpSchId, hour, timestep);
                 const Real64 heatBalanceTemp = 10.0; // (assumed) degC

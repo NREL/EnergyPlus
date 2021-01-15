@@ -260,11 +260,6 @@ namespace DataZoneControls {
         }
     };
 
-    extern Array1D<TStatObject> TStatObjects;
-    extern Array1D<TStatObject> ComfortTStatObjects;
-    extern Array1D<TStatObject> StagedTStatObjects;
-    extern Array1D<ZoneStagedControls> StageControlledZone;
-
 } // namespace DataZoneControls
 
 struct DataZoneControlsData : BaseGlobalStruct
@@ -285,6 +280,10 @@ struct DataZoneControlsData : BaseGlobalStruct
     Array1D<DataZoneControls::ZoneHumidityControls> HumidityControlZone;
     Array1D<DataZoneControls::ZoneTempControls> TempControlledZone;
     Array1D<DataZoneControls::ZoneComfortControls> ComfortControlledZone;
+    Array1D<DataZoneControls::TStatObject> TStatObjects;
+    Array1D<DataZoneControls::TStatObject> ComfortTStatObjects;
+    Array1D<DataZoneControls::TStatObject> StagedTStatObjects;
+    Array1D<DataZoneControls::ZoneStagedControls> StageControlledZone;
 
     void clear_state() override
     {
@@ -304,6 +303,10 @@ struct DataZoneControlsData : BaseGlobalStruct
         this->HumidityControlZone.deallocate();
         this->TempControlledZone.deallocate();
         this->ComfortControlledZone.deallocate();
+        this->TStatObjects.deallocate();
+        this->ComfortTStatObjects.deallocate();
+        this->StagedTStatObjects.deallocate();
+        this->StageControlledZone.deallocate();
     }
 };
 

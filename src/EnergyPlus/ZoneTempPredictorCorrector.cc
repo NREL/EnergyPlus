@@ -346,7 +346,7 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
         state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
+        state.dataZoneCtrls->TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneCtrls->NumTempControlledZones = 0;
@@ -365,22 +365,22 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            TStatObjects(Item).Name = cAlphaArgs(1);
+            state.dataZoneCtrls->TStatObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+                state.dataZoneCtrls->TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
                 ++state.dataZoneCtrls->NumTempControlledZones;
-                TStatObjects(Item).NumOfZones = 1;
-                TStatObjects(Item).ZoneListActive = false;
-                TStatObjects(Item).ZoneOrZoneListPtr = Item1;
+                state.dataZoneCtrls->TStatObjects(Item).NumOfZones = 1;
+                state.dataZoneCtrls->TStatObjects(Item).ZoneListActive = false;
+                state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
+                state.dataZoneCtrls->TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
                 state.dataZoneCtrls->NumTempControlledZones += ZoneList(ZLItem).NumOfZones;
-                TStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
-                TStatObjects(Item).ZoneListActive = true;
-                TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
+                state.dataZoneCtrls->TStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
+                state.dataZoneCtrls->TStatObjects(Item).ZoneListActive = true;
+                state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
@@ -414,10 +414,10 @@ namespace ZoneTempPredictorCorrector {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                for (Item1 = 1; Item1 <= TStatObjects(Item).NumOfZones; ++Item1) {
+                for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(Item).NumOfZones; ++Item1) {
                     ++TempControlledZoneNum;
-                    if (TStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    if (state.dataZoneCtrls->TStatObjects(Item).ZoneListActive) {
+                        cAlphaArgs(2) = Zone(ZoneList(state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned =
                         UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataZoneCtrls->TempControlledZone, &ZoneTempControls::ZoneName, TempControlledZoneNum - 1);
@@ -440,14 +440,14 @@ namespace ZoneTempPredictorCorrector {
                         continue;
                     }
 
-                    if (!TStatObjects(Item).ZoneListActive) {
+                    if (!state.dataZoneCtrls->TStatObjects(Item).ZoneListActive) {
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).Name = cAlphaArgs(1);
                     } else {
                         CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
-                                                 Zone(ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
-                                                 ZoneList(TStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                                                 TStatObjects(Item).Name,
+                                                 Zone(ZoneList(state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
+                                                 ZoneList(state.dataZoneCtrls->TStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                                 state.dataZoneCtrls->TStatObjects(Item).Name,
                                                  state.dataZoneCtrls->TempControlledZone,
                                                  TempControlledZoneNum - 1,
                                                  state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).Name,
@@ -943,7 +943,7 @@ namespace ZoneTempPredictorCorrector {
         // Start to read Thermal comfort control objects
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
         state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
+        state.dataZoneCtrls->ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneCtrls->NumComfortControlledZones = 0;
@@ -966,19 +966,19 @@ namespace ZoneTempPredictorCorrector {
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
-            ComfortTStatObjects(Item).Name = cAlphaArgs(1);
+            state.dataZoneCtrls->ComfortTStatObjects(Item).Name = cAlphaArgs(1);
             if (Item1 > 0) {
-                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
                 ++state.dataZoneCtrls->NumComfortControlledZones;
-                ComfortTStatObjects(Item).NumOfZones = 1;
-                ComfortTStatObjects(Item).ZoneListActive = false;
-                ComfortTStatObjects(Item).ZoneOrZoneListPtr = Item1;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).NumOfZones = 1;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive = false;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
                 state.dataZoneCtrls->NumComfortControlledZones += ZoneList(ZLItem).NumOfZones;
-                ComfortTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
-                ComfortTStatObjects(Item).ZoneListActive = true;
-                ComfortTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive = true;
+                state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
@@ -1012,10 +1012,10 @@ namespace ZoneTempPredictorCorrector {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                for (Item1 = 1; Item1 <= ComfortTStatObjects(Item).NumOfZones; ++Item1) {
+                for (Item1 = 1; Item1 <= state.dataZoneCtrls->ComfortTStatObjects(Item).NumOfZones; ++Item1) {
                     ++ComfortControlledZoneNum;
-                    if (ComfortTStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    if (state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive) {
+                        cAlphaArgs(2) = Zone(ZoneList(state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned = UtilityRoutines::FindItemInList(
                         cAlphaArgs(2), state.dataZoneCtrls->ComfortControlledZone, &ZoneComfortControls::ZoneName, ComfortControlledZoneNum - 1);
@@ -1036,11 +1036,11 @@ namespace ZoneTempPredictorCorrector {
                         continue;
                     }
 
-                    if (!ComfortTStatObjects(Item).ZoneListActive) {
+                    if (!state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneListActive) {
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).Name = cAlphaArgs(1);
                     } else {
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).Name =
-                            Zone(ZoneList(ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + ComfortTStatObjects(Item).Name;
+                            Zone(ZoneList(state.dataZoneCtrls->ComfortTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name + ' ' + state.dataZoneCtrls->ComfortTStatObjects(Item).Name;
                     }
 
                     // Read Fields A3 and A4 for averaging method
@@ -1776,7 +1776,7 @@ namespace ZoneTempPredictorCorrector {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 // find matching name of  ZONECONTROL:THERMOSTAT object
-                found = UtilityRoutines::FindItem(cAlphaArgs(1), TStatObjects);
+                found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
                 if (found == 0) {
                     // It might be in the TempControlledZones
                     found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
@@ -1873,8 +1873,8 @@ namespace ZoneTempPredictorCorrector {
                                             Zone(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
                     }
                 } else {
-                    for (Item = 1; Item <= TStatObjects(found).NumOfZones; ++Item) {
-                        TempControlledZoneNum = TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
+                    for (Item = 1; Item <= state.dataZoneCtrls->TStatObjects(found).NumOfZones; ++Item) {
+                        TempControlledZoneNum = state.dataZoneCtrls->TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
                         if (state.dataZoneCtrls->NumTempControlledZones == 0) continue;
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).OperativeTempControl = true;
                         if (UtilityRoutines::SameString(cAlphaArgs(2), "Scheduled")) {
@@ -1997,7 +1997,7 @@ namespace ZoneTempPredictorCorrector {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 // find matching name of  ZONECONTROL:THERMOSTAT object
-                found = UtilityRoutines::FindItem(cAlphaArgs(1), TStatObjects);
+                found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TStatObjects);
                 if (found == 0) {
                     // It might be in the TempControlledZones
                     found = UtilityRoutines::FindItem(cAlphaArgs(1), state.dataZoneCtrls->TempControlledZone);
@@ -2083,8 +2083,8 @@ namespace ZoneTempPredictorCorrector {
                         }
                     }
                 } else {
-                    for (Item = 1; Item <= TStatObjects(found).NumOfZones; ++Item) {
-                        TempControlledZoneNum = TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
+                    for (Item = 1; Item <= state.dataZoneCtrls->TStatObjects(found).NumOfZones; ++Item) {
+                        TempControlledZoneNum = state.dataZoneCtrls->TStatObjects(found).TempControlledZoneStartPtr + Item - 1;
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSched = cAlphaArgs(2);
                         state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex = GetScheduleIndex(state, cAlphaArgs(2));
                         if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).DehumidifyingSchedIndex == 0) {
@@ -2177,7 +2177,7 @@ namespace ZoneTempPredictorCorrector {
         // Staged thermostat control inputs start
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::StagedDual));
         NumStageControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (NumStageControlledZones > 0) StagedTStatObjects.allocate(NumStageControlledZones);
+        if (NumStageControlledZones > 0) state.dataZoneCtrls->StagedTStatObjects.allocate(NumStageControlledZones);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
         state.dataZoneTempPredictorCorrector->NumStageCtrZone = 0;
@@ -2196,22 +2196,22 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            StagedTStatObjects(Item).Name = cAlphaArgs(1);
+            state.dataZoneCtrls->StagedTStatObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
+                state.dataZoneCtrls->StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
                 ++state.dataZoneTempPredictorCorrector->NumStageCtrZone;
-                StagedTStatObjects(Item).NumOfZones = 1;
-                StagedTStatObjects(Item).ZoneListActive = false;
-                StagedTStatObjects(Item).ZoneOrZoneListPtr = Item1;
+                state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones = 1;
+                state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = false;
+                state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
+                state.dataZoneCtrls->StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
                 state.dataZoneTempPredictorCorrector->NumStageCtrZone += ZoneList(ZLItem).NumOfZones;
-                StagedTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
-                StagedTStatObjects(Item).ZoneListActive = true;
-                StagedTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
+                state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
+                state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive = true;
+                state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
             } else {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
@@ -2226,7 +2226,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
-            StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
+            state.dataZoneCtrls->StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
             state.dataZoneCtrls->StageZoneLogic.dimension(state.dataGlobal->NumOfZones, false);
 
             StageControlledZoneNum = 0;
@@ -2243,17 +2243,17 @@ namespace ZoneTempPredictorCorrector {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                for (Item1 = 1; Item1 <= StagedTStatObjects(Item).NumOfZones; ++Item1) {
+                for (Item1 = 1; Item1 <= state.dataZoneCtrls->StagedTStatObjects(Item).NumOfZones; ++Item1) {
                     ++StageControlledZoneNum;
-                    if (StagedTStatObjects(Item).ZoneListActive) {
-                        cAlphaArgs(2) = Zone(ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
+                    if (state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
+                        cAlphaArgs(2) = Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name;
                     }
                     ZoneAssigned = UtilityRoutines::FindItemInList(
-                        cAlphaArgs(2), StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
+                        cAlphaArgs(2), state.dataZoneCtrls->StageControlledZone, &ZoneStagedControls::ZoneName, StageControlledZoneNum - 1);
                     if (ZoneAssigned == 0) {
-                        StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
-                        StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
-                        if (StageControlledZone(StageControlledZoneNum).ActualZoneNum == 0) {
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2);
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                        if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum == 0) {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" +
                                             cAlphaArgs(2) + "\" not found.");
                             ErrorsFound = true;
@@ -2261,32 +2261,32 @@ namespace ZoneTempPredictorCorrector {
                             //           Zone(StageControlledZone(StageControlledZoneNum)%ActualZoneNum)%StageControlledZoneIndex =
                             //           StageControlledZoneNum
                         }
-                        state.dataZoneCtrls->StageZoneLogic(StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
+                        state.dataZoneCtrls->StageZoneLogic(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ActualZoneNum) = true;
                     } else {
-                        StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).ZoneName = cAlphaArgs(2); // for continuity
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                         "\" zone previously assigned.");
-                        ShowContinueError(state, "...Zone was previously assigned to Thermostat=\"" + StageControlledZone(ZoneAssigned).Name + "\".");
+                        ShowContinueError(state, "...Zone was previously assigned to Thermostat=\"" + state.dataZoneCtrls->StageControlledZone(ZoneAssigned).Name + "\".");
                         ErrorsFound = true;
                         continue;
                     }
 
-                    if (!StagedTStatObjects(Item).ZoneListActive) {
-                        StageControlledZone(StageControlledZoneNum).Name = cAlphaArgs(1);
+                    if (!state.dataZoneCtrls->StagedTStatObjects(Item).ZoneListActive) {
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).Name = cAlphaArgs(1);
                     } else {
                         CheckCreatedZoneItemName(state, RoutineName,
                                                  cCurrentModuleObject,
-                                                 Zone(ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
-                                                 ZoneList(StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
-                                                 StagedTStatObjects(Item).Name,
-                                                 StageControlledZone,
+                                                 Zone(ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).Zone(Item1)).Name,
+                                                 ZoneList(state.dataZoneCtrls->StagedTStatObjects(Item).ZoneOrZoneListPtr).MaxZoneNameLength,
+                                                 state.dataZoneCtrls->StagedTStatObjects(Item).Name,
+                                                 state.dataZoneCtrls->StageControlledZone,
                                                  StageControlledZoneNum - 1,
-                                                 StageControlledZone(StageControlledZoneNum).Name,
+                                                 state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).Name,
                                                  errFlag);
                         if (errFlag) ErrorsFound = true;
                     }
 
-                    StageControlledZone(StageControlledZoneNum).NumOfHeatStages = rNumericArgs(1);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages = rNumericArgs(1);
                     if (rNumericArgs(1) < 1 || rNumericArgs(1) > 4) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" invalid range {}=\"{:.0R}\"",
@@ -2298,17 +2298,17 @@ namespace ZoneTempPredictorCorrector {
                         ErrorsFound = true;
                     }
 
-                    StageControlledZone(StageControlledZoneNum).HeatSetBaseSchedName = cAlphaArgs(3);
-                    StageControlledZone(StageControlledZoneNum).HSBchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatSetBaseSchedName = cAlphaArgs(3);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HSBchedIndex = GetScheduleIndex(state, cAlphaArgs(3));
                     if (Item1 == 1) { // only show error on first of several if zone list
-                        if (StageControlledZone(StageControlledZoneNum).HSBchedIndex == 0) {
+                        if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HSBchedIndex == 0) {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
                                             cAlphaArgs(3) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
 
-                    StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatThroRange = rNumericArgs(2);
                     if (rNumericArgs(1) < 0.0) {
                         ShowSevereError(state,
                                         format("{}=\"" + cAlphaArgs(1) + "\" negative value is found at {}=\"{:.1R}\"",
@@ -2319,10 +2319,10 @@ namespace ZoneTempPredictorCorrector {
                         ErrorsFound = true;
                     }
 
-                    if (StageControlledZone(StageControlledZoneNum).NumOfHeatStages > 0) {
-                        StageControlledZone(StageControlledZoneNum).HeatTOffset.allocate(StageControlledZone(StageControlledZoneNum).NumOfHeatStages);
-                        for (i = 1; i <= StageControlledZone(StageControlledZoneNum).NumOfHeatStages; ++i) {
-                            StageControlledZone(StageControlledZoneNum).HeatTOffset(i) = rNumericArgs(2 + i);
+                    if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages > 0) {
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatTOffset.allocate(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages);
+                        for (i = 1; i <= state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfHeatStages; ++i) {
+                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).HeatTOffset(i) = rNumericArgs(2 + i);
                             if (rNumericArgs(2 + i) > 0.0) {
                                 ShowSevereError(state,
                                                 cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" positive value is found at " +
@@ -2350,7 +2350,7 @@ namespace ZoneTempPredictorCorrector {
                         }
                     }
 
-                    StageControlledZone(StageControlledZoneNum).NumOfCoolStages = rNumericArgs(7);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages = rNumericArgs(7);
                     if (rNumericArgs(7) < 1 || rNumericArgs(7) > 4) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" invalid range {}=\"{:.0R}\"",
@@ -2362,17 +2362,17 @@ namespace ZoneTempPredictorCorrector {
                         ErrorsFound = true;
                     }
 
-                    StageControlledZone(StageControlledZoneNum).CoolSetBaseSchedName = cAlphaArgs(4);
-                    StageControlledZone(StageControlledZoneNum).CSBchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolSetBaseSchedName = cAlphaArgs(4);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CSBchedIndex = GetScheduleIndex(state, cAlphaArgs(4));
                     if (Item1 == 1) { // only show error on first of several if zone list
-                        if (StageControlledZone(StageControlledZoneNum).CSBchedIndex == 0) {
+                        if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CSBchedIndex == 0) {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + "=\"" +
                                             cAlphaArgs(4) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
 
-                    StageControlledZone(StageControlledZoneNum).CoolThroRange = rNumericArgs(8);
+                    state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolThroRange = rNumericArgs(8);
                     if (rNumericArgs(8) < 0.0) {
                         ShowSevereError(state,
                                         format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
@@ -2384,10 +2384,10 @@ namespace ZoneTempPredictorCorrector {
                         ErrorsFound = true;
                     }
 
-                    if (StageControlledZone(StageControlledZoneNum).NumOfCoolStages > 0) {
-                        StageControlledZone(StageControlledZoneNum).CoolTOffset.allocate(StageControlledZone(StageControlledZoneNum).NumOfCoolStages);
-                        for (i = 1; i <= StageControlledZone(StageControlledZoneNum).NumOfCoolStages; ++i) {
-                            StageControlledZone(StageControlledZoneNum).CoolTOffset(i) = rNumericArgs(8 + i);
+                    if (state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages > 0) {
+                        state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolTOffset.allocate(state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages);
+                        for (i = 1; i <= state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).NumOfCoolStages; ++i) {
+                            state.dataZoneCtrls->StageControlledZone(StageControlledZoneNum).CoolTOffset(i) = rNumericArgs(8 + i);
                             if (rNumericArgs(8 + i) < 0.0) {
                                 ShowSevereError(state,
                                                 format("{}=\"{}\" negative value is found at {}=\"{:.1R}\"",
@@ -3270,67 +3270,67 @@ namespace ZoneTempPredictorCorrector {
         // Staged thermostat setpoint
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
             for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneTempPredictorCorrector->NumStageCtrZone; ++RelativeZoneNum) {
-                ActualZoneNum = StageControlledZone(RelativeZoneNum).ActualZoneNum;
+                ActualZoneNum = state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).ActualZoneNum;
                 ZoneT = MAT(ActualZoneNum);
                 if (ShortenTimeStepSys) ZoneT = XMPT(ActualZoneNum);
-                StageControlledZone(RelativeZoneNum).HeatSetPoint = GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).HSBchedIndex);
-                StageControlledZone(RelativeZoneNum).CoolSetPoint = GetCurrentScheduleValue(state, StageControlledZone(RelativeZoneNum).CSBchedIndex);
-                if (StageControlledZone(RelativeZoneNum).HeatSetPoint >= StageControlledZone(RelativeZoneNum).CoolSetPoint) {
-                    ++StageControlledZone(RelativeZoneNum).StageErrCount;
-                    if (StageControlledZone(RelativeZoneNum).StageErrCount < 2) {
+                state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HSBchedIndex);
+                state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CSBchedIndex);
+                if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint >= state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint) {
+                    ++state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).StageErrCount;
+                    if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).StageErrCount < 2) {
                         ShowWarningError(state,
                             "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above the cooling setpoint in " +
-                            StageControlledZone(RelativeZoneNum).Name);
+                            state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).Name);
                         ShowContinueError(state, "The zone heating setpoint is set to the cooling setpoint - 0.1C.");
                         ShowContinueErrorTimeStamp(state, "Occurrence info:");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state, "The heating setpoint is still above the cooling setpoint",
-                                                       StageControlledZone(RelativeZoneNum).StageErrIndex,
-                                                       StageControlledZone(RelativeZoneNum).HeatSetPoint,
-                                                       StageControlledZone(RelativeZoneNum).HeatSetPoint);
+                                                       state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).StageErrIndex,
+                                                       state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint,
+                                                       state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint);
                     }
-                    StageControlledZone(RelativeZoneNum).HeatSetPoint = StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.1; //???????????
+                    state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint = state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.1; //???????????
                 }
                 // Determine either cooling or heating
-                if (StageControlledZone(RelativeZoneNum).CoolSetPoint < ZoneT) { // Cooling
-                    SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).CoolSetPoint;
+                if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint < ZoneT) { // Cooling
+                    SetpointOffset = ZoneT - state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint;
                     Itemp = 0;
-                    for (I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfCoolStages; ++I) {
-                        if (SetpointOffset >= StageControlledZone(RelativeZoneNum).CoolTOffset(I)) {
+                    for (I = 1; I <= state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).NumOfCoolStages; ++I) {
+                        if (SetpointOffset >= state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolTOffset(I)) {
                             Itemp = -I;
                         }
                     }
                     ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
-                    if (SetpointOffset >= 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange) {
+                    if (SetpointOffset >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
                         ZoneThermostatSetPointHi(ActualZoneNum) =
-                            StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
+                            state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     } else {
                         ZoneThermostatSetPointHi(ActualZoneNum) =
-                            StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
+                            state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     }
                     ZoneThermostatSetPointLo(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
-                } else if (StageControlledZone(RelativeZoneNum).HeatSetPoint > ZoneT) { // heating
-                    SetpointOffset = ZoneT - StageControlledZone(RelativeZoneNum).HeatSetPoint;
+                } else if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint > ZoneT) { // heating
+                    SetpointOffset = ZoneT - state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint;
                     Itemp = 0;
-                    for (I = 1; I <= StageControlledZone(RelativeZoneNum).NumOfHeatStages; ++I) {
-                        if (std::abs(SetpointOffset) >= std::abs(StageControlledZone(RelativeZoneNum).HeatTOffset(I))) {
+                    for (I = 1; I <= state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).NumOfHeatStages; ++I) {
+                        if (std::abs(SetpointOffset) >= std::abs(state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatTOffset(I))) {
                             Itemp = I;
                         }
                     }
                     ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
-                    if (std::abs(SetpointOffset) >= 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange) {
+                    if (std::abs(SetpointOffset) >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
                         ZoneThermostatSetPointLo(ActualZoneNum) =
-                            StageControlledZone(RelativeZoneNum).HeatSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
+                            state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     } else {
                         ZoneThermostatSetPointLo(ActualZoneNum) =
-                            StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
+                            state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     }
                     ZoneThermostatSetPointHi(ActualZoneNum) = ZoneThermostatSetPointLo(ActualZoneNum);
                 } else {
                     ZoneThermostatSetPointHi(ActualZoneNum) =
-                        StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * StageControlledZone(RelativeZoneNum).CoolThroRange;
+                        state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     ZoneThermostatSetPointLo(ActualZoneNum) =
-                        StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * StageControlledZone(RelativeZoneNum).HeatThroRange;
+                        state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     ZoneSysEnergyDemand(ActualZoneNum).StageNum = 0;
                 }
             }

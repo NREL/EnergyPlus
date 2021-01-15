@@ -576,7 +576,6 @@ namespace EnergyPlus::DemandManager {
         using DataHeatBalance::LightsObjects;
         using DataHeatBalance::ZoneElectric;
         using DataHeatBalance::ZoneElectricObjects;
-        using DataZoneControls::TStatObjects;
 
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
@@ -1141,9 +1140,9 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to controlled zones
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), TStatObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
                     if (LoadPtr > 0) {
-                        DemandMgr(MgrNum).NumOfLoads += TStatObjects(LoadPtr).NumOfZones;
+                        DemandMgr(MgrNum).NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
                     } else {
                         LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
                         if (LoadPtr > 0) {
@@ -1160,11 +1159,11 @@ namespace EnergyPlus::DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     LoadNum = 0;
                     for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), TStatObjects);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
                         if (LoadPtr > 0) {
-                            for (Item1 = 1; Item1 <= TStatObjects(LoadPtr).NumOfZones; ++Item1) {
+                            for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
                                 ++LoadNum;
-                                DemandMgr(MgrNum).Load(LoadNum) = TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
                             }
                         } else {
                             LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
