@@ -6339,14 +6339,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = ort->unitsStyle;
+                unitsStyle_cur = ort->unitsStyle;
                 produceTabular = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                     produceSQLite = true;
@@ -6354,7 +6354,7 @@ namespace EnergyPlus::OutputReportTabular {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = ort->unitsStyle_SQLite;
+                unitsStyle_cur = ort->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -6362,19 +6362,19 @@ namespace EnergyPlus::OutputReportTabular {
 
             // set the unit conversion
             // if (ort->unitsStyle == iUnitsStyle::None) {
-            if (unitsStyle_temp == iUnitsStyle::None) {
+            if (unitsStyle_cur == iUnitsStyle::None) {
                 energyUnitsString = "J";
                 energyUnitsConversionFactor = 1.0;
             // } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-            } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+            } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
                 energyUnitsString = "kWh";
                 energyUnitsConversionFactor = 1.0 / 3600000.0;
             // } else if (ort->unitsStyle == iUnitsStyle::JtoMJ) {
-            } else if (unitsStyle_temp == iUnitsStyle::JtoMJ) {
+            } else if (unitsStyle_cur == iUnitsStyle::JtoMJ) {
                 energyUnitsString = "MJ";
                 energyUnitsConversionFactor = 1.0 / 1000000.0;
             // } else if (ort->unitsStyle == iUnitsStyle::JtoGJ) {
-            } else if (unitsStyle_temp == iUnitsStyle::JtoGJ) {
+            } else if (unitsStyle_cur == iUnitsStyle::JtoGJ) {
                 energyUnitsString = "GJ";
                 energyUnitsConversionFactor = 1.0 / 1000000000.0;
             } else { // Should never happen but assures compilers of initialization
@@ -6422,7 +6422,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                         // do the unit conversions
                         // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                        if (unitsStyle_cur == iUnitsStyle::InchPound) {
                             varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                             LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                             GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
@@ -6739,14 +6739,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = ort->unitsStyle;
+                unitsStyle_cur = ort->unitsStyle;
                 produceTabular = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                     produceSQLite = true;
@@ -6754,7 +6754,7 @@ namespace EnergyPlus::OutputReportTabular {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = ort->unitsStyle_SQLite;
+                unitsStyle_cur = ort->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -6804,7 +6804,7 @@ namespace EnergyPlus::OutputReportTabular {
                 firstReport = ort->OutputTableBinned(iInObj).resIndex;
                 curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
                 // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
                     curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
@@ -6947,7 +6947,7 @@ namespace EnergyPlus::OutputReportTabular {
                         repMean = 0.0;
                     }
                     // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
                         tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
                         tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
                         tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
@@ -7105,14 +7105,14 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTextLine(state, "", true);
             }
 
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -7120,7 +7120,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -7211,7 +7211,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // unit conversion - all values are used as divisors
                 {
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         largeConversionFactor = 3600000.0;
                         kConversionFactor = 1.0;
@@ -7293,7 +7293,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Total Energy [kWh]";
                         columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
@@ -7701,7 +7701,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Area [m2]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -7795,7 +7795,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Electricity [kWh]";
                         columnHead(2) = "Natural Gas [kWh]";
@@ -8191,7 +8191,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(2) = "Electricity [kWh]";
                         columnHead(3) = "Natural Gas [kWh]";
@@ -8408,7 +8408,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Electricity Intensity [kWh/m2]";
                         columnHead(2) = "Natural Gas Intensity [kWh/m2]";
@@ -8540,7 +8540,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Electricity [kWh]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8644,7 +8644,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Heat [kWh]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8741,7 +8741,7 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(2, 13);
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Water [m3]";
                     } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
@@ -8847,7 +8847,7 @@ namespace EnergyPlus::OutputReportTabular {
                     curNameWithSIUnits = "Degrees [deltaC]";
                     curNameAndUnits = curNameWithSIUnits;
                     // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     }
                     columnHead(1) = curNameAndUnits;
@@ -8856,7 +8856,7 @@ namespace EnergyPlus::OutputReportTabular {
                     rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
                     // if (ort->unitsStyle != iUnitsStyle::InchPound) {
-                    if (unitsStyle_temp != iUnitsStyle::InchPound) {
+                    if (unitsStyle_cur != iUnitsStyle::InchPound) {
                             tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
                         tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
                     } else {
@@ -9005,14 +9005,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displaySourceEnergyEndUseSummary) {
             
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -9020,7 +9020,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -9075,7 +9075,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         largeConversionFactor = 3600000.0;
                         areaConversionFactor = 1.0;
@@ -9143,7 +9143,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Source Electricity [kWh]";
                         columnHead(2) = "Source Natural Gas [kWh]";
@@ -9227,7 +9227,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 {
                     // auto const SELECT_CASE_var(ort->unitsStyle);
-                    auto const SELECT_CASE_var(unitsStyle_temp);
+                    auto const SELECT_CASE_var(unitsStyle_cur);
                     if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
                         columnHead(1) = "Source Electricity [kWh/m2]";
                         columnHead(2) = "Source Natural Gas [kWh/m2]";
@@ -9410,14 +9410,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayDemandEndUse) {
 
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -9425,7 +9425,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -9479,7 +9479,7 @@ namespace EnergyPlus::OutputReportTabular {
                 collapsedTotal(12) = ort->gatherDemandTotal(distrHeatSelected);
 
                 // establish unit conversion factors
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
                     flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
                 } else {
@@ -9625,7 +9625,7 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(16) = "";
                 rowHead(17) = "Total End Uses";
 
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     columnHead(1) = "Electricity [kBtuh]";
                     columnHead(2) = "Natural Gas [kBtuh]";
                     columnHead(3) = "Gasoline [kBtuh]";
@@ -9734,7 +9734,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
 
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     columnHead(1) = "Subcategory";
                     columnHead(2) = "Electricity [kBtuh]";
                     columnHead(3) = "Natural Gas [kBtuh]";
@@ -9966,14 +9966,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!state.dataCostEstimateManager->DoCostEstimate) return;
 
-        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = ort->unitsStyle;
+                unitsStyle_cur = ort->unitsStyle;
                 produceTabular = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                     produceSQLite = true;
@@ -9981,7 +9981,7 @@ namespace EnergyPlus::OutputReportTabular {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = ort->unitsStyle_SQLite;
+                unitsStyle_cur = ort->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -10017,7 +10017,7 @@ namespace EnergyPlus::OutputReportTabular {
             rowHead(8) = "Commissioning (~~$~~)";
             rowHead(9) = "Cost Estimate Total (~~$~~)";
             // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-            if (unitsStyle_temp == iUnitsStyle::InchPound) {
+            if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     SIunit = "[m2]";
                 LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
                 m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
@@ -10388,14 +10388,14 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, columnm)
         if (ort->displayTabularVeriSum) {
 
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -10403,7 +10403,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -10431,7 +10431,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // do unit conversions if necessary
                 // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                         SIunit = "[m]";
                     LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
                     m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
@@ -11476,14 +11476,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (state.dataOutRptTab->displayHeatEmissionsSummary) {
  
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -11491,7 +11491,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -11509,19 +11509,19 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody.allocate(6, 1);
 
                 Real64 energyconversion = 1.0;
-                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     rowHead(1) = "Heat Emissions [kBtu]";
                     energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
-                } else if (unitsStyle_temp == iUnitsStyle::JtoGJ) {
+                } else if (unitsStyle_cur == iUnitsStyle::JtoGJ) {
                     rowHead(1) = "Heat Emissions [GJ]";
                     energyconversion = 1.0;
-                } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
                     rowHead(1) = "Heat Emissions [kWh]";
                     energyconversion = 1.0e3 / 3.6;
-                } else if (unitsStyle_temp == iUnitsStyle::JtoMJ) {
+                } else if (unitsStyle_cur == iUnitsStyle::JtoMJ) {
                     rowHead(1) = "Heat Emissions [MJ]";
                     energyconversion = 1.0e3;
-                } else if (unitsStyle_temp == iUnitsStyle::None) {
+                } else if (unitsStyle_cur == iUnitsStyle::None) {
                     rowHead(1) = "Heat Emissions [J]"; 
                     energyconversion = 1.0e9;
                 } else {
@@ -11616,14 +11616,14 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 IPvalue;
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = ort->unitsStyle;
+                unitsStyle_cur = ort->unitsStyle;
                 produceTabular = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                     produceSQLite = true;
@@ -11631,7 +11631,7 @@ namespace EnergyPlus::OutputReportTabular {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = ort->unitsStyle_SQLite;
+                unitsStyle_cur = ort->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -11734,11 +11734,11 @@ namespace EnergyPlus::OutputReportTabular {
                                     // do the unit conversions
                                     colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
                                     // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                    if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
                                             LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
                                         colUnitConv(countColumn) = indexUnitConv;
                                     // } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    } else if (unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                                    } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
                                         LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
                                         colUnitConv(countColumn) = indexUnitConv;
                                     } else {
@@ -11771,11 +11771,11 @@ namespace EnergyPlus::OutputReportTabular {
                                     }
                                     // finally assign the entry to the place in the table body
                                     // if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    if (unitsStyle_temp == iUnitsStyle::InchPound || unitsStyle_temp == iUnitsStyle::JtoKWH) {
+                                    if (unitsStyle_cur == iUnitsStyle::InchPound || unitsStyle_cur == iUnitsStyle::JtoKWH) {
                                             columnUnitConv = colUnitConv(colCurrent);
                                         if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name,
                                                                         "SizingPeriod:DesignDay") &&
-                                                unitsStyle_temp == iUnitsStyle::InchPound) { // ort->unitsStyle == iUnitsStyle::InchPound)
+                                                unitsStyle_cur == iUnitsStyle::InchPound) { // ort->unitsStyle == iUnitsStyle::InchPound)
                                             if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
                                                 LookupSItoIP(state,
                                                              state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry,
@@ -11886,14 +11886,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayComponentSizing) {
 
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -11901,7 +11901,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -12001,7 +12001,7 @@ namespace EnergyPlus::OutputReportTabular {
                         // do the unit conversions
                         curColHeadWithSI = uniqueDesc(jUnique);
                         // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                        if (unitsStyle_cur == iUnitsStyle::InchPound) {
                                 LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
                             colUnitConv(jUnique) = indexUnitConv;
                         } else {
@@ -12036,7 +12036,7 @@ namespace EnergyPlus::OutputReportTabular {
                             if ((foundDesc >= 1) && (foundObj >= 1)) {
                                 curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
                                 // if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                if (unitsStyle_temp == iUnitsStyle::InchPound) {
+                                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                                     if (colUnitConv(foundDesc) != 0) {
                                         curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
                                     } else {
@@ -12303,14 +12303,14 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
 
-            iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
                 if (iUnitSystem == 0) {
-                    unitsStyle_temp = ort->unitsStyle;
+                    unitsStyle_cur = ort->unitsStyle;
                     produceTabular = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                         produceSQLite = true;
@@ -12318,7 +12318,7 @@ namespace EnergyPlus::OutputReportTabular {
                         produceSQLite = false;
                     }
                 } else { // iUnitSystem == 1
-                    unitsStyle_temp = ort->unitsStyle_SQLite;
+                    unitsStyle_cur = ort->unitsStyle_SQLite;
                     produceTabular = false;
                     produceSQLite = true;
                     if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
@@ -13065,14 +13065,14 @@ namespace EnergyPlus::OutputReportTabular {
 
         CompLoadTablesType curCompLoadTable; // active component load table
 
-        iUnitsStyle unitsStyle_temp = ort->unitsStyle;
+        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = ort->unitsStyle;
+                unitsStyle_cur = ort->unitsStyle;
                 produceTabular = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) {
                     produceSQLite = true;
@@ -13080,13 +13080,13 @@ namespace EnergyPlus::OutputReportTabular {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = ort->unitsStyle_SQLite;
+                unitsStyle_cur = ort->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
             }
 
-            // adjusted initilization location to after variable declaration for loops 2020-01-11
+            // adjusted initilization location to after variable declaration for loops 2021-01-11
             peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
             peopleDelaySeqHeat = 0.0;
             peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -13461,16 +13461,16 @@ namespace EnergyPlus::OutputReportTabular {
 
                     // LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
                     // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                    LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_temp);
+                    LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
                     //LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
                     // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                    LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_temp);
+                    LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
 
                     // OutputCompLoadSummary(
                        // state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
                     // JY 2020-01-15 Use reloaded version for dual units
                     OutputCompLoadSummary(
-                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop, unitsStyle_temp, produceSQLite);
+                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop, unitsStyle_cur, produceSQLite);
                 }
             }
 
@@ -13574,14 +13574,14 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
                 // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables, unitsStyle_temp);
+                LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables, unitsStyle_cur);
                 // LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
                 // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_temp);
+                LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_cur);
 
                 // OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
                 // JY 2020-01-15 Use reloade version for dual units
-                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0, unitsStyle_temp,produceSQLite);
+                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0, unitsStyle_cur,produceSQLite);
             }
 
             // ZoneComponentLoadSummary: Now we convert and Display
@@ -13591,14 +13591,14 @@ namespace EnergyPlus::OutputReportTabular {
                     if (allocated(CalcFinalZoneSizing)) {
                         // LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
                         // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                        LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_temp);
+                        LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_cur);
                         // LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
                         // JY 2020-01-12 Use the reloaded version instead for dual units adaption
-                        LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_temp);
+                        LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
 
                         // OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                         // JY 2020-01-15 Use reloade version for dual units
-                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone, unitsStyle_temp, produceSQLite);
+                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone, unitsStyle_cur, produceSQLite);
                     }
                 }
             }

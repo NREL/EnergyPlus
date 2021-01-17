@@ -624,14 +624,14 @@ namespace OutputReportTabularAnnual {
 
     void WriteAnnualTables(EnergyPlusData &state)
     {
-        OutputReportTabular::iUnitsStyle unitsStyle_temp = state.dataOutRptTab->unitsStyle;
+        OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
 
             if (iUnitSystem == 0) {
-                unitsStyle_temp = state.dataOutRptTab->unitsStyle;
+                unitsStyle_cur = state.dataOutRptTab->unitsStyle;
                 produceTabular = true;
                 if (state.dataOutRptTab->unitsStyle_SQLite == state.dataOutRptTab->unitsStyle) {
                     produceSQLite = true;
@@ -639,7 +639,7 @@ namespace OutputReportTabularAnnual {
                     produceSQLite = false;
                 }
             } else { // iUnitSystem == 1
-                unitsStyle_temp = state.dataOutRptTab->unitsStyle_SQLite;
+                unitsStyle_cur = state.dataOutRptTab->unitsStyle_SQLite;
                 produceTabular = false;
                 produceSQLite = true;
                 if (state.dataOutRptTab->unitsStyle_SQLite == state.dataOutRptTab->unitsStyle) break;
@@ -652,7 +652,7 @@ namespace OutputReportTabularAnnual {
             for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
                 // annualTableIt->writeTable(state, state.dataOutRptTab->unitsStyle);
                 // JY 2020-01-12 Use reloaded function for Dual Units instead
-                annualTableIt->writeTable(state, unitsStyle_temp, produceSQLite);
+                annualTableIt->writeTable(state, unitsStyle_cur, produceSQLite);
             }
         }
     }
