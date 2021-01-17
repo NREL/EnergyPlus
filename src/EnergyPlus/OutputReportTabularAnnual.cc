@@ -651,7 +651,7 @@ namespace OutputReportTabularAnnual {
             std::vector<AnnualTable>::iterator annualTableIt;
             for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
                 // annualTableIt->writeTable(state, state.dataOutRptTab->unitsStyle);
-                // JY 2020-01-12 Use reloaded function for Dual Units instead
+                // JY 2021-01-12 Use reloaded function for Dual Units instead
                 annualTableIt->writeTable(state, unitsStyle_cur, produceSQLite);
             }
         }
