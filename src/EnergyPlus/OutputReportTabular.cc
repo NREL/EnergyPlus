@@ -5955,9 +5955,7 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 totalVozMin = 0;
         Real64 totalMechVentVol = 0;
         Real64 totalNatVentVol = 0;
-        Real64 totalTotVentVol = 0;
         Real64 totalInfilVol = 0;
-        Real64 totalVentInfilVol = 0;
         Real64 totalMechVentRateOcc = 0;
         Real64 totalNatVentRateOcc = 0;
         Real64 totalInfilRateOcc = 0;
