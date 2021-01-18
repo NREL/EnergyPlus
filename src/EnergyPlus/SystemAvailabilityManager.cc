@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -204,22 +204,22 @@ namespace SystemAvailabilityManager {
 
         for (PlantNum = 1; PlantNum <= NumPlantLoops; ++PlantNum) {
 
-            PreviousStatus = PlantAvailMgr(PlantNum).AvailStatus; // Save the previous status for differential thermostat
-            PlantAvailMgr(PlantNum).AvailStatus = NoAction;       // Initialize the availability to "take no action"
+            PreviousStatus = state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus; // Save the previous status for differential thermostat
+            state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = NoAction;       // Initialize the availability to "take no action"
 
-            for (PlantAvailMgrNum = 1; PlantAvailMgrNum <= PlantAvailMgr(PlantNum).NumAvailManagers;
+            for (PlantAvailMgrNum = 1; PlantAvailMgrNum <= state.dataPlnt->PlantAvailMgr(PlantNum).NumAvailManagers;
                  ++PlantAvailMgrNum) { // loop over the avail managers in plant
 
                 SimSysAvailManager(state,
-                                   PlantAvailMgr(PlantNum).AvailManagerType(PlantAvailMgrNum),
-                                   PlantAvailMgr(PlantNum).AvailManagerName(PlantAvailMgrNum),
-                                   PlantAvailMgr(PlantNum).AvailManagerNum(PlantAvailMgrNum),
+                                   state.dataPlnt->PlantAvailMgr(PlantNum).AvailManagerType(PlantAvailMgrNum),
+                                   state.dataPlnt->PlantAvailMgr(PlantNum).AvailManagerName(PlantAvailMgrNum),
+                                   state.dataPlnt->PlantAvailMgr(PlantNum).AvailManagerNum(PlantAvailMgrNum),
                                    PlantNum,
                                    PreviousStatus,
                                    AvailStatus);
 
                 if (AvailStatus != NoAction) {
-                    PlantAvailMgr(PlantNum).AvailStatus = AvailStatus;
+                    state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = AvailStatus;
                     break; // First manager to do anything other than "NoAction" gets to set the availability
                 }
 
@@ -1340,32 +1340,32 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->GetAvailListsInput = false;
         }
 
-        if (!allocated(PlantAvailMgr)) {
-            PlantAvailMgr.allocate(NumPlantLoops);
+        if (!allocated(state.dataPlnt->PlantAvailMgr)) {
+            state.dataPlnt->PlantAvailMgr.allocate(NumPlantLoops);
         }
 
         Found = 0;
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0) Found = UtilityRoutines::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->SysAvailMgrListData);
 
         if (Found != 0) {
-            PlantAvailMgr(Loop).NumAvailManagers = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).NumItems;
-            PlantAvailMgr(Loop).AvailStatus = NoAction;
-            PlantAvailMgr(Loop).StartTime = 0;
-            PlantAvailMgr(Loop).StopTime = 0;
-            PlantAvailMgr(Loop).AvailManagerName.allocate(PlantAvailMgr(Loop).NumAvailManagers);
-            PlantAvailMgr(Loop).AvailManagerType.allocate(PlantAvailMgr(Loop).NumAvailManagers);
-            PlantAvailMgr(Loop).AvailManagerNum.allocate(PlantAvailMgr(Loop).NumAvailManagers);
-            for (Num = 1; Num <= PlantAvailMgr(Loop).NumAvailManagers; ++Num) {
-                PlantAvailMgr(Loop).AvailManagerName(Num) = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num);
-                PlantAvailMgr(Loop).AvailManagerNum(Num) = 0;
-                PlantAvailMgr(Loop).AvailManagerType(Num) = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num);
-                if (PlantAvailMgr(Loop).AvailManagerType(Num) == 0) {
+            state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).NumItems;
+            state.dataPlnt->PlantAvailMgr(Loop).AvailStatus = NoAction;
+            state.dataPlnt->PlantAvailMgr(Loop).StartTime = 0;
+            state.dataPlnt->PlantAvailMgr(Loop).StopTime = 0;
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerName.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerType.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerNum.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
+            for (Num = 1; Num <= state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers; ++Num) {
+                state.dataPlnt->PlantAvailMgr(Loop).AvailManagerName(Num) = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num);
+                state.dataPlnt->PlantAvailMgr(Loop).AvailManagerNum(Num) = 0;
+                state.dataPlnt->PlantAvailMgr(Loop).AvailManagerType(Num) = state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num);
+                if (state.dataPlnt->PlantAvailMgr(Loop).AvailManagerType(Num) == 0) {
                     ShowSevereError(state, "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" +
                                     state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).cAvailManagerType(Num) + "\".");
                     ShowContinueError(state, "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\".");
                     ErrorsFound = true;
                 }
-                if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num) == state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo && Num != PlantAvailMgr(Loop).NumAvailManagers) {
+                if (state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerType(Num) == state.dataSystemAvailabilityManager->SysAvailMgr_DiffThermo && Num != state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers) {
                     ShowWarningError(state, "GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                      state.dataSystemAvailabilityManager->SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
                     ShowContinueError(state,
@@ -1387,11 +1387,11 @@ namespace SystemAvailabilityManager {
                 ShowWarningError(state, "GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManagerAssignmentList=" + AvailabilityListName +
                                  " not found in lists.  No availability will be used.");
             }
-            PlantAvailMgr(Loop).NumAvailManagers = 0;
-            PlantAvailMgr(Loop).AvailStatus = NoAction;
-            PlantAvailMgr(Loop).AvailManagerName.allocate(PlantAvailMgr(Loop).NumAvailManagers);
-            PlantAvailMgr(Loop).AvailManagerType.allocate(PlantAvailMgr(Loop).NumAvailManagers);
-            PlantAvailMgr(Loop).AvailManagerNum.allocate(PlantAvailMgr(Loop).NumAvailManagers);
+            state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers = 0;
+            state.dataPlnt->PlantAvailMgr(Loop).AvailStatus = NoAction;
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerName.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerType.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
+            state.dataPlnt->PlantAvailMgr(Loop).AvailManagerNum.allocate(state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers);
         }
     }
 
@@ -3511,7 +3511,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::PlantAvailMgr;
 
         Real64 DeltaTemp;
 

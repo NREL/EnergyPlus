@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -765,7 +765,6 @@ namespace PoweredInductionUnits {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -803,7 +802,7 @@ namespace PoweredInductionUnits {
             MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(PIUNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(PIUNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) || (PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -822,7 +821,7 @@ namespace PoweredInductionUnits {
                 if (errFlag) {
                     ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
                 }
-                PIU(PIUNum).HotCoilOutNodeNum = PlantLoop(PIU(PIUNum).HWLoopNum)
+                PIU(PIUNum).HotCoilOutNodeNum = state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum)
                                                     .LoopSide(PIU(PIUNum).HWLoopSide)
                                                     .Branch(PIU(PIUNum).HWBranchNum)
                                                     .Comp(PIU(PIUNum).HWCompNum)
@@ -853,9 +852,9 @@ namespace PoweredInductionUnits {
             if (HotConNode > 0) {
                 // plant upgrade note? why no separate handling of steam coil? add it ?
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                        RoutineName);
 
                 PIU(PIUNum).MaxHotWaterFlow = rho * PIU(PIUNum).MaxVolHotWaterFlow;
@@ -993,8 +992,6 @@ namespace PoweredInductionUnits {
         using WaterCoils::GetCoilWaterInletNode;
         using WaterCoils::GetCoilWaterOutletNode;
         using WaterCoils::SetCoilDesFlow;
-        //  USE BranchInputManager, ONLY: MyPlantSizingIndex
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -1326,14 +1323,14 @@ namespace PoweredInductionUnits {
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
                                 rho = GetDensityGlycol(state,
-                                                       PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                        RoutineName);
                                 Cp = GetSpecificHeatGlycol(state,
-                                                           PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1519,7 +1516,6 @@ namespace PoweredInductionUnits {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using HeatingCoils::SimulateHeatingCoilComponents;

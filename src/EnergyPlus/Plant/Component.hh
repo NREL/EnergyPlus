@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,8 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/EquipAndOperations.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -95,7 +95,7 @@ namespace DataPlant {
         Real64 MaxOutletTemp;              // Component exit upper limit temperature
         bool FreeCoolCntrlShutDown;        // true if component was shut down because of free cooling
         Real64 FreeCoolCntrlMinCntrlTemp;  // current control temp value for free cooling controls
-        int FreeCoolCntrlMode;             // type of sensor used for free cooling controls
+        DataPlant::iFreeCoolControlMode FreeCoolCntrlMode;             // type of sensor used for free cooling controls
         int FreeCoolCntrlNodeNum;          // chiller condenser inlet node number for free cooling controls
         int IndexInLoopSidePumps;          // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
         Real64 TempDesCondIn;
@@ -105,12 +105,12 @@ namespace DataPlant {
 
         // Default Constructor
         CompData()
-            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus_Unknown), ON(false), Available(false),
-              NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
+            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus_Unknown), ON(false),
+              Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
               CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0), EMSLoadOverrideOn(false),
               EMSLoadOverrideValue(0.0), HowLoadServed(HowMet_Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false),
-              FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(0), FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0),
-              TempDesEvapOut(0.0), compPtr(nullptr)
+              FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned), FreeCoolCntrlNodeNum(0),
+              IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
 

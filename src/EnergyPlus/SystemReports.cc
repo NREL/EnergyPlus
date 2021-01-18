@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -354,7 +354,7 @@ namespace EnergyPlus::SystemReports {
                                 CompType = ZoneEquipList(ListNum).EquipData(AirDistUnitNum).TypeOf;
                                 CompName = ZoneEquipList(ListNum).EquipData(AirDistUnitNum).Name;
                                 Idx = 0;
-                                FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 if (MatchFound)
                                     UpdateZoneCompPtrArray(state, Idx, ListNum, AirDistUnitNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 ZoneEquipList(ListNum).EquipData(AirDistUnitNum).ZoneEqToPlantPtr = Idx;
@@ -370,7 +370,7 @@ namespace EnergyPlus::SystemReports {
                                     CompType = ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).TypeOf;
                                     CompName = ZoneEquipList(ListNum).EquipData(AirDistUnitNum).SubEquipData(SubEquipNum).Name;
                                     Idx = 0;
-                                    FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     if (MatchFound)
                                         UpdateZoneSubCompPtrArray(state,
                                             Idx, ListNum, AirDistUnitNum, SubEquipNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -409,7 +409,7 @@ namespace EnergyPlus::SystemReports {
                                                        .SubSubEquipData(SubSubEquipNum)
                                                        .Name;
                                         Idx = 0;
-                                        FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                        FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                         if (MatchFound)
                                             UpdateZoneSubSubCompPtrArray(state,
                                                                          Idx,
@@ -736,13 +736,13 @@ namespace EnergyPlus::SystemReports {
 
                     // 3. Find Demand Side Component Corresponding to Supply Side Component
                     for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum) {
-                        for (BranchNum = 1; BranchNum <= VentRepPlantSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                 {
-                                    auto &thisVentRepComp(VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
+                                    auto &thisVentRepComp(state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
                                     CompType = thisVentRepComp.TypeOf;
                                     CompName = thisVentRepComp.Name;
-                                    FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
                                     thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
                                     thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
@@ -753,13 +753,13 @@ namespace EnergyPlus::SystemReports {
                     }
 
                     for (PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum) {
-                        for (BranchNum = 1; BranchNum <= VentRepCondSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                 {
-                                    auto &thisVentRepComp(VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
+                                    auto &thisVentRepComp(state.dataPlnt->VentRepCondSupplySide(PlantLoopNum).Branch(BranchNum).Comp(CompNum));
                                     CompType = thisVentRepComp.TypeOf;
                                     CompName = thisVentRepComp.Name;
-                                    FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                    FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                     thisVentRepComp.ConnectPlant.LoopType = MatchLoopType;
                                     thisVentRepComp.ConnectPlant.LoopNum = MatchLoop;
                                     thisVentRepComp.ConnectPlant.BranchNum = MatchBranch;
@@ -998,7 +998,7 @@ namespace EnergyPlus::SystemReports {
 
         // On every iteration, load the Plant Supply Side Data and load the Plant Demand Side Data
         for (PlantLoopNum = 1; PlantLoopNum <= NumPlantLoops; ++PlantLoopNum) {
-            auto &vrpss = VentRepPlantSupplySide(PlantLoopNum);
+            auto &vrpss = state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrpss.TotalBranches; ++BranchNum) {
                 auto &vrpssBranch = vrpss.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrpssBranch.TotalComponents; ++CompNum) {
@@ -1011,7 +1011,7 @@ namespace EnergyPlus::SystemReports {
                     }
                 }
             }
-            auto &vrpds = VentRepPlantDemandSide(PlantLoopNum);
+            auto &vrpds = state.dataPlnt->VentRepPlantDemandSide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrpds.TotalBranches; ++BranchNum) {
                 auto &vrpdsBranch = vrpds.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrpdsBranch.TotalComponents; ++CompNum) {
@@ -1028,7 +1028,7 @@ namespace EnergyPlus::SystemReports {
 
         // On every iteration, load the Condenser Supply Side Data and load the Condenser Demand Side Data
         for (PlantLoopNum = 1; PlantLoopNum <= NumCondLoops; ++PlantLoopNum) {
-            auto &vrcss = VentRepCondSupplySide(PlantLoopNum);
+            auto &vrcss = state.dataPlnt->VentRepCondSupplySide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrcss.TotalBranches; ++BranchNum) {
                 auto &vrcssBranch = vrcss.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrcssBranch.TotalComponents; ++CompNum) {
@@ -1041,7 +1041,7 @@ namespace EnergyPlus::SystemReports {
                     }
                 }
             }
-            auto &vrcds = VentRepCondSupplySide(PlantLoopNum);
+            auto &vrcds = state.dataPlnt->VentRepCondSupplySide(PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrcds.TotalBranches; ++BranchNum) {
                 auto &vrcdsBranch = vrcds.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrcdsBranch.TotalComponents; ++CompNum) {
@@ -1140,11 +1140,11 @@ namespace EnergyPlus::SystemReports {
             //        countloop=countloop+1
             //        if (countloop > 100) exit
             if (LoopType == 1) {
-                for (BranchNum = 1; BranchNum <= VentRepPlantSupplySide(LoopNum).TotalBranches; ++BranchNum) {
-                    for (SupplySideCompNum = 1; SupplySideCompNum <= VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents;
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlantSupplySide(LoopNum).TotalBranches; ++BranchNum) {
+                    for (SupplySideCompNum = 1; SupplySideCompNum <= state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents;
                          ++SupplySideCompNum) {
                         {
-                            auto &thisVentRepComp(VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
+                            auto &thisVentRepComp(state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
                             DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                             DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
                             DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
@@ -1186,11 +1186,11 @@ namespace EnergyPlus::SystemReports {
                     }
                 }
             } else if (LoopType == 2) {
-                for (BranchNum = 1; BranchNum <= VentRepCondSupplySide(LoopNum).TotalBranches; ++BranchNum) {
-                    for (SupplySideCompNum = 1; SupplySideCompNum <= VentRepCondSupplySide(LoopNum).Branch(BranchNum).TotalComponents;
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCondSupplySide(LoopNum).TotalBranches; ++BranchNum) {
+                    for (SupplySideCompNum = 1; SupplySideCompNum <= state.dataPlnt->VentRepCondSupplySide(LoopNum).Branch(BranchNum).TotalComponents;
                          ++SupplySideCompNum) {
                         {
-                            auto &thisVentRepComp(VentRepCondSupplySide(LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
+                            auto &thisVentRepComp(state.dataPlnt->VentRepCondSupplySide(LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
                             DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                             DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
                             DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
@@ -2932,9 +2932,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &VentRepPlantDemandSide(PlantLoopNum);
+                            select_ThisReportData = &state.dataPlnt->VentRepPlantDemandSide(PlantLoopNum);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &VentRepPlantSupplySide(PlantLoopNum);
+                            select_ThisReportData = &state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
                         } else {
                             assert(false);
                         }
@@ -2943,9 +2943,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
                         } else {
                             assert(false);
                         }
@@ -3073,9 +3073,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &VentRepPlantDemandSide(PlantLoopNum);
+                            select_ThisReportData = &state.dataPlnt->VentRepPlantDemandSide(PlantLoopNum);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &VentRepPlantSupplySide(PlantLoopNum);
+                            select_ThisReportData = &state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
                         } else {
                             assert(false);
                         }
@@ -3084,9 +3084,9 @@ namespace EnergyPlus::SystemReports {
                     {
                         auto const SELECT_CASE_var(LoopSideNum);
                         if (SELECT_CASE_var == DemandSide) {
-                            select_ThisReportData = &VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - NumPlantLoops);
                         } else if (SELECT_CASE_var == SupplySide) {
-                            select_ThisReportData = &VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
+                            select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - NumPlantLoops);
                         } else {
                             assert(false);
                         }
@@ -4697,7 +4697,7 @@ namespace EnergyPlus::SystemReports {
                         CompType = thisComp.TypeOf;
                         CompName = thisComp.Name;
                         Idx = 0;
-                        FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                        FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                         if (MatchFound)
                             UpdateAirSysCompPtrArray(state, Idx, AirLoopNum, BranchNum, CompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                         thisComp.AirSysToPlantPtr = Idx;
@@ -4714,7 +4714,7 @@ namespace EnergyPlus::SystemReports {
                                 CompType = thisSubComp.TypeOf;
                                 CompName = thisSubComp.Name;
                                 Idx = 0;
-                                FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                 if (MatchFound)
                                     UpdateAirSysSubCompPtrArray(
                                         state, Idx, AirLoopNum, BranchNum, CompNum, SubCompNum, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -4732,7 +4732,7 @@ namespace EnergyPlus::SystemReports {
                                         CompType = thisSubSubComp.TypeOf;
                                         CompName = thisSubSubComp.Name;
                                         Idx = 0;
-                                        FindDemandSideMatch(CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
+                                        FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
                                         if (MatchFound)
                                             UpdateAirSysSubSubCompPtrArray(state,
                                                                            Idx,
@@ -4757,7 +4757,8 @@ namespace EnergyPlus::SystemReports {
         }
     }
 
-    void FindDemandSideMatch(std::string const &CompType, // Inlet node of the component to find the match of
+    void FindDemandSideMatch(EnergyPlusData &state,
+                             std::string const &CompType, // Inlet node of the component to find the match of
                              std::string const &CompName, // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match
@@ -4802,11 +4803,11 @@ namespace EnergyPlus::SystemReports {
         // record the type of loop and the loop, branch, and component numbers.
         if (!MatchFound) { // Go through the plant demand side loops
             for (PassLoopNum = 1; PassLoopNum <= NumPlantLoops; ++PassLoopNum) {
-                for (PassBranchNum = 1; PassBranchNum <= VentRepPlantDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
-                    for (PassCompNum = 1; PassCompNum <= VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
+                for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
+                    for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
                         if (UtilityRoutines::SameString(CompType,
-                                                        VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                            UtilityRoutines::SameString(CompName, VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                                                        state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                            UtilityRoutines::SameString(CompName, state.dataPlnt->VentRepPlantDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
                             // Found a match on the plant demand side--increment the counter
                             MatchFound = true;
                             MatchLoopType = 1;
@@ -4824,11 +4825,11 @@ namespace EnergyPlus::SystemReports {
 
         if (!MatchFound) { // Go through the condenser demand side loops
             for (PassLoopNum = 1; PassLoopNum <= NumCondLoops; ++PassLoopNum) {
-                for (PassBranchNum = 1; PassBranchNum <= VentRepCondDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
-                    for (PassCompNum = 1; PassCompNum <= VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
+                for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).TotalBranches; ++PassBranchNum) {
+                    for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).TotalComponents; ++PassCompNum) {
                         if (UtilityRoutines::SameString(CompType,
-                                                        VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                            UtilityRoutines::SameString(CompName, VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                                                        state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
+                            UtilityRoutines::SameString(CompName, state.dataPlnt->VentRepCondDemandSide(PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
                             // Found a match on the plant demand side--increment the counter
                             MatchFound = true;
                             MatchLoopType = 2;

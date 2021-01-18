@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1829,7 +1829,6 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_PackagedTESCoolingCoil;
 
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1887,18 +1886,18 @@ namespace PackagedThermalStorageCoil {
                 TESCoil(TESCoilNum).TESPlantBranchNum = brnum;
                 TESCoil(TESCoilNum).TESPlantCompNum = cpnum;
 
-                if ((PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn != TESCoil(TESCoilNum).TESPlantInletNodeNum) ||
-                    (PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != TESCoil(TESCoilNum).TESPlantOutletNodeNum)) {
+                if ((state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn != TESCoil(TESCoilNum).TESPlantInletNodeNum) ||
+                    (state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != TESCoil(TESCoilNum).TESPlantOutletNodeNum)) {
                     ShowSevereError(state, "InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"" + TESCoil(TESCoilNum).Name +
                                     "\", non-matching plant nodes.");
                     ShowContinueError(state, "...in Branch=\"" +
-                                      PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum)
+                                      state.dataPlnt->PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum)
                                           .LoopSide(TESCoil(TESCoilNum).TESPlantLoopSideNum)
                                           .Branch(TESCoil(TESCoilNum).TESPlantBranchNum)
                                           .Name +
                                       "\", Component referenced with:");
-                    ShowContinueError(state, "...Inlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
-                    ShowContinueError(state, "...Outlet Node=\"" + NodeID(PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
+                    ShowContinueError(state, "...Inlet Node=\"" + NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
+                    ShowContinueError(state, "...Outlet Node=\"" + NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
                     ShowContinueError(state, "...TES Inlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantInletNodeNum));
                     ShowContinueError(state, "...TES Outlet Node=\"" + NodeID(TESCoil(TESCoilNum).TESPlantOutletNodeNum));
                     errFlag = true;
@@ -4527,7 +4526,6 @@ namespace PackagedThermalStorageCoil {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using WaterThermalTanks::WaterThermalTankData;
@@ -4608,9 +4606,9 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).FluidTankTempFinal = NewTankTemp;
 
         if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
-            CpPlantConnection = GetSpecificHeatGlycol(state, PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
+            CpPlantConnection = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
                                                       Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp,
-                                                      PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
+                                                      state.dataPlnt->PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
                                                       calcTESIceStorageTank);
 
             TESCoil(TESCoilNum).QdotPlant = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * CpPlantConnection *
@@ -4663,7 +4661,6 @@ namespace PackagedThermalStorageCoil {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // Locals
@@ -4694,9 +4691,9 @@ namespace PackagedThermalStorageCoil {
 
         // update plant connection (if any)
         if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidName,
                                        Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).Temp,
-                                       PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(TESCoil(TESCoilNum).TESPlantLoopNum).FluidIndex,
                                        RoutineName);
 
             TESCoil(TESCoilNum).QdotPlant = Node(TESCoil(TESCoilNum).TESPlantInletNodeNum).MassFlowRate * Cp *

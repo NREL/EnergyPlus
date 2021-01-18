@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4803,7 +4803,6 @@ namespace Furnaces {
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
@@ -4976,7 +4975,7 @@ namespace Furnaces {
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
-        if (MyPlantScanFlag(FurnaceNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) || (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingSteam)) {
 
                 if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
@@ -5002,9 +5001,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
                     }
@@ -5035,7 +5034,7 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                Furnace(FurnaceNum).CoilOutletNode = PlantLoop(Furnace(FurnaceNum).LoopNum)
+                Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNum)
                                                          .LoopSide(Furnace(FurnaceNum).LoopSide)
                                                          .Branch(Furnace(FurnaceNum).BranchNum)
                                                          .Comp(Furnace(FurnaceNum).CompNum)
@@ -5049,7 +5048,7 @@ namespace Furnaces {
         }
 
         // Scan Supplemental hot water and steam heating coil plant components for one time initializations
-        if (MySuppCoilPlantScanFlag(FurnaceNum) && allocated(PlantLoop)) {
+        if (MySuppCoilPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) || (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
 
                 if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
@@ -5074,9 +5073,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                     if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                               state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                               state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                RoutineName);
                         Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
                     }
@@ -5106,7 +5105,7 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                Furnace(FurnaceNum).SuppCoilOutletNode = PlantLoop(Furnace(FurnaceNum).LoopNumSupp)
+                Furnace(FurnaceNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNumSupp)
                                                              .LoopSide(Furnace(FurnaceNum).LoopSideSupp)
                                                              .Branch(Furnace(FurnaceNum).BranchNumSupp)
                                                              .Comp(Furnace(FurnaceNum).CompNumSupp)
@@ -5147,9 +5146,9 @@ namespace Furnaces {
                         SimulateWaterCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
-                            rho = GetDensityGlycol(state, PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
+                            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -5188,9 +5187,9 @@ namespace Furnaces {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                                   state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
                                                    RoutineName);
                             Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
