@@ -494,7 +494,7 @@ namespace IceRink {
         // Using/Aliasing
 
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
+        //using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -512,7 +512,7 @@ namespace IceRink {
         bool errFlag;
         int SurfNum = this->SurfacePtr;
 
-        if ((this->MyFlag) && allocated(DataPlant::PlantLoop)) {
+        if ((this->MyFlag) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             this->setupOutputVariables(state);
             PlantUtilities::ScanPlantLoopsForObject(
@@ -521,9 +521,9 @@ namespace IceRink {
                 ShowFatalError(state, "Initialize: Program terminated due to previous condition(s).");
             }
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                            DataPrecisionGlobals::constant_zero,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);
 
             this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeLength;
@@ -553,8 +553,11 @@ namespace IceRink {
             LastTimeStepSys.dimension(TotSurfaces, 0.0);
             this->PastRefrigMassFlow = 0.01;
             this->RefrigTempIn = -10; // to be changed..
-            this->CpRefrig = GetSpecificHeatGlycol(
-                state, PlantLoop(this->LoopNum).FluidName, this->RefrigTempIn, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            this->CpRefrig = GetSpecificHeatGlycol(state,
+                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                   this->RefrigTempIn,
+                                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                   RoutineName);
             this->Qsrcmax = -(IceRinkFreezing(state)); // To calculate required Q to freeze the water. (Design Capcity)
             this->maxmdot = abs(this->Qsrcmax) / (this->CpRefrig * this->deltatemp); // To calculate maximum mass flow rate of the system.
 
@@ -636,33 +639,6 @@ namespace IceRink {
         }
     }
 
-    Real64 IceRinkData::PeopleHG(EnergyPlusData &state)
-    {
-        static std::string const RoutineName("PeopleHG");
-
-        this->PeopleHeatGain = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleHeatGainSchedPtr);
-        if (this->PeopleHeatGain < 0.0) {
-            ShowWarningError(state,
-                             RoutineName + ": Ice Rink =\"" + this->Name + " People Heat Gain Schedule =\"" + this->PeopleHeatGainSchedName +
-                                 " has a negative value.  This is not allowed.");
-            ShowContinueError(state, "The heat gain per person has been reset to zero.");
-            this->PeopleHeatGain = 0.0;
-        }
-
-        this->NumOfPeople = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleSchedPtr);
-        if (this->NumOfPeople < 0.0) {
-            ShowWarningError(state,
-                             RoutineName + ": Ice Rink =\"" + this->Name + " People Schedule =\"" + this->PeopleSchedName +
-                                 " has a negative value.  This is not allowed.");
-            ShowContinueError(state, "The number of people has been reset maximum people capacity.");
-            this->NumOfPeople = this->MaxNumOfPeople;
-        }
-
-        this->TotalPeopleHG = this->PeopleHeatGain * this->NumOfPeople;
-
-        return (this->TotalPeopleHG);
-    }
-
     Real64 IceRinkData::IceRinkFreezing(EnergyPlusData &state)
     {
         Real64 QFusion(333550.00);
@@ -711,7 +687,7 @@ namespace IceRink {
         // Using/Aliasing
 
         using DataGlobalConstants::Pi;
-        using DataPlant::PlantLoop;
+        //using DataPlant::PlantLoop;
 
         // Return value
         Real64 CalcEffectiveness; // Function return variable
@@ -726,13 +702,13 @@ namespace IceRink {
         Real64 NuseltNum; // Nuselt number (dimensionless)
         // printf("Temp is %f", Temperature);
         Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(
-            state, PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         Real64 Conductivity = FluidProperties::GetConductivityGlycol(
-            state, PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         Real64 Viscosity = FluidProperties::GetViscosityGlycol(
-            state, PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         Real64 Density = FluidProperties::GetDensityGlycol(
-            state, PlantLoop(this->LoopNum).FluidName, Temperature, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
         Real64 ReynoldsNum =
@@ -780,7 +756,7 @@ namespace IceRink {
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
+        //using DataPlant::PlantLoop;
         using DataSurfaces::HeatTransferModel_CTF;
         using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -834,8 +810,11 @@ namespace IceRink {
         this->Tsurfin2 = TempSurfIn(SurfNum); // Current
         this->IceTemperature = TempSurfIn(SurfNum);
         this->Tsrc = TempSource(SurfNum);
-        this->CpRefrig =
-            GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, this->RefrigTempIn, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+        this->CpRefrig = GetSpecificHeatGlycol(state,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                               this->RefrigTempIn,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                               RoutineName);
 
         int ConstrNum = DataSurfaces::Surface(SurfNum).Construction;
         this->coeffs.Ca = RadSysTiHBConstCoef(SurfNum);
@@ -943,7 +922,7 @@ namespace IceRink {
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
+        //using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 

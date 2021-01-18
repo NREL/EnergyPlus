@@ -557,5 +557,4 @@ EnergyPlusData::EnergyPlusData()
         this->files.ssz.close();
         this->files.zsz.close();
     }
-}
-} // namespace EnergyPlus
+}// namespace EnergyPlus
