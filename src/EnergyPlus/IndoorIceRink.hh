@@ -182,6 +182,7 @@ namespace IceRink {
         Real64 Qsource2;      // Q used to report data after calling heat balance. This is used to find any irregularities.
         Real64 Qsetpoint;     // Required Q to bring the inside surface temperature to ice setpoint.
         Real64 Qsrcmax;       // maximum Q to freeze water. This is used to calculate the design load and maximum mass flowrate.
+        Real64 Qsrcmax2;     // maximum Q based on CTFs
         Real64 Tsrc;          // Source Temperature. Only used to track simulation results.
         Real64 Effectiveness; // effectiveness of HX
         Real64 ReqMassFlow;   // Required mass flowarate
@@ -189,7 +190,7 @@ namespace IceRink {
         Real64 RhoWater;      // density of water
         Real64 CpWater;       // Specific heat of water
         Real64 Qfusion;       // Enthalpy of water transformation to ice
-        Real64 Q;             // Final Q to be reported to EnergyPlus
+        Real64 Q;             // Final Q to be reported to EnergyPlus - using eqn. from low radiant temp system
         Real64 SecInHour = 3600; 
         Real64 Increments = 0.1667; 
         Real64 TRefigOutCheck;     // Outlet temperature of refrigerant
@@ -200,6 +201,10 @@ namespace IceRink {
         Real64 COP = 2.5; // hardwired COP. This will be changed later.
         Real64 IceSetPointTemp; //Ice rink setpoint
         Real64 operation; //used to determine whether the ice rink is ON or OFF. 1: ON; 0: OFF
+        Real64 circuits = 423;
+        Real64 PipeArea;
+        Real64 EpsMdotCp;
+        
 
         Real64 FreezingLoad;
 
@@ -243,13 +248,13 @@ namespace IceRink {
 
         void setupOutputVariables(EnergyPlusData &state);
 
-        Real64 PeopleHG(EnergyPlusData &state);
+        //Real64 PeopleHG(EnergyPlusData &state);
 
         Real64 IceRinkFreezing(EnergyPlusData &state);
 
         Real64 calcEffectiveness(EnergyPlusData &state, Real64 const Temperature, Real64 const RefrigMassFlow);
 
-        void calculateIceRink(EnergyPlusData &state, Real64 &LoadMet, bool is_test);
+        void calculateIceRink(EnergyPlusData &state, Real64 &LoadMet);
 
         void update();
 

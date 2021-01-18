@@ -82,8 +82,8 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -168,7 +168,7 @@ namespace IceRink {
     {
         this->initialize(state);
         if (this->RinkType_Num == DataPlant::TypeOf_IceRink) {
-            this->calculateIceRink(state, CurLoad, false); //"false" is for unit testing
+            this->calculateIceRink(state, CurLoad); //"false" is for unit testing
         }
 
         this->update();
@@ -270,8 +270,8 @@ namespace IceRink {
                 Rink(Item).ControlStrategy = SurfaceTempControl;
             }
 
-            Rink(Item).hrstofreeze = rNumericArgs(3); 
-            Rink(Item).deltatemp = rNumericArgs(4);   
+            Rink(Item).hrstofreeze = rNumericArgs(3);
+            Rink(Item).deltatemp = rNumericArgs(4);
 
             Rink(Item).RefrigInNode = cAlphaArgs(6);
             Rink(Item).InNode = GetOnlySingleNode(state,
@@ -364,7 +364,6 @@ namespace IceRink {
                 ShowContinueError(state, "The rink width has been reset to 30.");
                 Rink(Item).WidthRink = 30.0;
             }
-
 
             Rink(Item).WaterTemp = rNumericArgs(8);
             if (Rink(Item).WaterTemp <= 0.0) {
@@ -527,8 +526,7 @@ namespace IceRink {
                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);
 
-            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho *
-                                       this->TubeLength; 
+            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeLength;
 
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignMassFlowRate,
@@ -539,10 +537,10 @@ namespace IceRink {
                                                this->BranchNum,
                                                this->CompNum); // initialization
 
-            PlantUtilities::RegisterPlantCompDesignFlow(this->InNode, this->DesignMassFlowRate / rho); 
+            PlantUtilities::RegisterPlantCompDesignFlow(this->InNode, this->DesignMassFlowRate / rho);
 
-            
-            PlantUtilities::SetComponentFlowRate(state, this->PastRefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->PastRefrigMassFlow, InNode, OutNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
 
             this->MyFlag = false;
         }
@@ -557,15 +555,14 @@ namespace IceRink {
             this->RefrigTempIn = -10; // to be changed..
             this->CpRefrig = GetSpecificHeatGlycol(
                 state, PlantLoop(this->LoopNum).FluidName, this->RefrigTempIn, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
-            this->Qsrcmax = -(IceRinkFreezing(state)); //To calculate maximum Q source in order to obtain design capacity.
-            this->maxmdot = abs(this->Qsrcmax) / (this->CpRefrig * this->deltatemp); //To calculate maximum mass flow rate of the system.
+            this->Qsrcmax = -(IceRinkFreezing(state)); // To calculate required Q to freeze the water. (Design Capcity)
+            this->maxmdot = abs(this->Qsrcmax) / (this->CpRefrig * this->deltatemp); // To calculate maximum mass flow rate of the system.
 
             FirstTimeInit = false;
         }
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-            
             QRadSysSrcAvg = 0.0;
             LastQRadSysSrc = 0.0;
             LastSysTimeElapsed = 0.0;
@@ -679,8 +676,8 @@ namespace IceRink {
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->WaterTemp, this->WaterIndex, RoutineName);
         Real64 Volume = this->LengthRink * this->WidthRink * this->IceThickness;
 
-        Real64 QFreezing = RhoWater * Volume * 
-                           ((CpWater * this->WaterTemp) + (QFusion) - (CpIce * this->IceSetPointTemp)) / (hrstofreeze * this->SecInHour);
+        Real64 QFreezing =
+            RhoWater * Volume * ((CpWater * this->WaterTemp) + (QFusion) - (CpIce * this->IceSetPointTemp)) / (this->hrstofreeze * this->SecInHour);
         FreezingLoad = QFreezing;
 
         return FreezingLoad;
@@ -761,7 +758,7 @@ namespace IceRink {
         return CalcEffectiveness;
     }
 
-    void IceRinkData::calculateIceRink(EnergyPlusData &state, Real64 &LoadMet, bool is_test) // should this begin in the second timestep?
+    void IceRinkData::calculateIceRink(EnergyPlusData &state, Real64 &LoadMet) // should this begin in the second timestep?
     {
 
         // Using/Aliasing
@@ -797,8 +794,8 @@ namespace IceRink {
         this->operation = GetCurrentScheduleValue(state, this->IceSetptSchedPtr);
 
         Real64 TSource;
-        Real64 circuits = 40; // assuming rink length is 100 and there is a refrigeration pipe every 2.5m.
-        Real64 PipeArea = (Pi * this->TubeLength * this->TubeDiameter) * circuits; // pipe surface area
+       
+        this->PipeArea = (Pi * this->TubeLength * this->circuits * this->TubeDiameter); // pipe surface area
 
         int ZoneNum = this->ZonePtr;
         int ControlStrategy = this->ControlStrategy;
@@ -832,19 +829,47 @@ namespace IceRink {
             ShowSevereError(state, "Illegal input for control strategy");
             ShowFatalError(state, "Preceding condition causes termination");
         }
-
-       
-        this->RefrigTempIn = Node(RefrigNodeIn).Temp;
-        this->RefrigMassFlow = this->PastRefrigMassFlow;
-
-        //Floor Surface temperatures. Only the current temperature is used. The others are for tracking and reporting purposes of the simulation.
-        this->Tsurfin1 = TH(2, 2, SurfNum); 
-        this->Tsurfin2 = TH(1, 2, SurfNum); //Current
+        //this->Tsurfin1 = TH(2, 2, SurfNum);
+        //this->Tsurfin2 = TH(1, 2, SurfNum); // Current
+        this->Tsurfin2 = TempSurfIn(SurfNum); // Current
         this->IceTemperature = TempSurfIn(SurfNum);
         this->Tsrc = TempSource(SurfNum);
-
         this->CpRefrig =
             GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, this->RefrigTempIn, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+
+        int ConstrNum = DataSurfaces::Surface(SurfNum).Construction;
+        this->coeffs.Ca = RadSysTiHBConstCoef(SurfNum);
+        this->coeffs.Cb = RadSysTiHBToutCoef(SurfNum);
+        this->coeffs.Cc = RadSysTiHBQsrcCoef(SurfNum);
+
+        this->coeffs.Cd = RadSysToHBConstCoef(SurfNum);
+        this->coeffs.Ce = RadSysToHBTinCoef(SurfNum);
+        this->coeffs.Cf = RadSysToHBQsrcCoef(SurfNum);
+
+        this->coeffs.Cg = CTFTsrcConstPart(SurfNum);
+        this->coeffs.Ch = state.dataConstruction->Construct(ConstrNum).CTFTSourceQ(0);
+        this->coeffs.Ci = state.dataConstruction->Construct(ConstrNum).CTFTSourceIn(0);
+        this->coeffs.Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
+
+        this->coeffs.Ck =
+            this->coeffs.Cg + ((this->coeffs.Ci * (this->coeffs.Ca + this->coeffs.Cb * this->coeffs.Cd) +
+                                              this->coeffs.Cj * (this->coeffs.Cd + this->coeffs.Ce * this->coeffs.Ca)) /
+                                             (1.0 - this->coeffs.Ce * this->coeffs.Cb));
+        this->coeffs.Cl =
+            this->coeffs.Ch + ((this->coeffs.Ci * (this->coeffs.Cc + this->coeffs.Cb * this->coeffs.Cf) +
+                                              this->coeffs.Cj * (this->coeffs.Cf + this->coeffs.Ce * this->coeffs.Cc)) /
+                                             (1.0 - this->coeffs.Ce * this->coeffs.Cb));
+
+        this->RefrigTempIn = Node(RefrigNodeIn).Temp;
+        this->RefrigMassFlow = this->PastRefrigMassFlow;
+        this->Qsrcmax2 = this->PastRefrigMassFlow * CpRefrig * (this->RefrigTempIn - this->Tsrc);
+        this->Qsetpoint = ((((1 - (this->coeffs.Cb * this->coeffs.Ce)) * this->IceSetPointTemp) - this->coeffs.Ca - (this->coeffs.Cb * this->coeffs.Cd)) /
+             (this->coeffs.Cc + (this->coeffs.Cb * this->coeffs.Cf)));
+        this->ReqMassFlow = abs(this->Qsetpoint / ((this->Effectiveness * this->CpRefrig) * (this->RefrigTempIn - this->Tsrc)));
+
+        // Floor Surface temperatures. Only the current temperature is used. The others are for tracking and reporting purposes of the simulation.
+
+        
 
         Real64 Volume = this->LengthRink * this->WidthRink * this->IceThickness;
         this->RhoWater = FluidProperties::GetDensityGlycol(state, "WATER", this->IceTemperature, this->WaterIndex, RoutineName);
@@ -852,11 +877,13 @@ namespace IceRink {
         Real64 CpIce(2040.00);
         Real64 RhoIce(917);
         Real64 QFusion(333550.00);
+       
 
-        if (this->operation == 1) { //If schedule's value equals to 1 then Ice Rink is ON.
 
-            if (this->Tsurfin2 <= this->IceSetPointTemp) { 
-                //If the current temperature is lower than the ice setpoint then do nothing.
+        if (this->operation == 1) { // If schedule's value equals to 1 then Ice Rink is ON.
+
+            if (this->Tsurfin2 <= this->IceSetPointTemp) {
+                // If the current temperature is lower than the ice setpoint then do nothing.
 
                 QRadSysSource(SurfNum) = 0.0;
                 this->Q = 0;
@@ -866,47 +893,27 @@ namespace IceRink {
 
             } else {
 
-                if (this->Tsurfin2 >= 0) {
-                    //If current temperature is above 0 then refrigeration is needed.
+                if (this->Qsrcmax2 <= this->Qsetpoint) {
 
-                    this->Qsetpoint = (this->RhoWater * Volume * ((this->CpWater * this->Tsurfin2) + (QFusion) - (CpIce * this->IceSetPointTemp))) /
-                                      (this->Increments * this->SecInHour);
-                    this->ReqMassFlow = abs(this->Qsetpoint / (this->CpRefrig * (this->Tsurfin2 - this->RefrigTempIn)));
-                    if (this->ReqMassFlow > this->maxmdot) {
-                        this->ReqMassFlow = this->maxmdot;
-                    }
-                    this->RefrigMassFlow = this->ReqMassFlow;
+                    this->RefrigMassFlow = this->maxmdot;
                     this->PastRefrigMassFlow = this->RefrigMassFlow;
                     this->Effectiveness = calcEffectiveness(state, this->RefrigTempIn, this->RefrigMassFlow);
-                    this->Q = -(this->Effectiveness * this->Qsetpoint);
-                    if (this->Q < (this->Effectiveness * this->Qsrcmax)) {
-                        this->Q = this->Effectiveness * this->Qsrcmax;
-                    }
-                    QRadSysSource(SurfNum) = (this->Q); //This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
+                    this->EpsMdotCp = this->Effectiveness * this->RefrigMassFlow * this->CpRefrig;
+                    this->Q = this->EpsMdotCp * (this->RefrigTempIn - this->coeffs.Ck) / (1.0 + (this->EpsMdotCp * this->coeffs.Cl / this->PipeArea));
+                    QRadSysSource(SurfNum) = (this->Q); // This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
 
                 } else {
 
-                    //If current temperature is below zero but higher than setpoint, then refrigeration is needed.
-                    this->Qsetpoint = (RhoIce * Volume * (CpIce * (this->Tsurfin2 - this->IceSetPointTemp))) / (this->Increments * this->SecInHour);
-                    this->ReqMassFlow = abs(this->Qsetpoint / (this->CpRefrig * (this->Tsurfin2 - this->RefrigTempIn)));
-                    if (this->ReqMassFlow > this->maxmdot) {
-                        this->ReqMassFlow = this->maxmdot;
-                    }
                     this->RefrigMassFlow = this->ReqMassFlow;
                     this->PastRefrigMassFlow = this->RefrigMassFlow;
                     this->Effectiveness = calcEffectiveness(state, this->RefrigTempIn, this->RefrigMassFlow);
+                    this->EpsMdotCp = this->Effectiveness * this->RefrigMassFlow * this->CpRefrig;
+                    this->Q = this->EpsMdotCp * (this->RefrigTempIn - this->coeffs.Ck) / (1.0 + (this->EpsMdotCp * this->coeffs.Cl / this->PipeArea));
 
-                    this->Q = -(this->Effectiveness * this->Qsetpoint);
-
-                    if (this->Q < (this->Effectiveness * this->Qsrcmax)) {
-                        this->Q = this->Effectiveness * this->Qsrcmax;
-                    }
-
-                    QRadSysSource(SurfNum) = (this->Q); //This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
-
+                    QRadSysSource(SurfNum) = (this->Q); // This the Q to updtate the EnergyPlus heat balance to get new surface temperatures
                 }
             }
-        } else { //If schedule 's value equals to zero then ice rink is OFF.
+        } else { // If schedule 's value equals to zero then ice rink is OFF.
             QRadSysSource(SurfNum) = 0.0;
             this->Q = 0;
             this->RefrigMassFlow = 0.0;
@@ -914,26 +921,25 @@ namespace IceRink {
             this->PastRefrigMassFlow = this->RefrigMassFlow;
         }
 
-        if (this->RefrigMassFlow > 0) //If mass flow is found then calculate outlet refrigerant temperature.
+        if (this->RefrigMassFlow > 0) // If mass flow is found then calculate outlet refrigerant temperature.
             this->TRefigOutCheck = this->RefrigTempIn - ((QRadSysSource(SurfNum)) / (this->RefrigMassFlow * this->CpRefrig));
 
-       
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(
             state, ZoneNum); // This subroutine performs a heat balance on the outside face of each surface in the building
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum); // This subroutine performs a heat balance on the outside face of each surface in the building
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(
+            state, ZoneNum); // This subroutine performs a heat balance on the outside face of each surface in the building
         this->Qsource2 = QRadSysSource(SurfNum);
 
-        
         LoadMet = QRadSysSource(SurfNum);
 
         this->LoadMet = LoadMet;
     }
 
-    void IceRinkData::update() //TODO: working on it
+    void IceRinkData::update() // TODO: working on it
     {
 
         // Using/Aliasing
-        //using DataGlobals::TimeStepZone;
+        // using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -983,9 +989,9 @@ namespace IceRink {
         //}
     }
 
-    void UpdateIceRinkSourceValAvg(bool &IceRinkOn) //TODO: working on it
-        
-        // .TRUE. if the radiant system has run this zone time step
+    void UpdateIceRinkSourceValAvg(bool &IceRinkOn) // TODO: working on it
+
+    // .TRUE. if the radiant system has run this zone time step
     {
 
         // SUBROUTINE INFORMATION:
@@ -1031,7 +1037,7 @@ namespace IceRink {
     void IceRinkData::report(bool RunFlag)
     {
         // Using/Aliasing
-        
+
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
