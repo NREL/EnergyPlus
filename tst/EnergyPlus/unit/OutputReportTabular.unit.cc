@@ -8518,3 +8518,72 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 }
+
+// TEST_F(EnergyPlusFixture, ORT_DualUnits_Heat_Emission)
+TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    // state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+    state->dataOutRptTab->displayHeatEmissionsSummary = true;
+
+    // DetermineBuildingFloorArea
+    BuildingPreDefRep.emiEnvelopConv = 1000.00; // * energyconversion, 2);
+    BuildingPreDefRep.emiZoneExfiltration = 50.00; // * energyconversion, 2);
+    BuildingPreDefRep.emiZoneExhaust = 200.00; // * energyconversion, 2);
+    BuildingPreDefRep.emiHVACRelief = 500.00; // * energyconversion, 2);
+    BuildingPreDefRep.emiHVACReject = 1750.00; // * energyconversion, 2);
+    BuildingPreDefRep.emiTotHeat = 4000.00; // * energyconversion, 2);
+
+    //state->dataOutRptTab->unitsStyle = iUnitsStyle::InchPound;
+    //state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+
+    WriteHeatEmissionTable(*state);
+
+    EnergyPlus::sqlite->sqliteCommit();
+
+    // Now test the reporting:
+    // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
+    const std::string reportName = "AnnualHeatEmissionsReport";
+    const std::string columnName = "Envelope Convection";
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testRowNames = {"Heating Emissions [kWh]"};
+
+    // TableName, value
+    std::vector<std::tuple<std::string, Real64>> results({
+        {"Envelop Convection", BuildingPreDefRep.emiEnvelopConv},
+        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration},
+        {"Zone Exhaust Air", BuildingPreDefRep.emiHVACRelief},
+        {"HVAC Relief Air", BuildingPreDefRep.emiZoneExhaust},
+        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject},
+        {"Total", BuildingPreDefRep.emiTotHeat},
+
+    });
+
+    for (auto &v : results) {
+
+        std::string tableName = std::get<0>(v);
+        Real64 expectedValue = std::get<1>(v);
+
+        for (auto &rowName : testRowNames) {
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND TableName = '" +
+                              tableName +
+                              "'"
+                              "  AND RowName = '" +
+                              rowName + "'" + "  AND ColumnName = '" + columnName + "'");
+
+            Real64 return_val = execAndReturnFirstDouble(query);
+
+            // Add informative message if failed
+            //EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+        }
+    }
+}
