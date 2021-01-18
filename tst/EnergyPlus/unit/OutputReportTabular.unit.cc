@@ -8423,3 +8423,98 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
 
     compare_err_stream(expected_error);
 }
+
+TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
+{
+    // Test units to ensure proper Output:SQLite unit conversion handling
+
+    // Test the regular scenario (No missing or default values) Case 1: UseoutputControlTableStyle
+    std::string const idf_objects =
+        delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.sqlite = true;
+
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+
+    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_NE(sqlite, nullptr);
+    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+}
+
+TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
+{
+    // Test the regular scenario (No missing or default values) Case 2: InchPound
+    std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "InchPound; !-Tabular Unit Conversion"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.sqlite = true;
+
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+
+    EXPECT_EQ(unitSQLiteTable, 4);
+    EXPECT_NE(sqlite, nullptr);
+    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+}
+
+TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
+{
+    // Test the regular scenario (No missing or default values) Case 3: None
+    std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "None; !-Tabular Unit Conversion"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.sqlite = true;
+
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+
+    EXPECT_EQ(unitSQLiteTable, 0);
+    EXPECT_NE(sqlite, nullptr);
+    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+}
+
+TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
+{
+    // Test the missing scenario (has missing or default fields) Case 1: Default empty input
+    std::string const idf_objects = delimited_string({"Output:SQLite,",
+        "SimpleAndTabular, !-Option Type",
+        "; !-Tabular Unit Conversion"
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.sqlite = true;
+
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); // EnergyPlus::CreateSQLiteDatabase(*state);
+
+    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_NE(sqlite, nullptr);
+    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+}
+
+TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
+{
+    // Test the missing scenario (has missing or default fields) Case 2: Missing A2 field at all
+    // This will allow a backward compatiability: even an earlier version format can be correctly handeled.
+    std::string const idf_objects = delimited_string({
+        "Output:SQLite,",
+        "SimpleAndTabular; !-Option Type"
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->files.outputControl.sqlite = true;
+
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+
+    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_NE(sqlite, nullptr);
+    EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
+    EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+}
