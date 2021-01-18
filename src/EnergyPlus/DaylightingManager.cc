@@ -5652,7 +5652,7 @@ namespace EnergyPlus::DaylightingManager {
         // Loop over exterior windows associated with zone
         for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             int IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-            bool WinShadingIndex = findWinShadingIndex(IWin);
+            int WinShadingIndex = findWinShadingIndex(IWin);
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
             Real64 GTOT1 = 0.4794 * (std::pow(state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, WinShadingIndex, IL), 1.6)) *
@@ -5714,7 +5714,7 @@ namespace EnergyPlus::DaylightingManager {
             // Loop over exterior windows associated with zone
             for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 int IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
-                bool WinShadingIndex = findWinShadingIndex(IWin);
+                int WinShadingIndex = findWinShadingIndex(IWin);
                 // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
                 // below, which is (0.2936)**0.6
                 Real64 GTOT1 = 0.4794 * (std::pow(state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, WinShadingIndex, IL), 1.6)) *
@@ -6584,7 +6584,7 @@ namespace EnergyPlus::DaylightingManager {
                     loop = state.dataDaylightingData->ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
 
                     ICtrl = Surface(IWin).activeWindowShadingControl;
-                    bool IS = findWinShadingIndex(IWin);
+                    int IS = findWinShadingIndex(IWin);
                     if (Surface(IWin).HasShadeControl) {
                         if (SurfWinShadingFlag(IWin) == WinShadingFlag::SwitchableGlazing && SurfWinGlareControlIsActive(IWin) &&
                             WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
@@ -6859,9 +6859,10 @@ namespace EnergyPlus::DaylightingManager {
 
                 for (const auto IWin : listOfExtWin) {
                     ++count;
+
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = state.dataDaylightingData->ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
-                    if (!SurfWinGlareControlIsActive(IWin) && SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing) continue;
+                    if (SurfWinShadingFlag(IWin) != WinShadingFlag::SwitchableGlazing) continue;
 
                     ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (!Surface(IWin).HasShadeControl) continue;
@@ -6884,6 +6885,7 @@ namespace EnergyPlus::DaylightingManager {
                             }
 
                             SurfWinShadingFlag(IWin) = WinShadingFlag::ShadeOff;
+                            SurfWinGlareControlIsActive(IWin) = false;
                             continue;
                         }
 
