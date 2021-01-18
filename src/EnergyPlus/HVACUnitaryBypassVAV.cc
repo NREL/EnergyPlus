@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1468,7 +1468,7 @@ namespace HVACUnitaryBypassVAV {
             // state.dataAirLoop->AirLoopControlInfo(AirLoopNum).Simple = true;
         }
 
-        if (MyPlantScanFlag(CBVAVNum) && allocated(DataPlant::PlantLoop)) {
+        if (MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
                 (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
                 if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
@@ -1496,9 +1496,9 @@ namespace HVACUnitaryBypassVAV {
 
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
                         Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
+                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
                                                                                 DataGlobalConstants::HWInitConvTemp,
-                                                                                DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
+                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                 RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorsFound) * FluidDensity;
@@ -1536,7 +1536,7 @@ namespace HVACUnitaryBypassVAV {
                 }
 
                 // fill outlet node for heating coil
-                CBVAV(CBVAVNum).CoilOutletNode = DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum)
+                CBVAV(CBVAVNum).CoilOutletNode = state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum)
                                                      .LoopSide(CBVAV(CBVAVNum).LoopSide)
                                                      .Branch(CBVAV(CBVAVNum).BranchNum)
                                                      .Comp(CBVAV(CBVAVNum).CompNum)
@@ -1606,9 +1606,9 @@ namespace HVACUnitaryBypassVAV {
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                    DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
+                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
                                                                                     DataGlobalConstants::HWInitConvTemp,
-                                                                                    DataPlant::PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
+                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
                                                                                     RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                         }

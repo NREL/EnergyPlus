@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::FluidCoolers;
@@ -347,10 +347,10 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
 
     auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
 
-    DataPlant::PlantLoop.allocate(FluidCoolerNum);
+    state->dataPlnt->PlantLoop.allocate(FluidCoolerNum);
     SimpleFluidCooler.allocate(FluidCoolerNum);
     SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
-    DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
+    state->dataPlnt->PlantLoop(FluidCoolerNum).PlantSizNum = 0;
 
     EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);
