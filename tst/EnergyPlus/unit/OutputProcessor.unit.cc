@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,12 +46,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus::OutputProcessor Unit Tests
+#include <map>
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -63,9 +65,6 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include <map>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
 using namespace EnergyPlus::WeatherManager;
@@ -3285,7 +3284,7 @@ namespace OutputProcessor {
         state->dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(*state);
-        EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+        EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly(*state);
 
         GetReportVariableInput(*state);
@@ -3342,7 +3341,7 @@ namespace OutputProcessor {
         state->dataGlobal->TimeStepZone = 0.25;
 
         OutputReportTabular::GetInputTabularMonthly(*state);
-        EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
+        EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly(*state);
 
         GetReportVariableInput(*state);

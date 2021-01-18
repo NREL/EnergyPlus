@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,8 +104,6 @@ namespace Fans {
         Real64 PowerLossToAir;         // Fan heat gain to air stream [W]
         bool EMSFanPressureOverrideOn; // if true, then EMS is calling to override
         Real64 EMSFanPressureValue;    // EMS value for Delta Pressure Across the Fan [Pa]
-        // cpw22Aug2010 Clarify meaning of "fan efficiency"
-        //  REAL(r64)    :: FanEff                   =0.0d0  !Fan total efficiency; motor and mechanical
         Real64 FanEff;            // Fan total system efficiency (fan*belt*motor*VFD)
         bool EMSFanEffOverrideOn; // if true, then EMS is calling to override
         Real64 EMSFanEffValue;    // EMS value for total efficiency of the Fan, fraction on 0..1
@@ -126,14 +124,13 @@ namespace Fans {
         std::string EndUseSubcategoryName;
         bool OneTimePowerRatioCheck; // one time flag used for error message
         bool OneTimeEffRatioCheck;   // one time flag used for error message
-        // cpw22Aug2010 Following added to support Fan Component Model input
         Real64 FanWheelDia;          // Fan wheel outer diameter [m]
         Real64 FanOutletArea;        // Fan outlet area [m2]
         Real64 FanMaxEff;            // Fan maximum static efficiency [-]
         Real64 EuMaxEff;             // Euler number at fan maximum static efficiency [-]
         Real64 FanMaxDimFlow;        // Fan maximum dimensionless airflow [-]
         Real64 FanShaftPwrMax;       // Fan shaft maximum input power [W]
-        Real64 FanSizingFactor;      // Fan sizing factor [-] cpw31Aug2010
+        Real64 FanSizingFactor;      // Fan sizing factor [-]
         Real64 PulleyDiaRatio;       // Motor/fan pulley diameter ratio [-]
         Real64 BeltMaxTorque;        // Belt maximum torque [N-m]
         Real64 BeltSizingFactor;     // Belt sizing factor [-]
@@ -143,7 +140,7 @@ namespace Fans {
         Real64 MotorSizingFactor;    // Motor sizing factor [-]
         std::string VFDEffType;      // VFD efficiency type [Speed or Power]
         Real64 VFDMaxOutPwr;         // VFD maximum output power [W]
-        Real64 VFDSizingFactor;      // VFD sizing factor [-] cpw31Aug2010
+        Real64 VFDSizingFactor;      // VFD sizing factor [-]
         int PressRiseCurveIndex;     // Fan pressure rise curve index
         int PressResetCurveIndex;    // Duct static pressure reset curve index
         int PLFanEffNormCurveIndex;  // Fan part-load efficiency (normal) curve index
@@ -157,17 +154,16 @@ namespace Fans {
         int MotorMaxEffCurveIndex;   // Motor maximum efficiency curve index
         int PLMotorEffCurveIndex;    // Motor part-load efficiency curve index
         int VFDEffCurveIndex;        // VFD efficiency curve index
-        // cpw22Aug2010 Following added to support Fan Component Model calculated values
         Real64 DeltaPressTot;          // Total pressure rise across fan [N/m2]
         Real64 FanAirPower;            // Air power for fan being Simulated [W]
         Real64 FanSpd;                 // Fan shaft rotational speed [rpm]
         Real64 FanTrq;                 // Fan shaft torque [N-m]
         Real64 FanWheelEff;            // Fan efficiency (mechanical)
         Real64 FanShaftPower;          // Shaft input power for fan being Simulated [W]
-        Real64 BeltMaxEff;             // Belt maximum efficiency (mechanical) cpw31Aug2010
+        Real64 BeltMaxEff;             // Belt maximum efficiency (mechanical)
         Real64 BeltEff;                // Belt efficiency (mechanical)
         Real64 BeltInputPower;         // Belt input power for fan being Simulated [W]
-        Real64 MotorMaxEff;            // Motor maximum efficiency (electrical) cpw31Aug2010
+        Real64 MotorMaxEff;            // Motor maximum efficiency (electrical)
         Real64 MotorInputPower;        // Motor input power for fan being Simulated [W]
         Real64 VFDEff;                 // VFD efficiency (electrical)
         Real64 VFDInputPower;          // VFD input power for fan being Simulated [W]
@@ -281,8 +277,6 @@ namespace Fans {
     void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
     void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
-
-    // cpw22Aug2010 Added Component Model fan algorithm
 
     void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
 
