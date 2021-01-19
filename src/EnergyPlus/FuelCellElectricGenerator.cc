@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -171,7 +171,7 @@ namespace FuelCellElectricGenerator {
 
         this->initialize(state);
         this->CalcFuelCellGeneratorModel(state, RunFlag, MyLoad, FirstHVACIteration);
-        this->CalcUpdateHeatRecovery(FirstHVACIteration);
+        this->CalcUpdateHeatRecovery(state, FirstHVACIteration);
         this->UpdateFuelCellGeneratorRecords(state);
     }
 
@@ -2901,7 +2901,7 @@ namespace FuelCellElectricGenerator {
                 this->ExhaustHX.THXexh = TprodGasIn - this->ExhaustHX.qHX / (NdotGas * CpProdGasMol * 1000.0);
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    state, DataPlant::PlantLoop(this->CWLoopNum).FluidName, TwaterIn, DataPlant::PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName, TwaterIn, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex, RoutineName);
 
                 if (this->ExhaustHX.WaterMassFlowRate * Cp <= 0.0) {
                     this->ExhaustHX.WaterOutletTemp = TwaterIn;
@@ -3172,7 +3172,7 @@ namespace FuelCellElectricGenerator {
 
         static std::string const RoutineName("InitFuelCellGenerators");
 
-        if (this->MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
+        if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
             PlantUtilities::ScanPlantLoopsForObject(state,
@@ -3255,9 +3255,9 @@ namespace FuelCellElectricGenerator {
             this->Inverter.QairIntake = 0.0;
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                            DataGenerators::InitHRTemp,
-                                                           DataPlant::PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                            RoutineName);
 
             this->ExhaustHX.WaterMassFlowRateDesign = this->ExhaustHX.WaterVolumeFlowMax * rho;
@@ -3407,7 +3407,7 @@ namespace FuelCellElectricGenerator {
         } // over number of Fuel cells
     }
 
-    void FCDataStruct::CalcUpdateHeatRecovery([[maybe_unused]] bool const FirstHVACIteration)
+    void FCDataStruct::CalcUpdateHeatRecovery(EnergyPlusData &state, [[maybe_unused]] bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3421,7 +3421,7 @@ namespace FuelCellElectricGenerator {
 
         // now update water outlet node Changing to Kg/s!
 
-        PlantUtilities::SafeCopyPlantNode(this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode);
 
         DataLoopNode::Node(this->ExhaustHX.WaterOutNode).Temp = this->ExhaustHX.WaterOutletTemp;
         DataLoopNode::Node(this->ExhaustHX.WaterOutNode).Enthalpy = this->ExhaustHX.WaterOutletEnthalpy;

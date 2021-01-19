@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1779,7 +1779,6 @@ namespace HVACMultiSpeedHeatPump {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataPlant::TypeOf_MultiSpeedHeatPumpRecovery;
@@ -1849,7 +1848,7 @@ namespace HVACMultiSpeedHeatPump {
         ++AirLoopPass;
         if (AirLoopPass > 2) AirLoopPass = 1;
 
-        if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && allocated(PlantLoop)) {
+        if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
@@ -1896,15 +1895,15 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
                                                                .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
                                                                .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
                                                                .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
@@ -1938,7 +1937,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
                                                                .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
                                                                .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
                                                                .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
@@ -1967,15 +1966,15 @@ namespace HVACMultiSpeedHeatPump {
                     GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
 
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow > 0.0) {
-                    rho = GetDensityGlycol(state, PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
+                    rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
                                                                    .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
                                                                    .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
                                                                    .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
@@ -2008,7 +2007,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
                                                                    .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
                                                                    .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
                                                                    .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
@@ -2122,9 +2121,9 @@ namespace HVACMultiSpeedHeatPump {
             if ((MSHeatPump(MSHeatPumpNum).HeatRecActive) && (!MSHeatPump(MSHeatPumpNum).MyPlantScantFlag)) {
 
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
                                        RoutineName);
 
                 MSHeatPump(MSHeatPumpNum).DesignHeatRecMassFlowRate = MSHeatPump(MSHeatPumpNum).DesignHeatRecFlowRate * rho;
@@ -2147,9 +2146,9 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -2197,9 +2196,9 @@ namespace HVACMultiSpeedHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -4121,7 +4120,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using DataHVACGlobals::MSHPWasteHeat;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
@@ -4157,9 +4155,9 @@ namespace HVACMultiSpeedHeatPump {
 
         if (HeatRecMassFlowRate > 0.0) {
 
-            CpHeatRec = GetSpecificHeatGlycol(state, PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
+            CpHeatRec = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
                                               HeatRecInletTemp,
-                                              PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
+                                              state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
                                               RoutineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
@@ -4172,7 +4170,7 @@ namespace HVACMultiSpeedHeatPump {
             QHeatRec = 0.0;
         }
 
-        SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
+        SafeCopyPlantNode(state, HeatRecInNode, HeatRecOutNode);
         // changed outputs
         Node(HeatRecOutNode).Temp = HeatRecOutletTemp;
 

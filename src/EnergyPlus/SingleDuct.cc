@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2004,7 +2004,6 @@ namespace EnergyPlus::SingleDuct {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -2048,7 +2047,7 @@ namespace EnergyPlus::SingleDuct {
             state.dataSingleDuct->InitSysFlag = false;
         }
 
-        if (this->PlantLoopScanFlag && allocated(PlantLoop)) {
+        if (this->PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if ((this->ReheatComp_PlantType == TypeOf_CoilWaterSimpleHeating) || (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
                 // setup plant topology indices for plant fed heating coils
                 errFlag = false;
@@ -2072,7 +2071,7 @@ namespace EnergyPlus::SingleDuct {
                 }
 
                 this->ReheatCoilOutletNode =
-                    PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSide).Branch(this->HWBranchIndex).Comp(this->HWCompIndex).NodeNumOut;
+                    state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSide).Branch(this->HWBranchIndex).Comp(this->HWCompIndex).NodeNumOut;
 
                 this->PlantLoopScanFlag = false;
             } else {
@@ -2138,7 +2137,7 @@ namespace EnergyPlus::SingleDuct {
 
             if (this->HWLoopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
                 rho = GetDensityGlycol(
-                    state, PlantLoop(this->HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, PlantLoop(this->HWLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex, RoutineName);
             } else {
                 rho = 1000.0;
             }
@@ -2362,7 +2361,6 @@ namespace EnergyPlus::SingleDuct {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2977,14 +2975,14 @@ namespace EnergyPlus::SingleDuct {
                             DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
                             if (DesCoilLoad >= SmallLoad) {
 
-                                rho = GetDensityGlycol(state, PlantLoop(this->HWLoopNum).FluidName,
+                                rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       PlantLoop(this->HWLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                        RoutineName);
 
-                                Cp = GetSpecificHeatGlycol(state, PlantLoop(this->HWLoopNum).FluidName,
+                                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           PlantLoop(this->HWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                            RoutineName);
 
                                 MaxReheatWaterVolFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);

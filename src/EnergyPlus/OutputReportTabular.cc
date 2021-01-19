@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4359,32 +4359,32 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
-            if (state.dataPlantChillers->ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
-            if (state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
-            if (state.dataPlantChillers->GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->GTChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
-            if (state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
-            if (state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
-            if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }

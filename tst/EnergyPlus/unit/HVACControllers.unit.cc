@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -65,7 +66,6 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -255,17 +255,17 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // state->dataWaterCoils->WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     bool SimZoneEquipment(false);
     SimAirServingZones::SimAirLoops(*state, true, SimZoneEquipment);
 
@@ -963,21 +963,21 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).Name = "CHW LOOP";
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).Name = "CHW LOOP";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
     DataSizing::NumPltSizInput = 1;
     DataSizing::PlantSizData.allocate(1);
@@ -987,9 +987,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     DataSizing::PlantSizData(1).LoopType = DataSizing::CoolingLoop;
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
