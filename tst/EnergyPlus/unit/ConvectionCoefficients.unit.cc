@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,8 @@
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -69,8 +69,6 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -455,7 +453,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -999,7 +997,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1056,7 +1054,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1113,7 +1111,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1170,7 +1168,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1227,7 +1225,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1284,7 +1282,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 

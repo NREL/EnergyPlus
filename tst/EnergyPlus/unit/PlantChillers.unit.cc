@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,12 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/PlantChillers.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantChillers.hh>
 
 using namespace EnergyPlus;
 using namespace PlantChillers;
@@ -70,7 +69,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     state->dataPlantChillers->GTChiller(1).HeatRecCapacityFraction = 0.5;
     state->dataPlantChillers->GTChiller(1).HeatRecActive = true;
-    state->dataPlantChillers->GTChiller(1).CondenserType = DataPlant::CondenserType::WATERCOOLED;
+    state->dataPlantChillers->GTChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
     state->dataPlantChillers->GTChiller(1).CWLoopNum = 1;
     state->dataPlantChillers->GTChiller(1).CDLoopNum = 2;
     state->dataPlantChillers->GTChiller(1).EvapVolFlowRate = 1.0;
@@ -79,14 +78,14 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->GTChiller(1).COP = 3.0;
     state->dataPlantChillers->GTChiller(1).engineCapacityScalar = 1.0;
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
     state->dataPlantChillers->GTChiller(1).size(*state);
@@ -95,7 +94,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 
     state->dataPlantChillers->GTChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
@@ -107,7 +106,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     state->dataPlantChillers->EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
     state->dataPlantChillers->EngineDrivenChiller(1).HeatRecActive = true;
-    state->dataPlantChillers->EngineDrivenChiller(1).CondenserType = DataPlant::CondenserType::WATERCOOLED;
+    state->dataPlantChillers->EngineDrivenChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
     state->dataPlantChillers->EngineDrivenChiller(1).CWLoopNum = 1;
     state->dataPlantChillers->EngineDrivenChiller(1).CDLoopNum = 2;
     state->dataPlantChillers->EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
@@ -115,14 +114,14 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->EngineDrivenChiller(1).NomCap = 10000;
     state->dataPlantChillers->EngineDrivenChiller(1).COP = 3.0;
 
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
     state->dataPlantChillers->EngineDrivenChiller(1).size(*state);
@@ -131,7 +130,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 
     state->dataPlantChillers->EngineDrivenChiller.deallocate();
     DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
