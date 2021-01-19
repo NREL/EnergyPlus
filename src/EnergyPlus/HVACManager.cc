@@ -943,7 +943,7 @@ namespace HVACManager {
             }
         }
 
-        // DSU  Test plant loop for errors
+        // Test plant loop for errors
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
                 CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);

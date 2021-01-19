@@ -6039,7 +6039,7 @@ namespace WaterThermalTanks {
 
             if (OutletAirSplitterNode > 0) DataLoopNode::Node(OutletAirSplitterNode).MassFlowRate = 0.0;
             // these are water nodes are not managed by plant. the HP connects
-            // directly to the WH without using plant. will not change this code for DSU because of this
+            // directly to the WH without using plant.
             if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterPumped) {
                 DataLoopNode::Node(HPWaterInletNode).MassFlowRate = 0.0;
                 DataLoopNode::Node(HPWaterOutletNode).MassFlowRate = 0.0;
@@ -10085,8 +10085,6 @@ namespace WaterThermalTanks {
                 FlowResult = min(DataLoopNode::Node(InNodeNum).MassFlowRateMaxAvail, FlowResult);
                 //=> following might take out of reverse dd compliance
                 FlowResult = min(DataLoopNode::Node(InNodeNum).MassFlowRateMax, FlowResult);
-
-                // DSU> use PlantUtilities::SetComponentFlowRate for above?
 
             } else if (SELECT_CASE_var == MaybeRequestingFlow) {
 

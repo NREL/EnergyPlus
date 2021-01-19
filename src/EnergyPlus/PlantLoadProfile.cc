@@ -303,8 +303,6 @@ namespace PlantLoadProfile {
 
         // Set outlet node variables that are possibly changed
         Node(OutletNode).Temp = this->OutletTemp;
-
-        // DSU? enthalpy? quality etc? central routine? given inlet node, fluid type, delta T, properly fill all node vars?
     }
 
     void PlantProfileData::ReportPlantProfile()
@@ -394,7 +392,7 @@ namespace PlantLoadProfile {
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 PlantProfile(ProfileNum).Name = cAlphaArgs(1);
-                PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant !DSU
+                PlantProfile(ProfileNum).TypeNum = TypeOf_PlantLoadProfile; // parameter assigned in DataPlant
 
                 PlantProfile(ProfileNum).InletNode = GetOnlySingleNode(state,
                     cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);

@@ -149,7 +149,6 @@
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
@@ -263,7 +262,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PondGroundHeatExchanger::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
-    Pumps::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
