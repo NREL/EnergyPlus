@@ -101,10 +101,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
 
 using DataHeatBalFanSys::TempControlType;
-using DataZoneEnergyDemands::CurDeadBandOrSetback;
-using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-using MixedAir::OAMixer;
 
 namespace EnergyPlus {
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
@@ -258,7 +254,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -280,16 +276,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -377,9 +373,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -410,11 +406,11 @@ namespace EnergyPlus {
         state->dataGlobal->DoingSizing = false;
 
         state->dataPlnt->PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -571,7 +567,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -594,16 +590,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -691,9 +687,9 @@ namespace EnergyPlus {
 
         HeatingLoad = false;
         CoolingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = -4000.0;
@@ -723,11 +719,11 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
         state->dataPlnt->PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -882,7 +878,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -904,16 +900,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1026,9 +1022,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -1072,7 +1068,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         // normal heating, no flow lock, heating capacity exceeded
         QZnReq = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
         state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(4420.0, QUnitOut, 5.0);
@@ -1081,7 +1077,7 @@ namespace EnergyPlus {
 
         // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
         QZnReq = 80.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
         state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC hits the 80 W target load
@@ -1094,8 +1090,8 @@ namespace EnergyPlus {
 
         // Coil Off Capacity Test #2 - lock plant flow after previous call
         state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
-        Node(OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
-        Node(OAMixer(1).RetNode).Enthalpy = 39000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC does not hit the 80 W target load since flow is locked at a low value
         EXPECT_NEAR(52.0, QUnitOut, 1.0);
@@ -1260,7 +1256,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1282,16 +1278,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1379,9 +1375,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -1410,7 +1406,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         // normal heating, heating capacity exceeded
         QZnReq = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(4575.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
@@ -1418,11 +1414,11 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
         state->dataPlnt->PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -1579,7 +1575,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1602,16 +1598,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1724,9 +1720,9 @@ namespace EnergyPlus {
 
         HeatingLoad = false;
         CoolingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = -4000.0;
@@ -1772,7 +1768,7 @@ namespace EnergyPlus {
 
         // normal cooling, no flow lock, cooling capacity exceeded
         QZnReq = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
         state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
@@ -1935,7 +1931,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1957,16 +1953,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2057,9 +2053,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -2085,8 +2081,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -2112,7 +2108,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2121,7 +2117,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2131,8 +2127,8 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2141,8 +2137,8 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
         QZnReq = -4255.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2151,7 +2147,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2160,7 +2156,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2172,11 +2168,11 @@ namespace EnergyPlus {
         state->dataGlobal->DoingSizing = false;
 
         state->dataPlnt->PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
         CoilNames.clear();
     }
@@ -2271,7 +2267,7 @@ namespace EnergyPlus {
         // OutputProcessor::TimeValue.allocate(2);
 
         GetZoneData(*state, ErrorsFound);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         SetPredefinedTables(*state);
@@ -2645,7 +2641,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -2667,16 +2663,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2766,10 +2762,10 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -2795,8 +2791,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -2822,8 +2818,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow, 0.0000000001);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -2835,8 +2831,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).LowSpeedRatio, 0.0000000001);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -2848,9 +2844,9 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).MedSpeedRatio, 0.0000000001);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -2862,8 +2858,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow, 0.0000000001);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -2875,8 +2871,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).LowSpeedRatio, 0.0000000001);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -3063,7 +3059,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
 
@@ -3097,7 +3093,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3179,10 +3175,10 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
         thisFanCoil.SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -3208,8 +3204,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -3234,8 +3230,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -3245,8 +3241,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -3258,9 +3254,9 @@ namespace EnergyPlus {
 
         // cooling mode tests
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -3270,8 +3266,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -3281,8 +3277,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -3465,7 +3461,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -3491,7 +3487,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3555,8 +3551,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -3570,8 +3566,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -3832,7 +3828,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -3858,7 +3854,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3922,8 +3918,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -3937,8 +3933,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -4199,7 +4195,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4225,7 +4221,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -4289,8 +4285,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -4304,8 +4300,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -4521,7 +4517,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4540,7 +4536,7 @@ namespace EnergyPlus {
         thisFanCoil.OutAirMassFlow = 0.0;
         thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 20.0;
@@ -4601,8 +4597,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
@@ -4613,8 +4609,8 @@ namespace EnergyPlus {
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;

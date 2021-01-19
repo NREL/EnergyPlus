@@ -4138,8 +4138,8 @@ namespace EnergyPlus::EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
                 columnHead.deallocate();
@@ -4195,8 +4195,8 @@ namespace EnergyPlus::EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 columnHead.deallocate();
@@ -4276,8 +4276,8 @@ namespace EnergyPlus::EconomicTariff {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
                                                                                                     tariff(iTariff).tariffName, "General");
                     }
                     columnHead.deallocate();
@@ -4666,8 +4666,8 @@ namespace EnergyPlus::EconomicTariff {
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
                                                                                         titleString);
         }
         columnHead.deallocate();

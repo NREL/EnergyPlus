@@ -59,21 +59,6 @@ namespace EnergyPlus {
 
 namespace DataZoneEnergyDemands {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
-    // before any heating / cooling done
-    extern Array1D_bool Setback; // true if zone temperature has increased
-    // from previous setting
-    extern Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
-    // in a zone is simulated
-
-    // Types
-
     struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
     {
         // Members
@@ -132,19 +117,23 @@ namespace DataZoneEnergyDemands {
         }
     };
 
-    // Object Data
-    extern Array1D<ZoneSystemDemandData> ZoneSysEnergyDemand;
-    extern Array1D<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
-
-    void clear_state();
-
 } // namespace DataZoneEnergyDemands
 
 struct DataZoneEnergyDemandsData : BaseGlobalStruct {
 
+    Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband before any heating / cooling done
+    Array1D_bool Setback; // true if zone temperature has increased from previous setting
+    Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment in a zone is simulated
+    Array1D<DataZoneEnergyDemands::ZoneSystemDemandData> ZoneSysEnergyDemand;
+    Array1D<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
+
     void clear_state() override
     {
-
+        this->DeadBandOrSetback.deallocate();
+        this->Setback.deallocate();
+        this->CurDeadBandOrSetback.deallocate();
+        this->ZoneSysEnergyDemand.deallocate();
+        this->ZoneSysMoistureDemand.deallocate();
     }
 };
 

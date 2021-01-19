@@ -14193,7 +14193,7 @@ namespace EnergyPlus::RefrigeratedCase {
             }
         } // FirstHVACIteration
 
-        RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // RemainingOutputToCoolingSP in Watts, < 0 for cooling demand
 
         if (RemainingOutputToCoolingSP < 0.0 && DataHeatBalFanSys::TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
