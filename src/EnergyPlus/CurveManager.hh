@@ -101,6 +101,7 @@ namespace CurveManager {
         ExponentialDecay,
         DoubleExponentialDecay,
         QuadLinear,
+        QuintLinear,
         CubicLinear,
         ChillerPartLoadWithLift
     };

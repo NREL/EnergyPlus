@@ -97,6 +97,7 @@ namespace CurveManager {
     //                          FanPressureRise, ExponentialSkewNormal, Sigmoid, RectangularHyperbola1,
     //                          RectangularHyperbola2, ExponentialDecay
     //                      March 2012, Atefe Makhmalbaf and Heejin Cho, added a new curve type (QuadLinear)
+    //                      Jan 2021 Yueyue, added a new curve type (QuintLinear)
     //                      Aug.  2014, Rongpeng Zhang, added a new curve type (ChillerPartLoadWithLift)
     //       RE-ENGINEERED  na
 
@@ -269,6 +270,7 @@ namespace CurveManager {
         int NumQuadLinear;               // Number of quadratic linear curve objects in the input data file
         int NumCubicLinear;              // Number of cubic linear curve objects in the input file
         int NumQLinear;                  // Number of quad linear curve objects in the input data file
+        int NumQuintLinear;               // Number of quint linear curve objects in the input data file
         int NumLinear;                   // Number of linear curve objects in the input data file
         int NumBicubic;                  // Number of bicubic curve objects in the input data file
         int NumTriQuad;                  // Number of triquadratic curve objects in the input file
@@ -303,6 +305,7 @@ namespace CurveManager {
         NumQuartic = inputProcessor->getNumObjectsFound(state, "Curve:Quartic");
         NumQuad = inputProcessor->getNumObjectsFound(state, "Curve:Quadratic");
         NumQLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadLinear");
+        NumQuintLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuintLinear");
         NumQuadLinear = inputProcessor->getNumObjectsFound(state, "Curve:QuadraticLinear");
         NumCubicLinear = inputProcessor->getNumObjectsFound(state, "Curve:CubicLinear");
         NumLinear = inputProcessor->getNumObjectsFound(state, "Curve:Linear");
@@ -323,7 +326,7 @@ namespace CurveManager {
 
         state.dataCurveManager->NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
                     NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-                    NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift + NumWPCValTab;
+                    NumExpDecay + NumDoubleExpDecay + NumQLinear + NumQuintLinear + NumChillerPartLoadWithLift + NumWPCValTab;
 
         // allocate the data structure
         state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
@@ -1006,7 +1009,7 @@ namespace CurveManager {
                 }
             }
         }
-
+        
         // Loop over quad linear curves and load data
         CurrentModuleObject = "Curve:QuadLinear";
         for (CurveIndex = 1; CurveIndex <= NumQLinear; ++CurveIndex) {
@@ -1052,47 +1055,21 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
             }
 
-            if (Numbers(6) > Numbers(7)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(6), Numbers(6), cNumericFieldNames(7), Numbers(7)));
-                ErrorsFound = true;
-            }
-            if (Numbers(8) > Numbers(9)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(8), Numbers(8), cNumericFieldNames(9), Numbers(9)));
-                ErrorsFound = true;
-            }
-            if (Numbers(10) > Numbers(11)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(10), Numbers(10), cNumericFieldNames(11), Numbers(11)));
-                ErrorsFound = true;
-            }
-            if (Numbers(12) > Numbers(13)) { // error
-                ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
-                ShowContinueError(state,
-                                  format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(12), Numbers(12), cNumericFieldNames(13), Numbers(13)));
-                ErrorsFound = true;
-            }
-
-            if (NumAlphas >= 2) {
-                if (!IsCurveInputTypeValid(Alphas(2))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for W is invalid.");
+            const int NumVar = 4;
+            std::string VarNames[NumVar] = {"w", "x", "y", "z"};
+            for (int i = 1; i <= NumVar; ++i) {
+                int MinIndex = 2*i + 4;
+                int MaxIndex = MinIndex + 1;
+                if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
+                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                    ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(MinIndex), Numbers(MinIndex), cNumericFieldNames(MaxIndex), Numbers(MaxIndex)));
+                    ErrorsFound = true;
                 }
-            }
-            if (NumAlphas >= 3) {
-                if (!IsCurveInputTypeValid(Alphas(3))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for X is invalid.");
-                }
-            }
-            if (NumAlphas >= 4) {
-                if (!IsCurveInputTypeValid(Alphas(4))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Y is invalid.");
-                }
-            }
-            if (NumAlphas >= 5) {
-                if (!IsCurveInputTypeValid(Alphas(5))) {
-                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for Z is invalid.");
+                int InputTypeIndex = i + 1;
+                if (NumAlphas >= InputTypeIndex) {
+                    if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
+                        ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                    }
                 }
             }
             if (NumAlphas >= 6) {
@@ -1101,6 +1078,78 @@ namespace CurveManager {
                 }
             }
         }
+
+        // Loop over quint linear curves and load data
+        CurrentModuleObject = "Curve:QuintLinear";
+        for (CurveIndex = 1; CurveIndex <= NumQuintLinear; ++CurveIndex) {
+            inputProcessor->getObjectItem(state,
+                                          CurrentModuleObject,
+                                          CurveIndex,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericFieldBlanks,
+                                          _,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataCurveManager->UniqueCurveNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
+            ++CurveNum;
+            state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
+            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuintLinear;
+            state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
+            state.dataCurveManager->PerfCurve(CurveNum).NumDims = 5;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = Numbers(4);
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = Numbers(5);
+            state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = Numbers(6);
+            state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(7);
+            state.dataCurveManager->PerfCurve(CurveNum).Var1Max = Numbers(8);
+            state.dataCurveManager->PerfCurve(CurveNum).Var2Min = Numbers(9);
+            state.dataCurveManager->PerfCurve(CurveNum).Var2Max = Numbers(10);
+            state.dataCurveManager->PerfCurve(CurveNum).Var3Min = Numbers(11);
+            state.dataCurveManager->PerfCurve(CurveNum).Var3Max = Numbers(12);
+            state.dataCurveManager->PerfCurve(CurveNum).Var4Min = Numbers(13);
+            state.dataCurveManager->PerfCurve(CurveNum).Var4Max = Numbers(14);
+            state.dataCurveManager->PerfCurve(CurveNum).Var5Min = Numbers(15);
+            state.dataCurveManager->PerfCurve(CurveNum).Var5Max = Numbers(16);
+            if (NumNumbers > 16 && !lNumericFieldBlanks(17)) {
+                state.dataCurveManager->PerfCurve(CurveNum).CurveMin = Numbers(17);
+                state.dataCurveManager->PerfCurve(CurveNum).CurveMinPresent = true;
+            }
+            if (NumNumbers > 17 && !lNumericFieldBlanks(18)) {
+                state.dataCurveManager->PerfCurve(CurveNum).CurveMax = Numbers(18);
+                state.dataCurveManager->PerfCurve(CurveNum).CurveMaxPresent = true;
+            }
+
+            const int NumVar = 5;
+            std::string VarNames[NumVar] = {"v", "w", "x", "y", "z"};
+            for (int i = 1; i <= NumVar; ++i) {
+                int MinIndex = 2*i + 5;
+                int MaxIndex = MinIndex + 1;
+                if (Numbers(MinIndex) > Numbers(MaxIndex)) { // error
+                    ShowSevereError(state, "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas(1));
+                    ShowContinueError(state, format("{} [{:.R2}] > {} [{.R2}]", cNumericFieldNames(MinIndex), Numbers(MinIndex), cNumericFieldNames(MaxIndex), Numbers(MaxIndex)));
+                    ErrorsFound = true;
+                }
+                int InputTypeIndex = i + 1;
+                if (NumAlphas >= InputTypeIndex) {
+                    if (!IsCurveInputTypeValid(Alphas(InputTypeIndex))) {
+                        ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Input Unit Type for " + VarNames[i] + " is invalid.");
+                    }
+                }
+            }
+            if (NumAlphas >= 7) {
+                if (!IsCurveOutputTypeValid(Alphas(7))) {
+                    ShowWarningError(state, "In " + CurrentModuleObject + " named " + Alphas(1) + " the Output Unit Type is invalid.");
+                }
+            }
+        }
+
         // Loop over Exponent curves and load data
         CurrentModuleObject = "Curve:Exponent";
         for (CurveIndex = 1; CurveIndex <= NumExponent; ++CurveIndex) {
@@ -2297,6 +2346,8 @@ namespace CurveManager {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
             } else if (SELECT_CASE_var == CurveTypeEnum::QuadLinear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
+            } else if (SELECT_CASE_var == CurveTypeEnum::QuintLinear) {
+                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
             } else if (SELECT_CASE_var == CurveTypeEnum::Cubic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
             } else if (SELECT_CASE_var == CurveTypeEnum::Quartic) {
