@@ -94,11 +94,11 @@ ZoneAirMassFlowConservation,
        \key None
 
 New choice Key:
-       \key AdjustZoneReturnFlow
-	   \note The zone air return air mass flow is adjusted to balance the zone air mass flow and 
-	   \note if that does not guarantee the zone air mass flow conservation, then adjusts zone  
-	   \note infiltration air flows per the user specified methods in the input field below.
-	   \note Zone Mixing objects mass flow is maintained at user specified value.
+       \key AdjustReturnOrSupplyFlow
+	   \note The zone return or supply air mass flow is adjusted to balance the zone air mass flow.
+	   \note The Zone Mixing and Infiltration objects mass flow are maintained at user specified value.
+	   \note Infiltration Balancing Method in the input field below is set to None if the Zone Air
+	   \note Mass Flow Balance Method selected is AdjustReturnOrSupplyFlow.
 	   
        \default No
   A2,  \field Infiltration Balancing Method
