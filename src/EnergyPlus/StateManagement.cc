@@ -141,8 +141,6 @@
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
-#include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -251,10 +249,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
     PlantManager::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
-    PlantPipingSystemsManager::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();

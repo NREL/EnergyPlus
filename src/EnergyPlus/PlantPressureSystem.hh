@@ -62,9 +62,6 @@ struct EnergyPlusData;
 
 namespace PlantPressureSystem {
 
-    // Functions
-    void clear_state();
-
     void SimPressureDropSystem(EnergyPlusData &state,
                                int const LoopNum,                       // Plant Loop to update pressure information
                                bool const FirstHVACIteration,           // System flag
@@ -105,9 +102,11 @@ namespace PlantPressureSystem {
 
 struct PlantPressureSysData : BaseGlobalStruct {
 
+    bool InitPressureDropOneTimeInit = true;
+
     void clear_state() override
     {
-
+        this->InitPressureDropOneTimeInit = true;
     }
 };
 
