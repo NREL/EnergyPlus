@@ -67,9 +67,16 @@
 
 
 #define BITF(B) (1 << (int(B)))
+#define BITF_TEST(V, B) (((V) & (B)) == (B))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
 #define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
+#define IS_SHADE_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::BGShadeOn))
+#define IS_SHADE_SCREEN_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::BGShadeOn) | BITF(WinShadingFlag::ExtScreenOn))
+#define IS_BLIND_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntBlindOn) | BITF(WinShadingFlag::ExtBlindOn) | BITF(WinShadingFlag::BGBlindOn))
+#define IS_INT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::IntBlindOn))
+#define IS_EXT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::ExtBlindOn) | BITF(WinShadingFlag::ExtScreenOn))
+#define IS_BG_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::BGShadeOn) | BITF(WinShadingFlag::BGBlindOn))
 
 
 namespace EnergyPlus {
