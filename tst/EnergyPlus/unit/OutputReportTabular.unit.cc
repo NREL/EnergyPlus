@@ -8536,16 +8536,16 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     BuildingPreDefRep.emiHVACReject = 1750.00; // * energyconversion, 2);
     BuildingPreDefRep.emiTotHeat = 4000.00; // * energyconversion, 2);
 
-    //state->dataOutRptTab->unitsStyle = iUnitsStyle::InchPound;
-    //state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    // state->dataOutRptTab->unitsStyle = iUnitsStyle::InchPound;
+    // state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
+    // state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
+    // state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoGJ;
+    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
 
     Real64 energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
-
-    EnergyPlus::sqlite->sqliteCommit();
 
     // Now test the reporting:
     // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
@@ -8553,16 +8553,16 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     const std::string columnName = "Envelope Convection";
 
     // Test the row of heat emissions
-    std::vector<std::string> testRowNames = {"Heat Emissions [J]"};
+    std::vector<std::string> testRowNames = {"Heat Emissions [GJ]"};
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
         {"Annual Heat Emissions Summary", BuildingPreDefRep.emiEnvelopConv * energyconversion},
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACRelief * energyconversion},
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExhaust * energyconversion},
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACReject * energyconversion},
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiTotHeat * energyconversion},
+        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACRelief * energyconversion},
+        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACReject * energyconversion},
+        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
@@ -8588,4 +8588,6 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
+
+    EnergyPlus::sqlite->sqliteCommit();
 }
