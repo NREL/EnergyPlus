@@ -146,7 +146,6 @@
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -259,7 +258,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
     PollutionModule::clear_state();
-    PondGroundHeatExchanger::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
