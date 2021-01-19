@@ -8541,6 +8541,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
 
+    Real64 energyconversion = 1.0;
+
     WriteHeatEmissionTable(*state);
 
     EnergyPlus::sqlite->sqliteCommit();
@@ -8550,17 +8552,17 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     const std::string reportName = "AnnualHeatEmissionsReport";
     const std::string columnName = "Envelope Convection";
 
-    // We test for Heating and Total, since they should be the same
-    std::vector<std::string> testRowNames = {"Heating Emissions [kWh]"};
+    // Test the row of heat emissions
+    std::vector<std::string> testRowNames = {"Heat Emissions [J]"};
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
-        {"Envelop Convection", BuildingPreDefRep.emiEnvelopConv},
-        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration},
-        {"Zone Exhaust Air", BuildingPreDefRep.emiHVACRelief},
-        {"HVAC Relief Air", BuildingPreDefRep.emiZoneExhaust},
-        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject},
-        {"Total", BuildingPreDefRep.emiTotHeat},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
@@ -8583,7 +8585,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             Real64 return_val = execAndReturnFirstDouble(query);
 
             // Add informative message if failed
-            //EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+            EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
 }
