@@ -1731,7 +1731,7 @@ namespace CoolingPanelSimple {
 
             if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
-                if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn) {
+                if (IS_INT_SHADED(SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += DataSurfaces::SurfWinDividerArea(SurfNum);
                 }
@@ -1741,7 +1741,7 @@ namespace CoolingPanelSimple {
                     SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntShadeOn && SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !IS_INT_SHADED(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
                         HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);

@@ -67,7 +67,6 @@
 
 
 #define BITF(B) (1 << (int(B)))
-#define BITF_TEST(V, B) (((V) & (B)) == (B))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
 #define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
