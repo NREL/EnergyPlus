@@ -219,10 +219,7 @@ namespace LowTempRadiantSystem {
     {
         // Members
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
-        Real64 TubeDiameterInner;        // inside tube diameter for embedded tubing (meters)
-        Real64 TubeDiameterOuter;        // outside tube diameter for embedded tubing (meters)
         Real64 TubeLength;               // tube length embedded in radiant surface (meters)
-        FluidToSlabHeatTransferTypes FluidToSlabHeatTransfer;   // Model used for calculating heat transfer between fluid and slab
         bool HeatingSystem;              // .TRUE. when the system is able to heat (parameters are valid)
         int HotWaterInNode;              // hot water inlet node
         int HotWaterOutNode;             // hot water outlet node
@@ -262,8 +259,7 @@ namespace LowTempRadiantSystem {
 
         // Default Constructor
         HydronicSystemBaseData()
-        : TubeDiameterInner(0.0), TubeDiameterOuter(0.0), TubeLength(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly),
-              HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
+        : TubeLength(0.0), HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0),CoolingSystem(false), ColdWaterInNode(0), ColdWaterOutNode(0), CWLoopNum(0), CWLoopSide(0),
               CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCausedTimeOff(0.0),
               CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), schedPtrChangeoverDelay(0), lastOperatingMode(NotOperating),
@@ -283,10 +279,15 @@ namespace LowTempRadiantSystem {
                                             Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                             Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
                                             Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
-                                            Real64 const NumCircs      // Number of fluid circuits in this surface
+                                            Real64 const NumCircs,      // Number of fluid circuits in this surface
+                                            int const DesignObjPtr      // Design Object Pointer
         );
 
-        Real64 calculateUFromISOStandard(EnergyPlusData &state, int const SurfNum, Real64 const WaterMassFlow);
+        Real64 calculateUFromISOStandard(EnergyPlusData &state,
+                                         int const SurfNum,
+                                         Real64 const WaterMassFlow,
+                                         int const DesignObjPtr      // Design Object Pointer
+                                         );
 
         Real64 sizeRadiantSystemTubeLength(EnergyPlusData &state);
 
@@ -329,6 +330,9 @@ namespace LowTempRadiantSystem {
         // Members
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
+        Real64 TubeDiameterInner;        // inside tube diameter for embedded tubing (meters)
+        Real64 TubeDiameterOuter;        // outside tube diameter for embedded tubing (meters)
+        FluidToSlabHeatTransferTypes FluidToSlabHeatTransfer;   // Model used for calculating heat transfer between fluid and slab
         Real64 VarFlowTubeConductivity;         // tube conductivity in W/m-K
         LowTempRadiantControlTypes VarFlowControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
         // Surface Face Temp, Surface Interior Temp, Running Mean Temp
@@ -357,7 +361,8 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         VarFlowRadDesignData()
         :
-                VarFlowTubeConductivity(0.0), VarFlowControlType(LowTempRadiantControlTypes::MATControl), VarFlowSetpointType(LowTempRadiantSetpointTypes::halfFlowPower),
+                TubeDiameterInner(0.0), TubeDiameterOuter(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly), VarFlowTubeConductivity(0.0),
+                VarFlowControlType(LowTempRadiantControlTypes::MATControl), VarFlowSetpointType(LowTempRadiantSetpointTypes::halfFlowPower),
                 HeatingWaterNodePresentCheckFlag(false),  HeatingCapMethod(0), ScaledHeatingCapacity(0.0), HotThrottlRange(0.0),
                 HotSetptSchedPtr(0), ColdThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0), CoolingWaterNodePresentCheckFlag(false),
                 ColdSetptSchedPtr(0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0)
@@ -451,6 +456,9 @@ namespace LowTempRadiantSystem {
         // Members
         // This data could be shared between multiple Var flow LowTempRad Systems
         std::string designName;           // name of the design object+
+        Real64 TubeDiameterInner;        // inside tube diameter for embedded tubing (meters)
+        Real64 TubeDiameterOuter;        // outside tube diameter for embedded tubing (meters)
+        FluidToSlabHeatTransferTypes FluidToSlabHeatTransfer;   // Model used for calculating heat transfer between fluid and slab
         Real64 ConstFlowTubeConductivity;         // tube conductivity in W/m-K
         LowTempRadiantControlTypes ConstFlowControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
         // Surface Face Temp, Surface Interior Temp, Running Mean Temp
@@ -463,6 +471,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         ConstantFlowRadDesignData()
                 :
+                TubeDiameterInner(0.0), TubeDiameterOuter(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly),
                 ConstFlowTubeConductivity(0.0), ConstFlowControlType(LowTempRadiantControlTypes::MATControl),
                 HotThrottlRange(0.0), CondCtrlType(1), CondDewPtDeltaT(1.0)
         {

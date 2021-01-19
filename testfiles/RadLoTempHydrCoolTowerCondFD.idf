@@ -1367,7 +1367,10 @@
    2.0,                     !- Cooling Control Throttling Range {deltaC}
    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
    ,                        !- Condensation Control Type
-   ;                        !- Condensation Control Dewpoint Offset {C}
+   1,                       !- Condensation Control Dewpoint Offset {C}
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016;                   !- Hydronic Tubing Outside Diameter {m}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject2,      !- Name
@@ -1387,7 +1390,10 @@
    2.0,                     !- Cooling Control Throttling Range {deltaC}
    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
    SimpleOff,               !- Condensation Control Type
-   1;                       !- Condensation Control Dewpoint Offset {C}
+   1,                       !- Condensation Control Dewpoint Offset {C}
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016;                   !- Hydronic Tubing Outside Diameter {m}
 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
@@ -1395,9 +1401,6 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
@@ -1416,9 +1419,6 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     East Zone,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.00008,                 !- Maximum Hot Water Flow {m3/s}
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
@@ -1436,9 +1436,6 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     North Zone,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
     0.00010,                 !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name

@@ -672,6 +672,9 @@ namespace LowTempRadiantSystem {
             }
 
             thisRadSysDesign.CondDewPtDeltaT    = Numbers(10);
+            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state, Alphas(9));
+            thisRadSysDesign.TubeDiameterInner = Numbers(11);
+            thisRadSysDesign.TubeDiameterOuter = Numbers(12);
 
             VarFlowRadDesignNames(Item) =  Alphas(1);
         }
@@ -706,7 +709,7 @@ namespace LowTempRadiantSystem {
 
             auto &thisRadSys(HydrRadSys(Item));
 
-            thisRadSys.designObjectName = Alphas(11);
+            thisRadSys.designObjectName = Alphas(10);
             thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, VarFlowRadDesignNames);
             VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(thisRadSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
@@ -779,10 +782,7 @@ namespace LowTempRadiantSystem {
             // Error checking for zones and construction information
             thisRadSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
-            thisRadSys.FluidToSlabHeatTransfer = thisRadSys.getFluidToSlabHeatTransferInput(state, Alphas(5));
-            thisRadSys.TubeDiameterInner = Numbers(1);
-            thisRadSys.TubeDiameterOuter = Numbers(2);
-            thisRadSys.TubeLength = Numbers(3);
+            thisRadSys.TubeLength = Numbers(1);
 
             // To be fixed
 
@@ -796,21 +796,21 @@ namespace LowTempRadiantSystem {
             }
 
             // Heating user input data
-            thisRadSys.WaterVolFlowMaxHeat = Numbers(4);
+            thisRadSys.WaterVolFlowMaxHeat = Numbers(2);
 
             thisRadSys.HotWaterInNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
+            if ((!lAlphaBlanks(5)) || (!lAlphaBlanks(6))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Hot Water Nodes");
             }
 
 // Fix lAlphaBlanks(10) condition which is now Heating Control Temperature Schedule Name in design object
             if ((thisRadSys.WaterVolFlowMaxHeat == AutoSize) &&
-                (lAlphaBlanks(6) || lAlphaBlanks(7) /*|| lAlphaBlanks(10)*/ || (thisRadSys.HotWaterInNode <= 0) || (thisRadSys.HotWaterOutNode <= 0) ||
+                (lAlphaBlanks(5) || lAlphaBlanks(6) /*|| lAlphaBlanks(10)*/ || (thisRadSys.HotWaterInNode <= 0) || (thisRadSys.HotWaterOutNode <= 0) ||
                  (variableFlowDesignDataObject.HotSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules.");
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (heating input) = " + Alphas(1));
@@ -819,27 +819,27 @@ namespace LowTempRadiantSystem {
 
 
             // Cooling user input data
-            thisRadSys.WaterVolFlowMaxCool = Numbers(6);
+            thisRadSys.WaterVolFlowMaxCool = Numbers(4);
 
             thisRadSys.ColdWaterInNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
-                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Chilled Water Nodes");
+            if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Chilled Water Nodes");
             }
 
-            if (UtilityRoutines::SameString(Alphas(10), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(9), OnePerSurf)) {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(10), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(9), CalcFromLength)) {
                 thisRadSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
             }
 
-            thisRadSys.CircLength = Numbers(7);
+            thisRadSys.CircLength = Numbers(5);
 
             if (variableFlowDesignDataObject.CoolingWaterNodePresentCheckFlag)
             {
@@ -852,11 +852,11 @@ namespace LowTempRadiantSystem {
 //                }
             }
 
-            thisRadSys.schedNameChangeoverDelay = Alphas(12);
-            if (!lAlphaBlanks(12)) {
-                thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(12));
+            thisRadSys.schedNameChangeoverDelay = Alphas(11);
+            if (!lAlphaBlanks(11)) {
+                thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(11));
                 if (thisRadSys.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(12) + " not found for " + Alphas(12));
+                    ShowWarningError(state, cAlphaFields(11) + " not found for " + Alphas(11));
                     ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
@@ -920,6 +920,11 @@ namespace LowTempRadiantSystem {
 
 
             thisRadSysDesign.ConstFlowTubeConductivity = Numbers(3);
+
+
+            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state, Alphas(5));
+            thisRadSysDesign.TubeDiameterInner = Numbers(1);
+            thisRadSysDesign.TubeDiameterOuter = Numbers(2);
 
             CFlowRadDesignNames(Item) =  Alphas(1);
         }
@@ -1023,9 +1028,6 @@ namespace LowTempRadiantSystem {
             // Error checking for zones and construction information
             thisCFloSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
-            thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(state, Alphas(5));
-            thisCFloSys.TubeDiameterInner = Numbers(1);
-            thisCFloSys.TubeDiameterOuter = Numbers(2);
             thisCFloSys.TubeLength = Numbers(3);
 
             // Process the temperature control type
@@ -3594,7 +3596,10 @@ namespace LowTempRadiantSystem {
                 // Determine the heat exchanger "effectiveness" term
 
                 EpsMdotCp =
-                    calculateHXEffectivenessTerm(state, SurfNum, WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum), this->NumCircuits(RadSurfNum));
+                    calculateHXEffectivenessTerm(state, SurfNum, WaterTempIn, WaterMassFlow,
+                                                 this->SurfaceFrac(RadSurfNum),
+                                                 this->NumCircuits(RadSurfNum),
+                                                 this->DesignObjectPtr);
 
                 // Obtain the heat balance coefficients and calculate the intermediate coefficients
                 // linking the inlet water temperature to the heat source/sink to the radiant system.
@@ -3869,7 +3874,10 @@ namespace LowTempRadiantSystem {
                             // Determine the heat exchanger "effectiveness" term
 
                             EpsMdotCp = calculateHXEffectivenessTerm(
-                                state, SurfNum, WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum3), this->NumCircuits(RadSurfNum3));
+                                state, SurfNum, WaterTempIn, WaterMassFlow,
+                                this->SurfaceFrac(RadSurfNum3),
+                                this->NumCircuits(RadSurfNum3),
+                                this->DesignObjectPtr);
 
                             if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
@@ -4624,7 +4632,10 @@ namespace LowTempRadiantSystem {
                 // Determine the heat exchanger "effectiveness" term
 
                 EpsMdotCp =
-                    calculateHXEffectivenessTerm(state, SurfNum, WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum), this->NumCircuits(RadSurfNum));
+                    calculateHXEffectivenessTerm(state, SurfNum, WaterTempIn, WaterMassFlow,
+                                                 this->SurfaceFrac(RadSurfNum),
+                                                 this->NumCircuits(RadSurfNum),
+                                                 this->DesignObjectPtr);
 
                 // Obtain the heat balance coefficients and calculate the intermediate coefficients
                 // linking the inlet water temperature to the heat source/sink to the radiant system.
@@ -5440,7 +5451,8 @@ namespace LowTempRadiantSystem {
                                                          Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                                          Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
                                                          Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
-                                                         Real64 const NumCircs       // Number of fluid circuits in this surface
+                                                         Real64 const NumCircs,       // Number of fluid circuits in this surface
+                                                         int const DesignObjPtr      // Design Object Pointer
     )
     {
 
@@ -5514,6 +5526,8 @@ namespace LowTempRadiantSystem {
         Real64 PRactual;
         Real64 Eff; // HX effectiveness
 
+        VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(DesignObjPtr)}; // Contains the data for variable flow hydronic systems
+
         // First find out where we are in the range of temperatures
         Index = 1;
         while (Index <= NumOfPropDivisions) {
@@ -5553,19 +5567,19 @@ namespace LowTempRadiantSystem {
 
         // Calculate NTU based on the heat transfer model
 
-        if (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ISOStandard) {
+        if (variableFlowDesignDataObject.FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ISOStandard) {
 
-            Real64 U = this->calculateUFromISOStandard(state, SurfNum, WaterMassFlow * FlowFraction);
+            Real64 U = this->calculateUFromISOStandard(state, SurfNum, WaterMassFlow * FlowFraction, DesignObjPtr);
 
             // Calculate the NTU parameter
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
             //        A = DataGlobalConstants::Pi()*D*TubeLength
-            NTU = U * DataGlobalConstants::Pi * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
+            NTU = U * DataGlobalConstants::Pi * variableFlowDesignDataObject.TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
         } else {    // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
 
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
-            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi * MUactual * this->TubeDiameterInner * NumCircs);
+            ReD = 4.0 * WaterMassFlow * FlowFraction / (DataGlobalConstants::Pi * MUactual * variableFlowDesignDataObject.TubeDiameterInner * NumCircs);
 
             // Calculate the Nusselt number based on what flow regime one is in
             if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
@@ -5596,7 +5610,11 @@ namespace LowTempRadiantSystem {
         return calculateHXEffectivenessTerm;
     }
 
-    Real64 HydronicSystemBaseData::calculateUFromISOStandard(EnergyPlusData &state, int const SurfNum, Real64 const WaterMassFlow)
+    Real64 HydronicSystemBaseData::calculateUFromISOStandard(EnergyPlusData &state,
+                                                             int const SurfNum,
+                                                             Real64 const WaterMassFlow,
+                                                             int const DesignObjPtr      // Design Object Pointer
+                                                             )
     {
         // Calculates the U-value for a pipe embedded in a radiant system using the information
         // from ISO Standard 11855, Part 2 (2012): "Building environment design — Design, dimensioning,
@@ -5610,17 +5628,20 @@ namespace LowTempRadiantSystem {
         Real64 calculateUFromISOStandard;
 
         int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
+
+        VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(DesignObjPtr)}; // Contains the data for variable flow hydronic systems
+
 //        ConstantFlowRadDesignData ConstantFlowDesignDataObject{CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for const flow hydronic systems
 //Fix this : Use DesignPtr instead of 0 in next line
         ConstantFlowRadDesignData ConstantFlowDesignDataObject{CflowRadiantSysDesign(0)}; // Contains the data for const flow hydronic systems
 
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
-        Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
+        Real64 ratioDiameterToMassFlowLength = variableFlowDesignDataObject.TubeDiameterInner / WaterMassFlow / this->TubeLength;
         Real64 rFluid = 0.125 / DataGlobalConstants::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
 
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
-        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobalConstants::Pi / ConstantFlowDesignDataObject.ConstFlowTubeConductivity;
+        Real64 rTube = 0.5 * distanceBetweenPipes * std::log(variableFlowDesignDataObject.TubeDiameterOuter/variableFlowDesignDataObject.TubeDiameterInner) / DataGlobalConstants::Pi / ConstantFlowDesignDataObject.ConstFlowTubeConductivity;
 
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
 
