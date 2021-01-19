@@ -3,7 +3,7 @@ Zone Air Mass Flow Balance Improvement
 
 **Bereket Nigusse, FSEC/UCF**
 
- - Original Date: January 11, 2021
+ - Original Date: January 19, 2021
  - Revision Date: none
  
 
@@ -26,15 +26,39 @@ The fundamental zone mass balance equation remains the same but what this featur
 
 Current zone air mass flow conservation equation is formulated to solve the following equation by adjusting the Zone Mixing flow, and zone infiltration flow sequentially.
 
- 0.0 = (Supply Mass Flow Rate - Exhaust Mass Flow Rate - Return Mass Flow Rate + Mixing Receiving Mass Flow Rate - Mixing Source Mass Flow Rate + Infiltration Mass Flow Rate)
+ 0.0 = [m_{sup} - m_{exh} - m_{ret} + m_{zmreceiving} - m_{zmsource} + m_{inf}]
+	
+where,
+m_{sup} = Zone Supply Air Mass Flow Rate, [kg/s]
+m_{exh} = Zone Exhaust Air Mass Flow Rate, [kg/s]
+m_{ret} = Zone Return Air Mass Flow Rate, [kg/s]
+m_{zmreceiving} = Zone Mixing Receiving Air Mass Flow Rate, [kg/s]
+m_{zmsource} = Zone Mixing Source Air Mass Flow Rate, [kg/s]
+m_{inf} = Zone Infiltration Air Mass Flow Rate, [kg/s]
 
-The current procedure first attempts to solve the above equation by adjusting the Zone Mixing flow only and if that does not satisfy the above equation, then the user specified zone infiltration air flow rate is adjusted as needed.  The zone infiltration air flow can be adjusted using two different methods depending user preference. The zone infiltration air flow adjusting method is a choice input field in the ZoneAirMassFlowConservation object.
+The existing procedure first attempts to solve the above equation by adjusting the Zone Mixing flow only and if that does not satisfy the above equation, then the user specified zone infiltration air flow rate is adjusted as needed.  The zone infiltration air flow can be adjusted using two different methods depending user preference. The zone infiltration air flow adjusting method is a choice input field in the ZoneAirMassFlowConservation object.
 
-The requested feature can be implemented by adjusting the return air mass flow but the return air mass flow rate can be varied between the minimum value of zero and a maximum value of the zone current supply air mass flow rate (or supply air maximum flow rate?). Since varying the return air mass flow only provides limiting flexibility in achieving balanced flow for the range of practical applications anticipated, we are proposing two alternatives for consideration.
+The requested feature can be implemented by adjusting the return air mass flow but the return air mass flow rate can be varied between the minimum value of zero and a maximum value of the zone return air maximum flow rate. Since varying the return air mass flow only provides limiting flexibility in achieving balanced flow for the range of practical applications, the zone air flow mass balance requires two different solution scenarios: one when the zone is under positive pressure and when the zone is under negative pressure.
 
-Option I: modulate the zone return air mass flow rate within the allowed range to effect the zone air mass balance while maintaining Zone Mixing and infiltration airflow objects mass flows at user specified values. However, it is difficult to anticipate a balanced zone air mass flow based on user inputs only, hence this option in some circumstances may results in net unbalanced zone air mass flow and a new report variable "Unbalanced Zone Air Mass Flow Rate" for tracking such cases.
+Solving the zone air flow mass balance equation for zone return air mass flow:
 
-Option II: first attempt to modulate the zone return air mass flow within the allowed limits and adjust zone infiltration air flow per one of the existing methods while maintaining Zone Mixing objects mass flows at user specified values. 
+m_{ret} = [m_{sup} - m_{exh} + m_{zmreceiving} - m_{zmsource} + m_{inf}]
+ 
+Depending on the sign of the value of return air mass flow rate calculated using the above equation two different cases that require different solution scheme are formulated:
+
+Case I:  [m_{ret} >= 0.0]
+
+         The zone is under positive pressure and requires return air mass flow rate to balance the zone air flow. The return air flow rate will be adjusted within the bounds of 0 and maximum return air flow rate to balance the zone air mass flow.
+
+Case II: [m_{ret} < 0.0]
+            
+         The zone is under negative pressure and requires additional supply air flow to balance the zone air flow. In this case the return air mass flow rate will be reset to zero and the supply air flow rate is increased proportionally.
+		 [m_{ret} = 0.0;]
+		 [m_{sup} += m_{ret};]
+		 
+
+In both cases the zone mixing and infiltration airflow objects flow are maintained at user specified values. 
+
 
 ## Testing/Validation/Data Sources ##
 
@@ -104,7 +128,7 @@ New choice Key:
 
 ## Outputs Description ##
 
-No new output variables will be implemented with Option II but if Option I is the preferred implementation a new report variable for the net unbalanced zone air mass flow rate may be required.
+No new output variables will be implemented.
 
 ## Engineering Reference ##
 
@@ -112,7 +136,7 @@ Will be updated as needed.
 
 ## Example File and Transition Changes ##
 
-One new example file will be added to the test suite to demonstrate this feature is functioning properly. Transition changes may be required if we choose to rename an existing input field and the two key choices. Also IDD change is required to add new choice key to an existing input field.
+One new example file will be added to the test suite to demonstrate this feature is functioning properly. IDD change is required to add new choice key to an existing input field. Transition changes may be required if we choose to rename an existing input fields and the two key choices. 
 
 ## References ##
 
