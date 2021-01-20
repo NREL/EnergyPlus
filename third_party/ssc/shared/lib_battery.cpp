@@ -383,9 +383,12 @@ void battery_t::initialize() {
     if (params->voltage->voltage_choice == voltage_params::TABLE || params->chem == battery_params::IRON_FLOW) {
         voltage = std::unique_ptr<voltage_t>(new voltage_table_t(params->voltage));
     }
-    else if (params->chem == battery_params::LEAD_ACID  || params->chem == battery_params::LITHIUM_ION) {
+    //Rohit Add lithium_ION_NMC
+    else if (params->chem == battery_params::LEAD_ACID  || params->chem == battery_params::LITHIUM_ION
+        || params->chem == battery_params::LITHIUM_ION_NMC) {
         voltage = std::unique_ptr<voltage_t>(new voltage_dynamic_t(params->voltage));
     }
+
     else if (params->chem == battery_params::VANADIUM_REDOX) {
         voltage = std::unique_ptr<voltage_t>(new voltage_vanadium_redox_t(params->voltage));
     }

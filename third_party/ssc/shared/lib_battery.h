@@ -257,8 +257,10 @@ struct battery_state {
 };
 
 struct battery_params {
+
+    //Rohit - Add Lithium_ion_nmc
     enum CHEM {
-        LEAD_ACID, LITHIUM_ION, VANADIUM_REDOX, IRON_FLOW
+        LEAD_ACID, LITHIUM_ION, VANADIUM_REDOX, IRON_FLOW, LITHIUM_ION_NMC
     };
     int chem;
     double dt_hour;

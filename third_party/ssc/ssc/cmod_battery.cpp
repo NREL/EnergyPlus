@@ -111,6 +111,7 @@ var_info vtab_battery_inputs[] = {
         { SSC_INPUT,        SSC_NUMBER,      "batt_minimum_modetime",                      "Minimum time at charge state",                            "min",     "",                     "BatteryCell",       "",                           "",                              "" },
 
         // lifetime inputs
+        //TODO: Rohit- Add batt_calendar_choice corresponding to lithium_ion_nmc
         { SSC_INPUT,		SSC_MATRIX,     "batt_lifetime_matrix",                        "Cycles vs capacity at different depths-of-discharge",    "",         "",                     "BatteryCell",       "",                           "",                             "" },
         { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_choice",                        "Calendar life degradation input option",                 "0/1/2",    "0=NoCalendarDegradation,1=LithiomIonModel,2=InputLossTable",                     "BatteryCell",       "",                           "",                             "" },
         { SSC_INPUT,        SSC_MATRIX,     "batt_calendar_lifetime_matrix",               "Days vs capacity",                                       "",         "",                     "BatteryCell",       "",                           "",                             "" },
@@ -802,6 +803,8 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
                                             batt_vars->batt_Vnom_default,
                                             batt_vars->batt_voltage_matrix, batt_vars->batt_resistance,
                                             dt_hr);
+
+    //Rohit- TODO add option of lifetime_t constructor corresponding lithium_ion_nmc
 
     if (batt_vars->batt_calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL) {
         lifetime_model = new lifetime_t(batt_vars->batt_lifetime_matrix, dt_hr,
