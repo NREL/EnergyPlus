@@ -135,8 +135,7 @@ namespace DataSurfaces {
     };
 
     enum class WinShadingFlag : int {
-        NoShade = 10,
-        ShadeOff = 0,
+        NoShade = 0,
         IntShadeOn = 1,
         SwitchableGlazing = 2,
         ExtShadeOn = 3,
@@ -144,7 +143,8 @@ namespace DataSurfaces {
         IntBlindOn = 6,
         ExtBlindOn = 7,
         BGShadeOn = 8,
-        BGBlindOn = 9
+        BGBlindOn = 9,
+        ShadeOff = 10
     };
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -265,17 +265,6 @@ namespace DataSurfaces {
     extern int const InConvWinLoc_WindowAboveThis;         // this is a wall with window above it
     extern int const InConvWinLoc_WindowBelowThis;         // this is a wall with window below it
     extern int const InConvWinLoc_LargePartOfExteriorWall; // this is a big window taking up most of wall
-
-    // WindowShadingControl Shading Types
-    extern int const WSC_ST_NoShade;
-    extern int const WSC_ST_InteriorShade;
-    extern int const WSC_ST_SwitchableGlazing;
-    extern int const WSC_ST_ExteriorShade;
-    extern int const WSC_ST_InteriorBlind;
-    extern int const WSC_ST_ExteriorBlind;
-    extern int const WSC_ST_BetweenGlassShade;
-    extern int const WSC_ST_BetweenGlassBlind;
-    extern int const WSC_ST_ExteriorScreen;
 
     // WindowShadingControl Control Types
     extern int const WSCT_AlwaysOn;                      // AlwaysOn
@@ -1113,7 +1102,7 @@ namespace DataSurfaces {
         std::string Name;   // User supplied name of this set of shading control data
         int ZoneIndex;      // number of the zone referenced
         int SequenceNumber; // Shading control sequence number
-        int ShadingType;    // Shading type (InteriorShade, SwitchableGlazing,
+        WinShadingFlag ShadingType;    // Shading type (InteriorShade, SwitchableGlazing,
         //  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
         //  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
         //  BetweenGlassBlind, or ExteriorScreen)
@@ -1199,7 +1188,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingFlag::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
               Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {

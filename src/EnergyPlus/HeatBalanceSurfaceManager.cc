@@ -1052,23 +1052,23 @@ namespace HeatBalanceSurfaceManager {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, WindowShadingControl(curWSC).Name);
                             {
                                 auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingType);
-                                if (SELECT_CASE_var1 == WSC_ST_NoShade) {
+                                if (SELECT_CASE_var1 == WinShadingFlag::NoShade) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "No Shade");
-                                } else if (SELECT_CASE_var1 == WSC_ST_InteriorShade) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::IntShadeOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Interior Shade");
-                                } else if (SELECT_CASE_var1 == WSC_ST_SwitchableGlazing) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::SwitchableGlazing) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Switchable Glazing");
-                                } else if (SELECT_CASE_var1 == WSC_ST_ExteriorShade) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::ExtShadeOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Shade");
-                                } else if (SELECT_CASE_var1 == WSC_ST_InteriorBlind) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::IntBlindOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Interior Blind");
-                                } else if (SELECT_CASE_var1 == WSC_ST_ExteriorBlind) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::ExtBlindOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Blind");
-                                } else if (SELECT_CASE_var1 == WSC_ST_BetweenGlassShade) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::BGShadeOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Between Glass Shade");
-                                } else if (SELECT_CASE_var1 == WSC_ST_BetweenGlassBlind) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::BGBlindOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Between Glass Blind");
-                                } else if (SELECT_CASE_var1 == WSC_ST_ExteriorScreen) {
+                                } else if (SELECT_CASE_var1 == WinShadingFlag::ExtScreenOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "Exterior Screen");
                                 }
                             }

@@ -1512,7 +1512,6 @@ namespace WindowManager {
         int NumHorDividers;   // Number of horizontal divider elements
         int NumVertDividers;  // Number of vertical divider elements
         int BaseSurfNum;      // Base surface number
-        int ShadingType;      // Window shading type
         int MatNum;           // Material number
         int DifOverrideCount; // Count the number of SolarDiffusing material overrides
 
@@ -1545,8 +1544,8 @@ namespace WindowManager {
 
             if (Surface(SurfNum).HasShadeControl) {
                 for (int winShadCtrl : Surface(SurfNum).windowShadingControlList) {
-                    ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
-                    if (ShadingType == WSC_ST_ExteriorScreen) {
+                    WinShadingFlag ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
+                    if (ShadingType == WinShadingFlag::ExtScreenOn) {
                         //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
                         //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
                         ++NumSurfaceScreens;
@@ -1616,7 +1615,7 @@ namespace WindowManager {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfWinSolarDiffusing(SurfNum) = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == WinShadingFlag::SwitchableGlazing) {
                             SurfWinSolarDiffusing(SurfNum) = true;
                         } else {
                             SurfWinSolarDiffusing(SurfNum) = false;
@@ -7458,7 +7457,6 @@ namespace WindowManager {
         Real64 SumReflect;     // Integration variable for reflectance
         Real64 SumReflectVis;  // Integration variable for visible reflectance
         Real64 SumArea;        // Integration variable for area of quarter hemisphere
-        int ShadingType;       // Type of shading device
         bool FoundMaterial;    // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
@@ -7510,8 +7508,8 @@ namespace WindowManager {
             if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 MatNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
-                if (ShadingType == WSC_ST_ExteriorScreen) {
+                WinShadingFlag ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
+                if (ShadingType == WinShadingFlag::ExtScreenOn) {
 
                     if (state.dataMaterial->Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
                     ++ScreenNum;

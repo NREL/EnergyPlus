@@ -1347,7 +1347,7 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WinShadingFlag::SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == WinShadingFlag::SwitchableGlazing) THEN  !ShadingFlag is not set to WinShadingFlag::SwitchableGlazing yet!
                             SetupOutputVariable(state, "Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -8740,35 +8740,19 @@ namespace SolarShading {
                 }
                 int IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
 
-                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
-                SurfWinShadingFlag(ISurf) = WinShadingFlag::ShadeOff; // Initialize shading flag to off
+//                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
+
 
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
                 Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
                 Real64 SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
 
+                WinShadingFlag ShType; // Type of shading (interior shade, interior blind, etc.)
 
-                // ShType = NoShade           ! =-1 (see DataHeatBalance)
-                // ShType = ShadeOff          ! =0
-                WinShadingFlag ShType;
-                // 1 = interior shade is on,
-                // 2 = glass is switched to dark state,
-                // 3 = exterior shade is on,
-                // 4 = exterior screen is on,
-                // 6 = interior blind is on,
-                // 7 = exterior blind is on,
-                // 8 = between-glass shade is on,
-                // 9 = between-glass blind is on.
-                //  CHARACTER(len=32)  :: ShadingType     ! Type of shading (interior shade, interior blind, etc.)
-                if (ShadingType == WSC_ST_InteriorShade) ShType = WinShadingFlag::IntShadeOn;            // =1
-                if (ShadingType == WSC_ST_SwitchableGlazing) ShType = WinShadingFlag::SwitchableGlazing; // =2
-                if (ShadingType == WSC_ST_ExteriorShade) ShType = WinShadingFlag::ExtShadeOn;            // =3
-                if (ShadingType == WSC_ST_ExteriorScreen) ShType = WinShadingFlag::ExtScreenOn;          // =4
-                if (ShadingType == WSC_ST_InteriorBlind) ShType = WinShadingFlag::IntBlindOn;            // =6
-                if (ShadingType == WSC_ST_ExteriorBlind) ShType = WinShadingFlag::ExtBlindOn;            // =7
-                if (ShadingType == WSC_ST_BetweenGlassShade) ShType = WinShadingFlag::BGShadeOn;         // =8
-                if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = WinShadingFlag::BGBlindOn;         // =9
+                if (IS_SHADED(WindowShadingControl(IShadingCtrl).ShadingType)) {
+                    ShType = WindowShadingControl(IShadingCtrl).ShadingType;
+                }
 
                 bool SchedAllowsControl = true; // True if control schedule is not specified or is specified and schedule value = 1
                 int SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
@@ -8796,6 +8780,7 @@ namespace SolarShading {
                 // Determine whether to deploy shading depending on type of control
 
                 SurfWinGlareControlIsActive(ISurf) = false;
+                SurfWinShadingFlag(ISurf) = WinShadingFlag::ShadeOff; // Initialize shading flag to off
 
                 auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).ShadingControlType);
 
@@ -8806,7 +8791,9 @@ namespace SolarShading {
                     SurfWinShadingFlag(ISurf) = WinShadingFlag::ShadeOff;
 
                 } else if (SELECT_CASE_var == WSCT_OnIfScheduled) { // 'ONIFSCHEDULEALLOWS'
-                    if (SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
+                    if (SchedAllowsControl) {
+                        SurfWinShadingFlag(ISurf) = ShType;
+                    }
 
                 } else if (SELECT_CASE_var == WSCT_HiSolar) {
                     // 'ONIFHIGHSOLARONWINDOW'  ! Direct plus diffuse solar intensity on window
@@ -10516,18 +10503,18 @@ namespace SolarShading {
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
                     //  removed that is absorbed
-                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::IntShadeOn ||
+                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::ExtShadeOn ||
+                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::BGShadeOn) {
                         int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
 
-                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
+                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::IntShadeOn) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::ExtShadeOn) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1); // Exterior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingFlag::BGShadeOn) {
                             if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) {
                                 // Double pane with between-glass shade
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(3);

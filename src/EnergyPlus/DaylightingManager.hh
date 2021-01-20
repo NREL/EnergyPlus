@@ -110,7 +110,7 @@ namespace DaylightingManager {
                                                   int &LSHCAL,      // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
                                                   int &InShelfSurf, // Inside daylighting shelf surface number
                                                   int &ICtrl,       // Window control counter
-                                                  int &ShType,      // Window shading type
+                                                  DataSurfaces::WinShadingFlag &ShType,      // Window shading type
                                                   int &BlNum,       // Window blind number
                                                   Vector3<Real64> &WNORM2, // Unit vector normal to window
                                                   DataDaylighting::iExtWinType &ExtWinType,         // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
@@ -257,7 +257,7 @@ namespace DaylightingManager {
         Real64 const TVISB,   // Visible transmittance of window for COSB angle of incidence (times light well efficiency, if appropriate)
         Real64 const DOMEGA,  // Solid angle subtended by window element wrt reference point (steradians)
         int const ICtrl,      // Window control counter
-        int const ShType,     // Window shading type
+        DataSurfaces::WinShadingFlag const ShType,     // Window shading type
         int const BlNum,      // Window blind number
         Real64 const THRAY,   // Azimuth of ray from reference point to window element (radians)
         Vector3<Real64> const &WNORM2, // Unit vector normal to window

@@ -1610,8 +1610,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     state->dataConstruction->Construct(1).Name = "Construction1";
 
-    DataSurfaces::WindowShadingControl(1).ShadingType = 0;
-    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
+    DataSurfaces::WindowShadingControl(1).ShadingType = DataSurfaces::WinShadingFlag::NoShade;
+    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WinShadingFlag::ExtScreenOn;
 
     DataSurfaces::TotSurfaces = 2;
 

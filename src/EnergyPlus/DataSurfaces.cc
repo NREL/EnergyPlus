@@ -237,17 +237,6 @@ namespace DataSurfaces {
     int const InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
     int const InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
 
-    // WindowShadingControl Shading Types
-    int const WSC_ST_NoShade(0);
-    int const WSC_ST_InteriorShade(1);
-    int const WSC_ST_SwitchableGlazing(2);
-    int const WSC_ST_ExteriorShade(3);
-    int const WSC_ST_InteriorBlind(4);
-    int const WSC_ST_ExteriorBlind(5);
-    int const WSC_ST_BetweenGlassShade(6);
-    int const WSC_ST_BetweenGlassBlind(7);
-    int const WSC_ST_ExteriorScreen(8);
-
     // WindowShadingControl Control Types
     int const WSCT_AlwaysOn(1);                       // AlwaysOn
     int const WSCT_AlwaysOff(2);                      // AlwaysOff

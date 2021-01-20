@@ -3474,7 +3474,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     WindowShadingControl(1).Name = "TheShadingControl";
     WindowShadingControl(1).ZoneIndex = 57;
     WindowShadingControl(1).SequenceNumber = 3;
-    WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    WindowShadingControl(1).ShadingType = WinShadingFlag::ExtShadeOn;
     WindowShadingControl(1).ShadingDevice = 17;
     WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
     WindowShadingControl(1).Schedule = 83;
@@ -3546,7 +3546,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
     WindowShadingControl(2) = WindowShadingControl(1);
 
-    WindowShadingControl(2).ShadingType = WSC_ST_BetweenGlassBlind;
+    WindowShadingControl(2).ShadingType = WinShadingFlag::BGBlindOn;
     EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
     WindowShadingControl(2) = WindowShadingControl(1);
 
@@ -3601,7 +3601,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     WindowShadingControl(1).Name = "TheShadingControl";
     WindowShadingControl(1).ZoneIndex = 57;
     WindowShadingControl(1).SequenceNumber = 3;
-    WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    WindowShadingControl(1).ShadingType = WinShadingFlag::ExtShadeOn;
     WindowShadingControl(1).ShadingDevice = 17;
     WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
     WindowShadingControl(1).Schedule = 83;
