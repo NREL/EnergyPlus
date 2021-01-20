@@ -70,9 +70,9 @@ namespace EnergyPlus::DataPlant {
     struct OpSchemePtrData
     {
         // Members
-        int OpSchemePtr; // DSU points to OpScheme on plant loop:
-        int NumEquipLists;                   // DSU ALLOCATABLE to the schedule (for valid schedules)
-        Array1D<EquipListPtrData> EquipList; // DSU Component  list
+        int OpSchemePtr; // points to OpScheme on plant loop:
+        int NumEquipLists;                   // ALLOCATABLE to the schedule (for valid schedules)
+        Array1D<EquipListPtrData> EquipList; // Component  list
 
         // Default Constructor
         OpSchemePtrData() : OpSchemePtr(0), NumEquipLists(0)
@@ -108,7 +108,7 @@ namespace EnergyPlus::DataPlant {
         }
     };
 
-    struct EquipOpList // DSU
+    struct EquipOpList
     {
         // Members
         std::string Name;                // The name of each item in the list
@@ -123,7 +123,7 @@ namespace EnergyPlus::DataPlant {
         }
     };
 
-    struct OperationData // DSU
+    struct OperationData
     {
         // Members
         std::string Name;               // The name of each item in the list

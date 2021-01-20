@@ -279,7 +279,6 @@ namespace PoweredInductionUnits {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataZoneEquipment::ZoneEquipConfig;
         using FluidProperties::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataIPShortCuts;
@@ -488,13 +487,13 @@ namespace PoweredInductionUnits {
 
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
-                            ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (PIU(PIUNum).OutAirNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
                             state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             AirNodeFound = true;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
@@ -698,13 +697,13 @@ namespace PoweredInductionUnits {
                 // Fill the Zone Equipment data with the supply air inlet node number of this unit.
                 AirNodeFound = false;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (SupAirIn = 1; SupAirIn <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                        if (PIU(PIUNum).OutAirNode == ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                            ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
-                            ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
+                        if (PIU(PIUNum).OutAirNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = PIU(PIUNum).PriAirInNode;
+                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = PIU(PIUNum).OutAirNode;
                             state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum =
-                                ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
+                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                             state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).ZoneEqNum = CtrlZone;
                             PIU(PIUNum).CtrlZoneNum = CtrlZone;
                             PIU(PIUNum).ctrlZoneInNodeIndex = SupAirIn;
@@ -768,8 +767,6 @@ namespace PoweredInductionUnits {
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -832,7 +829,7 @@ namespace PoweredInductionUnits {
             MyPlantScanFlag(PIUNum) = false;
         }
 
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             // Check to see if there is a Air Distribution Unit on the Zone Equipment List
             for (Loop = 1; Loop <= NumPIUs; ++Loop) {
@@ -913,7 +910,7 @@ namespace PoweredInductionUnits {
             if (PIU(PIUNum).AirLoopNum == 0) { // fill air loop index
                 if (PIU(PIUNum).CtrlZoneNum > 0 && PIU(PIUNum).ctrlZoneInNodeIndex > 0) {
                     PIU(PIUNum).AirLoopNum =
-                        DataZoneEquipment::ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex);
+                        state.dataZoneEquip->ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex);
                     state.dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum = PIU(PIUNum).AirLoopNum;
                 }
             }
@@ -1580,8 +1577,8 @@ namespace PoweredInductionUnits {
         PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
         PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
         SecAirMassFlow = Node(SecNode).MassFlowRate;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
 
         // On the first HVAC iteration the system values are given to the controller, but after that
@@ -1615,7 +1612,7 @@ namespace PoweredInductionUnits {
                 } else {
                     SecAirMassFlow = PIU(PIUNum).MaxTotAirMassFlow;
                 }
-            } else if (CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
+            } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
                 PriAirMassFlow = PriAirMassFlowMin;
                 SecAirMassFlow = max(0.0, PIU(PIUNum).MaxTotAirMassFlow - PriAirMassFlow);
@@ -1858,8 +1855,8 @@ namespace PoweredInductionUnits {
         PriAirMassFlowMax = Node(PriNode).MassFlowRateMaxAvail;
         PriAirMassFlowMin = Node(PriNode).MassFlowRateMinAvail;
         SecAirMassFlow = Node(SecNode).MassFlowRate;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
-        QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
+        QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         // Initialize local fan flags to global system flags
         bool PIUTurnFansOn =
@@ -1898,7 +1895,7 @@ namespace PoweredInductionUnits {
                     SecAirMassFlow = PIU(PIUNum).MaxSecAirMassFlow;
                     PIUTurnFansOn = (DataHVACGlobals::TurnFansOn || DataHVACGlobals::TurnZoneFansOnlyOn);
                 }
-            } else if (CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
+            } else if (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) || std::abs(QZnReq) < SmallLoad) {
                 // in deadband or very small load: set primary air flow to the minimum
                 PriAirMassFlow = PriAirMassFlowMin;
                 // PIU fan off if reheat is not needed, also reset fan flag if fan should be off

@@ -287,7 +287,7 @@ namespace SolarCollectors {
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(state, state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), state.dataSolarCollectors->Parameters);
