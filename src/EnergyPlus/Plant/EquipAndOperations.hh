@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,17 +51,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
-namespace EnergyPlus {
-namespace DataPlant {
+namespace EnergyPlus::DataPlant {
 
     struct EquipListPtrData
     {
         // Members
         int ListPtr; // points to List on OpScheme on plant loop:
-        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)...
         int CompPtr; // points to this component on List on OpScheme on plant loop:
-        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)%List(ListPtr)%Comp(compPtr)
 
         // Default Constructor
         EquipListPtrData() : ListPtr(0), CompPtr(0)
@@ -72,10 +70,9 @@ namespace DataPlant {
     struct OpSchemePtrData
     {
         // Members
-        int OpSchemePtr; // DSU points to OpScheme on plant loop:
-        // PlantLoop(LoopNum)%OpScheme(Optschemeptr)...
-        int NumEquipLists;                   // DSU ALLOCATABLE to the schedule (for valid schedules)
-        Array1D<EquipListPtrData> EquipList; // DSU Component  list
+        int OpSchemePtr; // points to OpScheme on plant loop:
+        int NumEquipLists;                   // ALLOCATABLE to the schedule (for valid schedules)
+        Array1D<EquipListPtrData> EquipList; // Component  list
 
         // Default Constructor
         OpSchemePtrData() : OpSchemePtr(0), NumEquipLists(0)
@@ -90,7 +87,7 @@ namespace DataPlant {
         std::string TypeOf; // The name of each item in the list
         int TypeOf_Num;
         std::string CtrlType;                  // CoolingOp, HeatingOp, DualOp
-        int CtrlTypeNum;                       // CoolingOp, HeatingOp, DualOp
+        DataPlant::iCtrlType CtrlTypeNum;      // CoolingOp, HeatingOp, DualOp
         int LoopNumPtr;                        // pointer to the comp location in the data structure
         int LoopSideNumPtr;                    // pointer to the comp location in the data structure
         int BranchNumPtr;                      // pointer to the comp location in the data structure
@@ -104,12 +101,14 @@ namespace DataPlant {
         Real64 EMSActuatorDispatchedLoadValue; // EMS actuator for dispatched load, neg= cooling [W]
 
         // Default Constructor
-        EquipListCompData() : TypeOf_Num(0), SetPointFlowRate(0.0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
+        EquipListCompData()
+            : TypeOf_Num(0), CtrlTypeNum(DataPlant::iCtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0),
+              SetPointFlowRate(0.0), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
         {
         }
     };
 
-    struct EquipOpList // DSU
+    struct EquipOpList
     {
         // Members
         std::string Name;                // The name of each item in the list
@@ -124,7 +123,7 @@ namespace DataPlant {
         }
     };
 
-    struct OperationData // DSU
+    struct OperationData
     {
         // Members
         std::string Name;               // The name of each item in the list
@@ -153,7 +152,6 @@ namespace DataPlant {
         {
         }
     };
-} // namespace DataPlant
 } // namespace EnergyPlus
 
 #endif

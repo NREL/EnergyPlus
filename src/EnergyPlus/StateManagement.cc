@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,9 +73,6 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -108,7 +105,6 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -130,7 +126,6 @@
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
-#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -144,13 +139,7 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/PipeHeatTransfer.hh>
-#include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantCentralGSHP.hh>
-#include <EnergyPlus/PlantComponentTemperatureSources.hh>
-#include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
@@ -160,10 +149,7 @@
 #include <EnergyPlus/PondGroundHeatExchanger.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
@@ -190,7 +176,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
-    DataPlant::clear_state();
     DataReportingFlags::clear_state();
     DataSizing::clear_state();
     DataStringGlobals::clear_state();
@@ -199,9 +184,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
-    DataZoneControls::clear_state();
-    DataZoneEnergyDemands::clear_state();
-    DataZoneEquipment::clear_state();
     DesiccantDehumidifiers::clear_state();
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
@@ -246,7 +228,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACManager::clear_state();
     HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
-    HVACStandAloneERV::clear_state();
     HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
@@ -259,7 +240,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     LowTempRadiantSystem::clear_state();
     MicroCHPElectricGenerator::clear_state();
     MicroturbineElectricGenerator::clear_state();
-    MixedAir::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();
@@ -271,11 +251,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    Pipes::clear_state();
-    PipeHeatTransfer::clear_state();
-    PlantCentralGSHP::clear_state();
-    PlantComponentTemperatureSources::clear_state();
-    PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
     PlantManager::clear_state();
@@ -287,14 +262,11 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PondGroundHeatExchanger::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
-    Pumps::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
-    ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelManager::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
-    ResultsFramework::clear_state();
 }

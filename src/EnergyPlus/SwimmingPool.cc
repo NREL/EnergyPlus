@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -702,7 +702,7 @@ namespace SwimmingPool {
         bool errFlag;
         static std::string const RoutineName("InitSwimmingPoolPlantLoopIndex");
 
-        if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
+        if (MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -924,7 +924,7 @@ namespace SwimmingPool {
 
         int WaterInletNode = this->WaterInletNode;   // inlet node number
         int WaterOutletNode = this->WaterOutletNode; // outlet node number
-        PlantUtilities::SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
 
         Real64 WaterMassFlow = DataLoopNode::Node(WaterInletNode).MassFlowRate; // water mass flow rate
         if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = this->PoolWaterTemp;
