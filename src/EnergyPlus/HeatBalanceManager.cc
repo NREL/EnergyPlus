@@ -911,6 +911,10 @@ namespace HeatBalanceManager {
                     DefaultInsideConvectionAlgo = AdaptiveConvectionAlgorithm;
                     AlphaName(1) = "AdaptiveConvectionAlgorithm";
 
+                } else if (SELECT_CASE_var == "ASTMC1340") {
+                    DefaultInsideConvectionAlgo = ASTMC1340;
+                    AlphaName(1) = "ASTMC1340";
+
                 } else {
                     ShowWarningError(state, "GetInsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject +
                                      ", defaulting to TARP, invalid value=" + AlphaName(1));
@@ -5153,6 +5157,9 @@ namespace HeatBalanceManager {
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
                     Zone(ZoneLoop).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+
+                } else if (SELECT_CASE_var == "ASTMC1340") {
+                    Zone(ZoneLoop).InsideConvectionAlgo = ASTMC1340;
 
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");

@@ -197,6 +197,7 @@ namespace DataHeatBalance {
     int const DOE2HcOutside(7);   // Only valid for outside use
     int const BLASTHcOutside(8);  // Only valid for outside use
     int const AdaptiveConvectionAlgorithm(9);
+    int const ASTMC1340(10);
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed

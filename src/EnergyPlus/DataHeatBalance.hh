@@ -153,6 +153,7 @@ namespace DataHeatBalance {
     extern int const DOE2HcOutside;   // Only valid for outside use
     extern int const BLASTHcOutside;  // Only valid for outside use
     extern int const AdaptiveConvectionAlgorithm;
+    extern int const ASTMC1340;
 
     // Parameters for WarmupDays
     extern int const DefaultMaxNumberOfWarmupDays; // Default maximum number of warmup days allowed
