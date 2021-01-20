@@ -8513,12 +8513,14 @@ namespace AirflowNetworkBalanceManager {
             // save values for predefined report
             Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
                                         ReportingConstant; // compute volume using standard density air
-            ZonePreDefRep(i).AFNInfilVolTotal += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+            // MJWToDo - Separate AFN Vent and InfilVolFlow
+            ZonePreDefRep(i).AFNVentVolFlow = StdDensInfilVolume;
+            ZonePreDefRep(i).AFNInfilVolTotal += StdDensInfilVolume;
             if (StdDensInfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
-                ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                ZonePreDefRep(i).AFNInfilVolMin = StdDensInfilVolume;
             }
             if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNInfilVolTotalOcc += StdDensInfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                ZonePreDefRep(i).AFNInfilVolTotalOcc += StdDensInfilVolume;
             }
 
             Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(i).OutDryBulbTemp);

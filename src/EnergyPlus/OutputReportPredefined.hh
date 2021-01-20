@@ -1131,10 +1131,21 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int sizeShadowRelate = 0;
     int numShadowRelate = 0;
 
+    // Totals for ABUPS report
     Real64 TotalNotMetHeatingOccupiedForABUPS = 0.0;
     Real64 TotalNotMetCoolingOccupiedForABUPS = 0.0;
     Real64 TotalNotMetOccupiedForABUPS = 0.0;
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+
+    // Totals for OA report
+    Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at targe Voz-Dyn
+    Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn
+    Real64 TotalAnyZoneBelowVozDynOccForOA = 0.0; // total time any zone below target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynOccForOA = 0.0; // total time all zones at targe Voz-Dyn
+    Real64 TotalAnyZoneAboveVozDynOccForOA = 0.0; // total time any zone above target Voz-Dyn
+    Real64 TotalAnyZoneVentUnoccForOA = 0.0; // total time any zone has ventilation when unoccupied
+
 
     Array1D<OutputReportPredefined::reportNameType> reportName;
     Array1D<OutputReportPredefined::SubTableType> subTable;
@@ -1981,6 +1992,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->TotalNotMetCoolingOccupiedForABUPS = 0.0;
         this->TotalNotMetOccupiedForABUPS = 0.0;
         this->TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+        this->TotalAnyZoneBelowVozDynForOA = 0.0;
+        this->TotalAllZonesAtVozDynForOA = 0.0;
+        this->TotalAnyZoneAboveVozDynForOA = 0.0;
+        this->TotalAnyZoneBelowVozDynOccForOA = 0.0;
+        this->TotalAllZonesAtVozDynOccForOA = 0.0;
+        this->TotalAnyZoneAboveVozDynOccForOA = 0.0;
+        this->TotalAnyZoneVentUnoccForOA = 0.0;
         this->reportName.deallocate();
         this->subTable.deallocate();
         this->columnTag.deallocate();

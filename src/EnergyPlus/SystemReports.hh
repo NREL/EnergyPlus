@@ -292,14 +292,22 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D<Real64> SysHCCompSteam;
     Array1D<Real64> SysDomesticH2O;
 
-    Array1D<Real64> ZoneOAMassFlow;         // zone mech vent mass flow rate {kg/s}
-    Array1D<Real64> ZoneOAMass;             // zone mech vent total mass for time {kg}
-    Array1D<Real64> ZoneOAVolFlowStdRho;    // zone mech vent volume flow rate at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolStdRho;        // zone mech vent total volume OA at standard density {m3/s}
-    Array1D<Real64> ZoneOAVolFlowCrntRho;   // zone mech vent volume flow rate at current density {m3/s}
-    Array1D<Real64> ZoneOAVolCrntRho;       // zone mech vent total volume OA at current density {m3/s}
-    Array1D<Real64> ZoneMechACH;            // zone mech vent air changes per hour {ACH}
-    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz {m3/s}
+    Array1D<Real64> ZoneOAMassFlow;               // zone mech vent mass flow rate {kg/s}
+    Array1D<Real64> ZoneOAMass;                   // zone mech vent total mass for time {kg}
+    Array1D<Real64> ZoneOAVolFlowStdRho;          // zone mech vent volume flow rate at standard density {m3/s}
+    Array1D<Real64> ZoneOAVolStdRho;              // zone mech vent total volume OA at standard density {m3/s}
+    Array1D<Real64> ZoneOAVolFlowCrntRho;         // zone mech vent volume flow rate at current density {m3/s}
+    Array1D<Real64> ZoneOAVolCrntRho;             // zone mech vent total volume OA at current density {m3/s}
+    Array1D<Real64> ZoneMechACH;                  // zone mech vent air changes per hour {ACH}
+    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+    Array1D<Real64> ZoneTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+    Array1D<Real64> ZoneTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Array1D<Real64> ZoneTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+    Array1D<Real64> ZoneTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during UNoccupied
+    Real64 AnyZoneTimeBelowVozDyn = 0.0;          // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1% during occupied
+    Real64 AllZonesTimeAtVozDyn = 0.0; // time [hrs] that all zones mechanical+natural ventilation is = VozTarget within 1% and > zero during occupied
+    Real64 AnyZoneTimeAboveVozDyn = 0.0; // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
+    Real64 AnyZoneTimeVentUnocc = 0.0;   // time [hrs] that any zone mechanical+natural ventilation is > zero during UNoccupied
 
     bool AirLoopLoadsReportEnabled = true;
     bool VentLoadsReportEnabled = true;
@@ -400,6 +408,14 @@ struct SystemReportsData : BaseGlobalStruct {
         this->ZoneOAVolCrntRho.deallocate();
         this->ZoneMechACH.deallocate();
         this->ZoneTargetVentilationFlowVoz.deallocate();
+        this->ZoneTimeBelowVozDyn.deallocate();
+        this->ZoneTimeAtVozDyn.deallocate();
+        this->ZoneTimeAboveVozDyn.deallocate();
+        this->ZoneTimeVentUnocc.deallocate();
+        this->AnyZoneTimeBelowVozDyn = 0.0;
+        this->AllZonesTimeAtVozDyn = 0.0;
+        this->AnyZoneTimeAboveVozDyn = 0.0;
+        this->AnyZoneTimeVentUnocc = 0.0;
         this->AirLoopLoadsReportEnabled = true;
         this->VentLoadsReportEnabled = true;
         this->VentEnergyReportEnabled = false;

@@ -1858,6 +1858,8 @@ namespace DataHeatBalance {
         //  - zone time step
         Real64 TotTimeOcc; // time occupied (and the mechanical ventilation volume is accumulating)
         //  - system time step
+
+        // OA Reports
         Real64 MechVentVolTotal; // volume for mechanical ventilation of outside air for entire simulation
         Real64 MechVentVolTotalOcc; // volume for mechanical ventilation of outside air for entire simulation during occupied
         Real64 MechVentVolMin;   // a large number since finding minimum volume
@@ -1867,10 +1869,21 @@ namespace DataHeatBalance {
         Real64 AFNInfilVolTotal; // volume for infiltration of outside air for entire simulation
         Real64 AFNInfilVolTotalOcc; // volume for infiltration of outside air for entire simulation during occupied
         Real64 AFNInfilVolMin;   // a large number since finding minimum volume
+        Real64 AFNVentVolFlow;   // current volume flow rate for natural ventilation
         Real64 SimpVentVolTotal; // volume for simple 'ZoneVentilation' of outside air for entire simulation
         Real64 SimpVentVolTotalOcc; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied
         Real64 SimpVentVolMin;   // a large number since finding minimum volume
         Real64 VozMin;           // minimum outdoor zone ventilation 
+        Real64 VozTargetTotal;   // volume for target Voz-dyn for entire simulation
+        Real64 VozTargetTotalOcc;   // volume for target Voz-dyn for entire simulation during occupied
+        Real64 VozTargetTimeBelow;  // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 VozTargetTimeAt;  // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 VozTargetTimeAbove;  // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 VozTargetTimeBelowOcc;  // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
+        Real64 VozTargetTimeAtOcc;  // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occupied
+        Real64 VozTargetTimeAboveOcc;  // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
+        Real64 TotVentTimeNonZeroUnocc;  // time [hrs] that mechanical+natural ventilation is > zero during UNoccupied
+
         // for Sensible Heat Gas Component Report
         // annual
         Real64 SHGSAnZoneEqHt;    // Zone Eq heating
@@ -1946,7 +1959,9 @@ namespace DataHeatBalance {
         ZonePreDefRepType()
             : isOccupied(false), NumOcc(0.0), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolTotalOcc(0.0), 
               MechVentVolMin(9.9e9), InfilVolTotal(0.0), InfilVolTotalOcc(0.0), InfilVolMin(9.9e9), AFNInfilVolTotal(0.0), AFNInfilVolTotalOcc(0.0), 
-              AFNInfilVolMin(9.9e9), SimpVentVolTotal(0.0), SimpVentVolTotalOcc(0.0), SimpVentVolMin(9.9e9), VozMin(0.0),
+              AFNInfilVolMin(9.9e9), AFNVentVolFlow(0.0), SimpVentVolTotal(0.0), SimpVentVolTotalOcc(0.0), SimpVentVolMin(9.9e9), VozMin(0.0),
+              VozTargetTotal(0.0), VozTargetTotalOcc(0.0), VozTargetTimeBelow(0.0), VozTargetTimeAt(0.0), VozTargetTimeAbove(0.0),
+              VozTargetTimeBelowOcc(0.0), VozTargetTimeAtOcc(0.0), VozTargetTimeAboveOcc(0.0), TotVentTimeNonZeroUnocc(0.0),
               SHGSAnZoneEqHt(0.0), SHGSAnZoneEqCl(0.0), SHGSAnHvacATUHt(0.0), SHGSAnHvacATUCl(0.0), SHGSAnSurfHt(0.0), SHGSAnSurfCl(0.0),
               SHGSAnPeoplAdd(0.0), SHGSAnLiteAdd(0.0), SHGSAnEquipAdd(0.0), SHGSAnWindAdd(0.0), SHGSAnIzaAdd(0.0), SHGSAnInfilAdd(0.0),
               SHGSAnOtherAdd(0.0), SHGSAnEquipRem(0.0), SHGSAnWindRem(0.0), SHGSAnIzaRem(0.0), SHGSAnInfilRem(0.0), SHGSAnOtherRem(0.0),

@@ -5956,11 +5956,21 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 totalMechVentVol = 0;
         Real64 totalNatVentVol = 0;
         Real64 totalInfilVol = 0;
+        Real64 totalVozDyn = 0;
+        Real64 totalBelowVozDyn = 0;
+        Real64 totalAtVozDyn = 0;
+        Real64 totalAboveVozDyn = 0;
+        Real64 totalTotVentUnocc = 0;
+
         Real64 totalMechVentRateOcc = 0;
         Real64 totalNatVentRateOcc = 0;
         Real64 totalInfilRateOcc = 0;
+        Real64 totalVozDynOcc = 0;
+        Real64 totalBelowVozDynOcc = 0;
+        Real64 totalAtVozDynOcc = 0;
+        Real64 totalAboveVozDynOcc = 0;
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            Real64 zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+            int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
 
                 // AFN infiltration -- check that afn sim is being done.
@@ -6029,6 +6039,13 @@ namespace EnergyPlus::OutputReportTabular {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotal
                         + ZonePreDefRep(iZone).SimpVentVolTotal + ZonePreDefRep(iZone).AFNInfilVolTotal + ZonePreDefRep(iZone).InfilVolTotal, 0);
 
+                    // Dynamic target ventilation Voz-dyn
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc, 0);
+
                     if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
                         // Mechanical ventilation
                         Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
@@ -6044,12 +6061,18 @@ namespace EnergyPlus::OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, Zone(iZone).Name, mechVent + natVent);
 
                         // infiltration
-                        Real64 infil = (ZonePreDefRep(iZone).InfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        Real64 infil = ZonePreDefRep(iZone).InfilVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, Zone(iZone).Name, infil);
                         totalInfilRateOcc += infil * zoneMult; 
 
                         // Total ventilation and infiltration
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil);
+
+                        // Dynamic target ventilation Voz-dyn
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotalOcc / ZonePreDefRep(iZone).TotTimeOcc, 0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
                     }
                 }
             }
