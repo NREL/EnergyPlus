@@ -869,7 +869,6 @@ namespace ChillerGasAbsorption {
 
         if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) && (!this->plantScanFlag)) {
             mdot = this->DesCondMassFlowRate;
-            // DSU removed, this has to have been wrong (?)  Node(CondInletNode)%Temp  = GasAbsorber(ChillNum)%TempDesCondReturn
 
             PlantUtilities::SetComponentFlowRate(state,
                 mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);

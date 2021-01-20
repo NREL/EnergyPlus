@@ -2047,8 +2047,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
 
@@ -2086,8 +2086,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
             columnHead.deallocate();
@@ -2123,8 +2123,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
                 columnHead.deallocate();
@@ -2168,8 +2168,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody,
                     rowHead,
                     columnHead,
@@ -2212,8 +2212,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Life-Cycle Cost Report",
@@ -2262,8 +2262,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (With Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Life-Cycle Cost Report",
@@ -2303,8 +2303,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Capital Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Life-Cycle Cost Report",
@@ -2356,8 +2356,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Operating Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Life-Cycle Cost Report",
@@ -2411,8 +2411,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Operating Cash Flow by Category (With Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Life-Cycle Cost Report",
@@ -2464,8 +2464,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
                 columnHead.deallocate();
@@ -2497,8 +2497,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2589,8 +2589,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody,
                     rowHead,
                     columnHead,
@@ -2650,8 +2650,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
             columnHead.deallocate();
@@ -2690,8 +2690,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
             columnHead.deallocate();
@@ -2732,8 +2732,8 @@ namespace EnergyPlus::EconomicLifeCycleCost {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
                 columnHead.deallocate();

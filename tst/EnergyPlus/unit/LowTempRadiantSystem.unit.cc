@@ -1111,7 +1111,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
 
@@ -1276,7 +1276,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
     state->dataGlobal->BeginTimeStepFlag = false;
@@ -1309,7 +1309,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
     state->dataGlobal->BeginTimeStepFlag = false;
@@ -1348,7 +1348,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
     state->dataGlobal->BeginTimeStepFlag = false;
@@ -1387,7 +1387,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).Name = "NoNameRadSys";
     TotalNumOfRadSystems = 0;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     CFloRadSys(RadSysNum).HotWaterInNode = 0;
     CFloRadSys(RadSysNum).ColdWaterInNode = 0;
     state->dataGlobal->BeginTimeStepFlag = false;

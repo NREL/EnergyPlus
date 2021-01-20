@@ -1058,7 +1058,6 @@ namespace OutdoorAirUnit {
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::OutdoorAirUnit_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1159,7 +1158,7 @@ namespace OutdoorAirUnit {
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
-        if (!state.dataOutdoorAirUnit->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataOutdoorAirUnit->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataOutdoorAirUnit->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataOutdoorAirUnit->NumOfOAUnits; ++Loop) {
                 if (CheckZoneEquipmentList(state, CurrentModuleObject, OutAirUnit(Loop).Name)) continue;

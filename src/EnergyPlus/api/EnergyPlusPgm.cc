@@ -265,8 +265,8 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
 
-    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    state.dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 

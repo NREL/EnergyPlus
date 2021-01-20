@@ -210,8 +210,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     thisUnit.ControlZoneNum = 1;
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     ScheduleManager::Schedule.allocate(1);
     Schedule(1).CurrentValue = 1.0;
@@ -561,7 +561,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     InitializePsychRoutines();
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
@@ -579,7 +579,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     thisFanCoil.OutAirMassFlow = 0.0;
     thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
     // outside air mixer
-    auto &MixerOA(MixedAir::OAMixer(1));
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).Temp = 20.0;
@@ -638,8 +638,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataFans->LocalTurnFansOff = false;
     state->dataFans->LocalTurnFansOn = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    auto &zSysEDemand(ZoneSysEnergyDemand(1));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
