@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,11 +56,15 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PVWattsSSC.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PVWatts {
 
@@ -163,9 +167,10 @@ namespace PVWatts {
         Real64 m_outputDCEnergy;
 
     public:
-        static PVWattsGenerator createFromIdfObj(int objNum);
+        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
-        PVWattsGenerator(const std::string &name,
+        PVWattsGenerator(EnergyPlusData &state,
+                         const std::string &name,
                          const Real64 dcSystemCapacity,
                          ModuleType moduleType,
                          ArrayType arrayType,
@@ -176,7 +181,7 @@ namespace PVWatts {
                          size_t surfaceNum = 0,
                          Real64 groundCoverageRatio = 0.4);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
         Real64 getDCSystemCapacity();
         ModuleType getModuleType();
@@ -193,11 +198,12 @@ namespace PVWatts {
         void setCellTemperature(Real64 cellTemp);
         void setPlaneOfArrayIrradiance(Real64 poa);
 
-        void calc();
+        void calc(EnergyPlusData &state);
 
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-        IrradianceOutput processIrradiance(int year,
+        IrradianceOutput processIrradiance(EnergyPlusData &state,
+                                           int year,
                                            int month,
                                            int day,
                                            int hour,
@@ -210,16 +216,24 @@ namespace PVWatts {
                                            Real64 df,
                                            Real64 alb);
 
-        DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
+        DCPowerOutput powerout(EnergyPlusData &state, Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
     };
 
     extern std::map<int, PVWattsGenerator> PVWattsGenerators;
 
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
 
     void clear_state();
 
 } // namespace PVWatts
+
+struct PVWattsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,32 +49,25 @@
 #define CrossVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct ConvectionCoefficientsData;
-struct CrossVentMgrData;
+struct EnergyPlusData;
 
 namespace CrossVentMgr {
 
-    void ManageUCSDCVModel(ConvectionCoefficientsData &dataConvectionCoefficients,
-                           CrossVentMgrData &dataCrossVentMgr,
-                           int ZoneNum); // index number for the specified zone
+    void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
 
-    void InitUCSDCV(CrossVentMgrData &dataCrossVentMgr, int ZoneNum);
+    void InitUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    void HcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
-                  CrossVentMgrData &dataCrossVentMgr,
-                  int ZoneNum);
+    void HcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    void EvolveParaUCSDCV(int ZoneNum);
+    void EvolveParaUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-    void CalcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
-                    CrossVentMgrData &dataCrossVentMgr,
-                    int ZoneNum); // Which Zonenum
+    void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
 } // namespace CrossVentMgr
 
@@ -89,12 +82,12 @@ namespace CrossVentMgr {
 
         void clear_state() override
         {
-            HAT_J = 0.0;
-            HA_J = 0.0;
-            HAT_R = 0.0;
-            HA_R = 0.0;
-            InitUCSDCV_MyOneTimeFlag = true;
-            InitUCSDCV_MyEnvrnFlag.deallocate();
+            this->HAT_J = 0.0;
+            this->HA_J = 0.0;
+            this->HAT_R = 0.0;
+            this->HA_R = 0.0;
+            this->InitUCSDCV_MyOneTimeFlag = true;
+            this->InitUCSDCV_MyEnvrnFlag.deallocate();
         }
     };
 

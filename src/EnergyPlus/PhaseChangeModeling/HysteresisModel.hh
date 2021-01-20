@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,13 @@
 #include <string>
 #include <vector>
 
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HysteresisPhaseChange {
 
@@ -114,7 +118,7 @@ namespace HysteresisPhaseChange {
         Real64 specHeatTransition;
 
         // the factory for this class
-        static HysteresisPhaseChange *factory(const std::string &objectName);
+        static HysteresisPhaseChange *factory(EnergyPlusData &state, const std::string &objectName);
 
         // the Cp calculation function for this class
         Real64 getCurrentSpecificHeat(
@@ -134,11 +138,19 @@ namespace HysteresisPhaseChange {
 
     extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-    void readAllHysteresisModels();
+    void readAllHysteresisModels(EnergyPlusData &state);
 
     void clear_state();
 
 } // namespace HysteresisPhaseChange
+
+struct HysteresisPhaseChangeData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixerComponent;
@@ -74,10 +74,10 @@ TEST_F(EnergyPlusFixture, GetZoneMixerIndex)
     MixerCond(1).MixerName = "SPACE1-1 ATU Mixer";
     MixerCond(2).MixerName = "SPACE2-1 ATU Mixer";
     MixerCond(3).MixerName = "SPACE3-1 ATU Mixer";
-    GetZoneMixerIndex(MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
+    GetZoneMixerIndex(*state, MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
     EXPECT_EQ(2, MixerIndex);
     EXPECT_FALSE(errFlag);
-    GetZoneMixerIndex("SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject);
+    GetZoneMixerIndex(*state, "SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject);
     EXPECT_EQ(0, MixerIndex);
     EXPECT_TRUE(errFlag);
 }

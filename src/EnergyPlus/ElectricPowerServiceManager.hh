@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,8 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -62,9 +64,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 enum class ThermalLossDestination : int
 {
     heatLossNotDetermined = 0,
@@ -72,7 +71,19 @@ enum class ThermalLossDestination : int
     lostToOutside // device thermal losses have no destination
 };
 
-void initializeElectricPowerServiceZoneGains();
+enum class GeneratorType {
+    Unassigned,
+    ICEngine,
+    CombTurbine,
+    PV,
+    FuelCell,
+    MicroCHP,
+    Microturbine,
+    WindTurbine,
+    PVWatts
+};
+
+void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
 
 class DCtoACInverter
 // This class is for modelling a power conversion device that takes DC power in and produces AC power out.
@@ -90,21 +101,21 @@ public: // Methods
     };
 
     // Constructor
-    DCtoACInverter(std::string const &objectName);
+    DCtoACInverter(EnergyPlusData &state, std::string const &objectName);
 
-    void simulate(Real64 const powerIntoInverter);
+    void simulate(EnergyPlusData &state, Real64 const powerIntoInverter);
 
     void reinitAtBeginEnvironment();
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void setPVWattsDCCapacity(Real64 const dcCapacity);
+    void setPVWattsDCCapacity(EnergyPlusData &state, Real64 const dcCapacity);
 
     Real64 pvWattsDCCapacity();
 
     Real64 thermLossRate() const;
 
-    Real64 getLossRateForOutputPower(Real64 const powerOutOfInverter);
+    Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfInverter);
 
     Real64 aCPowerOut() const;
 
@@ -115,7 +126,7 @@ public: // Methods
     std::string const &name() const;
 
 private: // Methods
-    void calcEfficiency();
+    void calcEfficiency(EnergyPlusData &state);
 
 private:               // data
     std::string name_; // user identifier
@@ -159,9 +170,9 @@ class ACtoDCConverter
 
 public: // Methods
     // Constructor
-    ACtoDCConverter(std::string const &objectName);
+    ACtoDCConverter(EnergyPlusData &state, std::string const &objectName);
 
-    void simulate(Real64 const powerOutFromConverter);
+    void simulate(EnergyPlusData &state, Real64 const powerOutFromConverter);
 
     void reinitAtBeginEnvironment();
 
@@ -175,12 +186,12 @@ public: // Methods
 
     Real64 aCPowerIn() const;
 
-    Real64 getLossRateForInputPower(Real64 const powerIntoConverter); // AC power going into inverter
+    Real64 getLossRateForInputPower(EnergyPlusData &state, Real64 const powerIntoConverter); // AC power going into inverter
 
     std::string const &name() const;
 
 private: // methods
-    void calcEfficiency();
+    void calcEfficiency(EnergyPlusData &state);
 
 private: // data
     enum class ConverterModelType : int
@@ -222,11 +233,12 @@ class ElectricStorage
 
 public: // methods
     // Constructor
-    ElectricStorage(std::string const &objectName);
+    ElectricStorage(EnergyPlusData &state, std::string const &objectName);
 
-    void timeCheckAndUpdate();
+    void timeCheckAndUpdate(EnergyPlusData &state);
 
-    void simulate(Real64 &powerCharge,
+    void simulate(EnergyPlusData &state,
+                  Real64 &powerCharge,
                   Real64 &powerDischarge,
                   bool &charging,
                   bool &discharging,
@@ -251,7 +263,8 @@ public: // methods
 
     Real64 storedEnergy() const;
 
-    bool determineCurrentForBatteryDischarge(Real64 &curI0,
+    bool determineCurrentForBatteryDischarge(EnergyPlusData &state,
+                                             Real64 &curI0,
                                              Real64 &curT0,
                                              Real64 &curVolt,
                                              Real64 const Pw,
@@ -274,7 +287,8 @@ private:                            // methods
         Real64 const controlSOCMaxFracLimit,
         Real64 const controlSOCMinFracLimit);
 
-    void simulateKineticBatteryModel(Real64 &powerCharge,
+    void simulateKineticBatteryModel(EnergyPlusData &state,
+                                     Real64 &powerCharge,
                                      Real64 &powerDischarge,
                                      bool &charging,
                                      bool &discharging,
@@ -388,15 +402,15 @@ class ElectricTransformer
 
 public: // methods
     // Constructor
-    ElectricTransformer(std::string const &objectName);
+    ElectricTransformer(EnergyPlusData &state, std::string const &objectName);
 
-    Real64 getLossRateForOutputPower(Real64 const powerOutOfTransformer);
+    Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfTransformer);
 
-    Real64 getLossRateForInputPower(Real64 const powerIntoTransformer);
+    Real64 getLossRateForInputPower(EnergyPlusData &state, Real64 const powerIntoTransformer);
 
-    void manageTransformers(Real64 const surplusPowerOutFromLoadCenters);
+    void manageTransformers(EnergyPlusData &state, Real64 const surplusPowerOutFromLoadCenters);
 
-    void setupMeterIndices();
+    void setupMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
@@ -474,7 +488,7 @@ class GeneratorController
 
 public: // Method
     // Constructor
-    GeneratorController(IOFiles &ioFiles,
+    GeneratorController(EnergyPlusData &state,
                         std::string const &objectName,
                         std::string const &objectType,
                         Real64 ratedElecPowerOutput,
@@ -491,22 +505,10 @@ public: // Method
     void reinitAtBeginEnvironment();
 
 public: // data // might make this class a friend of ElectPowerLoadCenter?
-    enum class GeneratorType : int
-    {
-        notYetSet = 0,
-        iCEngine,
-        combTurbine,
-        pV,
-        fuelCell,
-        microCHP,
-        microturbine,
-        windTurbine,
-        pvWatts,
-    };
 
     std::string name;          // user identifier
     std::string typeOfName;    // equipment type
-    int compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    GeneratorType compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
     int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
     std::string compPlantName; // name of plant component if heat recovery
     GeneratorType generatorType;
@@ -542,11 +544,11 @@ class ElectPowerLoadCenter
 
 public: // Methods
     // Constructor
-    ElectPowerLoadCenter(IOFiles &ioFiles, int const objectNum);
+    ElectPowerLoadCenter(EnergyPlusData &state, int const objectNum);
 
     void manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
-    void setupLoadCenterMeterIndices();
+    void setupLoadCenterMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
@@ -556,14 +558,14 @@ public: // Methods
 
     std::string const &generatorListName() const;
 
-    void updateLoadCenterGeneratorRecords();
+    void updateLoadCenterGeneratorRecords(EnergyPlusData &state);
 
 private: // Methods
     void dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
-    void dispatchStorage(Real64 const remainingPowerDemand);
+    void dispatchStorage(EnergyPlusData &state, Real64 const remainingPowerDemand);
 
-    Real64 calcLoadCenterThermalLoad(BranchInputManagerData &dataBranchInputManager); // returns heat rate called for from cogenerator(watts)
+    Real64 calcLoadCenterThermalLoad(EnergyPlusData &state); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
     enum class ElectricBussType : int
@@ -690,29 +692,30 @@ public: // Methods
     {
     }
 
-    void manageElectricPowerService(EnergyPlusData &state, bool const FirstHVACIteration,
+    void manageElectricPowerService(EnergyPlusData &state,
+                                    bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
                                     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
     );
 
     void reinitZoneGainsAtBeginEnvironment();
 
-    void verifyCustomMetersElecPowerMgr();
+    void verifyCustomMetersElecPowerMgr(EnergyPlusData &state);
 
 private: // Methods
-    void getPowerManagerInput(IOFiles &ioFiles);
+    void getPowerManagerInput(EnergyPlusData &state);
 
-    void setupMeterIndices();
+    void setupMeterIndices(EnergyPlusData &state);
 
     void reinitAtBeginEnvironment();
 
-    void updateWholeBuildingRecords();
+    void updateWholeBuildingRecords(EnergyPlusData &state);
 
-    void reportPVandWindCapacity();
+    void reportPVandWindCapacity(EnergyPlusData &state);
 
     void sumUpNumberOfStorageDevices();
 
-    void checkLoadCenters();
+    void checkLoadCenters(EnergyPlusData &state);
 
 public: // data
     bool newEnvironmentInternalGainsFlag;
@@ -765,6 +768,14 @@ extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 void createFacilityElectricPowerServiceObject();
 
 void clearFacilityElectricPowerServiceObject();
+
+struct ElectPwrSvcMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ElectricPowerServiceManager_hh_INCLUDED

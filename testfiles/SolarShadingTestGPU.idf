@@ -105,7 +105,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     RunPeriod 1,             !- Name
@@ -2968,9 +2970,10 @@
   Output:Surfaces:List,Details;
 
   ShadowCalculation,
-    PixelCounting, !- Shading Calculation Method
-    Periodic, !- Shading Calculation Update Frequency Method
-    , !- Shading Calculation Update Frequency
-    , !- Maximum Figures in Shadow Overlap Calculations
-    , !- Polygon Clipping Algorithm
-    2048; !- Pixel Counting Resolution
+    PixelCounting,           !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    ,                        !- Shading Calculation Update Frequency
+    ,                        !- Maximum Figures in Shadow Overlap Calculations
+    ,                        !- Polygon Clipping Algorithm
+    2048;                    !- Pixel Counting Resolution
+

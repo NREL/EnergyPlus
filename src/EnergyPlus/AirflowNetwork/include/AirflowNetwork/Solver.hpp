@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 // define this variable to get new code, commenting should yield original
 #define SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
 
@@ -68,9 +71,11 @@ namespace AirflowNetwork {
         Real64 temperature{20.0};
         // Real64 pressure;      //{0.0}; // gage pressure
         Real64 humidityRatio{0.0};
-        Real64 density{AIRDENSITY(20.0, 101325.0, 0.0)};
-        Real64 sqrtDensity{sqrt(AIRDENSITY(20.0, 101325.0, 0.0))};
+        Real64 density{0.0};
+        Real64 sqrtDensity{0.0};
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
+
+        explicit AirProperties(double const airDensity);
     };
 
     // Forward declaration
@@ -81,12 +86,13 @@ namespace AirflowNetwork {
         Solver() : PB(0.0)
         {}
 
-        void allocate();
+        void allocate(EnergyPlusData &state);
         void initialize();
         void setsky();
-        void airmov();
-        void solvzp(int &ITER);  // number of iterations
-        void filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
+        void airmov(EnergyPlusData &state);
+        void solvzp(EnergyPlusData &state, int &ITER);  // number of iterations
+        void filjac(EnergyPlusData &state,
+                    int const NNZE,  // number of nonzero entries in the "AU" array.
                     bool const LFLAG // if = 1, use laminar relationship (initialization).
         );
 
@@ -175,7 +181,7 @@ namespace AirflowNetwork {
 
     // Functions
 
-    int GenericCrack(Real64 &coef,               // Flow coefficient
+    int GenericCrack(EnergyPlusData &state, Real64 &coef,               // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
@@ -195,7 +201,7 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+    void FACSKY(EnergyPlusData &state, Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
                 Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
                 Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
                 const Array1D_int &IK, // pointer to the top of column/row "K"
@@ -247,7 +253,7 @@ namespace AirflowNetwork {
                      Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     );
 
-    void PStack();
+    void PStack(EnergyPlusData &state);
 
     Real64 psz(Real64 const Pz0,  // Pressure at altitude z0 [Pa]
                Real64 const Rho0, // density at altitude z0 [kg/m3]
@@ -257,7 +263,7 @@ namespace AirflowNetwork {
                Real64 const g     // gravity field strength [N/kg]
     );
 
-    void LClimb(Real64 const G,   // gravity field strength [N/kg]
+    void LClimb(EnergyPlusData &state, Real64 const G,   // gravity field strength [N/kg]
                 Real64 &Rho,      // Density link level (initialized with rho zone) [kg/m3]
                 Real64 const Z,   // Height of the link above the zone reference [m]
                 Real64 &T,        // temperature at link level [C]

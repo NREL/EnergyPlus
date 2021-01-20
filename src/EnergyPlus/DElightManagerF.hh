@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,21 @@
 #include <string>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+struct EnergyPlusData;
+
 namespace DElightManagerF {
 
-    void DElightInputGenerator(EnergyPlus::IOFiles &ioFiles);
+    void DElightInputGenerator(EnergyPlusData &state);
 
     void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag);
 
-    void GetInputDElightComplexFenestration(bool &ErrorsFound);
+    void GetInputDElightComplexFenestration(EnergyPlusData &state, bool &ErrorsFound);
 
-    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
+    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
     std::string ReplaceBlanksWithUnderscores(std::string const &InputString);
 

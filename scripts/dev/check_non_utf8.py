@@ -3,6 +3,7 @@
 import json
 import os
 import io  # For Python 2 compat
+import sys
 
 # note I am skipping docs for right now; I want to do those files
 DIRS_TO_SKIP = [
@@ -26,6 +27,9 @@ FILE_PATTERNS = [
 current_script_dir = os.path.dirname(os.path.realpath(__file__))
 repo_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
 full_path_dirs_to_skip = [os.path.join(repo_root, d) for d in DIRS_TO_SKIP]
+
+num_warnings = 0
+num_errors = 0
 
 for root, dirs, filenames in os.walk(repo_root):
     if any(root.startswith(f) for f in full_path_dirs_to_skip):
@@ -52,6 +56,7 @@ for root, dirs, filenames in os.walk(repo_root):
                                   "".format(relative_file_path))
                       }
             print(json.dumps(ci_msg))
+            num_errors += 1
 
             # Now you try to give a better error message by pointing at the
             # lines that are guilty. To do so, you open as binary, and try to
@@ -77,3 +82,7 @@ for root, dirs, filenames in os.walk(repo_root):
                         'message': ("Line has invalid characters/encoding: " +
                                     _l)
                     }))
+                    num_warnings += 1
+
+if num_errors + num_warnings > 0:
+    sys.exit(1)

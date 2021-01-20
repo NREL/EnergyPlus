@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,16 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalFiniteDiffManager {
 
@@ -127,7 +130,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> EnthOld; // Current node enthalpy
         Array1D<Real64> EnthNew; // Node enthalpy at new time
         Array1D<Real64> EnthLast;
-        Array1D<Real64> QDreport;        // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
+        Array1D<Real64> QDreport;        // Node heat flux for reporting [W/m2] positive is flow towards inside face of surface
         Array1D<Real64> CpDelXRhoS1;     // Current outer half-node Cp * DelX * RhoS / Delt
         Array1D<Real64> CpDelXRhoS2;     // Current inner half-node Cp * DelX * RhoS / Delt
         Array1D<Real64> TDpriortimestep; // Node temperatures from previous timestep
@@ -189,32 +192,35 @@ namespace HeatBalFiniteDiffManager {
 
     void clear_state();
 
-    void ManageHeatBalFiniteDiff(IOFiles &ioFiles,
+    void ManageHeatBalFiniteDiff(EnergyPlusData &state,
                                  int const SurfNum,
                                  Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                                  Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void GetCondFDInput(IOFiles &ioFiles);
+    void GetCondFDInput(EnergyPlusData &state);
 
-    void InitHeatBalFiniteDiff(IOFiles &ioFiles);
+    void InitHeatBalFiniteDiff(EnergyPlusData &state);
 
-    void InitialInitHeatBalFiniteDiff(IOFiles &ioFiles);
+    void InitialInitHeatBalFiniteDiff(EnergyPlusData &state);
 
-    void CalcHeatBalFiniteDiff(int const Surf,
+    void CalcHeatBalFiniteDiff(EnergyPlusData &state,
+                               int const Surf,
                                Real64 &TempSurfInTmp, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
                                Real64 &TempSurfOutTmp // Outside Surface Temperature of each Heat Transfer Surface
     );
 
-    void ReportFiniteDiffInits(IOFiles &ioFiles);
+    void ReportFiniteDiffInits(EnergyPlusData &state);
 
-    void CalcNodeHeatFlux(int const Surf,    // surface number
+    void CalcNodeHeatFlux(EnergyPlusData &state,
+                          int const Surf,    // surface number
                           int const TotNodes // number of nodes in surface
     );
 
     Real64 terpld(Array2<Real64> const &a, Real64 const x1, int const nind, int const ndep);
 
-    void ExteriorBCEqns(int const Delt,              // Time Increment
+    void ExteriorBCEqns(EnergyPlusData &state,
+                        int const Delt,              // Time Increment
                         int const i,                 // Node Index
                         int const Lay,               // Layer Number for Construction
                         int const Surf,              // Surface number
@@ -231,7 +237,8 @@ namespace HeatBalFiniteDiffManager {
                         Real64 const HMovInsul       // Conductance of movable(transparent) insulation.
     );
 
-    void InteriorNodeEqns(int const Delt,              // Time Increment
+    void InteriorNodeEqns(EnergyPlusData &state,
+                          int const Delt,              // Time Increment
                           int const i,                 // Node Index
                           int const Lay,               // Layer Number for Construction
                           int const Surf,              // Surface number
@@ -246,7 +253,8 @@ namespace HeatBalFiniteDiffManager {
                           Array1D<Real64> &EnthNew     // New Nodal enthalpy
     );
 
-    void IntInterfaceNodeEqns(int const Delt,                 // Time Increment
+    void IntInterfaceNodeEqns(EnergyPlusData &state,
+                              int const Delt,                 // Time Increment
                               int const i,                    // Node Index
                               int const Lay,                  // Layer Number for Construction
                               int const Surf,                 // Surface number
@@ -262,7 +270,8 @@ namespace HeatBalFiniteDiffManager {
                               int const GSiter                // Iteration number of Gauss Seidell iteration
     );
 
-    void InteriorBCEqns(int const Delt,              // Time Increment
+    void InteriorBCEqns(EnergyPlusData &state,
+                        int const Delt,              // Time Increment
                         int const i,                 // Node Index
                         int const Lay,               // Layer Number for Construction
                         int const Surf,              // Surface number
@@ -278,7 +287,8 @@ namespace HeatBalFiniteDiffManager {
                         Array1D<Real64> &TDreport    // Temperature value from previous HeatSurfaceHeatManager titeration's value
     );
 
-    void CheckFDSurfaceTempLimits(int const SurfNum,            // surface number
+    void CheckFDSurfaceTempLimits(EnergyPlusData &state,
+                                  int const SurfNum,            // surface number
                                   Real64 const CheckTemperature // calculated temperature, not reset
     );
 
@@ -292,6 +302,14 @@ namespace HeatBalFiniteDiffManager {
                                         Real64 &updatedThermalConductivity);
 
 } // namespace HeatBalFiniteDiffManager
+
+struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -60,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace OutsideEnergySources {
 
@@ -96,23 +96,24 @@ namespace OutsideEnergySources {
 
         virtual ~OutsideEnergySourceSpecs() = default;
 
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation,
+        void getDesignCapacities(EnergyPlusData &state,
+                                 const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 curLoad);
+        void initialize(EnergyPlusData &state, Real64 curLoad);
 
-        void calculate(bool runFlag, Real64 curLoad);
+        void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
-        void size();
+        void size(EnergyPlusData &state);
 
     };
 
@@ -122,11 +123,19 @@ namespace OutsideEnergySources {
     // Functions
     void clear_state();
 
-    void GetOutsideEnergySourcesInput();
+    void GetOutsideEnergySourcesInput(EnergyPlusData &state);
 
     void InitSimVars(int EnergySourceNum, Real64 MyLoad);
 
 } // namespace OutsideEnergySources
+
+struct OutsideEnergySourcesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

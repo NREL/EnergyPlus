@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace OutAirNodeManager {
 
@@ -77,21 +81,30 @@ namespace OutAirNodeManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetOutAirNodes();
+    void SetOutAirNodes(EnergyPlusData &state);
 
-    void GetOutAirNodesInput();
+    void GetOutAirNodesInput(EnergyPlusData &state);
 
-    void InitOutAirNodes();
+    void InitOutAirNodes(EnergyPlusData &state);
 
-    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber); // Number of node to check to see if in Outside Air list
 
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+    void CheckAndAddAirNodeNumber(EnergyPlusData &state,
+                                  int const NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay            // True if found, false if not
     );
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
+    void SetOANodeValues(EnergyPlusData &state, int const NodeNum, // Number of node to check to see if in Outside Air list
                          bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
     );
 } // namespace OutAirNodeManager
+
+struct OutAirNodeManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

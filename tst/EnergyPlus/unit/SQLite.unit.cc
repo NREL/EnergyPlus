@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -117,10 +118,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
     EnergyPlus::sqlite->sqliteBegin();
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", 2);
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 3, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(1, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(3, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::RunPeriodDesign);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::RunPeriodWeather, 1);
     auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -136,9 +137,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteEnvironmentPeriodRecord)
 
     EnergyPlus::sqlite->sqliteBegin();
     // This should fail to insert due to foreign key constraint
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", 1, 100);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(5, "CHICAGO ANN HTG 99.6% CONDNS DB", DataGlobalConstants::KindOfSim::DesignDay, 100);
     // This should fail to insert due to duplicate primary key
-    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1);
+    EnergyPlus::sqlite->createSQLiteEnvironmentPeriodRecord(4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", DataGlobalConstants::KindOfSim::DesignDay, 1);
     result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -209,7 +210,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_informationalErrorRecords)
     // There needs to be a simulation record otherwise the foreign key constraint will fail
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    ShowMessage("This is an informational message");
+    ShowMessage(*state, "This is an informational message");
 
     auto result = queryResult("SELECT * FROM Errors;", "Errors");
     EnergyPlus::sqlite->sqliteCommit();
@@ -783,8 +784,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     roomAirModelData0->AirModelName = "test roomAirModel 1";
     auto const &roomAirModelData1 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
     roomAirModelData1->AirModelName = "test roomAirModel 2";
-    roomAirModelData1->AirModelType = 3;
-    roomAirModelData1->TempCoupleScheme = 3;
+    roomAirModelData1->AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
+    roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;  // hmm this was set to 3 which wasn't a valid option
     roomAirModelData1->SimAirModel = true;
 
     std::string const alwaysOn("always on");
@@ -980,7 +981,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
 
     ASSERT_EQ(2ul, roomAirModels.size());
     std::vector<std::string> roomAirModel0{"1", "test roomAirModel 1", "2", "1", "0"};
-    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "3", "3", "1"};
+    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "3", "1", "1"};
     EXPECT_EQ(roomAirModel0, roomAirModels[0]);
     EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 }

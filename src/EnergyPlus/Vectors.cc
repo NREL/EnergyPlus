@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,7 +102,6 @@ namespace Vectors {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using DataGlobals::DegToRadians;
     using namespace DataVectorTypes;
 
     // MODULE PARAMETER DEFINITIONS
@@ -294,14 +293,14 @@ namespace Vectors {
         vec.z = nint64(vec.z * roundto) / roundto;
     }
 
-    void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
-                                 int const EP_UNUSED(NSides), // Number of sides to surface
-                                 Real64 &Azimuth,             // Outward Normal Azimuth Angle
-                                 Real64 &Tilt,                // Tilt angle of surface
+    void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf,       // Surface Definition
+                                 [[maybe_unused]] int const NSides, // Number of sides to surface
+                                 Real64 &Azimuth,                   // Outward Normal Azimuth Angle
+                                 Real64 &Tilt,                      // Tilt angle of surface
                                  Vector &lcsx,
                                  Vector &lcsy,
                                  Vector &lcsz,
-                                 Real64 const EP_UNUSED(surfaceArea),
+                                 [[maybe_unused]] Real64 const surfaceArea,
                                  Vector const &NewellSurfaceNormalVector)
     {
 
@@ -414,11 +413,11 @@ namespace Vectors {
         }
 
         tlt = std::acos(NewellSurfaceNormalVector.z);
-        tlt /= DegToRadians;
+        tlt /= DataGlobalConstants::DegToRadians;
 
         az = rotang_0;
 
-        az /= DegToRadians;
+        az /= DataGlobalConstants::DegToRadians;
         az = mod(450.0 - az, 360.0);
         az += 90.0;
         if (az < 0.0) az += 360.0;

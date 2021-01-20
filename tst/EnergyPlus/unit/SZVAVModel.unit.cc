@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,9 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -65,7 +64,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -77,7 +75,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SZVAVModel.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
 using namespace EnergyPlus;
@@ -85,13 +82,11 @@ using namespace CurveManager;
 using namespace DataBranchNodeConnections;
 using namespace DataEnvironment;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
-using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::FanCoilUnits;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -169,7 +164,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     CurZoneEqNum = 0;
     CurSysNum = 0;
@@ -215,8 +210,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     thisUnit.ControlZoneNum = 1;
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     ScheduleManager::Schedule.allocate(1);
     Schedule(1).CurrentValue = 1.0;
@@ -239,19 +234,19 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     PackagedTerminalHeatPump::CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
     PackagedTerminalHeatPump::CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
 
-    DataBranchNodeConnections::NumCompSets = 2;
-    CompSets.allocate(2);
-    CompSets(1).CType = "Coil:Cooling:DX:SingleSpeed";
-    CompSets(1).CName = "CoolingCoil";
-    CompSets(1).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
-    CompSets(1).ParentCName = "AirSystem";
-    CompSets(2).CType = "Coil:Heating:DX:SingleSpeed";
-    CompSets(2).CName = "HeatingCoil";
-    CompSets(2).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
-    CompSets(2).ParentCName = "AirSystem";
+    state->dataBranchNodeConnections->NumCompSets = 2;
+    state->dataBranchNodeConnections->CompSets.allocate(2);
+    state->dataBranchNodeConnections->CompSets(1).CType = "Coil:Cooling:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(1).CName = "CoolingCoil";
+    state->dataBranchNodeConnections->CompSets(1).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(1).ParentCName = "AirSystem";
+    state->dataBranchNodeConnections->CompSets(2).CType = "Coil:Heating:DX:SingleSpeed";
+    state->dataBranchNodeConnections->CompSets(2).CName = "HeatingCoil";
+    state->dataBranchNodeConnections->CompSets(2).ParentCType = "ZoneHVAC:PackagedTerminalHeatPump";
+    state->dataBranchNodeConnections->CompSets(2).ParentCName = "AirSystem";
 
-    DataEnvironment::OutDryBulbTemp = 5.0;
-    OutputReportPredefined::SetPredefinedTables();
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    OutputReportPredefined::SetPredefinedTables(*state);
     Psychrometrics::InitializePsychRoutines();
     createCoilSelectionReportObj();
 
@@ -267,7 +262,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     int CompressorOnFlag = 0;
     auto &SZVAVModel(PTUnit(1));
     // first pass through will get objects and reset node data
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     // set unit inlet node conditions for cooling
@@ -276,7 +271,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     DataLoopNode::Node(1).Enthalpy = 52120.0;
     bool ErrorsFound = false;
     // set zone condition
-    NodeInputManager::GetOnlySingleNode("ZoneNode",
+    NodeInputManager::GetOnlySingleNode(*state, "ZoneNode",
                                         ErrorsFound,
                                         "PTUnit",
                                         "PTUnit",
@@ -293,15 +288,15 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     Schedule(1).CurrentValue = 1.0;
     PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
     PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
-    DataGlobals::BeginEnvrnFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
-    DataEnvironment::StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.2; // fan used this to convert volume to mass flow rate
+    state->dataEnvrn->OutBaroPress = 101325.0;
     // second pass through will run model
 
     // Region 1 of control, low air flow rate, modulate coil capacity
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // low speed air flow rate
@@ -316,7 +311,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 2 of control, modulate air flow rate, modulate coil capacity
     QZnReq = -1200.0;
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_GT(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
@@ -333,7 +328,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 3 of control, high air flow rate, modulate coil capacity
     QZnReq = -2000.0;
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxCoolAirMassFlow, 0.00000001); // high speed air flow rate
@@ -361,7 +356,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 1 of control, low air flow rate, modulate coil capacity
     QZnReq = 200.0;
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow, 0.00000001); // high speed air flow rate
@@ -377,7 +372,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 2 of control, modulate air flow rate, modulate coil capacity
     QZnReq = 1200.0;
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_GT(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxNoCoolHeatAirMassFlow); // air flow higher than low speed
@@ -394,7 +389,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // Region 3 of control, high air flow rate, modulate coil capacity
     QZnReq = 2000.0;
-    SZVAVModel::calcSZVAVModel(state, 
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
 
     EXPECT_NEAR(DataLoopNode::Node(1).MassFlowRate, thisUnit.MaxHeatAirMassFlow, 0.00000001); // high speed air flow rate
@@ -429,12 +424,12 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     Real64 OnOffAirFlowRatio(1.0);
     Real64 PLR(0.0);
 
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    WaterCoils::GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
 
     std::string const idf_objects = delimited_string({
@@ -511,7 +506,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
         "  75,                        !- Design Pressure Rise {Pa}",
         "  0.5,                       !- Maximum Air Flow Rate {m3/s}",
         "  0.9,                       !- Motor Efficiency",
-        "  1,                         !- Motor In Air Stream Fraction",		
+        "  1,                         !- Motor In Air Stream Fraction",
         "  FanCoilOAMixerOutletNode,  !- Air Inlet Node Name",
         "  FanCoilFanOutletNode;      !- Air Outlet Node Name",
 
@@ -554,47 +549,47 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::StdRhoAir = 1.20;
-    WaterCoils::GetWaterCoilsInputFlag = true;
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = 1.20;
+    state->dataWaterCoils->GetWaterCoilsInputFlag = true;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();
-    GetZoneData(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
-    GetZoneEquipmentData1(state);
-    ProcessScheduleInput(state.files);
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
-    GetFanCoilUnits(state);
+    GetFanCoilUnits(*state);
     auto &thisFanCoil(FanCoil(1));
     EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
-    TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     AirMassFlow = 0.60;
     MaxAirMassFlow = 0.60;
     ColdWaterMassFlowRate = 1.0;
     thisFanCoil.OutAirMassFlow = 0.0;
     thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
     // outside air mixer
-    auto &MixerOA(MixedAir::OAMixer(1));
+    auto &MixerOA(state->dataMixedAir->OAMixer(1));
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
     DataLoopNode::Node(MixerOA.RetNode).Temp = 20.0;
     DataLoopNode::Node(MixerOA.RetNode).Enthalpy = 36000;
-    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.RetNode).HumRat = PsyWFnTdbH(*state, DataLoopNode::Node(MixerOA.RetNode).Temp, DataLoopNode::Node(MixerOA.RetNode).Enthalpy);
     DataLoopNode::Node(MixerOA.InletNode).Temp = 10.0;
     DataLoopNode::Node(MixerOA.InletNode).Enthalpy = 18000;
-    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
+    DataLoopNode::Node(MixerOA.InletNode).HumRat = PsyWFnTdbH(*state, DataLoopNode::Node(MixerOA.InletNode).Temp, DataLoopNode::Node(MixerOA.InletNode).Enthalpy);
     // chilled water coil
-    auto &CWCoil(WaterCoil(1));
+    auto &CWCoil(state->dataWaterCoils->WaterCoil(1));
     CWCoil.UACoilTotal = 470.0;
     CWCoil.UACoilExternal = 611.0;
     CWCoil.UACoilInternal = 2010.0;
@@ -616,49 +611,49 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataLoopNode::Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
     DataLoopNode::Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // chilled water plant loop
-    auto &CWLoop(PlantLoop(1));
+    auto &CWLoop(state->dataPlnt->PlantLoop(1));
     CWLoop.Name = "ChilledWaterLoop";
     CWLoop.FluidName = "ChilledWater";
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = WaterCoil_Cooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
-    MyUAAndFlowCalcFlag.allocate(1);
-    MyUAAndFlowCalcFlag(1) = true;
-    DataGlobals::DoingSizing = true;
-    state.fans.LocalTurnFansOff = false;
-    state.fans.LocalTurnFansOn = true;
+    state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state->dataGlobal->DoingSizing = true;
+    state->dataFans->LocalTurnFansOff = false;
+    state->dataFans->LocalTurnFansOn = true;
 
-    ZoneSysEnergyDemand.allocate(1);
-    auto &zSysEDemand(ZoneSysEnergyDemand(1));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
-    UpdateScheduleValues();
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    UpdateScheduleValues(*state);
     ZoneEqSizing.allocate(1);
     ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
-    BeginEnvrnFlag = true;
-    SysSizingCalc = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     zSysEDemand.RemainingOutputReqToCoolSP = 0.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 0.0;
@@ -667,8 +662,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     // init
-    InitFanCoilUnits(state, FanCoilNum, ZoneNum, ZoneNum);
-    Sim4PipeFanCoil(state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
+    InitFanCoilUnits(*state, FanCoilNum, ZoneNum, ZoneNum);
+    Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
     // heating mode tests
     CoolingLoad = false;
     HeatingLoad = true;
@@ -679,7 +674,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     FirstHVACIteration = true;
     auto &SZVAVModel(FanCoil(FanCoilNum));
 
-    // test 1: 1000 W heating load 
+    // test 1: 1000 W heating load
     zSysEDemand.RemainingOutputReqToCoolSP = 1000.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 1000.0;
     zSysEDemand.RemainingOutputRequired = 1000.0;
@@ -687,13 +682,13 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     PLR = 0.0;
-    SZVAVModel::calcSZVAVModel(state,
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
-    Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
+    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.092, 0.001);
     EXPECT_NEAR(QUnitOut, 1000.0, 1.0);
 
-    // test 2: 5000 W heating load 
+    // test 2: 5000 W heating load
     zSysEDemand.RemainingOutputReqToCoolSP = 5000.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 5000.0;
     zSysEDemand.RemainingOutputRequired = 5000.0;
@@ -701,13 +696,13 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     PLR = 0.0;
-    SZVAVModel::calcSZVAVModel(state,
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
-    Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
+    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.492, 0.001);
     EXPECT_NEAR(QUnitOut, 5000.0, 1.0);
 
-    // test 3: 9000 W heating load 
+    // test 3: 9000 W heating load
     zSysEDemand.RemainingOutputReqToCoolSP = 9000.0;
     zSysEDemand.RemainingOutputReqToHeatSP = 9000.0;
     zSysEDemand.RemainingOutputRequired = 9000.0;
@@ -715,9 +710,9 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     QUnitOut = 0.0;
     QLatOut = 0.0;
     PLR = 0.0;
-    SZVAVModel::calcSZVAVModel(state,
+    SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, FanCoilNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
-    Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
+    Calc4PipeFanCoil(*state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR);
     EXPECT_NEAR(PLR, 0.892, 0.001);
     EXPECT_NEAR(QUnitOut, 9000.0, 1.0);
 

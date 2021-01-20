@@ -10,7 +10,7 @@ The following metrics are added in EnergyPlus as optional report variables and s
 
 The heat index (HI) is an index that combines air temperature and relative humidity (Steadman 1979), in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. HI is widely used in the United States. The Occupational Safety and Health Administration (OSHA) uses HI as an indicator to assess heat stress [2]. This has important considerations for the human body's comfort.  When the body gets too hot, it begins to perspire or sweat to cool itself off.  If the perspiration is not able to evaporate, the body cannot regulate its temperature. When the atmospheric moisture content (i.e. relative humidity) is high, the rate of evaporation from the body decreases.  In other words, the human body feels warmer in humid conditions.  The opposite is true when the relative humidity decreases because the rate of perspiration increases.  
 
-Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature ($\degree C$) and relative humidity (\%) [3]. The HI effects on human health are categorized at five levels: Safe, Caution, Extreme caution, Danger and Extreme danger, defined in Table ~\ref{table:heat-index-chart} and color coded in Figure ~\ref{fig:heat-index-lookup-table}.
+Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature (\si{\celsius}) and relative humidity (\%) [3]. The HI effects on human health are categorized at five levels: Safe, Caution, Extreme caution, Danger and Extreme danger, defined in Table ~\ref{table:heat-index-chart} and color coded in Figure ~\ref{fig:heat-index-lookup-table}.
 
 \begin{figure}[hbtp] 
 \centering
@@ -24,11 +24,11 @@ Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA)
 \begin{tabular}{ |p{1in}|p{1in}|p{2in}|  }
 \hline
     \textbf{Heat Index in Celsius} & \textbf{Heat Index in Fahrenheit} & \textbf{Heat Index Level} \\ \hline 
-    Less than 26.7 \degree C & Less than 80 \degree F & Safe: no risk of heat hazard \\ \hline
-    26.7 - 32.2 \degree C & 80–90 \degree F & Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps. \\ \hline
-    32.2 - 39.4 \degree C & 90–103 \degree F & Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke. \\ \hline
-    39.4 - 51.7 \degree C & 103–125 \degree F & Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity. \\ \hline
-    over 51.7 \degree C & over 125 \degree F & Extreme danger: heat stroke is imminent. \\ \hline
+    Less than \SI{26.7}{\celsius} & Less than 80 °F & Safe: no risk of heat hazard \\ \hline
+    \SI{26.7}{\celsius} - \SI{32.2}{\celsius} & 80–90 °F & Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps. \\ \hline
+    \SI{32.2}{\celsius} - \SI{39.4}{\celsius}& 90–103 °F & Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke. \\ \hline
+    \SI{39.4}{\celsius} - \SI{51.7}{\celsius} & 103–125 °F & Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity. \\ \hline
+    over \SI{51.7}{\celsius} & over 125 °F & Extreme danger: heat stroke is imminent. \\ \hline
 \end{tabular}
 \end{table}
 
@@ -65,25 +65,25 @@ $c_8$ = .00085282,
 
 $c_9$ = .00000199.
 
-If the RH is less than 13\% and the temperature is between 80 and 112 \degree F, then the following adjustment is subtracted from HI:
+If the RH is less than 13\% and the temperature is between 80 and 112 °F, then the following adjustment is subtracted from HI:
 
 \begin{equation}  \label{eq:rm-2}
 HI = (13 - R) / 4 * (17 - |T - 95|)^{0.5}
 \end{equation}
 
-Otherwise, if the RH is greater than 85\% and the temperature is between 80 and 87 \degree F, then the following adjustment is added to HI:
+Otherwise, if the RH is greater than 85\% and the temperature is between 80 and 87 °F, then the following adjustment is added to HI:
 
 \begin{equation}  \label{eq:rm-3}
 HI = (R - 85) / 10 * (87 - T) / 5
 \end{equation}
 
-The Rothfusz regression is not appropriate when conditions of temperature and humidity warrant a heat index value below about 80 \degree F. In those cases, a simpler formula is applied to calculate values consistent with Steadman's results:
+The Rothfusz regression is not appropriate when conditions of temperature and humidity warrant a heat index value below about 80 °F. In those cases, a simpler formula is applied to calculate values consistent with Steadman's results:
 
 \begin{equation}  \label{eq:rm-4}
 HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + (R * 0.094))
 \end{equation}
 
-In practice, the simple formula is computed first and the result averaged with the temperature. If this heat index value is 80 \degree F or higher, the full regression equation along with any adjustment as described above is applied. The Rothfusz regression is not valid for extreme temperature and relative humidity conditions beyond the range of data considered by Steadman.
+In practice, the simple formula is computed first and the result averaged with the temperature. If this heat index value is 80 °F or higher, the full regression equation along with any adjustment as described above is applied. The Rothfusz regression is not valid for extreme temperature and relative humidity conditions beyond the range of data considered by Steadman.
 
 The Heat Index Hours (accumulated hours for a space) and Heat Index OccupantHours (accumulated hours for the sum of all occupants in a space) of each level for each zone and the whole building are reported under the Annual Thermal Resilience Report.
 
@@ -123,9 +123,9 @@ Where,
 
 $H$ = the Humidex,
 
-$T_{air}$ = the air temperature in $\degree C$,
+$T_{air}$ = the air temperature in \si{\celsius},
 
-$T_{dew}$ = the dew-point temperature in $\degree C$,
+$T_{dew}$ = the dew-point temperature in \si{\celsius},
 
 $exp$ = 2.71828.
 
@@ -134,20 +134,20 @@ The Humidex Hours (accumulated hours for a space) and Humidex OccupantHours (acc
 \subsubsection{Standard Effective Temperature Hours}\label{set-hour}
 Standard Effective Temperature (SET) is a model of human response to the thermal environment. Developed by A.P. Gagge and accepted by ASHRAE in 1986, SET is also referred to as the Pierce Two-Node model [8]. Its calculation is similar to PMV because it is a comprehensive comfort index based on heat-balance equations that incorporate personal factors of clothing and metabolic rate. Its fundamental difference is it takes a two-node method to represent human physiology in measuring skin temperature and skin wettedness. ASHRAE 55-2010 defines SET as "the temperature of an imaginary environment at 50\% relative humidity, $<$ 0.1 m/s [0.33 ft/s] average air speed, and mean radiant temperature equal to average air temperature, in which total heat loss from the skin of an imaginary occupant with an activity level of 1.0 met and a clothing level of 0.6 clo is the same as that from a person in the actual environment, with actual clothing and activity level" [9].
 
-LEED Pilot Credit IPpc100 - Passive Survivability and Back-up Power During Disruptions - defines “Livable conditions” as SET between 54 \degree F and 86 \degree F. The credit requires buildings to maintain safe thermal conditions in the event of an extended power outage or loss of heating fuel, or provide backup power to satisfy critical loads. Accumulated SET-days and SET-hours are metrics to measure thermal safety and temperatures. The SET-days and SET-hours are degree-days and degree-hours in Celsius/Fahrenheit degrees based on the indoor SET.
+LEED Pilot Credit IPpc100 - Passive Survivability and Back-up Power During Disruptions - defines “Livable conditions” as SET between 54 °F and 86 °F. The credit requires buildings to maintain safe thermal conditions in the event of an extended power outage or loss of heating fuel, or provide backup power to satisfy critical loads. Accumulated SET-days and SET-hours are metrics to measure thermal safety and temperatures. The SET-days and SET-hours are degree-days and degree-hours in Celsius/Fahrenheit degrees based on the indoor SET.
 
 LEED Passive Survivability defines the Thermal Safety Temperatures for Path 2 using the SET:
 
 \begin{itemize}
-\item Cooling: Not to exceed 9 \degree F SET-days (216 \degree F SET-hours) above 86 \degree F for residential buildings. (SI Metric: Not to exceed 5°C SET-days (120 \degree C SET-hours) above 30 \degree C SET for residential buildings.)
-\item Cooling: Not to exceed 18 \degree F SET-days (432 \degree F SET-hours) above 86 \degree F SET for non-residential buildings. (SI etric: Not to exceed 10 \degree C SET-days (240 \degree C SET-hours) above 30 \degree C SET for non-residential buildings.)
-\item Heating: Not to exceed 9 \degree F SET-days (216 \degree F SET-hours for all buildings. (SI Metric: Not to exceed 5 \degree C SET-days (120 \degree C SET-hours) below 12 \degree C SET-hours for all buildings.)
+\item Cooling: Not to exceed 9 °F SET-days (216 °F SET-hours) above 86 °F for residential buildings. (SI Metric: Not to exceed \SI{5}{\celsius} SET-days (\SI{120}{\celsius} SET-hours) above \SI{30}{\celsius} SET for residential buildings.)
+\item Cooling: Not to exceed 18 °F SET-days (432 °F SET-hours) above 86 °F SET for non-residential buildings. (SI etric: Not to exceed \SI{10}{\celsius} SET-days (\SI{240}{\celsius} SET-hours) above \SI{30}{\celsius} SET for non-residential buildings.)
+\item Heating: Not to exceed 9 °F SET-days (216 °F SET-hours for all buildings. (SI Metric: Not to exceed \SI{5}{\celsius} SET-days (\SI{120}{\celsius} SET-hours) below \SI{12}{\celsius} SET-hours for all buildings.)
 \end{itemize}
 
 EnergyPlus calculates and reports SET as a time-step report variable when Pierce method is chosen as the People's thermal comfort model. The aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating are reported under the Annual Thermal Resilience Summary. The tables also include the longest continuous unmet time duration in hours and the start time of their occurrences (first occurrence if multiple time slots have the same duration).
 
 
-\subsection{Indoor Air Quality - $CO_2$ Resilience}\label{indoor-air-quality-resilience}
+\subsection{Indoor Air Quality - CO2 Resilience}\label{indoor-air-quality-resilience}
 
 For indoor air quality, we chose to use $CO_2$ concentration at the zone level as an indicator. $CO_2$ at very high concentrations (e.g., greater than 5,000 ppm) can pose a health risk, referring to Appendix D Summary of Selected Air Quality Guidelines in ASHRAE Standard 62.1-2016, "Ventilation for Acceptable Indoor Air Quality". At concentrations above 15,000 ppm, some loss of mental acuity has been noted. The Occupational Safety and Health Administration (OSHA) of the US Department of Labor defined the Permissible Exposure Limits (PEL) and Short-Term Exposure Limit (STEL) of $CO_2$ level to be 5,000 ppm and 30,000 ppm accordingly [10].
 

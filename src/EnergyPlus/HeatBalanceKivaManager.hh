@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,12 +54,14 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
 
@@ -97,8 +99,15 @@ namespace HeatBalanceKivaManager {
     class KivaInstanceMap
     {
     public:
-        KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
+        KivaInstanceMap(EnergyPlusData &state,
+                        Kiva::Foundation &foundation,
+                        int floorSurface,
+                        std::vector<int> wallSurfaces,
+                        int zoneNum,
+                        Real64 zoneAssumedTemperature,
+                        Real64 floorWeight,
+                        int constructionNum,
+                        class KivaManager *kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
@@ -106,12 +115,12 @@ namespace HeatBalanceKivaManager {
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
-        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
-        void setBoundaryConditions();
+        void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
+        void setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        void setBoundaryConditions(EnergyPlusData &state);
         void plotDomain();
         Real64 floorWeight;
-        int constructionNum;
+        int constructionNum = 0;
         class KivaManager* kmPtr;
 
 #ifdef GROUND_PLOT
@@ -127,14 +136,14 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData(IOFiles &ioFiles);
-        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
-        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
-        void calcKivaInstances();
-        void defineDefaultFoundation();
+        void readWeatherData(EnergyPlusData &state);
+        bool setupKivaInstances(EnergyPlusData &state);
+        void initKivaInstances(EnergyPlusData &state);
+        void calcKivaInstances(EnergyPlusData &state);
+        void defineDefaultFoundation(EnergyPlusData &state);
         void addDefaultFoundation();
         int findFoundation(std::string const &name);
-        void calcKivaSurfaceResults();
+        void calcKivaSurfaceResults(EnergyPlusData &state);
 
         KivaWeatherData kivaWeather;
         FoundationKiva defaultFoundation;
@@ -198,6 +207,15 @@ namespace HeatBalanceKivaManager {
     };
 
 } // namespace HeatBalanceKivaManager
+
+struct HeatBalanceKivaMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif // HeatBalanceKivaManager_hh_INCLUDED

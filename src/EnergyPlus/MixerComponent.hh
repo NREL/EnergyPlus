@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace MixerComponent {
 
@@ -115,12 +119,12 @@ namespace MixerComponent {
 
     void clear_state();
 
-    void SimAirMixer(std::string const &CompName, int &CompIndex);
+    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetMixerInput();
+    void GetMixerInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -144,7 +148,7 @@ namespace MixerComponent {
     // Beginning of Update subroutines for the Mixer Module
     // *****************************************************************************
 
-    void UpdateAirMixer(int const MixerNum);
+    void UpdateAirMixer(EnergyPlusData &state, int const MixerNum);
 
     //        End of Update subroutines for the Mixer Module
     // *****************************************************************************
@@ -159,14 +163,22 @@ namespace MixerComponent {
 
     // Beginning of Utility subroutines for the Mixer Component
     // *****************************************************************************
-    void GetZoneMixerIndex(std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
+    void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int &MixerIndex, bool &ErrorsFound, std::string const &ThisObjectType = std::string());
 
-    int getZoneMixerIndexFromInletNode(int const &InNodeNum);
+    int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
 
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************
 
 } // namespace MixerComponent
+
+struct MixerComponentData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

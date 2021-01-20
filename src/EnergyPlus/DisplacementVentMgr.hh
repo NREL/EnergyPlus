@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,10 +49,14 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DisplacementVentMgr {
 
@@ -78,15 +82,15 @@ namespace DisplacementVentMgr {
 
     void clear_state();
 
-    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
+    void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
-    void InitUCSDDV(int const ZoneNum);
+    void InitUCSDDV(EnergyPlusData &state, int const ZoneNum);
 
     //**************************************************************************************************
 
-    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
 
     //**************************************************************************************************
 
@@ -100,9 +104,17 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
+
+struct DisplacementVentMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

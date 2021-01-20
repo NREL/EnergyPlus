@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,8 +68,8 @@ int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::stri
 
 int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const char *argv[]);
 
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
+void ENERGYPLUSLIB_API StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const));
 
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
+void ENERGYPLUSLIB_API StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &));
 
 #endif

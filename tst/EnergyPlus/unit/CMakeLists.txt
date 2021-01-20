@@ -1,3 +1,11 @@
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 set( test_src
   TestHelpers/IdfParser.cc
   TestHelpers/IdfParser.hh
@@ -17,6 +25,30 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  Autosizing/AutosizingFixture.hh
+  Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/BaseClassSizing.unit.cc
+  Autosizing/CoolingAirFlowSizing.unit.cc
+  Autosizing/CoolingCapacitySizing.unit.cc
+  Autosizing/CoolingSHRSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.unit.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.unit.cc
+  Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
+  Autosizing/CoolingWaterflowSizing.unit.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
+  Autosizing/HeatingAirFlowSizing.unit.cc
+  Autosizing/HeatingAirflowUASizing.unit.cc
+  Autosizing/HeatingCapacitySizing.unit.cc
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.unit.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
+  Autosizing/HeatingWaterflowSizing.unit.cc
+  Autosizing/SystemAirFlowSizing.unit.cc
+  Autosizing/WaterHeatingCapacitySizing.unit.cc
+  Autosizing/WaterHeatingCoilUASizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
@@ -48,6 +80,7 @@ set( test_src
   Datasets.unit.cc
   DataSizing.unit.cc
   DataSurfaces.unit.cc
+  DataSystemVariables.unit.cc
   DataZoneEquipment.unit.cc
   DaylightingManager.unit.cc
   DElightManager.unit.cc
@@ -149,7 +182,6 @@ set( test_src
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
   ReportCoilSelection.unit.cc
-  ReportSizingManager.unit.cc
   ResultsFramework.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
@@ -174,6 +206,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   SQLite.unit.cc
   StandardRatings.unit.cc
+  StringUtilities.unit.cc
   SurfaceGeometry.unit.cc
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
@@ -218,9 +251,10 @@ set( test_dependencies
 )
 
 if(LINK_WITH_PYTHON)
+  add_definitions("-DLINK_WITH_PYTHON")
+  find_package(PythonLibs 3 REQUIRED)
+  include_directories(${PYTHON_INCLUDE_DIRS})
   if (CMAKE_HOST_UNIX)
-    find_package(PythonLibs 3 REQUIRED)
-    include_directories(${PYTHON_INCLUDE_DIRS})
     list(APPEND test_src api/datatransfer.unit.cc)
     list(APPEND test_src PluginManager.unit.cc)
     list(APPEND test_dependencies ${PYTHON_LIBRARIES} )

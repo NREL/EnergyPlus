@@ -4,7 +4,7 @@ if(WIN32)
 endif()
 
 set(PYTHON_API_VERSION_MAJOR 0)
-set(PYTHON_API_VERSION_MINOR 1)
+set(PYTHON_API_VERSION_MINOR 2)
 configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
@@ -15,16 +15,84 @@ else()
   add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
+if(USE_PSYCHROMETRICS_CACHING)
+  # Caching defaulted ON
+else()
+  add_definitions("-DEP_nocache_Psychrometrics")
+endif()
+
+if(USE_GLYCOL_CACHING)
+  add_definitions("-DEP_cache_GlycolSpecificHeat")
+endif()
+
+if(USE_PSYCH_STATS)
+  add_definitions("-DEP_psych_stats")
+endif()
+
+if(USE_PSYCH_ERRORS)
+  add_definitions("-DEP_psych_errors")
+endif()
+
 SET( SRC
   "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
-  AirflowNetworkBalanceManager.cc
-  AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
   AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
+  AirflowNetworkBalanceManager.cc
+  AirflowNetworkBalanceManager.hh
+  Autosizing/All_Simple_Sizing.cc
+  Autosizing/All_Simple_Sizing.hh
+  Autosizing/Base.cc
+  Autosizing/Base.hh
+  Autosizing/BaseSizerWithFanHeatInputs.cc
+  Autosizing/BaseSizerWithFanHeatInputs.hh
+  Autosizing/BaseSizerWithScalableInputs.cc
+  Autosizing/BaseSizerWithScalableInputs.hh
+  Autosizing/CoolingAirFlowSizing.cc
+  Autosizing/CoolingAirFlowSizing.hh
+  Autosizing/CoolingCapacitySizing.cc
+  Autosizing/CoolingCapacitySizing.hh
+  Autosizing/CoolingSHRSizing.cc
+  Autosizing/CoolingSHRSizing.hh
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
+  Autosizing/CoolingWaterDesAirInletHumRatSizing.hh
+  Autosizing/CoolingWaterDesAirInletTempSizing.cc
+  Autosizing/CoolingWaterDesAirInletTempSizing.hh
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.cc
+  Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh
+  Autosizing/CoolingWaterDesAirOutletTempSizing.cc
+  Autosizing/CoolingWaterDesAirOutletTempSizing.hh
+  Autosizing/CoolingWaterDesWaterInletTempSizing.cc
+  Autosizing/CoolingWaterDesWaterInletTempSizing.hh
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
+  Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
+  Autosizing/CoolingWaterflowSizing.cc
+  Autosizing/CoolingWaterflowSizing.hh
+  Autosizing/HeatingAirFlowSizing.cc
+  Autosizing/HeatingAirFlowSizing.hh
+  Autosizing/HeatingAirflowUASizing.cc
+  Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingCapacitySizing.cc
+  Autosizing/HeatingCapacitySizing.hh
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.cc
+  Autosizing/HeatingWaterDesAirInletHumRatSizing.hh
+  Autosizing/HeatingWaterDesAirInletTempSizing.cc
+  Autosizing/HeatingWaterDesAirInletTempSizing.hh
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.cc
+  Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
+  Autosizing/HeatingWaterflowSizing.cc
+  Autosizing/HeatingWaterflowSizing.hh
+  Autosizing/SystemAirFlowSizing.cc
+  Autosizing/SystemAirFlowSizing.hh
+  Autosizing/WaterHeatingCapacitySizing.cc
+  Autosizing/WaterHeatingCapacitySizing.hh
+  Autosizing/WaterHeatingCoilUASizing.cc
+  Autosizing/WaterHeatingCoilUASizing.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -55,20 +123,20 @@ SET( SRC
   ChillerReformulatedEIR.hh
   Coils/CoilCoolingDX.cc
   Coils/CoilCoolingDX.hh
-  Coils/CoilCoolingDXCurveFitPerformance.cc
-  Coils/CoilCoolingDXCurveFitPerformance.hh
   Coils/CoilCoolingDXCurveFitOperatingMode.cc
   Coils/CoilCoolingDXCurveFitOperatingMode.hh
+  Coils/CoilCoolingDXCurveFitPerformance.cc
+  Coils/CoilCoolingDXCurveFitPerformance.hh
   Coils/CoilCoolingDXCurveFitSpeed.cc
   Coils/CoilCoolingDXCurveFitSpeed.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConfiguredFunctions.hh
   "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc"
-  ConvectionCoefficients.cc
-  ConvectionCoefficients.hh
   Construction.cc
   Construction.hh
+  ConvectionCoefficients.cc
+  ConvectionCoefficients.hh
   CoolTower.cc
   CoolTower.hh
   CostEstimateManager.cc
@@ -84,42 +152,30 @@ SET( SRC
   DXFEarClipping.cc
   DXFEarClipping.hh
   Data/BaseData.hh
+  Data/CommonIncludes.hh
+  Data/EnergyPlusData.cc
   Data/EnergyPlusData.hh
-  DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
   DataAirSystems.hh
-  DataBSDFWindow.cc
   DataBSDFWindow.hh
-  DataBranchAirLoopPlant.cc
   DataBranchAirLoopPlant.hh
-  DataBranchNodeConnections.cc
   DataBranchNodeConnections.hh
-  DataComplexFenestration.cc
   DataComplexFenestration.hh
-  DataContaminantBalance.cc
   DataContaminantBalance.hh
-  DataConvergParams.cc
   DataConvergParams.hh
-  DataConversions.cc
   DataConversions.hh
-  DataDElight.cc
   DataDElight.hh
-  DataDaylighting.cc
   DataDaylighting.hh
-  DataDaylightingDevices.cc
   DataDaylightingDevices.hh
-  DataDefineEquip.cc
   DataDefineEquip.hh
   DataEnvironment.cc
   DataEnvironment.hh
   DataErrorTracking.cc
   DataErrorTracking.hh
-  DataGenerators.cc
   DataGenerators.hh
   DataGlobalConstants.cc
   DataGlobalConstants.hh
-  DataGlobals.cc
   DataGlobals.hh
   DataHVACControllers.cc
   DataHVACControllers.hh
@@ -175,13 +231,10 @@ SET( SRC
   DataVectorTypes.hh
   DataViewFactorInformation.cc
   DataViewFactorInformation.hh
-  DataWater.cc
   DataWater.hh
   DataWindowEquivalentLayer.cc
   DataWindowEquivalentLayer.hh
-  DataZoneControls.cc
   DataZoneControls.hh
-  DataZoneEnergyDemands.cc
   DataZoneEnergyDemands.hh
   DataZoneEquipment.cc
   DataZoneEquipment.hh
@@ -211,8 +264,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
-  ElectricPowerServiceManager.hh
   ElectricPowerServiceManager.cc
+  ElectricPowerServiceManager.hh
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -303,8 +356,6 @@ SET( SRC
   HWBaseboardRadiator.hh
   HeatBalFiniteDiffManager.cc
   HeatBalFiniteDiffManager.hh
-  HeatBalanceKivaManager.cc
-  HeatBalanceKivaManager.hh
   HeatBalanceAirManager.cc
   HeatBalanceAirManager.hh
   HeatBalanceHAMTManager.cc
@@ -313,6 +364,8 @@ SET( SRC
   HeatBalanceIntRadExchange.hh
   HeatBalanceInternalHeatGains.cc
   HeatBalanceInternalHeatGains.hh
+  HeatBalanceKivaManager.cc
+  HeatBalanceKivaManager.hh
   HeatBalanceManager.cc
   HeatBalanceManager.hh
   HeatBalanceMovableInsulation.cc
@@ -333,12 +386,12 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
-  HybridUnitaryAirConditioners.cc
-  HybridUnitaryAirConditioners.hh
   HybridEvapCoolingModel.cc
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
+  HybridUnitaryAirConditioners.cc
+  HybridUnitaryAirConditioners.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -346,6 +399,8 @@ SET( SRC
   InputProcessing/DataStorage.hh
   InputProcessing/EmbeddedEpJSONSchema.hh
   "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
+  IOFiles.cc
+  IOFiles.hh
   InputProcessing/IdfParser.cc
   InputProcessing/IdfParser.hh
   InputProcessing/InputProcessor.cc
@@ -358,7 +413,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  Material.cc
   Material.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
@@ -382,10 +436,10 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
-        IOFiles.cc
-        IOFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
+  OutputReportData.cc
+  OutputReportData.hh
   OutputReportPredefined.cc
   OutputReportPredefined.hh
   OutputReportTabular.cc
@@ -394,10 +448,12 @@ SET( SRC
   OutputReportTabularAnnual.hh
   OutputReports.cc
   OutputReports.hh
-  OutputReportData.cc
-  OutputReportData.hh
   OutsideEnergySources.cc
   OutsideEnergySources.hh
+  PVWatts.cc
+  PVWatts.hh
+  PVWattsSSC.cc
+  PVWattsSSC.hh
   PackagedTerminalHeatPump.cc
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
@@ -413,29 +469,32 @@ SET( SRC
   PipeHeatTransfer.hh
   Pipes.cc
   Pipes.hh
-  Plant/CallingOrder.hh
-  Plant/DataPlant.cc
-  Plant/DataPlant.hh
-  Plant/Enums.hh
-  Plant/EquipAndOperations.hh
-  Plant/LoopSidePumpInformation.hh
-  Plant/PlantAvailManager.hh
-  Plant/PlantConvergencePoint.hh
-  Plant/MeterData.hh
-  Plant/ReportBranchData.hh
-  Plant/ReportCompData.hh
-  Plant/ReportLoopData.hh
   Plant/Branch.cc
   Plant/Branch.hh
+  Plant/CallingOrder.hh
   Plant/Component.cc
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
+  Plant/DataPlant.cc
+  Plant/DataPlant.hh
+  Plant/Enums.hh
+  Plant/EquipAndOperations.hh
   Plant/Loop.cc
   Plant/Loop.hh
   Plant/LoopSide.cc
   Plant/LoopSide.hh
+  Plant/LoopSidePumpInformation.hh
+  Plant/MeterData.hh
   Plant/MixerData.hh
+  Plant/PlantAvailManager.hh
+  Plant/PlantConvergencePoint.hh
+  Plant/PlantLocation.hh
+  Plant/PlantManager.cc
+  Plant/PlantManager.hh
+  Plant/ReportBranchData.hh
+  Plant/ReportCompData.hh
+  Plant/ReportLoopData.hh
   Plant/SplitterData.hh
   Plant/Subcomponents.hh
   PlantCentralGSHP.cc
@@ -453,9 +512,6 @@ SET( SRC
   PlantLoadProfile.hh
   PlantLoopHeatPumpEIR.cc
   PlantLoopHeatPumpEIR.hh
-  Plant/PlantLocation.hh
-  Plant/PlantManager.cc
-  Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
   PlantPipingSystemsManager.hh
   PlantPressureSystem.cc
@@ -479,16 +535,10 @@ SET( SRC
   Pumps.hh
   PurchasedAirManager.cc
   PurchasedAirManager.hh
-  PVWatts.cc
-  PVWatts.hh
-  PVWattsSSC.cc
-  PVWattsSSC.hh
   RefrigeratedCase.cc
   RefrigeratedCase.hh
   ReportCoilSelection.cc
   ReportCoilSelection.hh
-  ReportSizingManager.cc
-  ReportSizingManager.hh
   ResultsFramework.cc
   ResultsFramework.hh
   ReturnAirPathManager.cc
@@ -505,6 +555,8 @@ SET( SRC
   RuntimeLanguageProcessor.hh
   SQLiteProcedures.cc
   SQLiteProcedures.hh
+  SZVAVModel.cc
+  SZVAVModel.hh
   ScheduleManager.cc
   ScheduleManager.hh
   SetPointManager.cc
@@ -538,6 +590,7 @@ SET( SRC
   SteamBaseboardRadiator.hh
   SteamCoils.cc
   SteamCoils.hh
+  StringUtilities.hh
   SurfaceGeometry.cc
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
@@ -550,8 +603,6 @@ SET( SRC
   SystemAvailabilityManager.hh
   SystemReports.cc
   SystemReports.hh
-  SZVAVModel.cc
-  SZVAVModel.hh
   TARCOGArgs.cc
   TARCOGArgs.hh
   TARCOGCommon.cc
@@ -585,12 +636,12 @@ SET( SRC
   TranspiredCollector.hh
   UFADManager.cc
   UFADManager.hh
-  UnitarySystem.cc
-  UnitarySystem.hh
   UnitHeater.cc
   UnitHeater.hh
   UnitVentilator.cc
   UnitVentilator.hh
+  UnitarySystem.cc
+  UnitarySystem.hh
   UserDefinedComponents.cc
   UserDefinedComponents.hh
   UtilityRoutines.cc
@@ -628,10 +679,10 @@ SET( SRC
   WindowManager.hh
   WindowManagerExteriorData.cc
   WindowManagerExteriorData.hh
-  WindowManagerExteriorThermal.cc
-  WindowManagerExteriorThermal.hh
   WindowManagerExteriorOptical.cc
   WindowManagerExteriorOptical.hh
+  WindowManagerExteriorThermal.cc
+  WindowManagerExteriorThermal.hh
   WindowModel.cc
   WindowModel.hh
   ZoneAirLoopEquipmentManager.cc
@@ -689,12 +740,24 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
-#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
-#    endif()
-#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
-#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
-#    endif()
+    # PYTHON_BIT_SIZE will be either "32" or "64"
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:x64
+    # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:X86
+    if("${PYTHON_BIT_SIZE}" EQUAL "32")
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "86" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 32-bit")
+      else()
+        message(FATAL_ERROR "Python is 32-bit while EnergyPlus architecture appears to be 64-bit!")
+      endif()
+    else()  # assuming 64 bit
+      string(FIND "${CMAKE_EXE_LINKER_FLAGS}" "64" PY_BITS_IN_ARCH)
+      if("${PY_BITS_IN_ARCH}" GREATER -1)
+        message(STATUS "Architecture of Python lib and EnergyPlus build align at 64-bit")
+      else()
+        message(FATAL_ERROR "Python is 64-bit while EnergyPlus architecture appears to be 32-bit!")
+      endif()
+    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
@@ -704,7 +767,7 @@ endif()
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
 add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
-target_link_libraries( energyplusparser re2 )
+target_link_libraries( energyplusparser re2 fmt::fmt)
 if(UNIX AND NOT APPLE)
   target_link_libraries( energyplusparser dl )
 endif()
@@ -726,9 +789,15 @@ if(BUILD_GROUND_PLOT)
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+    target_link_libraries( energypluslib util )
+  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
+endif()
+if(LINK_WITH_PYTHON)
+  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
@@ -737,6 +806,7 @@ SET( API_HEADERS
   api/runtime.h
   api/datatransfer.h
   api/state.h
+#  api/autosizing.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -746,6 +816,7 @@ SET( API_CORE_SRC
   api/runtime.cc
   api/state.cc
   api/datatransfer.cc
+#  api/autosizing.cc
   api/EnergyPlusPgm.cc)
 
 option( BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared library for the EnergyPlus API" OFF )
@@ -775,21 +846,6 @@ install( TARGETS energyplusapi
   ARCHIVE DESTINATION ./
 )
 
-# we will build the intermediate wrapper DLL that hard links to Python DLL here
-if(LINK_WITH_PYTHON)
-  add_library( pythonwrapper SHARED
-          PythonLibWrapper.cc
-          PythonLibWrapper.hh
-          )
-  target_link_libraries( pythonwrapper ${PYTHON_LIBRARIES} )
-  add_dependencies( energyplusapi pythonwrapper)
-  install( TARGETS pythonwrapper
-          RUNTIME DESTINATION ./
-          LIBRARY DESTINATION ./
-          ARCHIVE DESTINATION ./
-          )
-endif()
-
 # now the actual E+ executable
 if (APPLE OR UNIX)
   add_executable( energyplus main.cc )
@@ -805,6 +861,9 @@ set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 add_custom_command(
         TARGET energyplusapi
         POST_BUILD
+        DEPENDS "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        DEPENDS __ALWAYSRUNME
         COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT=${PROJECT_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi>
@@ -815,9 +874,6 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
-        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
-        # ideally the whole process would be revamped
-        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -852,6 +908,7 @@ if(LINK_WITH_PYTHON)
       "execute_process(
         COMMAND ${CMAKE_COMMAND}
         -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+        -DEPLUS_DYNAMIC_LIB_NAME=libenergyplusapi.${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}.dylib
         -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
         -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
       )"
@@ -917,6 +974,12 @@ if( BUILD_TESTING )
   target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
+#  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")
+#  file(MAKE_DIRECTORY ${TEST_DIR})
+#  add_executable( TestAPI_Autosizing_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.c )
+#  target_link_libraries( TestAPI_Autosizing_C energyplusapi )
+#  add_test(NAME "API.TestAutosizingC" COMMAND TestAPI_Autosizing_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
+
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
   if(NOT MSVC)
@@ -940,6 +1003,13 @@ if( BUILD_TESTING )
     add_test(NAME "API.TestDataTransferPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+#    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
+#    file(MAKE_DIRECTORY ${TEST_DIR})
+#    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py" "${API_TEST_TARGET_DIR}/TestAutosizing.py" )
+#    add_test(NAME "API.TestAutosizingPython"
+#            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+#            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
     file(MAKE_DIRECTORY ${TEST_DIR})

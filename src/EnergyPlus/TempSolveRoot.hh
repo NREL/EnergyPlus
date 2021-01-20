@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,8 +63,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Forward declaration
 namespace OutputProcessor {
@@ -128,16 +129,17 @@ namespace TempSolveRoot {
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
-/*
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
+                   std::function<Real64(EnergyPlusData &state, Real64 const)> f,
                    Real64 const X_0, // 1st bound of interval that contains the solution
                    Real64 const X_1  // 2nd bound of interval that contains the solution
     );
-*/
+
 /*
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations

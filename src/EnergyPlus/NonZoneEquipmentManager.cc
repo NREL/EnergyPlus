@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,7 +47,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -104,7 +103,6 @@ namespace NonZoneEquipmentManager {
         // one here before it knows what to call for simulation.
 
         // Using/Aliasing
-        using DataGlobals::ZoneSizingCalc;
         using WaterThermalTanks::SimulateWaterHeaterStandAlone;
         using WaterUse::SimulateWaterUse;
 
@@ -118,13 +116,13 @@ namespace NonZoneEquipmentManager {
 
         // FLOW:
         if (CountNonZoneEquip) {
-            NumOfWaterHeater = inputProcessor->getNumObjectsFound("WaterHeater:Mixed") + inputProcessor->getNumObjectsFound("WaterHeater:Stratified");
+            NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;
         }
 
-        SimulateWaterUse(state.dataBranchInputManager, state.dataWaterUse, FirstHVACIteration); // simulate non-plant loop water use.
+        SimulateWaterUse(state, FirstHVACIteration); // simulate non-plant loop water use.
 
-        if (!ZoneSizingCalc) {
+        if (!state.dataGlobal->ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {
                 SimulateWaterHeaterStandAlone(state, WaterHeaterNum, FirstHVACIteration);
             }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,9 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -61,8 +62,6 @@
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;
@@ -130,11 +129,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
 }
@@ -199,11 +198,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -268,11 +267,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -337,11 +336,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName) 
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -406,11 +405,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -475,11 +474,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -544,11 +543,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -613,11 +612,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -682,11 +681,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection) 
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -751,11 +750,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -820,11 +819,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -889,11 +888,11 @@ TEST_F(EnergyPlusFixture, DISABLED_SiteGroundDomainSlab_CheckInputs_BadTimeStepS
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -958,11 +957,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
 }
@@ -1027,11 +1026,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1096,11 +1095,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1165,11 +1164,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1234,11 +1233,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1303,11 +1302,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1372,11 +1371,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1441,11 +1440,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1510,11 +1509,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName) {
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1579,11 +1578,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
     bool errorsFound = false;
 
     // Other necessary inputs
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(state, 1, 1, errorsFound);
+    ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1703,36 +1702,36 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Setup the plant itself manually
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
     // Dummy surface
     DataSurfaces::TotSurfaces = 1;
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     // Other necessary inputs
     bool errorsFound = false;
-    GetOSCMData(state.files, errorsFound);
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound);
+    GetOSCMData(*state, errorsFound);
+    GetMaterialData(*state, errorsFound);
 
     // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(state, DataPlant::TypeOf_PipingSystemPipeCircuit,
+    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::TypeOf_PipingSystemPipeCircuit,
                                                                               "MY PIPE CIRCUIT");
 
     EXPECT_EQ(2u, PlantPipingSystemsManager::domains.size());
@@ -1751,12 +1750,12 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     initLoopEquip = false;
     EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, 2, 1, 1);
     Real64 curLoad = 0.0;
-    thisCircuit->simulate(state, myLocation, true, curLoad, true);
+    thisCircuit->simulate(*state, myLocation, true, curLoad, true);
 
     // we can also try to call from the Domain side
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::BeginEnvrnFlag = true;
-    PlantPipingSystemsManager::SimulateGroundDomains(state, false);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    PlantPipingSystemsManager::SimulateGroundDomains(*state, false);
 }
 
 /*
@@ -1876,7 +1875,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound = false;
-    PlantPipingSystemsManager::ReadPipeCircuitInputs(ErrorsFound);
+    PlantPipingSystemsManager::ReadPipeCircuitInputs(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string error_string = delimited_string({
@@ -1894,43 +1893,43 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     Real64 Thickness;
     int MaterialIndex;
 
-    dataMaterial.Material.allocate(1);
+    state->dataMaterial->Material.allocate(1);
 
     // Test 1: Material has a valid thickness and is not R-only, result should be false
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.01;
     ExpectedResult = false;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
     // Test 2a: Material has a valid thickness but is R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.01;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
     // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
     //         Note that generally this case would not be encountered in EnergyPlus
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = false;
+    state->dataMaterial->Material(MaterialIndex).ROnly = false;
     Thickness = 0.0;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 
     // Test 3: Material does not have a valid thickness and is not R-only, result should be true
     MaterialIndex = 1;
-    dataMaterial.Material(MaterialIndex).ROnly = true;
+    state->dataMaterial->Material(MaterialIndex).ROnly = true;
     Thickness = 0.0;
     ExpectedResult = true;
-    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    TestResult = SiteGroundDomainUsingNoMassMat(*state, Thickness, MaterialIndex);
 
     EXPECT_EQ(TestResult, ExpectedResult);
 

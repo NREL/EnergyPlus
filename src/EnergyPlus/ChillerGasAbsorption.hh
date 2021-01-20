@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerGasAbsorptionData;
 
 namespace ChillerGasAbsorption {
 
@@ -206,27 +204,27 @@ namespace ChillerGasAbsorption {
         {
         }
 
-        static PlantComponent *factory(ChillerGasAbsorptionData &chillers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
-        void size();
+        void size(EnergyPlusData &state);
 
-        void calculateChiller(Real64 &MyLoad);
+        void calculateChiller(EnergyPlusData &state, Real64 &MyLoad);
 
-        void calculateHeater(Real64 &MyLoad, bool RunFlag);
+        void calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void updateCoolRecords(Real64 MyLoad, // current load
                                bool RunFlag   // TRUE if Absorber operating
@@ -237,17 +235,18 @@ namespace ChillerGasAbsorption {
         );
     };
 
-    void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers);
+    void GetGasAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerGasAbsorption
 
     struct ChillerGasAbsorptionData : BaseGlobalStruct {
         bool getGasAbsorberInputs = true;
         Array1D<ChillerGasAbsorption::GasAbsorberSpecs> GasAbsorber;
+
         void clear_state() override
         {
-            getGasAbsorberInputs = true;
-            GasAbsorber.deallocate();
+            this->getGasAbsorberInputs = true;
+            this->GasAbsorber.deallocate();
         }
     };
 

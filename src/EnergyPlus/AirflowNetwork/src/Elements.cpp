@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include "../../DataHVACGlobals.hh"
 #include "../../DataLoopNode.hh"
 #include "../../DataSurfaces.hh"
+#include "../../Data/EnergyPlusData.hh"
 
 namespace EnergyPlus {
 
@@ -233,15 +234,16 @@ namespace AirflowNetwork {
         return x * x;
     }
 
-    int Duct::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                        Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                        int const EP_UNUSED(i),     // Linkage number
-                        const Real64 EP_UNUSED(multiplier), // Element multiplier
-                        const Real64 EP_UNUSED(control),    // Element control signal
-                        const AirProperties &propN, // Node 1 properties
-                        const AirProperties &propM, // Node 2 properties
-                        std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                        std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int Duct::calculate([[maybe_unused]] EnergyPlusData &state,
+                        bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                        [[maybe_unused]] int const i,             // Linkage number
+                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                        [[maybe_unused]] const Real64 control,    // Element control signal
+                        const AirProperties &propN,               // Node 1 properties
+                        const AirProperties &propM,               // Node 2 properties
+                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -386,13 +388,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int Duct::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                        const Real64 EP_UNUSED(multiplier), // Element multiplier
-                        const Real64 EP_UNUSED(control),    // Element control signal
-                        const AirProperties &propN,         // Node 1 properties
-                        const AirProperties &propM,         // Node 2 properties
-                        std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                        std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int Duct::calculate([[maybe_unused]] EnergyPlusData &state,
+                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                        [[maybe_unused]] const Real64 control,    // Element control signal
+                        const AirProperties &propN,               // Node 1 properties
+                        const AirProperties &propM,               // Node 2 properties
+                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -526,15 +529,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SurfaceCrack::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                int const i,                // Linkage number
-                                const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                const Real64 EP_UNUSED(control),    // Element control signal
-                                const AirProperties &propN, // Node 1 properties
-                                const AirProperties &propM, // Node 2 properties
-                                std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int SurfaceCrack::calculate(EnergyPlusData &state,
+                                bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                int const i,                              // Linkage number
+                                [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                [[maybe_unused]] const Real64 control,    // Element control signal
+                                const AirProperties &propN,               // Node 1 properties
+                                const AirProperties &propM,               // Node 2 properties
+                                std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -579,7 +583,7 @@ namespace AirflowNetwork {
             Corr = MultizoneSurfaceData(i).Factor;
         }
         // CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+        RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         expn = FlowExpo;
@@ -645,7 +649,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SurfaceCrack::calculate(Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+    int SurfaceCrack::calculate(EnergyPlusData &state, Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                 const Real64 multiplier,    // Element multiplier
                                 const Real64 control,       // Element control signal
                                 const AirProperties &propN, // Node 1 properties
@@ -696,7 +700,7 @@ namespace AirflowNetwork {
         //    Corr = MultizoneSurfaceData(i).Factor;
         //}
         // CompNum = AirflowNetworkCompData(j).TypeNum;
-        RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+        RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
         expn = FlowExpo;
@@ -748,16 +752,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-
-    int DuctLeak::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                            Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                            int const EP_UNUSED(i),     // Linkage number
-                            const Real64 EP_UNUSED(multiplier), // Element multiplier
-                            const Real64 EP_UNUSED(control),    // Element control signal
-                            const AirProperties &propN, // Node 1 properties
-                            const AirProperties &propM, // Node 2 properties
-                            std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                            std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int DuctLeak::calculate(EnergyPlusData &state,
+                            bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                            Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                            [[maybe_unused]] int const i,             // Linkage number
+                            [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                            [[maybe_unused]] const Real64 control,    // Element control signal
+                            const AirProperties &propN,               // Node 1 properties
+                            const AirProperties &propM,               // Node 2 properties
+                            std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                            std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -788,7 +792,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -845,13 +849,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DuctLeak::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                            const Real64 EP_UNUSED(multiplier), // Element multiplier
-                            const Real64 EP_UNUSED(control),    // Element control signal
-                            const AirProperties &propN,         // Node 1 properties
-                            const AirProperties &propM,         // Node 2 properties
-                            std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                            std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int DuctLeak::calculate(EnergyPlusData &state,
+                            Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                            [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                            [[maybe_unused]] const Real64 control,    // Element control signal
+                            const AirProperties &propN,               // Node 1 properties
+                            const AirProperties &propM,               // Node 2 properties
+                            std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                            std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -882,7 +887,7 @@ namespace AirflowNetwork {
 
         // FLOW:
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        Real64 RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
+        Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
         Real64 coef = FlowCoef;
 
@@ -927,15 +932,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ConstantVolumeFan::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                     int const i,                // Linkage number
-                                     const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                     const Real64 EP_UNUSED(control),    // Element control signal
-                                     const AirProperties &propN, // Node 1 properties
-                                     const AirProperties &propM, // Node 2 properties
-                                     std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int ConstantVolumeFan::calculate(EnergyPlusData &state,
+                                     bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                     Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                     int const i,                              // Linkage number
+                                     [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                     [[maybe_unused]] const Real64 control,    // Element control signal
+                                     const AirProperties &propN,               // Node 1 properties
+                                     const AirProperties &propM,               // Node 2 properties
+                                     std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                     std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -957,7 +963,6 @@ namespace AirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
@@ -984,16 +989,16 @@ namespace AirflowNetwork {
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (FanTypeNum == FanType_SimpleOnOff) {
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(InletNode).MassFlowRate == 0.0) {
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && Node(InletNode).MassFlowRate == 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
-            } else if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
-                       AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
-                F[0] = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
+            } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                       state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
+                F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
                 F[0] = Node(InletNode).MassFlowRate * Ctrl;
                 if (MultiSpeedHPIndicator == 2) {
-                    F[0] = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
-                           AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
+                    F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate * state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio +
+                           state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate * (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
         } else if (FanTypeNum == FanType_SimpleConstVolume) {
@@ -1004,7 +1009,7 @@ namespace AirflowNetwork {
             }
 
             if (MultiSpeedHPIndicator == 2) {
-                F[0] = AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
+                F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
         } else if (FanTypeNum == FanType_SimpleVAV) {
             // Check VAV termals with a damper
@@ -1038,15 +1043,16 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int DetailedFan::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                               Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                               int const i,                // Linkage number
-                               const Real64 EP_UNUSED(multiplier), // Element multiplier
-                               const Real64 EP_UNUSED(control),    // Element control signal
-                               const AirProperties &propN, // Node 1 properties
-                               const AirProperties &propM, // Node 2 properties
-                               std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                               std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int DetailedFan::calculate(EnergyPlusData &state,
+                               bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                               Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                               int const i,                              // Linkage number
+                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                               [[maybe_unused]] const Real64 control,    // Element control signal
+                               const AirProperties &propN,               // Node 1 properties
+                               const AirProperties &propM,               // Node 2 properties
+                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1092,7 +1098,7 @@ namespace AirflowNetwork {
 
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (solver.AFECTL(i) >= TranRat) {
@@ -1114,7 +1120,7 @@ namespace AirflowNetwork {
             k = 5 * (j - 1) + 1;
             BX = Coeff(k);
             BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-            if (BY < 0.0) ShowFatalError("Out of range, too low in an AirflowNetwork detailed Fan");
+            if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
             while (true) {
                 DX = Coeff(k + 5);
@@ -1122,7 +1128,7 @@ namespace AirflowNetwork {
                 // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
                 if (BY * DY <= 0.0) break;
                 ++j;
-                if (j > NumCur) ShowFatalError("Out of range, too high (FAN) in ADS simulation");
+                if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
                 k += 5;
                 BX = DX;
                 BY = DY;
@@ -1132,7 +1138,7 @@ namespace AirflowNetwork {
             CY = 0.0;
         Label40:;
             ++L;
-            if (L > 100) ShowFatalError("Too many iterations (FAN) in AirflowNtework simulation");
+            if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
             CCY = CY;
             CX = BX - BY * ((DX - BX) / (DY - BY));
             CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -1168,13 +1174,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedFan::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                               const Real64 EP_UNUSED(multiplier), // Element multiplier
-                               const Real64 control,               // Element control signal
-                               const AirProperties &propN,         // Node 1 properties
-                               const AirProperties &propM,         // Node 2 properties
-                               std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                               std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int DetailedFan::calculate(EnergyPlusData &state,
+                               Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                               [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                               const Real64 control,                     // Element control signal
+                               const AirProperties &propN,               // Node 1 properties
+                               const AirProperties &propM,               // Node 2 properties
+                               std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                               std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1220,7 +1227,7 @@ namespace AirflowNetwork {
 
         if (control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
         }
         // Pressure rise at reference fan speed.
         if (control >= TranRat) {
@@ -1242,7 +1249,7 @@ namespace AirflowNetwork {
         k = 5 * (j - 1) + 1;
         BX = Coeff(k);
         BY = Coeff(k + 1) + BX * (Coeff(k + 2) + BX * (Coeff(k + 3) + BX * Coeff(k + 4))) - PRISE;
-        if (BY < 0.0) ShowFatalError("Out of range, too low in an AirflowNetwork detailed Fan");
+        if (BY < 0.0) ShowFatalError(state, "Out of range, too low in an AirflowNetwork detailed Fan");
 
         while (true) {
             DX = Coeff(k + 5);
@@ -1250,7 +1257,7 @@ namespace AirflowNetwork {
             // if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
             if (BY * DY <= 0.0) break;
             ++j;
-            if (j > NumCur) ShowFatalError("Out of range, too high (FAN) in ADS simulation");
+            if (j > NumCur) ShowFatalError(state, "Out of range, too high (FAN) in ADS simulation");
             k += 5;
             BX = DX;
             BY = DY;
@@ -1260,7 +1267,7 @@ namespace AirflowNetwork {
         CY = 0.0;
     Label40:;
         ++L;
-        if (L > 100) ShowFatalError("Too many iterations (FAN) in AirflowNtework simulation");
+        if (L > 100) ShowFatalError(state, "Too many iterations (FAN) in AirflowNtework simulation");
         CCY = CY;
         CX = BX - BY * ((DX - BX) / (DY - BY));
         CY = Coeff(k + 1) + CX * (Coeff(k + 2) + CX * (Coeff(k + 3) + CX * Coeff(k + 4))) - PRISE;
@@ -1284,7 +1291,7 @@ namespace AirflowNetwork {
     Label90:;
         F[0] = CX;
         DPDF = Coeff(k + 2) + CX * (2.0 * Coeff(k + 3) + CX * 3.0 * Coeff(k + 4));
- 
+
         // Convert to flow at given speed.
         F[0] *= (propN.density / RhoAir) * control;
         // Set derivative w/r pressure drop (-).
@@ -1296,16 +1303,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-
-    int Damper::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                          Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                          int const i,                // Linkage number
-                          const Real64 EP_UNUSED(multiplier), // Element multiplier
-                          const Real64 EP_UNUSED(control),    // Element control signal
-                          const AirProperties &propN, // Node 1 properties
-                          const AirProperties &propM, // Node 2 properties
-                          std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                          std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int Damper::calculate([[maybe_unused]] EnergyPlusData &state,
+                          bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                          Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                          int const i,                              // Linkage number
+                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                          [[maybe_unused]] const Real64 control,    // Element control signal
+                          const AirProperties &propN,               // Node 1 properties
+                          const AirProperties &propM,               // Node 2 properties
+                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1361,13 +1368,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int Damper::calculate(const Real64 PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                          const Real64 EP_UNUSED(multiplier), // Element multiplier
-                          const Real64 control,               // Element control signal
-                          const AirProperties &propN,         // Node 1 properties
-                          const AirProperties &propM,         // Node 2 properties
-                          std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                          std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int Damper::calculate([[maybe_unused]] EnergyPlusData &state,
+                          const Real64 PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                          const Real64 control,                     // Element control signal
+                          const AirProperties &propN,               // Node 1 properties
+                          const AirProperties &propM,               // Node 2 properties
+                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1423,15 +1431,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageRatio::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                         Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                         int const EP_UNUSED(i),     // Linkage number
-                                         const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                         const Real64 EP_UNUSED(control),    // Element control signal
-                                         const AirProperties &propN, // Node 1 properties
-                                         const AirProperties &propM, // Node 2 properties
-                                         std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                         std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int EffectiveLeakageRatio::calculate([[maybe_unused]] EnergyPlusData &state,
+                                         bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                         Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                         [[maybe_unused]] int const i,             // Linkage number
+                                         [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                         [[maybe_unused]] const Real64 control,    // Element control signal
+                                         const AirProperties &propN,               // Node 1 properties
+                                         const AirProperties &propM,               // Node 2 properties
+                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1511,13 +1520,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageRatio::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                         const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                         const Real64 EP_UNUSED(control),    // Element control signal
-                                         const AirProperties &propN,         // Node 1 properties
-                                         const AirProperties &propM,         // Node 2 properties
-                                         std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                                         std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int EffectiveLeakageRatio::calculate([[maybe_unused]] EnergyPlusData &state,
+                                         Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                         [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                         [[maybe_unused]] const Real64 control,    // Element control signal
+                                         const AirProperties &propN,               // Node 1 properties
+                                         const AirProperties &propM,               // Node 2 properties
+                                         std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                         std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -1587,15 +1597,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedOpening::calculate(bool const EP_UNUSED(LFLAG),           // Initialization flag.If = 1, use laminar relationship
-                                   Real64 const PDROP,                    // Total pressure drop across a component (P1 - P2) [Pa]
-                                   int const IL,                          // Linkage number
-                                   const Real64 EP_UNUSED(multiplier),    // Element multiplier
-                                   const Real64 EP_UNUSED(control),       // Element control signal
-                                   const AirProperties &EP_UNUSED(propN), // Node 1 properties
-                                   const AirProperties &EP_UNUSED(propM), // Node 2 properties
-                                   std::array<Real64, 2> &F,              // Airflow through the component [kg/s]
-                                   std::array<Real64, 2> &DF              // Partial derivative:  DF/DP
+    int DetailedOpening::calculate(EnergyPlusData &state,
+                                   [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                                   Real64 const PDROP,                          // Total pressure drop across a component (P1 - P2) [Pa]
+                                   int const IL,                                // Linkage number
+                                   [[maybe_unused]] const Real64 multiplier,    // Element multiplier
+                                   [[maybe_unused]] const Real64 control,       // Element control signal
+                                   [[maybe_unused]] const AirProperties &propN, // Node 1 properties
+                                   [[maybe_unused]] const AirProperties &propM, // Node 2 properties
+                                   std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                                   std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
     )
     {
 
@@ -1642,8 +1653,6 @@ namespace AirflowNetwork {
         // Lawrence Berkeley National Laboratory, Berkeley, CA, May 1990
 
         // USE STATEMENTS:
-        using DataGlobals::PiOvr2;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1717,7 +1726,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (HeightFac2 - HeightFac1);
                 Cfact = DischCoeff1 + (Fact - OpenFac1) / (OpenFac2 - OpenFac1) * (DischCoeff2 - DischCoeff1);
             } else {
-                ShowFatalError(
+                ShowFatalError(state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }
@@ -1733,7 +1742,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (HeightFac3 - HeightFac2);
                 Cfact = DischCoeff2 + (Fact - OpenFac2) / (OpenFac3 - OpenFac2) * (DischCoeff3 - DischCoeff2);
             } else {
-                ShowFatalError(
+                ShowFatalError(state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }
@@ -1753,7 +1762,7 @@ namespace AirflowNetwork {
                 HFact = HeightFac3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (HeightFac4 - HeightFac3);
                 Cfact = DischCoeff3 + (Fact - OpenFac3) / (OpenFac4 - OpenFac3) * (DischCoeff4 - DischCoeff3);
             } else {
-                ShowFatalError(
+                ShowFatalError(state,
                     "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " +
                     name);
             }
@@ -1800,11 +1809,11 @@ namespace AirflowNetwork {
             if (ActLw == 0.0) {
                 ++WidthErrCount;
                 if (WidthErrCount < 2) {
-                    ShowWarningError("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
-                    ShowContinueError("The actual width is set to 1.0E-6 m.");
-                    ShowContinueErrorTimeStamp("Occurrence info:");
+                    ShowWarningError(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
+                    ShowContinueError(state, "The actual width is set to 1.0E-6 m.");
+                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
+                    ShowRecurringWarningErrorAtEnd(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    WidthErrIndex,
                                                    ActLw,
@@ -1815,11 +1824,11 @@ namespace AirflowNetwork {
             if (ActLh == 0.0) {
                 ++HeightErrCount;
                 if (HeightErrCount < 2) {
-                    ShowWarningError("The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
-                    ShowContinueError("The actual height is set to 1.0E-6 m.");
-                    ShowContinueErrorTimeStamp("Occurrence info:");
+                    ShowWarningError(state, "The actual height of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name + " is 0.");
+                    ShowContinueError(state, "The actual height is set to 1.0E-6 m.");
+                    ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 } else {
-                    ShowRecurringWarningErrorAtEnd("The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
+                    ShowRecurringWarningErrorAtEnd(state, "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + name +
                                                        " is 0 error continues.",
                                                    HeightErrIndex,
                                                    ActLh,
@@ -1950,7 +1959,7 @@ namespace AirflowNetwork {
             DpZeroOffset = DifLim * 1e-3;
             // New definition for opening factors for LVO type 2: opening angle = 90 degrees --> opening factor = 1.0
             // should be PIOvr2 in below?
-            alpha = Fact * PiOvr2;
+            alpha = Fact * DataGlobalConstants::PiOvr2;
             Real64 const cos_alpha(std::cos(alpha));
             Real64 const tan_alpha(std::tan(alpha));
             h2 = Axishght * (1.0 - cos_alpha);
@@ -2051,15 +2060,16 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int SimpleOpening::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                 Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                 int const i,                // Linkage number
-                                 const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                 const Real64 EP_UNUSED(control),    // Element control signal
-                                 const AirProperties &propN, // Node 1 properties
-                                 const AirProperties &propM, // Node 2 properties
-                                 std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                 std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int SimpleOpening::calculate(EnergyPlusData &state,
+                                 bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                 Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                 int const i,                              // Linkage number
+                                 [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                 [[maybe_unused]] const Real64 control,    // Element control signal
+                                 const AirProperties &propN,               // Node 1 properties
+                                 const AirProperties &propM,               // Node 2 properties
+                                 std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                 std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2134,12 +2144,12 @@ namespace AirflowNetwork {
         GDRHO = 9.8 * DRHO;
         // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            return GenericCrack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
         }
         if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
-            NF = GenericCrack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            NF = GenericCrack(state, coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -2195,15 +2205,16 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int ConstantPressureDrop::calculate(bool const EP_UNUSED(LFLAG),           // Initialization flag.If = 1, use laminar relationship
-                                        const Real64 PDROP,                    // Total pressure drop across a component (P1 - P2) [Pa]
-                                        int const i,                           // Linkage number
-                                        const Real64 EP_UNUSED(multiplier),    // Element multiplier
-                                        const Real64 EP_UNUSED(control),       // Element control signal
-                                        const AirProperties &propN,            // Node 1 properties
-                                        const AirProperties &EP_UNUSED(propM), // Node 2 properties
-                                        std::array<Real64, 2> &F,              // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF              // Partial derivative:  DF/DP
+    int ConstantPressureDrop::calculate([[maybe_unused]] EnergyPlusData &state,
+                                        [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                                        const Real64 PDROP,                          // Total pressure drop across a component (P1 - P2) [Pa]
+                                        int const i,                                 // Linkage number
+                                        [[maybe_unused]] const Real64 multiplier,    // Element multiplier
+                                        [[maybe_unused]] const Real64 control,       // Element control signal
+                                        const AirProperties &propN,                  // Node 1 properties
+                                        [[maybe_unused]] const AirProperties &propM, // Node 2 properties
+                                        std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                                        std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
     )
     {
 
@@ -2253,15 +2264,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                        Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                        int const EP_UNUSED(i),     // Linkage number
-                                        const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                        const Real64 EP_UNUSED(control),    // Element control signal
-                                        const AirProperties &propN, // Node 1 properties
-                                        const AirProperties &propM, // Node 2 properties
-                                        std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int EffectiveLeakageArea::calculate([[maybe_unused]] EnergyPlusData &state,
+                                        bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                        [[maybe_unused]] int const i,             // Linkage number
+                                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                        [[maybe_unused]] const Real64 control,    // Element control signal
+                                        const AirProperties &propN,               // Node 1 properties
+                                        const AirProperties &propM,               // Node 2 properties
+                                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2344,13 +2356,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                        const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                        const Real64 EP_UNUSED(control),    // Element control signal
-                                        const AirProperties &propN,         // Node 1 properties
-                                        const AirProperties &propM,         // Node 2 properties
-                                        std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                                        std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int EffectiveLeakageArea::calculate([[maybe_unused]] EnergyPlusData &state,
+                                        Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                        [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                        [[maybe_unused]] const Real64 control,    // Element control signal
+                                        const AirProperties &propN,               // Node 1 properties
+                                        const AirProperties &propM,               // Node 2 properties
+                                        std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                        std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2424,15 +2437,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                      int const EP_UNUSED(i),     // Linkage number
-                                      const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                      const Real64 EP_UNUSED(control),    // Element control signal
-                                      const AirProperties &propN, // Node 1 properties
-                                      const AirProperties &propM, // Node 2 properties
-                                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                      std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int DisSysCompCoilProp::calculate([[maybe_unused]] EnergyPlusData &state,
+                                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                      [[maybe_unused]] int const i,             // Linkage number
+                                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                      [[maybe_unused]] const Real64 control,    // Element control signal
+                                      const AirProperties &propN,               // Node 1 properties
+                                      const AirProperties &propM,               // Node 2 properties
+                                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2488,7 +2502,7 @@ namespace AirflowNetwork {
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobals::Pi;
+        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2585,13 +2599,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                      const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                      const Real64 EP_UNUSED(control),    // Element control signal
-                                      const AirProperties &propN,         // Node 1 properties
-                                      const AirProperties &propM,         // Node 2 properties
-                                      std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                                      std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int DisSysCompCoilProp::calculate([[maybe_unused]] EnergyPlusData &state,
+                                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                      [[maybe_unused]] const Real64 control,    // Element control signal
+                                      const AirProperties &propN,               // Node 1 properties
+                                      const AirProperties &propM,               // Node 2 properties
+                                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2646,7 +2661,7 @@ namespace AirflowNetwork {
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobals::Pi;
+        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2732,15 +2747,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompTermUnitProp::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                          Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                          int const i,                // Linkage number
-                                          const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                          const Real64 EP_UNUSED(control),    // Element control signal
-                                          const AirProperties &propN, // Node 1 properties
-                                          const AirProperties &propM, // Node 2 properties
-                                          std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                          std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int DisSysCompTermUnitProp::calculate([[maybe_unused]] EnergyPlusData &state,
+                                          bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                          Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                          int const i,                              // Linkage number
+                                          [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                          [[maybe_unused]] const Real64 control,    // Element control signal
+                                          const AirProperties &propN,               // Node 1 properties
+                                          const AirProperties &propM,               // Node 2 properties
+                                          std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                          std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2797,7 +2813,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobals::Pi;
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2902,15 +2918,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                    Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                    int const EP_UNUSED(i),     // Linkage number
-                                    const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                    const Real64 EP_UNUSED(control),    // Element control signal
-                                    const AirProperties &propN, // Node 1 properties
-                                    const AirProperties &propM, // Node 2 properties
-                                    std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                    std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int DisSysCompHXProp::calculate([[maybe_unused]] EnergyPlusData &state,
+                                    bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                    Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                    [[maybe_unused]] int const i,             // Linkage number
+                                    [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                    [[maybe_unused]] const Real64 control,    // Element control signal
+                                    const AirProperties &propN,               // Node 1 properties
+                                    const AirProperties &propM,               // Node 2 properties
+                                    std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                    std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -2961,7 +2978,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobals::Pi;
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -3051,13 +3068,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                    const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                    const Real64 EP_UNUSED(control),    // Element control signal
-                                    const AirProperties &propN,         // Node 1 properties
-                                    const AirProperties &propM,         // Node 2 properties
-                                    std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                                    std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int DisSysCompHXProp::calculate([[maybe_unused]] EnergyPlusData &state,
+                                    Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                    [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                    [[maybe_unused]] const Real64 control,    // Element control signal
+                                    const AirProperties &propN,               // Node 1 properties
+                                    const AirProperties &propM,               // Node 2 properties
+                                    std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                    std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -3107,7 +3125,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobals::Pi;
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -3187,15 +3205,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                  Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                  int const i,                // Linkage number
-                                  const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                  const Real64 EP_UNUSED(control),    // Element control signal
-                                  const AirProperties &propN, // Node 1 properties
-                                  const AirProperties &propM, // Node 2 properties
-                                  std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                  std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int ZoneExhaustFan::calculate(EnergyPlusData &state,
+                                  bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                  int const i,                              // Linkage number
+                                  [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                  [[maybe_unused]] const Real64 control,    // Element control signal
+                                  const AirProperties &propN,               // Node 1 properties
+                                  const AirProperties &propM,               // Node 2 properties
+                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3250,7 +3269,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = MultizoneSurfaceData(i).Factor;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3317,13 +3336,14 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(Real64 const PDROP,                 // Total pressure drop across a component (P1 - P2) [Pa]
-                                  const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                  const Real64 control,               // Element control signal
-                                  const AirProperties &propN,         // Node 1 properties
-                                  const AirProperties &propM,         // Node 2 properties
-                                  std::array<Real64, 2> &F,           // Airflow through the component [kg/s]
-                                  std::array<Real64, 2> &DF           // Partial derivative:  DF/DP
+    int ZoneExhaustFan::calculate(EnergyPlusData &state,
+                                  Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                  [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                  const Real64 control,                     // Element control signal
+                                  const AirProperties &propN,               // Node 1 properties
+                                  const AirProperties &propM,               // Node 2 properties
+                                  std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                  std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3376,7 +3396,7 @@ namespace AirflowNetwork {
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3429,15 +3449,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int HorizontalOpening::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                     int const i,                // Linkage number
-                                     const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                     const Real64 EP_UNUSED(control),    // Element control signal
-                                     const AirProperties &propN, // Node 1 properties
-                                     const AirProperties &propM, // Node 2 properties
-                                     std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int HorizontalOpening::calculate(EnergyPlusData &state,
+                                     bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                     Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                     int const i,                              // Linkage number
+                                     [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                     [[maybe_unused]] const Real64 control,    // Element control signal
+                                     const AirProperties &propN,               // Node 1 properties
+                                     const AirProperties &propM,               // Node 2 properties
+                                     std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                     std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3459,8 +3480,6 @@ namespace AirflowNetwork {
         // NISTIR 89-4052, National Institute of Standards and Technology, Gaithersburg, MD
 
         // USE STATEMENTS:
-        using DataGlobals::Pi;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhozAver;
         Real64 expn;
@@ -3493,12 +3512,12 @@ namespace AirflowNetwork {
         // Slope = MultizoneCompHorOpeningData(CompNum).Slope;
         // DischCoeff = MultizoneCompHorOpeningData(CompNum).DischCoeff;
         Cshape = 0.942 * Width / Height;
-        OpenArea = Width * Height * Fact * std::sin(Slope * Pi / 180.0) * (1.0 + std::cos(Slope * Pi / 180.0));
+        OpenArea = Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi / 180.0));
         DH = 4.0 * (Width * Height) / 2.0 / (Width + Height) * Fact;
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            return GenericCrack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            return GenericCrack(state, coef, expn, LFLAG, PDROP, propN, propM, F, DF);
         }
 
         fma12 = 0.0;
@@ -3562,15 +3581,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int OutdoorAirFan::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                                 Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                                 int const i,                // Linkage number
-                                 const Real64 EP_UNUSED(multiplier), // Element multiplier
-                                 const Real64 EP_UNUSED(control),    // Element control signal
-                                 const AirProperties &propN, // Node 1 properties
-                                 const AirProperties &propM, // Node 2 properties
-                                 std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                                 std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int OutdoorAirFan::calculate(EnergyPlusData &state,
+                                 bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                                 Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                                 int const i,                              // Linkage number
+                                 [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                                 [[maybe_unused]] const Real64 control,    // Element control signal
+                                 const AirProperties &propN,               // Node 1 properties
+                                 const AirProperties &propM,               // Node 2 properties
+                                 std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                                 std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -3578,7 +3598,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
@@ -3608,15 +3627,15 @@ namespace AirflowNetwork {
             // Treat the component as an exhaust fan
             F[0] = Node(InletNode).MassFlowRate;
             DF[0] = 0.0;
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                F[0] = F[0] / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             return 1;
         } else {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;
@@ -3682,15 +3701,16 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ReliefFlow::calculate(bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                              Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
-                              int const i,                // Linkage number
-                              const Real64 EP_UNUSED(multiplier), // Element multiplier
-                              const Real64 EP_UNUSED(control),    // Element control signal
-                              const AirProperties &propN, // Node 1 properties
-                              const AirProperties &propM, // Node 2 properties
-                              std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
-                              std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
+    int ReliefFlow::calculate(EnergyPlusData &state,
+                              bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                              Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                              int const i,                              // Linkage number
+                              [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                              [[maybe_unused]] const Real64 control,    // Element control signal
+                              const AirProperties &propN,               // Node 1 properties
+                              const AirProperties &propM,               // Node 2 properties
+                              std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                              std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
     )
     {
 
@@ -3698,7 +3718,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::VerySmallMassFlow;
         using DataLoopNode::Node;
 
@@ -3729,8 +3748,8 @@ namespace AirflowNetwork {
                 F[0] = ReliefMassFlowRate;
             } else {
                 F[0] = Node(OutletNode).MassFlowRate;
-                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                    F[0] = F[0] / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                    F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
             }
             return 1;
@@ -3738,7 +3757,7 @@ namespace AirflowNetwork {
             // Treat the component as a surface crack
             // Crack standard condition from given inputs
             Corr = 1.0;
-            RhozNorm = AIRDENSITY(StandardP, StandardT, StandardW);
+            RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
             VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
             expn = FlowExpo;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,13 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace IntegratedHeatPump {
 
@@ -258,13 +260,13 @@ namespace IntegratedHeatPump {
                 Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetIHPInput();
+    void GetIHPInput(EnergyPlusData &state);
 
     void SizeIHP(EnergyPlusData &state, int const CoilNum);
 
-    void InitializeIHP(int const DXCoilNum);
+    void InitializeIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    void UpdateIHP(int const DXCoilNum);
+    void UpdateIHP(EnergyPlusData &state, int const DXCoilNum);
 
     void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
@@ -273,9 +275,9 @@ namespace IntegratedHeatPump {
 
     IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum);
 
-    int GetLowSpeedNumIHP(int const DXCoilNum);
+    int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    int GetMaxSpeedNumIHP(int const DXCoilNum);
+    int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum);
 
     Real64 GetAirVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
                                 int const SpeedNum,
@@ -295,24 +297,28 @@ namespace IntegratedHeatPump {
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    bool IHPInModel();
+    bool IHPInModel(EnergyPlusData &state);
 
-    int GetCoilIndexIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexIHP(EnergyPlusData &state,
+                        std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeIHP(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilOutletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
@@ -323,7 +329,8 @@ namespace IntegratedHeatPump {
                                  bool &ErrorsFound            // set to true if problem
     );
 
-    int GetIHPDWHCoilPLFFPLR(std::string const &CoilType, // must match coil types in this module
+    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
+                             std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              IHPOperationMode const Mode, // mode coil type
                              bool &ErrorsFound            // set to true if problem
@@ -333,6 +340,14 @@ namespace IntegratedHeatPump {
     );
 
 } // namespace IntegratedHeatPump
+
+struct IntegratedHeatPumpGlobalData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

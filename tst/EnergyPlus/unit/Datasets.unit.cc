@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,9 +55,10 @@
 #include <gtest/gtest.h>
 
 // Fixtures, etc.
-#include <EnergyPlus/ConfiguredFunctions.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -81,7 +82,7 @@ TEST_F(DataSetFixture, California_Title_24_2008)
 }
 TEST_F(DataSetFixture, Chillers)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/Chillers.idf"))));
 }
 TEST_F(DataSetFixture, CompositeWallConstructions)
@@ -112,7 +113,7 @@ TEST_F(DataSetFixture, ExhaustFiredChiller)
 }
 TEST_F(DataSetFixture, FluidPropertiesRefData)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/FluidPropertiesRefData.idf"))));
 }
 TEST_F(DataSetFixture, FossilFuelEnvironmentalImpactFactors)
@@ -170,16 +171,16 @@ TEST_F(DataSetFixture, PerfCurves)
 }
 TEST_F(DataSetFixture, PrecipitationSchedulesUSA)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/PrecipitationSchedulesUSA.idf"))));
 }
 TEST_F(DataSetFixture, RefrigerationCasesDataSet)
 {
-    DataGlobals::preserveIDFOrder = false;
+    state->dataGlobal->preserveIDFOrder = false;
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf"))));
 }
 // TEST_F( DataSetFixture, RefrigerationCompressorCurves ) {
-//	DataGlobals::preserveIDFOrder = false;
+//	state->dataGlobal->preserveIDFOrder = false;
 //	ASSERT_TRUE( process_idf( delimited_string( read_lines_in_file( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf"
 //) ) ) );
 //}

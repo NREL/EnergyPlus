@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACManager {
 
@@ -87,13 +89,13 @@ namespace HVACManager {
                               bool &FirstHVACIteration,  // True when solution technique on first iteration
                               bool const LockPlantFlows);
 
-    void ResetTerminalUnitFlowLimits();
+    void ResetTerminalUnitFlowLimits(EnergyPlusData &state);
 
-    void ResolveAirLoopFlowLimits();
+    void ResolveAirLoopFlowLimits(EnergyPlusData &state);
 
-    void ResolveLockoutFlags(bool &SimAir); // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir); // TRUE means air loops must be (re)simulated
 
-    void ResetHVACControl();
+    void ResetHVACControl(EnergyPlusData &state);
 
     void ResetNodeData();
 
@@ -101,13 +103,21 @@ namespace HVACManager {
 
     void ReportAirHeatBalance(EnergyPlusData &state);
 
-    void SetHeatToReturnAirFlag();
+    void SetHeatToReturnAirFlag(EnergyPlusData &state);
 
-    void UpdateZoneInletConvergenceLog();
+    void UpdateZoneInletConvergenceLog(EnergyPlusData &state);
 
-    void CheckAirLoopFlowBalance();
+    void CheckAirLoopFlowBalance(EnergyPlusData &state);
 
 } // namespace HVACManager
+
+struct HVACManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

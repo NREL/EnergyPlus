@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,9 +126,14 @@ namespace FileSystem {
         }
 
         std::string pathTail;
-        if (parentPath == ".")
+        std::string currentDir = ".";
+        std::string currentDirWithSep = currentDir + DataStringGlobals::pathChar;
+        if ((parentPath == currentDir || parentPath == currentDirWithSep) && path.find(currentDirWithSep) == std::string::npos)
+            // If parent path is the current directory and the original path does not already contain
+            // the current directory in the string, then leave the path tail as-is.
             pathTail = path;
         else
+            // otherwise strip off any preceding content from the path tail
             pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
 
         char *absolutePathTemp = realpath(parentPath.c_str(), NULL);

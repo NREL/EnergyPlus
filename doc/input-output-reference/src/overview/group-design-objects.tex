@@ -867,14 +867,15 @@ Unique identifying name. Any reference to this name by other objects will denote
 
 \paragraph{Field: Outdoor Air Method}\label{field-outdoor-air-method}
 
-The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, AirChanges/Hour}, \emph{Sum}, \emph{Maximum}, \emph{IndoorAirQualityProcedure}, \emph{ProportionalControlBasedOnDesignOccupancy}, or \emph{ProportionalControlBasedonOccupancySchedule}. The default is \emph{Flow/Person}.
+The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, AirChanges/Hour}, \emph{Sum}, \emph{Maximum}, \emph{IndoorAirQualityProcedure}, \emph{ProportionalControlBasedOnDesignOccupancy}, or \emph{ProportionalControlBasedOnOccupancySchedule}. The default is \emph{Flow/Person}.
 \begin{itemize}
 \tightlist
 
-\item  \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate.
+\item  \emph{Flow/Person} means the program will use the input from the field \emph{Outdoor Air Flow per Person} and the actual zone occupancy to calculate a zone outdoor air flow rate. The density of air is measured at IUPAC standard temperature and pressure.
 
-\item  \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate.
-\item  \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate.
+\item  \emph{Flow/Area} means that the program will use the input from the field \emph{Outdoor Air Flow per Zone Floor Area} and the actual zone floor area as the zone outdoor air flow rate.  The density of air is measured at IUPAC standard temperature and pressure.
+
+\item  \emph{Flow/Zone} means that the program will use the input of the field \emph{Outdoor Air Flow per Zone} as the zone outdoor air flow rate. The density of air is measured at IUPAC standard temperature and pressure.
 
 \item  \emph{AirChanges/Hour} means that the program will use the input from the field \emph{Air Changes per Hour} and the actual zone volume (divided by 3600 seconds per hour) as the zone outdoor air flow rate.
 
@@ -884,28 +885,28 @@ The input must be either \emph{Flow/Person}, \emph{Flow/Area}, \emph{Flow/Zone, 
 
 \item  \emph{IndoorAirQualityProcedure} means that the program will use the other procedure defined in ASHRAE Standard 62.1-2007 to calculate the amount of outdoor air necessary in order to maintain the levels of indoor air carbon dioxide at or below the setpoint defined in the \hyperref[zonecontrolcontaminantcontroller]{ZoneControl:ContaminantController} object. Appendix A of the ASHRAE 62.1-2010 user\('\)s manual discusses another method for implementing CO2-based DCV in a single zone system. The last two methods of Proportional Control calculate the required outdoor air flow rate which varies in proportion to the percentage of the CO2 signal range and has two choices to calculate occupancy-based outdoor air rate.
 
-\item  \emph{ProportionalControlBasedonOccupancySchedule} uses the real occupancy at the current time step to calculate outdoor air rate.
+\item  \emph{ProportionalControlBasedOnOccupancySchedule} uses the real occupancy at the current time step to calculate outdoor air rate.
 
-\item  \emph{ProportionalControlBasedonDesignOccupancy} uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage.
+\item  \emph{ProportionalControlBasedOnDesignOccupancy} uses the design occupancy level to calculate outdoor air rate. The former choice is a good approach to estimate outdoor air rate. However, for practical applications, the zone controller usually does not have the real time occupancy information, and the design occupancy level is assumed. The latter choice is used in the design stage.
 
 \end{itemize}
 
 
 \paragraph{Field: Outdoor Air Flow per Person}\label{field-outdoor-air-flow-per-person}
 
-The design outdoor air volume flow rate per person for this zone in cubic meters per second per person. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all \hyperref[people]{People} statements assigned to the zone. Occupancy schedule values \emph{are not} applied during sizing calculations and \emph{are} applied during the remainder of the simulation. This input is used if \emph{Outdoor Air Method} is one of \emph{Outdoor Air Flow per Person}, \emph{Sum}, or \emph{Maximum}.
+The design outdoor air volume flow rate per person for this zone in cubic meters per second per person, density of air measured at IUPAC standard temperature and pressure. The default is 0.00944 (20 cfm per person). An outdoor air flow rate is calculated based on the total number of people for all \hyperref[people]{People} statements assigned to the zone. Occupancy schedule values \emph{are not} applied during sizing calculations and \emph{are} applied during the remainder of the simulation. This input is used if \emph{Outdoor Air Method} is one of \emph{Outdoor Air Flow per Person}, \emph{Sum}, or \emph{Maximum}.
 
 \paragraph{Field: Outdoor Air Flow per Zone Floor Area}\label{field-outdoor-air-flow-per-zone-floor-area}
 
-The design outdoor air volume flow rate per square meter of floor area (units are m\(^{3}\)/s-m\(^{2}\)). This input is used if \emph{Outdoor Air Method} is \emph{Flow/Area, Sum} or \emph{Maximum}. The default value for this field is 0.
+The design outdoor air volume flow rate per square meter of floor area (units are m\(^{3}\)/s-m\(^{2}\)), density of air measured at IUPAC standard temperature and pressure. This input is used if \emph{Outdoor Air Method} is \emph{Flow/Area, Sum} or \emph{Maximum}. The default value for this field is 0.
 
 \paragraph{Field: Outdoor Air Flow per Zone}\label{field-outdoor-air-flow-per-zone}
 
-The design outdoor air flow rate for this zone in cubic meters per second. This input field is used if \emph{Outdoor Air Method} is \emph{Flow/Zone, Sum} or \emph{Maximum}. The default value for this field is 0.
+The design outdoor air flow rate for this zone in cubic meters per second, density of air measured at IUPAC standard temperature and pressure. This input field is used if \emph{Outdoor Air Method} is \emph{Flow/Zone, Sum} or \emph{Maximum}. The default value for this field is 0.
 
 \paragraph{Field: Outdoor Air Flow Changes per Hour}\label{field-outdoor-air-flow-changes-per-hour}
 
-The design outdoor air volume flow rate in air changes per hour. This factor is used along with the Zone Volume and converted to cubic meters per second. This input field is used if \emph{Outdoor Air Method} is \emph{AirChanges/Hour, Sum} or \emph{Maximum}. The default value for this field is 0.
+The design outdoor air volume flow rate in air changes per hour, density of air measured at IUPAC standard temperature and pressure. This factor is used along with the Zone Volume and converted to cubic meters per second. This input field is used if \emph{Outdoor Air Method} is \emph{AirChanges/Hour, Sum} or \emph{Maximum}. The default value for this field is 0.
 
 \paragraph{Field: Outdoor Air Schedule Name}\label{field-outdoor-air-schedule-name}
 
@@ -1118,7 +1119,7 @@ This alpha field specifies the name of a \hyperref[designspecificationoutdoorair
 
 When a choice of IndoorAirQualityProcedure is entered in the Outdoor Air Method field of the \hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir} object, the design outdoor airflow rate is calculated based on the choice of Sum in the same field.
 
-When a choice of ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule is entered, the design outdoor airflow rate is calculated based on equations specified in the "Proportional Control" section in the Engineering Reference.
+When a choice of ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnOccupancySchedule is entered, the design outdoor airflow rate is calculated based on equations specified in the "Proportional Control" section in the Engineering Reference.
 
 \paragraph{Field: Zone Heating Sizing Factor}\label{field-zone-heating-sizing-factor}
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,8 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitOperatingModeInputSpecification
 {
@@ -81,13 +82,14 @@ struct CoilCoolingDXCurveFitOperatingMode
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
 
-    void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
+    void instantiateFromInputSpec(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
     void size(EnergyPlusData &state);
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;
-    explicit CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find);
+    explicit CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find);
     Real64 getCurrentEvapCondPumpPower(int speedNum);
-    void CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
+    void CalcOperatingMode(EnergyPlusData &state,
+                           const DataLoopNode::NodeData &inletNode,
                            DataLoopNode::NodeData &outletNode,
                            Real64 &PLR,
                            int &speedNum,

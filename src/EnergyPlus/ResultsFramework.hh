@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,14 +59,17 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
-    class EnergyPlusFixture;
-    class ResultsFrameworkFixture;
+// Forward declarations
+class EnergyPlusFixture;
+class ResultsFrameworkFixture;
+struct EnergyPlusData;
 
 namespace ResultsFramework {
 
@@ -219,7 +222,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
+        void newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin);
 //        void newRow(const std::string &ts);
         virtual void pushVariableValue(const int reportID, double value);
 
@@ -321,19 +324,19 @@ namespace ResultsFramework {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
-        void parseTSOutputs(json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
+        void writeOutput(EnergyPlusData &state, std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
+        void parseTSOutputs(EnergyPlusData &state, json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
         friend class EnergyPlus::ResultsFrameworkFixture;
 
         char s[129] = {0};
-        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Hourly;
+        OutputProcessor::ReportingFrequency smallestReportingFrequency = OutputProcessor::ReportingFrequency::Yearly;
         std::map<std::string, std::vector<std::string>> outputs;
         std::vector<bool> outputVariableIndices;
 
-        static std::string &convertToMonth(std::string &datetime);
+        static std::string &convertToMonth(EnergyPlusData &state, std::string &datetime);
         void updateReportingFrequency(OutputProcessor::ReportingFrequency reportingFrequency);
         // void readRVI();
         // void readMVI();
@@ -345,7 +348,7 @@ namespace ResultsFramework {
 
         virtual ~ResultsFramework() = default;
 
-        void setupOutputOptions(IOFiles &ioFiles);
+        void setupOutputOptions(EnergyPlusData &state);
 
         bool timeSeriesEnabled() const;
 
@@ -385,7 +388,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
-        void writeOutputs(IOFiles & ioFiles);
+        void writeOutputs(EnergyPlusData &state);
 
         void addReportVariable(std::string const &keyedValue,
                                std::string const &variableName,
@@ -414,7 +417,7 @@ namespace ResultsFramework {
 
         void writeReport(JsonOutputStreams &jsonOutputStreams);
 
-        void writeCSVOutput(IOFiles & ioFiles);
+        void writeCSVOutput(EnergyPlusData &state);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
@@ -478,10 +481,45 @@ namespace ResultsFramework {
         inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
     };
 
-    extern std::unique_ptr<ResultsFramework> resultsFramework;
-
-    void clear_state();
 } // namespace ResultsFramework
+
+struct ResultsFrameworkData : BaseGlobalStruct {
+
+    std::unique_ptr<ResultsFramework::ResultsFramework> resultsFramework = std::make_unique<ResultsFramework::ResultsFramework>();
+
+    void clear_state() override
+    {
+        this->resultsFramework->DYMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->DYMeters.setRVariablesScanned(false);
+        this->resultsFramework->DYMeters.setIVariablesScanned(false);
+        this->resultsFramework->DYMeters.setIDataFrameEnabled(false);
+
+        this->resultsFramework->TSMeters.setRVariablesScanned(false);
+        this->resultsFramework->TSMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->TSMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->TSMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->HRMeters.setRVariablesScanned(false);
+        this->resultsFramework->HRMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->HRMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->HRMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->MNMeters.setRVariablesScanned(false);
+        this->resultsFramework->MNMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->MNMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->MNMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->SMMeters.setRVariablesScanned(false);
+        this->resultsFramework->SMMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->SMMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->SMMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->YRMeters.setRVariablesScanned(false);
+        this->resultsFramework->YRMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->YRMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->YRMeters.setIVariablesScanned(false);
+    }
+};
 
 } // namespace EnergyPlus
 
