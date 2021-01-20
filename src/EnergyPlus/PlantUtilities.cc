@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -253,10 +253,8 @@ namespace PlantUtilities {
             DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = max(DataLoopNode::Node(InletNode).MassFlowRateMinAvail, DataLoopNode::Node(InletNode).MassFlowRateMin);
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
             // virtual 2-way valve (was tried but it clamps down demand side component's flow options so they can't find proper solutions)
-            //  Node(OutletNode)%MassFlowRateMinAvail = MAX(Node(InletNode)%MassFlowRateMinAvail , CompFlow)
-            //  Node(OutletNode)%MassFlowRateMaxAvail = MIN(Node(InletNode)%MassFlowRateMaxAvail , CompFlow)
         } else {
-            // DSU lodge the original request for all types
+            // lodge the original request for all types
             DataLoopNode::Node(InletNode).MassFlowRateRequest = CompFlow;
         }
 

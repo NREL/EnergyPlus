@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
 

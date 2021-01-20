@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetPIUs(*state);
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
 
     GetPIUs(*state);
@@ -1468,7 +1468,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // OutputProcessor::TimeValue.allocate(2);
     state->dataGlobal->DDOnlySimulation = true;
 
     ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
@@ -1481,8 +1480,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     EXPECT_EQ("SERIES PIU ELEC RHT", PIU(PIUNum).Name);                               // PIU series name
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum, PIU(PIUNum).PriAirInNode);
     EXPECT_EQ(state->dataDefineEquipment->AirDistUnit(PIU(PIUNum).ADUNum).AirLoopNum,
-              ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex));
-    ASSERT_TRUE(ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
+              state->dataZoneEquip->ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).InletNodeAirLoopNum(PIU(PIUNum).ctrlZoneInNodeIndex));
+    ASSERT_TRUE(state->dataZoneEquip->ZoneEquipConfig(PIU(PIUNum).CtrlZoneNum).AirDistUnitCool(PIU(PIUNum).ctrlZoneInNodeIndex).SupplyAirPathExists);
 }
 
 } // namespace EnergyPlus

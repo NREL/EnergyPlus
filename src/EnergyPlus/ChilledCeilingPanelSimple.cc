@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,7 +125,6 @@ namespace CoolingPanelSimple {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // Index of unit in baseboard array
@@ -172,7 +171,7 @@ namespace CoolingPanelSimple {
 
             InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -545,9 +544,9 @@ namespace CoolingPanelSimple {
 
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
+                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
                         ThisCP.ZonePtr = ctrlZone;
                     }
                 }
@@ -715,8 +714,6 @@ namespace CoolingPanelSimple {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -762,10 +759,10 @@ namespace CoolingPanelSimple {
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
         auto &ThisInNode(Node(ThisCP.WaterInletNode));
 
-        if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
@@ -859,7 +856,7 @@ namespace CoolingPanelSimple {
         }
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
         ThisCP.WaterInletTemp = ThisInNode.Temp;
         ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;
@@ -1177,8 +1174,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -1227,7 +1222,7 @@ namespace CoolingPanelSimple {
 
         ModifiedWaterInletTemp = false;
         ZoneNum = this->ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         waterInletTemp = this->WaterInletTemp;
         waterOutletTemp = waterInletTemp;
         waterMassFlowRateMax = this->WaterMassFlowRateMax;
@@ -1303,7 +1298,7 @@ namespace CoolingPanelSimple {
 
         if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
 
-            if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
+            if (QZnReq < -SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
                 Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 

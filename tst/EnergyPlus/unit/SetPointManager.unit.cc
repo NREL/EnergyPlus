@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -600,8 +600,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysOutletNodeNum = NodeInputManager::GetOnlySingleNode(*state, "FAN INLET NODE",
@@ -670,13 +670,13 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
     int zoneAirNode = NodeInputManager::GetOnlySingleNode(*state, "KITCHEN AIR NODE",
                                                           ErrorsFound,
                                                           "Zone",
@@ -686,7 +686,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           1,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = zoneAirNode;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneAirNode;
     int zoneInletNode = NodeInputManager::GetOnlySingleNode(*state, "KITCHEN DIRECT AIR INLET NODE NAME",
                                                             ErrorsFound,
                                                             "Zone",
@@ -696,14 +696,14 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     SetPointManager::GetSetPointManagerInputs(*state);
     EXPECT_EQ(state->dataSetPointManager->SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
     state->dataSetPointManager->SingZoneRhSetPtMgr(1).AirLoopNum = 1;
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     SetPointManager::InitSetPointManagers(*state);
@@ -715,11 +715,11 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataLoopNode::Node(zoneInletNode).HumRat = 0.0008;
     DataLoopNode::Node(zoneInletNode).Temp = 20.0;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
     // pick these next values so ExtrRateNoHC doesn't exceed loat to sp
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
 
     DataLoopNode::Node(zoneAirNode).Temp = 22.0; // zone air node
     DataLoopNode::Node(zoneAirNode).HumRat = 0.0008;
@@ -1218,8 +1218,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     state->dataSetPointManager->ColdestSetPtMgr(1).AirLoopNum = 1;
 
     SetPointManager::InitSetPointManagers(*state);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
 
     EXPECT_EQ(DataLoopNode::NodeID(2), "SPACE1-1 IN NODE");
     EXPECT_EQ(DataLoopNode::NodeID(5), "SPACE1-1 NODE");
@@ -1240,7 +1240,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(2).HumRat);
     ZoneSetPointTemp = DataLoopNode::Node(5).Temp +
-                       DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
+                       state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
     EXPECT_EQ(DataLoopNode::NodeID(12), "HCOIL OUTLET NODE");
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
@@ -1382,20 +1382,20 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 
     DataLoopNode::Node.allocate(3);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     ASSERT_THROW(SetPointManager::InitSetPointManagers(*state), std::runtime_error);
@@ -1413,7 +1413,7 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     state->dataAirLoop->AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
@@ -1449,20 +1449,20 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 
     DataLoopNode::Node.allocate(3);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
     SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     ASSERT_THROW(SetPointManager::InitSetPointManagers(*state), std::runtime_error);
@@ -1480,7 +1480,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
     state->dataAirLoop->AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
@@ -1515,18 +1515,18 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     DataHeatBalance::Zone(1).Name = "ZSF1";
     SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
     int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", DataLoopNode::NodeID);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
     int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", DataLoopNode::NodeID);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
     int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", DataLoopNode::NodeID);
     int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", DataLoopNode::NodeID);
 
@@ -1535,10 +1535,10 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     auto &coolSPNode(DataLoopNode::Node(coolSPNodeNum));
     auto &heatSPNode(DataLoopNode::Node(heatSPNodeNum));
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
     SetPointManager::InitSetPointManagers(*state);
@@ -1547,8 +1547,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 1 - No load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, zoneNode.Temp, 0.001);
     EXPECT_NEAR(heatSPNode.TempSetPoint, zoneNode.Temp, 0.001);
@@ -1556,8 +1556,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 2 - Small heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 20.994, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 20.497, 0.01);
@@ -1565,8 +1565,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 3 - Large heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 99.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 45.0, 0.01);
@@ -1574,8 +1574,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 4 - Small cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 19.50, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 19.01, 0.01);
@@ -1583,8 +1583,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     // Case 5 - Large cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
     SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);

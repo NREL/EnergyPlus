@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -113,8 +113,6 @@ namespace SteamBaseboardRadiator {
     using DataLoopNode::ObjectIsNotParent;
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ZoneEquipConfig;
-    using DataZoneEquipment::ZoneEquipInputsFilled;
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -135,10 +133,6 @@ namespace SteamBaseboardRadiator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the steam baseboards or radiators.
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -187,9 +181,9 @@ namespace SteamBaseboardRadiator {
 
             InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
-            if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ActualZoneNum) &&
+            if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ActualZoneNum) &&
                 (GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0.0)) {
 
                 // On the first HVAC iteration the system values are given to the controller, but after that
@@ -526,9 +520,9 @@ namespace SteamBaseboardRadiator {
 
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
+                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
                     }
                 }
@@ -751,10 +745,10 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SetLoopIndexFlag = true;
         }
 
-        if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0) state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr <= 0) state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataSteamBaseboardRadiator->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, state.dataSteamBaseboardRadiator->SteamBaseboard(Loop).EquipID)) continue;
@@ -839,7 +833,7 @@ namespace SteamBaseboardRadiator {
 
         // Do the every time step initializations
         SteamInletNode = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode;
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate = Node(SteamInletNode).MassFlowRate;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletTemp = Node(SteamInletNode).Temp;
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy = Node(SteamInletNode).Enthalpy;
@@ -1077,8 +1071,6 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSatDensityRefrig;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatSpecificHeatRefrig;
@@ -1111,13 +1103,13 @@ namespace SteamBaseboardRadiator {
         Real64 Cp;
 
         ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         SteamInletTemp = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).Temp;
         SteamOutletTemp = SteamInletTemp;
         SteamMassFlowRate = Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRate;
         SubcoolDeltaT = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DegOfSubcooling;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && SteamMassFlowRate > 0.0 &&
+        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && SteamMassFlowRate > 0.0 &&
             GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0) {
             // Unit is on
             EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, SteamInletTemp, 1.0, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FluidIndex, RoutineName);

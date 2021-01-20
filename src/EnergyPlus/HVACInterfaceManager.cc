@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -523,9 +523,9 @@ namespace HVACInterfaceManager {
             // update the MIN/MAX available flow rates
             Node(OtherLoopSideInletNode).MassFlowRateMinAvail = Node(ThisLoopSideOutletNode).MassFlowRateMinAvail;
             Node(OtherLoopSideInletNode).MassFlowRateMaxAvail = Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
-            // update Quality.  DSU? Note: This update assumes that STEAM cannot be used with common pipes.
+            // update Quality.  Note: This update assumes that STEAM cannot be used with common pipes.
             Node(OtherLoopSideInletNode).Quality = Node(ThisLoopSideOutletNode).Quality;
-            // pressure update  DSU? Note: This update assumes that PRESSURE SIMULATION cannot be used with common pipes.
+            // pressure update  Note: This update assumes that PRESSURE SIMULATION cannot be used with common pipes.
             if (state.dataPlnt->PlantLoop(LoopNum).HasPressureComponents) {
                 // Don't update pressure, let the pressure simulation handle pressures
             } else {

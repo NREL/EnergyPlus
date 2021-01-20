@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1592,7 +1592,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetFanInput(*state);
@@ -1615,16 +1615,16 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     HotWaterMassFlowRate = 0.0;
     ColdWaterMassFlowRate = 0.14;
 
-    Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-    Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+    Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+    Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-    Node(OAMixer(1).RetNode).Temp = 24.0;
-    Node(OAMixer(1).RetNode).Enthalpy = 36000;
-    Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+    Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+    Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+    Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-    Node(OAMixer(1).InletNode).Temp = 30.0;
-    Node(OAMixer(1).InletNode).Enthalpy = 53000;
-    Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+    Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+    Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+    Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
     Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
     Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1737,9 +1737,9 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     HeatingLoad = false;
     CoolingLoad = true;
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
     FanCoil(1).SpeedFanSel = 2;
     QUnitOut = 0.0;
     QZnReq = -4000.0;

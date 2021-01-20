@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -948,15 +948,15 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed)) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            Pumps::PumpEquip(
+                                                                            state.dataPumps->PumpEquip(
                                                                                 CompIndex).MassFlowRateMax);
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn =
                                             max(ThisBranchFlowRequestNeedIfOn,
-                                                Pumps::PumpEquip(CompIndex).MassFlowRateMax /
-                                                Pumps::PumpEquip(CompIndex).NumPumpsInBank);
+                                                state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
                                     }
                                 } else {
                                     ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
@@ -975,15 +975,15 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed)) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            Pumps::PumpEquip(
+                                                                            state.dataPumps->PumpEquip(
                                                                                 CompIndex).MassFlowRateMax);
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn =
                                             max(ThisBranchFlowRequestNeedIfOn,
-                                                Pumps::PumpEquip(CompIndex).MassFlowRateMax /
-                                                Pumps::PumpEquip(CompIndex).NumPumpsInBank);
+                                                state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
                                     }
                                 } else {
                                     ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
@@ -996,7 +996,7 @@ namespace DataPlant {
                                 auto const SELECT_CASE_var(component.TypeOf_Num);
                                 if (SELECT_CASE_var == DataPlant::TypeOf_PumpConstantSpeed) {
                                     if (CompIndex > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(CompIndex));
+                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                         if (ParallelBranchIndex >= 1) { // branch pump
                                             if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                                 ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
@@ -1016,7 +1016,7 @@ namespace DataPlant {
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(CompIndex));
+                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                         if (ParallelBranchIndex >= 1) { // branch pump
                                             if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                                 ThisBranchFlowRequestNeedIfOn =
@@ -1045,7 +1045,7 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed) ||
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpCondensate)) {
                                     if (component.CompNum > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(component.CompNum));
+                                        auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                         this_pump.LoopSolverOverwriteFlag = false;
                                     }
                                 }
@@ -1199,7 +1199,7 @@ namespace DataPlant {
                             (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed) ||
                             (SELECT_CASE_var == DataPlant::TypeOf_PumpCondensate)) {
                             if (component.CompNum > 0) {
-                                auto &this_pump(Pumps::PumpEquip(component.CompNum));
+                                auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                 this_pump.LoopSolverOverwriteFlag = true;
                             }
                         }
@@ -1240,7 +1240,7 @@ namespace DataPlant {
         this->FlowLock = DataPlant::iFlowLock::Unlocked;
         this->SimulateAllLoopSideBranches(state, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
 
-        // DSU? discussion/comments about loop solver/flow resolver interaction
+        // discussion/comments about loop solver/flow resolver interaction
         // At this point, the components have been simulated.  They should have either:
         //  - logged a massflowrequest
         //  - or logged a MassFlowRate
@@ -1599,7 +1599,6 @@ namespace DataPlant {
                 if (FlowRemaining == 0.0) return;
 
                 // 6) Adjust Inlet branch and outlet branch flow rates to match parallel branch rate
-                // DSU? do we need this logic?   or should we fatal on a diagnostic error
                 TotParallelBranchFlowReq = 0.0;
                 for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
                     BranchNum = this->Splitter.BranchNumOut(iBranch);
@@ -1622,7 +1621,6 @@ namespace DataPlant {
                 // IF INSUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
             } else if (FlowRemaining < TotParallelBranchFlowReq) {
 
-                // DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
                 // 1) apportion flow based on requested fraction of total
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
 
@@ -1972,8 +1970,6 @@ namespace DataPlant {
         int const OutletNode(this_comp.NodeNumOut);
 
         if (this->FlowLock == DataPlant::iFlowLock::Unlocked) {
-
-            // For unlocked flow, use the inlet request -- !DSU? for now
             {
                 auto const SELECT_CASE_var(this_comp.CurOpSchemeType);
                 if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) {
@@ -1981,7 +1977,7 @@ namespace DataPlant {
                 } else {
                     // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
                     ComponentMassFlowRate = Node(InletNode).MassFlowRateRequest;
-                    // DSU? make sure components like economizers use the mass flow request
+                    // make sure components like economizers use the mass flow request
                 }
             }
 
@@ -2285,14 +2281,14 @@ namespace DataPlant {
                 }
                 DataLoopNode::Node(SplitterOutletNode).Quality = DataLoopNode::Node(SplitterInletNode).Quality;
 
-                // DSU? These two blocks and the following one which I added need to be cleaned up
+                // These two blocks and the following one which I added need to be cleaned up
                 // I think we will always pass maxavail down the splitter, min avail is the issue.
-                // Changed to include hardware max in next line 7/26/2011
+                // Changed to include hardware max in next line
                 DataLoopNode::Node(SplitterOutletNode).MassFlowRateMaxAvail =
                     min(DataLoopNode::Node(SplitterInletNode).MassFlowRateMaxAvail, DataLoopNode::Node(SplitterOutletNode).MassFlowRateMax);
                 DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = 0.0;
 
-                // DSU? Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
+                // Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
                 // min flow rate, and it is causing problems because this routine passes zero down.  Perhaps if
                 // it is a single parallel branch, we are safe to assume we need to just pass it down.
                 // But need to test for multiple branches (or at least think about it), to see what we need to do...

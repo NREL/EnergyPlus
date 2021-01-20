@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -374,9 +374,9 @@ namespace Furnaces {
         // here we need to deal with sequenced zone equip
         ZoneLoad = 0.0;
         if (Furnace(FurnaceNum).ZoneSequenceCoolingNum > 0 && Furnace(FurnaceNum).ZoneSequenceHeatingNum > 0) {
-            ZoneLoadToCoolSPSequenced = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+            ZoneLoadToCoolSPSequenced = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                             .SequencedOutputRequiredToCoolingSP(Furnace(FurnaceNum).ZoneSequenceCoolingNum);
-            ZoneLoadToHeatSPSequenced = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+            ZoneLoadToHeatSPSequenced = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                             .SequencedOutputRequiredToHeatingSP(Furnace(FurnaceNum).ZoneSequenceHeatingNum);
             if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
                 TempControlType(Furnace(FurnaceNum).ControlZoneNum) != SingleCoolingSetPoint) {
@@ -393,11 +393,11 @@ namespace Furnaces {
             } else if (ZoneLoadToHeatSPSequenced <= 0.0 && ZoneLoadToCoolSPSequenced >= 0.0) {
                 ZoneLoad = 0.0;
             }
-            MoistureLoad = ZoneSysMoistureDemand(Furnace(FurnaceNum).ControlZoneNum)
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(Furnace(FurnaceNum).ControlZoneNum)
                                .SequencedOutputRequiredToDehumidSP(Furnace(FurnaceNum).ZoneSequenceCoolingNum);
         } else {
-            ZoneLoad = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).RemainingOutputRequired;
-            MoistureLoad = ZoneSysMoistureDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToDehumidifyingSP;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).RemainingOutputRequired;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToDehumidifyingSP;
         }
 
         H2OHtOfVap =
@@ -831,12 +831,6 @@ namespace Furnaces {
         using BranchNodeConnections::TestCompSet;
         using DataHeatBalance::Zone;
         using DataLoopNode::NodeID;
-        using DataZoneControls::ComfortControlledZone;
-        using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumComfortControlledZones;
-        using DataZoneControls::NumHumidityControlZones;
-        using DataZoneControls::NumTempControlledZones;
-        using DataZoneControls::TempControlledZone;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetWtoAHPSimpleCoilCapacity(WaterToAirHeatPumpSimple::GetCoilCapacity);
         auto &GetWtoAHPSimpleCoilInletNode(WaterToAirHeatPumpSimple::GetCoilInletNode);
@@ -1123,12 +1117,12 @@ namespace Furnaces {
                 AirNodeFound = false;
                 AirLoopFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
-                    Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -1138,17 +1132,17 @@ namespace Furnaces {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
-                                    Furnace(FurnaceNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                    Furnace(FurnaceNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                     break;
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
-                                if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
-                                if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
                         }
@@ -1669,12 +1663,12 @@ namespace Furnaces {
                 AirNodeFound = false;
                 AirLoopFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
-                    Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     //             Determine if system is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -1684,17 +1678,17 @@ namespace Furnaces {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
-                                    Furnace(FurnaceNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                    Furnace(FurnaceNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                     break;
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
-                                if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
-                                if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
                         }
@@ -2217,8 +2211,8 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                        if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                        if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
@@ -2868,12 +2862,12 @@ namespace Furnaces {
                 AirNodeFound = false;
                 AirLoopFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
-                    Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -2883,17 +2877,17 @@ namespace Furnaces {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
-                                    Furnace(FurnaceNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                    Furnace(FurnaceNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                     break;
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
-                                if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
-                                if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
                         }
@@ -3427,8 +3421,8 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                        if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                        if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
@@ -3790,12 +3784,12 @@ namespace Furnaces {
                 AirNodeFound = false;
                 AirLoopFound = false;
                 for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                    if (ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                     //             Find the controlled zone number for the specified thermostat location
-                    Furnace(FurnaceNum).NodeNumOfControlledZone = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                    Furnace(FurnaceNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                     //             Determine if furnace is on air loop served by the thermostat location specified
-                    for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
-                        int AirLoopNumber = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
+                        int AirLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (AirLoopNumber > 0) {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNumber).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -3805,17 +3799,17 @@ namespace Furnaces {
                                                                      CurrentModuleObject))
                                         continue;
                                     AirLoopFound = true;
-                                    Furnace(FurnaceNum).ZoneInletNode = ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                    Furnace(FurnaceNum).ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                     break;
                                 }
                                 if (AirLoopFound) break;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumTempControlledZones; ++TstatZoneNum) {
-                                if (TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum) {
-                                if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
                         }
@@ -4238,8 +4232,8 @@ namespace Furnaces {
                     Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (Furnace(FurnaceNum).Humidistat) {
-                    for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                        if (HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
+                    for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                        if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != Furnace(FurnaceNum).ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound) {
@@ -4806,9 +4800,6 @@ namespace Furnaces {
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanSpeedRatioCurveIndex;
 
@@ -5253,14 +5244,14 @@ namespace Furnaces {
             }
         }
 
-        if (allocated(ZoneEquipConfig) && MyCheckFlag(FurnaceNum)) {
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MyCheckFlag(FurnaceNum)) {
             int zoneNum = Zone(Furnace(FurnaceNum).ControlZoneNum).ZoneEqNum;
             int zoneInlet = Furnace(FurnaceNum).ZoneInletNode;
             int coolingPriority = 0;
             int heatingPriority = 0;
             // setup furnace zone equipment sequence information based on finding matching air terminal
-            if (ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                ZoneEquipList(ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
+            if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex).getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                 Furnace(FurnaceNum).ZoneSequenceCoolingNum = coolingPriority;
                 Furnace(FurnaceNum).ZoneSequenceHeatingNum = heatingPriority;
             }
@@ -5390,11 +5381,11 @@ namespace Furnaces {
 
         // Original thermostat control logic (works only for cycling fan systems)
         if (QZnReq > SmallLoad && QZnReq > (Small5WLoad / Furnace(FurnaceNum).ControlZoneMassFlowFrac) &&
-            !CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum)) {
+            !state.dataZoneEnergyDemand->CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum)) {
             HeatingLoad = true;
             CoolingLoad = false;
         } else if (QZnReq < (-1.0 * SmallLoad) && std::abs(QZnReq) > (Small5WLoad / Furnace(FurnaceNum).ControlZoneMassFlowFrac) &&
-                   !CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum)) {
+                   !state.dataZoneEnergyDemand->CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum)) {
             HeatingLoad = false;
             CoolingLoad = true;
         } else {
@@ -5676,16 +5667,16 @@ namespace Furnaces {
 
             if (Furnace(FurnaceNum).ControlZoneMassFlowFrac > 0.0) {
                 if (Furnace(FurnaceNum).ZoneSequenceCoolingNum > 0 && Furnace(FurnaceNum).ZoneSequenceHeatingNum > 0) {
-                    QToCoolSetPt = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+                    QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                        .SequencedOutputRequiredToCoolingSP(Furnace(FurnaceNum).ZoneSequenceCoolingNum) /
                                    Furnace(FurnaceNum).ControlZoneMassFlowFrac;
-                    QToHeatSetPt = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+                    QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                        .SequencedOutputRequiredToHeatingSP(Furnace(FurnaceNum).ZoneSequenceHeatingNum) /
                                    Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 } else {
-                    QToCoolSetPt = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToCoolingSP /
+                    QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToCoolingSP /
                                    Furnace(FurnaceNum).ControlZoneMassFlowFrac;
-                    QToHeatSetPt = ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP /
+                    QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP /
                                    Furnace(FurnaceNum).ControlZoneMassFlowFrac;
                 }
                 //     If the furnace has a net cooling capacity (SensibleOutput < 0) and
@@ -7401,7 +7392,7 @@ namespace Furnaces {
             if ((GetCurrentScheduleValue(state, Furnace(FurnaceNum).SchedPtr) > 0.0 && CoolingLoad) ||
                 (Furnace(FurnaceNum).Humidistat && Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat &&
                  (SystemMoistureLoad < 0.0 ||
-                  (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad && !Setback(Furnace(FurnaceNum).ControlZoneNum))))) {
+                  (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad && !state.dataZoneEnergyDemand->Setback(Furnace(FurnaceNum).ControlZoneNum))))) {
 
                 //     For cooling operation, the first step is to set the HX operation flag in case a HX assisted coil is used.
                 //      (if a HX assisted coil is not used, this flag is not used. It's only used in the CALL to SimHXAssistedCoolingCoil)
@@ -7431,7 +7422,7 @@ namespace Furnaces {
                 if (OpMode == CycFanCycCoil && Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 && Furnace(FurnaceNum).Humidistat &&
                     Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat &&
                     (SystemMoistureLoad < 0.0 ||
-                     (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad && !Setback(Furnace(FurnaceNum).ControlZoneNum)))) {
+                     (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad && !state.dataZoneEnergyDemand->Setback(Furnace(FurnaceNum).ControlZoneNum)))) {
                     CoolingHeatingPLRRatio = min(1.0, PartLoadRatio / Furnace(FurnaceNum).HeatPartLoadRatio);
                     SetAverageAirFlow(state, FurnaceNum, max(PartLoadRatio, Furnace(FurnaceNum).HeatPartLoadRatio), OnOffAirFlowRatio);
 
@@ -7616,7 +7607,7 @@ namespace Furnaces {
                         //       ELSE calculate a new PLR for valid dehumidification control types if a moisture load exists.
                     } else if (Furnace(FurnaceNum).DehumidControlType_Num != DehumidControl_None &&
                                (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && TempLatentOutput > SystemMoistureLoad &&
-                                                             !Setback(Furnace(FurnaceNum).ControlZoneNum)))) {
+                                                             !state.dataZoneEnergyDemand->Setback(Furnace(FurnaceNum).ControlZoneNum)))) {
 
                         //         IF the furnace uses dehumidification control MultiMode, turn on the HX and calculate the latent output with
                         //         the HX ON to compare to the moisture load predicted by the humidistat.
@@ -7975,11 +7966,11 @@ namespace Furnaces {
                 //     Calculate the reheat coil output
                 if (HumControl) { // HumControl = .TRUE. if a Humidistat is installed and dehumdification control type is CoolReheat
                     if (Furnace(FurnaceNum).ZoneSequenceHeatingNum > 0) {
-                        QToHeatSetPt = (ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                             .SequencedOutputRequiredToHeatingSP(Furnace(FurnaceNum).ZoneSequenceHeatingNum) /
                                         Furnace(FurnaceNum).ControlZoneMassFlowFrac);
                     } else {
-                        QToHeatSetPt = (ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP /
+                        QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP /
                                         Furnace(FurnaceNum).ControlZoneMassFlowFrac);
                     }
                     //       Cooling mode or floating condition and dehumidification is required
@@ -9962,7 +9953,6 @@ namespace Furnaces {
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEquipment::ZoneEquipConfig;
         using IntegratedHeatPump::DecideWorkMode;
 
         Real64 PartLoadFrac;                 // compressor part load fraction
@@ -10025,7 +10015,7 @@ namespace Furnaces {
         // set the on/off flags
         if (Furnace(FurnaceNum).OpMode == CycFanCycCoil) {
             // cycling unit only runs if there is a cooling or heating load.
-            if (std::abs(QZnReq) < SmallLoad || AirMassFlow < SmallMassFlow || CurDeadBandOrSetback(ZoneNum)) {
+            if (std::abs(QZnReq) < SmallLoad || AirMassFlow < SmallMassFlow || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 UnitOn = false;
             }
         } else if (Furnace(FurnaceNum).OpMode == ContFanCycCoil) {
@@ -10142,12 +10132,12 @@ namespace Furnaces {
                                  OnOffAirFlowRatio,
                                  ReheatCoilLoad);
             if (Furnace(FurnaceNum).ZoneSequenceHeatingNum > 0) {
-                QToHeatSetPt = (ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
+                QToHeatSetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                     .SequencedOutputRequiredToHeatingSP(Furnace(FurnaceNum).ZoneSequenceHeatingNum) /
                                 Furnace(FurnaceNum).ControlZoneMassFlowFrac);
             } else {
                 QToHeatSetPt =
-                    (ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP / Furnace(FurnaceNum).ControlZoneMassFlowFrac);
+                    (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum).OutputRequiredToHeatingSP / Furnace(FurnaceNum).ControlZoneMassFlowFrac);
             }
             //       Cooling mode or floating condition and dehumidification is required
             if (QToHeatSetPt < 0.0) {
@@ -11568,7 +11558,6 @@ namespace Furnaces {
         // Using/Aliasing
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using IntegratedHeatPump::GetAirMassFlowRateIHP;
         using IntegratedHeatPump::GetMaxSpeedNumIHP;
         using IntegratedHeatPump::IHPOperationMode;
@@ -11638,7 +11627,7 @@ namespace Furnaces {
                 FanSpeedRatio = CompOnFlowRatio;
             }
         } else if (Furnace(FurnaceNum).bIsIHP) {
-            if (!CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
+            if (!state.dataZoneEnergyDemand->CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
                 // if(present(SpeedNum)) {
                 CompOnMassFlow = GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, SpeedRatio, false);
                 CompOnFlowRatio =
@@ -11684,7 +11673,7 @@ namespace Furnaces {
                 AverageUnitMassFlow = CompOnMassFlow;
             };
         } else {
-            if (!CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
+            if (!state.dataZoneEnergyDemand->CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
                 if (Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) {
                     if (SpeedNum == 1) {
                         CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(SpeedNum);
@@ -11802,24 +11791,6 @@ namespace Furnaces {
         // air flow rates. Use these flow rates during the Calc routines to set the average mass flow rates
         // based on PLR.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;  // Inlet node number in MSHP loop
         int OutNode; // Outlet node number in MSHP loop
@@ -11840,11 +11811,11 @@ namespace Furnaces {
         // Set the inlet node mass flow rate
         if (Furnace(FurnaceNum).OpMode == ContFanCycCoil) {
             // constant fan mode
-            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
                 Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::HeatingMode;
-            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
                 Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
@@ -11856,10 +11827,10 @@ namespace Furnaces {
             CompOffFlowRatio = Furnace(FurnaceNum).IdleSpeedRatio;
         } else {
             // cycling fan mode
-            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSHeatingSpeedRatio(1);
-            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = Furnace(FurnaceNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = Furnace(FurnaceNum).MSCoolingSpeedRatio(1);
             } else {

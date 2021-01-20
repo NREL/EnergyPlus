@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2623,10 +2623,6 @@ namespace EnergyPlus::PlantManager {
 
             // FirstHVACiteration inits
             for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-                // UPDATE LOOP FLOW SETPOINT
-                //    Node(LoopIn)%MassFlowRateSetPoint =  LoopMaxMassFlowRate !DSU? this is suspect, may not be set?
-                // UPDATE LOOP TEMPERATURE SETPOINTS
-
                 LoopSetPointTemp = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
                 // Check the Loop Setpoint and make sure it is bounded by the Loop Max and Min

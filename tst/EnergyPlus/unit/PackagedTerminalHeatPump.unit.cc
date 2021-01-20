@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -801,7 +801,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -824,10 +824,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = false;
@@ -868,9 +868,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(PTUnit(1).AirInNode).HumRat = Node(ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(PTUnit(1).AirInNode).Enthalpy = Node(ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    Node(PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    Node(PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    Node(PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
@@ -880,10 +880,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     TempControlType.allocate(1);
     TempControlType(1) = 1;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;    // set cooling load to zero
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // zero zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;    // set cooling load to zero
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // zero zone heating load
 
     // supply fan is continuous flow
     PTUnit(1).MaxHeatAirMassFlow = HVACInletMassFlowRate;
@@ -1153,7 +1153,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
     GetPTUnitInputFlag = false;
@@ -1170,10 +1170,10 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PrimaryAirMassFlowRate = 0.20;
 
     // set zoneNode air condition
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
-    Node(ZoneEquipConfig(1).ZoneNode).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(1).ZoneNode).Temp, Node(ZoneEquipConfig(1).ZoneNode).HumRat);
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 21.1;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.0075;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = false;
@@ -1214,23 +1214,23 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(PTUnit(PTUnitNum).OutsideAirNode).Enthalpy = state->dataEnvrn->OutEnthalpy;
 
     // set secondary air (recirculating air) conditions to zone air node
-    Node(PTUnit(1).AirInNode).Temp = Node(ZoneEquipConfig(1).ZoneNode).Temp;
-    Node(PTUnit(1).AirInNode).HumRat = Node(ZoneEquipConfig(1).ZoneNode).HumRat;
-    Node(PTUnit(1).AirInNode).Enthalpy = Node(ZoneEquipConfig(1).ZoneNode).Enthalpy;
+    Node(PTUnit(1).AirInNode).Temp = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp;
+    Node(PTUnit(1).AirInNode).HumRat = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat;
+    Node(PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     PTUnit(1).ControlZoneNum = 1;
     SysSizingRunDone = true;
     ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = false;
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
     TempControlType.allocate(1);
     TempControlType(1) = 1;
 
-    ZoneSysEnergyDemand.allocate(1);
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
-    ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;    // set cooling load to zero
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // zero zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;    // set cooling load to zero
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // zero zone heating load
 
     // supply fan is continuous flow
     //		PTUnit( 1 ).MaxHeatAirMassFlow = HVACInletMassFlowRate;
@@ -1267,29 +1267,29 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 
     // Boundary load for this system in Region 1 at minimum air flow rate is 2006.8 W (lower boundary load in Region 1)
     // loads below the bounday load should operate at the minimum air flow rate
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0; // set heating load to non-zero value below lower boundary load
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0; // set heating load to non-zero value below lower boundary load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0; // set heating load to just below lower boundary load
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0; // set heating load to just below lower boundary load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp);
 
     // loads above the lower bounday load should operate above the minimum air flow rate
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2010.0; // set heating load to just above lower boundary load
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2010.0; // set heating load to just above lower boundary load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
     ASSERT_GT(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
 
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W (upper boundary load of Region 1)
     // system should operate below the maximum air flow rate at loads less than 2995.2 W
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2990.0; // set heating load to just below upper boundary load
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2990.0; // set heating load to just below upper boundary load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_NEAR(PTUnit(PTUnitNum).DesignMaxOutletTemp, HeatingCoils::HeatingCoil(1).OutletAirTemp, 0.1);
     ASSERT_GT(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow);
@@ -1298,8 +1298,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     // Boundary load for this system in Region 1 at maximum air flow rate is 2995.2 W
     // system should operate at maximum air flow rate for loads greater than 2995.2 W
     // outlet air temperture is allowed to be above the design maximum supply air temperature in heating mode
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 3000.0; // set heating load to just above upper boundary load
-    QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 3000.0; // set heating load to just above upper boundary load
+    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP; // initialize zone heating load
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     ASSERT_GT(HeatingCoils::HeatingCoil(1).OutletAirTemp, PTUnit(PTUnitNum).DesignMaxOutletTemp);
     ASSERT_NEAR(Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate, PTUnit(PTUnitNum).MaxHeatAirMassFlow, 0.0001);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1960,7 +1960,7 @@ namespace ChillerElectricEIR {
                 PartLoadRat = 0.0;
                 this->ChillerPartLoadRatio = PartLoadRat;
 
-                // DSU? so what if the delta T is zero?  On FlowLock==0, the inlet temp could = setpoint, right?
+                // so what if the delta T is zero?  On FlowLock==0, the inlet temp could = setpoint, right?
                 if (this->DeltaTErrCount < 1 && !state.dataGlobal->WarmupFlag) {
                     ++this->DeltaTErrCount;
                     ShowWarningError(state, "Evaporator DeltaTemp = 0 in mass flow calculation (Tevapin = Tsetpoint).");
@@ -2157,7 +2157,7 @@ namespace ChillerElectricEIR {
             } else {
                 ShowSevereError(state, "CalcElectricEIRChillerModel: Condenser flow = 0, for ElectricEIRChiller=" + this->Name);
                 ShowContinueErrorTimeStamp(state, "");
-                // DSU? maybe this could be handled earlier, check if this component has a load and an evap flow rate
+                // maybe this could be handled earlier, check if this component has a load and an evap flow rate
                 // then if cond flow is zero, just make a request to the condenser,
                 // then just say it couldn't run until condenser loop wakes up.
                 // CALL ShowFatalError(state, 'Program Terminates due to previous error condition.')
