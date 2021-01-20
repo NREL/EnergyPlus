@@ -6911,8 +6911,8 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     if (produceTabular) {
-                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                         rowHead,
                                                                                                         columnHead,
                                                                                                         repNameWithUnitsandscheduleName,
@@ -6971,7 +6971,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                     if (produceTabular) {
-                        if (state.datatResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
                             state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
                         }
