@@ -161,11 +161,13 @@ TEST_F(lib_battery_lifetime_cycle_test, replaceBatteryTest) {
 TEST_F(lib_battery_lifetime_calendar_matrix_test, runCalendarMatrixTest) {
     double T = 278, SOC = 20;       // not used but required for function
     int idx = 0;
+    //Rohit - add charge_changed to CalendarModel
+    bool charge_changed = true;
     while (idx < 500){
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC, charge_changed);
         idx++;
     }
     calendar_state s = cal_model->get_state();
@@ -177,7 +179,7 @@ TEST_F(lib_battery_lifetime_calendar_matrix_test, runCalendarMatrixTest) {
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC, charge_changed);
         idx++;
     }
     s = cal_model->get_state();
@@ -189,11 +191,13 @@ TEST_F(lib_battery_lifetime_calendar_matrix_test, runCalendarMatrixTest) {
 TEST_F(lib_battery_lifetime_calendar_matrix_test, replaceBatteryTest) {
     double T = 4.85, SOC = 20;
     int idx = 0;
+    // Rohit - add charge_changed to Calendar Model
+    bool charge_changed = true; 
     while (idx < 200000){
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC,charge_changed);
         idx++;
     }
     calendar_state s = cal_model->get_state();
@@ -216,11 +220,13 @@ TEST_F(lib_battery_lifetime_calendar_model_test, SetUpTest) {
 TEST_F(lib_battery_lifetime_calendar_model_test, runCalendarModelTest) {
     double T = 4.85, SOC = 20;       // not used but required for function
     int idx = 0;
+    // Add charge_changed to calendar model
+    bool charge_changed = true;
     while (idx < 500){
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC,charge_changed);
         idx++;
     }
     calendar_state s = cal_model->get_state();
@@ -232,7 +238,7 @@ TEST_F(lib_battery_lifetime_calendar_model_test, runCalendarModelTest) {
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC,charge_changed);
         idx++;
     }
     s = cal_model->get_state();
@@ -244,11 +250,13 @@ TEST_F(lib_battery_lifetime_calendar_model_test, runCalendarModelTest) {
 TEST_F(lib_battery_lifetime_calendar_model_test, replaceBatteryTest) {
     double T = 4.85, SOC = 20;
     int idx = 0;
+    //Rohit - add charge_changed to CalendarModel
+    bool charge_changed = true; 
     while (idx < 200000){
         if (idx % 2 != 0){
             SOC = 90;
         }
-        cal_model->runLifetimeCalendarModel(idx, T, SOC);
+        cal_model->runLifetimeCalendarModel(idx, T, SOC,charge_changed);
         idx++;
     }
     calendar_state s = cal_model->get_state();
@@ -269,11 +277,13 @@ TEST_F(lib_battery_lifetime_calendar_matrix_test, TestLifetimeDegradation) {
     util::matrix_t<double> lifetime_matrix;
     lifetime_matrix.assign(vals, 2, 2);
 
+    //Rohit - add charge_changed to Calendar model
+    bool charge_changed = true;
     double dt_hour = 1;
     lifetime_calendar_t hourly_lifetime(dt_hour, lifetime_matrix);
 
     for (int idx = 0; idx < 8760; idx++) {
-        hourly_lifetime.runLifetimeCalendarModel(idx, 20, 80);
+        hourly_lifetime.runLifetimeCalendarModel(idx, 20, 80,charge_changed);
     }
 
     EXPECT_NEAR(hourly_lifetime.capacity_percent(), 50, 1);
@@ -282,7 +292,7 @@ TEST_F(lib_battery_lifetime_calendar_matrix_test, TestLifetimeDegradation) {
     lifetime_calendar_t subhourly_lifetime(dt_hour, lifetime_matrix);
 
     for (int idx = 0; idx < 8760 * 12; idx++) {
-        subhourly_lifetime.runLifetimeCalendarModel(idx, 20, 80);
+        subhourly_lifetime.runLifetimeCalendarModel(idx, 20, 80,charge_changed);
     }
 
     EXPECT_NEAR(subhourly_lifetime.capacity_percent(), 50, 1);
@@ -291,8 +301,11 @@ TEST_F(lib_battery_lifetime_calendar_matrix_test, TestLifetimeDegradation) {
 
 TEST_F(lib_battery_lifetime_calendar_model_test, TestLifetimeDegradation) {
 
+    //Rohit - add charge_changed to CalendarModel
+    bool charge_changed = true;
+
     for (int idx = 0; idx < 8760; idx++) {
-        cal_model->runLifetimeCalendarModel(idx, 20, 80);
+        cal_model->runLifetimeCalendarModel(idx, 20, 80,charge_changed);
     }
 
     EXPECT_NEAR(cal_model->capacity_percent(), 99.812, 1);
@@ -301,7 +314,7 @@ TEST_F(lib_battery_lifetime_calendar_model_test, TestLifetimeDegradation) {
     lifetime_calendar_t subhourly_lifetime(dt_hour);
 
     for (int idx = 0; idx < 8760 * 12; idx++) {
-        subhourly_lifetime.runLifetimeCalendarModel(idx, 20, 80);
+        subhourly_lifetime.runLifetimeCalendarModel(idx, 20, 80,charge_changed);
     }
 
     EXPECT_NEAR(subhourly_lifetime.capacity_percent(), 99.812, 1);
@@ -347,6 +360,8 @@ TEST_F(lib_battery_lifetime_test, runCycleLifetimeTestWithRestPeriod) {
     EXPECT_NEAR(s.range, 90, tol);
     EXPECT_NEAR(s.average_range, 90, tol);
     EXPECT_NEAR(s.n_cycles, 2, tol);
+    //Rohit
+    EXPECT_GT(s.n_cycles, 0, tol);
 }
 
 
