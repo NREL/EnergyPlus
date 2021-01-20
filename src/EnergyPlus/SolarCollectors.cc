@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -287,7 +287,7 @@ namespace SolarCollectors {
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(state, state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -782,7 +782,7 @@ namespace SolarCollectors {
         }
 
         if (this->SetLoopIndexFlag) {
-            if (allocated(DataPlant::PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
@@ -802,9 +802,9 @@ namespace SolarCollectors {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->WLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
                                                                DataGlobalConstants::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
                                                                RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
@@ -988,7 +988,7 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = DataSurfaces::Surface(SurfNum).Area;
@@ -1260,11 +1260,11 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // density of collector fluid (kg/m3)
         Real64 Rhow = FluidProperties::GetDensityGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp(state);
@@ -1967,11 +1967,11 @@ namespace SolarCollectors {
 
         static std::string const RoutineName("UpdateSolarCollector");
 
-        PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
         DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
     }
 

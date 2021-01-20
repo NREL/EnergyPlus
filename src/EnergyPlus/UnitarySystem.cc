@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -583,7 +583,7 @@ namespace UnitarySystems {
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
-        if (this->m_MyPlantScanFlag && allocated(DataPlant::PlantLoop)) {
+        if (this->m_MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (this->m_HeatRecActive) {
                 state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -650,14 +650,14 @@ namespace UnitarySystems {
                 this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                 if (this->MaxCoolCoilFluidFlow > 0.0) {
-                    Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
+                    Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
                                                                    routineName);
                     this->MaxCoolCoilFluidFlow *= rho;
                 }
                 // fill outlet node for coil
-                this->CoolCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->CoolCoilLoopNum)
+                this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilLoopNum)
                                                        .LoopSide(this->CoolCoilLoopSide)
                                                        .Branch(this->CoolCoilBranchNum)
                                                        .Comp(this->CoolCoilCompNum)
@@ -700,9 +700,9 @@ namespace UnitarySystems {
                         WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                     if (this->MaxHeatCoilFluidFlow > 0.0) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                        DataGlobalConstants::HWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                        routineName);
                         this->MaxHeatCoilFluidFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) * rho;
@@ -717,7 +717,7 @@ namespace UnitarySystems {
                     }
                 }
                 // fill outlet node for coil
-                this->HeatCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->HeatCoilLoopNum)
+                this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilLoopNum)
                                                        .LoopSide(this->HeatCoilLoopSide)
                                                        .Branch(this->HeatCoilBranchNum)
                                                        .Comp(this->HeatCoilCompNum)
@@ -731,7 +731,7 @@ namespace UnitarySystems {
         }
 
         // Scan Supplemental hot water and steam heating coil plant components for one time initializations
-        if (this->m_MySuppCoilPlantScanFlag && allocated(DataPlant::PlantLoop)) {
+        if (this->m_MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 state.dataUnitarySystems->initUnitarySystemsErrFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -759,15 +759,15 @@ namespace UnitarySystems {
                     WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
 
                 if (this->m_MaxSuppCoilFluidFlow > 0.0) {
-                    Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                    Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
-                                                                   DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                    routineName);
                     this->m_MaxSuppCoilFluidFlow =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->m_SuppCoilLoopNum)
+                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
                                                          .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
@@ -800,7 +800,7 @@ namespace UnitarySystems {
                 }
 
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->m_SuppCoilLoopNum)
+                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
                                                          .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
@@ -831,9 +831,9 @@ namespace UnitarySystems {
 
             if ((this->m_HeatRecActive) && (!this->m_MyPlantScanFlag)) {
 
-                Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_HRLoopNum).FluidName,
+                Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidName,
                                                                DataGlobalConstants::HWInitConvTemp,
-                                                               DataPlant::PlantLoop(this->m_HRLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidIndex,
                                                                routineName);
 
                 this->m_DesignHeatRecMassFlowRate = this->m_DesignHRWaterVolumeFlow * rho;
@@ -862,9 +862,9 @@ namespace UnitarySystems {
                     Real64 CoilMaxVolFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, this->m_CoolingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                     if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                        Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
+                        Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
-                                                                       DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->CoolCoilLoopNum).FluidIndex,
                                                                        routineName);
                         this->MaxCoolCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
@@ -888,9 +888,9 @@ namespace UnitarySystems {
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -930,9 +930,9 @@ namespace UnitarySystems {
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, state.dataUnitarySystems->initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -2838,7 +2838,7 @@ namespace UnitarySystems {
                 }
 
                 // Early calls to ATMixer don't have enough info to pass GetInput. Need push_back here, and protect against the next time through.
-                if (sysNum == -1 || !DataZoneEquipment::ZoneEquipInputsFilled) {
+                if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
                     if (sysNum == -1) state.dataUnitarySystems->unitarySys.push_back(thisSys);
                     continue;
                 }
@@ -3161,8 +3161,8 @@ namespace UnitarySystems {
                 }
                 if (thisSys.m_Humidistat && thisSys.m_ControlType == ControlType::Load) {
                     bool AirNodeFound = false;
-                    for (int HStatZoneNum = 1; HStatZoneNum <= DataZoneControls::NumHumidityControlZones; ++HStatZoneNum) {
-                        if (DataZoneControls::HumidityControlZone(HStatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
+                    for (int HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                        if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                         AirNodeFound = true;
                     }
                     if (!AirNodeFound && thisSys.ControlZoneNum > 0) {
@@ -3201,33 +3201,33 @@ namespace UnitarySystems {
                 // check if the UnitarySystem is connected as zone equipment
                 if (!thisSys.ATMixerExists && !AirLoopFound && !OASysFound) {
                     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
-                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
+                        for (int ZoneExhNum = 1; ZoneExhNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNum) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
                             ZoneEquipmentFound = true;
                             //               Find the controlled zone number for the specified thermostat location
-                            thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                            thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                             TotalFloorAreaOnAirLoop =
-                                DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                             thisSys.m_AirLoopEquipment = false;
-                            thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
-                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                       DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                            thisSys.m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
+                                for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
+                                                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                        .NumOfEquipTypes;
                                      ++EquipNum) {
-                                    if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                    if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                              .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != thisObjectName)
                                         continue;
                                     // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                     // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
                                     // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                     thisSys.m_ZoneSequenceCoolingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     thisSys.m_ZoneSequenceHeatingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
                                     break;
                                 }
@@ -3236,9 +3236,9 @@ namespace UnitarySystems {
                             break;
                         }
                         if (ZoneEquipmentFound) {
-                            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                            for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                  ++ZoneInletNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
                                 ZoneInletNodeFound = true;
                                 break;
                             }
@@ -3246,9 +3246,9 @@ namespace UnitarySystems {
                     }
                     if (!ZoneInletNodeFound) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                            for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                  ++ZoneInletNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
                                 ZoneInletNodeFound = true;
                                 ZoneEquipmentFound = true;
                                 break;
@@ -3271,44 +3271,44 @@ namespace UnitarySystems {
 
                     if (!AirLoopFound && !OASysFound) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
+                            for (int ZoneExhNum = 1; ZoneExhNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
                                  ++ZoneExhNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.m_ATMixerSecNode)
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.m_ATMixerSecNode)
                                     continue;
                                 ZoneEquipmentFound = true;
                                 //               Find the controlled zone number for the specified thermostat location
-                                thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                                thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                 TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.AirOutNode;
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                           DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
+                                    for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
+                                                                           state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                            .NumOfEquipTypes;
                                          ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                  .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                         // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
                                         // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
                                     }
                                 }
                                 break;
                             }
                             if (ZoneEquipmentFound) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                                for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
+                                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
                                     ZoneInletNodeFound = true;
                                     break;
                                 }
@@ -3316,9 +3316,9 @@ namespace UnitarySystems {
                         }
                         if (!ZoneInletNodeFound) {
                             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                                for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
+                                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.AirOutNode) continue;
                                     ZoneInletNodeFound = true;
                                     ZoneEquipmentFound = true;
                                     break;
@@ -3341,43 +3341,43 @@ namespace UnitarySystems {
 
                     if (!AirLoopFound && !OASysFound) {
                         for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            for (int ZoneExhNum = 1; ZoneExhNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
+                            for (int ZoneExhNum = 1; ZoneExhNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes;
                                  ++ZoneExhNum) {
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum) != thisSys.AirInNode) continue;
                                 ZoneEquipmentFound = true;
                                 //               Find the controlled zone number for the specified thermostat location
-                                thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                                thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                 TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
-                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
-                                    for (int EquipNum = 1; EquipNum <= DataZoneEquipment::ZoneEquipList(
-                                                                           DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
+                                    for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(
+                                                                           state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                                            .NumOfEquipTypes;
                                          ++EquipNum) {
-                                        if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                        if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                  .EquipType_Num(EquipNum) != DataZoneEquipment::ZoneUnitarySys_Num) ||
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
                                         // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
                                         // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         thisSys.m_ZoneSequenceHeatingNum =
-                                            DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
+                                            state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
                                     }
                                 }
                                 break;
                             }
                             if (ZoneEquipmentFound) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                                for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
+                                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
                                         continue;
                                     ZoneInletNodeFound = true;
                                     break;
@@ -3386,9 +3386,9 @@ namespace UnitarySystems {
                         }
                         if (!ZoneInletNodeFound) {
                             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                for (int ZoneInletNum = 1; ZoneInletNum <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                                for (int ZoneInletNum = 1; ZoneInletNum <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                      ++ZoneInletNum) {
-                                    if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
+                                    if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInletNum) != thisSys.ATMixerOutNode)
                                         continue;
                                     ZoneInletNodeFound = true;
                                     ZoneEquipmentFound = true;
@@ -3421,27 +3421,27 @@ namespace UnitarySystems {
                                     AirLoopNumber = AirLoopNum;
                                     AirLoopFound = true;
                                     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                        if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
+                                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                                         //             Find the controlled zone number for the specified thermostat location
-                                        thisSys.NodeNumOfControlledZone = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                                        thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                         //             Determine if system is on air loop served by the thermostat location specified
-                                        for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
+                                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes;
                                              ++zoneInNode) {
-                                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) ==
+                                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode) ==
                                                 AirLoopNumber) {
-                                                thisSys.m_ZoneInletNode = DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
+                                                thisSys.m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                                 TotalFloorAreaOnAirLoop +=
-                                                    DataHeatBalance::Zone(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
+                                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
                                                         .FloorArea;
                                             }
                                         }
                                         // if (thisSys.m_ZoneInletNode == 0) AirLoopFound = false;
-                                        for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
-                                            if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum) continue;
                                             AirNodeFound = true;
                                         }
-                                        for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones; ++TstatZoneNum) {
-                                            if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum)
+                                        for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++TstatZoneNum) {
+                                            if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != thisSys.ControlZoneNum)
                                                 continue;
                                             AirNodeFound = true;
                                         }
@@ -7781,9 +7781,9 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->CoolingLoad = false;
                 if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 and this->m_AirLoopEquipment) {
                     // air loop equipment uses sequenced variables
-                    state.dataUnitarySystems->QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToCoolingSP(this->m_ZoneSequenceCoolingNum);
-                    state.dataUnitarySystems->QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToHeatingSP(this->m_ZoneSequenceHeatingNum);
                     if (state.dataUnitarySystems->QToHeatSetPt > 0.0 && state.dataUnitarySystems->QToCoolSetPt > 0.0 &&
                         DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
@@ -7802,14 +7802,14 @@ namespace UnitarySystems {
                     } else if (state.dataUnitarySystems->QToHeatSetPt <= 0.0 && state.dataUnitarySystems->QToCoolSetPt >= 0.0) {
                         ZoneLoad = 0.0;
                     }
-                    state.dataUnitarySystems->MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum)
+                    state.dataUnitarySystems->MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToDehumidSP(this->m_ZoneSequenceCoolingNum);
                 } else {
                     // zone equipment uses Remaining* variables
-                    ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
-                    state.dataUnitarySystems->QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
-                    state.dataUnitarySystems->QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
-                    state.dataUnitarySystems->MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
+                    ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
+                    state.dataUnitarySystems->QToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
+                    state.dataUnitarySystems->QToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
+                    state.dataUnitarySystems->MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
                 }
 
                 if (ZoneLoad < 0.0 && state.dataUnitarySystems->MoistureLoad <= 0.0 && (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
@@ -9470,9 +9470,9 @@ namespace UnitarySystems {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex);
                         Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -9511,9 +9511,9 @@ namespace UnitarySystems {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex);
                         Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 rho = FluidProperties::GetDensityGlycol(state, DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
+                            Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
-                                                                           DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                            routineName);
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -9546,7 +9546,7 @@ namespace UnitarySystems {
             this->m_MyEnvrnFlag2 = false;
         }
 
-        if (allocated(DataZoneEquipment::ZoneEquipConfig) && this->m_MyCheckFlag) {
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && this->m_MyCheckFlag) {
             if (this->m_AirLoopEquipment) {
                 int zoneNum = DataHeatBalance::Zone(this->ControlZoneNum).ZoneEqNum;
                 int zoneInlet = this->m_ZoneInletNode;
@@ -9560,8 +9560,8 @@ namespace UnitarySystems {
                 int coolingPriority = 0;
                 int heatingPriority = 0;
                 // setup zone equipment sequence information based on finding matching air terminal
-                if (DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
-                    DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(zoneNum).EquipListIndex)
+                if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex > 0) {
+                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex)
                         .getPrioritiesForInletNode(state, zoneInlet, coolingPriority, heatingPriority);
                     this->m_ZoneSequenceCoolingNum = coolingPriority;
                     this->m_ZoneSequenceHeatingNum = heatingPriority;
@@ -9836,10 +9836,10 @@ namespace UnitarySystems {
         }
 
         // Determine the m_Staged status
-        if (allocated(DataZoneControls::StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
-            if (DataZoneControls::StageZoneLogic(this->ControlZoneNum)) {
+        if (allocated(state.dataZoneCtrls->StageZoneLogic) && this->m_DesignSpecMSHPIndex > 0) {
+            if (state.dataZoneCtrls->StageZoneLogic(this->ControlZoneNum)) {
                 this->m_Staged = true;
-                this->m_StageNum = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
+                this->m_StageNum = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum;
             } else {
                 if (this->m_MyStagedFlag) {
                     ShowWarningError(state, "ZoneControl:Thermostat:StagedDualSetpoint is found, but is not applied to this UnitarySystem "
@@ -9857,7 +9857,7 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->CoolingLoad = false;
                 QZnReq = 0.0;
             } else {
-                QZnReq = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired / this->ControlZoneMassFlowFrac;
+                QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired / this->ControlZoneMassFlowFrac;
                 if (this->m_StageNum > 0) {
                     state.dataUnitarySystems->HeatingLoad = true;
                     state.dataUnitarySystems->CoolingLoad = false;
@@ -14117,7 +14117,7 @@ namespace UnitarySystems {
         if (HeatRecMassFlowRate > 0.0) {
 
             Real64 CpHeatRec = FluidProperties::GetSpecificHeatGlycol(
-                state, DataPlant::PlantLoop(this->m_HRLoopNum).FluidName, HeatRecInletTemp, DataPlant::PlantLoop(this->m_HRLoopNum).FluidIndex, routineName);
+                state, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidName, HeatRecInletTemp, state.dataPlnt->PlantLoop(this->m_HRLoopNum).FluidIndex, routineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
             // coil model should be handling max outlet water temp (via limit to heat transfer) since heat rejection needs to be accounted for by the
@@ -14131,7 +14131,7 @@ namespace UnitarySystems {
             QHeatRec = 0.0;
         }
 
-        PlantUtilities::SafeCopyPlantNode(HeatRecInNode, HeatRecOutNode);
+        PlantUtilities::SafeCopyPlantNode(state, HeatRecInNode, HeatRecOutNode);
 
         DataLoopNode::Node(HeatRecOutNode).Temp = HeatRecOutletTemp;
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -67,9 +69,6 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
@@ -1010,8 +1009,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSolarShading->clear_state();
-
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;
 
@@ -1088,7 +1085,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_DOUBLE_EQ(1, SunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
     EXPECT_DOUBLE_EQ(0.5432, SunlitFrac(4, 9, surfNum));
-    state->dataSolarShading->clear_state();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
@@ -1420,8 +1416,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
-    state->dataSolarShading->clear_state();
 
     SimulationManager::GetProjectData(*state);
     bool FoundError = false;

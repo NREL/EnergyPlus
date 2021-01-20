@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,27 +52,21 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cmath>
 #include <string>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -657,20 +651,20 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     MixedAir::GetOAControllerInputs(*state);
 
     // there are two OA controller objects
-    EXPECT_EQ(MixedAir::NumOAControllers, 2);
+    EXPECT_EQ(state->dataMixedAir->NumOAControllers, 2);
     // there are five economizer faults
     EXPECT_EQ(FaultsManager::NumFaultyEconomizer, 5);
 
     // there are three economizer faults in the 1st OA controller
-    EXPECT_EQ(MixedAir::OAController(1).NumFaultyEconomizer, 3);
-    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(1), 1);
-    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(2), 2);
-    EXPECT_EQ(MixedAir::OAController(1).EconmizerFaultNum(3), 3);
+    EXPECT_EQ(state->dataMixedAir->OAController(1).NumFaultyEconomizer, 3);
+    EXPECT_EQ(state->dataMixedAir->OAController(1).EconmizerFaultNum(1), 1);
+    EXPECT_EQ(state->dataMixedAir->OAController(1).EconmizerFaultNum(2), 2);
+    EXPECT_EQ(state->dataMixedAir->OAController(1).EconmizerFaultNum(3), 3);
 
     // there are two economizer faults in the 2nd OA controller
-    EXPECT_EQ(MixedAir::OAController(2).NumFaultyEconomizer, 2);
-    EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(1), 4);
-    EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(2), 5);
+    EXPECT_EQ(state->dataMixedAir->OAController(2).NumFaultyEconomizer, 2);
+    EXPECT_EQ(state->dataMixedAir->OAController(2).EconmizerFaultNum(1), 4);
+    EXPECT_EQ(state->dataMixedAir->OAController(2).EconmizerFaultNum(2), 5);
 }
 
 
