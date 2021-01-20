@@ -1048,16 +1048,12 @@ namespace HeatBalFiniteDiffManager {
 
     int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)
     {
-        std::cout << "Num Surfs: " << Surface.size() << std::endl;
         for (auto &surface : Surface) {
             if (surface.Name == surfName) {
-                std::cout << "Matched Surface: " << surfName << std::endl;
                 int constrNum = surface.Construction;
                 for (int lay = 1; lay <= state.dataConstruction->Construct(constrNum).TotLayers; ++lay) {
                     int matLay = state.dataConstruction->Construct(constrNum).LayerPoint(lay);
                     if (state.dataMaterial->Material(matLay).Name == matName) {
-                        std::cout << "Matched Material: " << matName << std::endl;
-                        std::cout << "Num Layers in " << surfName << ": " << ConstructFD(constrNum).NodeNumPoint(lay) << std::endl;
                         return ConstructFD(constrNum).NodeNumPoint(lay);
                     }
                 }
