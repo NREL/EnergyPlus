@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6324,10 +6324,10 @@ namespace HeatBalanceSurfaceManager {
                     Real64 SumSysMCp = 0.0;
                     Real64 SumSysMCpT = 0.0;
                     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        Real64 NodeTemp = DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                        Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         Real64 MassFlowRate =
-                            DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -7188,10 +7188,10 @@ namespace HeatBalanceSurfaceManager {
                         Real64 SumSysMCp = 0.0;
                         Real64 SumSysMCpT = 0.0;
                         Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(zoneNum));
-                        for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            Real64 NodeTemp = DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                            Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             Real64 MassFlowRate =
-                                DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                                DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,13 +51,12 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -2456,7 +2455,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2611,7 +2609,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
     int CyclingScheme(1);
@@ -2635,11 +2633,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
-    PlantLoop.allocate(LoopNum);
-    PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
-    PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
-    auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
+    state->dataPlnt->PlantLoop.allocate(LoopNum);
+    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
