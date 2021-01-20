@@ -4345,7 +4345,6 @@ namespace VariableSpeedCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -4417,7 +4416,7 @@ namespace VariableSpeedCoils {
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum ==
              DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit)) { // fix coil type
-            if (MyPlantScanFlag(DXCoilNum) && allocated(PlantLoop)) {
+            if (MyPlantScanFlag(DXCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
                 // switch from coil type numbers in DataHVACGlobals, to coil type numbers in plant.
                 int plantTypeOfNum(0);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
@@ -4616,9 +4615,9 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp =
                         state.dataVariableSpeedCoils->RatedInletWaterTemp; // 85 F cooling mode
                     Real64 CpSource = GetSpecificHeatGlycol(state,
-                                                            PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                              state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                                             state.dataVariableSpeedCoils->SourceSideInletTemp,
-                                                            PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                              state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                                             RoutineName);
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy =
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp * CpSource;
@@ -4759,9 +4758,9 @@ namespace VariableSpeedCoils {
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp =
                         state.dataVariableSpeedCoils->RatedInletWaterTempHeat; // 21.11C or 70F, heating mode
                     Real64 CpSource = GetSpecificHeatGlycol(state,
-                                                            PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                              state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                                             state.dataVariableSpeedCoils->SourceSideInletTemp,
-                                                            PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                              state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                                             RoutineName);
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy =
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp * CpSource;
@@ -4920,14 +4919,14 @@ namespace VariableSpeedCoils {
                 WaterInletNode = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum;
 
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                        DataGlobalConstants::CWInitConvTemp,
-                                       PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                        RoutineNameSimpleWatertoAirHP);
                 Cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                            DataGlobalConstants::CWInitConvTemp,
-                                           PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                            RoutineNameSimpleWatertoAirHP);
 
                 //    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum)%DesignWaterMassFlowRate= &
@@ -5120,7 +5119,6 @@ namespace VariableSpeedCoils {
         using namespace Psychrometrics;
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallLoad;
-        using DataPlant::PlantLoop;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using namespace OutputReportPredefined;
@@ -5882,14 +5880,15 @@ namespace VariableSpeedCoils {
                                                false);
 
             if (PltSizNum > 0) {
-                rho = GetDensityGlycol(state, PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                rho = GetDensityGlycol(state,
+                                       state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                        PlantSizData(PltSizNum).ExitTemp,
-                                       PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                        RoutineNameAlt);
                 cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                            PlantSizData(PltSizNum).ExitTemp,
-                                           PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                            RoutineNameAlt);
 
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "HEATING") {
@@ -6031,9 +6030,9 @@ namespace VariableSpeedCoils {
                 rhoW = rho;
             } else {
                 rhoW = GetDensityGlycol(state,
-                                        PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                        state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                         RatedSourceTempCool,
-                                        PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                        state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                         RoutineName);
             }
 
@@ -6493,7 +6492,6 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::TimeStepSys;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -6677,9 +6675,9 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->SourceSideInletTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp;
             state.dataVariableSpeedCoils->SourceSideInletEnth = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy;
             CpSource = GetSpecificHeatGlycol(state,
-                                             PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                             state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                              state.dataVariableSpeedCoils->SourceSideInletTemp,
-                                             PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                             state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                              RoutineNameSourceSideInletTemp);
         }
 
@@ -8108,7 +8106,6 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using DataHVACGlobals::DXElecHeatingPower;
         using DataHVACGlobals::TimeStepSys;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -8224,9 +8221,9 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->SourceSideInletTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp;
             state.dataVariableSpeedCoils->SourceSideInletEnth = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy;
             CpSource = GetSpecificHeatGlycol(state,
-                                             PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
+                                             state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidName,
                                              state.dataVariableSpeedCoils->SourceSideInletTemp,
-                                             PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
+                                             state.dataPlnt->PlantLoop(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LoopNum).FluidIndex,
                                              RoutineNameSourceSideInletTemp);
         }
 
@@ -9246,7 +9243,7 @@ namespace VariableSpeedCoils {
         // Set the water outlet node of the WatertoAirHPSimple
         // Set the water outlet nodes for properties that just pass through & not used
         if (WaterInletNode != 0 && WaterOutletNode != 0) {
-            SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+            SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
             Node(WaterOutletNode).Temp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterTemp;
             Node(WaterOutletNode).Enthalpy = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletWaterEnthalpy;
         }

@@ -346,7 +346,7 @@ namespace IceThermalStorage {
 
         void CalcPcmStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
-        void CalcQpcmDischageMaxByNtu(Real64 &QpcmMin);
+        void CalcQpcmDischageMaxByNtu(EnergyPlusData &state, Real64 &QpcmMin);
 
         void CalcPcmStorageCharge(EnergyPlusData &state);
 
@@ -356,7 +356,7 @@ namespace IceThermalStorage {
 
         //void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-        void UpdateNode(Real64 myLoad, bool RunFlag);
+        void UpdateNode(EnergyPlusData &state, Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
