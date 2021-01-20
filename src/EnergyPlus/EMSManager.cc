@@ -356,7 +356,6 @@ namespace EMSManager {
         // collect routines needed to initialize EMS
 
         // Using/Aliasing
-        using DataZoneControls::GetZoneAirStatsInputFlag;
         using RuntimeLanguageProcessor::InitializeRuntimeLanguage;
         using RuntimeLanguageProcessor::SetErlValueNumber;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -378,7 +377,7 @@ namespace EMSManager {
             state.dataEMSMgr->GetEMSUserInput = false;
         }
 
-        if (!GetZoneAirStatsInputFlag && !state.dataEMSMgr->ZoneThermostatActuatorsHaveBeenSetup) {
+        if (!state.dataZoneCtrls->GetZoneAirStatsInputFlag && !state.dataEMSMgr->ZoneThermostatActuatorsHaveBeenSetup) {
             SetupThermostatActuators(state);
             state.dataEMSMgr->ZoneThermostatActuatorsHaveBeenSetup = true;
         }
@@ -1958,49 +1957,49 @@ namespace EMSManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int Loop(0); // local do loop index
 
-        for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataZoneCtrls->NumTempControlledZones; ++Loop) {
             SetupEMSActuator(state, "Zone Temperature Control",
-                             TempControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->TempControlledZone(Loop).ZoneName,
                              "Heating Setpoint",
                              "[C]",
-                             TempControlledZone(Loop).EMSOverrideHeatingSetPointOn,
-                             TempControlledZone(Loop).EMSOverrideHeatingSetPointValue);
+                             state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointOn,
+                             state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue);
             SetupEMSActuator(state, "Zone Temperature Control",
-                             TempControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->TempControlledZone(Loop).ZoneName,
                              "Cooling Setpoint",
                              "[C]",
-                             TempControlledZone(Loop).EMSOverrideCoolingSetPointOn,
-                             TempControlledZone(Loop).EMSOverrideCoolingSetPointValue);
+                             state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointOn,
+                             state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue);
         }
 
-        for (Loop = 1; Loop <= NumHumidityControlZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataZoneCtrls->NumHumidityControlZones; ++Loop) {
             SetupEMSActuator(state, "Zone Humidity Control",
-                             HumidityControlZone(Loop).ZoneName,
+                             state.dataZoneCtrls->HumidityControlZone(Loop).ZoneName,
                              "Relative Humidity Humidifying Setpoint",
                              "[%]",
-                             HumidityControlZone(Loop).EMSOverrideHumidifySetPointOn,
-                             HumidityControlZone(Loop).EMSOverrideHumidifySetPointValue);
+                             state.dataZoneCtrls->HumidityControlZone(Loop).EMSOverrideHumidifySetPointOn,
+                             state.dataZoneCtrls->HumidityControlZone(Loop).EMSOverrideHumidifySetPointValue);
             SetupEMSActuator(state, "Zone Humidity Control",
-                             HumidityControlZone(Loop).ZoneName,
+                             state.dataZoneCtrls->HumidityControlZone(Loop).ZoneName,
                              "Relative Humidity Dehumidifying Setpoint",
                              "[%]",
-                             HumidityControlZone(Loop).EMSOverrideDehumidifySetPointOn,
-                             HumidityControlZone(Loop).EMSOverrideDehumidifySetPointValue);
+                             state.dataZoneCtrls->HumidityControlZone(Loop).EMSOverrideDehumidifySetPointOn,
+                             state.dataZoneCtrls->HumidityControlZone(Loop).EMSOverrideDehumidifySetPointValue);
         }
 
-        for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
+        for (Loop = 1; Loop <= state.dataZoneCtrls->NumComfortControlledZones; ++Loop) {
             SetupEMSActuator(state, "Zone Comfort Control",
-                             ComfortControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).ZoneName,
                              "Heating Setpoint",
                              "[]",
-                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn,
-                             ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue);
             SetupEMSActuator(state, "Zone Comfort Control",
-                             ComfortControlledZone(Loop).ZoneName,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).ZoneName,
                              "Cooling Setpoint",
                              "[]",
-                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn,
-                             ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn,
+                             state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue);
         }
     }
 

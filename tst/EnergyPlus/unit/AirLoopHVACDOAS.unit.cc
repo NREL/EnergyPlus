@@ -4249,7 +4249,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
     ASSERT_TRUE(process_idf(idf_objects));
 
     MixedAir::GetOutsideAirSysInputs(*state);
-    MixedAir::GetOASysInputFlag = false;
+    state->dataMixedAir->GetOASysInputFlag = false;
     MixedAir::GetOAMixerInputs(*state);
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(5);

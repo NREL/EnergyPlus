@@ -133,9 +133,6 @@ namespace ZoneDehumidifier {
         // Call appropriate subroutines to get input values, initialize variables, model performanc
         // update node information, report model outputs.
 
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
         Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
@@ -173,7 +170,7 @@ namespace ZoneDehumidifier {
             }
         }
 
-        QZnDehumidReq = ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
+        QZnDehumidReq = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
 
         InitZoneDehumidifier(state, ZoneDehumidNum);
 
@@ -555,7 +552,6 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbRhPb;
 
@@ -590,7 +586,7 @@ namespace ZoneDehumidifier {
         }
 
         // Need to check all dehumidifiers to see if they are on Zone Equipment List or issue warning
-        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataZoneDehumidifier->ZoneEquipmentListChecked = true;
             for (LoopIndex = 1; LoopIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++LoopIndex) {
                 if (CheckZoneEquipmentList(state, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name)) continue;

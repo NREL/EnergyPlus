@@ -905,7 +905,6 @@ namespace UFADManager {
         // The model is described in the EnergyPlus Engineering Reference in Anna Liu's UCSD PhD thesis.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalFanSys;
@@ -1065,9 +1064,9 @@ namespace UFADManager {
         ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUI(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
-            for (InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
+            for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1377,7 +1376,6 @@ namespace UFADManager {
         // The model is described in the EnergyPlus Engineering Reference in Anna Liu's UCSD PhD thesis.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalFanSys;
@@ -1543,9 +1541,9 @@ namespace UFADManager {
         ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUE(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
-            for (InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
+            for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
