@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -162,11 +162,11 @@ namespace IceThermalStorage {
 
         void CalcIceStorageDormant(EnergyPlusData &state);
 
-        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+        void CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
         void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
-        void CalcQiceDischageMax(Real64 &QiceMin);
+        void CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin);
 
         void CalcIceStorageCharge(EnergyPlusData &state);
 
@@ -176,7 +176,7 @@ namespace IceThermalStorage {
 
         void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-        void UpdateNode(Real64 myLoad, bool RunFlag);
+        void UpdateNode(EnergyPlusData &state, Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
@@ -261,7 +261,7 @@ namespace IceThermalStorage {
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
-        void UpdateDetailedIceStorage();
+        void UpdateDetailedIceStorage(EnergyPlusData &state);
 
         void ReportDetailedIceStorage();
 

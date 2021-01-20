@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -860,13 +860,9 @@ namespace DataSurfaces {
         bool WindSpeedEMSOverrideOn;
         Real64 WindSpeedEMSOverrideValue;
 
-        // XL added 7/19/2017
         Real64 WindDir;                 // Surface outside wind direction, for surface heat balance and ventilation(degree)
         bool WindDirEMSOverrideOn;      // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue; // value to use for EMS override of the surface's outside wind speed
-
-        // XL added 7/25/2017
-
         bool SchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
         int ExternalShadingSchInd;         // Schedule for a the external shading
         bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface

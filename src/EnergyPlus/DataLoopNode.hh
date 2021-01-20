@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,8 +125,8 @@ namespace DataLoopNode {
         Real64 TempMin;              // {C}
         Real64 TempMax;              // {C}
         Real64 TempSetPoint;         // {C}
-        Real64 TempLastTimestep;     // [C}   DSU
-        Real64 MassFlowRateRequest;  // {kg/s}  DSU
+        Real64 TempLastTimestep;     // [C}
+        Real64 MassFlowRateRequest;  // {kg/s}
         Real64 MassFlowRate;         // {kg/s}
         Real64 MassFlowRateMin;      // {kg/s}
         Real64 MassFlowRateMax;      // {kg/s}
@@ -136,7 +136,7 @@ namespace DataLoopNode {
         Real64 Quality;              // {0.0-1.0 vapor fraction/percent}
         Real64 Press;                // {Pa}
         Real64 Enthalpy;             // {J/kg}
-        Real64 EnthalpyLastTimestep; // {J/kg}  DSU for steam?
+        Real64 EnthalpyLastTimestep; // {J/kg}
         Real64 HumRat;               // {}
         Real64 HumRatMin;            // {}
         Real64 HumRatMax;            // {}
@@ -197,8 +197,8 @@ namespace DataLoopNode {
                  Real64 const TempMin,              // {C}
                  Real64 const TempMax,              // {C}
                  Real64 const TempSetPoint,         // {C}
-                 Real64 const TempLastTimestep,     // [C}   DSU
-                 Real64 const MassFlowRateRequest,  // {kg/s}  DSU
+                 Real64 const TempLastTimestep,     // [C}
+                 Real64 const MassFlowRateRequest,  // {kg/s}
                  Real64 const MassFlowRate,         // {kg/s}
                  Real64 const MassFlowRateMin,      // {kg/s}
                  Real64 const MassFlowRateMax,      // {kg/s}
@@ -208,7 +208,7 @@ namespace DataLoopNode {
                  Real64 const Quality,              // {0.0-1.0 vapor fraction/percent}
                  Real64 const Press,                // {Pa}
                  Real64 const Enthalpy,             // {J/kg}
-                 Real64 const EnthalpyLastTimestep, // {J/kg}  DSU for steam?
+                 Real64 const EnthalpyLastTimestep, // {J/kg}
                  Real64 const HumRat,               // {}
                  Real64 const HumRatMin,            // {}
                  Real64 const HumRatMax,            // {}

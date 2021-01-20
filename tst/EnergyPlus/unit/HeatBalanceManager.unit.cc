@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -65,22 +65,17 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -478,63 +473,63 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
-    ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).InletNode.allocate(1);
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).ZoneNode = 1;
-    ZoneEquipConfig(1).InletNode(1) = 2;
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(1).NumReturnNodes = 1;
-    ZoneEquipConfig(1).ReturnNode.allocate(1);
-    ZoneEquipConfig(1).ReturnNode(1) = 4;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
-    ZoneEquipConfig(1).IsControlled = true;
-    ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
-    ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
-    ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    ZoneEquipConfig(1).InletNodeADUNum(1) = 0;
-    ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 2;
-    ZoneEquipConfig(1).ReturnNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(1).ReturnNodeInletNum.allocate(1);
-    ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
-    ZoneEquipConfig(1).ReturnNodeInletNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeADUNum(1) = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool(1).InNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeInletNum(1) = 1;
 
-    ZoneEquipConfig(2).ZoneName = "Zone 2";
-    ZoneEquipConfig(2).ActualZoneNum = 2;
-    ZoneEquipConfig(2).NumExhaustNodes = 1;
-    ZoneEquipConfig(2).ExhaustNode.allocate(1);
-    ZoneEquipConfig(2).NumInletNodes = 1;
-    ZoneEquipConfig(2).InletNode.allocate(1);
-    ZoneEquipConfig(2).ZoneNode = 5;
-    ZoneEquipConfig(2).InletNode(1) = 6;
-    ZoneEquipConfig(2).ExhaustNode(1) = 7;
-    ZoneEquipConfig(2).NumReturnNodes = 1;
-    ZoneEquipConfig(2).ReturnNode.allocate(1);
-    ZoneEquipConfig(2).ReturnNode(1) = 8;
-    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
-    ZoneEquipConfig(2).IsControlled = true;
-    ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
-    ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
-    ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
-    ZoneEquipConfig(2).AirDistUnitHeat.allocate(1);
-    ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
-    ZoneEquipConfig(2).InletNodeADUNum(1) = 0;
-    ZoneEquipConfig(2).AirDistUnitCool(1).InNode = 6;
-    ZoneEquipConfig(2).ReturnNodeAirLoopNum.allocate(1);
-    ZoneEquipConfig(2).ReturnNodeInletNum.allocate(1);
-    ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
-    ZoneEquipConfig(2).ReturnNodeInletNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 5;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeADUNum(1) = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).AirDistUnitCool(1).InNode = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeInletNum(1) = 1;
 
-    ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -544,22 +539,22 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
-    Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
 
     Node(1).MassFlowRate = 0.0; // Zone 1 zone node
     Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
     Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
     Node(4).MassFlowRate = 9.0; // Zone 1 return node
-    ZoneEquipConfig(1).ZoneExh = 2.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 2.0;
 
     Node(5).MassFlowRate = 0.0; // Zone 2 zone node
     Node(6).MassFlowRate = 2.0; // Zone 2 inlet node
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
-    ZoneEquipConfig(2).ZoneExh = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
     state->dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
     state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
@@ -574,7 +569,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
     ZoneReOrder.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
@@ -1221,24 +1216,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
     DataHeatBalance::Zone(1).IsControlled = true;
 
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 2;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(2);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(2) = 2;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
-    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataHeatBalance::TempEffBulkAir.allocate(6);
 

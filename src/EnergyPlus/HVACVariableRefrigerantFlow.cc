@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1218,9 +1218,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
 
             CpCond = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
                                            state.dataHVACVarRefFlow->VRF(VRFCond).CondenserInletTemp,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
                                            RoutineName);
             if (CondWaterMassFlow > 0.0) {
                 CondOutletTemp = state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser / (CondWaterMassFlow * CpCond) + CondInletTemp;
@@ -1359,7 +1359,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::GetCoilCondenserInletNode;
         using DXCoils::GetCoilTypeNum;
         using DXCoils::GetDXCoilAvailSchPtr;
@@ -4521,10 +4520,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             // for ZoneHVAC check that TU inlet node is a zone exhaust node otherwise ZoneAirNode and ZoneNum = 0
             if (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum = CtrlZone;
                             break;
                         }
@@ -4532,10 +4531,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum = CtrlZone;
                             break;
                         }
@@ -5183,7 +5182,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::VRFTerminalUnit_Num;
-        using DataZoneEquipment::ZoneEquipList;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
 
@@ -5293,7 +5291,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus = DataHVACGlobals::ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
         }
 
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(PlantLoop)) {
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 // hot water supplemental heating coil
                 errFlag = false;
@@ -5325,15 +5323,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                            RoutineName);
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
                 }
 
                 // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                                                                   .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
@@ -5368,7 +5366,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
 
                 // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                                                                   .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
@@ -5398,12 +5396,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     std::string const thisObjectName = state.dataHVACVarRefFlow->VRFTU(TUIndex).Name;
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).isInZone) goto EquipList_exit;   // already found previously
                     for (ELLoop = 1; ELLoop <= state.dataGlobal->NumOfZones; ++ELLoop) {  // NumOfZoneEquipLists
-                        if (ZoneEquipList(ELLoop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
-                        for (ListLoop = 1; ListLoop <= ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
-                            if (!UtilityRoutines::SameString(ZoneEquipList(ELLoop).EquipType(ListLoop),
+                        if (state.dataZoneEquip->ZoneEquipList(ELLoop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
+                        for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
+                            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipType(ListLoop),
                                                              DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
                                 continue;
-                            if (!UtilityRoutines::SameString(ZoneEquipList(ELLoop).EquipName(ListLoop), state.dataHVACVarRefFlow->VRFTU(TUIndex).Name)) continue;
+                            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipName(ListLoop), state.dataHVACVarRefFlow->VRFTU(TUIndex).Name)) continue;
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum = ELLoop;
                             state.dataHVACVarRefFlow->VRFTU(TUIndex).isInZone = true;
                             if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZonePtr == ELLoop) {
@@ -5412,17 +5410,17 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode == 0) {
                                 bool ZoneNodeNotFound = true;
                                 for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                                    if (!DataZoneEquipment::ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(CtrlZone).ZoneNode;
+                                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                                             ZoneNodeNotFound = false;
                                             break;
                                         }
                                     }
-                                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(CtrlZone).ZoneNode;
+                                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                                             ZoneNodeNotFound = false;
                                             break;
                                         }
@@ -5463,21 +5461,21 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                                            DataLoopNode::NodeID(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum),
                                                                            "Air Nodes");
                                         if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum > 0) {
-                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum).ZoneNode;
+                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum).ZoneNode;
                                             for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                     continue;
-                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
-                                                    if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumTempControlledZones; ++TstatZoneNum) {
+                                                    if (state.dataZoneCtrls->TempControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                         continue;
                                                     state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
                                                     AirNodeFound = true;
                                                     ctrlZoneNum = ControlledZoneNum;
                                                     goto EquipList_exit;
                                                 }
-                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones;
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= state.dataZoneCtrls->NumComfortControlledZones;
                                                      ++TstatZoneNum) {
-                                                    if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
+                                                    if (state.dataZoneCtrls->ComfortControlledZone(TstatZoneNum).ActualZoneNum != state.dataHVACVarRefFlow->VRFTU(TUIndex).ZoneNum)
                                                         continue;
                                                     state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
                                                     AirNodeFound = true;
@@ -5534,9 +5532,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                         int inletNodeADUNum = 0;
                         int sysType_Num = 0;
                         std::string sysName = "";
-                        for (int inletNode = 1; inletNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
-                            if (DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) != state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum) continue;
-                            inletNodeADUNum = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
+                        for (int inletNode = 1; inletNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) != state.dataHVACVarRefFlow->VRFTU(TUIndex).airLoopNum) continue;
+                            inletNodeADUNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
                             if (inletNodeADUNum > 0 && inletNodeADUNum <= state.dataDefineEquipment->NumAirDistUnits) {
                                 sysType_Num = DataZoneEquipment::AirDistUnit_Num;
                                 sysName = state.dataDefineEquipment->AirDistUnit(inletNodeADUNum).Name;
@@ -5544,21 +5542,21 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             }
                         }
                         if (inletNodeADUNum > 0) {
-                            if (DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex > 0) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex > 0) {
                                 for (int EquipNum = 1;
                                      EquipNum <=
-                                     DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
+                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
                                      ++EquipNum) {
-                                    if ((DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                    if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                              .EquipType_Num(EquipNum) != sysType_Num) ||
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != sysName)
                                         continue;
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).zoneSequenceCoolingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).zoneSequenceHeatingNum =
-                                        DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
                                     break;
                                 }
@@ -5764,10 +5762,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone && (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_SupplySide)) {
                 bool ZoneNodeNotFound = true;
                 for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!DataZoneEquipment::ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(CtrlZone).ZoneNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -5797,10 +5795,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             if ((state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone && (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide))) {
                 bool ZoneNodeNotFound = true;
                 for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!DataZoneEquipment::ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum == DataZoneEquipment::ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(CtrlZone).ZoneNode;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -6056,9 +6054,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
             if (state.dataHVACVarRefFlow->VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
                                        DataGlobalConstants::CWInitConvTemp,
-                                       PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
                                        RoutineName);
                 state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow = state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho;
 
@@ -6088,9 +6086,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
                                                    RoutineName);
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -8310,18 +8308,18 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             PltSizCondNum = 0;
 
             if (this->WaterCondVolFlowRate == DataSizing::AutoSize) {
-                if (this->SourceLoopNum > 0) PltSizCondNum = PlantLoop(this->SourceLoopNum).PlantSizNum;
+                if (this->SourceLoopNum > 0) PltSizCondNum = state.dataPlnt->PlantLoop(this->SourceLoopNum).PlantSizNum;
                 if (PltSizCondNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            PlantLoop(this->SourceLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                             DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
-                                                            PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
 
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                PlantLoop(this->SourceLoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
-                                                                PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                                 RoutineName);
                     tmpCondVolFlowRate =
                         max(this->CoolingCapacity, this->HeatingCapacity) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
@@ -8334,9 +8332,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
 
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            PlantLoop(this->SourceLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            PlantLoop(this->SourceLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
                     PlantUtilities::InitComponentNodes(0.0,
@@ -8762,7 +8760,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
@@ -9718,7 +9715,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
                 }
             } else if (SELECT_CASE_var == iThermostatCtrlType::MasterThermostatPriority) {
-                ZoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
                            state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
                 if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
                     SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
@@ -9734,9 +9731,9 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             .CalcVRF(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                     }
 
-                    LoadToCoolingSP = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
+                    LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
                                       state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-                    LoadToHeatingSP = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
+                    LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
                                       state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
                     if (TempOutput < LoadToHeatingSP) {
                         state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
@@ -10041,10 +10038,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
             // air loop equipment uses sequenced variables
-            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+            LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToCoolingSP(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
+            LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToHeatingSP(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
@@ -10068,16 +10065,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 // this will need more investigation. Using Remaining* variable during the initial load calculation seems wrong.
                 // This may also have implications when VRF TUs are in the air loop or if SP control is used
                 // another question is whether initialization of the opeating mode should look at TotalOutputRequired or RemainingOutputRequired
-                zoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToCoolingSP /
+                zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+                LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToCoolingSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToHeatingSP /
+                LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).OutputRequiredToHeatingSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             } else {
-                zoneLoad = ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP /
+                zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+                LoadToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-                LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP /
+                LoadToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP /
                                   state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) {
@@ -11943,7 +11940,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         // METHODOLOGY EMPLOYED:
         //		A new physics based VRF model applicable for Fluid Temperature Control.
-        using DataZoneEquipment::ZoneEquipConfig;
         using DXCoils::SimDXCoil;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
@@ -12262,7 +12258,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using DXCoils::ControlVRFIUCoil;
         using Fans::Fan;
         using Fans::SimulateFanComponents;
-        using MixedAir::OAMixer;
         using MixedAir::SimOAMixer;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
@@ -12327,7 +12322,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Simulation the OAMixer if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerUsed) {
             SimOAMixer(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerName, FirstHVACIteration, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex);
-            OAMixNode = OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
+            OAMixNode = state.dataMixedAir->OAMixer(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OAMixerIndex).MixNode;
             Tin = DataLoopNode::Node(OAMixNode).Temp;
             Win = DataLoopNode::Node(OAMixNode).HumRat;
         }

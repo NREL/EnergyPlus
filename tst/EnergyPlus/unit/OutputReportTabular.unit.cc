@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -86,7 +87,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataGlobalConstants;
@@ -1433,7 +1433,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     EXPECT_NEAR(10.0, (state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1) / state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1)), 0.00001);
     EXPECT_NEAR(
         10.0,
-        (DataZoneEnergyDemands::ZoneSysEnergyDemand(2).TotalOutputRequired / DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired),
+        (state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).TotalOutputRequired / state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired),
         0.00001);
 
     state->dataGlobal->DoWeathSim = true;                           // flag to trick tabular reports to scan meters
@@ -3719,10 +3719,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataEnvrn->OutHumRat = 0.005;
     state->dataEnvrn->OutDryBulbTemp = 25.0;
 
-    MixedAir::NumOAControllers = 2;
-    MixedAir::OAController.allocate(2);
-    MixedAir::OAController(1).RelTotalLossRate = 1.0;
-    MixedAir::OAController(2).RelTotalLossRate = 1.0;
+    state->dataMixedAir->NumOAControllers = 2;
+    state->dataMixedAir->OAController.allocate(2);
+    state->dataMixedAir->OAController(1).RelTotalLossRate = 1.0;
+    state->dataMixedAir->OAController(2).RelTotalLossRate = 1.0;
     state->dataCondenserLoopTowers->NumSimpleTowers = 1;
     state->dataCondenserLoopTowers->towers.allocate(1);
     state->dataCondenserLoopTowers->towers(1).Qactual = 1.0;
@@ -7003,8 +7003,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
     DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
