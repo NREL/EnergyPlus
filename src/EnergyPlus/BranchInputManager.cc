@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,9 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -2350,9 +2349,6 @@ namespace BranchInputManager {
         // This routine will point out any "dangling branches" that are not included on a BranchList.
         // Warnings are produced as the user might clutter up the input file with unused branches.
 
-        // Using/Aliasing
-        using DataErrorTracking::TotalSevereErrors;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumDanglingCount;        // when mustprint not true, count and report
         int BlNum;                   // Branch List Counter
@@ -2390,7 +2386,7 @@ namespace BranchInputManager {
                     }
                 } else {
                     ShowSevereMessage(state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
-                    ++TotalSevereErrors;
+                    ++state.dataErrTracking->TotalSevereErrors;
                 }
             }
         }
@@ -2400,7 +2396,7 @@ namespace BranchInputManager {
         }
         if (!mustprint && NumDanglingCount > 0) {
             ShowSevereMessage(state, fmt::format("AuditBranches: There are {} branch(es) that do not appear on any BranchList.", NumDanglingCount));
-            TotalSevereErrors += NumDanglingCount;
+            state.dataErrTracking->TotalSevereErrors += NumDanglingCount;
             ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; for detail of each branch not on a branch list.");
         }
     }

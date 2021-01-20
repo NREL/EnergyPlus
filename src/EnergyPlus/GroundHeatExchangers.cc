@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,23 +59,23 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -612,7 +612,7 @@ namespace GroundHeatExchangers {
         // Determine how many g-function pairs to generate based on user defined maximum simulation time
         while (true) {
             Real64 maxPossibleSimTime = exp(tempLNTTS.back()) * t_s;
-            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay() * DataGlobalConstants::SecInHour()) {
+            if (maxPossibleSimTime < myRespFactors->maxSimYears * numDaysInYear * DataGlobalConstants::HoursInDay * DataGlobalConstants::SecInHour) {
                 tempLNTTS.push_back(tempLNTTS.back() + lnttsStepSize);
             } else {
                 break;
@@ -655,7 +655,6 @@ namespace GroundHeatExchangers {
 
     void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     {
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -730,8 +729,8 @@ namespace GroundHeatExchangers {
         Real64 bh_equivalent_resistance_convection = bhResistance - bh_equivalent_resistance_tube_grout;
 
         Real64 initial_temperature = inletTemp;
-        Real64 cpFluid_init = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, initial_temperature, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 fluidDensity_init = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, initial_temperature, PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 cpFluid_init = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, initial_temperature, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 fluidDensity_init = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, initial_temperature, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // initialize the fluid cells
         for (int i = 0; i < num_fluid_cells; ++i) {
@@ -760,7 +759,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_conv + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_convection);
+            thisCell.conductivity = log(radius_pipe_in / radius_conv) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_convection);
             thisCell.rhoCp = 1;
             Cells.push_back(thisCell);
         }
@@ -773,7 +772,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_pipe_in + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_tube_grout);
+            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
             thisCell.rhoCp = pipe.rhoCp;
             Cells.push_back(thisCell);
         }
@@ -786,7 +785,7 @@ namespace GroundHeatExchangers {
             thisCell.radius_inner = radius_pipe_out + i * thisCell.thickness;
             thisCell.radius_center = thisCell.radius_inner + thisCell.thickness / 2.0;
             thisCell.radius_outer = thisCell.radius_inner + thisCell.thickness;
-            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi() * bh_equivalent_resistance_tube_grout);
+            thisCell.conductivity = log(radius_grout / radius_pipe_in) / (2 * DataGlobalConstants::Pi * bh_equivalent_resistance_tube_grout);
             thisCell.rhoCp = grout.rhoCp;
             Cells.push_back(thisCell);
         }
@@ -806,7 +805,7 @@ namespace GroundHeatExchangers {
 
         // other non-geometric specific setup
         for (auto &thisCell : Cells) {
-            thisCell.vol = DataGlobalConstants::Pi() * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
+            thisCell.vol = DataGlobalConstants::Pi * (pow_2(thisCell.radius_outer) - pow_2(thisCell.radius_inner));
             thisCell.temperature = initial_temperature;
         }
 
@@ -841,8 +840,8 @@ namespace GroundHeatExchangers {
                     auto &thisCell = Cells[cell_index];
                     auto &eastCell = Cells[cell_index + 1];
 
-                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
-                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi() * eastCell.conductivity);
+                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
+                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
                     Real64 AE = 1 / (FE1 + FE2);
 
                     Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -869,12 +868,12 @@ namespace GroundHeatExchangers {
                     auto &thisCell = Cells[cell_index];
                     auto &eastCell = Cells[cell_index + 1];
 
-                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
-                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi() * eastCell.conductivity);
+                    Real64 FE1 = log(thisCell.radius_outer / thisCell.radius_center) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
+                    Real64 FE2 = log(eastCell.radius_center / eastCell.radius_inner) / (2 * DataGlobalConstants::Pi * eastCell.conductivity);
                     Real64 AE = 1 / (FE1 + FE2);
 
-                    Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * DataGlobalConstants::Pi() * westCell.conductivity);
-                    Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * DataGlobalConstants::Pi() * thisCell.conductivity);
+                    Real64 FW1 = log(westCell.radius_outer / westCell.radius_center) / (2 * DataGlobalConstants::Pi * westCell.conductivity);
+                    Real64 FW2 = log(thisCell.radius_center / thisCell.radius_inner) / (2 * DataGlobalConstants::Pi * thisCell.conductivity);
                     Real64 AW = -1 / (FW1 + FW2);
 
                     Real64 AD = thisCell.rhoCp * thisCell.vol / time_step;
@@ -901,8 +900,8 @@ namespace GroundHeatExchangers {
 
                 if (leftCell.type == CellType::GROUT && rightCell.type == CellType::SOIL) {
 
-                    Real64 left_conductance = 2 * DataGlobalConstants::Pi() * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
-                    Real64 right_conductance = 2 * DataGlobalConstants::Pi() * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
+                    Real64 left_conductance = 2 * DataGlobalConstants::Pi * leftCell.conductivity / log(leftCell.radius_outer / leftCell.radius_inner);
+                    Real64 right_conductance = 2 * DataGlobalConstants::Pi * rightCell.conductivity / log(rightCell.radius_center / leftCell.radius_inner);
 
                     T_bhWall = (left_conductance * leftCell.temperature + right_conductance * rightCell.temperature) /
                                (left_conductance + right_conductance);
@@ -912,7 +911,7 @@ namespace GroundHeatExchangers {
 
             total_time += time_step;
 
-            GFNC_shortTimestep.push_back(2 * DataGlobalConstants::Pi() * soil.k * ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
+            GFNC_shortTimestep.push_back(2 * DataGlobalConstants::Pi * soil.k * ((Cells[0].temperature - initial_temperature) / heat_flux - bhResistance));
             LNTTS_shortTimestep.push_back(log(total_time / t_s));
 
         } // end timestep loop
@@ -1354,7 +1353,7 @@ namespace GroundHeatExchangers {
                 }         // n1
             }             // m1
 
-            myRespFactors->GFNC(NT) = (gFunc * (coilDiameter / 2.0)) / (4 * DataGlobalConstants::Pi() * fraction * numTrenches * numCoils);
+            myRespFactors->GFNC(NT) = (gFunc * (coilDiameter / 2.0)) / (4 * DataGlobalConstants::Pi * fraction * numTrenches * numCoils);
             myRespFactors->LNTTS(NT) = tLg;
 
         } // NT time
@@ -1445,7 +1444,7 @@ namespace GroundHeatExchangers {
         errFunc1 = std::erfc(0.5 * distance / sqrtAlphaT);
         errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
 
-        return 4 * pow_2(DataGlobalConstants::Pi()) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
+        return 4 * pow_2(DataGlobalConstants::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
     }
 
     //******************************************************************************
@@ -1586,7 +1585,7 @@ namespace GroundHeatExchangers {
         Real64 sumIntF(0.0);
         Real64 theta(0.0);
         Real64 theta1(0.0);
-        Real64 theta2(2 * DataGlobalConstants::Pi());
+        Real64 theta2(2 * DataGlobalConstants::Pi);
         Real64 h;
         int j;
         Array1D<Real64> f(J0, 0.0);
@@ -1635,7 +1634,7 @@ namespace GroundHeatExchangers {
         Real64 sumIntF(0.0);
         Real64 eta(0.0);
         Real64 eta1(0.0);
-        Real64 eta2(2 * DataGlobalConstants::Pi());
+        Real64 eta2(2 * DataGlobalConstants::Pi);
         Real64 h;
         int i;
         Array1D<Real64> g(I0, 0.0);
@@ -1675,7 +1674,7 @@ namespace GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate annual time constant for ground conduction
 
-        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / DataGlobalConstants::SecInHour() / 8760.0;
+        timeSS = (pow_2(bhLength) / (9.0 * soil.diffusivity)) / DataGlobalConstants::SecInHour / 8760.0;
         timeSSFactor = timeSS * 8760.0;
     }
 
@@ -1727,7 +1726,6 @@ namespace GroundHeatExchangers {
         //   for Vertical Ground Loop Heat Exchangers.' ASHRAE Transactions. 105(2): 475-485.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -1775,10 +1773,10 @@ namespace GroundHeatExchangers {
 
         inletTemp = Node(inletNodeNum).Temp;
 
-        cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
-        kGroundFactor = 2.0 * DataGlobalConstants::Pi() * soil.k;
+        kGroundFactor = 2.0 * DataGlobalConstants::Pi * soil.k;
 
         // Get time constants
         getAnnualTimeConstant();
@@ -2015,7 +2013,6 @@ namespace GroundHeatExchangers {
         // Updates the outlet node and check for out of bounds temperatures
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2028,16 +2025,16 @@ namespace GroundHeatExchangers {
         Real64 const deltaTempLimit(100.0); // temp limit for warnings
         Real64 GLHEdeltaTemp;               // ABS(Outlet temp -inlet temp)
 
-        SafeCopyPlantNode(inletNodeNum, outletNodeNum);
+        SafeCopyPlantNode(state, inletNodeNum, outletNodeNum);
 
         Node(outletNodeNum).Temp = outletTemp;
         Node(outletNodeNum).Enthalpy =
-            outletTemp * GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, outletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            outletTemp * GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, outletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
         if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !state.dataGlobal->WarmupFlag) {
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
             ShowContinueError(state, "For GroundHeatExchanger: " + name + "GLHE delta Temp > 100C.");
@@ -2743,7 +2740,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.numCoils = thisGLHE.trenchLength / thisGLHE.coilPitch;
 
                 // Total tube length
-                thisGLHE.totalTubeLength = DataGlobalConstants::Pi() * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
+                thisGLHE.totalTubeLength = DataGlobalConstants::Pi * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
 
                 // Get g function data
                 thisGLHE.SubAGG = 15;
@@ -2836,7 +2833,7 @@ namespace GroundHeatExchangers {
 
         // Equation 13
 
-        Real64 const beta = 2 * DataGlobalConstants::Pi() * grout.k * calcPipeResistance(state);
+        Real64 const beta = 2 * DataGlobalConstants::Pi * grout.k * calcPipeResistance(state);
 
         Real64 const final_term_1 = log(theta_2 / (2 * theta_1 * pow(1 - pow_4(theta_1), sigma)));
         Real64 const num_final_term_2 = pow_2(theta_3) * pow_2(1 - (4 * sigma * pow_4(theta_1)) / (1 - pow_4(theta_1)));
@@ -2845,7 +2842,7 @@ namespace GroundHeatExchangers {
         Real64 const den_final_term_2 = den_final_term_2_pt_1 + den_final_term_2_pt_2;
         Real64 const final_term_2 = num_final_term_2 / den_final_term_2;
 
-        return (1 / (4 * DataGlobalConstants::Pi() * grout.k)) * (beta + final_term_1 - final_term_2);
+        return (1 / (4 * DataGlobalConstants::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
 
     //******************************************************************************
@@ -2859,7 +2856,7 @@ namespace GroundHeatExchangers {
 
         // Equation 26
 
-        Real64 beta = 2 * DataGlobalConstants::Pi() * grout.k * calcPipeResistance(state);
+        Real64 beta = 2 * DataGlobalConstants::Pi * grout.k * calcPipeResistance(state);
 
         Real64 final_term_1 = log(pow(1 + pow_2(theta_1), sigma) / (theta_3 * pow(1 - pow_2(theta_1), sigma)));
         Real64 num_term_2 = pow_2(theta_3) * pow_2(1 - pow_4(theta_1) + 4 * sigma * pow_2(theta_1));
@@ -2869,7 +2866,7 @@ namespace GroundHeatExchangers {
         Real64 den_term_2 = den_term_2_pt_1 - den_term_2_pt_2 + den_term_2_pt_3;
         Real64 final_term_2 = num_term_2 / den_term_2;
 
-        return (1 / (DataGlobalConstants::Pi() * grout.k)) * (beta + final_term_1 - final_term_2);
+        return (1 / (DataGlobalConstants::Pi * grout.k)) * (beta + final_term_1 - final_term_2);
     }
 
     //******************************************************************************
@@ -2897,8 +2894,7 @@ namespace GroundHeatExchangers {
 
         // Eq: 3-67
 
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetSpecificHeatGlycol;
+                using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("calcBHResistance");
@@ -2906,7 +2902,7 @@ namespace GroundHeatExchangers {
         if (massFlowRate <= 0.0) {
             return 0;
         } else {
-            Real64 const cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+            Real64 const cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             return calcBHAverageResistance(state) + 1 / (3 * calcBHTotalInternalResistance(state)) * pow_2(bhLength / (massFlowRate * cpFluid));
         }
     }
@@ -2920,7 +2916,7 @@ namespace GroundHeatExchangers {
         // Javed, S. & Spitler, J.D. 2016. 'Accuracy of Borehole Thermal Resistance Calculation Methods
         // for Grouted Single U-tube Ground Heat Exchangers.' Applied Energy. 187:790-806.
 
-        return log(pipe.outDia / pipe.innerDia) / (2 * DataGlobalConstants::Pi() * pipe.k);
+        return log(pipe.outDia / pipe.innerDia) / (2 * DataGlobalConstants::Pi * pipe.k);
     }
 
     //******************************************************************************
@@ -2932,8 +2928,7 @@ namespace GroundHeatExchangers {
         // Gneilinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         // International Chemical Engineering 16(1976), pp. 359-368.
 
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetConductivityGlycol;
+                using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetViscosityGlycol;
 
@@ -2943,9 +2938,9 @@ namespace GroundHeatExchangers {
         // Get fluid props
         inletTemp = Node(inletNodeNum).Temp;
 
-        Real64 const cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const kFluid = GetConductivityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        Real64 const fluidViscosity = GetViscosityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const kFluid = GetConductivityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        Real64 const fluidViscosity = GetViscosityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // Smoothing fit limits
         Real64 const lower_limit = 2000;
@@ -2953,7 +2948,7 @@ namespace GroundHeatExchangers {
 
         Real64 const bhMassFlowRate = massFlowRate / myRespFactors->numBoreholes;
 
-        Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi() * pipe.innerDia);
+        Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi * pipe.innerDia);
 
         Real64 nusseltNum = 0.0;
         if (reynoldsNum < lower_limit) {
@@ -2973,7 +2968,7 @@ namespace GroundHeatExchangers {
 
         Real64 h = nusseltNum * kFluid / pipe.innerDia;
 
-        return 1 / (h * DataGlobalConstants::Pi() * pipe.innerDia);
+        return 1 / (h * DataGlobalConstants::Pi * pipe.innerDia);
     }
 
     //******************************************************************************
@@ -3033,8 +3028,7 @@ namespace GroundHeatExchangers {
         //	  outer tube wall.
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using FluidProperties::GetConductivityGlycol;
+                using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetViscosityGlycol;
@@ -3063,10 +3057,10 @@ namespace GroundHeatExchangers {
         Real64 laminarNusseltNo(4.364);
         Real64 turbulentNusseltNo;
 
-        cpFluid = GetSpecificHeatGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        kFluid = GetConductivityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
-        fluidViscosity = GetViscosityGlycol(state, PlantLoop(loopNum).FluidName, inletTemp, PlantLoop(loopNum).FluidIndex, RoutineName);
+        cpFluid = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        kFluid = GetConductivityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
+        fluidViscosity = GetViscosityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
 
         // calculate mass flow rate
         singleSlinkyMassFlowRate = massFlowRate / numTrenches;
@@ -3079,7 +3073,7 @@ namespace GroundHeatExchangers {
             Rconv = 0.0;
         } else {
             // Re=Rho*V*D/Mu
-            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi() * pow_2(pipeInnerRad))) / fluidViscosity;
+            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
             prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
             //   Convection Resistance
             if (reynoldsNum <= 2300) {
@@ -3092,11 +3086,11 @@ namespace GroundHeatExchangers {
                 nusseltNum = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
             }
             hci = nusseltNum * kFluid / pipeInnerDia;
-            Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi() * pipeInnerDia * hci);
+            Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi * pipeInnerDia * hci);
         }
 
         //   Conduction Resistance
-        Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi() * pipe.k) / 2.0; // pipe in parallel so /2
+        Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi * pipe.k) / 2.0; // pipe in parallel so /2
 
         return Rcond + Rconv;
     }
@@ -3287,8 +3281,7 @@ namespace GroundHeatExchangers {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_GrndHtExchgSystem;
+                using DataPlant::TypeOf_GrndHtExchgSystem;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
@@ -3311,7 +3304,7 @@ namespace GroundHeatExchangers {
         Real64 fluidDensity;
         bool errFlag;
 
-        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
         // Init more variables
         if (myFlag) {
@@ -3328,7 +3321,7 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, 20.0, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3366,7 +3359,7 @@ namespace GroundHeatExchangers {
 
         tempGround /= 5;
 
-        massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
+        massFlowRate = RegulateCondenserCompFlowReqOp(state, loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
         SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3394,8 +3387,7 @@ namespace GroundHeatExchangers {
         // na
 
         // Using/Aliasing
-        using DataPlant::PlantLoop;
-        using DataPlant::TypeOf_GrndHtExchgSlinky;
+                using DataPlant::TypeOf_GrndHtExchgSlinky;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
@@ -3420,7 +3412,7 @@ namespace GroundHeatExchangers {
         bool errFlag;
         Real64 CurTime;
 
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour();
+        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) + (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
         // Init more variables
         if (myFlag) {
@@ -3437,7 +3429,7 @@ namespace GroundHeatExchangers {
 
             myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(state, PlantLoop(loopNum).FluidName, 20.0, PlantLoop(loopNum).FluidIndex, RoutineName);
+            fluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
             InitComponentNodes(0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 
@@ -3459,7 +3451,7 @@ namespace GroundHeatExchangers {
 
         tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, coilDepth, CurTime);
 
-        massFlowRate = RegulateCondenserCompFlowReqOp(loopNum, loopSideNum, branchNum, compNum, designMassFlow);
+        massFlowRate = RegulateCondenserCompFlowReqOp(state, loopNum, loopSideNum, branchNum, compNum, designMassFlow);
 
         SetComponentFlowRate(state, massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum);
 

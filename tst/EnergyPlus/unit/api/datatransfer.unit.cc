@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,8 +68,6 @@ using namespace EnergyPlus;
 
 class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
 {
-    // create a plugin manager instance
-    EnergyPlus::PluginManagement::PluginManager pluginManager = EnergyPlus::PluginManagement::PluginManager(*state);
 
     struct DummyRealVariable
     {
@@ -150,8 +148,9 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         Real64 timeStep = 1.0;
         OutputProcessor::SetupTimePointers(*state, "Zone", timeStep);
         OutputProcessor::SetupTimePointers(*state, "HVAC", timeStep);
-        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
     }
 
     void TearDown() override
@@ -214,13 +213,13 @@ public:
     void setupActuatorsOnceAllAreRequested()
     {
         for (auto &act : this->realActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->intActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
         for (auto &act : this->boolActuatorPlaceholders) {
-            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
+            SetupEMSActuator(*state, act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
@@ -236,16 +235,16 @@ public:
         }
     }
 
-    void addPluginGlobal(std::string const &varName)
+    void addPluginGlobal(EnergyPlus::EnergyPlusData &state, std::string const &varName)
     {
-        this->pluginManager.addGlobalVariable(varName);
+        state.dataPluginManager->pluginManager->addGlobalVariable(state, varName);
     }
 
     void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
     {
-        this->pluginManager.addGlobalVariable(newGlobalVarName);
+        state->dataPluginManager->pluginManager->addGlobalVariable(*state, newGlobalVarName);
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(*state, newGlobalVarName, true);
-        EnergyPlus::PluginManagement::trends.emplace_back(*state, trendName, numTrendValues, i);
+        state->dataPluginManager->trends.emplace_back(*state, trendName, numTrendValues, i);
     }
 
     void simulateTimeStepAndReport()
@@ -274,7 +273,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->setupActuatorsOnceAllAreRequested();
     this->preRequestInternalVariable("Floor Area", "Zone 1", 6.02e23);
     this->setupInternalVariablesOnceAllAreRequested();
-    this->addPluginGlobal("Plugin_Global_Var_Name");
+    this->addPluginGlobal(*state, "Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     char * charCsvDataFull = listAllAPIDataCSV((void*)this->state);
     std::string csvData = std::string(charCsvDataFull);
@@ -659,12 +658,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes(*state);
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
-    EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
-    EXPECT_EQ(1, DataRuntimeLanguage::numActuatorsUsed);
+    EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
+    EXPECT_EQ(1, state->dataRuntimeLang->numActuatorsUsed);
 
     // no error message until now
     EXPECT_TRUE(compare_err_stream("", true));
@@ -674,7 +673,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
     EXPECT_GT(hActuator, -1);
 
     // Both the EMS one and the Plugin one point to the same handle, which is the index into the DataRuntimeLanguage::EMSActuatorAvailable array
-    EXPECT_EQ(DataRuntimeLanguage::EMSActuatorUsed(1).ActuatorVariableNum, hActuator);
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorUsed(1).ActuatorVariableNum, hActuator);
 
     std::string const expectedError = delimited_string({
         "   ** Warning ** Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named 'TEMPSETPOINTLO'.",
@@ -703,12 +702,12 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes(*state);
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
     bool anyRan;
     // Calls SetupNodeSetpointsAsActuator (via InitEMS, which calls GetEMSInput too)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan);
-    EXPECT_GT(EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable, 0);
-    EXPECT_EQ(0, DataRuntimeLanguage::numActuatorsUsed);
+    EXPECT_GT(state->dataRuntimeLang->numEMSActuatorsAvailable, 0);
+    EXPECT_EQ(0, state->dataRuntimeLang->numActuatorsUsed);
 
     // no error message until now
     EXPECT_TRUE(compare_err_stream("", true));

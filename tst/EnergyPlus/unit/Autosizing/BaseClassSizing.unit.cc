@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -937,11 +937,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     SizingResult = sizerSystemAirFlow.size(*state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
-    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
-    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanPkTime, CompName));
+    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanDesDay, CompName));
+    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanPkTime, CompName));
 
     // Bonus test for #6949
-    EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(OutputReportPredefined::pdchFanEndUse).heading);
+    EXPECT_EQ("End Use Subcategory", state->dataOutRptPredefined->columnTag(state->dataOutRptPredefined->pdchFanEndUse).heading);
 }
 TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 {

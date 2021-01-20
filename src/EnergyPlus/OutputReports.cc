@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,11 +55,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
@@ -89,25 +88,9 @@ void ReportSurfaces(EnergyPlusData &state)
     // Use a REPORT command to determine if there should be
     // a file created.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    using DataErrorTracking::AskForSurfacesReport;
     using namespace DataSurfaceColors;
     using General::ScanForReports;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // na
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SurfDetails;
@@ -119,7 +102,7 @@ void ReportSurfaces(EnergyPlusData &state)
     std::string Option2;
     bool DoReport;
 
-    AskForSurfacesReport = false;
+    state.dataErrTracking->AskForSurfacesReport = false;
 
     SurfDetails = 0;
     SurfVert = false;
@@ -1416,7 +1399,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     }
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1) << '\n';
+        *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
@@ -1910,9 +1893,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     //  Do all detached shading surfaces first
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
-        if (Surface(surf).Construction > 0) {
-            if (state.dataConstruction->Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
-        }
+        if (Surface(surf).IsAirBoundarySurf) continue;
         if (Surface(surf).Class == SurfaceClass::Shading) continue;
         if (Surface(surf).Sides == 0) continue;
         if (Surface(surf).Class == SurfaceClass::Detached_F) colorindex = 3;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -774,7 +774,7 @@ namespace AirflowNetwork {
                     C = CCF(n) * CEF(n);
                 } else {
                     //            IF (CCF(N) .EQ. 0.0d0) CCF(N)=TINY(CCF(N))  ! 1.0E-40
-                    if (CCF(n) == 0.0) CCF(n) = DataGlobalConstants::rTinyValue(); // 1.0E-40 (Epsilon)
+                    if (CCF(n) == 0.0) CCF(n) = DataGlobalConstants::rTinyValue; // 1.0E-40 (Epsilon)
                     PCF(n) = CCF(n);
                     C = CCF(n);
                 }
@@ -1097,11 +1097,11 @@ namespace AirflowNetwork {
         if (LFLAG) {
             // Initialization by linear relation.
             if (PDROP >= 0.0) {
-                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propN.density / propN.viscosity * Ctl;
             } else {
-                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 DF[0] = coef * propM.density / propM.viscosity * Ctl;
             }
@@ -1111,7 +1111,7 @@ namespace AirflowNetwork {
             if (PDROP >= 0.0) {
                 // Flow in positive direction.
                 // Laminar flow.
-                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
+                RhoCor = (propN.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
                 Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propN.density / propN.viscosity * Ctl;
                 FL = CDM * PDROP;
@@ -1124,7 +1124,7 @@ namespace AirflowNetwork {
             } else {
                 // Flow in negative direction.
                 // Laminar flow.
-                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv()) / (Tave + DataGlobalConstants::KelvinConv());
+                RhoCor = (propM.temperature + DataGlobalConstants::KelvinConv) / (Tave + DataGlobalConstants::KelvinConv);
                 Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
                 CDM = coef * propM.density / propM.viscosity * Ctl;
                 FL = CDM * PDROP;
@@ -1198,7 +1198,7 @@ namespace AirflowNetwork {
         // FLOW:
         // Get component properties
         Real64 ed = Rough / Diameter;
-        Real64 area = Diameter * Diameter * DataGlobalConstants::Pi() / 4.0;
+        Real64 area = Diameter * Diameter * DataGlobalConstants::Pi / 4.0;
         Real64 ld = Length / Diameter;
         Real64 g = 1.14 - 0.868589 * std::log(ed);
         Real64 AA1 = g;
@@ -2021,7 +2021,7 @@ namespace AirflowNetwork {
         // FLOW:
         RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
-        CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi() / 360.0;
+        CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi / 360.0;
         G = 9.780373 * (1.0 + 0.0052891 * pow_2(std::sin(CONV)) - 0.0000059 * pow_2(std::sin(2.0 * CONV)));
 
         Hfl = 1.0;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,6 @@
 #include <EnergyPlus/TARCOGMain.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalEN673Calc.hh>
 #include <EnergyPlus/ThermalISO15099Calc.hh>
 
@@ -343,7 +342,6 @@ namespace TARCOGMain {
     using namespace TARCOGOutput;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
-    using namespace TarcogShading;
     using namespace TARCOGArgs;
     using namespace ThermalISO15099Calc;
     using namespace ThermalEN673Calc;

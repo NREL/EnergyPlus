@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -60,33 +61,29 @@ namespace EnergyPlus {
 
 namespace DataRoomAirModel {
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cUserDefinedControlObject;
-    extern std::string const cTempPatternConstGradientObject;
-    extern std::string const cTempPatternTwoGradientObject;
-    extern std::string const cTempPatternNDHeightObject;
-    extern std::string const cTempPatternSurfMapObject;
+    auto constexpr cUserDefinedControlObject("RoomAir:TemperaturePattern:UserDefined");
+    auto constexpr cTempPatternConstGradientObject("RoomAir:TemperaturePattern:ConstantGradient");
+    auto constexpr cTempPatternTwoGradientObject("RoomAir:TemperaturePattern:TwoGradient");
+    auto constexpr cTempPatternNDHeightObject("RoomAir:TemperaturePattern:NondimensionalHeight");
+    auto constexpr cTempPatternSurfMapObject("RoomAir:TemperaturePattern:SurfaceMapping");
 
     // Parameters to indicate room air model selected
-    extern int const RoomAirModel_UserDefined;    // user defined patterns
-    extern int const RoomAirModel_Mixing;         // mixing air model
-    extern int const RoomAirModel_Mundt;          // Mundt nodal model
-    extern int const RoomAirModel_UCSDDV;         // UCSD Displacement Ventilation model
-    extern int const RoomAirModel_UCSDCV;         // UCSD-CV
-    extern int const RoomAirModel_UCSDUFI;        // UCSD UFAD interior zone model
-    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD exterior zone model
-    extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
-    extern Array1D_string const ChAirModel;
+    enum class RoomAirModel : int {
+        UserDefined = 1,    // user defined patterns
+        Mixing = 2,         // mixing air model
+        Mundt = 3,          // Mundt nodal model
+        UCSDDV = 4,         // UCSD Displacement Ventilation model
+        UCSDCV = 5,         // UCSD-CV
+        UCSDUFI = 6,        // UCSD UFAD interior zone model
+        UCSDUFE = 7,        // UCSD UFAD exterior zone model
+        AirflowNetwork = 8  // RoomAirModel_AirflowNetwork interior zone model
+    };
+    constexpr const char * ChAirModel[] = {"*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
 
     // Parameters to indicate air temperature coupling scheme
-    extern int const DirectCoupling;   // direct coupling scheme
-    extern int const IndirectCoupling; // indirect coupling scheme
+    enum class CouplingScheme : int {
+        Direct = 1, Indirect = 2
+    };
 
     // Parameters to indicate type of air node, which is dependent on air models
     extern int const InletAirNode;              // air node at inlet (for Mundt and Rees&Haves Models)
@@ -105,183 +102,40 @@ namespace DataRoomAirModel {
     extern int const RoomAirNode3;              // air node for vertical walls (for Rees&Haves Model)
     extern int const RoomAirNode4;              // air node for vertical walls (for Rees&Haves Model)
 
-    // user-defined pattern two gradient interplotation modes
-    extern int const OutdoorDryBulbMode;  // by outdoor air bulb.
-    extern int const SensibleCoolingMode; // by sensible cooling load
-    extern int const SensibleHeatingMode; // by sensible heating load
-    extern int const ZoneAirTempMode;     // by zone air temperature
-    extern int const DeltaOutdoorZone;    // by difference between zone and outdoor
+    // user-defined pattern two gradient interpolation modes
+    enum class UserDefinedPatternMode {
+        Unassigned,
+        OutdoorDryBulbMode,  // by outdoor air bulb.
+        SensibleCoolingMode, // by sensible cooling load
+        SensibleHeatingMode, // by sensible heating load
+        ZoneAirTempMode,     // by zone air temperature
+        DeltaOutdoorZone     // by difference between zone and outdoor
+    };
 
     // user defined temperature pattern types
-    extern int const ConstGradTempPattern;  // constant gradient in vertical direction
-    extern int const TwoGradInterpPattern;  // two gradient interpolation
-    extern int const NonDimenHeightPattern; // non-dimensionalized height
-    extern int const SurfMapTempPattern;    // arbitrary surface mappings
-
-    // Parameters to indicate type of control for the UCSD UFAD interior zone model
-    // INTEGER, PARAMETER :: ConsFlow          = 1     ! constant supply air flow
-    // INTEGER, PARAMETER :: VarFlowConsPress  = 2     ! variable supply air flow, constant supply plenum pressure
-    // INTEGER, PARAMETER :: VarFlowVarPress   = 3     ! variable supply air flow, variable supply plenum pressure
+    enum class UserDefinedPatternType {
+        Unassigned,
+        ConstGradTempPattern,  // constant gradient in vertical direction
+        TwoGradInterpPattern,  // two gradient interpolation
+        NonDimenHeightPattern, // non-dimensionalized height
+        SurfMapTempPattern    // arbitrary surface mappings
+    };
 
     // parameters to indicate diffuser type
-    extern int const Swirl;
-    extern int const VarArea;
-    extern int const DisplVent;
-    extern int const LinBarGrille;
-    extern int const Custom;
+    enum class Diffuser {
+        Unassigned,
+        Swirl,
+        VarArea,
+        DisplVent,
+        LinBarGrille,
+        Custom
+    };
 
-    // parameters for comfort calculations
-    extern int const VComfort_Invalid;
-    extern int const VComfort_Jet;
-    extern int const VComfort_Recirculation;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Air Node Data
-
-    // UCSD
-
-    // END UCSD
-
-    // begin NREL RoomAir DERIVED TYPES ******************************************
-
-    // end NREL room air derived types*********************************
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int TotNumOfAirNodes;
-    extern int TotNumOfRoomAFNNodes;
-    extern Array1D_int TotNumOfZoneAirNodes;
-    extern Array1D<Real64> ConvectiveFloorSplit;
-    extern Array1D<Real64> InfiltratFloorSplit;
-    // UCSD
-    extern Array1D<Real64> DVHcIn;
-    extern int TotUCSDDV;                // Total number of UCSDDV zones
-    extern Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
-    extern Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
-    extern Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
-    extern Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
-    extern Array1D<Real64> MaxTempGrad;  // maximum Average Temperature Gradient in the room
-    extern Array1D<Real64> HVACAirTemp;  // HVAC system temperature (DEG C)
-    extern Array1D<Real64> HVACMassFlow; // HVAC system mass flow rate (KG/S)
-    extern Array1D<Real64> ZTFloor;
-    extern Array1D<Real64> HeightTransition;
-    extern Array1D<Real64> FracMinFlow;
-    extern Array1D_int ZoneDVMixedFlag;
-    extern Array1D<Real64> ZoneDVMixedFlagRep;
-    extern Array1D_bool ZoneAirSystemON;
-    extern Array1D<Real64> TCMF; // comfort temperature
-    extern Array1D<Real64> ZoneCeilingHeight;
-    extern Array1D<Real64> MATFloor;    // [C] floor level mean air temp
-    extern Array1D<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
-    extern Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
-    extern Array1D<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
-    extern Array1D<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
-    extern Array1D<Real64> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
-    extern Array1D<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
-    extern Array1D<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
-    extern Array1D<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
-    extern Array1D<Real64> MATOC;       // [C] occupied mean air temp
-    extern Array1D<Real64> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
-    extern Array1D<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
-    extern Array1D<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
-    extern Array1D<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
-    extern Array1D<Real64> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
-    extern Array1D<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
-    extern Array1D<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
-    extern Array1D<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
-    extern Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
-    extern Array1D<Real64> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
-    extern Array1D<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
-    extern Array1D<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
-    extern Array1D<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
-    extern Array1D<Real64> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
-    extern Array1D<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
-    extern Array1D<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
-    extern Array1D<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
-    extern Array1D<Real64> ZTM1Floor;   // [C] difference equation's Floor air temp at t minus 1
-    extern Array1D<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
-    extern Array1D<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
-    extern Array1D<Real64> ZTM1OC;      // [C] difference equation's Occupied air temp at t minus 1
-    extern Array1D<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
-    extern Array1D<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
-    extern Array1D<Real64> ZTM1MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    extern Array1D<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    extern Array1D<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    extern Array1D<Real64> AIRRATFloor;
-    extern Array1D<Real64> AIRRATOC;
-    extern Array1D<Real64> AIRRATMX;
-    // Euler and Exact solution algorithms
-    extern Array1D<Real64> Zone1Floor;  // [C] difference equation's Floor air temp at previous dt
-    extern Array1D<Real64> ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
-    extern Array1D<Real64> ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
-    extern Array1D<Real64> Zone1OC;     // [C] difference equation's Occupied air temp at previous dt
-    extern Array1D<Real64> ZoneMXOC;    // [C] difference equation's Occupied air temp at t minus 1
-    extern Array1D<Real64> ZoneM2OC;    // [C] difference equation's Occupied air temp at t minus 2
-    extern Array1D<Real64> Zone1MX;     // [C] difference equation's Mixed  air temp at previous dt
-    extern Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
-    extern Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
-    // UCSD-CV
-    extern Array1D<Real64> CVHcIn;
-    extern int TotUCSDCV;                   // Total number of UCSDDV zones
-    extern Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
-    extern Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
-    extern Array1D<Real64> ZTJET;           // Jet Temperatures
-    extern Array1D<Real64> ZTREC;           // Recirculation Temperatures
-    extern Array1D<Real64> RoomOutflowTemp; // Temperature of air flowing out of the room
-    extern Array1D<Real64> JetRecAreaRatio;
-    extern Array1D<Real64> Urec;           // Recirculation region average velocity
-    extern Array1D<Real64> Ujet;           // Jet region average velocity
-    extern Array1D<Real64> Qrec;           // Recirculation zone total flow rate
-    extern Array1D<Real64> Qtot;           // Total volumetric inflow rate through all active aperatures [m3/s]
-    extern Array1D<Real64> RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
-    extern Array1D<Real64> Uhc;
-    extern Array1D<Real64> Ain;                     // Inflow aperture area
-    extern Array1D<Real64> Droom;                   // CV Zone average length
-    extern Array1D<Real64> Dstar;                   // CV Zone average length, wind direction corrected
-    extern Array1D<Real64> Tin;                     // Inflow air temperature
-    extern Array1D<Real64> TotArea;                 // Sum of the areas of all apertures in the zone
-    extern Array2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
-    extern int CVNumAirflowNetworkSurfaces;         // total number of AirFlowNetwork surfaces.
-    // Interzone surfaces counts twice.
-    extern Array1D<Real64> Rfr;          // Ration between inflow and recirculation air flows
-    extern Array1D<Real64> ZoneCVhasREC; // Airflow pattern is C(0), CR(1)
-    extern bool UCSDModelUsed;
-    extern bool MundtModelUsed;
-    // UCSD-UF
-    extern int TotUCSDUI;         // total number of UCSDUI zones
-    extern int TotUCSDUE;         // total number of UCSDUE zones
-    extern Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
-    extern Array1D_int ZoneUFPtr;
-    extern Array1D<Real64> UFHcIn;
-    extern Array1D_int ZoneUFMixedFlag;
-    extern Array1D<Real64> ZoneUFMixedFlagRep;
-    extern Array1D<Real64> ZoneUFGamma;
-    extern Array1D<Real64> ZoneUFPowInPlumes;            // [W]
-    extern Array1D<Real64> ZoneUFPowInPlumesfromWindows; // [W]
-    extern Array1D<Real64> Phi;                          // dimensionless measure of occupied subzone temperature
-
-    // END UCSD
-
-    // Begin NREL User-defined patterns
-
-    extern int numTempDistContrldZones; // count of zones with user-defined patterns
-    extern int NumAirTempPatterns;      // count of all different patterns in input file
-    extern int NumConstantGradient;     // count of constant gradient patterns in input
-    extern int NumTwoGradientInterp;    // count of two gradient interp patterns in input
-    extern int NumNonDimensionalHeight; // count of ND height profile patterns in input
-    extern int NumSurfaceMapping;       // count of generic surface map patterns in input
-
-    extern bool UserDefinedUsed; // true if user-defined model used anywhere
-
-    // End User-defined patterns
-
-    // RoomAirflowNetwork
-    extern int NumOfRoomAirflowNetControl; // count of RoomAirSettings:AirflowNetwork
-
-    // Types
+    enum class Comfort {
+        VComfort_Invalid,
+        VComfort_Jet,
+        VComfort_Recirculation
+    };
 
     struct AirModelData
     {
@@ -289,16 +143,16 @@ namespace DataRoomAirModel {
         std::string AirModelName;
         std::string ZoneName;
         int ZonePtr;      // Pointer to the zone number for this statement
-        int AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
+        RoomAirModel AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
         // 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
         // 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
-        int TempCoupleScheme; // 1 = absolute (direct),
+        CouplingScheme TempCoupleScheme; // 1 = absolute (direct),
         // 2 = relative air model temperature passing scheme (indirect)
         bool SimAirModel; // FALSE if Mixing air model is currently used and
         // TRUE if other air models are currently used
 
         // Default Constructor
-        AirModelData() : ZonePtr(0), AirModelType(RoomAirModel_Mixing), TempCoupleScheme(DirectCoupling), SimAirModel(false)
+        AirModelData() : ZonePtr(0), AirModelType(RoomAirModel::Mixing), TempCoupleScheme(CouplingScheme::Direct), SimAirModel(false)
         {
         }
     };
@@ -346,11 +200,11 @@ namespace DataRoomAirModel {
         int ZonePtr;                // Pointer to the zone number for this statement
         int SchedGainsPtr;          // Schedule for internal gain fraction to occupied zone
         std::string SchedGainsName; // Gains Schedule name
-        int VforComfort;            // Use Recirculation or Jet velocity and temperatures
+        Comfort VforComfort;            // Use Recirculation or Jet velocity and temperatures
         // for comfort models
 
         // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(VComfort_Invalid)
+        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::VComfort_Invalid)
         {
         }
     };
@@ -409,7 +263,7 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        int DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
         Real64 TransHeight;   // user specified transition height [m]
         bool CalcTransHeight; // flag to calc trans height or use user specified input
         Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
@@ -421,7 +275,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(0), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
               B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
@@ -443,7 +297,7 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        int DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
         Real64 TransHeight;   // user specified transition height [m]
         bool CalcTransHeight; // flag to calc trans height or use user specified input
         Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
@@ -458,7 +312,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(0), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
               B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }
@@ -503,7 +357,7 @@ namespace DataRoomAirModel {
         Real64 TexhaustHeight;          // height of exhaust air node where leaving zone
         Real64 LowGradient;             // lower value of vertical gradient [C/m]
         Real64 HiGradient;              // upper value of vertical gradient [C/m]
-        int InterpolationMode;          // control for interpolation mode
+        DataRoomAirModel::UserDefinedPatternMode InterpolationMode;          // control for interpolation mode
         Real64 UpperBoundTempScale;     // temperature value for HiGradient
         Real64 LowerBoundTempScale;     // temperature value for LowGradient
         Real64 UpperBoundHeatRateScale; // load value for HiGradient
@@ -511,7 +365,7 @@ namespace DataRoomAirModel {
 
         // Default Constructor
         TwoVertGradInterpolPattern()
-            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0), InterpolationMode(0),
+            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0), InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned),
               UpperBoundTempScale(0.0), LowerBoundTempScale(0.0), UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }
@@ -534,7 +388,7 @@ namespace DataRoomAirModel {
         // Members
         std::string Name;                        // unique identifier
         int PatrnID;                             // control ID for referencing in Schedules
-        int PatternMode;                         // Control for what type of calcs in this pattern
+        UserDefinedPatternType PatternMode;                         // Control for what type of calcs in this pattern
         ConstGradPattern GradPatrn;              // Constant gradient pattern
         TwoVertGradInterpolPattern TwoGradPatrn; // Two gradient interpolation pattern
         TempVsHeightPattern VertPatrn;           // Vertical gradient profile pattern
@@ -544,7 +398,7 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct() : PatrnID(0), PatternMode(0), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };
@@ -828,22 +682,289 @@ namespace DataRoomAirModel {
         }
     };
 
-    // Object Data
-    extern Array1D<AirModelData> AirModel;
-    extern Array1D<AirNodeData> AirNode;
-    extern Array1D<DVData> ZoneUCSDDV; // UCSD
-    extern Array1D<CVData> ZoneUCSDCV;
-    extern Array1D<UFIData> ZoneUCSDUI;
-    extern Array1D<UFEData> ZoneUCSDUE;
-    extern Array2D<CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
-    extern Array1D<CVDVParameters> SurfParametersCVDV;                             // Surface parameters
-    extern Array1D<TemperaturePatternStruct> RoomAirPattern;                       // user defined patterns ,various types
-    extern Array1D<AirPatternInfobyZoneStruct> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    extern Array1D<RoomAirflowNetworkInfoByZoneStruct> RoomAirflowNetworkZoneInfo; // added zone info
-
-    void clear_state();
-
 } // namespace DataRoomAirModel
+
+struct RoomAirModelData : BaseGlobalStruct {
+
+    int TotNumOfAirNodes = 0;
+    int TotNumOfRoomAFNNodes = 0;
+    Array1D_int TotNumOfZoneAirNodes;
+    Array1D<Real64> ConvectiveFloorSplit;
+    Array1D<Real64> InfiltratFloorSplit;
+    // UCSD
+    int TotUCSDDV = 0;             // Total number of UCSDDV zones
+    Array1D<Real64> DVHcIn;
+    Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
+    Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
+    Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
+    Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
+    Array1D<Real64> MaxTempGrad;  // maximum Average Temperature Gradient in the room
+    Array1D<Real64> HVACAirTemp;  // HVAC system temperature (DEG C)
+    Array1D<Real64> HVACMassFlow; // HVAC system mass flow rate (KG/S)
+    Array1D<Real64> ZTFloor;
+    Array1D<Real64> HeightTransition;
+    Array1D<Real64> FracMinFlow;
+    Array1D_int ZoneDVMixedFlag;
+    Array1D<Real64> ZoneDVMixedFlagRep;
+    Array1D_bool ZoneAirSystemON;
+    Array1D<Real64> TCMF; // comfort temperature
+    Array1D<Real64> ZoneCeilingHeight;
+    Array1D<Real64> MATFloor;    // [C] floor level mean air temp
+    Array1D<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
+    Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
+    Array1D<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
+    Array1D<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
+    Array1D<Real64> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
+    Array1D<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
+    Array1D<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
+    Array1D<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
+    Array1D<Real64> MATOC;       // [C] occupied mean air temp
+    Array1D<Real64> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
+    Array1D<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
+    Array1D<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
+    Array1D<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
+    Array1D<Real64> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
+    Array1D<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
+    Array1D<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
+    Array1D<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
+    Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
+    Array1D<Real64> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+    Array1D<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
+    Array1D<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
+    Array1D<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
+    Array1D<Real64> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
+    Array1D<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
+    Array1D<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
+    Array1D<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
+    Array1D<Real64> ZTM1Floor;   // [C] difference equation's Floor air temp at t minus 1
+    Array1D<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
+    Array1D<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
+    Array1D<Real64> ZTM1OC;      // [C] difference equation's Occupied air temp at t minus 1
+    Array1D<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
+    Array1D<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
+    Array1D<Real64> ZTM1MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    Array1D<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    Array1D<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    Array1D<Real64> AIRRATFloor;
+    Array1D<Real64> AIRRATOC;
+    Array1D<Real64> AIRRATMX;
+    // Euler and Exact solution algorithms
+    Array1D<Real64> Zone1Floor;  // [C] difference equation's Floor air temp at previous dt
+    Array1D<Real64> ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
+    Array1D<Real64> ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
+    Array1D<Real64> Zone1OC;     // [C] difference equation's Occupied air temp at previous dt
+    Array1D<Real64> ZoneMXOC;    // [C] difference equation's Occupied air temp at t minus 1
+    Array1D<Real64> ZoneM2OC;    // [C] difference equation's Occupied air temp at t minus 2
+    Array1D<Real64> Zone1MX;     // [C] difference equation's Mixed  air temp at previous dt
+    Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
+    Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
+    // UCSD-CV
+    int TotUCSDCV = 0;                // Total number of UCSDDV zones
+    int CVNumAirflowNetworkSurfaces = 0;      // total number of AirFlowNetwork surfaces.
+    Array1D<Real64> CVHcIn;
+    Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
+    Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
+    Array1D<Real64> ZTJET;           // Jet Temperatures
+    Array1D<Real64> ZTREC;           // Recirculation Temperatures
+    Array1D<Real64> RoomOutflowTemp; // Temperature of air flowing out of the room
+    Array1D<Real64> JetRecAreaRatio;
+    Array1D<Real64> Urec;           // Recirculation region average velocity
+    Array1D<Real64> Ujet;           // Jet region average velocity
+    Array1D<Real64> Qrec;           // Recirculation zone total flow rate
+    Array1D<Real64> Qtot;           // Total volumetric inflow rate through all active aperatures [m3/s]
+    Array1D<Real64> RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
+    Array1D<Real64> Uhc;
+    Array1D<Real64> Ain;                     // Inflow aperture area
+    Array1D<Real64> Droom;                   // CV Zone average length
+    Array1D<Real64> Dstar;                   // CV Zone average length, wind direction corrected
+    Array1D<Real64> Tin;                     // Inflow air temperature
+    Array1D<Real64> TotArea;                 // Sum of the areas of all apertures in the zone
+    Array2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
+    // Interzone surfaces counts twice.
+    Array1D<Real64> Rfr;          // Ration between inflow and recirculation air flows
+    Array1D<Real64> ZoneCVhasREC; // Airflow pattern is C = 0, CR(1)
+    bool UCSDModelUsed = false;
+    bool MundtModelUsed = false;
+    // UCSD-UF
+    int TotUCSDUI = 0;      // total number of UCSDUI zones
+    int TotUCSDUE = 0;      // total number of UCSDUE zones
+    Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
+    Array1D_int ZoneUFPtr;
+    Array1D<Real64> UFHcIn;
+    Array1D_int ZoneUFMixedFlag;
+    Array1D<Real64> ZoneUFMixedFlagRep;
+    Array1D<Real64> ZoneUFGamma;
+    Array1D<Real64> ZoneUFPowInPlumes;            // [W]
+    Array1D<Real64> ZoneUFPowInPlumesfromWindows; // [W]
+    Array1D<Real64> Phi;                          // dimensionless measure of occupied subzone temperature
+    // END UCSD
+    // Begin NREL User-defined patterns
+    int numTempDistContrldZones = 0; // count of zones with user-defined patterns
+    int NumAirTempPatterns = 0;      // count of all different patterns in input file
+    int NumConstantGradient = 0;     // count of constant gradient patterns in input
+    int NumTwoGradientInterp = 0;    // count of two gradient interp patterns in input
+    int NumNonDimensionalHeight = 0; // count of ND height profile patterns in input
+    int NumSurfaceMapping = 0;       // count of generic surface map patterns in input
+    bool UserDefinedUsed = false; // true if user-defined model used anywhere
+    // End User-defined patterns
+
+    // RoomAirflowNetwork
+    int NumOfRoomAirflowNetControl = 0; // count of RoomAirSettings:AirflowNetwork
+
+    // Object Data
+    Array1D<DataRoomAirModel::AirModelData> AirModel;
+    Array1D<DataRoomAirModel::AirNodeData> AirNode;
+    Array1D<DataRoomAirModel::DVData> ZoneUCSDDV; // UCSD
+    Array1D<DataRoomAirModel::CVData> ZoneUCSDCV;
+    Array1D<DataRoomAirModel::UFIData> ZoneUCSDUI;
+    Array1D<DataRoomAirModel::UFEData> ZoneUCSDUE;
+    Array2D<DataRoomAirModel::CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
+    Array1D<DataRoomAirModel::CVDVParameters> SurfParametersCVDV;                             // Surface parameters
+    Array1D<DataRoomAirModel::TemperaturePatternStruct> RoomAirPattern;                       // user defined patterns ,various types
+    Array1D<DataRoomAirModel::AirPatternInfobyZoneStruct> AirPatternZoneInfo;                 // added zone information for user defined patterns
+    Array1D<DataRoomAirModel::RoomAirflowNetworkInfoByZoneStruct> RoomAirflowNetworkZoneInfo; // added zone info
+
+    void clear_state() override
+    {
+        TotNumOfAirNodes = 0;
+        TotNumOfRoomAFNNodes = 0;
+        TotNumOfZoneAirNodes.clear();
+        ConvectiveFloorSplit.clear();
+        InfiltratFloorSplit.clear();
+        // UCSD
+        TotUCSDDV = 0;             // Total number of UCSDDV zones
+        DVHcIn.clear();
+        IsZoneDV.clear();        // Is the air model for the zone UCSDDV?
+        ZTOC.clear();         // Temperature of occupied (lower) zone
+        AvgTempGrad.clear();  // vertical Average Temperature Gradient in the room
+        ZTMX.clear();         // Temperature of the mixing(upper) layer
+        MaxTempGrad.clear();  // maximum Average Temperature Gradient in the room
+        HVACAirTemp.clear();  // HVAC system temperature (DEG C)
+        HVACMassFlow.clear(); // HVAC system mass flow rate (KG/S)
+        ZTFloor.clear();
+        HeightTransition.clear();
+        FracMinFlow.clear();
+        ZoneDVMixedFlag.clear();
+        ZoneDVMixedFlagRep.clear();
+        ZoneAirSystemON.clear();
+        TCMF.clear(); // comfort temperature
+        ZoneCeilingHeight.clear();
+        MATFloor.clear();    // [C] floor level mean air temp
+        XMATFloor.clear();   // [C] floor level mean air temp at t minus 1 zone time step
+        XM2TFloor.clear();   // [C] floor level mean air temp at t minus 2 zone time step
+        XM3TFloor.clear();   // [C] floor level mean air temp at t minus 3 zone time step
+        XM4TFloor.clear();   // [C] floor level mean air temp at t minus 4 zone time step
+        DSXMATFloor.clear(); // [C] floor level mean air temp at t minus 1 system time step
+        DSXM2TFloor.clear(); // [C] floor level mean air temp at t minus 2 system time step
+        DSXM3TFloor.clear(); // [C] floor level mean air temp at t minus 3 system time step
+        DSXM4TFloor.clear(); // [C] floor level mean air temp at t minus 4 system time step
+        MATOC.clear();       // [C] occupied mean air temp
+        XMATOC.clear();      // [C] occupied mean air temp at t minus 1 zone time step
+        XM2TOC.clear();      // [C] occupied mean air temp at t minus 2 zone time step
+        XM3TOC.clear();      // [C] occupied mean air temp at t minus 3 zone time step
+        XM4TOC.clear();      // [C] occupied mean air temp at t minus 4 zone time step
+        DSXMATOC.clear();    // [C] occupied mean air temp at t minus 1 system time step
+        DSXM2TOC.clear();    // [C] occupied mean air temp at t minus 2 system time step
+        DSXM3TOC.clear();    // [C] occupied mean air temp at t minus 3 system time step
+        DSXM4TOC.clear();    // [C] occupied mean air temp at t minus 4 system time step
+        MATMX.clear();       // [C] mixed (upper) mean air temp
+        XMATMX.clear();      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+        XM2TMX.clear();      // [C] mixed (upper) mean air temp at t minus 2 zone time step
+        XM3TMX.clear();      // [C] mixed (upper) mean air temp at t minus 3 zone time step
+        XM4TMX.clear();      // [C] mixed (upper) mean air temp at t minus 4 zone time step
+        DSXMATMX.clear();    // [C] mixed  mean air temp at t minus 1 system time step
+        DSXM2TMX.clear();    // [C] mixed  mean air temp at t minus 2 system time step
+        DSXM3TMX.clear();    // [C] mixed  mean air temp at t minus 3 system time step
+        DSXM4TMX.clear();    // [C] mixed  mean air temp at t minus 4 system time step
+        ZTM1Floor.clear();   // [C] difference equation's Floor air temp at t minus 1
+        ZTM2Floor.clear();   // [C] difference equation's Floor air temp at t minus 2
+        ZTM3Floor.clear();   // [C] difference equation's Floor air temp at t minus 3
+        ZTM1OC.clear();      // [C] difference equation's Occupied air temp at t minus 1
+        ZTM2OC.clear();      // [C] difference equation's Occupied air temp at t minus 2
+        ZTM3OC.clear();      // [C] difference equation's Occupied air temp at t minus 3
+        ZTM1MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+        ZTM2MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+        ZTM3MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+        AIRRATFloor.clear();
+        AIRRATOC.clear();
+        AIRRATMX.clear();
+        // Euler and Exact solution algorithms
+        Zone1Floor.clear();  // [C] difference equation's Floor air temp at previous dt
+        ZoneMXFloor.clear(); // [C] difference equation's Floor air temp at t minus 1
+        ZoneM2Floor.clear(); // [C] difference equation's Floor air temp at t minus 2
+        Zone1OC.clear();     // [C] difference equation's Occupied air temp at previous dt
+        ZoneMXOC.clear();    // [C] difference equation's Occupied air temp at t minus 1
+        ZoneM2OC.clear();    // [C] difference equation's Occupied air temp at t minus 2
+        Zone1MX.clear();     // [C] difference equation's Mixed  air temp at previous dt
+        ZoneMXMX.clear();    // [C] difference equation's Mixed  air temp at t minus 1
+        ZoneM2MX.clear();    // [C] difference equation's Mixed  air temp at t minus 2
+        // UCSD-CV
+        TotUCSDCV = 0;                // Total number of UCSDDV zones
+        CVNumAirflowNetworkSurfaces = 0;      // total number of AirFlowNetwork surfaces.
+        CVHcIn.clear();
+        IsZoneCV.clear();           // Is the air model for the zone UCSDDV?
+        ZoneCVisMixing.clear();  // Zone set to CV is actually using a mixing model
+        ZTJET.clear();           // Jet Temperatures
+        ZTREC.clear();           // Recirculation Temperatures
+        RoomOutflowTemp.clear(); // Temperature of air flowing out of the room
+        JetRecAreaRatio.clear();
+        Urec.clear();           // Recirculation region average velocity
+        Ujet.clear();           // Jet region average velocity
+        Qrec.clear();           // Recirculation zone total flow rate
+        Qtot.clear();           // Total volumetric inflow rate through all active aperatures [m3/s]
+        RecInflowRatio.clear(); // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
+        Uhc.clear();
+        Ain.clear();                     // Inflow aperture area
+        Droom.clear();                   // CV Zone average length
+        Dstar.clear();                   // CV Zone average length, wind direction corrected
+        Tin.clear();                     // Inflow air temperature
+        TotArea.clear();                 // Sum of the areas of all apertures in the zone
+        AirflowNetworkSurfaceUCSDCV.clear(); // table for AirflowNetwork surfaces organization
+        // Interzone surfaces counts twice.
+        Rfr.clear();          // Ration between inflow and recirculation air flows
+        ZoneCVhasREC.clear(); // Airflow pattern is C = 0, CR(1)
+        UCSDModelUsed = false;
+        MundtModelUsed = false;
+        // UCSD-UF
+        TotUCSDUI = 0;      // total number of UCSDUI zones
+        TotUCSDUE = 0;      // total number of UCSDUE zones
+        IsZoneUI.clear(); // controls program flow, for interior or exterior UFAD model
+        ZoneUFPtr.clear();
+        UFHcIn.clear();
+        ZoneUFMixedFlag.clear();
+        ZoneUFMixedFlagRep.clear();
+        ZoneUFGamma.clear();
+        ZoneUFPowInPlumes.clear();            // [W]
+        ZoneUFPowInPlumesfromWindows.clear(); // [W]
+        Phi.clear();                          // dimensionless measure of occupied subzone temperature
+        // END UCSD
+        // Begin NREL User-defined patterns
+        numTempDistContrldZones = 0; // count of zones with user-defined patterns
+        NumAirTempPatterns = 0;      // count of all different patterns in input file
+        NumConstantGradient = 0;     // count of constant gradient patterns in input
+        NumTwoGradientInterp = 0;    // count of two gradient interp patterns in input
+        NumNonDimensionalHeight = 0; // count of ND height profile patterns in input
+        NumSurfaceMapping = 0;       // count of generic surface map patterns in input
+        UserDefinedUsed = false; // true if user-defined model used anywhere
+        // End User-defined patterns
+
+        // RoomAirflowNetwork
+        NumOfRoomAirflowNetControl = 0; // count of RoomAirSettings:AirflowNetwork
+
+        // Object Data
+        AirModel.clear();
+        AirNode.clear();
+        ZoneUCSDDV.clear(); // UCSD
+        ZoneUCSDCV.clear();
+        ZoneUCSDUI.clear();
+        ZoneUCSDUE.clear();
+        CVJetRecFlows.clear();                                          // Jet and recirculation zone flows and properties
+        SurfParametersCVDV.clear();                             // Surface parameters
+        RoomAirPattern.clear();                       // user defined patterns ,various types
+        AirPatternZoneInfo.clear();                 // added zone information for user defined patterns
+        RoomAirflowNetworkZoneInfo.clear(); // added zone info
+    }
+};
 
 } // namespace EnergyPlus
 

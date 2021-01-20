@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,17 +91,17 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     Real64 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                     Real64 DesCoilLoad = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                     if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
-                        if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)DataPlant::PlantLoop.size() &&
+                        if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                             this->dataWaterCoilSizHeatDeltaT > 0.0) {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                               DataGlobalConstants::HWInitConvTemp(),
-                                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                               DataGlobalConstants::HWInitConvTemp,
+                                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                                this->callingRoutine);
                             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                           DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobalConstants::HWInitConvTemp(),
-                                                                           DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                           DataGlobalConstants::HWInitConvTemp,
+                                                                           state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                             this->autoSizedValue = DesCoilLoad / (this->dataWaterCoilSizHeatDeltaT * Cp * rho);
                         } else {
@@ -121,17 +121,17 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                 this->autoSizedValue = _originalValue;
             } else {
                 if (this->dataCapacityUsedForSizing >= DataHVACGlobals::SmallLoad) {
-                    if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)DataPlant::PlantLoop.size() &&
+                    if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                         this->dataWaterCoilSizHeatDeltaT > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                           DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                           DataGlobalConstants::HWInitConvTemp(),
-                                                                           DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                           state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                           DataGlobalConstants::HWInitConvTemp,
+                                                                           state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
                         Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                       DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                       DataGlobalConstants::HWInitConvTemp(),
-                                                                       DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                       DataGlobalConstants::HWInitConvTemp,
+                                                                       state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                        this->callingRoutine);
                         this->autoSizedValue = this->dataCapacityUsedForSizing / (this->dataWaterCoilSizHeatDeltaT * Cp * rho);
                     } else {
@@ -157,11 +157,11 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
-        coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp());
+        coilSelectionReportObj->setCoilEntWaterTemp(state, this->compName, this->compType, DataGlobalConstants::HWInitConvTemp);
         if (this->plantSizData.size() > 0 && this->dataPltSizHeatNum > 0) {
             coilSelectionReportObj->setCoilWaterDeltaT(state, this->compName, this->compType, this->plantSizData(this->dataPltSizHeatNum).DeltaT);
             coilSelectionReportObj->setCoilLvgWaterTemp(state,
-                this->compName, this->compType, DataGlobalConstants::HWInitConvTemp() - this->plantSizData(this->dataPltSizHeatNum).DeltaT);
+                this->compName, this->compType, DataGlobalConstants::HWInitConvTemp - this->plantSizData(this->dataPltSizHeatNum).DeltaT);
         }
     }
     return this->autoSizedValue;

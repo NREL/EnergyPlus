@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,13 +46,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <utility>
+
+// disabling "maybe unused" warnings for all the API functions so the IDE isn't lit up with messages
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
 //    argv[0] = "energyplus";
@@ -93,7 +94,7 @@ void registerProgressCallback(EnergyPlusState state, void (*f)(int const)) {
 void registerStdOutCallback([[maybe_unused]] EnergyPlusState state, std::function<void(const std::string &)> f)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->messageCallback = f;
+    thisState->dataGlobal->messageCallback = f; // NOLINT(performance-unnecessary-value-param)
 }
 
 void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {
@@ -105,7 +106,7 @@ void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {
 
 void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f) {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    thisState->dataGlobal->externalHVACManager = f;
+    thisState->dataGlobal->externalHVACManager = f; // NOLINT(performance-unnecessary-value-param)
 }
 
 void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
@@ -289,3 +290,5 @@ void callbackUnitarySystemSizing(EnergyPlusState state, void (*f)(EnergyPlusStat
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::UnitarySystemSizing, f);
 }
+
+#pragma clang diagnostic pop

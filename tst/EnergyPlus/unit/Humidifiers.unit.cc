@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,18 +50,16 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
@@ -88,8 +86,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -123,8 +121,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
@@ -165,8 +163,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;
@@ -256,8 +254,8 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
-    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     FinalSysSizing.allocate(CurSysNum);
     FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;

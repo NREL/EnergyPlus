@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -63,50 +64,45 @@ struct EnergyPlusData;
 
 namespace SimAirServingZones {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // coil operation
-    extern int const CoilOn;  // normal coil operation
-    extern int const CoilOff; // signal coil shouldn't run
-    extern int const BeforeBranchSim;
-    extern int const AfterBranchSim;
+    constexpr int CoilOn(1);  // normal coil operation
+    constexpr int CoilOff(0); // signal coil shouldn't run
+
+    constexpr int BeforeBranchSim(1);
+    constexpr int AfterBranchSim(2);
+
     // CompType numerics -- for this module
     // component types addressed by this module
-    extern int const OAMixer_Num;
-    extern int const Fan_Simple_CV;
-    extern int const Fan_Simple_VAV;
-    extern int const Fan_System_Object;
-    extern int const WaterCoil_SimpleCool;
-    extern int const WaterCoil_Cooling;
-    extern int const WaterCoil_SimpleHeat;
-    extern int const SteamCoil_AirHeat;
-    extern int const WaterCoil_DetailedCool;
-    extern int const Coil_ElectricHeat;
-    extern int const Coil_GasHeat;
-    extern int const WaterCoil_CoolingHXAsst;
-    extern int const DXCoil_CoolingHXAsst;
-    extern int const Coil_DeSuperHeat;
-    extern int const DXSystem;
-    extern int const HeatXchngr;
-    extern int const Desiccant;
-    extern int const Unglazed_SolarCollector;
-    extern int const EvapCooler;
-    extern int const Furnace_UnitarySys_HeatOnly;
-    extern int const Furnace_UnitarySys_HeatCool;
-    extern int const Humidifier;
-    extern int const Duct;
-    extern int const UnitarySystem_BypassVAVSys;
-    extern int const UnitarySystem_MSHeatPump;
-    extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
-    extern int const DXHeatPumpSystem;
-    extern int const CoilUserDefined;
-    extern int const UnitarySystemModel;
-    extern int const ZoneVRFasAirLoopEquip;
-
-    extern bool GetAirLoopInputFlag; // Flag set to make sure you get input once
-    extern int NumOfTimeStepInDay;   // number of zone time steps in a day
-
-    void clear_state();
+    constexpr int OAMixer_Num(1);
+    constexpr int Fan_Simple_CV(2);
+    constexpr int Fan_Simple_VAV(3);
+    constexpr int WaterCoil_SimpleCool(4);
+    constexpr int WaterCoil_Cooling(5);
+    constexpr int WaterCoil_SimpleHeat(6);
+    constexpr int SteamCoil_AirHeat(7);
+    constexpr int WaterCoil_DetailedCool(8);
+    constexpr int Coil_ElectricHeat(9);
+    constexpr int Coil_GasHeat(10);
+    constexpr int WaterCoil_CoolingHXAsst(11);
+    constexpr int DXCoil_CoolingHXAsst(12);
+    constexpr int Coil_DeSuperHeat(13);
+    constexpr int DXSystem(14);
+    constexpr int HeatXchngr(15);
+    constexpr int Desiccant(16);
+    constexpr int Unglazed_SolarCollector(17);
+    constexpr int EvapCooler(18);
+    constexpr int Furnace_UnitarySys_HeatOnly(19);
+    constexpr int Furnace_UnitarySys_HeatCool(20);
+    constexpr int Humidifier(21);
+    constexpr int Duct(22);
+    constexpr int UnitarySystem_BypassVAVSys(23);
+    constexpr int UnitarySystem_MSHeatPump(24);
+    constexpr int Fan_ComponentModel(25);
+    constexpr int DXHeatPumpSystem(26);
+    constexpr int CoilUserDefined(27);
+    constexpr int Fan_System_Object(28);
+    constexpr int UnitarySystemModel(29);
+    constexpr int ZoneVRFasAirLoopEquip(30);
 
     void ManageAirLoops(EnergyPlusData &state, bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,                  // TRUE means air loops must be (re)simulated
@@ -176,21 +172,46 @@ namespace SimAirServingZones {
 
     Real64 GetHeatingSATempHumRatForSizing(EnergyPlusData &state, int IndexAirLoop);
 
-    void LimitZoneVentEff(Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
+    void LimitZoneVentEff(EnergyPlusData &state,
+                          Real64 Xs,              // ratio of uncorrected system outdoor air flow rate to the design system supply flow rate
                           Real64 Voz,             // corrected (divided by distribution efficiency) zone outside air flow rate [m3/s]
                           int CtrlZoneNum,        // controlled zone number
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string CompType, std::string CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string CompName);
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
 
 } // namespace SimAirServingZones
+
+struct SimAirServingZonesData : BaseGlobalStruct {
+
+    bool GetAirLoopInputFlag = true;        // Flag set to make sure you get input once
+    int NumOfTimeStepInDay = 0;             // number of zone time steps in a day
+    bool InitAirLoopsOneTimeFlag = true;
+    int TestUniqueNodesNum = 0;
+    bool SizeAirLoopsOneTimeFlag = true;
+    bool InitAirLoopsBranchSizingFlag = true;
+    bool OutputSetupFlag = false;
+    bool MyEnvrnFlag = true;
+
+    void clear_state() override
+    {
+        this->GetAirLoopInputFlag = true;
+        this->NumOfTimeStepInDay = 0;
+        this->InitAirLoopsOneTimeFlag = true;
+        this->TestUniqueNodesNum = 0;
+        this->SizeAirLoopsOneTimeFlag = true;
+        this->InitAirLoopsBranchSizingFlag = true;
+        this->OutputSetupFlag = false;
+        this->MyEnvrnFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

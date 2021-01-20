@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -245,10 +245,6 @@ namespace Construction {
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
         // Air boundary
         bool TypeIsAirBoundary;               // true for Construction:AirBoundary
-        bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
-        bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
-        bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
-        bool TypeIsAirBoundaryIRTSurface;     // true for Construction:AirBoundary with IRTSurface for radiant
         bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
         Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
         int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
@@ -283,27 +279,31 @@ namespace Construction {
               CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
               SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiff(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffGnd(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), BlAbsDiffSky(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
-              BlAbsDiffBack(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0),
-              TransDiff(0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
-              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0),
-              BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0),
-              ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0), rfBareVisCoef(6, 5, 0.0),
-              rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0), tBareSolDiff(5, 0.0),
-              tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
-              abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0), W5FileGlazingSysWidth(0.0),
-              W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false),
-              WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
-              TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
-              ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
-              AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
-              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
-              TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
-              AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
+              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiff(DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiff(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffGnd(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffSky(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffBack(DataHeatBalance::MaxSolidWinLayers, 0.0),
+              BlAbsDiffBack(DataSurfaces::MaxSlatAngs, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsDiffShade(0.0),
+              AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              ShadeAbsorpThermal(0.0), AbsBeamCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0),
+              AbsBeamBackCoef(6, DataHeatBalance::MaxSolidWinLayers, 0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
+              BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0),
+              BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0), BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
+              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
+              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolCoef(6, 5, 0.0), tBareVisCoef(6, 5, 0.0), rfBareSolCoef(6, 5, 0.0),
+              rfBareVisCoef(6, 5, 0.0), rbBareSolCoef(6, 5, 0.0), rbBareVisCoef(6, 5, 0.0), afBareSolCoef(6, 5, 0.0), abBareSolCoef(6, 5, 0.0),
+              tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0),
+              afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0),
+              W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0),
+              SourceSinkPresent(false), TypeIsWindow(false), WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false),
+              TypeIsFfactorFloor(false), TCFlag(0), TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0),
+              Area(0.0), PerimeterExposed(0.0), ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false),
+              WindowTypeEQL(false), EQLConsPtr(0), AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0),
+              AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
+              TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0), AirBoundaryMixingSched(0), rcmax(0), NodeSource(0), NodeUserTemp(0)
         {
             BMat.allocate(3);
             CMat.allocate(2);
@@ -323,7 +323,7 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
-        bool isGlazingConstruction() const;
+        bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,73 +52,18 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataErrorTracking {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const SearchCounts;
+    int constexpr SearchCounts(20);
     extern Array1D_string const MessageSearch;
     extern Array1D_string const Summaries;
-    // in below -- simple line end <CR>.  End of Whole message <CRE>
-    extern std::string const MoreDetails_1;  // InterZone Surface Areas -- mismatch
-    extern std::string const MoreDetails_2;  // Interzone surfaces - different zones
-    extern std::string const MoreDetails_3;  // Node Connection Errors
-    extern std::string const MoreDetails_4;  // InterZone Surface Azimuths -- mismatch
-    extern std::string const MoreDetails_5;  // InterZone Surface Tilts -- mismatch
-    extern std::string const MoreDetails_6;  // Likely non-planar surfaces
-    extern std::string const MoreDetails_7;  // Deprecated Features or Key Values
-    extern std::string const MoreDetails_8;  // Incorrect Floor Tilt
-    extern std::string const MoreDetails_9;  // Incorrect Roof/Ceiling Tilt
-    extern std::string const MoreDetails_10; // Incomplete View factors
-    extern std::string const MoreDetails_11; // Unbalanced exhaust air flow
-    extern std::string const MoreDetails_12; // Loads Initialization did not Converge
-    extern std::string const MoreDetails_13; // CalcDaylightMapPoints: Window
-    extern std::string const MoreDetails_14; // Zone Air Heat Balance Warnings
-    extern std::string const MoreDetails_15; // Occupant density is extremely high
-    extern std::string const MoreDetails_16; // Temperature (low) out of bounds AND Temperature (high) out of bounds
-    extern std::string const MoreDetails_18; // Nominally unused constructions
-    extern std::string const MoreDetails_19; // InfraredTransparent constructions in non-interzone surfaces
-    extern std::string const MoreDetails_20; // No reporting elements requested
     extern Array1D_string const MoreDetails; // Details 16 applies to both temperature out of bounds | errors.
 
-    extern int const MaxRecurringErrorMsgLength; // Maximum error message length for recurring error messages
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int MatchCounts;
-    extern bool AbortProcessing;                // Flag used to if currently in "abort processing"
-    extern int NumRecurringErrors;              // Number of stored recurring error messages
-    extern int TotalSevereErrors;               // Counter
-    extern int TotalWarningErrors;              // Counter
-    extern int TotalSevereErrorsDuringWarmup;   // Counter
-    extern int TotalWarningErrorsDuringWarmup;  // Counter
-    extern int TotalSevereErrorsDuringSizing;   // Counter
-    extern int TotalWarningErrorsDuringSizing;  // Counter
-    extern int TotalMultipliedWindows;          // Counter
-    extern int TotalCoincidentVertices;         // Counter
-    extern int TotalDegenerateSurfaces;         // Counter
-    extern int TotalReceivingNonConvexSurfaces; // Counter
-    extern int TotalCastingNonConvexSurfaces;   // Counter
-    extern int TotalRoomAirPatternTooLow;       // Counter
-    extern int TotalRoomAirPatternTooHigh;      // Counter
-    extern bool AskForConnectionsReport;        // Flag used to tell when connections should be reported
-    extern bool AskForSurfacesReport;           // Flag used to tell when surfaces should be reported
-    extern bool AskForPlantCheckOnAbort;        // flag used to tell if plant structure can be checked
-    extern bool ExitDuringSimulations;          // flag used to tell if program is in simulation mode when fatal occurs
-    extern std::string LastSevereError;
-
-    // Types
     struct RecurringErrorData
     {
         // Members
@@ -144,14 +89,62 @@ namespace DataErrorTracking {
         }
     };
 
-    // Object Data
-    extern Array1D<RecurringErrorData> RecurringErrors;
-
-    // Clears the global data in DataErrorTracking
-    // Needed for unit tests, should not normally be called.
-    void clear_state();
-
 } // namespace DataErrorTracking
+
+struct ErrorTrackingData : BaseGlobalStruct {
+    Array1D<DataErrorTracking::RecurringErrorData> RecurringErrors;
+    Array1D_int MatchCounts;
+    bool AbortProcessing = false;            // Flag used to if currently in "abort processing"
+    int NumRecurringErrors = 0;              // Number of stored recurring error messages
+    int TotalSevereErrors = 0;               // Counter
+    int TotalWarningErrors = 0;              // Counter
+    int TotalSevereErrorsDuringWarmup = 0;   // Counter
+    int TotalWarningErrorsDuringWarmup = 0;  // Counter
+    int TotalSevereErrorsDuringSizing = 0;   // Counter
+    int TotalWarningErrorsDuringSizing = 0;  // Counter
+    int TotalMultipliedWindows = 0;          // Counter
+    int TotalCoincidentVertices = 0;         // Counter
+    int TotalDegenerateSurfaces = 0;         // Counter
+    int TotalReceivingNonConvexSurfaces = 0; // Counter
+    int TotalCastingNonConvexSurfaces = 0;   // Counter
+    int TotalRoomAirPatternTooLow = 0;       // Counter
+    int TotalRoomAirPatternTooHigh = 0;      // Counter
+    bool AskForConnectionsReport = false;    // Flag used to tell when connections should be reported
+    bool AskForSurfacesReport = false;       // Flag used to tell when surfaces should be reported
+    bool AskForPlantCheckOnAbort = false;    // flag used to tell if plant structure can be checked
+    bool ExitDuringSimulations = false;      // flag used to tell if program is in simulation mode when fatal occurs
+    std::string LastSevereError;
+
+    ErrorTrackingData() {
+        MatchCounts = Array1D_int(DataErrorTracking::SearchCounts, 0);
+    }
+
+    void clear_state() override
+    {
+        RecurringErrors.clear();
+        MatchCounts = Array1D_int(DataErrorTracking::SearchCounts, 0);
+        AbortProcessing = false;            // Flag used to if currently in "abort processing"
+        NumRecurringErrors = 0;              // Number of stored recurring error messages
+        TotalSevereErrors = 0;               // Counter
+        TotalWarningErrors = 0;              // Counter
+        TotalSevereErrorsDuringWarmup = 0;   // Counter
+        TotalWarningErrorsDuringWarmup = 0;  // Counter
+        TotalSevereErrorsDuringSizing = 0;   // Counter
+        TotalWarningErrorsDuringSizing = 0;  // Counter
+        TotalMultipliedWindows = 0;          // Counter
+        TotalCoincidentVertices = 0;         // Counter
+        TotalDegenerateSurfaces = 0;         // Counter
+        TotalReceivingNonConvexSurfaces = 0; // Counter
+        TotalCastingNonConvexSurfaces = 0;   // Counter
+        TotalRoomAirPatternTooLow = 0;       // Counter
+        TotalRoomAirPatternTooHigh = 0;      // Counter
+        AskForConnectionsReport = false;    // Flag used to tell when connections should be reported
+        AskForSurfacesReport = false;       // Flag used to tell when surfaces should be reported
+        AskForPlantCheckOnAbort = false;    // flag used to tell if plant structure can be checked
+        ExitDuringSimulations = false;      // flag used to tell if program is in simulation mode when fatal occurs
+        LastSevereError = "";
+    }
+};
 
 } // namespace EnergyPlus
 
