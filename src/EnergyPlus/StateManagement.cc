@@ -93,7 +93,6 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -204,7 +203,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
     GeneratorFuelSupply::clear_state();
     GlobalNames::clear_state();
-    GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();

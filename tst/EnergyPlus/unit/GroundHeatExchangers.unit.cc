@@ -255,9 +255,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(1u, vertPropsVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->vertPropsVector.size());
 
-    auto &thisProp(vertPropsVector[0]);
+    auto &thisProp(state->dataGroundHeatExchanger->vertPropsVector[0]);
 
     EXPECT_EQ("GHE-1 PROPS", thisProp->name);
     EXPECT_EQ(1, thisProp->bhTopDepth);
@@ -449,9 +449,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(1u, responseFactorsVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->responseFactorsVector.size());
 
-    auto &thisRF(responseFactorsVector[0]);
+    auto &thisRF(state->dataGroundHeatExchanger->responseFactorsVector[0]);
 
     EXPECT_EQ("GHE-1 G-FUNCTIONS", thisRF->name);
     EXPECT_EQ("GHE-1 PROPS", thisRF->props->name);
@@ -492,9 +492,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Chec
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(1u, vertArraysVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->vertArraysVector.size());
 
-    auto &thisArray(vertArraysVector[0]);
+    auto &thisArray(state->dataGroundHeatExchanger->vertArraysVector[0]);
 
     EXPECT_EQ("GHE-ARRAY", thisArray->name);
     EXPECT_EQ("GHE-1 PROPS", thisArray->props->name);
@@ -701,19 +701,19 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(1u, vertPropsVector.size());
-    EXPECT_EQ(1u, responseFactorsVector.size());
-    EXPECT_EQ(1u, verticalGLHE.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->vertPropsVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->responseFactorsVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->verticalGLHE.size());
 
-    auto &thisRF(responseFactorsVector[0]);
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisRF(state->dataGroundHeatExchanger->responseFactorsVector[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
     EXPECT_EQ("VERTICAL GHE 1X4 STD", thisGLHE.name);
     EXPECT_EQ(true, thisGLHE.available);
     EXPECT_EQ(true, thisGLHE.on);
     EXPECT_EQ(2.423, thisGLHE.soil.k);
     EXPECT_EQ(2.343E6, thisGLHE.soil.rhoCp);
-    EXPECT_EQ(GetResponseFactor(thisRF->name), thisGLHE.myRespFactors);
+    EXPECT_EQ(GetResponseFactor(*state, thisRF->name), thisGLHE.myRespFactors);
     EXPECT_EQ(0.109982, thisGLHE.bhDiameter);
     EXPECT_EQ(0.109982 / 2, thisGLHE.bhRadius);
     EXPECT_EQ(100, thisGLHE.bhLength);
@@ -771,19 +771,19 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(1u, vertPropsVector.size());
-    EXPECT_EQ(1u, vertArraysVector.size());
-    EXPECT_EQ(1u, verticalGLHE.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->vertPropsVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->vertArraysVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->verticalGLHE.size());
 
-    auto &thisArray(vertArraysVector[0]);
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisArray(state->dataGroundHeatExchanger->vertArraysVector[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
     EXPECT_EQ("VERTICAL GHE 1X4 STD", thisGLHE.name);
     EXPECT_EQ(true, thisGLHE.available);
     EXPECT_EQ(true, thisGLHE.on);
     EXPECT_EQ(2.423, thisGLHE.soil.k);
     EXPECT_EQ(2.343E6, thisGLHE.soil.rhoCp);
-    EXPECT_EQ(GetResponseFactor(thisArray->name), thisGLHE.myRespFactors);
+    EXPECT_EQ(GetResponseFactor(*state, thisArray->name), thisGLHE.myRespFactors);
     EXPECT_EQ(0.109982, thisGLHE.bhDiameter);
     EXPECT_EQ(0.109982 / 2, thisGLHE.bhRadius);
     EXPECT_EQ(100, thisGLHE.bhLength);
@@ -862,11 +862,11 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
 
     GetGroundHeatExchangerInput(*state);
 
-    EXPECT_EQ(2u, vertPropsVector.size());
-    EXPECT_EQ(4u, singleBoreholesVector.size());
-    EXPECT_EQ(1u, verticalGLHE.size());
+    EXPECT_EQ(2u, state->dataGroundHeatExchanger->vertPropsVector.size());
+    EXPECT_EQ(4u, state->dataGroundHeatExchanger->singleBoreholesVector.size());
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->verticalGLHE.size());
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
     EXPECT_EQ("VERTICAL GHE 1X4 STD", thisGLHE.name);
     EXPECT_EQ(true, thisGLHE.available);
@@ -1185,7 +1185,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
@@ -1287,7 +1287,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
 
     GetGroundHeatExchangerInput(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
     Real64 const tolerance = 0.00001;
 
@@ -1348,9 +1348,9 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
 
     GetGroundHeatExchangerInput(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
-    Real64 reynoldsNum = 0;
+    Real64 reynoldsNum;
 
     Real64 const tolerance = 0.000001;
 
@@ -1667,7 +1667,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
@@ -1971,7 +1971,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
@@ -2267,7 +2267,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
@@ -2565,7 +2565,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
@@ -2863,7 +2863,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
@@ -3161,7 +3161,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
@@ -3459,7 +3459,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
@@ -3757,7 +3757,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
-    auto &thisGLHE(verticalGLHE[0]);
+    auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
