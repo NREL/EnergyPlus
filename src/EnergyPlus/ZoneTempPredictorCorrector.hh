@@ -307,7 +307,7 @@ namespace ZoneTempPredictorCorrector {
 
     bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
-    bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
+    bool VerifyControlledZoneForThermostat(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
     void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
@@ -334,7 +334,7 @@ namespace ZoneTempPredictorCorrector {
                                                         int const ActualZoneNum // controlled zone actual zone number
     );
 
-    void OverrideAirSetPointsforEMSCntrl();
+    void OverrideAirSetPointsforEMSCntrl(EnergyPlusData& state);
 
     void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData& state);
 

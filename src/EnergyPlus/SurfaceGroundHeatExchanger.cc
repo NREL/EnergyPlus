@@ -1330,7 +1330,7 @@ namespace SurfaceGroundHeatExchanger {
         // update flux
         this->QSrc = state.dataSurfaceGroundHeatExchangers->SourceFlux;
 
-        if (this->LastSysTimeElapsed == SysTimeElapsed) { // only update in normal mode !DSU
+        if (this->LastSysTimeElapsed == SysTimeElapsed) { // only update in normal mode
             if (this->LastSysTimeElapsed == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid

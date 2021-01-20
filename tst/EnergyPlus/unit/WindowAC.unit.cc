@@ -468,8 +468,8 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // check Sizing
     EXPECT_NEAR(state->dataWindowAC->WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
 
     WindowAC::SimWindowAC(*state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output

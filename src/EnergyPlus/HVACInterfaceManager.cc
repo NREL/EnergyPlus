@@ -523,9 +523,9 @@ namespace HVACInterfaceManager {
             // update the MIN/MAX available flow rates
             Node(OtherLoopSideInletNode).MassFlowRateMinAvail = Node(ThisLoopSideOutletNode).MassFlowRateMinAvail;
             Node(OtherLoopSideInletNode).MassFlowRateMaxAvail = Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
-            // update Quality.  DSU? Note: This update assumes that STEAM cannot be used with common pipes.
+            // update Quality.  Note: This update assumes that STEAM cannot be used with common pipes.
             Node(OtherLoopSideInletNode).Quality = Node(ThisLoopSideOutletNode).Quality;
-            // pressure update  DSU? Note: This update assumes that PRESSURE SIMULATION cannot be used with common pipes.
+            // pressure update  Note: This update assumes that PRESSURE SIMULATION cannot be used with common pipes.
             if (state.dataPlnt->PlantLoop(LoopNum).HasPressureComponents) {
                 // Don't update pressure, let the pressure simulation handle pressures
             } else {
