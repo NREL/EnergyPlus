@@ -17,7 +17,24 @@ Manufacturers have a configuration option that includes free cooling using a coo
 
 ## E-mail and  Conference Call Conclusions ##
 
-TBD
+Brent 1/15/21
+
+I would suggest to change CoilSystem:Cooling:DX to CoilSystem:Cooling and the allow that parent to use chilled water coils.  Seems hard to justify yet-another-coil-system object.  Or add the controls needed to unitary system and model with two unitary objects in series.
+
+MJWitte 1/19/21
+
+1. I like adding CoilSystem:Cooling:Water because it can be used for more than this application.
+2. In theory, one could use AirloopHVAC:UnitarySystem with just one coil and no fan, but it still wouldn't have the extra control offset field, and it's become so large that a focused object makes more sense.
+3. One could overthink (not me, of course) the naming and think about how all of the existing CoilSystem objects relate to each other. Some of them have controls in them, some do not (*:HeatExchangerAssisted).
+4. These all started with CoilSystem:Cooling:DX because we needed a way to control a dx coil that was loose on the branch. Using CoilsSystem for this was perhaps a confusing choice because of the overlap with CoilSystem:*:HeatExchangerAssisted.
+5. Some consolidation might be nice, but why? Look at how hard it's been to accomplish that with the DX coils and UnitarySystems. Oh, right, we haven't. So, perhaps better to keep the set of objects and move towards a common code base for them (i.e., they're all part of the same class).
+6. So, I guess I'm convincing myself that the proposed object name is ok as-is.
+7. I'm fine with leaving off the sensor node.
+8. The MultiMode dehumidification control maybe should have a different name. It's only for activating an HXassisted coil, right?
+
+RR: Yes, MultiMode would be used for the HX. If that choice were used the HX would cycle on based on need, otherwise it would always be on. HeatExchangerControlled may be more accurate.
+
+MJWitte: Or HeatExchangerControl or ActivateHeatExchanger. I think including HeatExchanger in the option name is good. If some other way of controlling humidity comes along then a new option can be added.
 
 ## Overview ##
 
@@ -159,13 +176,13 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
     A8, \field Dehumidification Control Type
         \type choice
         \key None
-        \key Multimode
+        \key HeatExchangerControl
         \key CoolReheat
         \default None
         \note None = meet sensible load only
-        \note Multimode = activate water coil and meet sensible load.
+        \note HeatExchangerControl = activate water coil and meet sensible load.
         \note If no sensible load exists, and Run on Latent Load = Yes, and a latent
-        \note load exists, the unit will operate to meet the latent load.
+        \note load exists, the coil will operate to meet the latent load.
         \note If the latent load cannot be met the heat exchanger will be activated.
         \note IF Run on Latent Load = No, the heat exchanger will always be active.
         \note CoolReheat = cool beyond the dry-bulb setpoint as required
@@ -196,9 +213,9 @@ Instead of incorporating a waterside economizer coil object into a packaged syst
 
 Several considerations need to be resolved for this new object.
 
- - Should a Sensor Node Name input field be included, or force use of the object or coil outlet node (recommended)
- - Should a controller tolerance input field be included or assume a typical value of 0.001 for temperature control and 0.00001 for humidity control
- - If the CoilSystem objects are consolodated, additional inputs would be needed for Use Outdoor Air DX Cooling Coil (A11) and Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature (N1) to replicate all inputs for CoilSystem:Cooling:DX. Additional inputs would also be required for heat exchanger type and name.
+ - Should a Sensor Node Name input field be included, or force use of the object or coil outlet node (recommended and agreed to via comments)
+ - Should a controller tolerance input field be included or assume a typical value of 0.001 for temperature control and 0.00001 for humidity control (no comments, assumed OK)
+ - If the CoilSystem objects are consolidated, additional inputs would be needed for Use Outdoor Air DX Cooling Coil (A11) and Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature (N1) to replicate all inputs for CoilSystem:Cooling:DX. Additional inputs would also be required for heat exchanger type and name. (discouraged via comments)
 
 ## Testing/Validation/Data Sources ##
 
