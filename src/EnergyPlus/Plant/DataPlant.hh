@@ -110,7 +110,7 @@ namespace DataPlant {
     }
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    constexpr int NumSimPlantEquipTypes(96);
+    constexpr int NumSimPlantEquipTypes(98);
     extern Array1D_string const SimPlantEquipTypes;
     extern Array1D_string const ccSimPlantEquipTypes;
     extern Array1D<LoopType> const ValidLoopEquipTypes;
