@@ -895,8 +895,6 @@ namespace WaterThermalTanks {
 
     int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
-    void clear_state();
-
     void SetTankVolume(EnergyPlusData &state, std::string sType, std::string sName, const Real64 dVolume); 
 
 } // namespace WaterThermalTanks
