@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -447,9 +447,9 @@ namespace ElectricBaseboardRadiator {
 
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
+                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
                         ElecBaseboard(BaseboardNum).ZonePtr = ctrlZone;
                     }
                 }
@@ -590,8 +590,6 @@ namespace ElectricBaseboardRadiator {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
@@ -616,7 +614,7 @@ namespace ElectricBaseboardRadiator {
             MyOneTimeFlag = false;
         }
 
-        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) ElecBaseboard(BaseboardNum).ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         if (!state.dataGlobal->SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
@@ -625,7 +623,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumElecBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_BBRadiator_Electric, ElecBaseboard(Loop).EquipName)) continue;
@@ -661,7 +659,7 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         ElecBaseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
         ElecBaseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
 
@@ -790,13 +788,10 @@ namespace ElectricBaseboardRadiator {
 
         // METHODOLOGY EMPLOYED:
         // This is primarily modified from Convective Electric Baseboard. An existing algorithm of radiant
-        // heat transfer calculation in the High Tmeperature Radiant System module is implemented.
+        // heat transfer calculation in the High Temperature Radiant System module is implemented.
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
@@ -818,7 +813,7 @@ namespace ElectricBaseboardRadiator {
         Real64 LoadMet;
 
         ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = ElecBaseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
         CpAir = PsyCpAirFnW(ElecBaseboard(BaseboardNum).AirInletHumRat);
@@ -829,7 +824,7 @@ namespace ElectricBaseboardRadiator {
         // thermal loss that could be accounted for with this efficiency input.
         Effic = ElecBaseboard(BaseboardNum).BaseboardEfficiency;
 
-        if (QZnReq > SmallLoad && !CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(state, ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
+        if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && GetCurrentScheduleValue(state, ElecBaseboard(BaseboardNum).SchedPtr) > 0.0) {
 
             // If the load exceeds the capacity than the capacity is set to the BB limit.
             if (QZnReq > ElecBaseboard(BaseboardNum).NominalCapacity) {
@@ -1053,7 +1048,6 @@ namespace ElectricBaseboardRadiator {
         using DataHeatBalFanSys::QElecBaseboardSurf;
         using DataHeatBalFanSys::QElecBaseboardToPerson;
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)

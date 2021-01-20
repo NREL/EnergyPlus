@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -9112,7 +9112,7 @@ namespace SurfaceGeometry {
                     SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_ReturnAir;
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
-                        DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
+                        state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
                         DataHeatBalance::Zone(Surface(SurfNum).Zone).HasAirFlowWindowReturn = true;
                     }
 
