@@ -199,7 +199,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 }
 
 SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
-               std::string const &dbName,
+               fs::path const &dbName,
                fs::path const &errorFilePath,
                bool writeOutputToSQLite,
                bool writeTabularDataToSQLite)
@@ -2561,7 +2561,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
 SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                                    bool writeOutputToSQLite,
-                                   std::string const &dbName,
+                                   fs::path const &dbName,
                                    fs::path const &errorFilePath)
     : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream), m_connection(nullptr)
 {

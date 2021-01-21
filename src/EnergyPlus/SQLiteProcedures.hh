@@ -80,7 +80,7 @@ protected:
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db);
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                      bool writeOutputToSQLite,
-                     std::string const &dbName,
+                     fs::path const &dbName,
                      fs::path const &errorFilePath);
 
     int sqliteExecuteCommand(const std::string &commandBuffer);
@@ -137,7 +137,7 @@ public:
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
     SQLite(std::shared_ptr<std::ostream> errorStream,
-           std::string const &dbName,
+           fs::path const &dbName,
            fs::path const &errorFilePath,
            bool writeOutputToSQLite = false,
            bool writeTabularDataToSQLite = false);
