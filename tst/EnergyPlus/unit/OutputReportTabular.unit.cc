@@ -8553,7 +8553,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     const std::string columnName = "Envelope Convection";
 
     // Test the row of heat emissions
-    std::vector<std::string> testRowNames = {"Heat Emissions [GJ]"};
+    std::vector<std::string> testRowNames = {"Heat Emissions"};
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
