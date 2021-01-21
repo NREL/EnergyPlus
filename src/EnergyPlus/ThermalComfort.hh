@@ -174,7 +174,7 @@ namespace ThermalComfort {
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
 
-    void CalcThermalComfortPierce(EnergyPlusData &state);
+    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
 
     void CalcThermalComfortKSU(EnergyPlusData &state);
 
@@ -266,7 +266,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 HcFor = 0.0;                     // Convective heat transfer coeffiency - Forced
     Real64 HcNat = 0.0;                     // Convective heat transfer coeffiency - Natural
     Real64 HeatFlow = 0.0;                  // Heat flow from core to skin
-    Real64 Hr = 0.0;                        // Radiant heat transfer coeffiency
+    Real64 Hr = 0.0;                        // Hriency
     Real64 IntHeatProd = 0.0;               // Internal heat production
     int IterNum = 0;                        // Number of iteration
     Real64 LatRespHeatLoss = 0.0;           // Latent respiration heat loss

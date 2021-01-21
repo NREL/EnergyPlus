@@ -990,7 +990,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QSteamBaseboardToPerson(1) = 0.0;
     QElecBaseboardToPerson(1) = 0.0;
 
-    CalcThermalComfortPierce(*state);
+    CalcThermalComfortPierceASHRAE(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, 23.62, 0.01);
