@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(ConvertInputFormat)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # Set the CFLAGS and CXXFLAGS depending on the options the user specified.
 # Only GCC-like compilers support -Wextra, and other compilers give tons of
@@ -33,6 +33,10 @@ target_link_libraries( ConvertInputFormat energyplusparser )
 
 if(UNIX AND NOT APPLE)
   target_link_libraries( ConvertInputFormat dl )
+  # See https://en.cppreference.com/w/cpp/filesystem#Notes
+  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+    target_link_libraries( ConvertInputFormat stdc++fs )
+  endif()
 endif()
 
 if (WIN32)
