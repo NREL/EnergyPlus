@@ -396,14 +396,13 @@ namespace EnergyPlus::PluginManagement {
     {
 #if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
-        std::string programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
-        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
-        std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
+        fs::path programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
+        fs::path programDir = FileSystem::getParentDirectoryPath(programPath);
+        fs::path sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
         // I think we need to set the python path before initializing the library
         // make this relative to the binary
-        std::string pathToPythonPackages = sanitizedProgramDir + DataStringGlobals::pathChar + "python_standard_lib";
-        pathToPythonPackages = FileSystem::makeNativePath(pathToPythonPackages);
+        fs::path pathToPythonPackages = FileSystem::makeNativePath(sanitizedProgramDir / "python_standard_lib");
         wchar_t *a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
         Py_SetPythonHome(a);
@@ -416,9 +415,8 @@ namespace EnergyPlus::PluginManagement {
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-        std::string pathToDynLoad = sanitizedProgramDir + "python_standard_lib/lib-dynload";
-        pathToDynLoad = FileSystem::makeNativePath(pathToDynLoad);
-        std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
+        fs::path pathToDynLoad = FileSystem::makeNativePath(sanitizedProgramDir /"python_standard_lib/lib-dynload");
+        fs::path libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(state, libDirDynLoad, false);
 
         // now for additional paths:
@@ -436,7 +434,7 @@ namespace EnergyPlus::PluginManagement {
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(state, ".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
+            fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
             PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
         }
         if (searchPaths > 0) {
@@ -467,7 +465,7 @@ namespace EnergyPlus::PluginManagement {
                     // defaulted to YES
                 }
                 if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
+                    fs::path sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
                     PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
                 }
                 try {
@@ -501,15 +499,14 @@ namespace EnergyPlus::PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-                // TODO: fs::path?
-                std::string fileName = fields.at("python_module_name");
+                fs::path modulePath(fields.at("python_module_name"));
                 std::string className = fields.at("plugin_class_name");
                 std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
                 bool warmup = false;
                 if (sWarmup == "YES") {
                     warmup = true;
                 }
-                state.dataPluginManager->plugins.emplace_back(fileName, className, thisObjectName, warmup);
+                state.dataPluginManager->plugins.emplace_back(modulePath, className, thisObjectName, warmup);
             }
         }
 
@@ -590,7 +587,7 @@ namespace EnergyPlus::PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    std::string PluginManager::sanitizedPath(std::string path)
+    fs::path PluginManager::sanitizedPath(fs::path const& path)
     {
         // there are parts of this program that need to write out a string to execute in Python
         // because of that, escaped backslashes actually need double escaping
@@ -600,24 +597,25 @@ namespace EnergyPlus::PluginManagement {
             // this is really only likely to occur during unit testing, just return the original blank path
             return path;
         }
-        if (path.substr(path.length() - 1, path.length()) == "\\") {
-            path = path.substr(0, path.length() - 1);
+        std::string pathStr = path.string();
+        if (pathStr.back() == '\\') {
+            pathStr.erase(pathStr.size()-1);
         }
         // then sanitize it to escape the backslashes for writing the string literal to Python
         std::string sanitizedDir;
-        for (char i : path) {
+        for (char i : pathStr) {
             if (i == '\\') {
                 sanitizedDir += "\\\\";
             } else {
                 sanitizedDir += i;
             }
         }
-        return sanitizedDir;
+        return fs::path(sanitizedDir);
     }
 #else
-    std::string PluginManager::sanitizedPath([[maybe_unused]] std::string path)
+    fs::path PluginManager::sanitizedPath([[maybe_unused]] fs::path const& path)
     {
-        return "";
+        return fs::path();
     }
 #endif
 
@@ -707,7 +705,7 @@ namespace EnergyPlus::PluginManagement {
         // should decrement it.
         Py_DECREF(pModuleName);
         if (!this->pModule) {
-            EnergyPlus::ShowSevereError(state, "Failed to import module \"" + this->moduleName + "\"");
+            EnergyPlus::ShowSevereError(state, "Failed to import module \"" + this->moduleName.string() + "\"");
             // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError(state);
@@ -718,7 +716,7 @@ namespace EnergyPlus::PluginManagement {
         }
         PyObject *pModuleDict = PyModule_GetDict(this->pModule);
         if (!pModuleDict) {
-            EnergyPlus::ShowSevereError(state, "Failed to read module dictionary from module \"" + this->moduleName + "\"");
+            EnergyPlus::ShowSevereError(state, "Failed to read module dictionary from module \"" + this->moduleName.string() + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError(state);
             } else {
@@ -742,7 +740,7 @@ namespace EnergyPlus::PluginManagement {
         PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
         // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
         if (!pClass) {
-            EnergyPlus::ShowSevereError(state, "Failed to get class type \"" + className + "\" from module \"" + moduleName + "\"");
+            EnergyPlus::ShowSevereError(state, "Failed to get class type \"" + className + "\" from module \"" + moduleName.string() + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError(state);
             } else {
@@ -779,8 +777,8 @@ namespace EnergyPlus::PluginManagement {
         std::string const detectOverriddenFunctionName = "_detect_overridden";
         PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
         if (!detectFunction || !PyCallable_Check(detectFunction)) {
-            EnergyPlus::ShowSevereError(state, "Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" + this->moduleName +
-                                        "." + this->className + "\"");
+            EnergyPlus::ShowSevereError(state, "Could not find or call function \"" + detectOverriddenFunctionName
+                    + "\" on class \"" + this->moduleName.string() + "." + this->className + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError(state);
             } else {
@@ -1048,22 +1046,22 @@ namespace EnergyPlus::PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::addToPythonPath(EnergyPlusData &state, const std::string &path, bool userDefinedPath)
+    void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath)
     {
         if (path.empty()) return;
 
-        std::string command = "sys.path.insert(0, \"" + path + "\")";
+        std::string command = "sys.path.insert(0, \"" + path.string() + "\")";
         if (PyRun_SimpleString(command.c_str()) == 0) {
             if (userDefinedPath) {
-                EnergyPlus::ShowMessage(state, "Successfully added path \"" + path + "\" to the sys.path in Python");
+                EnergyPlus::ShowMessage(state, "Successfully added path \"" + path.string() + "\" to the sys.path in Python");
             }
             //PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");
         } else {
-            EnergyPlus::ShowFatalError(state, "ERROR adding \"" + path + "\" to the sys.path in Python");
+            EnergyPlus::ShowFatalError(state, "ERROR adding \"" + path.string() + "\" to the sys.path in Python");
         }
     }
 #else
-    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &path, [[maybe_unused]] bool userDefinedPath)
+    void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const fs::path &path, [[maybe_unused]] bool userDefinedPath)
     {
     }
 #endif

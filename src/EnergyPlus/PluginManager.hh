@@ -88,16 +88,15 @@ namespace PluginManagement {
     void clear_state();
 
     struct PluginInstance {
-        PluginInstance(const std::string& _moduleName, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
-                emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
+        PluginInstance(const fs::path& _moduleName, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
+                moduleName(_moduleName), className(_className),
+                emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
+                stringIdentifier(_moduleName.string() + "." + _className)
         {
-            this->moduleName = _moduleName;
-            this->className = _className;
-            this->stringIdentifier = _moduleName + "." + _className;
         }
 
         // members
-        std::string moduleName;
+        fs::path moduleName;
         std::string className;
         std::string emsAlias;
         bool runDuringWarmup;
@@ -181,10 +180,9 @@ namespace PluginManagement {
         explicit PluginManager(EnergyPlusData &state);
         ~PluginManager();
 
-        // TODO/ replace with fs::path?
         static int numActiveCallbacks(EnergyPlusData &state);
-        static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
-        static std::string sanitizedPath(std::string path); // intentionally not a const& string
+        static void addToPythonPath(EnergyPlusData &state, const fs::path& path, bool userDefinedPath);
+        static fs::path sanitizedPath(fs::path const &path);
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
