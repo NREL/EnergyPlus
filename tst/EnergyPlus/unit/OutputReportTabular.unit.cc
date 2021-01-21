@@ -8525,7 +8525,6 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    // state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
     state->dataOutRptTab->displayHeatEmissionsSummary = true;
 
     // DetermineBuildingFloorArea
@@ -8536,28 +8535,23 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     BuildingPreDefRep.emiHVACReject = 1750.00; // * energyconversion, 2);
     BuildingPreDefRep.emiTotHeat = 4000.00; // * energyconversion, 2);
 
-    // state->dataOutRptTab->unitsStyle = iUnitsStyle::InchPound;
-    // state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
-    // state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
-    // state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    // Test Combination 0: GJ
     state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoGJ;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
-
     Real64 energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
 
     // Now test the reporting:
-    // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
     const std::string reportName = "AnnualHeatEmissionsReport";
     const std::string tableName = "Annual Heat Emissions Summary";
-    const std::string unitsName = "GJ";
+    std::string unitsName = "GJ";
 
     // Test the row of heat emissions
     std::vector<std::string> testRowNames = {"Heat Emissions"};
 
     // TableName, value
-    std::vector<std::tuple<std::string, Real64>> results({
+    std::vector<std::tuple<std::string, Real64>> results0({
         {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
         {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
         {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
@@ -8567,7 +8561,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     });
 
-    for (auto &v : results) {
+    for (auto &v : results0) {
 
         std::string columnName = std::get<0>(v);
         Real64 expectedValue = std::get<1>(v);
@@ -8587,6 +8581,65 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
+
+    // Test Combination 1: None
+    state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    energyconversion = 1.0e9;
+
+    WriteHeatEmissionTable(*state);
+
+    // Now test the reporting:
+    //const std::string reportName = "AnnualHeatEmissionsReport";
+    // const std::string tableName = "Annual Heat Emissions Summary";
+    unitsName = "J";
+
+    // Test the row of heat emissions
+    // std::vector<std::string> testRowNames = {"Heat Emissions"};
+
+    // TableName, value
+    std::vector<std::tuple<std::string, Real64>> results1({
+        {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"HVAC Relief Air", BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Total", BuildingPreDefRep.emiTotHeat * energyconversion},
+
+    });
+
+    for (auto &v : results1) {
+
+        std::string columnName = std::get<0>(v);
+        Real64 expectedValue = std::get<1>(v);
+
+        for (auto &rowName : testRowNames) {
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND TableName = '" +
+                              tableName +
+                              "'"
+                              "  AND RowName = '" +
+                              rowName +
+                              "'"
+                              "  AND ColumnName = '" +
+                              columnName +
+                              "'"
+                              "  AND Units = '" +
+                              unitsName + "'");
+
+            Real64 return_val = execAndReturnFirstDouble(query);
+
+            // Add informative message if failed
+            EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+        }
+    }
+
+    // Test 2: Other units
+    // state->dataOutRptTab->unitsStyle = iUnitsStyle::InchPound;
+    // state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
 
     EnergyPlus::sqlite->sqliteCommit();
 }
