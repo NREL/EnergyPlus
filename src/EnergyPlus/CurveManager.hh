@@ -273,7 +273,7 @@ namespace CurveManager {
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const json&> independentVarRefs;
-        std::map<std::string, TableFile> tableFiles;
+        std::map<fs::path, TableFile> tableFiles;
         void clear();
     private:
         std::map<std::string, std::size_t> gridMap;
