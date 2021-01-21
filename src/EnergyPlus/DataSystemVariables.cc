@@ -273,7 +273,7 @@ namespace DataSystemVariables {
                     pathsChecked.push_back(currentPath);
                 }
                 print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"",
-                      FileSystem::getAbsolutePath(pathsToCheck[i].first));
+                      FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
             }
         }
 
