@@ -8550,37 +8550,36 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     // Now test the reporting:
     // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
     const std::string reportName = "AnnualHeatEmissionsReport";
-    const std::string columnName = "Envelope Convection";
+    const std::string tableName = "Annual Heat Emissions Summary";
+    const std::string unitsName = "GJ";
 
     // Test the row of heat emissions
     std::vector<std::string> testRowNames = {"Heat Emissions"};
 
     // TableName, value
     std::vector<std::tuple<std::string, Real64>> results({
-        {"Annual Heat Emissions Summary", BuildingPreDefRep.emiEnvelopConv * energyconversion},
-        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
-        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACRelief * energyconversion},
-        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiZoneExhaust * energyconversion},
-        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiHVACReject * energyconversion},
-        //{"Annual Heat Emissions Summary", BuildingPreDefRep.emiTotHeat * energyconversion},
+        {"Envelope Convection", BuildingPreDefRep.emiEnvelopConv * energyconversion},
+        {"Zone Exfiltration", BuildingPreDefRep.emiZoneExfiltration * energyconversion},
+        {"Zone Exhaust Air", BuildingPreDefRep.emiZoneExhaust * energyconversion},
+        {"HVAC Relief Air", BuildingPreDefRep.emiHVACRelief * energyconversion},
+        {"HVAC Reject Heat", BuildingPreDefRep.emiHVACReject * energyconversion},
+        {"Total", BuildingPreDefRep.emiTotHeat * energyconversion},
 
     });
 
     for (auto &v : results) {
 
-        std::string tableName = std::get<0>(v);
+        std::string columnName = std::get<0>(v);
         Real64 expectedValue = std::get<1>(v);
 
         for (auto &rowName : testRowNames) {
             std::string query("SELECT Value From TabularDataWithStrings"
-                              "  WHERE ReportName = '" +
-                              reportName +
-                              "'"
-                              "  AND TableName = '" +
-                              tableName +
-                              "'"
-                              "  AND RowName = '" +
-                              rowName + "'" + "  AND ColumnName = '" + columnName + "'");
+                              "  WHERE ReportName = '" + reportName + "'"
+                              "  AND TableName = '" + tableName + "'"
+                              "  AND RowName = '" + rowName + "'" 
+                              "  AND ColumnName = '" + columnName + "'"
+                              "  AND Units = '" + unitsName + "'"
+            );
 
             Real64 return_val = execAndReturnFirstDouble(query);
 
