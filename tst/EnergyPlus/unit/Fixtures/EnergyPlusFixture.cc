@@ -152,7 +152,7 @@ std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &
     return compare_text.str();
 }
 
-std::vector<std::string> EnergyPlusFixture::read_lines_in_file(std::string const &filePath)
+std::vector<std::string> EnergyPlusFixture::read_lines_in_file(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;
