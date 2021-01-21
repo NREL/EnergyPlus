@@ -101,12 +101,12 @@ TEST(FileSystem, movefile_test)
 TEST(FileSystem, getAbsolutePath)
 {
     std::string pathName = "FileSystemTest.idf";
-    std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    std::string absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName).string();
     EXPECT_TRUE(absPathName.find(pathName) != std::string::npos); // Check that the path name appears in the absolute path
 
     std::string currentDirWithSep = std::string(".") + EnergyPlus::DataStringGlobals::pathChar;
     pathName =  currentDirWithSep + std::string("FileSystemTest.idf");  // e.g., "./FileSystemTest.idf"
-    absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName);
+    absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName).string();
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
 
@@ -135,10 +135,10 @@ TEST(FileSystem, Others)
 
 TEST(FileSystem, getProgramPath)
 {
-    std::string programPath = EnergyPlus::FileSystem::getProgramPath();
+    fs::path programPath = EnergyPlus::FileSystem::getProgramPath();
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists(programPath));
-    EXPECT_TRUE(programPath.find("energyplus_tests") != std::string::npos);
-    EXPECT_EQ("energyplus_tests" + EnergyPlus::FileSystem::exeExtension, EnergyPlus::FileSystem::getFileName(programPath));
+    EXPECT_TRUE(programPath.string().find("energyplus_tests") != std::string::npos);
+    EXPECT_EQ("energyplus_tests", EnergyPlus::FileSystem::getFileName(programPath));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists(EnergyPlus::FileSystem::getParentDirectoryPath(programPath)));
 }
 

@@ -59,7 +59,7 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, File_Not_Found_ERR_Output)
 {
     fs::path filePath = FileSystem::makeNativePath("./NonExistentFile.txt");
-    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath));
+    std::string expectedError = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(filePath)).string();
     std::string contextString = "Test File_Not_Found_ERR_Output";
     fs::path fullPath = DataSystemVariables::CheckForActualFilePath(*this->state, filePath, contextString);
     // not found!

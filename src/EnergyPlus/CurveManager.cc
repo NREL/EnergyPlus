@@ -1716,7 +1716,8 @@ namespace CurveManager {
                         std::vector<double> axis;
 
                         if (indVarInstance.count("external_file_name")) {
-                            fs::path filePath(indVarInstance.at("external_file_name"));
+                            std::string tmp = indVarInstance.at("external_file_name");
+                            fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
                                 ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
@@ -1910,7 +1911,8 @@ namespace CurveManager {
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
-                    fs::path filePath(fields.at("external_file_name"));
+                    std::string tmp = fields.at("external_file_name");
+                    fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
                         ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
@@ -2081,11 +2083,11 @@ namespace CurveManager {
             auto &content = contents[col];
             if (col >= numColumns) {
                 ShowFatalError(state,
-                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
+                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath.string(), col + 1, numColumns));
             }
             if (row >= numRows) {
                 ShowFatalError(state,
-                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
+                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {

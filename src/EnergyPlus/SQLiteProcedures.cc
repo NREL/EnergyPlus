@@ -2590,7 +2590,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // Test if we can write to the database
         // If we can't then there are probably locks on the database
         if (ok) {
-            sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
             char *zErrMsg = nullptr;
             rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
             sqlite3_close(m_connection);
@@ -2600,7 +2600,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             } else {
                 if (dbName != ":memory:") {
                     // Remove test db
-                    rc = remove(dbName.c_str());
+                    rc = remove(dbName.string().c_str());
                     if (rc) {
                         *m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
                         ok = false;
@@ -2612,7 +2612,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 
         if (ok) {
             // Now open the output db for the duration of the simulation
-            rc = sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
             m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;

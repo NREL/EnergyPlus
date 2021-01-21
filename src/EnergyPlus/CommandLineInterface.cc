@@ -599,13 +599,13 @@ namespace CommandLineInterface {
         }
 
         if (runExpandObjects) {
-            std::string expandObjectsPath = (DataStringGlobals::exeDirectoryPath / "ExpandObjects").replace_extension(FileSystem::exeExtension);
+            fs::path expandObjectsPath = (DataStringGlobals::exeDirectoryPath / fs::path("ExpandObjects")).replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(expandObjectsPath)) {
                 DisplayString(state, "ERROR: Could not find ExpandObjects executable: "
                         + FileSystem::getAbsolutePath(expandObjectsPath).string() + ".");
                 exit(EXIT_FAILURE);
             }
-            std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
+            std::string expandObjectsCommand = "\"" + expandObjectsPath.string() + "\"";
             bool inputFilePathdIn = (FileSystem::getAbsolutePath(DataStringGlobals::inputFilePath) == FileSystem::getAbsolutePath("in.idf"));
 
             // check if IDD actually exists since ExpandObjects still requires it

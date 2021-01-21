@@ -403,7 +403,7 @@ namespace EnergyPlus::PluginManagement {
         // I think we need to set the python path before initializing the library
         // make this relative to the binary
         fs::path pathToPythonPackages = FileSystem::makeNativePath(sanitizedProgramDir / "python_standard_lib");
-        wchar_t *a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
+        wchar_t *a = Py_DecodeLocale(pathToPythonPackages.string().c_str(), nullptr);
         Py_SetPath(a);
         Py_SetPythonHome(a);
 
@@ -472,7 +472,10 @@ namespace EnergyPlus::PluginManagement {
                     auto const vars = fields.at("py_search_paths");
                     for (const auto &var : vars) {
                         try {
-                            PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(var.at("search_path")), true);
+                            std::string v = var.at("search_path");
+                            fs::path searchPath = v;
+                            searchPath = PluginManager::sanitizedPath(searchPath);
+                            PluginManager::addToPythonPath(state, searchPath, true);
                         } catch (nlohmann::json::out_of_range &e) {
                             // empty entry
                         }
@@ -499,7 +502,8 @@ namespace EnergyPlus::PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-                fs::path modulePath(fields.at("python_module_name"));
+                std::string tmp = fields.at("python_module_name");
+                fs::path modulePath(tmp);
                 std::string className = fields.at("plugin_class_name");
                 std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
                 bool warmup = false;
@@ -698,7 +702,7 @@ namespace EnergyPlus::PluginManagement {
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
-        PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->moduleName.c_str());
+        PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->moduleName.string().c_str());
         this->pModule = PyImport_Import(pModuleName);
         // PyUnicode_DecodeFSDefault documentation does not explicitly say whether it returns a new or borrowed reference,
         // but other functions in that section say they return a new reference, and that makes sense to me, so I think we

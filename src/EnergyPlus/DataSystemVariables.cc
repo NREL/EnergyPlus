@@ -228,9 +228,13 @@ namespace DataSystemVariables {
 
         if (firstTime) {
             state.files.audit.ensure_open(state, "CheckForActualFilePath", state.files.outputControl.audit);
-            get_environment_variable(cInputPath1, envinputpath1);
-            get_environment_variable(cInputPath2, envinputpath2);
-            get_environment_variable(cProgramPath, DataStringGlobals::ProgramPath);
+            std::string tmp;
+            get_environment_variable(cInputPath1, tmp);
+            envinputpath1 = fs::path(tmp);
+            get_environment_variable(cInputPath2, tmp);
+            envinputpath2 = fs::path(tmp);
+            get_environment_variable(cProgramPath, tmp);
+            DataStringGlobals::ProgramPath = fs::path(tmp);
             firstTime = false;
         }
 
@@ -253,10 +257,10 @@ namespace DataSystemVariables {
         for(std::size_t i = 0; i < numPathsToNotTest; i++) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(foundFilePath));
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(foundFilePath).string());
                 return foundFilePath;
             } else {
-                std::pair <std::string,std::string> currentPath(
+                std::pair <fs::path,std::string> currentPath(
                         FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
                         pathsToCheck[i].second);
                 bool found = false;

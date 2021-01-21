@@ -1159,7 +1159,7 @@ namespace ExternalInterface {
 
                 if (!tempFullFilePath.empty()) {
                     fullFilePaths.push_back(tempFullFilePath);
-                    strippedFileNames.push_back(inputPath.filename());
+                    strippedFileNames.push_back(inputPath.filename().string());
 
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {

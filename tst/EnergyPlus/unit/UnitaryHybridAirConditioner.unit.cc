@@ -121,7 +121,7 @@ using EnergyPlus::HybridEvapCoolingModel::Model;
 using namespace EnergyPlus::HybridUnitaryAirConditioners;
 
 namespace EnergyPlus {
-std::vector<std::string> getAllLinesInFile2(std::string filePath)
+std::vector<std::string> getAllLinesInFile2(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;

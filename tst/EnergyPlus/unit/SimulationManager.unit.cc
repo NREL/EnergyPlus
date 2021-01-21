@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(DataStringGlobals::outputPerfLogFilePath.c_str());
+    fs::remove(DataStringGlobals::outputPerfLogFilePath);
 
 }
 

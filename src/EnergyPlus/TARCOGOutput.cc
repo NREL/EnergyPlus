@@ -316,7 +316,7 @@ namespace TARCOGOutput {
             print(InArgumentsFile, Format_1007, iguID);
         }
 
-        print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
+        print(InArgumentsFile, "     Debug dir:     {}\n", DBGD.string());
 
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1000);
@@ -1482,7 +1482,7 @@ namespace TARCOGOutput {
                 files.FileMode = "SEQUENTIAL";
             }
 
-            const auto open_file = [&](InputOutputFile &of, const std::string &filePath, const bool forAppend) {
+            const auto open_file = [&](InputOutputFile &of, const fs::path &filePath, const bool forAppend) {
                 of.filePath = files.DBGD / filePath;
                 of.open(forAppend);
 
