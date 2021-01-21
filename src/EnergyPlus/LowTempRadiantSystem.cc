@@ -904,28 +904,42 @@ namespace LowTempRadiantSystem {
             // General user input data
             thisRadSysDesign.designName         = Alphas(1);
 
-            thisRadSysDesign.HotThrottlRange    = Numbers(1);
+            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state,
+                                                                                                        Alphas(2));
 
-            if (UtilityRoutines::SameString(Alphas(2), Off)) {
+            // Process the temperature control type
+            thisRadSysDesign.ConstFlowControlType = thisRadSysDesign.processRadiantSystemControlInput(state,
+                                                                                                      Alphas(3),
+                                                                                                      cAlphaFields(3),
+                                                                                                      LowTempRadiantSystem::SystemType::ConstantFlowSystem);
+            thisRadSysDesign.runningMeanOutdoorAirTemperatureWeightingFactor = Numbers(1);
+
+            thisRadSysDesign.TubeDiameterInner                              = Numbers(2);
+            thisRadSysDesign.TubeDiameterOuter                              = Numbers(3);
+            thisRadSysDesign.ConstFlowTubeConductivity                      = Numbers(4);
+            thisRadSysDesign.MotorEffic                                     = Numbers(5);
+            thisRadSysDesign.FracMotorLossToFluid                           = Numbers(6);
+
+            if (UtilityRoutines::SameString(Alphas(4), Off)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(2), SimpleOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(4), SimpleOff)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(2), VariableOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(4), VariableOff)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlVariedOff;
             } else {
                 thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
             }
+            thisRadSysDesign.CondDewPtDeltaT    = Numbers(7);
 
-            thisRadSysDesign.CondDewPtDeltaT    = Numbers(2);
-
-
-            thisRadSysDesign.ConstFlowTubeConductivity = Numbers(3);
-
-
-            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state, Alphas(5));
-            thisRadSysDesign.TubeDiameterInner = Numbers(1);
-            thisRadSysDesign.TubeDiameterOuter = Numbers(2);
-
+            thisRadSysDesign.schedNameChangeoverDelay = Alphas(5);
+            if (!lAlphaBlanks(5)) {
+                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(5));
+                if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
+                    ShowWarningError(state, cAlphaFields(5) + " not found for " + Alphas(5));
+                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
+                }
+            }
             CFlowRadDesignNames(Item) =  Alphas(1);
         }
 
@@ -956,30 +970,30 @@ namespace LowTempRadiantSystem {
             auto &thisCFloSys(CFloRadSys(Item));
 
             thisCFloSys.Name = Alphas(1);
-            thisCFloSys.designObjectName = Alphas(18);
+            thisCFloSys.designObjectName = Alphas(2);
             thisCFloSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisCFloSys.designObjectName, CFlowRadDesignNames);
 
-            thisCFloSys.SchedName = Alphas(2);
-            if (lAlphaBlanks(2)) {
+            thisCFloSys.SchedName = Alphas(3);
+            if (lAlphaBlanks(3)) {
                 thisCFloSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                thisCFloSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisCFloSys.SchedPtr == 0) {
-                    ShowSevereError(state, cAlphaFields(2) + " not found for " + Alphas(1));
-                    ShowContinueError(state, "Missing " + cAlphaFields(2) + " is " + Alphas(2));
+                    ShowSevereError(state, cAlphaFields(3) + " not found for " + Alphas(1));
+                    ShowContinueError(state, "Missing " + cAlphaFields(3) + " is " + Alphas(3));
                     ErrorsFound = true;
                 }
             }
 
-            thisCFloSys.ZoneName = Alphas(3);
-            thisCFloSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
+            thisCFloSys.ZoneName = Alphas(4);
+            thisCFloSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisCFloSys.ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.SurfListName = Alphas(4);
+            thisCFloSys.SurfListName = Alphas(5);
             SurfListNum = 0;
             if (NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisCFloSys.SurfListName, SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
@@ -1016,7 +1030,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 } else if (Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
-                    ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
+                    ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (thisCFloSys.SurfacePtr(1) != 0) {
@@ -1028,131 +1042,116 @@ namespace LowTempRadiantSystem {
             // Error checking for zones and construction information
             thisCFloSys.errorCheckZonesAndConstructions(state, ErrorsFound);
 
-            thisCFloSys.TubeLength = Numbers(3);
-
-            // Process the temperature control type
-            thisCFloSys.ControlType = thisCFloSys.processRadiantSystemControlInput(state, Alphas(6), cAlphaFields(6), LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-            thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = Numbers(4);
+            thisCFloSys.TubeLength = Numbers(1);
 
             // Process pump input for constant flow (hydronic) radiant system
-            thisCFloSys.WaterVolFlowMax = Numbers(5);
-            thisCFloSys.VolFlowSched = Alphas(7);
-            thisCFloSys.VolFlowSchedPtr = GetScheduleIndex(state, Alphas(7));
-            if ((thisCFloSys.VolFlowSchedPtr == 0) && (!lAlphaBlanks(7))) {
-                ShowSevereError(state, cAlphaFields(7) + " not found: " + Alphas(7));
+            thisCFloSys.WaterVolFlowMax = Numbers(2);
+            thisCFloSys.VolFlowSched = Alphas(6);
+            thisCFloSys.VolFlowSchedPtr = GetScheduleIndex(state, thisCFloSys.VolFlowSched);
+            if ((thisCFloSys.VolFlowSchedPtr == 0) && (!lAlphaBlanks(6))) {
+                ShowSevereError(state, cAlphaFields(6) + " not found: " + Alphas(6));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
-            thisCFloSys.NomPumpHead = Numbers(6);
-            thisCFloSys.NomPowerUse = Numbers(7);
-            thisCFloSys.MotorEffic = Numbers(8);
-            thisCFloSys.FracMotorLossToFluid = Numbers(9);
+            thisCFloSys.NomPumpHead = Numbers(3);
+            thisCFloSys.NomPowerUse = Numbers(4);
 
             // Heating user input data
             thisCFloSys.HotWaterInNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             thisCFloSys.HotWaterOutNode = GetOnlySingleNode(state,
-                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Hot Water Nodes");
+            if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Hot Water Nodes");
             }
 
-            thisCFloSys.HotWaterHiTempSched = Alphas(10);
-            thisCFloSys.HotWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(10));
-            if ((thisCFloSys.HotWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
+            thisCFloSys.HotWaterHiTempSched = Alphas(9);
+            thisCFloSys.HotWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(9));
+            if ((thisCFloSys.HotWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(9))) {
+                ShowSevereError(state, cAlphaFields(9) + " not found: " + Alphas(9));
+                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ErrorsFound = true;
+            }
+
+            thisCFloSys.HotWaterLoTempSched = Alphas(10);
+            thisCFloSys.HotWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(10));
+            if ((thisCFloSys.HotWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(10))) {
                 ShowSevereError(state, cAlphaFields(10) + " not found: " + Alphas(10));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.HotWaterLoTempSched = Alphas(11);
-            thisCFloSys.HotWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(11));
-            if ((thisCFloSys.HotWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
+            thisCFloSys.HotCtrlHiTempSched = Alphas(11);
+            thisCFloSys.HotCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(11));
+            if ((thisCFloSys.HotCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(11))) {
                 ShowSevereError(state, cAlphaFields(11) + " not found: " + Alphas(11));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.HotCtrlHiTempSched = Alphas(12);
-            thisCFloSys.HotCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(12));
-            if ((thisCFloSys.HotCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(12))) {
+            thisCFloSys.HotCtrlLoTempSched = Alphas(12);
+            thisCFloSys.HotCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(12));
+            if ((thisCFloSys.HotCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(12))) {
                 ShowSevereError(state, cAlphaFields(12) + " not found: " + Alphas(12));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ErrorsFound = true;
-            }
-
-            thisCFloSys.HotCtrlLoTempSched = Alphas(13);
-            thisCFloSys.HotCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(13));
-            if ((thisCFloSys.HotCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(13))) {
-                ShowSevereError(state, cAlphaFields(13) + " not found: " + Alphas(13));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
             // Cooling user input data
             thisCFloSys.ColdWaterInNode = GetOnlySingleNode(state,
-                Alphas(14), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(13), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
             thisCFloSys.ColdWaterOutNode = GetOnlySingleNode(state,
-                Alphas(15), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(14), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(14)) || (!lAlphaBlanks(15))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(14), Alphas(15), "Chilled Water Nodes");
+            if ((!lAlphaBlanks(13)) || (!lAlphaBlanks(14))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(13), Alphas(14), "Chilled Water Nodes");
             }
 
-            thisCFloSys.ColdWaterHiTempSched = Alphas(16);
-            thisCFloSys.ColdWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(16));
-            if ((thisCFloSys.ColdWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(16))) {
+            thisCFloSys.ColdWaterHiTempSched = Alphas(15);
+            thisCFloSys.ColdWaterHiTempSchedPtr = GetScheduleIndex(state, Alphas(15));
+            if ((thisCFloSys.ColdWaterHiTempSchedPtr == 0) && (!lAlphaBlanks(15))) {
+                ShowSevereError(state, cAlphaFields(15) + " not found: " + Alphas(15));
+                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ErrorsFound = true;
+            }
+
+            thisCFloSys.ColdWaterLoTempSched = Alphas(16);
+            thisCFloSys.ColdWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(16));
+            if ((thisCFloSys.ColdWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(16))) {
                 ShowSevereError(state, cAlphaFields(16) + " not found: " + Alphas(16));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.ColdWaterLoTempSched = Alphas(17);
-            thisCFloSys.ColdWaterLoTempSchedPtr = GetScheduleIndex(state, Alphas(17));
-            if ((thisCFloSys.ColdWaterLoTempSchedPtr == 0) && (!lAlphaBlanks(17))) {
+            thisCFloSys.ColdCtrlHiTempSched = Alphas(17);
+            thisCFloSys.ColdCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(17));
+            if ((thisCFloSys.ColdCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(17))) {
                 ShowSevereError(state, cAlphaFields(17) + " not found: " + Alphas(17));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.ColdCtrlHiTempSched = Alphas(18);
-            thisCFloSys.ColdCtrlHiTempSchedPtr = GetScheduleIndex(state, Alphas(18));
-            if ((thisCFloSys.ColdCtrlHiTempSchedPtr == 0) && (!lAlphaBlanks(18))) {
-                ShowSevereError(state, cAlphaFields(18) + " not found: " + Alphas(18));
+            thisCFloSys.ColdCtrlLoTempSched = Alphas(18);
+            thisCFloSys.ColdCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(18));
+            if ((thisCFloSys.ColdCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(18))) {
+                ShowSevereError(state, cAlphaFields(19) + " not found: " + Alphas(18));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisCFloSys.ColdCtrlLoTempSched = Alphas(19);
-            thisCFloSys.ColdCtrlLoTempSchedPtr = GetScheduleIndex(state, Alphas(19));
-            if ((thisCFloSys.ColdCtrlLoTempSchedPtr == 0) && (!lAlphaBlanks(19))) {
-                ShowSevereError(state, cAlphaFields(19) + " not found: " + Alphas(19));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ErrorsFound = true;
-            }
-
-            if (UtilityRoutines::SameString(Alphas(20), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(19), OnePerSurf)) {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(20), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(19), CalcFromLength)) {
                 thisCFloSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
             }
 
-            thisCFloSys.CircLength = Numbers(12);
+            thisCFloSys.CircLength = Numbers(5);
 
-            thisCFloSys.schedNameChangeoverDelay = Alphas(21);
-            if (!lAlphaBlanks(21)) {
-                thisCFloSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(21));
-                if (thisCFloSys.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(21) + " not found for " + Alphas(21));
-                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
-                }
-            }
 
         }
 
@@ -1859,6 +1858,7 @@ namespace LowTempRadiantSystem {
 
 
         VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+        ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
 
         InitErrorsFound = false;
 
@@ -1914,10 +1914,10 @@ namespace LowTempRadiantSystem {
             for (RadNum = 1; RadNum <= NumOfCFloLowTempRadSys; ++RadNum) {
                 // Calculate the efficiency for each pump: The calculation
                 // is based on the PMPSIM code in the ASHRAE Secondary Toolkit
-                if ((CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (CFloRadSys(RadNum).MotorEffic > ZeroTol) &&
+                if ((CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (constantFlowDesignDataObject.MotorEffic > ZeroTol) &&
                     (CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
-                    CFloRadSys(RadNum).PumpEffic = TotalEffic / CFloRadSys(RadNum).MotorEffic;
+                    CFloRadSys(RadNum).PumpEffic = TotalEffic / constantFlowDesignDataObject.MotorEffic;
                     static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     Real64 pumpEfficiency = CFloRadSys(RadNum).PumpEffic * 100.0;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
@@ -2268,7 +2268,7 @@ namespace LowTempRadiantSystem {
 
             if (anyRadiantSystemUsingRunningMeanAverage) {
                 if (state.dataGlobal->BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
-                    CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature(state);
+                    CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature(state, RadSysNum);
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
                 } else if (!state.dataGlobal->BeginDayFlag && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay =
@@ -4212,10 +4212,10 @@ namespace LowTempRadiantSystem {
                 PumpPartLoadRat = 1.0;
             }
             this->PumpPower = PumpPartLoadRat * this->NomPowerUse;
-            ShaftPower = this->PumpPower * this->MotorEffic;
+            ShaftPower = this->PumpPower * ConstantFlowDesignDataObject.MotorEffic;
             // This adds the pump heat based on User input for the pump (same as in Pump module)
             // We assume that all of the heat ends up in the fluid eventually since this is a closed loop.
-            this->PumpHeattoFluid = ShaftPower + ((this->PumpPower - ShaftPower) * this->FracMotorLossToFluid);
+            this->PumpHeattoFluid = ShaftPower + ((this->PumpPower - ShaftPower) * ConstantFlowDesignDataObject.FracMotorLossToFluid);
             if (this->PumpMassFlowRate > 0.0) {
                 PumpTempRise = this->PumpHeattoFluid / (this->PumpMassFlowRate * CpFluid);
             } else {
@@ -5000,12 +5000,16 @@ namespace LowTempRadiantSystem {
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
     }
 
-    void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state)
+    void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state,
+                                                                               int RadSysNum)
     {
         // This routine grabs the current weather data since it is currently available at this point in the simulation.  Note, however,
         // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
         // values are calculated and then shifted at the beginning of the next day to the tomorrow variables.  It is these tomorrow variables
         // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
+
+        ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
+
         if (state.dataGlobal->DayOfSim == 1 && state.dataGlobal->WarmupFlag) {
             // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
@@ -5019,8 +5023,8 @@ namespace LowTempRadiantSystem {
             this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayRunningMeanOutdoorDryBulbTemperature;
             // Now update the running mean and average outdoor air temperatures
             this->todayRunningMeanOutdoorDryBulbTemperature =
-                (1.0 - this->runningMeanOutdoorAirTemperatureWeightingFactor) * this->yesterdayAverageOutdoorDryBulbTemperature +
-                this->runningMeanOutdoorAirTemperatureWeightingFactor * this->yesterdayRunningMeanOutdoorDryBulbTemperature;
+                (1.0 - constantFlowDesignDataObject.runningMeanOutdoorAirTemperatureWeightingFactor) * this->yesterdayAverageOutdoorDryBulbTemperature +
+                        constantFlowDesignDataObject.runningMeanOutdoorAirTemperatureWeightingFactor * this->yesterdayRunningMeanOutdoorDryBulbTemperature;
             this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
         }
     }
