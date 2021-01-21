@@ -64,6 +64,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -472,7 +473,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state(EnergyPlusData &state);
 
-    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file = true);
+    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const & filePath, bool output_to_file = true);
 
     void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 

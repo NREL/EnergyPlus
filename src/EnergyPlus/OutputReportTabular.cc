@@ -176,13 +176,13 @@ namespace EnergyPlus::OutputReportTabular {
         OutputReportTabular::ResetTabularReports(state);
     }
 
-    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const & filename, bool output_to_file)
+    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const & filePath, bool output_to_file)
     {
         std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
         if (output_to_file) {
-            tbl_stream.open(filename);
+            tbl_stream.open(filePath);
             if (!tbl_stream) {
-                ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filename +
+                ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filePath.string() +
                                "\" for output (write).");
             }
         } else {
