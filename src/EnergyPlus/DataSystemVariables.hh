@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
@@ -150,10 +151,11 @@ namespace DataSystemVariables {
     extern std::string MinReportFrequency; // String for minimum reporting frequency
     extern bool SortedIDD;                 // after processing, use sorted IDD to obtain Defs, etc.
     extern bool lMinimalShadowing;         // TRUE if MinimalShadowing is to override Solar Distribution flag
-    extern std::string TempFullFileName;
-    extern std::string envinputpath1;
-    extern std::string envinputpath2;
-    extern std::string envprogrampath;
+
+    // TODO: is this really needed?
+    extern fs::path envinputpath1;
+    extern fs::path envinputpath2;
+
     extern bool TestAllPaths;
     extern int iEnvSetThreads;
     extern bool lEnvSetThreadsInput;
@@ -170,11 +172,11 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(EnergyPlusData &state,
-                                std::string const &originalInputFileName, // name as input for object
-                                bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &foundFileName,             // Blank if not found.
-                                const std::string contextString = std::string()
+    // Helper to try and locate a file in common folders if it's not found directly (such as when passed as absolute path)
+    // Returns an empty path if not found.
+    [[nodiscard]] fs::path CheckForActualFilePath(EnergyPlusData &state,
+                                                  fs::path const &originalInputFilePath,  // path (or filename only) as input for object
+                                                  const std::string& contextString = std::string()
     );
 
     // Needed for unit tests, should not be normally called.

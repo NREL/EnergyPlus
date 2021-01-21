@@ -3027,7 +3027,7 @@ namespace EnergyPlus::OutputReportTabular {
                 curDel = ort->del(iStyle);
                 if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                     DisplayString(state, "Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblCsvFilePath, state.files.outputControl.tabular);
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
@@ -3040,7 +3040,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                     DisplayString(state, "Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTabFilePath, state.files.outputControl.tabular);
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
@@ -3053,7 +3053,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                     DisplayString(state, "Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblHtmFilePath, state.files.outputControl.tabular);
                     tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
@@ -3086,7 +3086,7 @@ namespace EnergyPlus::OutputReportTabular {
                                << "</b></p>\n";
                 } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                     DisplayString(state, "Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFilePath, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
                     tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
@@ -3106,7 +3106,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << '\n';
                 } else {
                     DisplayString(state, "Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFileName, state.files.outputControl.tabular);
+                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblTxtFilePath, state.files.outputControl.tabular);
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
@@ -5292,8 +5292,8 @@ namespace EnergyPlus::OutputReportTabular {
         storeASHRAEHDD = "";
         storeASHRAECDD = "";
         lineTypeinterim = StatLineType::Initialized;
-        if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-            auto statFile = state.files.inStatFileName.open(state, "FillWeatherPredefinedEntries");
+        if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+            auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
             while (statFile.good()) { // end of file, or error
                 lineType = lineTypeinterim;
                 auto lineIn = statFile.readLine().data;

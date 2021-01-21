@@ -2469,9 +2469,9 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
         readStat = 0;
-        if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
+        if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
             // Read hourly dry bulb temperature first
-            auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
+            auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
             for (i = 1; i <= 9; ++i) { // Headers
                 epwFile.readLine();
             }
@@ -2538,7 +2538,8 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
         } else {
-            ShowFatalError(state, "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFileName.fileName + " for input (read). (File does not exist)");
+            ShowFatalError(state, "CalcThermalComfortAdaptive: Could not open file "
+                    + state.files.inputWeatherFilePath.filePath.string() + " for input (read). (File does not exist)");
         }
     }
 

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
@@ -63,40 +64,40 @@ namespace DataStringGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    extern std::string outputErrFileName;
+    extern fs::path outputErrFilePath;
 
 
-    extern std::string outputMddFileName;
-    extern std::string outputRddFileName;
-    extern std::string outputShdFileName;
-    extern std::string outputTblCsvFileName;
-    extern std::string outputTblHtmFileName;
-    extern std::string outputTblTabFileName;
-    extern std::string outputTblTxtFileName;
-    extern std::string outputTblXmlFileName;
-    extern std::string inputFileName;
-    extern std::string inputIddFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string outputAdsFileName;
-    extern std::string outputGLHEFileName;
-    extern std::string outputDelightOutFileName;
-    extern std::string outputIperrFileName;
-    extern std::string outputPerfLogFileName;
-    extern std::string outputSqlFileName;
-    extern std::string outputSqliteErrFileName;
-    extern std::string eplusADSFileName;
-    extern std::string outputCsvFileName;
-    extern std::string outputMtrCsvFileName;
-    extern std::string outputRvauditFileName;
+    extern fs::path outputMddFilePath;
+    extern fs::path outputRddFilePath;
+    extern fs::path outputShdFilePath;
+    extern fs::path outputTblCsvFilePath;
+    extern fs::path outputTblHtmFilePath;
+    extern fs::path outputTblTabFilePath;
+    extern fs::path outputTblTxtFilePath;
+    extern fs::path outputTblXmlFilePath;
+    extern fs::path inputFilePath;
+    extern fs::path inputIddFilePath;
+    extern fs::path inputEpJSONSchemaFilePath;
+    extern fs::path outputAdsFilePath;
+    extern fs::path outputGLHEFilePath;
+    extern fs::path outputDelightOutFilePath;
+    extern fs::path outputIperrFilePath;
+    extern fs::path outputPerfLogFilePath;
+    extern fs::path outputSqlFilePath;
+    extern fs::path outputSqliteErrFilePath;
+    extern fs::path eplusADSFilePath;
+    extern fs::path outputCsvFilePath;
+    extern fs::path outputMtrCsvFilePath;
+    extern fs::path outputRvauditFilePath;
 
-    extern std::string weatherFileNameOnly;
-    extern std::string idfDirPathName;
-    extern std::string outDirPathName;
-    extern std::string idfFileNameOnly;
-    extern std::string inputDirPathName;
-    extern std::string outputDirPathName;
-    extern std::string inputFileNameOnly;
-    extern std::string exeDirectory;
+    extern fs::path weatherFilePathNameOnly;
+    extern fs::path idfDirPath;
+    extern fs::path outDirPath;
+    extern fs::path idfFilePathNameOnly;
+    extern fs::path inputDirPath;
+    extern fs::path outputDirPath;
+    extern fs::path inputFilePathNameOnly;
+    extern fs::path exeDirectoryPath;
 
     // MODULE PARAMETER DEFINITIONS:
     extern std::string const UpperCase;
@@ -119,9 +120,11 @@ namespace DataStringGlobals {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern std::string ProgramPath;          // Path for Program from INI file
-    extern std::string CurrentWorkingFolder; // Current working directory for run
-    extern std::string FullName;             // Full name of file to open, including path
+    extern fs::path ProgramPath;          // Path for Program from INI file
+    extern fs::path CurrentWorkingFolder; // Current working directory for run
+    // TODO: unused
+    extern fs::path FullPath;             // Full name of file to open, including path
+
     extern std::string IDDVerString;         // Version information from the IDD (line 1)
     extern std::string VerString;            // String that represents version information
     extern std::string MatchVersion;         // String to be matched by Version object

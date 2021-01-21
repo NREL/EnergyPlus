@@ -54,6 +54,7 @@ extern "C" {
 
 // C++ Headers
 #include <string>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -446,18 +447,16 @@ namespace ExternalInterface {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int retVal;     // Return value, needed to catch return value of function call
-        bool fileExist; // Set to true if file exists
 
         // Try to establish socket connection. This is needed if Ptolemy started E+,
         //  but E+ had an error before the call to InitExternalInterface.
 
-        fileExist = FileSystem::fileExists(socCfgFilNam);
-
-        if ((socketFD == -1) && fileExist) {
+        if ((socketFD == -1) && FileSystem::fileExists(socCfgFilNam)) {
             socketFD = establishclientsocket(socCfgFilNam.c_str());
         }
 
         if (socketFD >= 0) {
+            // TODO: use retVal?
             retVal = sendclientmessage(&socketFD, &FlagToWriteToSocket);
             // Don't close socket as this may give sometimes an IOException in Windows
             // This problem seems to affect only Windows but not Mac
@@ -1080,7 +1079,7 @@ namespace ExternalInterface {
         using DataStringGlobals::altpathChar;
         using DataStringGlobals::CurrentWorkingFolder;
         using DataStringGlobals::pathChar;
-        using DataSystemVariables::CheckForActualFileName;
+        using DataSystemVariables::CheckForActualFilePath;
 
         using RuntimeLanguageProcessor::FindEMSVariable;
         using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
@@ -1102,10 +1101,14 @@ namespace ExternalInterface {
         int retValfmiVersion;
         int retValfmiPathLib;
         Array1D_string NameListInstances(5);
-        bool fileExist;
-        std::string tempFullFileName;
+        fs::path tempFullFilePath;
+
+        std::vector<fs::path> fullFilePaths;
+        std::vector<std::string> strippedFileNames;
+
         Array1D_string strippedFileName; // remove path from entered file name
         Array1D_string fullFileName;     // entered file name/found
+
         std::string::size_type pos;
         int FOUND;
 
@@ -1124,8 +1127,13 @@ namespace ExternalInterface {
             FMURootWorkingFolder += pathChar; // getStringFromCharArray( FMUWorkingFolderCharArr );
 
             // Get and store the names of all FMUs in EnergyPlus data structure
+            // I doubt we'll have more than a handful of objects, so reserve is probably overkill
+            fullFilePaths.reserve(static_cast<unsigned>(NumFMUObjects));
+            strippedFileNames.reserve(static_cast<unsigned>(NumFMUObjects));
+
             strippedFileName.allocate(NumFMUObjects);
             fullFileName.allocate(NumFMUObjects);
+
             cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
             for (Loop = 1; Loop <= NumFMUObjects; ++Loop) {
                 inputProcessor->getObjectItem(state,
@@ -1143,11 +1151,16 @@ namespace ExternalInterface {
                 // Get the FMU name
                 FMU(Loop).Name = cAlphaArgs(1);
 
+                fs::path inputPath = FileSystem::makeNativePath(FMU(Loop).Name);
+
                 std::string contextString = cCurrentModuleObject + ", " + cAlphaFieldNames(1) + ": ";
 
-                CheckForActualFileName(state, cAlphaArgs(1), fileExist, tempFullFileName, contextString);
+                tempFullFilePath = CheckForActualFilePath(state, inputPath, contextString);
 
-                if (fileExist) {
+                if (!tempFullFilePath.empty()) {
+                    fullFilePaths.push_back(tempFullFilePath);
+                    strippedFileNames.push_back(inputPath.filename());
+
                     pos = index(FMU(Loop).Name, pathChar, true); // look backwards
                     if (pos != std::string::npos) {
                         strippedFileName(Loop) = FMU(Loop).Name.substr(pos + 1);
@@ -1159,8 +1172,11 @@ namespace ExternalInterface {
                             strippedFileName(Loop) = FMU(Loop).Name;
                         }
                     }
-                    fullFileName(Loop) = tempFullFileName;
+                    fullFileName(Loop) = tempFullFilePath.string();
+
                 } else {
+                    fullFilePaths.push_back(fs::path{});
+                    strippedFileNames.push_back(std::string(""));
                     ErrorsFound = true;
                 }
                 // Get fmu time out
@@ -1171,6 +1187,7 @@ namespace ExternalInterface {
 
             // check for dups that aren't the same file
             // this is windows code...
+            // So  this check that if I entered two different things and get the same end filename, then it's wrong?
             for (j = 1; j <= NumFMUObjects; ++j) {
                 for (k = 2; k <= NumFMUObjects; ++k) {
                     if (!UtilityRoutines::SameString(strippedFileName(j), strippedFileName(k))) continue;
@@ -1186,9 +1203,23 @@ namespace ExternalInterface {
                     ErrorsFound = true;
                 }
             }
+
+            for (j = 0; j < NumFMUObjects; ++j) {
+                for (k = 1; k < NumFMUObjects; ++k) {
+                    if (UtilityRoutines::SameString(strippedFileNames[j], strippedFileNames[k]) &&
+                        (fullFilePaths[j] != fullFilePaths[j])) {
+                        ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:");
+                        ShowContinueError(state, "duplicate file names (but not same file) entered.");
+                        ShowContinueError(state, "...entered file name=\"" + FMU(j).Name + "\"");
+                        ShowContinueError(state, "...   full file name=\"" + fullFileName(j) + "\"");
+                        ShowContinueError(state, "...entered file name=\"" + FMU(k).Name + "\"");
+                        ShowContinueError(state, "...   full file name=\"" + fullFileName(k) + "\"");
+                        ShowContinueError(state, "...name collision but not same file name.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
             if (ErrorsFound) {
-                strippedFileName.deallocate();
-                fullFileName.deallocate();
                 StopExternalInterfaceIfError(state);
             }
 

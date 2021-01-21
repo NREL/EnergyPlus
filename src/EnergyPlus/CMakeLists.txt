@@ -767,44 +767,57 @@ endif()
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
 add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
-target_link_libraries( energyplusparser re2 fmt::fmt)
+target_link_libraries( energyplusparser PUBLIC re2 fmt::fmt)
 if(UNIX AND NOT APPLE)
-  target_link_libraries( energyplusparser dl)
+  target_link_libraries( energyplusparser PUBLIC dl)
   # See https://en.cppreference.com/w/cpp/filesystem#Notes
   if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    target_link_libraries( energyplusparser stdc++fs )
+    target_link_libraries( energyplusparser PRIVATE stdc++fs )
   endif()
 endif()
 if (WIN32)
-  target_link_libraries( energyplusparser Shlwapi )
+  target_link_libraries( energyplusparser PUBLIC Shlwapi )
 endif()
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
+target_link_libraries( energypluslib
+  PUBLIC fmt::fmt
+         objexx
+         sqlite
+         bcvtb
+         epexpat
+         epfmiimport
+         re2
+         DElight
+         libkiva
+         btwxt
+         Windows-CalcEngine
+         airflownetworklib)
+
 if (OPENGL_FOUND)
-  target_link_libraries( energypluslib penumbra )
+  target_link_libraries( energypluslib PUBLIC penumbra )
 endif()
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
-  target_link_libraries( energypluslib groundplot )
+  target_link_libraries( energypluslib PUBLIC groundplot )
 endif()
 if(UNIX AND NOT APPLE)
-  target_link_libraries( energypluslib dl )
+  target_link_libraries( energypluslib PUBLIC dl )
   if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
-    target_link_libraries( energypluslib util )
+    target_link_libraries( energypluslib PUBLIC util )
   endif()
   if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    target_link_libraries( energypluslib stdc++fs )
+    target_link_libraries( energypluslib PRIVATE stdc++fs )
   endif()
 endif()
 if (WIN32)
-  target_link_libraries( energypluslib Shlwapi )
+  target_link_libraries( energypluslib PUBLIC Shlwapi )
 endif()
 if(LINK_WITH_PYTHON)
-  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
+  target_link_libraries( energypluslib PUBLIC ${PYTHON_LIBRARIES} )
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
@@ -829,10 +842,10 @@ SET( API_CORE_SRC
 option( BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared library for the EnergyPlus API" OFF )
 mark_as_advanced( BUILD_STATIC_ENERGYPLUS_API )
 if( BUILD_STATIC_ENERGYPLUS_API )
-	set(API_LIBRARY_TYPE STATIC)
-	ADD_DEFINITIONS(-DENERGYPLUS_STATIC_API)
+  set(API_LIBRARY_TYPE STATIC)
+  ADD_DEFINITIONS(-DENERGYPLUS_STATIC_API)
 else()
-	set(API_LIBRARY_TYPE SHARED)
+  set(API_LIBRARY_TYPE SHARED)
 endif()
 
 if(APPLE OR UNIX)
@@ -840,7 +853,12 @@ if(APPLE OR UNIX)
 else()  # windows
   add_library( energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
-target_link_libraries( energyplusapi energypluslib )
+target_link_libraries( energyplusapi PUBLIC energypluslib )
+#if(UNIX AND NOT APPLE)
+  #if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+    #target_link_libraries( energyplusapi stdc++fs )
+  #endif()
+#endif()
 
 set_target_properties(
   energyplusapi
@@ -859,7 +877,7 @@ if (APPLE OR UNIX)
 else()  # windows
   add_executable( energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
 endif()
-target_link_libraries( energyplus energyplusapi )
+target_link_libraries( energyplus PRIVATE energyplusapi )
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
@@ -951,7 +969,7 @@ endif()
 if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
-  target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
+  target_link_libraries( TestEnergyPlusCallbacks PRIVATE energyplusapi )
   add_test(NAME "API.LegacyCallbackTest"
            COMMAND ${CMAKE_COMMAND}
            -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
@@ -964,7 +982,13 @@ if( BUILD_TESTING )
   set(IDF_FILE "${PROJECT_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
 
   add_executable( TestAPI_Functional_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c )
-  target_link_libraries( TestAPI_Functional_C energyplusapi )
+  target_link_libraries( TestAPI_Functional_C PRIVATE energyplusapi )
+  #if(UNIX AND NOT APPLE)
+    #if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+      #target_link_libraries( TestAPI_Functional_C stdc++fs )
+    #endif()
+  #endif()
+
   add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
 
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/tst/api/)
@@ -972,13 +996,13 @@ if( BUILD_TESTING )
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime")
   file(MAKE_DIRECTORY ${TEST_DIR})
   add_executable( TestAPI_Runtime_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c )
-  target_link_libraries( TestAPI_Runtime_C energyplusapi )
+  target_link_libraries( TestAPI_Runtime_C PRIVATE energyplusapi )
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange")
   file(MAKE_DIRECTORY ${TEST_DIR})
   add_executable( TestAPI_DataTransfer_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c )
-  target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
+  target_link_libraries( TestAPI_DataTransfer_C PRIVATE energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
 #  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing")

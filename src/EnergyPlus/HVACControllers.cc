@@ -69,6 +69,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -2501,8 +2502,8 @@ namespace HVACControllers {
             return;
         }
 
-        InputOutputFileName StatisticsFileName{"statistics.HVACControllers.csv"};
-        auto statisticsFile = StatisticsFileName.open(state, "DumpAirLoopStatistics");
+        InputOutputFilePath StatisticsFilePath{"statistics.HVACControllers.csv"};
+        auto statisticsFile = StatisticsFilePath.open(state, "DumpAirLoopStatistics");
 
         // note that the AirLoopStats object does not seem to be initialized when this code
         // is executed and it causes a crash here
@@ -2680,14 +2681,14 @@ namespace HVACControllers {
         int ControllerNum;
 
         // Open main controller trace file for each air loop
-        const auto TraceFileName = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
+        const auto TraceFilePath = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
 
         // Store file unit in air loop stats
-        AirLoopStats(AirLoopNum).TraceFile->fileName = TraceFileName;
+        AirLoopStats(AirLoopNum).TraceFile->filePath = TraceFilePath;
         AirLoopStats(AirLoopNum).TraceFile->open();
 
         if (!AirLoopStats(AirLoopNum).TraceFile->good()) {
-            ShowFatalError(state, "SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFileName + "\" for output (write).");
+            ShowFatalError(state, "SetupAirLoopControllersTracer: Failed to open air loop trace file \"" + TraceFilePath + "\" for output (write).");
             return;
         }
 
@@ -2939,13 +2940,13 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        const auto TraceFileName = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
+        const auto TraceFilePath = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
         auto &TraceFile = *ControllerProps(ControlNum).TraceFile;
-        TraceFile.fileName = TraceFileName;
+        TraceFile.filePath = TraceFilePath;
         TraceFile.open();
 
         if (!TraceFile.good()) {
-            ShowFatalError(state, "SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFileName + "\" for output (write).");
+            ShowFatalError(state, "SetupIndividualControllerTracer: Failed to open controller trace file \"" + TraceFilePath + "\" for output (write).");
             return;
         }
 

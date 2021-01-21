@@ -176,9 +176,9 @@ namespace SolarShading {
 #endif
         if (state.dataGlobal->BeginSimFlag) {
             if (state.files.outputControl.shd) {
-                shd_stream = std::unique_ptr<std::iostream>(new std::fstream(DataStringGlobals::outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
+                shd_stream = std::unique_ptr<std::iostream>(new std::fstream(DataStringGlobals::outputShdFilePath, std::ios_base::out | std::ios_base::trunc));
                 if (!shd_stream) {
-                    ShowFatalError(state, "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");
+                    ShowFatalError(state, "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFilePath.string() + "\" for output (write).");
                 }
             } else {
                 shd_stream = std::unique_ptr<std::iostream>(new std::iostream(nullptr));

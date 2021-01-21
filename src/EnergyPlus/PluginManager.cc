@@ -403,7 +403,7 @@ namespace EnergyPlus::PluginManagement {
         // I think we need to set the python path before initializing the library
         // make this relative to the binary
         std::string pathToPythonPackages = sanitizedProgramDir + DataStringGlobals::pathChar + "python_standard_lib";
-        FileSystem::makeNativePath(pathToPythonPackages);
+        pathToPythonPackages = FileSystem::makeNativePath(pathToPythonPackages);
         wchar_t *a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
         Py_SetPythonHome(a);
@@ -417,7 +417,7 @@ namespace EnergyPlus::PluginManagement {
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
         std::string pathToDynLoad = sanitizedProgramDir + "python_standard_lib/lib-dynload";
-        FileSystem::makeNativePath(pathToDynLoad);
+        pathToDynLoad = FileSystem::makeNativePath(pathToDynLoad);
         std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(state, libDirDynLoad, false);
 
@@ -436,7 +436,7 @@ namespace EnergyPlus::PluginManagement {
         if (searchPaths == 0) {
             // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
             PluginManager::addToPythonPath(state, ".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
             PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
         }
         if (searchPaths > 0) {
@@ -467,7 +467,7 @@ namespace EnergyPlus::PluginManagement {
                     // defaulted to YES
                 }
                 if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPath);
                     PluginManager::addToPythonPath(state, sanitizedInputFileDir, false);
                 }
                 try {
@@ -501,6 +501,7 @@ namespace EnergyPlus::PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
+                // TODO: fs::path?
                 std::string fileName = fields.at("python_module_name");
                 std::string className = fields.at("plugin_class_name");
                 std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));

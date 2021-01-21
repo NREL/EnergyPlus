@@ -77,9 +77,9 @@ std::vector<std::string> getAllLinesInFile(std::string filePath)
 namespace EnergyPlus {
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_good ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -102,9 +102,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_bad ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -127,9 +127,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_worse ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );
@@ -152,9 +152,9 @@ namespace EnergyPlus {
 // }
 
 // TEST_F( InputProcessorFixture, stress_get_number_objects_worst ) {
-// 	auto compressors = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCompressorCurves.idf" );
-// 	auto cases = getAllLinesInFile( configured_source_directory() + "/datasets/RefrigerationCasesDataSet.idf" );
-// 	auto chillers = getAllLinesInFile( configured_source_directory() + "/datasets/Chillers.idf" );
+// 	auto compressors = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCompressorCurves.idf" );
+// 	auto cases = getAllLinesInFile( configured_source_directory() / "datasets/RefrigerationCasesDataSet.idf" );
+// 	auto chillers = getAllLinesInFile( configured_source_directory() / "datasets/Chillers.idf" );
 
 // 	compressors.insert( compressors.end(), cases.begin(), cases.end() );
 // 	compressors.insert( compressors.end(), chillers.begin(), chillers.end() );

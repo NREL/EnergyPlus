@@ -97,7 +97,7 @@ namespace TARCOGOutput {
     // Functions
 
     void WriteInputArguments(InputOutputFile &InArgumentsFile,
-                             const std::string &DBGD,
+                             fs::path const &DBGD,
                              Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
@@ -519,7 +519,7 @@ namespace TARCOGOutput {
     }
 
     void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
-                                [[maybe_unused]] std::string const &DBGD,
+                                [[maybe_unused]] fs::path const &DBGD,
                                 Real64 const esky,
                                 Real64 const trmout,
                                 Real64 const trmin,
@@ -633,7 +633,7 @@ namespace TARCOGOutput {
     }
 
     void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
-                              [[maybe_unused]] std::string const &DBGD,
+                              [[maybe_unused]] fs::path const &DBGD,
                               int const nlayer,
                               Real64 const tamb,
                               const Array1D<Real64> &q,
@@ -936,7 +936,7 @@ namespace TARCOGOutput {
     }
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
-                          [[maybe_unused]] std::string const &DBGD,
+                          [[maybe_unused]] fs::path const &DBGD,
                           int const nlayer,
                           Real64 const ufactor,
                           Real64 const hout,
@@ -1449,21 +1449,11 @@ namespace TARCOGOutput {
     }
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID)
+        Files &files, fs::path const &Debug_dir, fs::path const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
         // Locals
-        char LastPathChar;
-        std::string::size_type LastPathCharIndex;
-
         files.DBGD = Debug_dir;
-
-        LastPathCharIndex = len(Debug_dir);
-        if (LastPathCharIndex > 0) {
-            LastPathChar = Debug_dir[LastPathCharIndex - 1];
-            if (LastPathChar != '/') files.DBGD = Debug_dir + '/';
-            if ((LastPathChar == '/') && (LastPathCharIndex == 1)) files.DBGD = "";
-        }
 
         // DebugDir = Debug_dir
         files.DebugMode = Debug_mode;
@@ -1472,9 +1462,9 @@ namespace TARCOGOutput {
 
         // setup file names if file name is provided, otherwise keep default
         if (Debug_file != "") {
-            files.WINCogFileName = Debug_file + ".w7";
+            files.WINCogFilePath = fs::path(Debug_file.string() + ".w7");
             // SHGCFileName = TRIM(Debug_file)//'_SHGC.w7'
-            files.DebugOutputFileName = Debug_file + ".dbg";
+            files.DebugOutputFilePath = fs::path(Debug_file.string() + ".dbg");
         }
 
         // bi...Write debug output files - if debug flag > 0:
@@ -1492,23 +1482,23 @@ namespace TARCOGOutput {
                 files.FileMode = "SEQUENTIAL";
             }
 
-            const auto open_file = [&](InputOutputFile &of, const std::string &fileName, const bool forAppend) {
-                of.fileName = files.DBGD + fileName;
+            const auto open_file = [&](InputOutputFile &of, const std::string &filePath, const bool forAppend) {
+                of.filePath = files.DBGD / filePath;
                 of.open(forAppend);
 
                 if (!of.good()) {
-                    of.fileName = fileName;
+                    of.filePath = filePath;
                     of.open(forAppend);
                 }
 
-                std::clog << "File: '" << of.fileName << "': " << of.good() << std::endl;
+                std::clog << "File: '" << of.filePath << "': " << of.good() << std::endl;
             };
 
-            open_file(files.DebugOutputFile, files.DebugOutputFileName, files.FilePosition == "APPEND");
-            open_file(files.WINCogFile, files.WINCogFileName, files.FilePosition == "APPEND");
+            open_file(files.DebugOutputFile, files.DebugOutputFilePath, files.FilePosition == "APPEND");
+            open_file(files.WINCogFile, files.WINCogFilePath, files.FilePosition == "APPEND");
 
             if (Debug_mode == saveIntermediateResults) {
-                open_file(files.TarcogIterationsFile, files.TarcogIterationsFileName, true);
+                open_file(files.TarcogIterationsFile, files.TarcogIterationsFilePath, true);
                 open_file(files.IterationCSVFile, files.IterationCSVName, true);
             }
         }

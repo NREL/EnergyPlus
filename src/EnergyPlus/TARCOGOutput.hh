@@ -55,35 +55,36 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
 namespace TARCOGOutput {
 
     struct Files {
-      std::string DBGD;
+      fs::path DBGD; // Debug directory
       std::string FileMode;
       std::string FilePosition{"ASIS"};
       bool WriteDebugOutput{false};
       int DebugMode{0};
 
-      std::string WINCogFileName{"test.w7"};
-      InputOutputFile WINCogFile{WINCogFileName};
+      fs::path WINCogFilePath{"test.w7"};
+      InputOutputFile WINCogFile{WINCogFilePath};
 
      // Intermediate debug files
-      std::string TarcogIterationsFileName{"TarcogIterations.dbg"};
-      InputOutputFile TarcogIterationsFile{TarcogIterationsFileName};
+      fs::path TarcogIterationsFilePath{"TarcogIterations.dbg"};
+      InputOutputFile TarcogIterationsFile{TarcogIterationsFilePath};
 
-      std::string IterationCSVName{"IterationResults.csv"};
+      fs::path IterationCSVName{"IterationResults.csv"};
       InputOutputFile IterationCSVFile{IterationCSVName};
 
 
       // integer, parameter :: IterationHHAT = 102
       // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
 
-      // character(len=1000)    :: SHGCFileName = 'test.w7'
-      std::string DebugOutputFileName{"Tarcog.dbg"};
-      InputOutputFile DebugOutputFile{DebugOutputFileName};
+      // character(len=1000)    :: SHGCFilePath = 'test.w7'
+      fs::path DebugOutputFilePath{"Tarcog.dbg"};
+      InputOutputFile DebugOutputFile{DebugOutputFilePath};
     };
 
     extern int winID;
@@ -96,7 +97,7 @@ namespace TARCOGOutput {
     // Functions
 
     void WriteInputArguments(InputOutputFile &InArgumentsFile,
-                             const std::string &DBGD,
+                             fs::path const &DBGC,
                              Real64 const tout,
                              Real64 const tind,
                              Real64 const trmin,
@@ -157,7 +158,7 @@ namespace TARCOGOutput {
                              const Array1D<Real64> &xwght);
 
     void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
-                                std::string const &DBGD,
+                                fs::path const &DBGC,
                                 Real64 const esky,
                                 Real64 const trmout,
                                 Real64 const trmin,
@@ -178,7 +179,7 @@ namespace TARCOGOutput {
                                 const Array1D<Real64> &xwght);
 
     void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
-                              std::string const &DBGD,
+                              fs::path const &DBGC,
                               int const nlayer,
                               Real64 const tamb,
                               const Array1D<Real64> &q,
@@ -223,7 +224,7 @@ namespace TARCOGOutput {
                               int const NumOfIter);
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
-                          std::string const &DBGD,
+                          fs::path const &DBGC,
                           int const nlayer,
                           Real64 const ufactor,
                           Real64 const hout,
@@ -307,7 +308,7 @@ namespace TARCOGOutput {
     void FinishDebugOutputFiles(Files &files, int const nperr);
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
+        Files &files, fs::path const &Debug_dir, fs::path const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
 
 } // namespace TARCOGOutput
 

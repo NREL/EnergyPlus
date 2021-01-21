@@ -1026,14 +1026,14 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (!FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
+        if (!FileSystem::fileExists(DataStringGlobals::outputGLHEFilePath)) {
             // if the file doesn't exist, there are no data to read
             return;
         } else {
             // file exists -- read data and load if possible
 
             // open file
-            std::ifstream ifs(DataStringGlobals::outputGLHEFileName);
+            std::ifstream ifs(DataStringGlobals::outputGLHEFilePath);
 
             // create empty json object
             json json_in;
@@ -1045,7 +1045,7 @@ namespace GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, DataStringGlobals::outputGLHEFileName + " contains invalid file format");
+                    ShowWarningError(state, DataStringGlobals::outputGLHEFilePath.string() + " contains invalid file format");
                 }
                 ifs.close();
                 return;
@@ -1103,11 +1103,11 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
+        if (FileSystem::fileExists(DataStringGlobals::outputGLHEFilePath)) {
             // file exists -- add data
 
             // open file
-            std::ifstream ifs(DataStringGlobals::outputGLHEFileName);
+            std::ifstream ifs(DataStringGlobals::outputGLHEFilePath);
 
             // create empty json object
             json json_in;
@@ -1119,8 +1119,8 @@ namespace GroundHeatExchangers {
             } catch (...) {
                 if (!json_in.empty()) {
                     // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, "Error reading from " + DataStringGlobals::outputGLHEFileName);
-                    ShowWarningError(state, "Data from previous " + DataStringGlobals::outputGLHEFileName + " not saved");
+                    ShowWarningError(state, "Error reading from " + DataStringGlobals::outputGLHEFilePath.string());
+                    ShowWarningError(state, "Data from previous " + DataStringGlobals::outputGLHEFilePath.string() + " not saved");
                 }
                 ifs.close();
             }
@@ -1143,7 +1143,7 @@ namespace GroundHeatExchangers {
             if (state.files.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
-                ofs.open(DataStringGlobals::outputGLHEFileName);
+                ofs.open(DataStringGlobals::outputGLHEFilePath);
                 // write data to file, set spacing at 2
                 ofs << std::setw(2) << json_out;
                 // don't forget to close
@@ -1163,7 +1163,7 @@ namespace GroundHeatExchangers {
             if (state.files.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
-                ofs.open(DataStringGlobals::outputGLHEFileName);
+                ofs.open(DataStringGlobals::outputGLHEFilePath);
                 // write data to file, set spacing at 2
                 ofs << std::setw(2) << json_out;
                 // don't forget to close

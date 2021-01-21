@@ -179,8 +179,11 @@ namespace DataSystemVariables {
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD(true);           // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string envinputpath1;
-    std::string envinputpath2;
+
+    // TODO: is this needed?
+    fs::path envinputpath1;
+    fs::path envinputpath2;
+
     bool TestAllPaths(false);
     int iEnvSetThreads(0);
     bool lEnvSetThreadsInput(false);
@@ -198,11 +201,9 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(EnergyPlusData &state,
-                                std::string const &originalInputFileName, // name as input for object
-                                bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName,             // Blank if not found.
-                                const std::string contextString           //
+    fs::path CheckForActualFilePath(EnergyPlusData &state,
+                                    fs::path const &originalInputFilePath,    // path (or filename only) as input for object
+                                    const std::string& contextString           //
     )
     {
 
@@ -223,46 +224,37 @@ namespace DataSystemVariables {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string InputFileName; // save for changing out path characters
-        std::string::size_type pos;
+        fs::path foundFilePath;
 
         if (firstTime) {
-            state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
+            state.files.audit.ensure_open(state, "CheckForActualFilePath", state.files.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
-            if (!envinputpath1.empty()) {
-                pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
-                if (pos != std::string::npos) envinputpath1.erase(pos + 1);
-            }
             get_environment_variable(cInputPath2, envinputpath2);
-            get_environment_variable(cProgramPath, ProgramPath);
+            get_environment_variable(cProgramPath, DataStringGlobals::ProgramPath);
             firstTime = false;
         }
 
-        FileFound = false;
-        CheckedFileName.clear();
-        InputFileName = originalInputFileName;
-        FileSystem::makeNativePath(InputFileName);
+        fs::path InputFilePath = FileSystem::makeNativePath(originalInputFilePath); // save for changing out path characters
 
-        std::vector<std::pair<std::string, std::string>> pathsChecked;
+        std::vector<std::pair<fs::path, std::string>> pathsChecked;
 
-        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {{
-            {InputFileName, "Current Working Directory"},
-            {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
-            {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
-            {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
-            {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
-            {CurrentWorkingFolder + InputFileName, "INI File Directory"},
-            {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
+        const std::array<std::pair<fs::path, std::string>, 7> pathsToCheck = {{
+            {InputFilePath, "Current Working Directory"},
+            {DataStringGlobals::inputDirPath / InputFilePath, "IDF Directory"},
+            {DataStringGlobals::exeDirectoryPath / InputFilePath, "EnergyPlus Executable Directory"},
+            {envinputpath1 / InputFilePath, "\"epin\" Environment Variable"},
+            {envinputpath2 / InputFilePath, "\"input_path\" Environment Variable"},
+            {DataStringGlobals::CurrentWorkingFolder / InputFilePath, "INI File Directory"},
+            {DataStringGlobals::ProgramPath / InputFilePath, "\"program\", \"dir\" from INI File"}}
         };
 
         std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
 
         for(std::size_t i = 0; i < numPathsToNotTest; i++) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
-                FileFound = true;
-                CheckedFileName = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(CheckedFileName));
-                return;
+                foundFilePath = pathsToCheck[i].first;
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(foundFilePath));
+                return foundFilePath;
             } else {
                 std::pair <std::string,std::string> currentPath(
                         FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
@@ -280,13 +272,15 @@ namespace DataSystemVariables {
                       FileSystem::getAbsolutePath(pathsToCheck[i].first));
             }
         }
-        if (!FileFound) {
-            ShowSevereError(state, contextString+ "\"" + originalInputFileName + "\" not found.");
-            ShowContinueError(state, "  Paths searched:");
-            for(auto path: pathsChecked){
-                ShowContinueError(state, "    " + path.second +": \"" + path.first +"\"");
-            }
+
+        // If we get here, we didn't find the file
+        ShowSevereError(state, contextString+ "\"" + originalInputFilePath.string() + "\" not found.");
+        ShowContinueError(state, "  Paths searched:");
+        for(auto path: pathsChecked){
+            ShowContinueError(state, "    " + path.second +": \"" + path.first.string() +"\"");
         }
+
+        return foundFilePath;
     }
 
     void clear_state()

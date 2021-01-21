@@ -113,10 +113,10 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             }
         }
         std::shared_ptr<std::ofstream> errorStream =
-            std::make_shared<std::ofstream>(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
+            std::make_shared<std::ofstream>(DataStringGlobals::outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
         return std::unique_ptr<SQLite>(new SQLite(errorStream,
-                                                  DataStringGlobals::outputSqlFileName,
-                                                  DataStringGlobals::outputSqliteErrFileName,
+                                                  DataStringGlobals::outputSqlFilePath,
+                                                  DataStringGlobals::outputSqliteErrFilePath,
                                                   writeOutputToSQLite,
                                                   writeTabularDataToSQLite));
     } catch (const std::runtime_error &error) {
@@ -200,10 +200,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
 
 SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
                std::string const &dbName,
-               std::string const &errorFileName,
+               fs::path const &errorFilePath,
                bool writeOutputToSQLite,
                bool writeTabularDataToSQLite)
-    : SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFileName), m_writeTabularDataToSQLite(writeTabularDataToSQLite),
+    : SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFilePath), m_writeTabularDataToSQLite(writeTabularDataToSQLite),
       m_sqlDBTimeIndex(0), m_reportDataInsertStmt(nullptr), m_reportExtendedDataInsertStmt(nullptr), m_reportDictionaryInsertStmt(nullptr),
       m_timeIndexInsertStmt(nullptr), m_zoneInfoInsertStmt(nullptr), m_zoneInfoZoneListInsertStmt(nullptr), m_nominalLightingInsertStmt(nullptr),
       m_nominalElectricEquipmentInsertStmt(nullptr), m_nominalGasEquipmentInsertStmt(nullptr), m_nominalSteamEquipmentInsertStmt(nullptr),
@@ -2562,7 +2562,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
 SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                                    bool writeOutputToSQLite,
                                    std::string const &dbName,
-                                   std::string const &errorFileName)
+                                   fs::path const &errorFilePath)
     : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream), m_connection(nullptr)
 {
     if (m_writeOutputToSQLite) {
@@ -2572,7 +2572,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // Test if we can write to the sqlite error file
         //  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
         if (m_errorStream) {
-            *m_errorStream << "SQLite3 message, " << errorFileName << " open for processing!" << std::endl;
+            *m_errorStream << "SQLite3 message, " << errorFilePath.string() << " open for processing!" << std::endl;
         } else {
             ok = false;
         }

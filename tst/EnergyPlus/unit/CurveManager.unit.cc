@@ -54,6 +54,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -640,7 +641,7 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
 {
     CurveManager::TableFile testTableFile = CurveManager::TableFile();
-    std::string testCSV = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
+    fs::path testCSV = configured_source_directory() / "tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
     testTableFile.filePath = testCSV;
     testTableFile.load(*state, testCSV);
     std::vector<double> TestArray;

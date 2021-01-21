@@ -116,19 +116,20 @@ TEST(FileSystem, Others)
         std::string pathName = "folder/FileSystemTest.txt.idf";
         EXPECT_EQ("idf", EnergyPlus::FileSystem::getFileExtension(pathName));
         EXPECT_EQ("folder/FileSystemTest.txt", EnergyPlus::FileSystem::removeFileExtension(pathName));
-        EXPECT_EQ("folder/", EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+        EXPECT_EQ(fs::path("folder"), EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+
     }
     {
         std::string pathName = "folder/FileSystemTest.txt";
         EXPECT_EQ("txt", EnergyPlus::FileSystem::getFileExtension(pathName));
         EXPECT_EQ("folder/FileSystemTest", EnergyPlus::FileSystem::removeFileExtension(pathName));
-        EXPECT_EQ("folder/", EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+        EXPECT_EQ(fs::path("folder"), EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
     }
     {
         std::string pathName = "folder/FileSystemTest";
         EXPECT_EQ("", EnergyPlus::FileSystem::getFileExtension(pathName));
         EXPECT_EQ("folder/FileSystemTest", EnergyPlus::FileSystem::removeFileExtension(pathName));
-        EXPECT_EQ("folder/", EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+        EXPECT_EQ(fs::path("folder"), EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
     }
 }
 
@@ -143,9 +144,9 @@ TEST(FileSystem, getProgramPath)
 
 TEST(FileSystem, getParentDirectoryPath)
 {
-    EXPECT_EQ("a/b/", EnergyPlus::FileSystem::getParentDirectoryPath("a/b/c"));
-    EXPECT_EQ("a/b/", EnergyPlus::FileSystem::getParentDirectoryPath("a/b/c/"));
-    EXPECT_EQ("./", EnergyPlus::FileSystem::getParentDirectoryPath("a.idf"));
+    EXPECT_EQ(fs::path{"a/b"}, EnergyPlus::FileSystem::getParentDirectoryPath("a/b/c"));
+    EXPECT_EQ(fs::path{"a/b"}, EnergyPlus::FileSystem::getParentDirectoryPath("a/b/c/"));
+    EXPECT_EQ(fs::path{"./"}, EnergyPlus::FileSystem::getParentDirectoryPath("a.idf"));
 }
 
 TEST(FileSystem, make_and_remove_Directory)
@@ -203,7 +204,7 @@ TEST(FileSystem, Elaborate)
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists("sandbox"));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox"));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
-    EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).size(), pathName.size());
+    EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).string().size(), pathName.size());
     EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox/"),
               EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName)));
     EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath("sandbox"),

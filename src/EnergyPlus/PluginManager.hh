@@ -181,6 +181,7 @@ namespace PluginManagement {
         explicit PluginManager(EnergyPlusData &state);
         ~PluginManager();
 
+        // TODO/ replace with fs::path?
         static int numActiveCallbacks(EnergyPlusData &state);
         static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string

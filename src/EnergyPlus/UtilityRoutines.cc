@@ -436,20 +436,22 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFilePath)) {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFilePath, std::fstream::out); //open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError(state, "appendPerfLog: Could not open file \""
+                                + DataStringGlobals::outputPerfLogFilePath.string() + "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFilePath, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError(state, "appendPerfLog: Could not open file \""
+                                + DataStringGlobals::outputPerfLogFilePath.string() + "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -719,7 +721,7 @@ namespace UtilityRoutines {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
-                DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
             }
             print(tempfl,
                   "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
@@ -873,7 +875,7 @@ namespace UtilityRoutines {
         {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
             if (!tempfl.good()) {
-                DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+                DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
             }
             print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
         }

@@ -50,16 +50,38 @@
 
 #include <algorithm>
 #include <string>
-
+#include <fmt/format.h>
 #if __has_include(<filesystem>)
     #include <filesystem>
     namespace fs = std::filesystem;
+    // Add a custom formatter for fmt, so we don't have to call fs::path::string() everywhere
+    namespace fmt {
+    template <>
+    struct formatter<std::filesystem::path> : formatter<std::string> {};
+    }
 #elif __has_include(<experimental/filesystem>)
     #include <experimental/filesystem>
     namespace fs = std::experimental::filesystem;
+    // Add a custom formatter for fmt
+    namespace fmt {
+    template <>
+    struct formatter<std::experimental::filesystem::path> : formatter<std::string> {};
+    }
 #else
     #error "no filesystem support"
 #endif
+
+// If we want to allow this kind of stuff
+// fs::path p = "folder/eplus";
+// std::string suffixStr = "out.audit";
+//
+// fs::path filePath = p + suffixStr; => folder/eplusout.audit (would throw)
+// std::string message = "Cannot find " + p + "." => would throw now, need p.string() instead
+
+// inline fs::path operator+(fs::path const &left, fs::path const &right) {
+//    return fs::path(left)+=right;
+// }
+
 
 namespace EnergyPlus {
 
@@ -67,8 +89,19 @@ namespace FileSystem {
 
     extern std::string const exeExtension;
 
+
+    enum class InputFileType {
+        EpJSON,
+        IDF,
+        CBOR,
+        MsgPack,
+        UBJSON,
+        BSON,
+        Unknown
+    };
+
     // Similar to fs::path::make_preferred, but also does '\\' => '/' conversion on POSIX, which make_preferred does not do
-    void makeNativePath(fs::path &path);
+    [[no_discard]] fs::path makeNativePath(fs::path const &path);
 
     [[no_discard]] fs::path getFileName(fs::path const &filePath);
 
@@ -86,10 +119,13 @@ namespace FileSystem {
     [[no_discard]] fs::path getProgramPath();
 
     // For `a/b/c.txt.idf` it returns `idf`, i.e. anything after last dot, **not including the dot** (unlike fs::path::extension() which includes it)
-    [[no_discard]] fs::path getFileExtension(fs::path const &fileName);
+    [[no_discard]] fs::path getFileExtension(fs::path const &gc);
+
+    // Returns the FileType by looking at its extension.
+    [[no_discard]] InputFileType getInputFileType(fs::path const &filePath);
 
     // Turns a/b/c.txt.idf into a/b/c.txt
-    [[no_discard]] fs::path removeFileExtension(fs::path const &fileName);
+    [[no_discard]] fs::path removeFileExtension(fs::path const &filePath);
 
     // Creates a directory if it doesn't already exists
     void makeDirectory(fs::path const &directoryPath);
@@ -102,16 +138,16 @@ namespace FileSystem {
 
     // Checks that fileExists(filePath), if so tries to rename to destination, falling back on copy+remove if failed (if trying to do move accross
     // devices for eg)
-    void moveFile(fs::path const &filePath, fs::path const &destination);
+    void moveFile(fs::path const &filePath, fs::path const &destinationPath);
 
-    int systemCall(fs::path const &command);
+    int systemCall(std::string const &command);
 
     // Returns false if not fileExists(filePath), or if filePath cannot be removed
     bool removeFile(fs::path const &filePath);
 
     // On Windows, this just copies the file. On Unix, it creates a symlink
     // Starts by checking that fileExists(filePath) is true
-    void linkFile(fs::path const &fileName, fs::path const &link);
+    void linkFile(fs::path const &filePath, fs::path const &linkPath);
 
 } // namespace FileSystem
 } // namespace EnergyPlus

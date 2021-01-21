@@ -369,13 +369,13 @@ bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
     if (!idd.empty()) {
         idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
     } else {
-        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
+        static auto const exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+        static auto idd_location = exeDirectoryPath / "Energy+.schema.epJSON";
         static auto file_exists = FileSystem::fileExists(idd_location);
 
         if (!file_exists) {
             // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
+            idd_location = FileSystem::getParentDirectoryPath(exeDirectoryPath) / "Energy+.schema.epJSON";
             file_exists = FileSystem::fileExists(idd_location);
         }
 

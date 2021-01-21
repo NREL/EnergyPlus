@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
@@ -128,10 +129,10 @@ TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
 
 TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
 {
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    DataStringGlobals::outputPerfLogFilePath = "eplusout_perflog.csv";
 
     // start with no file
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+    fs::remove(DataStringGlobals::outputPerfLogFilePath);
 
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
@@ -147,7 +148,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
 
-    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogFile.open(DataStringGlobals::outputPerfLogFilePath);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
     std::string perfLogContents = perfLogStrSteam.str();
@@ -159,7 +160,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+    std::remove(DataStringGlobals::outputPerfLogFilePath.c_str());
 
 }
 

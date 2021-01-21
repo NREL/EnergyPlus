@@ -929,7 +929,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
     std::string const idf_objects = delimited_string({
                                                          "  Version,9.3;",
 
@@ -1067,7 +1067,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);

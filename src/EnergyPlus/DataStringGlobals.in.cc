@@ -120,40 +120,40 @@ namespace DataStringGlobals {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    std::string outputMddFileName("eplusout.mdd");
-    std::string outputRddFileName("eplusout.rdd");
-    std::string outputShdFileName("eplusout.shd");
-    std::string outputTblCsvFileName("eplustbl.csv");
-    std::string outputTblHtmFileName("eplustbl.htm");
-    std::string outputTblTabFileName("eplustbl.tab");
-    std::string outputTblTxtFileName("eplustbl.txt");
-    std::string outputTblXmlFileName("eplustbl.xml");
-    std::string outputAdsFileName("eplusADS.out");
-    std::string outputGLHEFileName("eplusout.glhe");
-    std::string outputDelightOutFileName("eplusout.delightout");
-    std::string outputIperrFileName("eplusout.iperr");
-    std::string outputPerfLogFileName("eplusout_perflog.csv");
-    std::string outputSqlFileName("eplusout.sql");
-    std::string outputSqliteErrFileName("eplussqlite.err");
-    std::string outputCsvFileName("eplusout.csv");
-    std::string outputMtrCsvFileName("eplusmtr.csv");
-    std::string outputRvauditFileName("eplusout.rvaudit");
+    fs::path outputMddFilePath("eplusout.mdd");
+    fs::path outputRddFilePath("eplusout.rdd");
+    fs::path outputShdFilePath("eplusout.shd");
+    fs::path outputTblCsvFilePath("eplustbl.csv");
+    fs::path outputTblHtmFilePath("eplustbl.htm");
+    fs::path outputTblTabFilePath("eplustbl.tab");
+    fs::path outputTblTxtFilePath("eplustbl.txt");
+    fs::path outputTblXmlFilePath("eplustbl.xml");
+    fs::path outputAdsFilePath("eplusADS.out");
+    fs::path outputGLHEFilePath("eplusout.glhe");
+    fs::path outputDelightOutFilePath("eplusout.delightout");
+    fs::path outputIperrFilePath("eplusout.iperr");
+    fs::path outputPerfLogFilePath("eplusout_perflog.csv");
+    fs::path outputSqlFilePath("eplusout.sql");
+    fs::path outputSqliteErrFilePath("eplussqlite.err");
+    fs::path outputCsvFilePath("eplusout.csv");
+    fs::path outputMtrCsvFilePath("eplusmtr.csv");
+    fs::path outputRvauditFilePath("eplusout.rvaudit");
 
-    std::string eplusADSFileName;
-    std::string idfFileNameOnly;
-    std::string idfDirPathName;
-    std::string outDirPathName;
-    std::string inputFileNameOnly;
-    std::string inputDirPathName;
-    std::string outputDirPathName;
-    std::string exeDirectory;
-    std::string inputFileName;
-    std::string inputIddFileName;
-    std::string inputEpJSONSchemaFileName;
-    std::string FullName;
-    std::string weatherFileNameOnly;
-    std::string ProgramPath;          // Path for Program from INI file
-    std::string CurrentWorkingFolder; // Current working directory for run
+    fs::path eplusADSFilePath;
+    fs::path idfFilePathNameOnly;
+    fs::path idfDirPath;
+    fs::path outDirPath;
+    fs::path inputFilePathNameOnly;
+    fs::path inputDirPath;
+    fs::path outputDirPath;
+    fs::path exeDirectoryPath;
+    fs::path inputFilePath;
+    fs::path inputIddFilePath;
+    fs::path inputEpJSONSchemaFilePath;
+    fs::path FullPath;
+    fs::path weatherFilePathNameOnly;
+    fs::path ProgramPath;          // Path for Program from INI file
+    fs::path CurrentWorkingFolder; // Current working directory for run
     std::string CurrentDateTime;      // For printing current date and time at start of run
     std::string IDDVerString;         // Version information from the IDD (line 1)
 
@@ -168,19 +168,19 @@ namespace DataStringGlobals {
 
     void clear_state()
     {
-        eplusADSFileName.clear();
-        idfFileNameOnly.clear();
-        idfDirPathName.clear();
-        outDirPathName.clear();
-        inputFileNameOnly.clear();
-        inputDirPathName.clear();
-        outputDirPathName.clear();
-        exeDirectory.clear();
-        inputFileName.clear();
-        inputIddFileName.clear();
-        inputEpJSONSchemaFileName.clear();
-        FullName.clear();
-        weatherFileNameOnly.clear();
+        eplusADSFilePath.clear();
+        idfFilePathNameOnly.clear();
+        idfDirPath.clear();
+        outDirPath.clear();
+        inputFilePathNameOnly.clear();
+        inputDirPath.clear();
+        outputDirPath.clear();
+        exeDirectoryPath.clear();
+        inputFilePath.clear();
+        inputIddFilePath.clear();
+        inputEpJSONSchemaFilePath.clear();
+        FullPath.clear();
+        weatherFilePathNameOnly.clear();
         ProgramPath.clear();
         CurrentWorkingFolder.clear();
         CurrentDateTime.clear();

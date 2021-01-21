@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -220,7 +221,7 @@ namespace ScheduleManager {
         using DataStringGlobals::CharSemicolon;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-        using DataSystemVariables::CheckForActualFileName;
+        using DataSystemVariables::CheckForActualFilePath;
         using DataSystemVariables::iUnicode_end;
 
         // Locals
@@ -307,7 +308,6 @@ namespace ScheduleManager {
         static std::string LastFor;
         static std::string errmsg;
         int kdy;
-        bool FileExists;
         // for SCHEDULE:FILE
         Array1D<Real64> hourlyFileValues;
         std::map<std::string, int> CSVAllColumnNames;
@@ -512,18 +512,18 @@ namespace ScheduleManager {
         if (NumCommaFileShading != 0) {
             inputProcessor->getObjectItem(
                 state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
-            std::string ShadingSunlitFracFileName = Alphas(1);
+            std::string ShadingSunlitFracFilePath = Alphas(1);
 
             std::string contextString = CurrentModuleObject + ", " + cAlphaFields(1) + ": ";
-            CheckForActualFileName(state, ShadingSunlitFracFileName, FileExists, state.files.TempFullFileName.fileName, contextString);
+            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, ShadingSunlitFracFilePath, contextString);
 
-            if (!FileExists) {
+            if (state.files.TempFullFilePath.filePath.empty()) {
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
 
-            auto SchdFile = state.files.TempFullFileName.try_open();
+            auto SchdFile = state.files.TempFullFilePath.try_open();
             if (!SchdFile.good()) {
-                ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\" cannot be opened.");
+                ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFilePath + "\" cannot be opened.");
                 ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
@@ -533,7 +533,7 @@ namespace ScheduleManager {
             if (endLine > 0) {
                 if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
                     SchdFile.close();
-                    ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
+                    ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFilePath + "\" appears to be a Unicode or binary file.");
                     ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError(state, "Program terminates due to previous condition.");
                 }
@@ -579,7 +579,7 @@ namespace ScheduleManager {
                         // no more commas
                         subString = LineIn.data.substr(wordStart);
                         if (firstLine && subString == BlankString) {
-                            ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName +
+                            ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFilePath +
                                              "\"  first line does not contain the indicated column separator=comma.");
                             ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                             firstLine = false;
@@ -590,10 +590,10 @@ namespace ScheduleManager {
                     if (colCnt > 1) {
                         if (rowCnt == 1) {
                             if (subString == BlankString) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column hearder.");
+                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFilePath + "\": invalid blank column hearder.");
                                 errFlag = true;
                             } else if (CSVAllColumnNames.count(subString)) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column hearder: \"" + subString +
+                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFilePath + "\": duplicated column hearder: \"" + subString +
                                                  "\".");
                                 ShowContinueError(state, "The first occurrence of the same surface name would be used.");
                                 errFlag = true;
@@ -615,10 +615,10 @@ namespace ScheduleManager {
                                 ShowWarningError(state,
                                                  format("{}:\"{}\": found error processing column: {}, row:{} in {}.",
                                                         RoutineName,
-                                                        ShadingSunlitFracFileName,
+                                                        ShadingSunlitFracFilePath,
                                                         colCnt,
                                                         rowCnt,
-                                                        ShadingSunlitFracFileName));
+                                                        ShadingSunlitFracFilePath));
                                 ShowContinueError(state, "This value is set to 0.");
                             }
                             CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;
@@ -1757,14 +1757,14 @@ namespace ScheduleManager {
 
             std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
 
-            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
+            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, Alphas(3), contextString);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
             // Setup file reading parameters
-            if (!FileExists) {
+            if (state.files.TempFullFilePath.filePath.empty()) {
                 ErrorsFound = true;
             } else {
-                auto SchdFile = state.files.TempFullFileName.try_open();
+                auto SchdFile = state.files.TempFullFilePath.try_open();
                 if (!SchdFile.good()) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" cannot be opened.");

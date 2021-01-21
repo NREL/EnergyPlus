@@ -79,15 +79,17 @@ namespace FileSystem {
     std::string const exeExtension;
 #endif
 
-    void makeNativePath(fs::path &path)
+    fs::path makeNativePath(fs::path const &path)
     {
         // path.make_preferred() on windows will change "/" to "\\", because '/' is a fallback separator
         // but on Unix it will *not* change "\\" to "/", because POSIX doesn't define it as a fallback separator. In fact, it's even allowed in a
         // filename. Do we really need that though?
         // path.make_preferred();
-        std::string tempPathAsStr = path.make_preferred().string();
+        fs::path result = path;
+        std::string tempPathAsStr = result.make_preferred().string();
         std::replace(tempPathAsStr.begin(), tempPathAsStr.end(), DataStringGlobals::altpathChar, DataStringGlobals::pathChar);
-        path = fs::path(tempPathAsStr);
+        result = fs::path(tempPathAsStr);
+        return result;
     }
 
     // TODO: remove as providing little benefit over calling fs::path::filename directly?
@@ -98,7 +100,7 @@ namespace FileSystem {
 
     fs::path getParentDirectoryPath(fs::path const &path)
     {
-        // Remove trailing separator
+        // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
         std::string pathStr = path.string();
         while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
             pathStr.erase(pathStr.size()-1);
@@ -187,8 +189,8 @@ namespace FileSystem {
 
     // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
     // just compare to ".EPJSON" instead of "EPJSON"...
-    fs::path getFileExtension(fs::path const &fileName) {
-        std::string pext = fs::path(fileName).extension().string();
+    fs::path getFileExtension(fs::path const &filePath) {
+        std::string pext = fs::path(filePath).extension().string();
         if (!pext.empty()) {
             // remove '.'
             pext = std::string(++pext.begin(), pext.end());
@@ -196,11 +198,33 @@ namespace FileSystem {
         return fs::path{pext};
     }
 
+    // TODO: is this any better?
+    InputFileType getInputFileType(fs::path const &filePath) {
+        std::string pext = fs::path(filePath).extension().string();
+        std::transform(pext.begin(), pext.end(), pext.begin(), ::toupper);
+        if (pext == ".EPJSON" || pext == ".JSON") {
+            return InputFileType::EpJSON;
+        } else if (pext == ".IDF" || pext == ".IMF") {
+           return InputFileType::IDF;
+        } else if (pext == ".CBOR") {
+            return InputFileType::CBOR;
+        } else if (pext == ".MSGPACK") {
+             return InputFileType::MsgPack;
+        } else if (pext == ".UBJSON") {
+            return InputFileType::UBJSON;
+        } else if (pext == ".BSON") {
+            return InputFileType::BSON;
+        }
+        return InputFileType::Unknown;
+
+    }
+
+
     // TODO: remove for fs::path::replace_extension directly?
-    fs::path removeFileExtension(fs::path const &fileName)
+    fs::path removeFileExtension(fs::path const &filePath)
     {
-        // return fs::path(fileName).stem().string();
-        return fs::path(fileName).replace_extension().string();
+        // return fs::path(filePath).stem().string();
+        return fs::path(filePath).replace_extension().string();
     }
 
     // TODO: remove? `fs::create_directory` for a single or `fs::create_directories` for nested directory creation
@@ -214,7 +238,7 @@ namespace FileSystem {
             }
         } else { // directory does not already exist
             // Create_directories is recursive, create_directory isn't. I don't see why we wouldn't want recursive
-            fs::create_directories(fs::path(directoryPath));
+            fs::create_directories(directoryPath);
         }
     }
 
@@ -251,7 +275,7 @@ namespace FileSystem {
         }
     }
 
-    int systemCall(fs::path const &command)
+    int systemCall(std::string const &command)
     {
 #ifdef _WIN32
         // Wrap in double quotes and pass that to system
@@ -283,7 +307,8 @@ namespace FileSystem {
 #ifdef _WIN32
         fs::copy(filePath, linkPath, fs::copy_options::update_existing);
 #else
-        return fs::create_symlink(filePath, linkPath);
+        // we could return bool?
+        fs::create_symlink(filePath, linkPath);
 #endif
     }
 

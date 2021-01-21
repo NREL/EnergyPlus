@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
+#include <memory>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -147,20 +148,20 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
+bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, fs::path outputDirPath, std::string & outputTypeStr)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
     json epJSON;
 
-    auto const inputFileNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
-    auto const inputDirPathName = EnergyPlus::FileSystem::getParentDirectoryPath(inputFilePath);
+    auto const inputFilePathNameOnly = EnergyPlus::FileSystem::removeFileExtension(EnergyPlus::FileSystem::getFileName(inputFilePath));
+    auto const inputDirPath = EnergyPlus::FileSystem::getParentDirectoryPath(inputFilePath);
 
-    if (outputDirectory.empty()) {
-        outputDirectory = inputDirPathName;
+    if (outputDirPath.empty()) {
+        outputDirPath = inputDirPath;
     }
 
-    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath);
+    auto inputFileExt = EnergyPlus::FileSystem::getFileExtension(inputFilePath).string();
     std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
 
     bool isEpJSON = true;
@@ -266,38 +267,33 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
         return false;
     }
 
+    fs::path fileNameWithoutExtension = outputDirPath / inputFilePathNameOnly;
     if ((outputType == OutputTypes::Default || outputType == OutputTypes::IDF) && isEpJSON) {
         auto const input_file = idf_parser->encode(epJSON, schema);
-        std::string convertedEpJSON(outputDirectory + inputFileNameOnly + ".idf");
-        EnergyPlus::FileSystem::makeNativePath(convertedEpJSON);
+        fs::path convertedEpJSON = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".idf"));
         std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
         convertedFS << input_file << std::endl;
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
         auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-        std::string convertedIDF(outputDirectory + inputFileNameOnly + ".epJSON");
-        EnergyPlus::FileSystem::makeNativePath(convertedIDF);
+        fs::path convertedIDF = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".epJSON"));
         std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
         convertedFS << input_file << std::endl;
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
-        std::string convertedCBOR(outputDirectory + inputFileNameOnly + ".cbor");
-        EnergyPlus::FileSystem::makeNativePath(convertedCBOR);
+        fs::path convertedCBOR = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".cbor"));
         std::ofstream convertedFS(convertedCBOR, std::ofstream::out | std::ofstream::binary);
         json::to_cbor(epJSON, convertedFS);
     } else if (outputType == OutputTypes::MsgPack) {
-        std::string convertedMsgPack(outputDirectory + inputFileNameOnly + ".msgpack");
-        EnergyPlus::FileSystem::makeNativePath(convertedMsgPack);
+        fs::path convertedMsgPack = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".msgpack"));
         std::ofstream convertedFS(convertedMsgPack, std::ofstream::out | std::ofstream::binary);
         json::to_msgpack(epJSON, convertedFS);
     } else if (outputType == OutputTypes::UBJSON) {
-        std::string convertedUBJSON(outputDirectory + inputFileNameOnly + ".ubjson");
-        EnergyPlus::FileSystem::makeNativePath(convertedUBJSON);
+        fs::path convertedUBJSON = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".ubjson"));
         std::ofstream convertedFS(convertedUBJSON, std::ofstream::out | std::ofstream::binary);
         json::to_ubjson(epJSON, convertedFS);
     } else if (outputType == OutputTypes::BSON) {
-        std::string convertedBSON(outputDirectory + inputFileNameOnly + ".bson");
-        EnergyPlus::FileSystem::makeNativePath(convertedBSON);
+        fs::path convertedBSON = EnergyPlus::FileSystem::makeNativePath(fileNameWithoutExtension.replace_extension(".bson"));
         std::ofstream convertedFS(convertedBSON, std::ofstream::out | std::ofstream::binary);
         json::to_bson(epJSON, convertedFS);
     } else {
