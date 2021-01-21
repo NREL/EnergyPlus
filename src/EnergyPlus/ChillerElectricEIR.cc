@@ -1027,7 +1027,7 @@ namespace EnergyPlus::ChillerElectricEIR {
 
     void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state) {
 
-        static std::string const RoutineName("InitElectricEIRChiller");
+        static std::string const RoutineName("ElectricEIRChillerSpecs::initEachEnvironment");
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
