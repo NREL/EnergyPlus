@@ -473,7 +473,12 @@ namespace CommandLineInterface {
         state.files.iniFile.filePath = "Energy+.ini";
 
         // Stat next to epw
-        state.files.inStatFilePath.filePath = state.files.inputWeatherFilePath.filePath.replace_extension(".stat");
+        // Careful! fs::path::replace_extension will **mutate the original object**
+        state.files.inStatFilePath.filePath = state.files.inputWeatherFilePath.filePath;
+        state.files.inStatFilePath.filePath.replace_extension(".stat");
+        // Or is it better to provide a helper like this?
+        // state.files.inStatFilePath.filePath = FileSystem::replaceFileExtension(state.inputWeatherFilePath.filePath, ".stat");
+
         DataStringGlobals::eplusADSFilePath = DataStringGlobals::inputDirPath / "eplusADS.inp";
 
         // Readvars files

@@ -124,8 +124,11 @@ namespace FileSystem {
     // Returns the FileType by looking at its extension.
     [[no_discard]] InputFileType getInputFileType(fs::path const &filePath);
 
-    // Turns a/b/c.txt.idf into a/b/c.txt
+    // Turns a/b/c.txt.idf into a/b/c.txt, **without mutating the original object** unlike fs::path::replace_extension
     [[no_discard]] fs::path removeFileExtension(fs::path const &filePath);
+
+    // Replace (or append) an extension to a path **without mutating the original object** unlike fs::path::replace_extension
+    [[no_discard]] fs::path replaceFileExtension(fs::path const &filePath, fs::path const &ext);
 
     // Creates a directory if it doesn't already exists
     void makeDirectory(fs::path const &directoryPath);

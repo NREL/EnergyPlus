@@ -220,12 +220,19 @@ namespace FileSystem {
     }
 
 
-    // TODO: remove for fs::path::replace_extension directly?
+    // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
     fs::path removeFileExtension(fs::path const &filePath)
     {
         // return fs::path(filePath).stem().string();
-        return fs::path(filePath).replace_extension().string();
+        return fs::path(filePath).replace_extension();
     }
+
+    fs::path replaceFileExtension(fs::path const &filePath, fs::path const &ext)
+    {
+        // return fs::path(filePath).stem().string();
+        return fs::path(filePath).replace_extension(ext);
+    }
+
 
     // TODO: remove? `fs::create_directory` for a single or `fs::create_directories` for nested directory creation
     void makeDirectory(fs::path const &directoryPath)
