@@ -1120,17 +1120,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 TotCapTempModFac = 1.0;
         Real64 SensCapAtPeak;
         Real64 SensCapTempModFac;
-        Real64 TotalCapCoeff1; // 1st coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff2; // 2nd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff3; // 3rd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff4; // 4th coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff5; // 5th coefficient of the total cooling capacity performance curve
-        Real64 SensCapCoeff1;  // 1st coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff2;  // 2nd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff3;  // 3rd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff4;  // 4th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff5;  // 5th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff6;  // 6th coefficient of the sensible cooling capacity performance curve
         int TimeStepNumAtMax;
         int DDNum;
         int PltSizNum;
@@ -2083,22 +2072,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 CoolPowerRated;        // Rated Cooling Power Input[W]
         Real64 AirVolFlowRateRated;   // Rated Air Volumetric Flow Rate [m3/s]
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
-        Real64 TotalCapCoeff1;        // 1st coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff2;        // 2nd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff3;        // 3rd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff4;        // 4th coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff5;        // 5th coefficient of the total cooling capacity performance curve
-        Real64 SensCapCoeff1;         // 1st coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff2;         // 2nd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff3;         // 3rd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff4;         // 4th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff5;         // 5th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff6;         // 6th coefficient of the sensible cooling capacity performance curve
-        Real64 CoolPowerCoeff1;       // 1st coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff2;       // 2nd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff3;       // 3rd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff4;       // 4th coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff5;       // 5th coefficient of the cooling power consumption curve
         Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
         Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
 
@@ -2415,16 +2388,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 HeatPowerRated;        // Rated Heating Power Input[W]
         Real64 AirVolFlowRateRated;   // Rated Air Volumetric Flow Rate [m3/s]
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
-        Real64 HeatCapCoeff1;         // 1st coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff2;         // 2nd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff3;         // 3rd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff4;         // 4th coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff5;         // 5th coefficient of the heating capacity performance curve
-        Real64 HeatPowerCoeff1;       // 1st coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff2;       // 2nd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff3;       // 3rd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff4;       // 4th coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff5;       // 5th coefficient of the heating power consumption curve
 
         //  REAL(r64) :: PartLoadRatio          ! Part load ratio
         Real64 ratioTDB; // Ratio of the inlet air dry bulb temperature to the rated conditions
