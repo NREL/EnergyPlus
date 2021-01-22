@@ -1891,24 +1891,31 @@
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    JermyDesignObject1,      !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    0.87,                    !- Motor Efficiency
+    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    SimpleOff,               !- Condensation Control Type
+    1.0;                     !- Condensation Control Dewpoint Offset {C}
+!    ;                        !- Changeover Delay Time Period Schedule
+
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
+    JermyDesignObject1,    !- Design Object 1
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
     0.0004,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
@@ -1921,29 +1928,20 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    SimpleOff,               !- Condensation Control Type
-    1.0,                     !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     East Zone Radiant Floor, !- Name
+    JermyDesignObject1,    !- Design Object 1
     RadiantSysAvailSched,    !- Availability Schedule Name
     East Zone,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
     0.0004,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
@@ -1956,29 +1954,20 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    VariableOff,             !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     North Zone Radiant Floor,!- Name
+    JermyDesignObject1,    !- Design Object 1
     RadiantSysAvailSched,    !- Availability Schedule Name
     North Zone,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    0.8,                     !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
     0.0005,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
-    0.87,                    !- Motor Efficiency
-    0.1,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     RadHeatHighWaterTemp,    !- Heating High Water Temperature Schedule Name
@@ -1991,8 +1980,6 @@
     RadCoolLowWaterTemp,     !- Cooling Low Water Temperature Schedule Name
     RadCoolHighControlTemp,  !- Cooling High Control Temperature Schedule Name
     RadCoolLowControlTemp,   !- Cooling Low Control Temperature Schedule Name
-    Off,                     !- Condensation Control Type
-    0.0,                     !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
