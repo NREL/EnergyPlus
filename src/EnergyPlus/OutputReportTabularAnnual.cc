@@ -624,26 +624,17 @@ namespace OutputReportTabularAnnual {
 
     void WriteAnnualTables(EnergyPlusData &state)
     {
-        OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = state.dataOutRptTab->unitsStyle;
-                produceTabular = true;
-                if (state.dataOutRptTab->unitsStyle_SQLite == state.dataOutRptTab->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = state.dataOutRptTab->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (state.dataOutRptTab->unitsStyle_SQLite == state.dataOutRptTab->unitsStyle) break;
-            }
+            OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem,
+                                      state.dataOutRptTab->unitsStyle,
+                                      state.dataOutRptTab->unitsStyle_SQLite,
+                                      unitsStyle_cur,
+                                      produceTabular,
+                                      produceSQLite))
+                break;
 
             // Jason Glazer, August 2015
             // This function is not part of the class but acts as an interface between procedural code and the class by

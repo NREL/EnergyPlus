@@ -5121,9 +5121,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->WriteTabularFiles) {
 
-            //iUnitsStyle unitsql_unitconv = iUnitsStyle::None;
-            ort->unitsStyle_SQLite = iUnitsStyle::None;
-            // if (unitsqltab == 5) unitsqltab = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+            // ort->unitsStyle_SQLite = iUnitsStyle::None;
             if (unitSQLiteTable == 0) {
                 ort->unitsStyle_SQLite = iUnitsStyle::None;
             } else if (unitSQLiteTable == 1) {
@@ -6363,26 +6361,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = ort->unitsStyle;
-                produceTabular = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = ort->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-            }
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // set the unit conversion
             // if (ort->unitsStyle == iUnitsStyle::None) {
@@ -6763,26 +6746,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = ort->unitsStyle;
-                produceTabular = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = ort->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-            }
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             rowHead(1) = "Interval Start";
             rowHead(2) = "Interval End";
@@ -7129,26 +7097,12 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTextLine(state, "", true);
             }
 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite))
+                    break;
 
                 // determine building floor areas
                 DetermineBuildingFloorArea(state);
@@ -9029,26 +8983,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displaySourceEnergyEndUseSummary) {
             
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 if (produceTabular) {
                     // show the headers of the report
@@ -9434,26 +9373,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayDemandEndUse) {
 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-                
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;                
 
                 // show the headers of the report
                 WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -9990,26 +9914,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!state.dataCostEstimateManager->DoCostEstimate) return;
 
-        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = ort->unitsStyle;
-                produceTabular = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = ort->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-            }
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             if (produceTabular) {
                 WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -10412,26 +10321,11 @@ namespace EnergyPlus::OutputReportTabular {
         // all arrays are in the format: (row, columnm)
         if (ort->displayTabularVeriSum) {
 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 // show the headers of the report
                 if (produceTabular) {
@@ -11499,12 +11393,11 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (state.dataOutRptTab->displayHeatEmissionsSummary) {
- 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 if (produceTabular) {
@@ -11626,26 +11519,11 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 IPvalue;
         auto &ort(state.dataOutRptTab);
 
-        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = ort->unitsStyle;
-                produceTabular = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = ort->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-            }
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // loop through the entries and associate them with the subtable and create
             // list of unique object names
@@ -11896,26 +11774,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayComponentSizing) {
 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 if (produceTabular) {
                     WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -12313,26 +12176,11 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
 
-            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-            bool produceTabular = true;
-            bool produceSQLite = false;
-
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 // now go through each header and create a report for each one
                 for (auto headerLine : headerLines) {
@@ -13071,26 +12919,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         CompLoadTablesType curCompLoadTable; // active component load table
 
-        iUnitsStyle unitsStyle_cur = ort->unitsStyle;
-        bool produceTabular = true;
-        bool produceSQLite = false;
-
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-            if (iUnitSystem == 0) {
-                unitsStyle_cur = ort->unitsStyle;
-                produceTabular = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                    produceSQLite = true;
-                } else {
-                    produceSQLite = false;
-                }
-            } else { // iUnitSystem == 1
-                unitsStyle_cur = ort->unitsStyle_SQLite;
-                produceTabular = false;
-                produceSQLite = true;
-                if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-            }
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
             // adjusted initilization location to after variable declaration for loops 2021-01-11
             peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
