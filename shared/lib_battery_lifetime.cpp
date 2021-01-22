@@ -45,6 +45,7 @@ void lifetime_cycle_t::initialize() {
     state = std::make_shared<cycle_state>();
     state->n_cycles = 0;
     state->q_relative_cycle = bilinear(0., 0);
+    state->dq_relative_cycle_old = 0; 
     state->range = 0;
     state->average_range = 0;
     state->rainflow_jlt = 0;
@@ -88,6 +89,27 @@ double lifetime_cycle_t::estimateCycleDamage() {
         DOD = state->average_range;
     }
     return (bilinear(DOD, state->n_cycles + 1) - bilinear(DOD, state->n_cycles + 2));
+}
+
+// Rohit - function to compute Q_neg for Lithium ion NMC
+double lifetime_cycle_t::runCycleLifetimeNMC(double T, double DOD) {
+    int n_cycles_old = state->n_cycles;
+    rainflow(DOD);
+    int dn_cycles = state->n_cycles - n_cycles_old;
+
+    double c2 = c2_ref * exp(-(Ea_c_2 / Rug) * (1. / T - 1. / T_ref))
+        * pow(DOD, beta_c2);
+
+    double dq_new;
+    if (state->dq_relative_cycle_old == 0)
+        dq_new = 1 - sqrt(1 - 2 * (c2 / c0_ref) * dn_cycles);
+    else
+        dq_new = 1 - sqrt(1 - 2 * (c2 / c0_ref) * dn_cycles) + state->dq_relative_cycle_old;
+
+    state->dq_relative_cycle_old = dq_new;
+
+    state->q_relative_cycle = (1- (dq_new)) * 100;
+    return state->q_relative_cycle;
 }
 
 double lifetime_cycle_t::runCycleLifetime(double DOD) {
@@ -353,7 +375,7 @@ void lifetime_calendar_t::initialize() {
     state->day_age_of_battery = 0;
     state->q_relative_calendar = 100;
     state->dq_relative_calendar_old = 0;
-    if (params->calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL) {
+    if (params->calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL || params->calendar_choice == lifetime_params::CALENDAR_CHOICE::NMC_MODEL) {
         dt_day = params->dt_hour / util::hours_per_day;
         state->q_relative_calendar = params->calendar_q0 * 100;
     }
@@ -409,6 +431,28 @@ lifetime_calendar_t *lifetime_calendar_t::clone() {
     return new lifetime_calendar_t(*this);
 }
 
+// Rohit - Define negative electrode voltage function
+double lifetime_calendar_t::Uneg_computation(double SOC) {
+    double Uneg = 0.1;
+        if (SOC <= 0.1)
+            Uneg = ((0.2420 - 1.2868) / 0.1) * SOC + 1.268;
+        else
+            Uneg = ((0.0859 - 0.2420) / 0.9) * (SOC - 0.1) + 0.2420;
+    return Uneg;
+}
+
+// Rohit - Define open circuit voltage function
+double lifetime_calendar_t::Voc_computation(double SOC) {
+    double Voc = 0.1;
+    if (SOC <= 0.1)
+        Voc = ((0.4679) / 0.1) * SOC + 3;
+    else if (SOC <= 0.6)
+        Voc = ((3.747 - 3.4679) / 0.5) * (SOC - 0.1) + 3.4679;
+    else
+        Voc = ((4.1934 - 3.7469) / 0.4) * (SOC - 0.6) + 3.7469;
+    return Voc;
+}
+
 double lifetime_calendar_t::capacity_percent() { return state->q_relative_calendar; }
 
 calendar_state lifetime_calendar_t::get_state() { return *state; }
@@ -449,8 +493,8 @@ void lifetime_calendar_t::runLithiumIonNMCModel(double temp, double SOC, bool ch
     SOC *= 0.01;
     // write function to find DOD_max, U_neg, and V_oc
     double DOD_max = 0.8;
-    double U_neg = 0.1726;
-    double V_oc = 3.6912;
+    double U_neg = Uneg_computation(SOC);
+    double V_oc = Voc_computation(SOC);
     //calendar component
     double b1 = b1_ref * exp(-(Ea_b_1 / Rug) * (1. / temp - 1. / T_ref))
         * exp((alpha_a_b1 * F / Rug) * (U_neg / temp - U_ref / T_ref))
@@ -462,10 +506,14 @@ void lifetime_calendar_t::runLithiumIonNMCModel(double temp, double SOC, bool ch
         * exp((alpha_a_b3 * F / Rug) * (V_oc / temp - V_ref / T_ref))
         * (1+theta*DOD_max);
 
-    if (charge_changed)
-        cycle_model->rainflow(100. - SOC);
+    int n_cycles_old = cycle_model->get_state().n_cycles;
 
-    double dn_cycles = cycle_model->get_state().n_cycles;
+    if (charge_changed) {
+        cycle_model->rainflow(100. - SOC);
+    }
+        
+
+    int dn_cycles = cycle_model->get_state().n_cycles - n_cycles_old;
 
     double k_cal = 0;
     if (state->day_age_of_battery > 0)
@@ -477,7 +525,7 @@ void lifetime_calendar_t::runLithiumIonNMCModel(double temp, double SOC, bool ch
     if (state->dq_relative_calendar_old == 0)
         dq_new = k_cal * dt_day + b2*dn_cycles;
     else
-        dq_new = k_cal * dt_day + state->dq_relative_calendar_old;
+        dq_new = k_cal * dt_day + b2*dn_cycles + state->dq_relative_calendar_old;
     state->dq_relative_calendar_old = dq_new;
     state->q_relative_calendar = (params->calendar_q0 - (dq_new)) * 100;
 }
@@ -640,10 +688,10 @@ void lifetime_t::runLifetimeModels(size_t lifetimeIndex, bool charge_changed, do
         double q_cycle = cycle_model->capacity_percent();
         double q_calendar;
 
-        if (charge_changed)
+        if (charge_changed && params->calendar_choice != lifetime_params::CALENDAR_CHOICE::NMC_MODEL)
             q_cycle = cycle_model->runCycleLifetime(prev_DOD);
-        else if (lifetimeIndex == 0)
-            q_cycle = cycle_model->runCycleLifetime(DOD);
+        else if (lifetimeIndex == 0 != lifetime_params::CALENDAR_CHOICE::NMC_MODEL)
+            q_cycle = cycle_model->runCycleLifetimeNMC(T_battery, DOD);
 
         // Rohit - add parameter charge_changed
         q_calendar = calendar_model->runLifetimeCalendarModel(lifetimeIndex, T_battery, 100. - DOD, charge_changed);
