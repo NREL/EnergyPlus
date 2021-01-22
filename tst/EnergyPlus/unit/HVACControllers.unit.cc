@@ -523,9 +523,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -655,9 +655,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_CoolingHXAsst;
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);

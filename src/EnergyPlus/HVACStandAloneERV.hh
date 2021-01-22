@@ -48,6 +48,9 @@
 #ifndef HVACStandAloneERV_hh_INCLUDED
 #define HVACStandAloneERV_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -62,41 +65,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace HVACStandAloneERV {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    extern int const ControllerSimple;
-    extern int const ControllerOutsideAir;
-    extern int const ControllerStandAloneERV;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
-
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetERVInputFlag; // First time, input is "gotten"
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routine
-
-    // Algorithms/Calculation routine for the module
-
-    // Get Input routine for module
-
-    // Sizing routine for the module
-
-    // Initialization routine for module
-
-    // Utility routines for module
-
-    // Types
 
     struct StandAloneERVData
     {
@@ -172,13 +140,6 @@ namespace HVACStandAloneERV {
         }
     };
 
-    // Object Data
-    extern Array1D<StandAloneERVData> StandAloneERV;
-
-    // Functions
-
-    void clear_state();
-
     void SimStandAloneERV(EnergyPlusData &state, std::string const &CompName,   // name of the Stand Alone ERV unit
                           int const ZoneNum,             // number of zone being served unused1208
                           bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -235,9 +196,27 @@ namespace HVACStandAloneERV {
 
 struct HVACStandAloneERVData : BaseGlobalStruct {
 
+    int NumStandAloneERVs = 0;
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+    bool GetERVInputFlag = true;
+    Array1D<HVACStandAloneERV::StandAloneERVData> StandAloneERV;
+    std::unordered_set<std::string> HeatExchangerUniqueNames;
+    std::unordered_set<std::string> SupplyAirFanUniqueNames;
+    std::unordered_set<std::string> ExhaustAirFanUniqueNames;
+    std::unordered_set<std::string> ControllerUniqueNames;
+
     void clear_state() override
     {
-
+        NumStandAloneERVs = 0;
+        GetERVInputFlag = true;
+        MySizeFlag.deallocate();
+        CheckEquipName.deallocate();
+        StandAloneERV.deallocate();
+        HeatExchangerUniqueNames.clear();
+        SupplyAirFanUniqueNames.clear();
+        ExhaustAirFanUniqueNames.clear();
+        ControllerUniqueNames.clear();
     }
 };
 

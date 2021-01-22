@@ -79,8 +79,6 @@ namespace ResultsFramework {
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 
-    std::unique_ptr<ResultsFramework> resultsFramework(new ResultsFramework);
-
     // trim string
     std::string trim(std::string str)
     {
@@ -1540,38 +1538,6 @@ namespace ResultsFramework {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
     }
 
-    void clear_state()
-    {
-        resultsFramework->DYMeters.setRDataFrameEnabled(false);
-        resultsFramework->DYMeters.setRVariablesScanned(false);
-        resultsFramework->DYMeters.setIVariablesScanned(false);
-        resultsFramework->DYMeters.setIDataFrameEnabled(false);
-
-        resultsFramework->TSMeters.setRVariablesScanned(false);
-        resultsFramework->TSMeters.setRDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIVariablesScanned(false);
-
-        resultsFramework->HRMeters.setRVariablesScanned(false);
-        resultsFramework->HRMeters.setRDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIVariablesScanned(false);
-
-        resultsFramework->MNMeters.setRVariablesScanned(false);
-        resultsFramework->MNMeters.setRDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIVariablesScanned(false);
-
-        resultsFramework->SMMeters.setRVariablesScanned(false);
-        resultsFramework->SMMeters.setRDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIVariablesScanned(false);
-
-        resultsFramework->YRMeters.setRVariablesScanned(false);
-        resultsFramework->YRMeters.setRDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIVariablesScanned(false);
-    }
 } // namespace ResultsFramework
 
 } // namespace EnergyPlus

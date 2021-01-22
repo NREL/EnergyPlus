@@ -51,7 +51,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    struct ConnectedLoopData // DSU
+    struct ConnectedLoopData
     {
         // Members
         int LoopNum;              // plant loop index pointer, for the other loop

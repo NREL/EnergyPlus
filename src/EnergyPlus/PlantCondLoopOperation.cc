@@ -528,7 +528,7 @@ CurrentModuleObject, PlantOpSchemeName);
         std::string CurrentModuleObject; // for ease in renaming.
         std::unordered_map<std::string, std::string> UniqueNames;
 
-        ErrorsFound = false; // DSU CS
+        ErrorsFound = false;
 
         //**********VERIFY THE 'PLANTEQUIPMENTOPERATION:...' KEYWORDS**********
         CLRBO = inputProcessor->getNumObjectsFound(state, "PlantEquipmentOperation:CoolingLoad");
@@ -692,7 +692,7 @@ CurrentModuleObject, PlantOpSchemeName);
                         FindCompSPInput(state, CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
 
                     } else { // invalid op scheme type for plant loop
-                        // DSU?  Seems like the alpha args below is incorrect....
+                        // Seems like the alpha args below is incorrect....
                         ShowSevereError(state, "Invalid operation scheme type = \"" + cAlphaArgs(Num * 3 - 1) + "\", entered in " + CurrentModuleObject +
                                         '=' + cAlphaArgs(1));
                         ErrorsFound = true;
@@ -1983,7 +1983,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                     } else {
                                         if (SchemeType != this_plant_loop.OpScheme(OpSchemePtr).OpSchemeType) {
                                             // CALL FATAL ERROR 'component may not be specified on two types of operation schemes
-                                            // DSU?  BG do not understand.  Cannot different op schemes be in effect at different times?
+                                            // Cannot different op schemes be in effect at different times?
                                             //  I thought this would be allowed??
                                         }
                                     }
@@ -2891,7 +2891,7 @@ CurrentModuleObject, PlantOpSchemeName);
         rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
         DemandMdot = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
-        // DSU?  DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
+        // DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
         ActualMdot = Node(DemandNode).MassFlowRate;
         CurSpecHeat = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
         if ((ActualMdot > 0.0) && (ActualMdot != DemandMdot)) {

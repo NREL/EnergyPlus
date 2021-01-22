@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Real64 OnOffAirFlowRatio; // This is a return value
     Real64 PartLoadRatio(1.0);
     Node.allocate(10);
-    CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     Schedule.allocate(1);
 
     MSHPMassFlowRateLow = 0.0;
@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Furnace(FurnaceNum).CoolMassFlowRate(3) = 1.2;
     Furnace(FurnaceNum).MSCoolingSpeedRatio(3) = 1.2;
 
-    CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
 
     Furnace(FurnaceNum).OpMode = CycFanCycCoil;
     // heating air flow at various speeds
@@ -1166,8 +1166,8 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 25000.0;
-    ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 25000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 25000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 25000.0;
     SimFurnace(*state, Furnace(1).Name, FirstHVACIteration, AirLoopNum, CompIndex);
     // check the heating mode is On
     EXPECT_TRUE(Furnaces::HeatingLoad);

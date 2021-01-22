@@ -574,7 +574,6 @@ namespace DisplacementVentMgr {
         using namespace DataHeatBalance;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::UseZoneTimeStepHistory;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
@@ -722,10 +721,10 @@ namespace DisplacementVentMgr {
         SumSysMCpT = 0.0;
         // Check to make sure if this is a controlled zone and determine ZoneEquipConfigNum
         ZoneEquipConfigNum = ZoneNum;
-        if (ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+        if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1116,7 +1115,7 @@ namespace DisplacementVentMgr {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
         }
 
-        if (ZoneEquipConfig(ZoneNum).IsControlled) {
+        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
             ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
             Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
         }
