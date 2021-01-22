@@ -66,7 +66,8 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -78,6 +79,7 @@ using namespace EnergyPlus::DataRoomAirModel;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
+//using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -970,29 +972,44 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
     People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
     People(1).CO2RateFactor = 3.82e-8;
-    People(1).ActivityLevelPtr = -1;
     People(1).Show55Warning = true;
     People(1).Pierce = true;
     People(1).MRTCalcType = ZoneAveraged;
     People(1).WorkEffPtr = 0;
     People(1).ClothingType = 1;
-    People(1).ClothingPtr = -1;
-    People(1).AirVelocityPtr = 0;
 
-    ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
-    state->dataEnvrn->OutBaroPress = 101217.;
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     QHTRadSysToPerson(1) = 0.0;
     QCoolingPanelToPerson(1) = 0.0;
     QHWBaseboardToPerson(1) = 0.0;
     QSteamBaseboardToPerson(1) = 0.0;
     QElecBaseboardToPerson(1) = 0.0;
+    Real64 BodySurfaceArea = 1.8258;
+    state->dataEnvrn->OutBaroPress = 101325.;
 
-    CalcThermalComfortPierceASHRAE(*state);
+    const std::vector<double> TAir = {25, 0, 40, 25, 25, 25, 25, 25};
+    const std::vector<double> RH = {0.5, 0.5, 0.5, 0.9, 0.5, 0.5, 0.5, 0.5};
+    const std::vector<double> Vel = {0.15, 0.15, 0.15, 0.15, 3, 0.15, 0.15, 0.15};
+    const std::vector<double> TRad = {25, 25, 25, 25, 25, 40, 25, 25};
+    const std::vector<double> MET = {1, 1, 1, 1, 1, 1, 2, 1};
+    const std::vector<double> Clo = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2};
 
-    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
-    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, 23.62, 0.01);
+    const std::vector<double> SET = {23.8, 12.3, 34.3, 24.9, 18.8, 31.8, 29.7, 32.5};
+    for (unsigned i = 0; i < TAir.size(); i++) {
+        ZTAVComf(1) = TAir[i];
+        MRT(1) = TRad[i];
+        ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RH[i], state->dataEnvrn->OutBaroPress);
+        People(1).ActivityLevelPtr = 1;
+        People(1).ClothingPtr = 2;
+        People(1).AirVelocityPtr = 3;
+        ScheduleManager::Schedule.allocate(3);
+        ScheduleManager::Schedule(1).CurrentValue = MET[i] * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+        ScheduleManager::Schedule(2).CurrentValue = Clo[i];
+        ScheduleManager::Schedule(3).CurrentValue = Vel[i];
+
+        CalcThermalComfortPierceASHRAE(*state);
+
+        EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, SET[i], 0.1);
+    }
 
 }
