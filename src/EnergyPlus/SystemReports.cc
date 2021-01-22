@@ -4287,6 +4287,9 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->AllZonesTimeAtVozDyn = 0.0;
         state.dataSysRpts->AnyZoneTimeAboveVozDyn = 0.0;
         state.dataSysRpts->AnyZoneTimeVentUnocc = 0.0;
+        state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = 0.0;
+        state.dataSysRpts->AllZonesTimeAtVozDynOcc = 0.0;
+        state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = 0.0;
         state.dataSysRpts->MaxCoolingLoadMetByVent = 0.0;
         state.dataSysRpts->MaxCoolingLoadAddedByVent = 0.0;
         state.dataSysRpts->MaxOvercoolingByVent = 0.0;
@@ -4314,11 +4317,11 @@ namespace EnergyPlus::SystemReports {
 
             bool const UseOccSchFlag = true;
             bool const UseMinOASchFlag = true;
-            state.dataSysRpts->ZoneTargetVentilationFlowVoz = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
+            state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
                 state, ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
             if (ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
                 state.dataSysRpts->ZoneTargetVentilationFlowVoz =
-                    state.dataSysRpts->ZoneTargetVentilationFlowVoz /
+                    state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) /
                     DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
@@ -4638,17 +4641,19 @@ namespace EnergyPlus::SystemReports {
 
             // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
             // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
+            Real64 afnVentVol = ZonePreDefRep(ActualZoneNum).AFNVentVolFlow * TimeStepSys * DataGlobalConstants::SecInHour;
             Real64 totMechNatVentVolStdRho = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) + ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                             ZonePreDefRep(ActualZoneNum).AFNVentVolFlow;
-            if (totMechNatVentVolStdRho < (0.99 * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum))) {
+                                             afnVentVol;
+            Real64 targetVoz = state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
+            if (totMechNatVentVolStdRho < (0.99 * targetVoz)) {
                 state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum) = TimeStepSys;
                 state.dataSysRpts->AnyZoneTimeBelowVozDyn = TimeStepSys;
-            } else if (totMechNatVentVolStdRho > (1.01 * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum))) {
+            } else if (totMechNatVentVolStdRho > (1.01 * targetVoz)) {
                 state.dataSysRpts->ZoneTimeAboveVozDyn(CtrlZoneNum) = TimeStepSys;
-                state.dataSysRpts->AllZonesTimeAtVozDyn = TimeStepSys;
+                state.dataSysRpts->AnyZoneTimeAboveVozDyn = TimeStepSys;
             } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
                 state.dataSysRpts->ZoneTimeAtVozDyn(CtrlZoneNum) = TimeStepSys;
-                state.dataSysRpts->AnyZoneTimeAboveVozDyn = TimeStepSys;
+                state.dataSysRpts->AllZonesTimeAtVozDyn = TimeStepSys;
             }
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
@@ -4673,12 +4678,15 @@ namespace EnergyPlus::SystemReports {
                 }
                 // natural ventilation
                 ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOcc +=
-                    ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolFlow;
+                    ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
                 if (ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity < ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
                     ZonePreDefRep(ActualZoneNum).SimpVentVolMin = ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
                 }
                 //target ventilation Voz-dyn
-                ZonePreDefRep(ActualZoneNum).VozTargetTotalOcc += state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
+                ZonePreDefRep(ActualZoneNum).VozTargetTotalOcc += targetVoz;
+                state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
+                state.dataSysRpts->AllZonesTimeAtVozDynOcc = state.dataSysRpts->ZoneTimeAtVozDyn(CtrlZoneNum);
+                state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = state.dataSysRpts->ZoneTimeAboveVozDyn(CtrlZoneNum);
 
                 // time mechanical+natural ventilation is below, at, or above target Voz-dyn
                 ZonePreDefRep(ActualZoneNum).VozTargetTimeBelowOcc += state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
@@ -4692,8 +4700,8 @@ namespace EnergyPlus::SystemReports {
             ZonePreDefRep(ActualZoneNum).MechVentVolTotal += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
             ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
             ZonePreDefRep(ActualZoneNum).SimpVentVolTotal +=
-                ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolFlow;
-            ZonePreDefRep(ActualZoneNum).VozTargetTotal += state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
+                ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
+            ZonePreDefRep(ActualZoneNum).VozTargetTotal += targetVoz;
             ZonePreDefRep(ActualZoneNum).VozTargetTimeBelow += state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
             ZonePreDefRep(ActualZoneNum).VozTargetTimeAt += state.dataSysRpts->ZoneTimeAtVozDyn(CtrlZoneNum);
             ZonePreDefRep(ActualZoneNum).VozTargetTimeAbove += state.dataSysRpts->ZoneTimeAboveVozDyn(CtrlZoneNum);
@@ -4749,7 +4757,10 @@ namespace EnergyPlus::SystemReports {
         state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA += state.dataSysRpts->AllZonesTimeAtVozDyn;
         state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA += state.dataSysRpts->AnyZoneTimeAboveVozDyn;
         state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA += state.dataSysRpts->AnyZoneTimeVentUnocc;
-    }
+        state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA += state.dataSysRpts->AnyZoneTimeBelowVozDynOcc;
+        state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA += state.dataSysRpts->AllZonesTimeAtVozDynOcc;
+        state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA += state.dataSysRpts->AnyZoneTimeAboveVozDynOcc;
+   }
 
     void MatchPlantSys(EnergyPlusData &state,
                        int const AirLoopNum, // counter for zone air distribution inlets

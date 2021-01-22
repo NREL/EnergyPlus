@@ -5957,18 +5957,10 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 totalNatVentVol = 0;
         Real64 totalInfilVol = 0;
         Real64 totalVozDyn = 0;
-        Real64 totalBelowVozDyn = 0;
-        Real64 totalAtVozDyn = 0;
-        Real64 totalAboveVozDyn = 0;
-        Real64 totalTotVentUnocc = 0;
-
         Real64 totalMechVentRateOcc = 0;
         Real64 totalNatVentRateOcc = 0;
         Real64 totalInfilRateOcc = 0;
         Real64 totalVozDynOcc = 0;
-        Real64 totalBelowVozDynOcc = 0;
-        Real64 totalAtVozDynOcc = 0;
-        Real64 totalAboveVozDynOcc = 0;
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
@@ -6041,38 +6033,45 @@ namespace EnergyPlus::OutputReportTabular {
 
                     // Dynamic target ventilation Voz-dyn
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal, 0);
+                    totalVozDyn += ZonePreDefRep(iZone).VozTargetTotal * zoneMult;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow, 0);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt, 0);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove, 0);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc, 0);
 
                     if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
+                        Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * SecInHour;
                         // Mechanical ventilation
-                        Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, Zone(iZone).Name, mechVent);
+                        Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOcc / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, Zone(iZone).Name, mechVent, 4);
                         totalMechVentRateOcc += mechVent * zoneMult;
 
                         // Natural ventilation
-                        Real64 natVent = (ZonePreDefRep(iZone).SimpVentVolTotalOcc + ZonePreDefRep(iZone).AFNInfilVolTotalOcc) / ZonePreDefRep(iZone).TotTimeOcc;
+                        Real64 natVent = (ZonePreDefRep(iZone).SimpVentVolTotalOcc + ZonePreDefRep(iZone).AFNInfilVolTotalOcc) / totTimeOccSec;
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, Zone(iZone).Name, natVent);
                         totalNatVentRateOcc += natVent * zoneMult;
 
-                        // Total ventilation 
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, Zone(iZone).Name, mechVent + natVent);
+                        // Total ventilation
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, Zone(iZone).Name, mechVent + natVent, 4);
 
                         // infiltration
-                        Real64 infil = ZonePreDefRep(iZone).InfilVolTotalOcc / ZonePreDefRep(iZone).TotTimeOcc;
+                        Real64 infil = ZonePreDefRep(iZone).InfilVolTotalOcc / totTimeOccSec;
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, Zone(iZone).Name, infil);
-                        totalInfilRateOcc += infil * zoneMult; 
+                        totalInfilRateOcc += infil * zoneMult;
 
                         // Total ventilation and infiltration
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil, 4);
 
                         // Dynamic target ventilation Voz-dyn
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotalOcc / ZonePreDefRep(iZone).TotTimeOcc, 0);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
+                        Real64 avgVoz = ZonePreDefRep(iZone).VozTargetTotalOcc / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, avgVoz, 4);
+                        totalVozDynOcc += avgVoz * zoneMult;
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
                     }
                 }
             }
@@ -6090,12 +6089,21 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total", totalMechVentVol + totalNatVentVol, 0);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total", totalInfilVol, 0);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil,  "Total", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total", totalVozDyn, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total", totalMechVentRateOcc);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total", totalNatVentRateOcc);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, "Total", totalMechVentRateOcc + totalNatVentRateOcc);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, "Total", totalInfilRateOcc);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, "Total", totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total", totalMechVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total", totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, "Total", totalMechVentRateOcc + totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, "Total", totalInfilRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, "Total", totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total", totalVozDynOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
 
 
         // Add the number of central air distributions system to the count report

@@ -1855,9 +1855,9 @@ namespace DataHeatBalance {
         Real64 NumOcc;          // number of occupants - used in calculating Vbz
         Real64 NumOccAccum;     // number of occupants accumulating for entire simulation
         Real64 NumOccAccumTime; // time that the number of occupants is accumulating to compute average
-        //  - zone time step
+        //  - zone time step [hrs]
         Real64 TotTimeOcc; // time occupied (and the mechanical ventilation volume is accumulating)
-        //  - system time step
+        //  - system time step [hrs]
 
         // OA Reports
         Real64 MechVentVolTotal; // volume for mechanical ventilation of outside air for entire simulation
