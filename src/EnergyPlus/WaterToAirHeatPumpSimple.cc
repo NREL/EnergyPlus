@@ -1733,7 +1733,7 @@ namespace WaterToAirHeatPumpSimple {
                                       format("Rated Total Cooling Capacity    = {:.2T} W",
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal));
                     ShowContinueError(state, "See eio file for further details.");
-                    ShowContinueError(state, "Check Total and Sensible Cooling Capacity Coefficients to ensure they are accurate.");
+                    ShowContinueError(state, "Check Total and Sensible Cooling Capacity Coefficients in curves to ensure they are accurate.");
                     ShowContinueError(state, "Check Zone and System Sizing objects to verify sizing inputs.");
                     ShowContinueError(state, "Sizing statistics:");
                     ShowContinueError(state, format("Entering Air Dry-Bulb Temperature = {:.3T} C", MixTemp));
@@ -2013,7 +2013,7 @@ namespace WaterToAirHeatPumpSimple {
         // This subroutine is for simulating the cooling mode of the Water to Air HP Simple
 
         // METHODOLOGY EMPLOYED:
-        // Simulate the heat pump performance using the coefficients and rated conditions
+        // Simulate the heat pump performance using the coefficients in quadlinear and quintlinear curves and rated conditions
         // If the LatDegradModelSimFlag is enabled, the coil will be simulated twice:
         // (1)first simulation at the rated conditions (2) second simulation at the
         // actual operating conditions. Then call CalcEffectiveSHR and the effective SHR
@@ -2340,7 +2340,7 @@ namespace WaterToAirHeatPumpSimple {
         // This subroutine is for simulating the heating mode of the Water to Air HP Simple
 
         // METHODOLOGY EMPLOYED:
-        // Simulate the heat pump performance using the coefficients and rated conditions
+        // Simulate the heat pump performance using the coefficients in quadlinear and quintlinear curves and rated conditions
         // Finally, adjust the heat pump outlet conditions based on the PartLoadRatio
         // and RuntimeFrac.
 
