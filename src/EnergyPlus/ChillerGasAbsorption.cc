@@ -760,7 +760,6 @@ namespace EnergyPlus::ChillerGasAbsorption {
         int CondOutletNode; // node number of water outlet node from the condenser
         int HeatInletNode;  // node number of hot water inlet node
         int HeatOutletNode; // node number of hot water outlet node
-        bool errFlag;
         Real64 rho;  // local fluid density
         Real64 mdot; // lcoal fluid mass flow rate
 
