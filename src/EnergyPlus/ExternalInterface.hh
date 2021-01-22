@@ -57,6 +57,7 @@ extern "C" {
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 // C++ Standard Library Headers
 #include <string>
@@ -77,7 +78,7 @@ namespace ExternalInterface {
     extern Real64 tStart;
     extern Real64 hStep;
     extern bool FlagReIni;
-    extern std::string FMURootWorkingFolder;
+    extern fs::path FMURootWorkingFolder;
     extern int LEN_FMU_ROOT_DIR;
 
     // MODULE PARAMETER DEFINITIONS:
@@ -93,7 +94,7 @@ namespace ExternalInterface {
     extern int const fmiError;             // fmiError
     extern int const fmiFatal;             // fmiPending
     extern int const fmiPending;           // fmiPending
-    extern std::string const socCfgFilNam; // socket configuration file
+    extern fs::path const socCfgFilPath;  // socket configuration file
 
     void clear_state();
 
@@ -220,8 +221,8 @@ namespace ExternalInterface {
         std::string Name;               // FMU Filename
         std::string modelID;            // FMU modelID
         std::string modelGUID;          // FMU modelGUID
-        std::string WorkingFolder;      // Path to the FMU wokring folder
-        std::string WorkingFolder_wLib; // Path to the binaries
+        fs::path WorkingFolder;         // Path to the FMU wokring folder
+        fs::path WorkingFolder_wLib;    // Path to the binaries
         std::string fmiVersionNumber;   // Version number of FMI used
         int NumInputVariablesInFMU;     // Number of input variables in fmu
         int NumInputVariablesInIDF;     // Number of fmus input variables in idf
@@ -258,7 +259,7 @@ namespace ExternalInterface {
 
         // Default Constructor
         InstanceType()
-            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(std::string()), WorkingFolder_wLib(std::string()),
+            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(fs::path()), WorkingFolder_wLib(fs::path()),
               fmiVersionNumber(std::string()), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
               NumOutputVariablesInIDF(0), NumOutputVariablesSchedule(0), NumOutputVariablesVariable(0), NumOutputVariablesActuator(0), LenModelID(0),
               LenModelGUID(0), LenWorkingFolder(0), LenWorkingFolder_wLib(0)

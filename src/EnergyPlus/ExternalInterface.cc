@@ -104,7 +104,7 @@ namespace ExternalInterface {
     Real64 tStart(0.0);               // Start time used during the warmup period
     Real64 hStep(15.0);               // Communication step size
     bool FlagReIni(false);            // Flag for reinitialization of states in GetSetAndDoStep
-    std::string FMURootWorkingFolder; // FMU root working folder
+    fs::path FMURootWorkingFolder;    // FMU root working folder
 
     // MODULE PARAMETER DEFINITIONS:
     int const maxVar(100000);                     // Maximum number of variables to be exchanged
@@ -119,7 +119,7 @@ namespace ExternalInterface {
     int const fmiError(3);                        // fmiError
     int const fmiFatal(4);                        // fmiPending
     int const fmiPending(5);                      // fmiPending
-    std::string const socCfgFilNam("socket.cfg"); // socket configuration file
+    fs::path const socCfgFilPath("socket.cfg");    // socket configuration file
 
     int NumExternalInterfaces(0);               // Number of ExternalInterface objects
     int NumExternalInterfacesBCVTB(0);          // Number of BCVTB ExternalInterface objects
@@ -178,7 +178,7 @@ namespace ExternalInterface {
         tStart = 0.0;
         hStep = 15.0;
         FlagReIni = false;
-        FMURootWorkingFolder = "";
+        FMURootWorkingFolder.clear();
         nInKeys = 3;
         NumExternalInterfaces = 0;
         NumExternalInterfacesBCVTB = 0;
@@ -451,8 +451,8 @@ namespace ExternalInterface {
         // Try to establish socket connection. This is needed if Ptolemy started E+,
         //  but E+ had an error before the call to InitExternalInterface.
 
-        if ((socketFD == -1) && FileSystem::fileExists(socCfgFilNam)) {
-            socketFD = establishclientsocket(socCfgFilNam.c_str());
+        if ((socketFD == -1) && FileSystem::fileExists(socCfgFilPath)) {
+            socketFD = establishclientsocket(socCfgFilPath.c_str());
         }
 
         if (socketFD >= 0) {
@@ -547,14 +547,14 @@ namespace ExternalInterface {
             }
 
             // Get port number
-            if (FileSystem::fileExists(socCfgFilNam)) {
-                socketFD = establishclientsocket(socCfgFilNam.c_str());
+            if (FileSystem::fileExists(socCfgFilPath)) {
+                socketFD = establishclientsocket(socCfgFilPath.c_str());
                 if (socketFD < 0) {
                     ShowSevereError(state, format("ExternalInterface: Could not open socket. File descriptor = {}.", socketFD));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, "ExternalInterface: Did not find file \"" + socCfgFilNam + "\".");
+                ShowSevereError(state, "ExternalInterface: Did not find file \"" + socCfgFilPath.string() + "\".");
                 ShowContinueError(state, "This file needs to be in same directory as in.idf.");
                 ShowContinueError(state, "Check the documentation for the ExternalInterface.");
                 ErrorsFound = true;
@@ -1123,8 +1123,7 @@ namespace ExternalInterface {
             // in any case, the relative paths work fine here
 
             // post process as needed in case these are used later
-            FMURootWorkingFolder = "tmp-fmus";
-            FMURootWorkingFolder += pathChar; // getStringFromCharArray( FMUWorkingFolderCharArr );
+            FMURootWorkingFolder = fs::path("tmp-fmus"); // getStringFromCharArray( FMUWorkingFolderCharArr );
 
             // Get and store the names of all FMUs in EnergyPlus data structure
             // I doubt we'll have more than a handful of objects, so reserve is probably overkill
@@ -1286,7 +1285,7 @@ namespace ExternalInterface {
             // write output folder where FMUs will be unpacked later on.
             for (i = 1; i <= NumFMUObjects; ++i) {
                 for (j = 1; j <= FMU(i).NumInstances; ++j) {
-                    FMU(i).Instance(j).WorkingFolder = FMURootWorkingFolder + strippedFileName(i) + '_' + FMU(i).Instance(j).Name;
+                    FMU(i).Instance(j).WorkingFolder = FMURootWorkingFolder / fs::path(strippedFileName(i) + '_' + FMU(i).Instance(j).Name);
                 }
             }
 
@@ -1294,12 +1293,12 @@ namespace ExternalInterface {
             for (i = 1; i <= NumFMUObjects; ++i) {
                 for (j = 1; j <= FMU(i).NumInstances; ++j) {
                     // get the length of working folder trimmed
-                    FMU(i).Instance(j).LenWorkingFolder = FMU(i).Instance(j).WorkingFolder.length();
+                    FMU(i).Instance(j).LenWorkingFolder = FMU(i).Instance(j).WorkingFolder.string().length();
                     // unpack fmus
                     // preprocess arguments for library call
                     {
                         auto fullFileNameArr(getCharArrayFromString(fullFileName(i)));
-                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder));
+                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder.string()));
                         int lenFileName(len(fullFileName(i)));
 
                         // make the library call
@@ -1317,7 +1316,7 @@ namespace ExternalInterface {
                     {
                         // determine modelID and modelGUID of all FMU instances
                         // preprocess arguments for library call
-                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder));
+                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder.string()));
 
                         // make the library call
                         FMU(i).Instance(j).Index = model_ID_GUID((char *)FMU(i).Instance(j).Name.c_str(),
@@ -1339,18 +1338,21 @@ namespace ExternalInterface {
                     {
                         // get the path to the binaries
                         // preprocess args for library call
-                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder));
-                        FMU(i).Instance(j).WorkingFolder_wLib =
-                            FMU(i).Instance(j).WorkingFolder +
+                        auto workingFolderArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder.string()));
+
+                        // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the workingFolderWithLibArr
+                        // Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will find the null
+                        // terminator and so it will have no effect
+                        std::string reservedString = FMU(i).Instance(j).WorkingFolder.string() +
                             "                                                                                           ";
-                        auto workingFolderWithLibArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder_wLib));
+                        auto workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                         // make the library call
                         retValfmiPathLib = addLibPathCurrentWorkingFolder(
                             &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU(i).Instance(j).LenWorkingFolder, &FMU(i).Instance(j).Index);
 
                         // post process args in case they are used later
-                        FMU(i).Instance(j).WorkingFolder_wLib = trim(getStringFromCharArray(workingFolderWithLibArr));
+                        FMU(i).Instance(j).WorkingFolder_wLib = fs::path(trim(getStringFromCharArray(workingFolderWithLibArr)));
 
                         if (retValfmiPathLib != 0) {
                             ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to");
@@ -1362,13 +1364,13 @@ namespace ExternalInterface {
                         }
 
                         // get the length of the working folder with libraries
-                        FMU(i).Instance(j).LenWorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder_wLib.length();
+                        FMU(i).Instance(j).LenWorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder_wLib.string().length();
                     }
 
                     {
                         // determine the FMI version
                         // preprocess args for library call
-                        auto workingFolderWithLibArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder_wLib));
+                        auto workingFolderWithLibArr(getCharArrayFromString(FMU(i).Instance(j).WorkingFolder_wLib.string()));
                         auto VersionNumArr(
                             getCharArrayFromString("    ")); // the version should only be 3 characters long, since for now we only handle "1.0"
 
