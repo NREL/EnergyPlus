@@ -57,13 +57,11 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -2027,8 +2025,6 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
 TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
 {
-    DataIPShortCuts::lAlphaFieldBlanks = true;
-
     std::string const idf_objects = delimited_string({
         "Version,9.3;",
 
