@@ -8440,6 +8440,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
+    DataStringGlobals::outputSqlFileName = "eplussqlite1.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout1.sql";
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
@@ -8447,6 +8449,9 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+
+    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
@@ -8458,12 +8463,17 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 
     state->files.outputControl.sqlite = true;
 
+    DataStringGlobals::outputSqlFileName = "eplussqlite2.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
     EXPECT_EQ(unitSQLiteTable, 4);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+
+    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
@@ -8475,12 +8485,17 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 
     state->files.outputControl.sqlite = true;
 
+    DataStringGlobals::outputSqlFileName = "eplussqlite3.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
     EXPECT_EQ(unitSQLiteTable, 0);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+
+    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
@@ -8495,12 +8510,18 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
+    DataStringGlobals::outputSqlFileName = "eplussqlite4.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout4.sql";
+    
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(unitSQLiteTable, 5);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+
+    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
@@ -8516,12 +8537,18 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->files.outputControl.sqlite = true;
 
+    DataStringGlobals::outputSqlFileName = "eplussqlite5.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout5.sql";
+
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
     EXPECT_EQ(unitSQLiteTable, 5);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
+
+    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
 // TEST_F(EnergyPlusFixture, ORT_DualUnits_Heat_Emission)
