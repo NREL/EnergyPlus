@@ -756,12 +756,8 @@ namespace EnergyPlus::ChillerGasAbsorption {
 
         std::string const RoutineName("InitGasAbsorber");
 
-        int CondInletNode;  // node number of water inlet node to the condenser
-        int CondOutletNode; // node number of water outlet node from the condenser
-        int HeatInletNode;  // node number of hot water inlet node
-        int HeatOutletNode; // node number of hot water outlet node
-        Real64 rho;  // local fluid density
-        Real64 mdot; // lcoal fluid mass flow rate
+        Real64 rho = 0.0;  // local fluid density
+        Real64 mdot = 0.0; // lcoal fluid mass flow rate
 
         if (this->oneTimeFlag) {
             this->setupOutputVariables(state);
@@ -774,10 +770,10 @@ namespace EnergyPlus::ChillerGasAbsorption {
             this->plantScanFlag = false;
         }
 
-        CondInletNode = this->CondReturnNodeNum;
-        CondOutletNode = this->CondSupplyNodeNum;
-        HeatInletNode = this->HeatReturnNodeNum;
-        HeatOutletNode = this->HeatSupplyNodeNum;
+        int CondInletNode = this->CondReturnNodeNum;
+        int CondOutletNode = this->CondSupplyNodeNum;
+        int HeatInletNode = this->HeatReturnNodeNum;
+        int HeatOutletNode = this->HeatSupplyNodeNum;
 
         if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
@@ -898,7 +894,6 @@ namespace EnergyPlus::ChillerGasAbsorption {
 
         std::string const RoutineName("SizeGasAbsorber");
 
-        bool ErrorsFound; // If errors detected in input
         std::string equipName;
         Real64 Cp;                     // local fluid specific heat
         Real64 rho;                    // local fluid density
@@ -911,7 +906,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
         Real64 CondVolFlowRateUser;    // Hardsized condenser flow rate for reporting
         Real64 HeatRecVolFlowRateUser; // Hardsized generator flow rate for reporting
 
-        ErrorsFound = false;
+        bool ErrorsFound = false;
         tmpNomCap = this->NomCoolingCap;
         tmpEvapVolFlowRate = this->EvapVolFlowRate;
         tmpCondVolFlowRate = this->CondVolFlowRate;
