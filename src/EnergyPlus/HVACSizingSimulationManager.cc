@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,9 +92,7 @@ void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &
 
 void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyPlusData &state, std::string const &PlantLoopName, int const PlantSizingIndex)
 {
-    using DataPlant::PlantLoop;
     using DataPlant::SupplySide;
-    using DataPlant::TotNumLoops;
     using namespace FluidProperties;
     using DataSizing::PlantSizData;
 
@@ -102,17 +100,17 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
     Real64 cp;
 
     // find plant loop number
-    for (int i = 1; i <= TotNumLoops; ++i) {
-        if (PlantLoopName == PlantLoop(i).Name) { // found it
+    for (int i = 1; i <= state.dataPlnt->TotNumLoops; ++i) {
+        if (PlantLoopName == state.dataPlnt->PlantLoop(i).Name) { // found it
 
             density = GetDensityGlycol(
-                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+                state, state.dataPlnt->PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
             cp = GetSpecificHeatGlycol(
-                state, PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
+                state, state.dataPlnt->PlantLoop(i).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(i).FluidIndex, "createNewCoincidentPlantAnalysisObject");
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
-                                             PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
+                                             state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
                                              density,
                                              cp,
                                              PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
@@ -135,9 +133,9 @@ void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
         P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
         P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
         if (PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, DataPlant::PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
         } else if (PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, DataPlant::PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }
     }
 }

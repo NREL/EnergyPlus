@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,17 +57,16 @@
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -2361,11 +2360,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     DataHeatBalFanSys::ZoneAirHumRat(3) = 0.0012;
     DataHeatBalFanSys::ZoneAirHumRat(4) = 0.0008;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataZoneEquipment::ZoneEquipConfig.allocate(4);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(4);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
     DataHVACGlobals::TimeStepSys = 0.1;
 
     AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
@@ -13186,7 +13185,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
     DataHeatBalFanSys::MAT.allocate(5);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(5);
-    DataZoneEquipment::ZoneEquipConfig.allocate(5);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(5);
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.001;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
@@ -13195,11 +13194,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
-    DataZoneEquipment::ZoneEquipConfig(5).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(4).IsControlled = false;
+    state->dataZoneEquip->ZoneEquipConfig(5).IsControlled = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(5);
     AirflowNetwork::AirflowNetworkLinkSimu(3).FLOW2 = 0.002364988;
     ReportAirflowNetwork(*state);
@@ -15691,14 +15690,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
     EXPECT_FALSE(errFlag);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
 
@@ -15759,14 +15758,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
     EXPECT_FALSE(errFlag);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
     // One AirflowNetwork:MultiZone:Zone object
     AirflowNetwork::AirflowNetworkNumOfZones = 1;
@@ -20000,10 +19999,10 @@ std::string const idf_objects = delimited_string({
     GetAirflowNetworkInput(*state);
 
     state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1) = 1;
     AirflowNetwork::DisSysNodeData(9).EPlusNodeNum = 50;
     // AirflowNetwork::AirflowNetworkExchangeData.allocate(5);
     ManageAirflowNetworkBalance(*state, true);
