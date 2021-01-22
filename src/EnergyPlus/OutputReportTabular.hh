@@ -716,6 +716,13 @@ namespace OutputReportTabular {
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 
+    bool produceDualUnitsFlags(const int &iUnit_Sys,
+                               const iUnitsStyle &unitsStyle_Tab,
+                               const iUnitsStyle &unitsStyle_Sql,
+                               iUnitsStyle &unitsStyle_Cur,
+                               bool &produce_Tab,
+                               bool &produce_Sql);
+
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
     std::string InsertCurrencySymbol(EnergyPlusData &state,

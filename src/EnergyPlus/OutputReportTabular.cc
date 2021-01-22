@@ -5186,6 +5186,32 @@ namespace EnergyPlus::OutputReportTabular {
         print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
     }
 
+    bool produceDualUnitsFlags(const int& iUnit_Sys, const iUnitsStyle& unitsStyle_Tab, const iUnitsStyle& unitsStyle_Sql, 
+        iUnitsStyle& unitsStyle_Cur, bool& produce_Tab, bool& produce_Sql)
+    {
+        bool brkflag = false;
+
+        if (iUnit_Sys == 0) {
+            unitsStyle_Cur = unitsStyle_Tab; 
+            produce_Tab = true;
+            if (unitsStyle_Sql == unitsStyle_Tab) {
+                produce_Sql = true;
+            } else {
+                produce_Sql = false;
+            }
+        } else { // iUnit_Sys == 1
+            unitsStyle_Cur = unitsStyle_Sql;
+            produce_Tab = false;
+            produce_Sql = true;
+            if (unitsStyle_Sql == unitsStyle_Tab) {
+                brkflag = true;
+                produce_Sql = false;
+            }
+        }
+
+        return brkflag;
+    }
+
     void parseStatLine(const std::string &lineIn,
                        StatLineType &lineType,
                        bool &desConditionlinepassed,
@@ -11479,21 +11505,7 @@ namespace EnergyPlus::OutputReportTabular {
             bool produceSQLite = false;
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-
-                if (iUnitSystem == 0) {
-                    unitsStyle_cur = ort->unitsStyle;
-                    produceTabular = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) {
-                        produceSQLite = true;
-                    } else {
-                        produceSQLite = false;
-                    }
-                } else { // iUnitSystem == 1
-                    unitsStyle_cur = ort->unitsStyle_SQLite;
-                    produceTabular = false;
-                    produceSQLite = true;
-                    if (ort->unitsStyle_SQLite == ort->unitsStyle) break;
-                }
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
                 if (produceTabular) {
                     WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
