@@ -7247,6 +7247,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
 
     SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
@@ -7305,6 +7306,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
 
     SetupUnitConversions(*state);
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil";
@@ -8493,7 +8495,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); // EnergyPlus::CreateSQLiteDatabase(*state);
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(unitSQLiteTable, 5);
     EXPECT_NE(sqlite, nullptr);
