@@ -8982,25 +8982,25 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displaySourceEnergyEndUseSummary) {
-            
+
+            // show the headers of the report
+            WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+            // show the number of hours that the table applies to
+            WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
+            if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
+                WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
+            }
+            WriteTextLine(state, "", true);
+
+            // determine building floor areas
+            DetermineBuildingFloorArea(state);
+
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 iUnitsStyle unitsStyle_cur = ort->unitsStyle;
                 bool produceTabular = true;
                 bool produceSQLite = false;
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-                if (produceTabular) {
-                    // show the headers of the report
-                    WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                    // show the number of hours that the table applies to
-                    WriteTextLine(state, "Values gathered over " + RealToStr(ort->gatherElapsedTimeBEPS, 2) + " hours", true);
-                    if (ort->gatherElapsedTimeBEPS < 8759.0) { // might not add up to 8760 exactly but can't be more than 1 hour diff.
-                        WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
-                    }
-                    WriteTextLine(state, "", true);
-                }
-                // determine building floor areas
-                DetermineBuildingFloorArea(state);
                 // collapse the gatherEndUseBEPS array to the resource groups displayed
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
@@ -9320,7 +9320,7 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
                 } // End of Normalized by Total Area
-            }
+            } // End of Dual Units reporting
         } // end if displaySourceEnergyEndUseSummary
     }
 
