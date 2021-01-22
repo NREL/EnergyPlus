@@ -63,6 +63,8 @@ struct lifetime_params {
 
 struct cycle_state {
     double q_relative_cycle;                // %
+    //Rohit - Keep track of cycle degradation for Liion NMC
+    double dq_relative_cycle_old; 
     int n_cycles;
     double range;
     double average_range;
@@ -96,6 +98,9 @@ public:
 
     /// return q, the effective capacity percent
     double runCycleLifetime(double DOD);
+
+    /// Rohit - return q, the effective capacity percent for Lithium Ion NMC
+    double runCycleLifetimeNMC(double T, double DOD);
 
     /// return hypothetical dq the average cycle
     double estimateCycleDamage();
@@ -136,6 +141,15 @@ protected:
 
 private:
     void initialize();
+
+    /// Rohit - constants for Q_neg of LiionNMC
+    double c0_ref = 75.1;
+    double c2_ref = 0.0039193;
+    double Ea_c_2 = -48260;
+    double Rug = 8.314;
+    double T_ref = 298.15;
+    double beta_c2 = 4.54; 
+
 
     friend class lifetime_t;
 };
@@ -179,6 +193,12 @@ public:
 
     /// Return the relative capacity percentage of nominal (%)
     double capacity_percent();
+
+    /// Calculate negative electrode voltage from SOC
+    double Uneg_computation(double SOC);
+
+    /// Calculate open circuit voltage from SOC
+    double Voc_computation(double SOC);
 
     calendar_state get_state();
 
