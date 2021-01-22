@@ -151,13 +151,17 @@ namespace FileSystem {
             }
         }
 
-        return result;
+
         // Workaround to maintain std::string & backward compat
+        // TODO: is this wanted?
+        // The problem is really only for unit tests, if you try to compare getAbsolutePath("sandbox/") == getAbsolutePath("sandbox") you get false
+        // because one has the trailing sep, the other doesn't. Both paths have the same components though (if iterated on), and as long as you use
+        // path operations (such as operator/) and not string concatenation, this works just fine.
         //std::string s = result.string();
         //if (fs::is_directory(s)) {
             //s += '/';
         //}
-        //return s;
+        return result;
     }
 
     fs::path getProgramPath()
