@@ -8648,8 +8648,10 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     // Test 2.5: 
     // Actually here is an additonal test unit for the getSpecificUnitDivider: 
+    SetupUnitConversions(*state);
     Real64 rconv = getSpecificUnitDivider(*state, "GJ", "kBtu");
-    energyconversion = 1.0 / rconv;
+    energyconversion = 1.0 / rconv; // 948.45
+    EXPECT_NEAR(energyconversion, 948.0, 0.5);
 
     WriteHeatEmissionTable(*state);
 
