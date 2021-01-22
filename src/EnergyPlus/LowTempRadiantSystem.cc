@@ -422,6 +422,14 @@ namespace LowTempRadiantSystem {
         MaxAlphas = 0;
         MaxNumbers = 0;
 
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design", NumArgs, NumAlphas, NumNumbers);
+        MaxAlphas = max(MaxAlphas, NumAlphas);
+        MaxNumbers = max(MaxNumbers, NumNumbers);
+
+        inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design", NumArgs, NumAlphas, NumNumbers);
+        MaxAlphas = max(MaxAlphas, NumAlphas);
+        MaxNumbers = max(MaxNumbers, NumNumbers);
+
         inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", NumArgs, NumAlphas, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNumbers = max(MaxNumbers, NumNumbers);
@@ -1857,8 +1865,13 @@ namespace LowTempRadiantSystem {
         bool errFlag;
 
 
-        VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-        ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
+        if  (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
+            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems;
+        }
+
+        if  (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
+            ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
+        }
 
         InitErrorsFound = false;
 
@@ -1910,14 +1923,20 @@ namespace LowTempRadiantSystem {
                 }
             }
 
+            Real64 MotorEffic(0.0);
+            if  (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
+                ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
+                MotorEffic = constantFlowDesignDataObject.MotorEffic;
+            }
+
             // Check pump parameters for constant flow hydronic radiant systems
             for (RadNum = 1; RadNum <= NumOfCFloLowTempRadSys; ++RadNum) {
                 // Calculate the efficiency for each pump: The calculation
                 // is based on the PMPSIM code in the ASHRAE Secondary Toolkit
-                if ((CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (constantFlowDesignDataObject.MotorEffic > ZeroTol) &&
+                if ((CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (MotorEffic > ZeroTol) &&
                     (CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
-                    CFloRadSys(RadNum).PumpEffic = TotalEffic / constantFlowDesignDataObject.MotorEffic;
+                    CFloRadSys(RadNum).PumpEffic = TotalEffic / MotorEffic;
                     static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     Real64 pumpEfficiency = CFloRadSys(RadNum).PumpEffic * 100.0;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
@@ -2061,15 +2080,23 @@ namespace LowTempRadiantSystem {
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
                 MySizeFlagHydr(RadSysNum) = false;
 
+
+                int ColdSetptSchedPtr(0), HotSetptSchedPtr(0);
+                if  (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
+                    VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems;
+                    ColdSetptSchedPtr = variableFlowDesignDataObject.ColdSetptSchedPtr;
+                    HotSetptSchedPtr = variableFlowDesignDataObject.HotSetptSchedPtr;
+                }
+
                 // Can this system actually do cooling?
                 if ((HydrRadSys(RadSysNum).WaterVolFlowMaxCool > 0.0) && (HydrRadSys(RadSysNum).ColdWaterInNode > 0) &&
-                    (HydrRadSys(RadSysNum).ColdWaterOutNode > 0) && variableFlowDesignDataObject.ColdSetptSchedPtr > 0) {
+                    (HydrRadSys(RadSysNum).ColdWaterOutNode > 0) && ColdSetptSchedPtr > 0) {
                     HydrRadSys(RadSysNum).CoolingSystem = true;
                 }
 
                 // Can this system actually do heating?
                 if ((HydrRadSys(RadSysNum).WaterVolFlowMaxHeat > 0.0) && (HydrRadSys(RadSysNum).HotWaterInNode > 0) &&
-                    (HydrRadSys(RadSysNum).HotWaterOutNode > 0) && (variableFlowDesignDataObject.HotSetptSchedPtr > 0)) {
+                    (HydrRadSys(RadSysNum).HotWaterOutNode > 0) && (HotSetptSchedPtr > 0)) {
                     HydrRadSys(RadSysNum).HeatingSystem = true;
                 }
 

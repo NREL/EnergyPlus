@@ -170,6 +170,7 @@ namespace LowTempRadiantSystem {
         int OperatingMode;               // Operating mode currently being used (NotOperating, Heating, Cooling)
         Real64 HeatPower;             // heating sent to panel in Watts
         Real64 HeatEnergy;            // heating sent to panel in Joules
+        Real64 runningMeanOutdoorAirTemperatureWeightingFactor; // Weighting factor for running mean outdoor air temperature equation (user input)
         Real64 todayRunningMeanOutdoorDryBulbTemperature;        // Current running mean outdoor air dry-bulb temperature
         Real64 yesterdayRunningMeanOutdoorDryBulbTemperature;    // Running mean outdoor air dry-bulb temperature from yesterday
         Real64 todayAverageOutdoorDryBulbTemperature;            // Average outdoor dry-bulb temperature for today
@@ -178,7 +179,7 @@ namespace LowTempRadiantSystem {
         // Default Constructor
         RadiantSystemBaseData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl),
-            SetpointType(LowTempRadiantSetpointTypes::halfFlowPower),OperatingMode(NotOperating),todayRunningMeanOutdoorDryBulbTemperature(0.0),
+            SetpointType(LowTempRadiantSetpointTypes::halfFlowPower),OperatingMode(NotOperating),runningMeanOutdoorAirTemperatureWeightingFactor(0.8), todayRunningMeanOutdoorDryBulbTemperature(0.0),
             yesterdayRunningMeanOutdoorDryBulbTemperature(0.0), todayAverageOutdoorDryBulbTemperature(0.0),
             yesterdayAverageOutdoorDryBulbTemperature(0.0)
         {
