@@ -8732,3 +8732,195 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 
     EnergyPlus::sqlite->sqliteCommit();
 }
+
+TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+
+    // DetermineBuildingFloorArea
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
+
+    TotSurfaces = 4;
+    Surface.allocate(TotSurfaces);
+
+    // walls
+    Surface(1).Class = SurfaceClass::Wall;
+    Surface(1).HeatTransSurf = true;
+    Surface(1).ExtBoundCond = ExternalEnvironment;
+    Surface(1).Azimuth = 0.;
+    Surface(1).GrossArea = 200.; // 20 x 10
+    Surface(1).Tilt = 90.;
+    Surface(1).Zone = 1;
+
+    Surface(2).Class = SurfaceClass::Wall;
+    Surface(2).HeatTransSurf = true;
+    Surface(2).ExtBoundCond = ExternalEnvironment;
+    Surface(2).Azimuth = 90.;
+    Surface(2).GrossArea = 300.; // 30 x 10
+    Surface(2).Tilt = 90.;
+    Surface(2).Zone = 2;
+
+    // windows
+    Surface(3).Class = SurfaceClass::Window;
+    Surface(3).HeatTransSurf = true;
+    Surface(3).ExtBoundCond = ExternalEnvironment;
+    Surface(3).Azimuth = 0.;
+    Surface(3).GrossArea = 40.;
+    Surface(3).Height = 5;
+    Surface(3).Width = 8;
+    Surface(3).Tilt = 90.;
+    Surface(3).Zone = 1;
+
+    Surface(4).Class = SurfaceClass::Window;
+    Surface(4).HeatTransSurf = true;
+    Surface(4).ExtBoundCond = ExternalEnvironment;
+    Surface(4).Azimuth = 90.;
+    Surface(4).GrossArea = 60.;
+    Surface(4).Height = 6;
+    Surface(4).Width = 10;
+    Surface(4).Tilt = 90.;
+    Surface(4).Zone = 2;
+
+    // Loads
+    DataHeatBalance::TotLights = 3;
+    Lights.allocate(DataHeatBalance::TotLights);
+
+    DataHeatBalance::TotPeople = 3;
+    People.allocate(DataHeatBalance::TotPeople);
+
+    DataHeatBalance::TotElecEquip = 3;
+    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+
+    Lights(1).ZonePtr = 1;
+    Lights(1).DesignLevel = 1000.0;
+    Lights(2).ZonePtr = 2;
+    Lights(2).DesignLevel = 100.0;
+    Lights(3).ZonePtr = 3;
+    Lights(3).DesignLevel = 10.0;
+
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 10.0;
+    People(2).ZonePtr = 2;
+    People(2).NumberOfPeople = 5.0;
+    People(3).ZonePtr = 3;
+    People(3).NumberOfPeople = 1.0;
+
+    ZoneElectric(1).ZonePtr = 1;
+    ZoneElectric(1).DesignLevel = 500.0;
+    ZoneElectric(2).ZonePtr = 2;
+    ZoneElectric(2).DesignLevel = 50.0;
+    ZoneElectric(3).ZonePtr = 3;
+    ZoneElectric(3).DesignLevel = 5.0;
+
+    // zone
+    state->dataGlobal->NumOfZones = 3;
+    Zone.allocate(state->dataGlobal->NumOfZones);
+    Zone(1).Name = "PartofTot Conditioned Zone";
+    Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    Zone(1).isPartOfTotalArea = true;
+    Zone(1).Multiplier = 1.;
+    Zone(1).ListMultiplier = 1.;
+    Zone(1).FloorArea = 1000.;
+    Zone(1).Volume = 2000.;
+    Zone(1).ExtGrossWallArea = 800.;
+    Zone(1).ExteriorTotalGroundSurfArea = 0;
+    Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+
+    Zone(2).Name = "PartofTot Unconditioned Zone";
+    Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    Zone(2).isPartOfTotalArea = true;
+    Zone(2).Multiplier = 1.;
+    Zone(2).ListMultiplier = 1.;
+    Zone(2).FloorArea = 100.;
+    Zone(2).Volume = 200.;
+    Zone(2).ExtGrossWallArea = 80.;
+    Zone(2).ExteriorTotalGroundSurfArea = 0;
+    Zone(2).ExtWindowArea = 0.0;
+
+    Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    Zone(3).isPartOfTotalArea = false;
+    Zone(3).Multiplier = 1.;
+    Zone(3).ListMultiplier = 1.;
+    Zone(3).FloorArea = 10.;
+    Zone(3).Volume = 20.;
+    Zone(3).ExtGrossWallArea = 8.;
+    Zone(3).ExteriorTotalGroundSurfArea = 0;
+    Zone(3).ExtWindowArea = 0.0;
+
+    // Gross takes all that are PartOfTot
+    Real64 expectedBuildingGrossFloorArea = Zone(1).FloorArea + Zone(2).FloorArea;
+    // Conditioned takes only PartOfTot AND COnditioned
+    Real64 expectedBuildingConditionedFloorArea = Zone(1).FloorArea;
+
+    // Assume that we only have electricity with a value of 3.6e6 * 1e4 J =10.000 kWh.
+    // And that this only comes for a single end use DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)=1
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) = 3.6e10;
+    state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
+    Real64 eleckWh = 1e4;
+
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+
+    SetupUnitConversions(*state);
+    Real64 largeConv = getSpecificUnitDivider(*state, "J", "kBtu");
+    largeConv /= (3.6e6);
+    Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
+
+    // Now we're ready to call the actual function of interest
+    OutputReportTabular::WriteSourceEnergyEndUseSummary(*state);
+
+    // Before we test the reporting itself, we check that DetermineBuildingFloorArea (called from WriteSourceEnergyEndUseSummary)
+    // actually did what we expected
+    EXPECT_EQ(expectedBuildingGrossFloorArea, state->dataOutRptTab->buildingGrossFloorArea);
+    EXPECT_EQ(expectedBuildingConditionedFloorArea, state->dataOutRptTab->buildingConditionedFloorArea);
+
+    //expectedBuildingGrossFloorArea /= areaConv; 
+    //expectedBuildingConditionedFloorArea /= areaConv;
+
+    //eleckWh /= largeConv;
+
+    // Now we test the reporting itself:
+    // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
+    const std::string reportName = "SourceEnergyEndUseComponentsSummary";
+    const std::string columnName = "Source Electricity";
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testRowNames = {"Heating", "Total Source Energy End Use Components"};
+
+    // TableName, value
+    std::vector<std::tuple<std::string, Real64>> results({
+        {"Source Energy End Use Components Summary", eleckWh/largeConv},
+        {"Source Energy End Use Component Per Conditioned Floor Area", 10000.0/largeConv / (expectedBuildingConditionedFloorArea/areaConv)},
+        {"Source Energy End Use Components Per Total Floor Area", 10000.0/largeConv / (expectedBuildingGrossFloorArea/areaConv)},
+    });
+
+    for (auto &v : results) {
+
+        std::string tableName = std::get<0>(v);
+        Real64 expectedValue = std::get<1>(v);
+
+        for (auto &rowName : testRowNames) {
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND TableName = '" +
+                              tableName +
+                              "'"
+                              "  AND RowName = '" +
+                              rowName + "'" + "  AND ColumnName = '" + columnName + "'");
+
+            Real64 return_val = execAndReturnFirstDouble(query);
+
+            // Add informative message if failed
+            EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+        }
+    }
+
+    EnergyPlus::sqlite->sqliteCommit();
+}
