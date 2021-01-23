@@ -2773,9 +2773,9 @@
     -1.718780157,            !- CoefficientC3
     0.746414818,             !- CoefficientC4
     0.0,                     !- CoefficientC5
-    0,                   ! Minimum Value of w
+    -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
-    0,                   ! Minimum Value of x
+    -100,                   ! Minimum Value of x
     100,                 ! Maximum Value of x
     0,                   ! Minimum Value of y
     100,                 ! Maximum Value of y
@@ -2791,9 +2791,9 @@
     3.97892546,              !- CoefficientC3
     0.938181818,             !- CoefficientC4
     0.0,                     !- CoefficientC5
-    0,                   ! Minimum Value of w
+    -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
-    0,                   ! Minimum Value of x
+    -100,                   ! Minimum Value of x
     100,                 ! Maximum Value of x
     0,                   ! Minimum Value of y
     100,                 ! Maximum Value of y
@@ -2809,9 +2809,9 @@
     4.173164514,             !- CoefficientC3
     0.640757401,             !- CoefficientC4
     0.0,                     !- CoefficientC5
-    0,                   ! Minimum Value of w
+    -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
-    0,                   ! Minimum Value of x
+    -100,                   ! Minimum Value of x
     100,                 ! Maximum Value of x
     0,                   ! Minimum Value of y
     100,                 ! Maximum Value of y
@@ -2827,9 +2827,9 @@
     1.570743399,       !- CoefficientC3
     0.690793651,       !- CoefficientC4
     0.0,               !- CoefficientC5
-    0,                   ! Minimum Value of w
+    -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
-    0,                   ! Minimum Value of x
+    -100,                   ! Minimum Value of x
     100,                 ! Maximum Value of x
     0,                   ! Minimum Value of y
     100,                 ! Maximum Value of y
@@ -2848,11 +2848,11 @@
     -0.980163419,            !- CoefficientC4
     0.767285761,             !- CoefficientC5
     0.0,                     !- CoefficientC6
-    0,                   ! Minimum Value of v
+    -100,                   ! Minimum Value of v
     100,                 ! Maximum Value of v
-    0,                   ! Minimum Value of w
+    -100,                   ! Minimum Value of w
     100,                 ! Maximum Value of w
-    0,                   ! Minimum Value of x
+    -100,                   ! Minimum Value of x
     100,                 ! Maximum Value of x
     0,                   ! Minimum Value of y
     100,                 ! Maximum Value of y
