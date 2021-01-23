@@ -5119,22 +5119,21 @@ namespace EnergyPlus::OutputReportTabular {
         FillRemainingPredefinedEntries(state);
         auto &ort(state.dataOutRptTab);
 
-        if (ort->WriteTabularFiles) {
+        if (unitSQLiteTable == 0) {
+            ort->unitsStyle_SQLite = iUnitsStyle::None;
+        } else if (unitSQLiteTable == 1) {
+            ort->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
+        } else if (unitSQLiteTable == 2) {
+            ort->unitsStyle_SQLite = iUnitsStyle::JtoMJ;
+        } else if (unitSQLiteTable == 3) {
+            ort->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
+        } else if (unitSQLiteTable == 4) {
+            ort->unitsStyle_SQLite = iUnitsStyle::InchPound;
+        } else {
+            ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+        }
 
-            // ort->unitsStyle_SQLite = iUnitsStyle::None;
-            if (unitSQLiteTable == 0) {
-                ort->unitsStyle_SQLite = iUnitsStyle::None;
-            } else if (unitSQLiteTable == 1) {
-                ort->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
-            } else if (unitSQLiteTable == 2) {
-                ort->unitsStyle_SQLite = iUnitsStyle::JtoMJ;
-            } else if (unitSQLiteTable == 3) {
-                ort->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
-            } else if (unitSQLiteTable == 4) {
-                ort->unitsStyle_SQLite = iUnitsStyle::InchPound;
-            } else {
-                ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
-            }
+        if (ort->WriteTabularFiles) {
 
             // call each type of report in turn
             WriteBEPSTable(state);
@@ -10350,7 +10349,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // do unit conversions if necessary
                 // if (ort->unitsStyle == iUnitsStyle::InchPound) {
                 if (unitsStyle_cur == iUnitsStyle::InchPound) {
-                        SIunit = "[m]";
+                    SIunit = "[m]";
                     LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
                     m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
                     SIunit = "[m2]";
@@ -10481,8 +10480,8 @@ namespace EnergyPlus::OutputReportTabular {
                 kOpaque = 0;
 
                 DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
-                if (produceTabular) {
-                    if (DetailedWWR) {
+                if (DetailedWWR) {
+                    if (produceTabular) {
                         print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
                         print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
                     }
@@ -10574,8 +10573,8 @@ namespace EnergyPlus::OutputReportTabular {
                                     zoneOpeningArea(zonePt) +=
                                         curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
                                     zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
-                                    if (produceTabular) {
-                                        if (DetailedWWR) {
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Window,{:.1R},{:.1R}\n",
                                                   Surface(iSurf).Name,
@@ -10592,8 +10591,8 @@ namespace EnergyPlus::OutputReportTabular {
                                     (SELECT_CASE_var == SurfaceClass::Roof)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                                     roofArea += curArea * mult;
-                                    if (produceTabular) {
-                                        if (DetailedWWR) {
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Roof,{:.1R},{:.1R}\n",
                                                   Surface(iSurf).Name,
@@ -10604,8 +10603,8 @@ namespace EnergyPlus::OutputReportTabular {
                                 } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
                                     skylightArea += curArea * mult;
-                                    if (produceTabular) {
-                                        if (DetailedWWR) {
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Skylight,{:.1R},{:.1R}\n",
                                                   Surface(iSurf).Name,
@@ -10624,8 +10623,8 @@ namespace EnergyPlus::OutputReportTabular {
                 TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
                 TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
                 TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
-                if (produceTabular) {
-                    if (DetailedWWR) {
+                if (DetailedWWR) {
+                    if (produceTabular) {
                         print(state.files.debug, "{}\n", "========================");
                         print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
                         print(state.files.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
@@ -10780,8 +10779,8 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(2) = "Skylight Area " + m2_unitName;
                 rowHead(3) = "Skylight-Roof Ratio [%]";
 
-                if (produceTabular) {
-                    if (DetailedWWR) {
+                if (DetailedWWR) {
+                    if (produceTabular) {
                         print(state.files.debug, "{}\n", "========================");
                         print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
                         print(state.files.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
