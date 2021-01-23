@@ -696,7 +696,7 @@ namespace EnergyPlus::SwimmingPool {
 
         static std::string const RoutineName("InitSwimmingPoolPlantLoopIndex");
 
-        if (MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
+        if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
             if (this->WaterInletNode > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,

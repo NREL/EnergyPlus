@@ -166,7 +166,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWLoopSide, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWBranchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWCompNum, 1);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool, true);
 
     // Test 2
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = true;
@@ -175,7 +174,6 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWLoopSide, 2);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWBranchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWCompNum, 1);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool, true);
 }
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
