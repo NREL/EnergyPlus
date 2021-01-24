@@ -3879,7 +3879,7 @@ namespace HeatBalanceSurfaceManager {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
                 WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
-                if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::IntBlind)
+                if (IS_INT_SHADED(ShadeFlag))
                     ITABSF(SurfNum) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
                                                     SurfaceWindow(SurfNum).EffShBlindEmiss) +
                                       InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),

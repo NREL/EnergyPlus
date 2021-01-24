@@ -3298,7 +3298,7 @@ namespace WindowComplexManager {
             SurfOutsideEmiss = emis(1);
 
             IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
-            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::IntBlind) {
+            if (IS_INT_SHADED(ShadeFlag)) {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
 
@@ -3417,7 +3417,7 @@ namespace WindowComplexManager {
             SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
             SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
-            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
+            if (IS_INT_SHADED(ShadeFlag)) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;

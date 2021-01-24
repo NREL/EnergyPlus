@@ -212,7 +212,7 @@ namespace UFADManager {
             if (SurfNum == 0) continue;
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                 Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                if (SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade || SurfWinShadingFlag(SurfNum) == WinShadingType::IntBlind) {
+                if (IS_INT_SHADED(SurfWinShadingFlag(SurfNum))) {
                     ++NumShadesDown;
                 }
             }

@@ -10503,9 +10503,7 @@ namespace SolarShading {
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
                     //  removed that is absorbed
-                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::IntShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::ExtShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::BGShade) {
+                    if (IS_SHADE_ON(WindowShadingControl(WinShadeCtrlNum).ShadingType)) {
                         int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 

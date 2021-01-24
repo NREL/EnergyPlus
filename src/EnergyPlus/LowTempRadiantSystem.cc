@@ -5570,7 +5570,7 @@ namespace LowTempRadiantSystem {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {
-                if (SurfWinShadingFlag(surfNum) == WinShadingType::IntShade || SurfWinShadingFlag(surfNum) == WinShadingType::IntBlind) {
+                if (IS_INT_SHADED(SurfWinShadingFlag(surfNum))) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(surfNum);
                 }
@@ -5581,8 +5581,7 @@ namespace LowTempRadiantSystem {
                                   SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != WinShadingType::IntShade &&
-                    SurfWinShadingFlag(surfNum) != WinShadingType::IntBlind) {
+                if (SurfWinDividerArea(surfNum) > 0.0 && !IS_INT_SHADED(SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
                                   SurfWinDividerTempSurfIn(surfNum);

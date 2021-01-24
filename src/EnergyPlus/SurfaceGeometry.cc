@@ -4770,11 +4770,7 @@ namespace SurfaceGeometry {
                 if (ConstrNumSh > 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNumSh;
                 } else {
-                    if (WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
-                        WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind ||
-                        WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtShade ||
-                        WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtScreen ||
-                        WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtBlind) {
+                    if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType) || IS_EXT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
                         ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
                         if (ShDevNum > 0) {
                             CreateShadedWindowConstruction(state, SurfNum, WSCPtr, ShDevNum, shadeControlIndex);
@@ -4789,8 +4785,7 @@ namespace SurfaceGeometry {
             ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
             if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
 
-                if (WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
-                    WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
+                if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -4813,9 +4808,7 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                if (WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtShade ||
-                    WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtScreen ||
-                    WindowShadingControl(WSCPtr).ShadingType == WinShadingType::ExtBlind) {
+                if (IS_EXT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -11688,7 +11681,7 @@ namespace SurfaceGeometry {
         ShDevName = state.dataMaterial->Material(ShDevNum).Name;
         ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
         ConstrName = state.dataConstruction->Construct(ConstrNum).Name;
-        if (WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade || WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
+        if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":INT";
         } else {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":EXT";
