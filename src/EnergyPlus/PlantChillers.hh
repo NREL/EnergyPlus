@@ -242,6 +242,10 @@ namespace PlantChillers {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size(EnergyPlusData &state) override;
@@ -340,6 +344,10 @@ namespace PlantChillers {
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void setupOutputVariables(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
@@ -437,6 +445,10 @@ namespace PlantChillers {
 
         void setupOutputVariables(EnergyPlusData &state);
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 
         void size(EnergyPlusData &state) override;
@@ -470,6 +482,10 @@ namespace PlantChillers {
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVariables(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad) override;
 

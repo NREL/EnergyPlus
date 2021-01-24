@@ -82,6 +82,8 @@ public:
     {
     }
 
+    virtual void oneTimeInit([[maybe_unused]] EnergyPlusData &state) {};
+
     ~PlantComponent() = default;
 };
 

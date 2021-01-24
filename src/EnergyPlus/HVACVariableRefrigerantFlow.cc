@@ -5160,6 +5160,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         }
     }
 
+    void VRFCondenserEquipment::oneTimeInit([[maybe_unused]] EnergyPlusData &state) {}
+
     void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool const FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq)
     {
 

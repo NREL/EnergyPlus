@@ -146,6 +146,8 @@ namespace CTElectricGenerator {
 
         void setupOutputVars(EnergyPlusData &state);
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
         void InitCTGenerators(EnergyPlusData &state,
                               bool RunFlag, bool FirstHVACIteration);
 

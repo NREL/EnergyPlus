@@ -418,11 +418,13 @@ namespace HVACVariableRefrigerantFlow {
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
 
-        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
