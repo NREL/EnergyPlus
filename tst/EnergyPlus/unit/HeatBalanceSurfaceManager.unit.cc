@@ -280,7 +280,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
-    DataSurfaces::SurfWinShadingFlag(1) = DataSurfaces::WinShadingFlag::ShadeOff;
+    DataSurfaces::SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::ShadeOff;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;

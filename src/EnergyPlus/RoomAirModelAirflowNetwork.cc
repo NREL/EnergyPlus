@@ -1088,8 +1088,8 @@ namespace RoomAirModelAirflowNetwork {
                     HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingType::IntShade &&
+                    SurfWinShadingFlag(SurfNum) != WinShadingType::IntBlind) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);

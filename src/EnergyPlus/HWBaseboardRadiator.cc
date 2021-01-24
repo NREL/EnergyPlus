@@ -1735,7 +1735,7 @@ namespace HWBaseboardRadiator {
             Area = Surface(SurfNum).Area;
 
             if (Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntShadeOn || SurfWinShadingFlag(SurfNum) == WinShadingFlag::IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade || SurfWinShadingFlag(SurfNum) == WinShadingType::IntBlind) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(SurfNum);
                 }
@@ -1746,8 +1746,8 @@ namespace HWBaseboardRadiator {
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != WinShadingFlag::IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingType::IntShade &&
+                    SurfWinShadingFlag(SurfNum) != WinShadingType::IntBlind) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);

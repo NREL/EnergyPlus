@@ -1696,7 +1696,7 @@ namespace CoolingPanelSimple {
         using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalSurface::TempSurfInTmp;
-        using DataSurfaces::WinShadingFlag;
+        using DataSurfaces::WinShadingType;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfWinShadingFlag;
         using DataSurfaces::SurfWinFrameArea;

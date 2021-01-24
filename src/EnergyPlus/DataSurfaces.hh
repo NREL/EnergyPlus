@@ -69,13 +69,13 @@
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
-#define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::NoShade) | BITF(WinShadingFlag::ShadeOff))
-#define IS_SHADE_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::BGShadeOn))
-#define IS_SHADE_SCREEN_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::BGShadeOn) | BITF(WinShadingFlag::ExtScreenOn))
-#define IS_BLIND_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntBlindOn) | BITF(WinShadingFlag::ExtBlindOn) | BITF(WinShadingFlag::BGBlindOn))
-#define IS_INT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::IntShadeOn) | BITF(WinShadingFlag::IntBlindOn))
-#define IS_EXT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::ExtShadeOn) | BITF(WinShadingFlag::ExtBlindOn) | BITF(WinShadingFlag::ExtScreenOn))
-#define IS_BG_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingFlag::BGShadeOn) | BITF(WinShadingFlag::BGBlindOn))
+#define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
+#define IS_SHADE_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
+#define IS_SHADE_SCREEN_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
+#define IS_BLIND_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
+#define IS_INT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind))
+#define IS_EXT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen))
+#define IS_BG_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
 
 
 namespace EnergyPlus {
@@ -134,16 +134,16 @@ namespace DataSurfaces {
         Count // The counter representing the total number of surface class, always stays at the bottom
     };
 
-    enum class WinShadingFlag : int {
+    enum class WinShadingType : int {
         NoShade = 0,
-        IntShadeOn = 1,
+        IntShade = 1,
         SwitchableGlazing = 2,
-        ExtShadeOn = 3,
-        ExtScreenOn = 4,
-        IntBlindOn = 6,
-        ExtBlindOn = 7,
-        BGShadeOn = 8,
-        BGBlindOn = 9,
+        ExtShade = 3,
+        ExtScreen = 4,
+        IntBlind = 6,
+        ExtBlind = 7,
+        BGShade = 8,
+        BGBlind = 9,
         ShadeOff = 10
     };
 
@@ -517,14 +517,14 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     extern Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    extern Array1D<WinShadingFlag> SurfWinShadingFlag;                       // -1: window has no shading device
+    extern Array1D<WinShadingType> SurfWinShadingFlag;                       // -1: window has no shading device
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    extern Array1D<WinShadingFlag> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    extern Array1D<WinShadingType> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     extern Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     extern Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    extern Array1D<WinShadingFlag> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    extern Array1D<WinShadingType> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     extern Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     extern Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     extern Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
@@ -1102,7 +1102,7 @@ namespace DataSurfaces {
         std::string Name;   // User supplied name of this set of shading control data
         int ZoneIndex;      // number of the zone referenced
         int SequenceNumber; // Shading control sequence number
-        WinShadingFlag ShadingType;    // Shading type (InteriorShade, SwitchableGlazing,
+        WinShadingType ShadingType;    // Shading type (InteriorShade, SwitchableGlazing,
         //  CHARACTER(len=32) :: ShadingType    = ' ' ! Shading type (InteriorShade, SwitchableGlazing,
         //  ExteriorShade,InteriorBlind,ExteriorBlind,BetweenGlassShade,
         //  BetweenGlassBlind, or ExteriorScreen)
@@ -1188,7 +1188,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingFlag::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
               Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {

@@ -483,14 +483,14 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    Array1D<WinShadingFlag> SurfWinShadingFlag;             // -1: window has no shading device
+    Array1D<WinShadingType> SurfWinShadingFlag;             // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    Array1D<WinShadingFlag> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    Array1D<WinShadingType> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    Array1D<WinShadingFlag> SurfWinExtIntShadePrevTS;       // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    Array1D<WinShadingType> SurfWinExtIntShadePrevTS;       // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
