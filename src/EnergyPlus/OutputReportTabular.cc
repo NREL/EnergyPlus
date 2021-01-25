@@ -13299,10 +13299,10 @@ namespace EnergyPlus::OutputReportTabular {
                     CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
 
                     // LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
-                    // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                    // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                     LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
                     //LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
-                    // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                    // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                     LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
 
                     // OutputCompLoadSummary(
@@ -13412,10 +13412,10 @@ namespace EnergyPlus::OutputReportTabular {
                 ComputePeakDifference(FacilityHeatCompLoadTables);
 
                 // LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
-                // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                 LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables, unitsStyle_cur);
                 // LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
-                // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                 LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_cur);
 
                 // OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
@@ -13429,10 +13429,10 @@ namespace EnergyPlus::OutputReportTabular {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     if (allocated(CalcFinalZoneSizing)) {
                         // LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
-                        // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                        // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                         LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_cur);
                         // LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
-                        // JY 2021-01-12 Use the reloaded version instead for dual units adaption
+                        // JY 2021-01-12 Use the overloaded version instead for dual units adaption
                         LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
 
                         // OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
@@ -13448,6 +13448,12 @@ namespace EnergyPlus::OutputReportTabular {
             AirLoopCoolCompLoadTables.deallocate();
             AirLoopZonesHeatCompLoadTables.deallocate();
             AirLoopZonesCoolCompLoadTables.deallocate();
+
+            FacilityHeatCompLoadTables.cells.deallocate();
+            FacilityHeatCompLoadTables.cellUsed.deallocate();
+            FacilityCoolCompLoadTables.cells.deallocate();
+            FacilityCoolCompLoadTables.cellUsed.deallocate();
+
             FacilityZonesHeatCompLoadTables.deallocate();
             FacilityZonesCoolCompLoadTables.deallocate();
 
