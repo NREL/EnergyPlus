@@ -1297,14 +1297,14 @@ namespace PhotovoltaicThermalCollectors {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         K. Haddad & S. Brideau
         //       DATE WRITTEN   March 2020
-        //       MODIFIED       na
+        //       MODIFIED       Sept 2020
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the maximum heat transfer from the BIPVT system to the air stream in the channel behind the PV module
 
         // METHODOLOGY EMPLOYED:
-        // ???
+        // Numerical & Analytical
 
         const Real64 pi(3.14159);
         // BIPVT system parameters
