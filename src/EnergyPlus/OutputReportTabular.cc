@@ -12916,7 +12916,8 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
         Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
 
-        CompLoadTablesType curCompLoadTable; // active component load table
+        // JY 2021-01-25 The following variable is redudant in the original code, deleting the line
+        // CompLoadTablesType curCompLoadTable; // active component load table
 
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
             iUnitsStyle unitsStyle_cur = ort->unitsStyle;
