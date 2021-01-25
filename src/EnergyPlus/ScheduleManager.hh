@@ -154,6 +154,15 @@ namespace ScheduleManager {
               CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0)
         {
         }
+
+        Real64 GetCurrentScheduleValue(EnergyPlusData &state) const;
+
+        // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
+        Real64 LookUpScheduleValue(EnergyPlusData &state,
+                                   int ThisHour,
+                                   int ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
+        );
+
     };
 
     void clear_state();
@@ -163,18 +172,13 @@ namespace ScheduleManager {
     enum class ReportLevelDetail {Hourly, TimeStepDetailed, IDF};
     void ReportScheduleDetails(EnergyPlusData &state, ReportLevelDetail LevelOfDetail);
 
+    // small wrappers around class methods
     Real64 GetCurrentScheduleValue(EnergyPlusData &state, int ScheduleIndex);
+    Real64 LookUpScheduleValue(EnergyPlusData &state, int ScheduleIndex, int ThisHour, int ThisTimeStep = -1);
 
     // Updates each schedule value to the current timestep
     // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
     void UpdateScheduleValues(EnergyPlusData &state);
-
-    // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
-    Real64 LookUpScheduleValue(EnergyPlusData &state,
-                               int ScheduleIndex,
-                               int ThisHour,
-                               int ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
-    );
 
     int GetScheduleIndex(EnergyPlusData &state, std::string const &ScheduleName);
 

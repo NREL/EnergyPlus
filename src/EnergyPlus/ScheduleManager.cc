@@ -2659,50 +2659,11 @@ namespace EnergyPlus::ScheduleManager {
         RoundTSValue.deallocate();
     }
 
-    Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       August 2011; adapt Autodesk changes (time reduction)
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns the hourly schedule value for the current day.
-
-        // METHODOLOGY EMPLOYED:
-        // Use internal Schedule data structure to return value.  Note that missing values in
-        // input will equate to 0 indices in arrays -- which has been set up to return legally with
-        // 0.0 values.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
+    Real64 ScheduleData::GetCurrentScheduleValue(EnergyPlusData &state) const {
         if (!ScheduleDSTSFileWarningIssued) {
             if (DSTIndicator == 1) {
-                if (Schedule(ScheduleIndex).SchType == ScheduleInput::File) {
-                    ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + Schedule(ScheduleIndex).Name + "\" is a Schedule:File");
+                if (this->SchType == ScheduleInput::File) {
+                    ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + this->Name + "\" is a Schedule:File");
                     ShowContinueError(state, "...Use of Schedule:File when DaylightSavingTime is in effect is not recommended.");
                     ShowContinueError(state, "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File.");
                     ShowContinueError(state, "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST.");
@@ -2713,16 +2674,36 @@ namespace EnergyPlus::ScheduleManager {
                 }
             }
         }
+        if (!this->EMSActuatedOn) {
+            return this->CurrentValue;  // This block probably unecessary, UpdateScheduleValues already does it
+        } else {
+            return this->EMSValue;
+        }
+    }
 
-        // Checking if valid index is passed is necessary
+    Real64 GetCurrentScheduleValue(EnergyPlusData &state, int const ScheduleIndex)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       August 2011; adapt Autodesk changes (time reduction)
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function returns the current schedule value
+
+        // METHODOLOGY EMPLOYED:
+        // Use internal Schedule data structure to return value.  Note that missing values in
+        // input will equate to 0 indices in arrays -- which has been set up to return legally with
+        // 0.0 values.
+
         if (ScheduleIndex == -1) {
             return 1.0;
         } else if (ScheduleIndex == 0) {
             return 0.0;
-        } else if (!Schedule(ScheduleIndex).EMSActuatedOn) {
-            return Schedule(ScheduleIndex).CurrentValue;  // This block probably unecessary, UpdateScheduleValues already does it
         } else {
-            return Schedule(ScheduleIndex).EMSValue;
+            return Schedule(ScheduleIndex).GetCurrentScheduleValue(state);
         }
     }
 
@@ -2744,26 +2725,6 @@ namespace EnergyPlus::ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);
             ScheduleInputProcessed = true;
@@ -2781,6 +2742,22 @@ namespace EnergyPlus::ScheduleManager {
     Real64 LookUpScheduleValue(EnergyPlusData &state,
                                int const ScheduleIndex,
                                int const ThisHour,
+                               int const ThisTimeStep) {
+        if (ThisHour > 24) {
+            ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
+        }
+
+        if (ScheduleIndex == -1) {
+            return 1.0;
+        } else if (ScheduleIndex == 0) {
+            return 0.0;
+        } else {
+            return Schedule(ScheduleIndex).LookUpScheduleValue(state, ThisHour, ThisTimeStep);
+        }
+    }
+
+    Real64 ScheduleData::LookUpScheduleValue(EnergyPlusData &state,
+                               int const ThisHour,
                                int const ThisTimeStep // Negative => unspecified
     )
     {
@@ -2793,41 +2770,6 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function provides a method to look up schedule values for any hour, timestep, day
         // of the year (rather than just the "current time").
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Return value
-        Real64 scheduleValue(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        if (ThisHour > 24) {
-            ShowFatalError(state, format("LookUpScheduleValue called with thisHour={}", ThisHour));
-        }
-
-        if (ScheduleIndex == -1) {
-            return 1.0;
-        } else if (ScheduleIndex == 0) {
-            return 0.0;
-        }
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -2854,22 +2796,20 @@ namespace EnergyPlus::ScheduleManager {
             thisDayOfYear = 1;
         }
 
-        int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(thisDayOfYear);
+        int WeekScheduleIndex = this->WeekSchedulePointer(thisDayOfYear);
         int DaySchedulePointer;
 
         // TODO: the (thisDayOfWeek < 7) looks fishy and maybe unnecessary... how about if there are more than 7 holidays?
         // It should use 7 + thisHolidayIndex in that case but it won't
         if (thisDayOfWeek <= 7 && thisHolidayIndex > 0) {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + thisHolidayIndex);
+            DaySchedulePointer = WeekSchedule(WeekScheduleIndex).DaySchedulePointer(7 + thisHolidayIndex);
         } else {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(thisDayOfWeek);
+            DaySchedulePointer = WeekSchedule(WeekScheduleIndex).DaySchedulePointer(thisDayOfWeek);
         }
 
         // If Unspecified or equal to zero, use NumOfTimeStepInHour, otherwise use supplied
         int thisTimeStep = ThisTimeStep > 0 ? ThisTimeStep : state.dataGlobal->NumOfTimeStepInHour;
-        scheduleValue = DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
-
-        return scheduleValue;
+        return DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
     }
 
     int GetScheduleIndex(EnergyPlusData &state, std::string const &ScheduleName)
@@ -2931,28 +2871,8 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Schedule "ScheduleName".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         std::string TypeOfSchedule;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int curSchType;
@@ -3022,26 +2942,6 @@ namespace EnergyPlus::ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
         int DaySchedulePointer;
@@ -3061,7 +2961,7 @@ namespace EnergyPlus::ScheduleManager {
 
         // Determine which Week Schedule is used
         if (!present(JDay)) {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DataEnvironment::DayOfYear_Schedule);
         } else {
             WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
         }
@@ -3101,29 +3001,6 @@ namespace EnergyPlus::ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);
             ScheduleInputProcessed = true;
@@ -3152,32 +3029,9 @@ namespace EnergyPlus::ScheduleManager {
         // for supervisory controls or internal gains obtained from real-time occupancy
         // measurements.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int TS; // Counter for Num Of Time Steps in Hour
-        int Hr; // Hour Counter
-
         // Assign the value of the variable
-        for (Hr = 1; Hr <= 24; ++Hr) {
-            for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+        for (int Hr = 1; Hr <= 24; ++Hr) {
+            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                 DaySchedule(ScheduleIndex).TSValue(TS, Hr) = Value;
             }
         }
@@ -3206,30 +3060,9 @@ namespace EnergyPlus::ScheduleManager {
         // This subroutine processes the "interval" fields with/without optional "until" in front of
         // time (hh:mm).
 
-        // METHODOLOGY EMPLOYED:
-        // na.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         MinuteValue.dim(60, 24);
         SetMinuteValue.dim(60, 24);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -3416,26 +3249,6 @@ namespace EnergyPlus::ScheduleManager {
         // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule
         // representation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rRetHH; // real Returned "hour"
         Real64 rRetMM; // real Returned "minute"
@@ -3530,30 +3343,9 @@ namespace EnergyPlus::ScheduleManager {
         // This subroutine processes a field "For: day types" and returns
         // those day types (can be multiple) from field.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(TheseDays, MaxDayTypes);
         EP_SIZE_CHECK(AlReady, MaxDayTypes);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DayT;
@@ -3744,27 +3536,6 @@ namespace EnergyPlus::ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
         int DayT;             // Day Type Loop control
@@ -3814,9 +3585,7 @@ namespace EnergyPlus::ScheduleManager {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
@@ -3842,27 +3611,6 @@ namespace EnergyPlus::ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
         int DayT;             // Day Type Loop control
@@ -3871,9 +3619,6 @@ namespace EnergyPlus::ScheduleManager {
         Real64 MaxValue(0.0); // For total maximum
         bool MinValueOk(true);
         bool MaxValueOk(true);
-        /////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
-        // static bool RunOnceOnly( true );
-        /////////////////////////////////////////////////
         // precompute the dayschedule max and min so that it is not in nested loop
         if (CheckScheduleValueMinMaxRunOnceOnly) {
             for (Loop = 0; Loop <= NumDaySchedules; ++Loop) {
@@ -3929,9 +3674,7 @@ namespace EnergyPlus::ScheduleManager {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
@@ -3954,27 +3697,6 @@ namespace EnergyPlus::ScheduleManager {
         // Schedule data structure stores this on first validity check.  If there, then is returned else
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -4025,9 +3747,7 @@ namespace EnergyPlus::ScheduleManager {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
@@ -4052,27 +3772,6 @@ namespace EnergyPlus::ScheduleManager {
         // Schedule data structure stores this on first validity check.  If there, then is returned else
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;             // Loop Control variable
@@ -4131,9 +3830,7 @@ namespace EnergyPlus::ScheduleManager {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValue(EnergyPlusData &state,
@@ -4156,33 +3853,7 @@ namespace EnergyPlus::ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;  // Loop Control variable
-        int DayT;  // Day Type Loop control
-        int WkSch; // Pointer for WeekSchedule value
-
-        CheckScheduleValue = false;
+        bool CheckScheduleValue = false;
 
         if (ScheduleIndex == -1) {
             CheckScheduleValue = (Value == 1.0);
@@ -4194,9 +3865,9 @@ namespace EnergyPlus::ScheduleManager {
 
         if (ScheduleIndex > 0) {
             CheckScheduleValue = false;
-            for (Loop = 1; Loop <= 366; ++Loop) {
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+            for (int Loop = 1; Loop <= 366; ++Loop) {
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                     if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, Value)) {
                         CheckScheduleValue = true;
                         goto DayLoop_exit;
@@ -4229,33 +3900,7 @@ namespace EnergyPlus::ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;  // Loop Control variable
-        int DayT;  // Day Type Loop control
-        int WkSch; // Pointer for WeekSchedule value
-
-        CheckScheduleValue = false;
+        bool CheckScheduleValue = false;
         if (ScheduleIndex == -1) {
             CheckScheduleValue = (Value == 1);
         } else if (ScheduleIndex == 0) {
@@ -4265,9 +3910,9 @@ namespace EnergyPlus::ScheduleManager {
         }
 
         if (ScheduleIndex > 0) {
-            for (Loop = 1; Loop <= 366; ++Loop) {
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+            for (int Loop = 1; Loop <= 366; ++Loop) {
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                     if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, double(Value))) {
                         CheckScheduleValue = true;
                         goto DayLoop_exit;
@@ -4303,27 +3948,6 @@ namespace EnergyPlus::ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
@@ -4367,9 +3991,7 @@ namespace EnergyPlus::ScheduleManager {
             }
         }
 
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckDayScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,        // Which Day Schedule being tested
@@ -4395,27 +4017,6 @@ namespace EnergyPlus::ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
@@ -4458,9 +4059,7 @@ namespace EnergyPlus::ScheduleManager {
             }
         }
 
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckDayScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
@@ -4476,36 +4075,8 @@ namespace EnergyPlus::ScheduleManager {
         // This function returns true if the schedule contains fractional
         // values [>0, <1].
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool HasFractions; // True if the schedule has fractional values
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WkSch;
-        int DayT;
-        int Loop;
-        int Hour;
-        int TStep;
 
         if (ScheduleIndex == -1 || ScheduleIndex == 0) {
 
@@ -4516,10 +4087,10 @@ namespace EnergyPlus::ScheduleManager {
         HasFractions = false;
 
         if (ScheduleIndex > 0) {
-            WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                for (Hour = 1; Hour <= 24; ++Hour) {
-                    for (TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
+            int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+            for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                for (int Hour = 1; Hour <= 24; ++Hour) {
+                    for (int TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
                         if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
                             DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
                             HasFractions = true;
@@ -4530,11 +4101,11 @@ namespace EnergyPlus::ScheduleManager {
             }
         DayTLoop_exit:;
             if (!HasFractions) {
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        for (Hour = 1; Hour <= 24; ++Hour) {
-                            for (TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                        for (int Hour = 1; Hour <= 24; ++Hour) {
+                            for (int TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
                                 if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
                                     DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
                                     HasFractions = true;
@@ -4564,36 +4135,12 @@ namespace EnergyPlus::ScheduleManager {
         // This function returns the minimum value used by a schedule over
         // the entire year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 MinimumValue; // Minimum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
         Real64 MaxValue(0.0);
-        int WkSch;
-        int DayT;
-        int Loop;
 
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
@@ -4607,16 +4154,16 @@ namespace EnergyPlus::ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                         MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
@@ -4648,36 +4195,12 @@ namespace EnergyPlus::ScheduleManager {
         // This function returns the maximum value used by a schedule over
         // the entire year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 MaximumValue; // Maximum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
         Real64 MaxValue(0.0);
-        int WkSch;
-        int DayT;
-        int Loop;
 
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
@@ -4691,16 +4214,16 @@ namespace EnergyPlus::ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                         MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
@@ -4732,38 +4255,12 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the schedule name from the Schedule Index.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        std::string ScheduleName;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);
             ScheduleInputProcessed = true;
         }
 
+        std::string ScheduleName;
         if (ScheduleIndex > 0) {
             ScheduleName = Schedule(ScheduleIndex).Name;
         } else if (ScheduleIndex == -1) {
@@ -4773,7 +4270,6 @@ namespace EnergyPlus::ScheduleManager {
         } else {
             ScheduleName = "N/A-Invalid";
         }
-
         return ScheduleName;
     }
 
@@ -4789,30 +4285,6 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput(state);
@@ -4981,8 +4453,6 @@ namespace EnergyPlus::ScheduleManager {
         // This function returns the "average" hours per week for a schedule over
         // the entire year.
 
-        // Return value
-
         Real64 WeeksInYear;
 
         if (isItLeapYear) {
@@ -5054,37 +4524,7 @@ namespace EnergyPlus::ScheduleManager {
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the number of schedules.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int NumberOfSchedules;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        NumberOfSchedules = NumSchedules;
-
-        return NumberOfSchedules;
+        return NumSchedules;
     }
 
 } // namespace EnergyPlus
