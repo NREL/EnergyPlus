@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,12 +54,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -1785,7 +1785,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // check chiller inputs
     auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
-    EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LEAVINGSETPOINTMODULATED);
+    EXPECT_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated);
     // define local var
     int EvapInletNode = thisChiller.EvapInletNodeNum;
     int EvapOutletNode = thisChiller.EvapOutletNodeNum;
@@ -1812,11 +1812,11 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // lock the evap flow at test condition specified
     int LoopNum = thisChiller.CWLoopNum;
     int LoopSideNum = thisChiller.CWLoopSideNum;
-    PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 1;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
     int GenLoopSideNum = thisChiller.GenLoopSideNum;
-    PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = 0;
+    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
     thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);

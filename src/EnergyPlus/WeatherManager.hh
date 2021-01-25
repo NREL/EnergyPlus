@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -634,7 +634,8 @@ namespace WeatherManager {
 
     void AllocateWeatherData(EnergyPlusData &state);
 
-    void CalculateDailySolarCoeffs(int DayOfYear,                 // Day of year (1 - 366)
+    void CalculateDailySolarCoeffs(EnergyPlusData &state,
+                                   int DayOfYear,                 // Day of year (1 - 366)
                                    Real64 &A,                     // ASHRAE "A" - Apparent solar irradiation at air mass = 0 [W/M**2]
                                    Real64 &B,                     // ASHRAE "B" - Atmospheric extinction coefficient
                                    Real64 &C,                     // ASHRAE "C" - Diffuse radiation factor
@@ -644,7 +645,8 @@ namespace WeatherManager {
                                    Real64 &CosineSolarDeclination // Cosine of Solar Declination
     );
 
-    void CalculateSunDirectionCosines(Real64 TimeValue,    // Current Time of Day
+    void CalculateSunDirectionCosines(EnergyPlusData &state,
+                                      Real64 TimeValue,    // Current Time of Day
                                       Real64 EqOfTime,     // Equation of Time
                                       Real64 SinSolDeclin, // Sine of Solar Declination
                                       Real64 CosSolDeclin, // Cosine of Solar Declination
@@ -702,15 +704,17 @@ namespace WeatherManager {
 
     void CalcWaterMainsTemp(EnergyPlusData &state);
 
-    Real64 WaterMainsTempFromCorrelation(Real64 AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
+    Real64 WaterMainsTempFromCorrelation(EnergyPlusData &state,
+                                         Real64 AnnualOAAvgDryBulbTemp,        // annual average OA drybulb temperature
                                          Real64 MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
     void GetWeatherStation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void DayltgCurrentExtHorizIllum();
+    void DayltgCurrentExtHorizIllum(EnergyPlusData &state);
 
-    void DayltgLuminousEfficacy(Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
+    void DayltgLuminousEfficacy(EnergyPlusData &state,
+                                Real64 &DiffLumEff, // Luminous efficacy of sky diffuse solar radiation (lum/W)
                                 Real64 &DirLumEff   // Luminous efficacy of beam solar radiation (lum/W)
     );
 
@@ -745,7 +749,7 @@ namespace WeatherManager {
 
     GregorianDate computeGregorianDate(int jdate);
 
-    WeekDay calculateDayOfWeek(int year, int month, int day);
+    WeekDay calculateDayOfWeek(EnergyPlusData &state, int year, int month, int day);
 
     int calculateDayOfYear(int Month, int Day, bool leapYear = false);
 

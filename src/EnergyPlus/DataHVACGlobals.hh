@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -122,15 +123,15 @@ namespace DataHVACGlobals {
     extern int const Other;
     extern int const RAB;
     // parameters describing fan types
-    extern int const NumAllFanTypes; // cpw22Aug2010 (was 4)
+    extern int const NumAllFanTypes;
 
     // fan types
     extern int const FanType_SimpleConstVolume;
     extern int const FanType_SimpleVAV;
     extern int const FanType_SimpleOnOff;
     extern int const FanType_ZoneExhaust;
-    extern int const FanType_ComponentModel;    // cpw22Aug2010 (new)
-    extern int const FanType_SystemModelObject; //
+    extern int const FanType_ComponentModel;
+    extern int const FanType_SystemModelObject;
 
     // Fan Minimum Flow Fraction Input Method
     extern int const MinFrac;
@@ -145,7 +146,7 @@ namespace DataHVACGlobals {
     extern int const BypassWhenWithinEconomizerLimits;   // heat recovery controlled by economizer limits
     extern int const BypassWhenOAFlowGreaterThanMinimum; // heat recovery ON at minimum OA in economizer mode
 
-    extern Array1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
+    extern Array1D_string const cFanTypes;
 
     // parameters describing unitary systems
     extern int const NumUnitarySystemTypes;
@@ -499,6 +500,14 @@ namespace DataHVACGlobals {
     void clear_state();
 
 } // namespace DataHVACGlobals
+
+struct HVACGlobalsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

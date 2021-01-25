@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,17 +50,16 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -216,8 +215,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
         using DataHVACGlobals::ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 
         // Locals
@@ -271,11 +268,11 @@ namespace HybridUnitaryAirConditioners {
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
-                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
+                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state,
                         "InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +
@@ -293,9 +290,9 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
 
         // Set the inlet volumetric flow rate from the mass flow rate
-        if (DataEnvironment::StdRhoAir > 1) {
+        if (state.dataEnvrn->StdRhoAir > 1) {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate =
-                ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
+                ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / state.dataEnvrn->StdRhoAir;
         } else {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / 1.225;
         }
@@ -354,34 +351,21 @@ namespace HybridUnitaryAirConditioners {
         //       MODIFIED
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        //
-
-        // METHODOLOGY EMPLOYED:
-        //
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using namespace DataLoopNode;
         using namespace Psychrometrics;
-        using DataEnvironment::StdRhoAir;
 
         Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 
         Real64 ZoneCoolingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
         Real64 ZoneHeatingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
         Real64 OutputRequiredToHumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
 
         Real64 OutputRequiredToDehumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
 
         SensibleOutputProvided = 0;
@@ -392,17 +376,18 @@ namespace HybridUnitaryAirConditioners {
         EnvRelHumm = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
         RoomRelHum = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
 
-        bool UseOccSchFlag = 1;
-        bool UseMinOASchFlag = 1;
+        bool UseOccSchFlag = true;
+        bool UseMinOASchFlag = true;
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        DesignMinVR = CalcDesignSpecificationOutdoorAir(state, ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+        DesignMinVR = CalcDesignSpecificationOutdoorAir(state,
+                                                        ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
                                                         ZoneNum,
                                                         UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]
         Real64 DesignMinVRMassFlow = 0;
-        if (StdRhoAir > 1) {
-            DesignMinVRMassFlow = DesignMinVR * StdRhoAir;
+        if (state.dataEnvrn->StdRhoAir > 1) {
+            DesignMinVRMassFlow = DesignMinVR * state.dataEnvrn->StdRhoAir;
         } else {
             DesignMinVRMassFlow = DesignMinVR * 1.225;
         }
@@ -485,7 +470,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace ScheduleManager;
         using BranchNodeConnections::SetUpCompSets;
         using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace DataLoopNode;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         std::string cCurrentModuleObject;  // Object type for getting and error messages
@@ -548,7 +532,7 @@ namespace HybridUnitaryAirConditioners {
                 // A2, \field Availability Schedule Name
                 ZoneHybridUnitaryAirConditioner(UnitLoop).Schedule = Alphas(2);
                 if (lAlphaBlanks(2)) {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr = GetScheduleIndex(state, Alphas(2));
                     if (ZoneHybridUnitaryAirConditioner(UnitLoop).SchedPtr == 0) {
@@ -652,10 +636,10 @@ namespace HybridUnitaryAirConditioners {
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(4);
                 // the two numbers above are used to generate a overall scaling factor
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(4);
-                if (DataEnvironment::StdRhoAir > 1) {
+                if (state.dataEnvrn->StdRhoAir > 1) {
                     // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
-                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
+                        ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * state.dataEnvrn->StdRhoAir;
                 } else {
                     ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
                         ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;

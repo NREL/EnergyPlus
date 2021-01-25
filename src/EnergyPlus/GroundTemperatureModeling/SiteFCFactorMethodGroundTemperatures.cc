@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     // Reads input and creates instance of Site:GroundTemperature:FCfactorMethod object
 
     // USE STATEMENTS:
-    using DataEnvironment::FCGroundTemps;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
 
@@ -112,7 +111,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
             thisModel->fcFactorGroundTemps(i) = rNumericArgs(i);
         }
 
-        FCGroundTemps = true;
+        state.dataEnvrn->FCGroundTemps = true;
         found = true;
 
     } else if (numCurrObjects > 1) {
@@ -125,7 +124,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
             thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager->GroundTempsFCFromEPWHeader(i);
         }
 
-        FCGroundTemps = true;
+        state.dataEnvrn->FCGroundTemps = true;
         found = true;
 
     } else {
@@ -134,7 +133,7 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, int obj
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    if (FCGroundTemps) {
+    if (state.dataEnvrn->FCGroundTemps) {
         write_ground_temps(state.files.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
@@ -178,7 +177,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
 
     // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay() / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * DataGlobalConstants::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

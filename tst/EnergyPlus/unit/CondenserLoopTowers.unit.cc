@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -66,7 +67,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -940,7 +940,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_GT(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 10000000.0);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
@@ -1349,7 +1349,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
@@ -1764,7 +1764,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRateWasAutoSized);
     EXPECT_NEAR(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate, 2.8262, 0.0001);
     EXPECT_DOUBLE_EQ(state->dataCondenserLoopTowers->towers(1).HighSpeedAirFlowRate,
-                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0);
+                     state->dataCondenserLoopTowers->towers(1).HighSpeedFanPower * 0.5 * (101325.0 / state->dataEnvrn->StdBaroPress) / 190.0);
 
     // autosized input
     EXPECT_TRUE(state->dataCondenserLoopTowers->towers(1).HighSpeedFanPowerWasAutoSized);
@@ -3043,7 +3043,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3435,7 +3435,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3909,7 +3909,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     PlantManager::GetPlantLoopData(*state);
     PlantManager::GetPlantInput(*state);
     SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(1);
+    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
     PlantManager::InitLoopEquip = true;
 
@@ -3919,15 +3919,15 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     CondenserLoopTowers::GetTowerInput(*state);
     auto &VSTower = state->dataCondenserLoopTowers->towers(1);
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataGlobal->BeginEnvrnFlag = true;
 
     // test case 1:
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutWetBulbTemp = 26.0;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutWetBulbTemp = 26.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
     DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
     VSTower.initialize(*state);
@@ -3937,10 +3937,10 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     VSTower.InletWaterTemp = 35.0;
     Real64 WaterFlowRateRatio = 0.75;
-    Real64 AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+    Real64 AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
 
-    DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = 1;
-    DataPlant::PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
+    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(VSTower.LoopNum).LoopSide(VSTower.LoopSideNum).TempSetPoint = 30.0;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
     VSTower.calculateVariableSpeedTower(*state);
@@ -3950,16 +3950,16 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
 
     // test case 2:
-    DataEnvironment::OutDryBulbTemp = 15.0;
-    DataEnvironment::OutWetBulbTemp = 10.0;
-    DataEnvironment::OutHumRat =
-        Psychrometrics::PsyWFnTdbTwbPb(*state, DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
-    AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+    state->dataEnvrn->OutDryBulbTemp = 15.0;
+    state->dataEnvrn->OutWetBulbTemp = 10.0;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    AirWetBulbTemp = state->dataEnvrn->OutWetBulbTemp;
     VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
 
-    VSTower.AirTemp = DataEnvironment::OutDryBulbTemp;
-    VSTower.AirWetBulb = DataEnvironment::OutWetBulbTemp;
-    VSTower.AirHumRat = DataEnvironment::OutHumRat;
+    VSTower.AirTemp = state->dataEnvrn->OutDryBulbTemp;
+    VSTower.AirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    VSTower.AirHumRat = state->dataEnvrn->OutHumRat;
 
     VSTower.calculateVariableSpeedTower(*state);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);

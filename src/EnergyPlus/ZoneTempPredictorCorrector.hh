@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,9 +49,9 @@
 #define ZoneTempPredictorCorrector_hh_INCLUDED
 
 // C++ Headers
-#include <vector>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -307,7 +307,7 @@ namespace ZoneTempPredictorCorrector {
 
     bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
-    bool VerifyControlledZoneForThermostat(std::string const &ZoneName); // Zone to verify
+    bool VerifyControlledZoneForThermostat(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 
     void DetectOscillatingZoneTemp(EnergyPlusData &state);
 
@@ -334,7 +334,7 @@ namespace ZoneTempPredictorCorrector {
                                                         int const ActualZoneNum // controlled zone actual zone number
     );
 
-    void OverrideAirSetPointsforEMSCntrl();
+    void OverrideAirSetPointsforEMSCntrl(EnergyPlusData& state);
 
     void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData& state);
 

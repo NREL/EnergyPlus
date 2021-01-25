@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,6 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -134,287 +133,287 @@ CoilSelectionData::CoilSelectionData( // constructor
 void ReportCoilSelection::finishCoilSummaryReportTable(EnergyPlusData &state)
 {
     doFinalProcessingOfCoilData(state);
-    writeCoilSelectionOutput();
-    writeCoilSelectionOutput2();
+    writeCoilSelectionOutput(state);
+    writeCoilSelectionOutput2(state);
 }
 
-void ReportCoilSelection::writeCoilSelectionOutput()
+void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 {
 
     // make calls to fill out predefined tabular report entries for each coil selection report object
     for (auto &c : coilSelectionDataObjs) {
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilType, c->coilName_, c->coilObjName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLocation, c->coilName_, c->coilLocation);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilHVACType, c->coilName_, c->typeHVACname);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilHVACName, c->coilName_, c->userNameforHVACsystem);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType, c->coilName_, c->coilObjName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLocation, c->coilName_, c->coilLocation);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType, c->coilName_, c->typeHVACname);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName, c->coilName_, c->userNameforHVACsystem);
 
         if (c->zoneName.size() == 1) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilZoneName, c->coilName_, c->zoneName[0]);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, c->zoneName[0]);
         } else if (c->zoneName.size() > 1) {
             // make list of zone names
             std::string tmpZoneList;
             for (std::size_t vecLoop = 0; vecLoop < c->zoneName.size(); ++vecLoop) {
                 tmpZoneList += c->zoneName[vecLoop] + "; ";
             }
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilZoneName, c->coilName_, tmpZoneList);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, tmpZoneList);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilZoneName, c->coilName_, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, "N/A");
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSysSizingMethCoinc, c->coilName_, c->coilSizingMethodConcurrenceName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSysSizingMethCap, c->coilName_, c->coilSizingMethodCapacityName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchSysSizingMethAir, c->coilName_, c->coilSizingMethodAirFlowName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilIsCapAutosized, c->coilName_, c->coilCapAutoMsg);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilIsAirFlowAutosized, c->coilName_, c->coilVolFlowAutoMsg);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilIsWaterFlowAutosized, c->coilName_, c->coilWaterFlowAutoMsg);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilIsOATreated, c->coilName_, c->coilOAPretreatMsg);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFinalTotalCap, c->coilName_, c->coilTotCapFinal, 3);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFinalSensCap, c->coilName_, c->coilSensCapFinal, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizingMethCoinc, c->coilName_, c->coilSizingMethodConcurrenceName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizingMethCap, c->coilName_, c->coilSizingMethodCapacityName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizingMethAir, c->coilName_, c->coilSizingMethodAirFlowName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilIsCapAutosized, c->coilName_, c->coilCapAutoMsg);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilIsAirFlowAutosized, c->coilName_, c->coilVolFlowAutoMsg);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilIsWaterFlowAutosized, c->coilName_, c->coilWaterFlowAutoMsg);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilIsOATreated, c->coilName_, c->coilOAPretreatMsg);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFinalTotalCap, c->coilName_, c->coilTotCapFinal, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFinalSensCap, c->coilName_, c->coilSensCapFinal, 3);
         if (c->coilRefAirVolFlowFinal == -999.0 || c->coilRefAirVolFlowFinal == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 6);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 6);
         }
 
         if (c->coilRefWaterVolFlowFinal == -999.0 || c->coilRefWaterVolFlowFinal == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchCoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 1);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchCoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchCoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 8);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchCoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedWithCoilName, c->coilName_, c->fanAssociatedWithCoilName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedWithCoilType, c->coilName_, c->fanTypeName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilName, c->coilName_, c->fanAssociatedWithCoilName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilType, c->coilName_, c->fanTypeName);
         if (c->fanSizeMaxAirVolumeFlow == -999.0 || c->fanSizeMaxAirVolumeFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 6);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 6);
         }
         if (c->fanSizeMaxAirMassFlow == -999.0 || c->fanSizeMaxAirMassFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDateTimeSensIdealPeak, c->coilName_, c->coilSensePeakHrMin);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDDnameTotIdealPeak, c->coilName_, c->desDayNameAtTotalPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDateTimeTotIdealPeak, c->coilName_, c->coilTotalPeakHrMin);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDateTimeSensIdealPeak, c->coilName_, c->coilSensePeakHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDDnameTotIdealPeak, c->coilName_, c->desDayNameAtTotalPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDateTimeTotIdealPeak, c->coilName_, c->coilTotalPeakHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilPeakLoadTypeToSizeOn, c->coilName_, c->coilPeakLoadTypeToSizeOnName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPeakLoadTypeToSizeOn, c->coilName_, c->coilPeakLoadTypeToSizeOnName);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2);
         if (c->coilDesMassFlow == -999.0 || c->coilDesMassFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilAirMassFlowIdealPeak, c->coilName_, c->coilDesMassFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilAirMassFlowIdealPeak, c->coilName_, c->coilDesMassFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilAirMassFlowIdealPeak, c->coilName_, c->coilDesMassFlow, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilAirMassFlowIdealPeak, c->coilName_, c->coilDesMassFlow, 8);
         }
         if (c->coilDesVolFlow == -999.0 || c->coilDesVolFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 6);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 6);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntDryBulbIdealPeak, c->coilName_, c->coilDesEntTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntWetBulbIdealPeak, c->coilName_, c->coilDesEntWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntDryBulbIdealPeak, c->coilName_, c->coilDesEntTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntWetBulbIdealPeak, c->coilName_, c->coilDesEntWetBulb, 2);
         if (c->coilDesEntHumRat == -999.0 || c->coilDesEntHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 8);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntEnthalpyIdealPeak, c->coilName_, c->coilDesEntEnth, 1);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgDryBulbIdealPeak, c->coilName_, c->coilDesLvgTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgWetBulbIdealPeak, c->coilName_, c->coilDesLvgWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntEnthalpyIdealPeak, c->coilName_, c->coilDesEntEnth, 1);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgDryBulbIdealPeak, c->coilName_, c->coilDesLvgTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgWetBulbIdealPeak, c->coilName_, c->coilDesLvgWetBulb, 2);
         if (c->coilDesLvgHumRat == -999.0 || c->coilDesLvgHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 8);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgEnthalpyIdealPeak, c->coilName_, c->coilDesLvgEnth, 1);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgEnthalpyIdealPeak, c->coilName_, c->coilDesLvgEnth, 1);
         if (c->coilDesWaterMassFlow == -999.0 || c->coilDesWaterMassFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchCoilWaterMassFlowIdealPeak, c->coilName_, c->coilDesWaterMassFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchCoilWaterMassFlowIdealPeak, c->coilName_, c->coilDesWaterMassFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchCoilWaterMassFlowIdealPeak, c->coilName_, c->coilDesWaterMassFlow, 8);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchCoilWaterMassFlowIdealPeak, c->coilName_, c->coilDesWaterMassFlow, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilEntWaterTempIdealPeak, c->coilName_, c->coilDesWaterEntTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilLvgWaterTempIdealPeak, c->coilName_, c->coilDesWaterLvgTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilWaterDeltaTempIdealPeak, c->coilName_, c->coilDesWaterTempDiff, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanHeatGainIdealPeak, c->coilName_, c->fanHeatGainIdealPeak, 3);
-        OutputReportPredefined::PreDefTableEntry(
-            OutputReportPredefined::pdchCoilNetTotalCapacityIdealPeak, c->coilName_, c->coilAndFanNetTotalCapacityIdealPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilEntWaterTempIdealPeak, c->coilName_, c->coilDesWaterEntTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLvgWaterTempIdealPeak, c->coilName_, c->coilDesWaterLvgTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilWaterDeltaTempIdealPeak, c->coilName_, c->coilDesWaterTempDiff, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanHeatGainIdealPeak, c->coilName_, c->fanHeatGainIdealPeak, 3);
+        OutputReportPredefined::PreDefTableEntry(state,
+            state.dataOutRptPredefined->pdchCoilNetTotalCapacityIdealPeak, c->coilName_, c->coilAndFanNetTotalCapacityIdealPeak, 2);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedTotalCap, c->coilName_, c->coilRatedTotCap, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedSensCap, c->coilName_, c->coilRatedSensCap, 2);
-        OutputReportPredefined::PreDefTableEntry(
-            OutputReportPredefined::pdchCoilOffRatingCapacityModifierIdealPeak, c->coilName_, c->coilCapFTIdealPeak, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedTotalCap, c->coilName_, c->coilRatedTotCap, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedSensCap, c->coilName_, c->coilRatedSensCap, 2);
+        OutputReportPredefined::PreDefTableEntry(state,
+            state.dataOutRptPredefined->pdchCoilOffRatingCapacityModifierIdealPeak, c->coilName_, c->coilCapFTIdealPeak, 4);
         if (c->ratedAirMassFlow == -999.0 || c->ratedAirMassFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedAirMass, c->coilName_, c->ratedAirMassFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedAirMass, c->coilName_, c->ratedAirMassFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedAirMass, c->coilName_, c->ratedAirMassFlow, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedAirMass, c->coilName_, c->ratedAirMassFlow, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedEntDryBulb, c->coilName_, c->ratedCoilInDb, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedEntWetBulb, c->coilName_, c->ratedCoilInWb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedEntDryBulb, c->coilName_, c->ratedCoilInDb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedEntWetBulb, c->coilName_, c->ratedCoilInWb, 2);
         if (c->ratedCoilInHumRat == -999.0 || c->ratedCoilInHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedEntHumRat, c->coilName_, c->ratedCoilInHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedEntHumRat, c->coilName_, c->ratedCoilInHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedEntHumRat, c->coilName_, c->ratedCoilInHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedEntHumRat, c->coilName_, c->ratedCoilInHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedEntEnthalpy, c->coilName_, c->ratedCoilInEnth, 1);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedLvgDryBulb, c->coilName_, c->ratedCoilOutDb, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedLvgWetBulb, c->coilName_, c->ratedCoilOutWb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedEntEnthalpy, c->coilName_, c->ratedCoilInEnth, 1);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedLvgDryBulb, c->coilName_, c->ratedCoilOutDb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedLvgWetBulb, c->coilName_, c->ratedCoilOutWb, 2);
         if (c->ratedCoilOutHumRat == -999.0 || c->ratedCoilOutHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedLvgHumRat, c->coilName_, c->ratedCoilOutHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedLvgHumRat, c->coilName_, c->ratedCoilOutHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedLvgHumRat, c->coilName_, c->ratedCoilOutHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedLvgHumRat, c->coilName_, c->ratedCoilOutHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilRatedLvgEnthalpy, c->coilName_, c->ratedCoilOutEnth, 1);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilRatedLvgEnthalpy, c->coilName_, c->ratedCoilOutEnth, 1);
 
         if (c->plantDesMaxMassFlowRate == -999.0 || c->plantDesMaxMassFlowRate == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantMassFlowMaximum, c->coilName_, c->plantDesMaxMassFlowRate, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantMassFlowMaximum, c->coilName_, c->plantDesMaxMassFlowRate, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantMassFlowMaximum, c->coilName_, c->plantDesMaxMassFlowRate, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantMassFlowMaximum, c->coilName_, c->plantDesMaxMassFlowRate, 8);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantRetTempDesign, c->coilName_, c->plantDesRetTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantSupTempDesign, c->coilName_, c->plantDesSupTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantDeltaTempDesign, c->coilName_, c->plantDesDeltaTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantCapacity, c->coilName_, c->plantDesCapacity, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilCapPrcntPlantCapacity, c->coilName_, c->coilCapPrcntPlantCap, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantRetTempDesign, c->coilName_, c->plantDesRetTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSupTempDesign, c->coilName_, c->plantDesSupTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantDeltaTempDesign, c->coilName_, c->plantDesDeltaTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantCapacity, c->coilName_, c->plantDesCapacity, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilCapPrcntPlantCapacity, c->coilName_, c->coilCapPrcntPlantCap, 4);
         if (c->coilFlowPrcntPlantFlow == -999.0 || c->coilFlowPrcntPlantFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFlowPrcntPlantFlow, c->coilName_, c->coilFlowPrcntPlantFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFlowPrcntPlantFlow, c->coilName_, c->coilFlowPrcntPlantFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilFlowPrcntPlantFlow, c->coilName_, c->coilFlowPrcntPlantFlow, 6);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilFlowPrcntPlantFlow, c->coilName_, c->coilFlowPrcntPlantFlow, 6);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2);
         if (c->oaPeakHumRat == -999.0 || c->oaPeakHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAWetBulbatIdealPeak, c->coilName_, c->oaPeakWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAWetBulbatIdealPeak, c->coilName_, c->oaPeakWetBulb, 2);
         if (c->oaPeakVolFlow == -999.0 || c->oaPeakVolFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAVolFlowIdealPeak, c->coilName_, c->oaPeakVolFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAVolFlowIdealPeak, c->coilName_, c->oaPeakVolFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAVolFlowIdealPeak, c->coilName_, c->oaPeakVolFlow, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAVolFlowIdealPeak, c->coilName_, c->oaPeakVolFlow, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchOAFlowPrcntIdealPeak, c->coilName_, c->oaPeakVolFrac, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchAirSysRADryBulbIdealPeak, c->coilName_, c->raPeakTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOAFlowPrcntIdealPeak, c->coilName_, c->oaPeakVolFrac, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirSysRADryBulbIdealPeak, c->coilName_, c->raPeakTemp, 2);
         if (c->raPeakHumRat == -999.0 || c->raPeakHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchAirSysRAHumRatIdealPeak, c->coilName_, c->raPeakHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirSysRAHumRatIdealPeak, c->coilName_, c->raPeakHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchAirSysRAHumRatIdealPeak, c->coilName_, c->raPeakHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirSysRAHumRatIdealPeak, c->coilName_, c->raPeakHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneAirDryBulbIdealPeak, c->coilName_, c->rmPeakTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneAirDryBulbIdealPeak, c->coilName_, c->rmPeakTemp, 2);
         if (c->rmPeakHumRat == -999.0 || c->rmPeakHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneAirRelHumIdealPeak, c->coilName_, c->rmPeakRelHum, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilUA, c->coilName_, c->coilUA, 3);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneSensibleLoadIdealPeak, c->coilName_, c->rmSensibleAtPeak, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchZoneLatentLoadIdealPeak, c->coilName_, c->rmLatentAtPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchReheatCoilMultiplier, c->coilName_, c->reheatLoadMult, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFlowCapRatioLowCapIncreaseRatio, c->coilName_, c->maxRatio, 5);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFlowCapRatioHiCapDecreaseRatio, c->coilName_, c->minRatio, 5);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantFluidSpecificHeat, c->coilName_, c->cpFluid, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchPlantFluidDensity, c->coilName_, c->rhoFluid, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMoistAirSpecificHeat, c->coilName_, c->cpMoistAir, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDryAirSpecificHeat, c->coilName_, c->cpDryAir, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchStandRhoAir, c->coilName_, c->rhoStandAir, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneAirRelHumIdealPeak, c->coilName_, c->rmPeakRelHum, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilUA, c->coilName_, c->coilUA, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneSensibleLoadIdealPeak, c->coilName_, c->rmSensibleAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchZoneLatentLoadIdealPeak, c->coilName_, c->rmLatentAtPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchReheatCoilMultiplier, c->coilName_, c->reheatLoadMult, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFlowCapRatioLowCapIncreaseRatio, c->coilName_, c->maxRatio, 5);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFlowCapRatioHiCapDecreaseRatio, c->coilName_, c->minRatio, 5);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantFluidSpecificHeat, c->coilName_, c->cpFluid, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantFluidDensity, c->coilName_, c->rhoFluid, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMoistAirSpecificHeat, c->coilName_, c->cpMoistAir, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDryAirSpecificHeat, c->coilName_, c->cpDryAir, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchStandRhoAir, c->coilName_, c->rhoStandAir, 4);
     }
 }
 
-void ReportCoilSelection::writeCoilSelectionOutput2()
+void ReportCoilSelection::writeCoilSelectionOutput2(EnergyPlusData &state)
 {
 
     // make calls to fill out predefined tabular report entries for each coil selection report object
     for (auto &c : coilSelectionDataObjs) {
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilType, c->coilName_, c->coilObjName);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilHVACType, c->coilName_, c->typeHVACname);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilHVACName, c->coilName_, c->userNameforHVACsystem);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilType, c->coilName_, c->coilObjName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilHVACType, c->coilName_, c->typeHVACname);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilHVACName, c->coilName_, c->userNameforHVACsystem);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilFinalTotalCap, c->coilName_, c->coilTotCapFinal, 3);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilFinalSensCap, c->coilName_, c->coilSensCapFinal, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilFinalTotalCap, c->coilName_, c->coilTotCapFinal, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilFinalSensCap, c->coilName_, c->coilSensCapFinal, 3);
         if (c->coilRefAirVolFlowFinal == -999.0 || c->coilRefAirVolFlowFinal == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 1);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 6);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdch2CoilFinalAirVolFlowRate, c->coilName_, c->coilRefAirVolFlowFinal, 6);
         }
 
         if (c->coilRefWaterVolFlowFinal == -999.0 || c->coilRefWaterVolFlowFinal == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 1);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 8);
+            OutputReportPredefined::PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdch2CoilFinalPlantVolFlowRate, c->coilName_, c->coilRefWaterVolFlowFinal, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilDateTimeSensIdealPeak, c->coilName_, c->coilSensePeakHrMin);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilDateTimeSensIdealPeak, c->coilName_, c->coilSensePeakHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2);
         if (c->coilDesVolFlow == -999.0 || c->coilDesVolFlow == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 6);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilAirVolumeFlowIdealPeak, c->coilName_, c->coilDesVolFlow, 6);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilEntDryBulbIdealPeak, c->coilName_, c->coilDesEntTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilEntWetBulbIdealPeak, c->coilName_, c->coilDesEntWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilEntDryBulbIdealPeak, c->coilName_, c->coilDesEntTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilEntWetBulbIdealPeak, c->coilName_, c->coilDesEntWetBulb, 2);
         if (c->coilDesEntHumRat == -999.0 || c->coilDesEntHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilEntHumRatIdealPeak, c->coilName_, c->coilDesEntHumRat, 8);
         }
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilLvgDryBulbIdealPeak, c->coilName_, c->coilDesLvgTemp, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilLvgWetBulbIdealPeak, c->coilName_, c->coilDesLvgWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilLvgDryBulbIdealPeak, c->coilName_, c->coilDesLvgTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilLvgWetBulbIdealPeak, c->coilName_, c->coilDesLvgWetBulb, 2);
         if (c->coilDesLvgHumRat == -999.0 || c->coilDesLvgHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilLvgHumRatIdealPeak, c->coilName_, c->coilDesLvgHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilRatedTotalCap, c->coilName_, c->coilRatedTotCap, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilRatedSensCap, c->coilName_, c->coilRatedSensCap, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilRatedTotalCap, c->coilName_, c->coilRatedTotCap, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilRatedSensCap, c->coilName_, c->coilRatedSensCap, 2);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2OADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2OADryBulbIdealPeak, c->coilName_, c->oaPeakTemp, 2);
         if (c->oaPeakHumRat == -999.0 || c->oaPeakHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2OAHumRatIdealPeak, c->coilName_, c->oaPeakHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2OAWetBulbatIdealPeak, c->coilName_, c->oaPeakWetBulb, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2OAFlowPrcntIdealPeak, c->coilName_, c->oaPeakVolFrac, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2OAWetBulbatIdealPeak, c->coilName_, c->oaPeakWetBulb, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2OAFlowPrcntIdealPeak, c->coilName_, c->oaPeakVolFrac, 4);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneAirDryBulbIdealPeak, c->coilName_, c->rmPeakTemp, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneAirDryBulbIdealPeak, c->coilName_, c->rmPeakTemp, 2);
         if (c->rmPeakHumRat == -999.0 || c->rmPeakHumRat == -99999.0) {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 1);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 1);
         } else {
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 8);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneAirHumRatIdealPeak, c->coilName_, c->rmPeakHumRat, 8);
         }
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneAirRelHumIdealPeak, c->coilName_, c->rmPeakRelHum, 4);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2CoilUA, c->coilName_, c->coilUA, 3);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneSensibleLoadIdealPeak, c->coilName_, c->rmSensibleAtPeak, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdch2ZoneLatentLoadIdealPeak, c->coilName_, c->rmLatentAtPeak);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneAirRelHumIdealPeak, c->coilName_, c->rmPeakRelHum, 4);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2CoilUA, c->coilName_, c->coilUA, 3);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneSensibleLoadIdealPeak, c->coilName_, c->rmSensibleAtPeak, 2);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdch2ZoneLatentLoadIdealPeak, c->coilName_, c->rmLatentAtPeak);
     }
 }
 
@@ -444,8 +443,8 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
         // see if there is an OA controller
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -490,7 +489,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
     c->zoneNum.resize(1);
-    c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
+    c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
     c->zoneName.resize(1);
     c->zoneName[0] = DataHeatBalance::Zone(c->zoneNum[0]).Name;
     c->typeHVACname = "Zone Equipment"; // init
@@ -506,8 +505,8 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     if (c->airloopNum > 0) {
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -544,44 +543,44 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         c->typeHVACname = "Unknown";
         c->userNameforHVACsystem = "Unknown";
         // now search equiment
-        if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-            c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(1);
-            c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(1);
+        if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
+            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
+            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
             c->coilLocation = "Zone Equipment";
-            c->zoneHVACTypeNum = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(1);
-            c->zoneHVACIndex = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipIndex(1);
-        } else if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+            c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(1);
+            c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(1);
+        } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
             bool foundOne(false);
-            for (int equipLoop = 1; equipLoop <= DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
+            for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                 // go with the first ZoneHVAC device in the list
-                if ((DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
                     if (!foundOne) {
-                        c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                        c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                        c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         foundOne = true;
                         c->coilLocation = "Zone Equipment";
-                        c->zoneHVACTypeNum = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop);
-                        c->zoneHVACIndex = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
+                        c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop);
+                        c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
                     } else { // or may have found another
-                        c->typeHVACname += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                        c->userNameforHVACsystem += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                        c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                     }
                 }
             }
@@ -601,45 +600,45 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->typeHVACname = "Unknown";
             c->userNameforHVACsystem = "Unknown";
             // now search equiment
-            if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(1);
-                c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(1);
+            if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
+                c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
+                c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
                 c->coilLocation = "Zone Equipment";
-            } else if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+            } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
                 bool foundOne(false);
-                for (int equipLoop = 1; equipLoop <= DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
+                for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                     // go with the first ZoneHVAC device in the list
-                    if ((DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
                         if (!foundOne) {
-                            c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                             foundOne = true;
                             c->coilLocation = "Zone Equipment";
                         } else { // or may have found another
-                            c->typeHVACname += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                            c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         }
                     }
                 }
@@ -716,46 +715,46 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         // call psych routine to flush out moist air metrics from those available
         if (c->coilDesEntTemp != -999.0) {
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
             if (c->coilDesEntHumRat != -999.0) {
                 c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             }
         }
         if (c->oaPeakTemp != -999.0 && c->oaPeakHumRat != -999.0) {
             c->oaPeakWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->oaPeakTemp, c->oaPeakHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
+                c->oaPeakTemp, c->oaPeakHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::doFinalProcessingOfCoilData");
         }
 
         if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
 
-            c->plantLoopName = DataPlant::PlantLoop(c->waterLoopNum).Name;
+            c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
             if (DataSizing::PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
                 c->rhoFluid = FluidProperties::GetDensityGlycol(state,
-                                                                DataPlant::PlantLoop(c->waterLoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp(),
-                                                                DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
+                                                                DataGlobalConstants::InitConvTemp,
+                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::doFinalProcessingOfCoilData");
 
                 c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                    DataPlant::PlantLoop(c->waterLoopNum).FluidName,
-                                                                    DataGlobalConstants::InitConvTemp(),
-                                                                    DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                    state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
+                                                                    DataGlobalConstants::InitConvTemp,
+                                                                    state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                     "ReportCoilSelection::doFinalProcessingOfCoilData");
             } else { // steam loop
                 c->rhoFluid = FluidProperties::GetSatDensityRefrig(state,
-                                                                   DataPlant::PlantLoop(c->waterLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                    100.0,
                                                                    1.0,
-                                                                   DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                    "ReportCoilSelection::doFinalProcessingOfCoilData");
                 c->cpFluid = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                       DataPlant::PlantLoop(c->waterLoopNum).FluidName,
+                                                                       state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                        100.0,
                                                                        0.0,
-                                                                       DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                       state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                        "ReportCoilSelection::doFinalProcessingOfCoilData");
             }
-            c->plantDesMaxMassFlowRate = DataPlant::PlantLoop(c->waterLoopNum).MaxMassFlowRate;
+            c->plantDesMaxMassFlowRate = state.dataPlnt->PlantLoop(c->waterLoopNum).MaxMassFlowRate;
             if (c->plantDesMaxMassFlowRate > 0.0 && c->coilDesWaterMassFlow > 0.0) {
                 c->coilFlowPrcntPlantFlow = (c->coilDesWaterMassFlow / c->plantDesMaxMassFlowRate) * 100.0; // convert to percentage.
             }
@@ -851,13 +850,13 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
 
         c->cpDryAir = Psychrometrics::PsyCpAirFnW(0.0);
-        c->rhoStandAir = DataEnvironment::StdRhoAir;
+        c->rhoStandAir = state.dataEnvrn->StdRhoAir;
 
         // apply ADP method to find an SHR for Ideal loads peak, calculate sensible capacity for cooling coils
         if (c->coilDesEntTemp > c->coilDesLvgTemp) {                                                              // cooling coil
-            Real64 CoilADPTemp = Psychrometrics::PsyTdpFnWPb(state, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress); // apparatus dewpoint temperature
+            Real64 CoilADPTemp = Psychrometrics::PsyTdpFnWPb(state, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress); // apparatus dewpoint temperature
             Real64 CoilADPHumRat =
-                Psychrometrics::PsyWFnTdpPb(state, CoilADPTemp, DataEnvironment::StdBaroPress); // humidity ratio at apparatus dewpoint temperaure
+                Psychrometrics::PsyWFnTdpPb(state, CoilADPTemp, state.dataEnvrn->StdBaroPress); // humidity ratio at apparatus dewpoint temperaure
             Real64 CoilTinwADPEnthalpy = Psychrometrics::PsyHFnTdbW(
                 c->coilDesEntTemp, CoilADPHumRat); // Enthalpy at inlet drybulb and humidity ratio at apparatus dewpoint temperature
             Real64 CoilADPEnthalpy =
@@ -979,7 +978,7 @@ void ReportCoilSelection::setCoilAirFlow(EnergyPlusData &state, std::string cons
     c->coilDesVolFlow = airVdot;
     c->volFlowIsAutosized = isAutoSized;
 
-    c->coilDesMassFlow = airVdot * DataEnvironment::StdRhoAir;
+    c->coilDesMassFlow = airVdot * state.dataEnvrn->StdRhoAir;
 }
 
 void ReportCoilSelection::setCoilWaterFlowNodeNums(EnergyPlusData &state,
@@ -1014,34 +1013,34 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
     c->pltSizNum = plantSizNum;
     c->waterLoopNum = plantLoopNum;
     if (c->waterLoopNum > 0) {
-        c->plantLoopName = DataPlant::PlantLoop(c->waterLoopNum).Name;
+        c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
     }
 
     if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
         if (DataSizing::PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
             c->rhoFluid = FluidProperties::GetDensityGlycol(state,
-                                                            DataPlant::PlantLoop(c->waterLoopNum).FluidName,
-                                                            DataGlobalConstants::InitConvTemp(),
-                                                            DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
+                                                            DataGlobalConstants::InitConvTemp,
+                                                            state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                             "ReportCoilSelection::setCoilWaterFlow");
 
             c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                DataPlant::PlantLoop(c->waterLoopNum).FluidName,
-                                                                DataGlobalConstants::InitConvTemp(),
-                                                                DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
+                                                                DataGlobalConstants::InitConvTemp,
+                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::setCoilWaterFlow");
         } else { // steam loop
             c->rhoFluid = FluidProperties::GetSatDensityRefrig(state,
-                                                               DataPlant::PlantLoop(c->waterLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                100.0,
                                                                1.0,
-                                                               DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                "ReportCoilSelection::setCoilWaterFlow");
             c->cpFluid = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                   DataPlant::PlantLoop(c->waterLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                    100.0,
                                                                    0.0,
-                                                                   DataPlant::PlantLoop(c->waterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                    "ReportCoilSelection::setCoilWaterFlow");
         }
     }
@@ -1181,7 +1180,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
         // crash
         if (DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin =
                 PeakHrMinString(state,
@@ -1189,7 +1188,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                                 DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin =
                 PeakHrMinString(state,
@@ -1198,7 +1197,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         }
 
         if (DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= DataEnvironment::TotDesDays) {
+            DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
             c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin =
                 PeakHrMinString(state,
@@ -1252,7 +1251,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 if (Vdot_z == 0.0) { // take value from final zone sizing
                     Vdot_z = DataSizing::FinalZoneSizing(z).CoolMassFlow;
                     if (Vdot_z == 0.0) {
-                        Vdot_z = DataSizing::FinalSysSizing(curSysNum).DesCoolVolFlow * DataEnvironment::StdRhoAir / c->zoneNum.size();
+                        Vdot_z = DataSizing::FinalSysSizing(curSysNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
                     }
                 }
                 Real64 Wz = DataSizing::CalcZoneSizing(SysPeakDDnum, z).CoolZoneHumRatSeq(SysPeakTimeStepInDay);
@@ -1271,7 +1270,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->rmPeakTemp = (sumT_Vdot / sumVdot);
             c->rmPeakHumRat = (sumW_Vdot / sumVdot);
             c->rmPeakRelHum =
-                Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, DataEnvironment::StdBaroPress) * 100.0; // convert to percentage
+                Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         } else {
             c->rmPeakTemp = -999.0;
             c->rmPeakHumRat = -999.0;
@@ -1293,7 +1292,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).OutHumRatAtCoolPeak;
             }
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly
                 c->coilDesLvgTemp = DataSizing::FinalSysSizing(curSysNum).PrecoolTemp;
@@ -1302,7 +1301,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).PrecoolHumRat;
             }
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
 
         } else {                               // part of main air loop
@@ -1313,7 +1312,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).MixHumRatAtCoolPeak;
             }
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) {
                 c->coilDesLvgTemp = DataSizing::FinalSysSizing(curSysNum).CoolSupTemp;
@@ -1322,7 +1321,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).CoolSupHumRat;
             }
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+                c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             if (state.dataAirSystemsData->PrimaryAirSystems(curSysNum).NumOACoolCoils > 0) { // there is precooling of the OA stream
                 c->oaPretreated = true;
@@ -1332,8 +1331,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).CoolDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak;
@@ -1342,9 +1341,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->rmPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtCoolPeak;
         c->rmPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtCoolPeak;
         c->rmPeakRelHum =
-            Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, DataEnvironment::StdBaroPress) * 100.0; // convert to percentage
+            Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         if (DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum > 0 &&
-            DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
+            DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin = PeakHrMinString(
                 state, DataSizing::FinalZoneSizing(curZoneEqNum).CoolDDNum, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtCoolMax);
             c->airPeakHrMin = PeakHrMinString(
@@ -1406,7 +1405,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->coilDesLvgHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).CoolDesHumRat;
         }
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-            c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
+            c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
     } else {
         // do nothing
@@ -1480,7 +1479,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 if (Vdot_z == 0.0) { // take value from final zone sizing
                     Vdot_z = DataSizing::FinalZoneSizing(z).HeatMassFlow;
                     if (Vdot_z == 0.0) {
-                        Vdot_z = DataSizing::FinalSysSizing(curSysNum).DesHeatVolFlow * DataEnvironment::StdRhoAir / c->zoneNum.size();
+                        Vdot_z = DataSizing::FinalSysSizing(curSysNum).DesHeatVolFlow * state.dataEnvrn->StdRhoAir / c->zoneNum.size();
                     }
                 }
                 Real64 Wz = DataSizing::CalcZoneSizing(SysPeakDDnum, z).HeatZoneHumRatSeq(SysPeakTimeStepInDay);
@@ -1500,7 +1499,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->rmPeakTemp = (sumT_Vdot / sumVdot);
             c->rmPeakHumRat = (sumW_Vdot / sumVdot);
             c->rmPeakRelHum =
-                Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, DataEnvironment::StdBaroPress) * 100.0; // convert to percentage
+                Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         } else {
             c->rmPeakTemp = -999.0;
             c->rmPeakHumRat = -999.0;
@@ -1513,7 +1512,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->rmSensibleAtPeak = sumLoad;
         }
 
-        if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= DataEnvironment::TotDesDays) {
+        if (DataSizing::FinalSysSizing(curSysNum).HeatDDNum > 0 && DataSizing::FinalSysSizing(curSysNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin =
                 PeakHrMinString(state, DataSizing::FinalSysSizing(curSysNum).HeatDDNum, DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk);
 
@@ -1529,24 +1528,24 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = DataSizing::FinalSysSizing(curSysNum).HeatOutTemp;
             if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).HeatOutHumRat;
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = DataSizing::FinalSysSizing(curSysNum).PreheatTemp;
             if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).PreheatHumRat;
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+                c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
 
         } else { // part of main air loop
             if (c->coilDesEntTemp == -999.0) c->coilDesEntTemp = DataSizing::FinalSysSizing(curSysNum).HeatMixTemp;
             if (c->coilDesEntHumRat == -999.0) c->coilDesEntHumRat = DataSizing::FinalSysSizing(curSysNum).HeatMixHumRat;
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
             if (c->coilDesLvgTemp == -999.0) c->coilDesLvgTemp = DataSizing::FinalSysSizing(curSysNum).HeatSupTemp;
             if (c->coilDesLvgHumRat == -999.0) c->coilDesLvgHumRat = DataSizing::FinalSysSizing(curSysNum).HeatSupHumRat;
             c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+                c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             if (state.dataAirSystemsData->PrimaryAirSystems(curSysNum).NumOAHeatCoils > 0) { // there is preHeating of the OA stream
                 c->oaPretreated = true;
@@ -1556,8 +1555,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak;
@@ -1566,9 +1565,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->rmPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak;
         c->rmPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
         c->rmPeakRelHum =
-            Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, DataEnvironment::StdBaroPress) * 100.0; // convert to percentage
+            Psychrometrics::PsyRhFnTdbWPb(state, c->rmPeakTemp, c->rmPeakHumRat, state.dataEnvrn->StdBaroPress) * 100.0; // convert to percentage
         if (DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum > 0 &&
-            DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum <= DataEnvironment::TotDesDays) {
+            DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
             c->coilSensePeakHrMin = PeakHrMinString(
                 state, DataSizing::FinalZoneSizing(curZoneEqNum).HeatDDNum, DataSizing::FinalZoneSizing(curZoneEqNum).TimeStepNumAtHeatMax);
             c->airPeakHrMin = PeakHrMinString(
@@ -1653,7 +1652,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
         if (c->coilDesEntTemp > -999.0 && c->coilDesEntHumRat > -999.0) {
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+                c->coilDesEntTemp, c->coilDesEntHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
         }
 
@@ -1664,7 +1663,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilDesLvgHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat;
         }
         c->coilDesLvgWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-            c->coilDesLvgTemp, c->coilDesLvgHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+            c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
         c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
     } else {
         // do nothing
@@ -1680,7 +1679,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         } else if ((curZoneEqNum > 0) && allocated(DataSizing::FinalZoneSizing) &&
                    (DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow)) {
             c->coilDesMassFlow = DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatMassFlow;
-            c->coilDesVolFlow = c->coilDesMassFlow / DataEnvironment::StdRhoAir;
+            c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
         } else if (curSysNum > 0 && allocated(DataSizing::FinalSysSizing)) {
             if (curOASysNum > 0 && allocated(DataSizing::OASysEqSizing)) {
                 if (DataSizing::OASysEqSizing(curOASysNum).AirFlow) {
@@ -1722,7 +1721,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 }
             }
         }
-        c->coilDesMassFlow = c->coilDesVolFlow * DataEnvironment::StdRhoAir;
+        c->coilDesMassFlow = c->coilDesVolFlow * state.dataEnvrn->StdRhoAir;
     }
 
     // calc sensible capacity from inlet outlet

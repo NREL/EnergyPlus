@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,17 +51,17 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -2162,7 +2162,7 @@ namespace IntegratedHeatPump {
             break;
         }
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
         IntegratedHeatPumps(DXCoilNum).Energy = IntegratedHeatPumps(DXCoilNum).TotalPower * ReportingConstant; // total electric energy consumption
                                                                                                                // [J]
@@ -2197,7 +2197,6 @@ namespace IntegratedHeatPump {
         // it should be called by an air loop parent object, when FirstHVACIteration == true
 
         // Using/Aliasing
-        using DataEnvironment::OutDryBulbTemp;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::TimeStepSys;
         using WaterThermalTanks::GetWaterThermalTankInput;
@@ -2269,7 +2268,7 @@ namespace IntegratedHeatPump {
         WHHeatTimeSav = IntegratedHeatPumps(DXCoilNum).SHDWHRunTime;
         if (IHPOperationMode::SCDWHMode == IntegratedHeatPumps(DXCoilNum).CurMode) {
             WHHeatVolSave = IntegratedHeatPumps(DXCoilNum).WaterFlowAccumVol + Node(IntegratedHeatPumps(DXCoilNum).WaterTankoutNod).MassFlowRate /
-                                                                                   983.0 * TimeStepSys * DataGlobalConstants::SecInHour(); // 983 - water density at 60 C
+                                                                                   983.0 * TimeStepSys * DataGlobalConstants::SecInHour; // 983 - water density at 60 C
         } else {
             WHHeatVolSave = 0.0;
         }
@@ -2285,7 +2284,7 @@ namespace IntegratedHeatPump {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCMode;
             } else if (SensLoad > SmallLoad) {
                 if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                    (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
+                    (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // used for cooling season, avoid heating after SCWH mode
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::IdleMode;
                 else
                     IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHMode;
@@ -2308,15 +2307,15 @@ namespace IntegratedHeatPump {
             };
 
         } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorOverCoolAllow) &&
-                   (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
+                   (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientOverCoolAllow)) // over-cooling allowed, water heating priority
         {
             IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SCWHMatchWHMode;
         } else if ((IntegratedHeatPumps(DXCoilNum).ControlledZoneTemp > IntegratedHeatPumps(DXCoilNum).TindoorWHHighPriority) &&
-                   (OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
+                   (state.dataEnvrn->OutDryBulbTemp > IntegratedHeatPumps(DXCoilNum).TambientWHHighPriority)) // ignore space heating request
         {
             IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::DWHMode;
         } else if (SensLoad > SmallLoad) {
-            IntegratedHeatPumps(DXCoilNum).SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour();
+            IntegratedHeatPumps(DXCoilNum).SHDWHRunTime = WHHeatTimeSav + TimeStepSys * DataGlobalConstants::SecInHour;
 
             if (WHHeatTimeSav > IntegratedHeatPumps(DXCoilNum).TimeLimitSHDWH) {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHDWHElecHeatOnMode;

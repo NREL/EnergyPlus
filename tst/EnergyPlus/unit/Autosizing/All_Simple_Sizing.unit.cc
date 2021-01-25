@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -624,7 +624,7 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
     DataSizing::DataCapacityUsedForSizing = 2500.0;
     DataSizing::DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     DataSizing::ZoneSizingRunDone = true;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Test 2 - Zone Equipment
     // start with an auto-sized value as the user input
@@ -791,7 +791,7 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
     DataSizing::DataCapacityUsedForSizing = 2500.0;
     DataSizing::DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     DataSizing::ZoneSizingRunDone = true;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
 
     // Test 2 - Zone Equipment
     // start with an auto-sized value as the user input

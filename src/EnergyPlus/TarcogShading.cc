@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,6 @@
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
-
-#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -677,8 +675,8 @@ namespace TarcogShading {
 
         TGapOld1 = 0.0;
         TGapOld2 = 0.0;
-        tilt = DataGlobalConstants::Pi() / 180 * (angle - 90);
-        T0 = 0.0 + DataGlobalConstants::KelvinConv();
+        tilt = DataGlobalConstants::Pi / 180 * (angle - 90);
+        T0 = 0.0 + DataGlobalConstants::KelvinConv;
         A1eqin = 0.0;
         A2eqout = 0.0;
         A1eqout = 0.0;
@@ -719,7 +717,7 @@ namespace TarcogShading {
             //  A = dens0 * T0 * GravityConstant * ABS(cos(tilt)) * ABS(Tgap1 - Tgap2) / (Tgap1 * Tgap2)
 
             // bi...Bug fix #00005:
-            A = dens0 * T0 * DataGlobalConstants::GravityConstant() * H * std::abs(cos_Tilt) * std::abs(Tgap1 - Tgap2) / (Tgap1 * Tgap2);
+            A = dens0 * T0 * DataGlobalConstants::GravityConstant * H * std::abs(cos_Tilt) * std::abs(Tgap1 - Tgap2) / (Tgap1 * Tgap2);
 
             if (A == 0.0) {
                 qv1 = 0.0;
@@ -947,8 +945,8 @@ namespace TarcogShading {
         Real64 TGapOld;
         bool converged;
 
-        tilt = DataGlobalConstants::Pi() / 180.0 * (angle - 90.0);
-        T0 = 0.0 + DataGlobalConstants::KelvinConv();
+        tilt = DataGlobalConstants::Pi / 180.0 * (angle - 90.0);
+        T0 = 0.0 + DataGlobalConstants::KelvinConv;
 
         GASSES90(T0, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con0, visc0, dens0, cp0, pr0, 1, nperr, ErrorMessage);
         // call gasses90(Tenv, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, &
@@ -988,7 +986,7 @@ namespace TarcogShading {
             //  A = dens0 * T0 * gravity * ABS(cos(tilt)) * ABS(Tgap - Tenv) / (Tgap * Tenv)
 
             // bi...Bug fix #00005:
-            A = dens0 * T0 * DataGlobalConstants::GravityConstant() * H * abs_cos_tilt * std::abs(Tgap - Tenv) / (Tgap * Tenv);
+            A = dens0 * T0 * DataGlobalConstants::GravityConstant * H * abs_cos_tilt * std::abs(Tgap - Tenv) / (Tgap * Tenv);
             //  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
             B1 = dens2 / 2;
@@ -1079,7 +1077,7 @@ namespace TarcogShading {
     {
         for (int i = 1; i <= nlayer; ++i) {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
-                const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobalConstants::Pi() / 360;
+                const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobalConstants::Pi / 360;
                 Real64 C1_VENET(0);
                 Real64 C2_VENET(0);
                 Real64 C3_VENET(0);

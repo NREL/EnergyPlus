@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,39 +62,35 @@ namespace DataComplexFenestration {
 
     // Data
     // Parameters for complex shade
-    extern int const csVenetianHorizontal;
-    extern int const csWoven;
-    extern int const csPerforated;
-    extern int const csOtherShadingType;
-    extern int const csBSDF;
-    extern int const csVenetianVertical;
+    constexpr int csVenetianHorizontal(1);
+    constexpr int csWoven(2);
+    constexpr int csPerforated(3);
+    constexpr int csOtherShadingType(4);
+    constexpr int csBSDF(5);
+    constexpr int csVenetianVertical(6);
 
     // Parameters for gas definitions
-    extern int const GasCoeffsCustom;
-    extern int const GasCoeffsAir;
-    extern int const GasCoeffsArgon;
-    extern int const GasCoeffsKrypton;
-    extern int const GasCoeffsXenon;
-
-    // Parameters for Thermal Algorithm
-    // INTEGER, PARAMETER :: taTarcog = 0
-    // INTEGER, PARAMETER :: taWinkelmann = 1
+    constexpr int GasCoeffsCustom(0);
+    constexpr int GasCoeffsAir(1);
+    constexpr int GasCoeffsArgon(2);
+    constexpr int GasCoeffsKrypton(3);
+    constexpr int GasCoeffsXenon(4);
 
     // Parameters for calculation standard
-    extern int const csISO15099;
-    extern int const csEN673Declared;
-    extern int const csEN673Design;
+    constexpr int csISO15099(1);
+    constexpr int csEN673Declared(2);
+    constexpr int csEN673Design(3);
 
     // Parameters for thermal model
-    extern int const tmISO15099;
-    extern int const tmScaledCavityWidth;
-    extern int const tmConvectiveScalarModel_NoSDThickness;
-    extern int const tmConvectiveScalarModel_WithSDThickness;
+    constexpr int tmISO15099(0);
+    constexpr int tmScaledCavityWidth(1);
+    constexpr int tmConvectiveScalarModel_NoSDThickness(2);
+    constexpr int tmConvectiveScalarModel_WithSDThickness(3);
 
     // Parameters for deflection model
-    extern int const dmNoDeflection;
-    extern int const dmTemperatureAndPressureInput;
-    extern int const dmMeasuredDeflection;
+    constexpr int dmNoDeflection(0);
+    constexpr int dmTemperatureAndPressureInput(1);
+    constexpr int dmMeasuredDeflection(2);
 
     // Types
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -63,13 +62,12 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::DataLoopNode;
-using DataContaminantBalance::Contaminant;
 
 TEST_F(EnergyPlusFixture, ZonePlenum_InitAirZoneReturnPlenumTest)
 {
     state->dataGlobal->BeginEnvrnFlag = false;
-    Contaminant.CO2Simulation = true;
-    Contaminant.GenericContamSimulation = true;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 1;
     state->dataZonePlenum->ZoneRetPlenCond.allocate(state->dataZonePlenum->NumZoneReturnPlenums);

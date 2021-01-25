@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TestGetFunctions1)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanSizing1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
     std::string fanName = "TEST FAN";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate;
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
@@ -319,13 +319,13 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
 
     // 50% of the time at speed 1 (0.5 flow) and 50% of the time at speed 2 (1.0 flow), average flow 0.75, on for entire timestep
-    Real64 designMassFlowRate = locFanSizeVdot * DataEnvironment::StdRhoAir;
+    Real64 designMassFlowRate = locFanSizeVdot * state->dataEnvrn->StdRhoAir;
     Real64 massFlow1 = 0.5 * designMassFlowRate;
     Real64 massFlow2 = designMassFlowRate;
     Real64 runTimeFrac1 = 0.5;
@@ -418,13 +418,13 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate;
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
 
     // 50% of the time at speed 1 (0.5 flow) and 50% of the time at speed 2 (1.0 flow), average flow 0.75, on for entire timestep
-    Real64 designMassFlowRate = locFanSizeVdot * DataEnvironment::StdRhoAir;
+    Real64 designMassFlowRate = locFanSizeVdot * state->dataEnvrn->StdRhoAir;
     Real64 massFlow1 = 0.5 * designMassFlowRate;
     Real64 massFlow2 = designMassFlowRate;
     Real64 runTimeFrac1 = 0.5;
@@ -468,8 +468,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc4)
 TEST_F(EnergyPlusFixture, SystemFanObj_FanEnergyIndex)
 {
     // this unit test checks the functions calculating FEI
-    DataEnvironment::StdRhoAir = 1.2;
-    Real64 testFEI = HVACFan::FanSystem::report_fei(1.0, 1000.0, 100.0, 1.2);
+    state->dataEnvrn->StdRhoAir = 1.2;
+    Real64 testFEI = HVACFan::FanSystem::report_fei(*state, 1.0, 1000.0, 100.0, 1.2);
     EXPECT_NEAR(testFEI, 0.4917, 0.001);
 }
 
@@ -507,13 +507,13 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_noPowerFFlowCurve)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate;
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
 
     // 50% of the time at speed 1 (0.5 flow) and 50% of the time at speed 2 (1.0 flow), average flow 0.75, on for entire timestep
-    Real64 designMassFlowRate = locFanSizeVdot * DataEnvironment::StdRhoAir;
+    Real64 designMassFlowRate = locFanSizeVdot * state->dataEnvrn->StdRhoAir;
     Real64 massFlow1 = 0.5 * designMassFlowRate;
     Real64 massFlow2 = designMassFlowRate;
     Real64 runTimeFrac1 = 0.5;
@@ -602,14 +602,14 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     EMSManager::CheckIfAnyEMS(*state);
-    EMSManager::FinishProcessingUserInput = true;
+    state->dataEMSMgr->FinishProcessingUserInput = true;
 
     std::string fanName = "TEST FAN";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate;
@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     // 50% of the time at speed 1 (0.5 flow) and 50% of the time at speed 2 (1.0 flow)
     // average flow 0.75, on for entire timestep
-    Real64 designMassFlowRate = locFanSizeVdot * DataEnvironment::StdRhoAir;
+    Real64 designMassFlowRate = locFanSizeVdot * state->dataEnvrn->StdRhoAir;
     Real64 massFlow1 = 0.5 * designMassFlowRate;
     Real64 massFlow2 = designMassFlowRate;
     Real64 runTimeFrac1 = 0.5;

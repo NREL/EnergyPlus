@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,11 +60,11 @@ namespace DataDElight {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const M2FT;   // Length:   Meters * M2FT = Feet
-    extern Real64 const FT22M2; // Area:     SquareFeet * FT22M2 = SquareMeter
-    extern Real64 const M22FT2; // Area:     SquareMeter * M22FT2 = SquareFeet
-    extern Real64 const M32FT3; // Volume:       CubicMeter * M32FT3 = CubicFeet
-    extern Real64 const LUX2FC; // Illuminance:  Lux * LUX2FC = Footcandles
+    constexpr Real64 M2FT(3.280840);       // Length:   Meters * M2FT = Feet
+    constexpr Real64 FT22M2(0.09290304);   // Area:     SquareFeet * FT22M2 = SquareMeter
+    constexpr Real64 M22FT2(1.0 / FT22M2); // Area:     SquareMeter * M22FT2 = SquareFeet
+    constexpr Real64 M32FT3(35.3147);      // Volume:       CubicMeter * M32FT3 = CubicFeet
+    constexpr Real64 LUX2FC(0.09290304);   // Illuminance:  Lux * LUX2FC = Footcandles
 
 } // namespace DataDElight
 

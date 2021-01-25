@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,11 +57,9 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#define EP_cache_GlycolSpecificHeat
-
 
 namespace EnergyPlus {
 
@@ -551,7 +549,8 @@ namespace FluidProperties {
         return cTsh.sh; // saturation pressure {Pascals}
     }
 #else
-    Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
+    Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
+                                 std::string const &Glycol,    // carries in substance name
                                  Real64 const Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
@@ -758,6 +757,14 @@ namespace FluidProperties {
     };
 
 } // namespace FluidProperties
+
+struct FluidPropertiesData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,11 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -65,12 +65,12 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
     // set the program state so that errors can be thrown
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = false;
-    EMSManager::FinishProcessingUserInput = false;
+    state->dataEMSMgr->FinishProcessingUserInput = false;
 
     bool errorsFound = false;
 
-    DataRuntimeLanguage::ErlExpression.allocate(1);
-    auto &erlExpression = DataRuntimeLanguage::ErlExpression(1);
+    state->dataRuntimeLang->ErlExpression.allocate(1);
+    auto &erlExpression = state->dataRuntimeLang->ErlExpression(1);
     erlExpression.Operator = DataRuntimeLanguage::FuncExp;
     erlExpression.NumOperands = 1;
     erlExpression.Operand.allocate(1);

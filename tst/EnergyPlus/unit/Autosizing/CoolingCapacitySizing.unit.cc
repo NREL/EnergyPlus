@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,7 +81,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
     DataLoopNode::Node(1).Press = 101325.0;
@@ -158,7 +158,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriDryBulb = 20.0;
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriHumRat = 0.007;
 
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataSizing::DataWaterLoopNum = 1;
     DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
 
@@ -174,7 +174,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4981.71, sizedValue, 0.01);
-    EXPECT_NEAR(1.2, DataEnvironment::StdRhoAir, 0.01);
+    EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 4 - Zone Equipment, Zone Eq Fan Coil, HX assisted water coil
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = 0.0;
-    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / DataEnvironment::StdRhoAir;
+    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -63,9 +64,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataPlant;
@@ -347,12 +345,12 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(3);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(3);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians());
-    state->dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians());
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
 
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
@@ -367,34 +365,34 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     ZoneSizingInput(3).ZoneNum = 3;
 
     int TotNumLoops = 1;
-    PlantLoop.allocate(TotNumLoops);
+    state->dataPlnt->PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(TotNumLoops);
     PlantSizData(1).DeltaT = 10.0;
     // unit test results are based on a low HW temp at 40 C. Baseboard does not have the capacity to meet the zone load.
     PlantSizData(1).ExitTemp = 40.0;
 
     for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.PlantSizNum = 1;
         loop.FluidName = "WATER";
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     BaseboardRadiator::GetBaseboardInput(*state);
 
     DataSizing::FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
     DataSizing::ZoneSizingRunDone = true;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(3);
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(3);
 
     BaseboardNum = 1;
     CntrlZoneNum = 1;
@@ -404,8 +402,8 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     // do baseboard sizing
@@ -420,7 +418,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).WaterVolFlowRateMax = DataSizing::AutoSize;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA = DataSizing::AutoSize; // reset to autosize to test new calculation
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
-    EXPECT_EQ(DataZoneEnergyDemands::ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP, 2000.0); // design load = 2000
+    EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP, 2000.0); // design load = 2000
     EXPECT_EQ(state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA, 2000.0);                                       // UA = design load
 
     BaseboardNum = 2;
@@ -431,7 +429,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
@@ -458,7 +456,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;

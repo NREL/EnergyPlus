@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = 2.0;
     DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.15;
     DataSizing::DataAirFlowUsedForSizing = 0.2;
-    DataEnvironment::StdRhoAir = 1000;
+    state->dataEnvrn->StdRhoAir = 1000;
     DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = 2.0;
     DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.15;
     DataSizing::DataAirFlowUsedForSizing = 0.2;
-    DataEnvironment::StdRhoAir = 1000;
+    state->dataEnvrn->StdRhoAir = 1000;
     DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
@@ -321,7 +321,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
-    DataEnvironment::StdRhoAir = 1.18;
+    state->dataEnvrn->StdRhoAir = 1.18;
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[0]->simulate(*state, _, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain1 = HVACFan::fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
@@ -419,7 +419,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
     fanName = "TEST FAN 3";
     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
-    DataEnvironment::StdRhoAir = 1.2;
+    state->dataEnvrn->StdRhoAir = 1.2;
     HVACFan::fanObjs[2]->simulate(*state, _, _, _, _);                  // triggers sizing call
     locFanSizeVdot = HVACFan::fanObjs[2]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
 
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
@@ -557,7 +557,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.30;
 
     ZoneSizingRunDone = true;
-    StdBaroPress = 101325.0;
+    state->dataEnvrn->StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
@@ -588,8 +588,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
-    DataEnvironment::StdRhoAir = 1.18;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.18;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
@@ -637,27 +637,27 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     DataSizing::CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow = 0.34;
     DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).ATMixerVolFlow = 0.0;
-    DataEnvironment::StdRhoAir = 1.23;
+    state->dataEnvrn->StdRhoAir = 1.23;
 
     Real64 oaFrac = 0.0;
     Real64 DesMassFlow = 0.685;
-    Real64 massFlowRate = DataEnvironment::StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
+    Real64 massFlowRate = state->dataEnvrn->StdRhoAir * DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).OAVolFlow;
     Real64 oaFrac_Test = massFlowRate / DesMassFlow;
 
     ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(1);
 
     // ATMixer flow rate = 0 so oaFrac depends on ZoneEqSizing.OAVolFlow
-    oaFrac = sizer.setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     zoneEqSizing.ATMixerVolFlow = 0.11;
 
     oaFrac = 0.0;
-    massFlowRate = DataEnvironment::StdRhoAir * zoneEqSizing.ATMixerVolFlow;
+    massFlowRate = state->dataEnvrn->StdRhoAir * zoneEqSizing.ATMixerVolFlow;
     oaFrac_Test = massFlowRate / DesMassFlow;
 
     // ATMixer flow rate > 0 so oaFrac depends on ZoneEqSizing.ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 
     DesMassFlow = 0.0;
@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_setOAFracForZoneEqSizing_Test)
     zoneEqSizing.OAVolFlow = 1.0;
     zoneEqSizing.ATMixerVolFlow = 1.0;
     // DesMassFlow = 0 so oaFrac = 0 regardless of OAVolFlow or ATMixerVolFlow
-    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing);
+    oaFrac = sizer.EnergyPlus::BaseSizer::setOAFracForZoneEqSizing(*state, DesMassFlow, zoneEqSizing);
     EXPECT_EQ(oaFrac, oaFrac_Test);
 }
 
@@ -680,10 +680,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
 
     zoneEqSizing.OAVolFlow = 0.34;
     zoneEqSizing.ATMixerVolFlow = 0.0;
-    DataEnvironment::StdRhoAir = 1.23;
+    state->dataEnvrn->StdRhoAir = 1.23;
 
     Real64 DesMassFlow = 0.685;
-    Real64 massFlowRate = DataEnvironment::StdRhoAir * zoneEqSizing.OAVolFlow;
+    Real64 massFlowRate = state->dataEnvrn->StdRhoAir * zoneEqSizing.OAVolFlow;
     Real64 oaFrac = massFlowRate / DesMassFlow;
 
     // Test heating mode coil inlet temperature
@@ -917,7 +917,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
     state->dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
-    DataEnvironment::TotDesDays = 1;
+    state->dataEnvrn->TotDesDays = 1;
 
     DataSizing::ZoneSizingRunDone = true;
 
@@ -937,11 +937,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     SizingResult = sizerSystemAirFlow.size(*state, SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
-    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
-    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanPkTime, CompName));
+    EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanDesDay, CompName));
+    EXPECT_EQ("7/15 18:00:00", OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFanPkTime, CompName));
 
     // Bonus test for #6949
-    EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(OutputReportPredefined::pdchFanEndUse).heading);
+    EXPECT_EQ("End Use Subcategory", state->dataOutRptPredefined->columnTag(state->dataOutRptPredefined->pdchFanEndUse).heading);
 }
 TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
 {

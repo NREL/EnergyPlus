@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,12 +51,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-
 
 using namespace EnergyPlus;
 
@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
-    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour();
+    Real64 ExpectedCurrentRate = 1.0 * (0.75 / 0.80771) / DataGlobalConstants::SecInHour;
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
     EXPECT_NEAR(NomAnnualRain, ExpectedNomAnnualRain, 0.000001);
@@ -121,4 +121,141 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, 0.0, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_Fill)
+{
+    // Test for #6435 : When using a Valve from a well, it should keep on filling until it hits the ValveOffCapacity instead of stopping after
+    // the first timestep as soon as it's over ValveOnCapacity
+    std::string const idf_objects = delimited_string({
+
+        "WaterUse:Storage,",
+        "  Cooling Tower Water Storage Tank,  !- Name",
+        "  Mains,                   !- Water Quality Subcategory",
+        "  3,                       !- Maximum Capacity {m3}",
+        "  0.25,                    !- Initial Volume {m3}",
+        "  0.003,                   !- Design In Flow Rate {m3/s}",
+        "  ,                        !- Design Out Flow Rate {m3/s}",
+        "  ,                        !- Overflow Destination",
+        "  GroundwaterWell,         !- Type of Supply Controlled by Float Valve",
+        "  0.20,                    !- Float Valve On Capacity {m3}",
+        "  3,                       !- Float Valve Off Capacity {m3}",
+        "  0.10,                    !- Backup Mains Capacity {m3}",
+        "  ,                        !- Other Tank Name",
+        "  ScheduledTemperature,    !- Water Thermal Mode",
+        "  Always 18,               !- Water Temperature Schedule Name",
+        "  ,                        !- Ambient Temperature Indicator",
+        "  ,                        !- Ambient Temperature Schedule Name",
+        "  ,                        !- Zone Name",
+        "  ,                        !- Tank Surface Area {m2}",
+        "  ,                        !- Tank U Value {W/m2-K}",
+        "  ;                        !- Tank Outside Surface Material Name",
+
+        "WaterUse:Well,",
+        "  Cooling Tower Transfer Pumps,  !- Name",
+        "  Cooling Tower Water Storage Tank,  !- Storage Tank Name",
+        "  ,                        !- Pump Depth {m}",
+        "  0.003,                   !- Pump Rated Flow Rate {m3/s}",
+        "  ,                        !- Pump Rated Head {Pa}",
+        "  1500,                    !- Pump Rated Power Consumption {W}",
+        "  ,                        !- Pump Efficiency",
+        "  ,                        !- Well Recovery Rate {m3/s}",
+        "  ,                        !- Nominal Well Storage Volume {m3}",
+        "  ,                        !- Water Table Depth Mode",
+        "  ,                        !- Water Table Depth {m}",
+        "  ;                        !- Water Table Depth Schedule Name",
+
+        "Schedule:Constant,",
+        "    Always 18,               !- Name",
+        "    ,                        !- Schedule Type Limits Name",
+        "    18.0;                    !- Hourly Value",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    WaterManager::GetWaterManagerInput(*state);
+    state->dataWaterManager->GetInputFlag = false;
+
+    EXPECT_EQ(1u, state->dataWaterData->WaterStorage.size());
+    int TankNum = 1;
+    EXPECT_EQ(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply);
+    EXPECT_EQ(0u, state->dataWaterData->WaterStorage(TankNum).NumWaterDemands);
+    EXPECT_EQ(0.003, state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate);
+    EXPECT_EQ(0.20, state->dataWaterData->WaterStorage(TankNum).ValveOnCapacity);
+    EXPECT_EQ(3.0, state->dataWaterData->WaterStorage(TankNum).ValveOffCapacity);
+    EXPECT_EQ(3.0, state->dataWaterData->WaterStorage(TankNum).MaxCapacity);
+
+    // Initialize the tank at 0.29 m3
+    Real64 calcVolume = 0.26;
+    state->dataWaterData->WaterStorage(TankNum).LastTimeStepVolume = calcVolume;
+    state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume = calcVolume;
+
+    // Simulate a call for tank water that would produce 0.025m3 of draw in one timestep
+    DataHVACGlobals::TimeStepSys = 10.0 / 60.0;
+    state->dataWaterData->WaterStorage(TankNum).NumWaterDemands = 1;
+    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand.allocate(1);
+    Real64 draw = 0.025;
+    state->dataWaterData->WaterStorage(TankNum).VdotRequestDemand(1) = draw / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+
+
+    // First call, should bring predicted volume above the ValveOnCapacity
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(0.235, calcVolume);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+    WaterManager::UpdateWaterManager(*state);
+
+    // Second call, still above the ValveOnCapacity
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(0.21, calcVolume);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+    WaterManager::UpdateWaterManager(*state);
+
+    // Third call: Predicted volume is below ValveOnCapacity, it kicks on
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(1.985, calcVolume);
+    EXPECT_TRUE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+
+    WaterManager::UpdateWaterManager(*state);
+
+    // Fourth call: it should keep on filling, until it hits ValveOffCapacity
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    calcVolume += state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate * (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
+    EXPECT_DOUBLE_EQ(3.76, calcVolume);
+    calcVolume = min(calcVolume, state->dataWaterData->WaterStorage(TankNum).MaxCapacity);
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(3.0, calcVolume);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+    WaterManager::UpdateWaterManager(*state);
+
+    // Fifth Call: now it starts drawing only
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(2.975, calcVolume);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+    WaterManager::UpdateWaterManager(*state);
+
+    // Sixth call: same.
+    WaterManager::ManageWater(*state);
+    calcVolume -= draw;
+    EXPECT_DOUBLE_EQ(calcVolume, state->dataWaterData->WaterStorage(TankNum).ThisTimeStepVolume);
+    EXPECT_DOUBLE_EQ(2.95, calcVolume);
+    EXPECT_FALSE(state->dataWaterData->WaterStorage(TankNum).LastTimeStepFilling);
+
+    WaterManager::UpdateWaterManager(*state);
+
+
 }

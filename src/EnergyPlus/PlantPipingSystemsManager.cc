@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,14 +61,12 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -78,6 +76,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -228,10 +227,10 @@ namespace EnergyPlus {
                 // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
                 // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
                 // which would be carried over from the previous environment
-                thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+                thisDomain.Cur.CurSimTimeStepSize = state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                 thisDomain.Cur.CurSimTimeSeconds = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                                     (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
-                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour();
+                                                    DataHVACGlobals::SysTimeElapsed) * DataGlobalConstants::SecInHour;
 
                 // There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
                 if ((state.dataGlobal->BeginSimFlag && thisDomain.BeginSimInit) ||
@@ -903,7 +902,7 @@ namespace EnergyPlus {
                 // Get slab material properties
                 if (thisDomain.SlabInGradeFlag) {
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                 dataMaterial.Material,
+                                                                                 state.dataMaterial->Material,
                                                                                  DataHeatBalance::TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -911,12 +910,12 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.SlabThickness = dataMaterial.Material(thisDomain.SlabMaterialNum).Thickness;
-                        thisDomain.SlabProperties.Density = dataMaterial.Material(
+                        thisDomain.SlabThickness = state.dataMaterial->Material(thisDomain.SlabMaterialNum).Thickness;
+                        thisDomain.SlabProperties.Density = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).Density;
-                        thisDomain.SlabProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.SlabProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).SpecHeat;
-                        thisDomain.SlabProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.SlabProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.SlabMaterialNum).Conductivity;
                     }
                 }
@@ -938,7 +937,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
-                                                                                     dataMaterial.Material,
+                                                                                     state.dataMaterial->Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
@@ -946,13 +945,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = dataMaterial.Material(
+                        thisDomain.HorizInsThickness = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -995,7 +994,7 @@ namespace EnergyPlus {
                 // Get vertical insulation material properties
                 if (thisDomain.VertInsPresentFlag) {
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
-                                                                                    dataMaterial.Material,
+                                                                                    state.dataMaterial->Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
@@ -1003,13 +1002,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = dataMaterial.Material(
+                        thisDomain.VertInsThickness = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1335,7 +1334,7 @@ namespace EnergyPlus {
                 // Get horizontal insulation material properties
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
-                                                                                     dataMaterial.Material,
+                                                                                     state.dataMaterial->Material,
                                                                                      DataHeatBalance::TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
@@ -1343,13 +1342,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.HorizInsThickness = dataMaterial.Material(
+                        thisDomain.HorizInsThickness = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Thickness;
-                        thisDomain.HorizInsProperties.Density = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Density;
-                        thisDomain.HorizInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
-                        thisDomain.HorizInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.HorizInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1397,7 +1396,7 @@ namespace EnergyPlus {
                         ErrorsFound = true;
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
-                                                                                    dataMaterial.Material,
+                                                                                    state.dataMaterial->Material,
                                                                                     DataHeatBalance::TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
@@ -1405,13 +1404,13 @@ namespace EnergyPlus {
                         ShowContinueError(state, "Found in: " + thisDomain.Name);
                         ErrorsFound = true;
                     } else {
-                        thisDomain.VertInsThickness = dataMaterial.Material(
+                        thisDomain.VertInsThickness = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Thickness;
-                        thisDomain.VertInsProperties.Density = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Density = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Density;
-                        thisDomain.VertInsProperties.SpecificHeat = dataMaterial.Material(
+                        thisDomain.VertInsProperties.SpecificHeat = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).SpecHeat;
-                        thisDomain.VertInsProperties.Conductivity = dataMaterial.Material(
+                        thisDomain.VertInsProperties.Conductivity = state.dataMaterial->Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
                         if (SiteGroundDomainUsingNoMassMat(state, thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
@@ -1485,7 +1484,7 @@ namespace EnergyPlus {
         bool SiteGroundDomainUsingNoMassMat([[maybe_unused]] EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum)
         {
 
-            if ( (MaterialThickness <= 0.0) || (dataMaterial.Material(MaterialNum).ROnly) ) {
+            if ( (MaterialThickness <= 0.0) || (state.dataMaterial->Material(MaterialNum).ROnly) ) {
                 return true;
             } else {
                 return false;
@@ -2160,9 +2159,9 @@ namespace EnergyPlus {
 
                 // Once we find ourselves on the plant loop, we can do other things
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp(),
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                               DataGlobalConstants::InitConvTemp,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
                 thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
                 thisCircuit->NeedToFindOnPlantLoop = false;
@@ -2190,7 +2189,7 @@ namespace EnergyPlus {
             // The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
             // includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
             // which would be carried over from the previous environment
-            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+            this->Cur.CurSimTimeStepSize = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             this->Cur.CurSimTimeSeconds = (state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone +
                                           DataHVACGlobals::SysTimeElapsed;
@@ -2624,7 +2623,7 @@ namespace EnergyPlus {
             }
 
             //'also assign the interface cell surrounding the radial system
-            this->InterfaceVolume = (1.0 - (DataGlobalConstants::Pi() / 4.0)) * pow_2(GridCellWidth) * CellDepth;
+            this->InterfaceVolume = (1.0 - (DataGlobalConstants::Pi / 4.0)) * pow_2(GridCellWidth) * CellDepth;
         }
 
         void Domain::developMesh(EnergyPlusData &state) {
@@ -4143,7 +4142,7 @@ namespace EnergyPlus {
             //       RE-ENGINEERED  na
 
             // Always do start of time step inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // Begin iterating for this time step
             for (int IterationIndex = 1; IterationIndex <= this->SimControls.MaxIterationsPerTS; ++IterationIndex) {
@@ -4366,9 +4365,9 @@ namespace EnergyPlus {
             Real64 GroundCoverCoefficient;
 
             // retrieve information from E+ globals
-            Latitude_Degrees = DataEnvironment::Latitude;
-            StMeridian_Degrees = -DataEnvironment::TimeZoneMeridian; // Standard meridian, degrees W
-            Longitude_Degrees = -DataEnvironment::Longitude;         // Longitude, degrees W
+            Latitude_Degrees = state.dataEnvrn->Latitude;
+            StMeridian_Degrees = -state.dataEnvrn->TimeZoneMeridian; // Standard meridian, degrees W
+            Longitude_Degrees = -state.dataEnvrn->Longitude;         // Longitude, degrees W
 
             // retrieve any information from input data structure
             GroundCoverCoefficient = this->Moisture.GroundCoverCoefficient;
@@ -4419,9 +4418,9 @@ namespace EnergyPlus {
                         Denominator += (Beta / Resistance);
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         }
@@ -4443,9 +4442,9 @@ namespace EnergyPlus {
                         // debug error, can't get here
                     } else if (CurDirection == Direction::PositiveY) {
                         // convection at the surface
-                        if (DataEnvironment::WindSpeed > 0.1) {
+                        if (state.dataEnvrn->WindSpeed > 0.1) {
                             Resistance = 208.0 /
-                                         (AirDensity * AirSpecificHeat * DataEnvironment::WindSpeed * ThisNormalArea);
+                                         (AirDensity * AirSpecificHeat * state.dataEnvrn->WindSpeed * ThisNormalArea);
                             Numerator += (Beta / Resistance) * this->Cur.CurAirTemp;
                             Denominator += (Beta / Resistance);
                         } else {
@@ -4458,26 +4457,26 @@ namespace EnergyPlus {
             }
 
             // Latitude, converted to radians...positive for northern hemisphere, [radians]
-            Latitude_Radians = DataGlobalConstants::Pi() / 180.0 * Latitude_Degrees;
+            Latitude_Radians = DataGlobalConstants::Pi / 180.0 * Latitude_Degrees;
 
             // The day of year at this point in the simulation
-            DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobalConstants::SecsInDay());
+            DayOfYear = int(this->Cur.CurSimTimeSeconds / DataGlobalConstants::SecsInDay);
 
             // The number of seconds into the current day
-            CurSecondsIntoToday = int(mod(this->Cur.CurSimTimeSeconds, DataGlobalConstants::SecsInDay()));
+            CurSecondsIntoToday = int(mod(this->Cur.CurSimTimeSeconds, DataGlobalConstants::SecsInDay));
 
             // The number of hours into today
-            HourOfDay = int(CurSecondsIntoToday / DataGlobalConstants::SecInHour());
+            HourOfDay = int(CurSecondsIntoToday / DataGlobalConstants::SecInHour);
 
             // For convenience convert to Kelvin once
             CurAirTempK = this->Cur.CurAirTemp + 273.15;
 
             // Calculate some angles
-            dr = 1.0 + 0.033 * std::cos(2.0 * DataGlobalConstants::Pi() * DayOfYear / 365.0);
-            Declination = 0.409 * std::sin(2.0 * DataGlobalConstants::Pi() / 365.0 * DayOfYear - 1.39);
-            b_SC = 2.0 * DataGlobalConstants::Pi() * (DayOfYear - 81.0) / 364.0;
+            dr = 1.0 + 0.033 * std::cos(2.0 * DataGlobalConstants::Pi * DayOfYear / 365.0);
+            Declination = 0.409 * std::sin(2.0 * DataGlobalConstants::Pi / 365.0 * DayOfYear - 1.39);
+            b_SC = 2.0 * DataGlobalConstants::Pi * (DayOfYear - 81.0) / 364.0;
             Sc = 0.1645 * std::sin(2.0 * b_SC) - 0.1255 * std::cos(b_SC) - 0.025 * std::sin(b_SC);
-            Hour_Angle = DataGlobalConstants::Pi() / 12.0 *
+            Hour_Angle = DataGlobalConstants::Pi / 12.0 *
                          (((HourOfDay - 0.5) + 0.06667 * (StMeridian_Degrees - Longitude_Degrees) + Sc) - 12.0);
 
             // Calculate sunset something, and constrain to a minimum of 0.000001
@@ -4485,12 +4484,12 @@ namespace EnergyPlus {
             X_sunset = max(X_sunset, 0.000001);
 
             // Find sunset angle
-            Sunset_Angle = DataGlobalConstants::Pi() / 2.0 -
+            Sunset_Angle = DataGlobalConstants::Pi / 2.0 -
                            std::atan(-std::tan(Latitude_Radians) * std::tan(Declination) / std::sqrt(X_sunset));
 
             // Find solar angles
-            Solar_Angle_1 = Hour_Angle - DataGlobalConstants::Pi() / 24.0;
-            Solar_Angle_2 = Hour_Angle + DataGlobalConstants::Pi() / 24.0;
+            Solar_Angle_1 = Hour_Angle - DataGlobalConstants::Pi / 24.0;
+            Solar_Angle_2 = Hour_Angle + DataGlobalConstants::Pi / 24.0;
 
             // Constrain solar angles
             if (Solar_Angle_1 < -Sunset_Angle) Solar_Angle_1 = -Sunset_Angle;
@@ -4503,13 +4502,13 @@ namespace EnergyPlus {
             IncidentSolar_MJhrmin = this->Cur.CurIncidentSolar * Convert_Wm2_To_MJhrmin;
 
             // Calculate another Q term...
-            QRAD_A = 12.0 * 60.0 / DataGlobalConstants::Pi() * MeanSolarConstant * dr *
+            QRAD_A = 12.0 * 60.0 / DataGlobalConstants::Pi * MeanSolarConstant * dr *
                      ((Solar_Angle_2 - Solar_Angle_1) * std::sin(Latitude_Radians) * std::sin(Declination) +
                       std::cos(Latitude_Radians) * std::cos(Declination) *
                       (std::sin(Solar_Angle_2) - std::sin(Solar_Angle_1)));
 
             // Calculate another Q term...
-            QRAD_SO = (A_s + B_s + 0.00002 * DataEnvironment::Elevation) * QRAD_A;
+            QRAD_SO = (A_s + B_s + 0.00002 * state.dataEnvrn->Elevation) * QRAD_A;
 
             // Correct the Qrad term ... better way??
             if (IncidentSolar_MJhrmin < 0.01) {
@@ -5026,7 +5025,7 @@ namespace EnergyPlus {
             Real64 const Prandtl = thisCircuit->CurFluidPropertySet.Prandtl;
 
             // Flow calculations
-            Real64 const Area_c = (DataGlobalConstants::Pi() / 4.0) * pow_2(thisCircuit->PipeSize.InnerDia);
+            Real64 const Area_c = (DataGlobalConstants::Pi / 4.0) * pow_2(thisCircuit->PipeSize.InnerDia);
             Real64 const Velocity = thisCircuit->CurCircuitFlowRate / (Density * Area_c);
 
             // Determine convection coefficient based on flow conditions
@@ -5234,7 +5233,7 @@ namespace EnergyPlus {
             Real64 OutermostRadialCellRadialCentroid = outerRadialCell.RadialCentroid;
             Real64 OutermostRadialCellTemperature = outerRadialCell.Temperature;
             Real64 Resistance = std::log(OutermostRadialCellOuterRadius / OutermostRadialCellRadialCentroid) /
-                                (2.0 * DataGlobalConstants::Pi() * cell.depth() * cell.Properties.Conductivity);
+                                (2.0 * DataGlobalConstants::Pi * cell.depth() * cell.Properties.Conductivity);
             Numerator += (cell.Beta / Resistance) * OutermostRadialCellTemperature;
             Denominator += (cell.Beta / Resistance);
 
@@ -5306,15 +5305,15 @@ namespace EnergyPlus {
 
             //'add effects from interface cell
             Real64 Resistance = std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                                (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity);
+                                (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity);
             Numerator += (Beta / Resistance) * cell.Temperature;
             Denominator += (Beta / Resistance);
 
             //'add effects from inner radial cell
             Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity)) +
                          (std::log(NextOuterRadialCellOuterRadius / NextOuterRadialCellRadialCentroid) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * NextOuterRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi * cell.depth() * NextOuterRadialCellConductivity));
             Numerator += (Beta / Resistance) * NextOuterRadialCellTemperature;
             Denominator += (Beta / Resistance);
 
@@ -5362,18 +5361,18 @@ namespace EnergyPlus {
                 //'add effects from outer cell
                 Real64 Resistance =
                         (std::log(OuterRadialCellRadialCentroid / OuterRadialCellInnerRadius) /
-                         (2 * DataGlobalConstants::Pi() * cell.depth() * OuterRadialCellConductivity)) +
+                         (2 * DataGlobalConstants::Pi * cell.depth() * OuterRadialCellConductivity)) +
                         (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                         (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity));
+                         (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity));
                 Numerator += (thisSoilCell.Beta / Resistance) * OuterRadialCellTemperature;
                 Denominator += (thisSoilCell.Beta / Resistance);
 
                 //'add effects from inner cell
                 Resistance =
                         (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                         (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
+                         (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity)) +
                         (std::log(InnerRadialCellOuterRadius / InnerRadialCellRadialCentroid) /
-                         (2 * DataGlobalConstants::Pi() * cell.depth() * InnerRadialCellConductivity));
+                         (2 * DataGlobalConstants::Pi * cell.depth() * InnerRadialCellConductivity));
                 Numerator += (thisSoilCell.Beta / Resistance) * InnerRadialCellTemperature;
                 Denominator += (thisSoilCell.Beta / Resistance);
 
@@ -5432,17 +5431,17 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
                          (std::log(ThisRadialCellOuterRadius / ThisRadialCellRadialCentroid) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity));
             Numerator += (soilZero.Beta / Resistance) * OuterNeighborRadialCellTemperature;
             Denominator += (soilZero.Beta / Resistance);
 
             //'add effects from pipe cell
             Resistance = (std::log(ThisRadialCellRadialCentroid / ThisRadialCellInnerRadius) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisRadialCellConductivity)) +
+                          (2 * DataGlobalConstants::Pi * cell.depth() * ThisRadialCellConductivity)) +
                          (std::log(InnerNeighborRadialCellOuterRadius / InnerNeighborRadialCellRadialCentroid) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * InnerNeighborRadialCellConductivity));
+                          (2 * DataGlobalConstants::Pi * cell.depth() * InnerNeighborRadialCellConductivity));
             Numerator += (soilZero.Beta / Resistance) * InnerNeighborRadialCellTemperature;
             Denominator += (soilZero.Beta / Resistance);
 
@@ -5473,17 +5472,17 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Real64 Resistance = (std::log(NextInnerRadialCell.RadialCentroid / NextInnerRadialCell.InnerRadius) /
-                                 (2 * DataGlobalConstants::Pi() * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
+                                 (2 * DataGlobalConstants::Pi * cell.depth() * NextInnerRadialCell.Properties.Conductivity)) +
                                 (std::log(ThisInsulationCell.OuterRadius / ThisInsulationCell.RadialCentroid) /
-                                 (2 * DataGlobalConstants::Pi() * cell.depth() * ThisInsulationCell.Properties.Conductivity));
+                                 (2 * DataGlobalConstants::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity));
             Numerator += (ThisInsulationCell.Beta / Resistance) * NextInnerRadialCell.Temperature;
             Denominator += (ThisInsulationCell.Beta / Resistance);
 
             //'add effects from pipe cell
             Resistance = (std::log(ThisInsulationCell.RadialCentroid / ThisInsulationCell.InnerRadius) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
+                          (2 * DataGlobalConstants::Pi * cell.depth() * ThisInsulationCell.Properties.Conductivity)) +
                          (std::log(PipeCell.OuterRadius / PipeCell.RadialCentroid) /
-                          (2 * DataGlobalConstants::Pi() * cell.depth() * PipeCell.Properties.Conductivity));
+                          (2 * DataGlobalConstants::Pi * cell.depth() * PipeCell.Properties.Conductivity));
             Numerator += (ThisInsulationCell.Beta / Resistance) * PipeCell.Temperature;
             Denominator += (ThisInsulationCell.Beta / Resistance);
 
@@ -5536,18 +5535,18 @@ namespace EnergyPlus {
 
             //'add effects from outer radial cell
             Real64 Resistance = (std::log(OuterNeighborRadialCellRadialCentroid / OuterNeighborRadialCellInnerRadius) /
-                                 (2 * DataGlobalConstants::Pi() * cell.depth() * OuterNeighborRadialCellConductivity)) +
+                                 (2 * DataGlobalConstants::Pi * cell.depth() * OuterNeighborRadialCellConductivity)) +
                                 (std::log(ThisPipeCellOuterRadius / ThisPipeCellRadialCentroid) /
-                                 (2 * DataGlobalConstants::Pi() * cell.depth() * ThisPipeCellConductivity));
+                                 (2 * DataGlobalConstants::Pi * cell.depth() * ThisPipeCellConductivity));
             Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * OuterNeighborRadialCellTemperature;
             Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
 
             //'add effects from water cell
             Real64 PipeConductionResistance =
                     std::log(ThisPipeCellRadialCentroid / ThisPipeCellInnerRadius) /
-                    (2 * DataGlobalConstants::Pi() * cell.depth() * ThisPipeCellConductivity);
+                    (2 * DataGlobalConstants::Pi * cell.depth() * ThisPipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi() * ThisPipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi * ThisPipeCellInnerRadius * cell.depth());
             Resistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Pipe.Beta / Resistance) * FluidCellTemperature;
             Denominator += (cell.PipeCellData.Pipe.Beta / Resistance);
@@ -5584,9 +5583,9 @@ namespace EnergyPlus {
 
             //'add effects from outer pipe cell
             Real64 PipeConductionResistance = std::log(PipeCellRadialCentroid / PipeCellInnerRadius) /
-                                              (2 * DataGlobalConstants::Pi() * cell.depth() * PipeCellConductivity);
+                                              (2 * DataGlobalConstants::Pi * cell.depth() * PipeCellConductivity);
             Real64 ConvectiveResistance =
-                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi() * PipeCellInnerRadius * cell.depth());
+                    1.0 / (thisCircuit->CurCircuitConvectionCoefficient * 2 * DataGlobalConstants::Pi * PipeCellInnerRadius * cell.depth());
             Real64 TotalPipeResistance = PipeConductionResistance + ConvectiveResistance;
             Numerator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance) * PipeCellTemperature;
             Denominator += (cell.PipeCellData.Fluid.Beta / TotalPipeResistance);
@@ -5727,14 +5726,14 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::DoStartOfTimeStepInitializations() {
+        void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state) {
             static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
             // Update environmental conditions
-            this->Cur.CurAirTemp = DataEnvironment::OutDryBulbTemp;
-            this->Cur.CurWindSpeed = DataEnvironment::WindSpeed;
-            this->Cur.CurRelativeHumidity = DataEnvironment::OutRelHum;
-            this->Cur.CurIncidentSolar = DataEnvironment::BeamSolarRad;
+            this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
+            this->Cur.CurWindSpeed = state.dataEnvrn->WindSpeed;
+            this->Cur.CurRelativeHumidity = state.dataEnvrn->OutRelHum;
+            this->Cur.CurIncidentSolar = state.dataEnvrn->BeamSolarRad;
 
             //'now update cell properties
             auto &cells(this->Cells);
@@ -5798,31 +5797,31 @@ namespace EnergyPlus {
             Real64 FluidPrandtl;
 
             // do the regular, non-circuit related inits
-            this->DoStartOfTimeStepInitializations();
+            this->DoStartOfTimeStepInitializations(state);
 
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
             FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidConductivity = FluidProperties::GetConductivityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
             FluidViscosity = FluidProperties::GetViscosityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
 
             // Doesn't anyone care about poor Ludwig Prandtl?

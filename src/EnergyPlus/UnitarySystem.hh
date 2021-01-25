@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,8 +48,12 @@
 #ifndef ENERGYPLUS_UNITARYSYSTEM_HH
 #define ENERGYPLUS_UNITARYSYSTEM_HH
 
+// C++ headers
 #include <string>
 #include <vector>
+
+// EnergyPlus headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 
 namespace EnergyPlus {
@@ -807,6 +811,9 @@ struct UnitarySystemsData : BaseGlobalStruct {
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
+    bool myOneTimeFlag = true;
+    bool getInputFlag = true;
+
     void clear_state() override
     {
         numUnitarySystems = 0;
@@ -837,6 +844,8 @@ struct UnitarySystemsData : BaseGlobalStruct {
         getInputOnceFlag = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
+        myOneTimeFlag = true;
+        getInputFlag = true;
     }
 
     // Default Constructor
