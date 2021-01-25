@@ -452,7 +452,7 @@ namespace ExternalInterface {
         //  but E+ had an error before the call to InitExternalInterface.
 
         if ((socketFD == -1) && FileSystem::fileExists(socCfgFilPath)) {
-            socketFD = establishclientsocket(socCfgFilPath.c_str());
+            socketFD = establishclientsocket(socCfgFilPath.string().c_str());
         }
 
         if (socketFD >= 0) {
@@ -548,7 +548,7 @@ namespace ExternalInterface {
 
             // Get port number
             if (FileSystem::fileExists(socCfgFilPath)) {
-                socketFD = establishclientsocket(socCfgFilPath.c_str());
+                socketFD = establishclientsocket(socCfgFilPath.string().c_str());
                 if (socketFD < 0) {
                     ShowSevereError(state, format("ExternalInterface: Could not open socket. File descriptor = {}.", socketFD));
                     ErrorsFound = true;

@@ -172,7 +172,8 @@ namespace DataSystemVariables {
 
     // Functions
 
-    // Helper to try and locate a file in common folders if it's not found directly (such as when passed as absolute path)
+    // Helper to try and locate a file in common folders if it's not found directly (such as when passed as a filename only). Looks in current
+    // working folder, programs folder, etc.
     // Returns an empty path if not found.
     [[nodiscard]] fs::path CheckForActualFilePath(EnergyPlusData &state,
                                                   fs::path const &originalInputFilePath,  // path (or filename only) as input for object
