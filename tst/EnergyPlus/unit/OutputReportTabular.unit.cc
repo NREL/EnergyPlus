@@ -8924,3 +8924,42 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 
     EnergyPlus::sqlite->sqliteCommit();
 }
+
+TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
+{
+    CompLoadTablesType compLoad;
+    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells = 0.;
+    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed = true;
+
+    compLoad.cells(cSensInst, rLights) = 3.;
+    compLoad.cells(cLatent, rLights) = 10.;
+
+    compLoad.cells(cArea, rLights) = 5.;
+
+    compLoad.outsideDryBulb = 20.;
+    compLoad.mainFanAirFlow = 0.7;
+    compLoad.airflowPerTotCap = 0.2;
+    compLoad.totCapPerArea = 0.15;
+
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    Real64 powerConversion = getSpecificUnitMultiplier(*state, "W", "Btu/h");
+    Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
+    Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
+    Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(*state, "m3/s-m2", "ft3/min-ft2");
+    int tempConvIndx = getSpecificUnitIndex(*state, "C", "F");
+
+    // LoadSummaryUnitConversion(*state, compLoad);
+    LoadSummaryUnitConversion(*state, compLoad, state->dataOutRptTab->unitsStyle_SQLite);
+
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+
+    EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
+    EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
+    EXPECT_EQ(0.2 * airFlowPerAreaConversion / powerConversion, compLoad.airflowPerTotCap);
+    EXPECT_EQ(0.15 * powerConversion / areaConversion, compLoad.totCapPerArea);
+}
