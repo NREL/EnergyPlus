@@ -1334,8 +1334,8 @@ namespace PhotovoltaicThermalCollectors {
         Real64 hpv_1;                               // conductance of pv backing (W/m2-K)
         Real64 hrad12;                              // radiative heat transfer coefficient between bldg surface and pv backing surface (W/m2-K)
         Real64 hrad_surr;                           // radiative heat transfer coefficient between pv glass cover and surrounding (W/m2-K)
-        Real64 IAM_pv, b0_pv(0.1), b1_pv(0.0);      // pv incidence angle modifier parameters
-        Real64 IAM_bs, b0_bs(0.1), b1_bs(0.0);      // back surface incidence angle modifier parameters
+        Real64 IAM_pv, b0_pv(0.1), b1_pv(0.0);      // pv incidence angle modifier parameters - Not needed???
+        Real64 IAM_bs, b0_bs(0.1), b1_bs(0.0);      // back surface incidence angle modifier parameters - Not needed???
         const Real64 small_num(1.0e-10);            // small real number
         const Real64 sigma(5.67e-8);                // stephan bolzmann constant
         Real64 eff_pv(0.0);                         // efficiency pv panel
