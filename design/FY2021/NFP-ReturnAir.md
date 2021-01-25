@@ -659,3 +659,73 @@ No transition is expected, because an optional field is proposed to be added.
 
 insert text
 
+## Design Document ##
+
+The code modification will be performed in modules as follows:
+
+InternalHeatGains
+
+DataHeatBalance
+
+ZoneEquipmentManager
+
+PackagedTerminalHeatPump
+
+UnitarySystem
+
+ZonePlenum
+
+### InternalHeatGains ###
+
+Since IDD change is required by modifying the last field name in Lights object, the corresponding change in GetInternalHeatGainsInput will be performed to allow NodeList, in addition node.
+
+#### GetInternalHeatGainsInput ####
+
+The changes is to allow the last field to include NodeList. One of the node in the NodeList should be the zone exhaust node name.
+
+### DataHeatBalance ###
+
+The Struct LightsData will be modified
+
+#### Add two new variables ####
+
+1. bool NodeListActive
+
+The varaible is set to false, when NodeList is not an input, Otherwise, the value is set to true.
+
+2. int NumofReturnHeatNodes
+
+If NodeListActive, then assign the number of nodes in the NodeLIst into this variables.
+
+#### Replace int ZoneReturnNum by Array1D<int> ZoneReturnNodeNum()
+
+Since a single node will be replaced by NodeList, 1-D array is needed to carry NodeList information. 
+
+### ZoneEquipmentManager ###
+
+The return air heat gain is handled in ZoneEquipmentManager::CalcZoneLeavingConditions it calls some functions to collect the heat gains on the return.
+
+A new section will be added to perform followig calculations
+
+1. A sum of total light return heat gains from multiple lights objects in the same zone
+2. Collect mass flow rates from return node and exhaust node
+3. Calculate outlet air properties weighted by mass flow rates and total light heat gains.
+
+### PackagedTerminalHeatPump ###
+
+The GetPTUnit function will be modified to allow Induced Air Outlet Node or NodeList Name as Inlet Air Node for both PTAC and PTHP. 
+
+### UnitarySystem ###
+
+The getUnitarySystemInput function will be modified to allow Induced Air Outlet Node or NodeList Name as Inlet Air Node for UnitarySystem as a zone equipment.
+
+### ZonePlenum ###
+
+Both functions of InitAirZoneReturnPlenum and CalcAirZoneReturnPlenum may be modified.
+
+1. Add Equipment mass flow rate in the return mass flow rate
+2. Calculate zone plenumn outlet conditions using existing procedure
+3. Set air properties for all induced air nodes and return plenum node
+4. Split mass flow rate of plenum outlets for retur plenum node and induced nodes.
+ 
+
