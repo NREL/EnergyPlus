@@ -770,13 +770,15 @@ add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
 target_link_libraries( energyplusparser PUBLIC re2 fmt::fmt)
 if(UNIX AND NOT APPLE)
   target_link_libraries( energyplusparser PUBLIC dl)
-  # See https://en.cppreference.com/w/cpp/filesystem#Notes
-  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    target_link_libraries( energyplusparser PRIVATE stdc++fs )
-  endif()
 endif()
 if (WIN32)
   target_link_libraries( energyplusparser PUBLIC Shlwapi )
+endif()
+
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries( energyplusparser PRIVATE stdc++fs )
 endif()
 
 # first we will create a static library of EnergyPlus
@@ -809,15 +811,17 @@ if(UNIX AND NOT APPLE)
   if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
     target_link_libraries( energypluslib PUBLIC util )
   endif()
-  if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    target_link_libraries( energypluslib PRIVATE stdc++fs )
-  endif()
 endif()
 if (WIN32)
   target_link_libraries( energypluslib PUBLIC Shlwapi )
 endif()
 if(LINK_WITH_PYTHON)
   target_link_libraries( energypluslib PUBLIC ${PYTHON_LIBRARIES} )
+endif()
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries( energyplusparser PRIVATE stdc++fs )
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
@@ -854,11 +858,6 @@ else()  # windows
   add_library( energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi PUBLIC energypluslib )
-#if(UNIX AND NOT APPLE)
-  #if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-    #target_link_libraries( energyplusapi stdc++fs )
-  #endif()
-#endif()
 
 set_target_properties(
   energyplusapi
@@ -983,11 +982,6 @@ if( BUILD_TESTING )
 
   add_executable( TestAPI_Functional_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c )
   target_link_libraries( TestAPI_Functional_C PRIVATE energyplusapi )
-  #if(UNIX AND NOT APPLE)
-    #if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-      #target_link_libraries( TestAPI_Functional_C stdc++fs )
-    #endif()
-  #endif()
 
   add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
 
