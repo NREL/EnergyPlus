@@ -690,7 +690,7 @@ void lifetime_t::runLifetimeModels(size_t lifetimeIndex, bool charge_changed, do
 
         if (charge_changed && params->calendar_choice != lifetime_params::CALENDAR_CHOICE::NMC_MODEL)
             q_cycle = cycle_model->runCycleLifetime(prev_DOD);
-        else if (lifetimeIndex == 0 != lifetime_params::CALENDAR_CHOICE::NMC_MODEL)
+        else if (charge_changed && params->calendar_choice == lifetime_params::CALENDAR_CHOICE::NMC_MODEL)
             q_cycle = cycle_model->runCycleLifetimeNMC(T_battery, DOD);
 
         // Rohit - add parameter charge_changed

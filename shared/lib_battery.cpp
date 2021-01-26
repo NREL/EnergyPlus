@@ -55,6 +55,8 @@ thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R,
                      const util::matrix_t<double> &c_vs_t, std::vector<double> T_room_C) {
     params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, c_vs_t}));
     params->option = thermal_params::SCHEDULE;
+    //Rohit intialize analytical_model
+    params->analytical_model = false;
     params->T_room_schedule = std::move(T_room_C);
     initialize();
     state->T_room = params->T_room_schedule[0];
@@ -64,6 +66,21 @@ thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R,
                      const util::matrix_t<double> &c_vs_t, double T_room_C) {
     params = std::shared_ptr<thermal_params>(new thermal_params({dt_hour, mass, surface_area, Cp, h, R, c_vs_t}));
     params->option = thermal_params::VALUE;
+    //Rohit initialize analytical_model
+    params->analytical_model = false;
+    params->T_room_init = T_room_C;
+    initialize();
+}
+
+thermal_t::thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
+                     double T_room_C) {
+    util::matrix_t<double> c_vs_t;
+    double vals3[] = { -10, 60, 0, 80, 25, 100, 40, 100 };
+    c_vs_t.assign(vals3, 4, 2);
+    params = std::shared_ptr<thermal_params>(new thermal_params({ dt_hour, mass, surface_area, Cp, h, R, c_vs_t }));
+    params->option = thermal_params::VALUE;
+    //Rohit initialize analytical_model
+    params->analytical_model = true;
     params->T_room_init = T_room_C;
     initialize();
 }
@@ -101,7 +118,13 @@ void thermal_t::replace_battery(size_t lifetimeIndex) {
 }
 
 void thermal_t::calc_capacity() {
-    double percent = util::linterp_col(params->cap_vs_temp, 0, state->T_batt, 1);
+
+    double percent;
+    if (params->analytical_model)
+        percent = 100 * exp(-(Ea_d0_1 / Rug) * (1 / state->T_batt - 1 / T_ref) -
+            (Ea_d0_2 / Rug) * pow((1 / state->T_batt - 1 / T_ref), 2));
+    else
+        percent = util::linterp_col(params->cap_vs_temp, 0, state->T_batt, 1);
 
     if (std::isnan(percent) || percent < 0 || percent > 100) {
         percent = 100;

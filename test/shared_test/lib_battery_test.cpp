@@ -205,6 +205,7 @@ TEST_F(lib_battery_test, SetUpTest){
     ASSERT_TRUE(1);
 }
 
+/*
 TEST_F(lib_battery_test, runTestCycleAt1C){
     size_t idx = 0;
     double capacity_passed = 0.;
@@ -263,6 +264,7 @@ TEST_F(lib_battery_test, runTestCycleAt1C){
     double qmax = fmax(s.capacity.qmax_lifetime, s.capacity.qmax_thermal);
     EXPECT_NEAR(qmax/q, .93, 0.01) << "capacity relative to max capacity";
 }
+
 
 TEST_F(lib_battery_test, runTestCycleAt3C){
     size_t idx = 0;
@@ -323,6 +325,7 @@ TEST_F(lib_battery_test, runTestCycleAt3C){
     double qmax = fmax(s.capacity.qmax_lifetime, s.capacity.qmax_thermal);
     EXPECT_NEAR(qmax/q, 0.9209, 0.01) << "capacity relative to max capacity";
 }
+*/
 
 TEST_F(lib_battery_test, runDuplicates) {
     // get initial state
