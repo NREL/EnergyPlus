@@ -7694,15 +7694,20 @@ namespace EnergyPlus::OutputReportTabular {
 
                 tableBody = "";
                 tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
-                if (produceTabular) {
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
+
+                // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    if (produceTabular) {
                         PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
-                    } else {
+                    }
+                } else {
+                    if (produceTabular) {
                         PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
                     }
                 }
+                
                 tableBody(1, 2) = RealToStr(convBldgCondFloorArea, 2);
                 tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
 
@@ -7900,8 +7905,10 @@ namespace EnergyPlus::OutputReportTabular {
                 if (produceTabular) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Electricity", processElecCost, 2);
                 }
-                addFootNoteSubTable(
-                    state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
+                if (produceTabular) {
+                    addFootNoteSubTable(
+                        state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
+                }
 
                 //  Energy Use Intensities- Natural Gas
                 if (ort->buildingGrossFloorArea > 0) {
@@ -8050,26 +8057,26 @@ namespace EnergyPlus::OutputReportTabular {
                 {
                     auto const SELECT_CASE_var(resourcePrimaryHeating);
                     if (SELECT_CASE_var == colElectricity) {
-                        footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
                         if (produceTabular) {
+                            footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
                         }
                     } else if (SELECT_CASE_var == colGas) {
-                        footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
                         if (produceTabular) {
+                            footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
                         }
                     } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
                                SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
-                        footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
                         if (produceTabular) {
+                            footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
                         }
                         // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
                         // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
                     } else if (SELECT_CASE_var == colPurchHeat) {
-                        footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
                         if (produceTabular) {
+                            footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
                         }
                     }
@@ -11658,7 +11665,7 @@ namespace EnergyPlus::OutputReportTabular {
                                     // finally assign the entry to the place in the table body
                                     // if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
                                     if (unitsStyle_cur == iUnitsStyle::InchPound || unitsStyle_cur == iUnitsStyle::JtoKWH) {
-                                            columnUnitConv = colUnitConv(colCurrent);
+                                        columnUnitConv = colUnitConv(colCurrent);
                                         if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name,
                                                                         "SizingPeriod:DesignDay") &&
                                                 unitsStyle_cur == iUnitsStyle::InchPound) { // ort->unitsStyle == iUnitsStyle::InchPound)
