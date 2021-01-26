@@ -49,7 +49,7 @@
 #include <cassert>
 #include <cmath>
 #include <memory>
-#include <chrono>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -6881,12 +6881,6 @@ namespace SolarShading {
                                     // The layer order for interior windows is "outside" to "inside," where "outside" refers to
                                     // the adjacent zone and "inside" refers to the current zone.
                                     WinShadingType ShadeFlagBack = SurfWinShadingFlag(BackSurfNum);
-                                    int ConstrNum = Surface(SurfNum).Construction;
-                                    int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                                    if (SurfWinStormWinFlag(SurfNum) == 1) {
-                                        ConstrNum = Surface(SurfNum).StormWinConstruction;
-                                        ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
-                                    }
                                     bool VarSlatsBack = SurfWinMovableSlats(BackSurfNum);
                                     Real64 SlatAngBack = SurfWinSlatAngThisTS(BackSurfNum);
                                     Real64 CosIncBack = std::abs(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, BackSurfNum));
@@ -7053,7 +7047,7 @@ namespace SolarShading {
                                             IntBeamAbsByShadFac(BackSurfNum) =
                                                     BOverlap * ABlBack / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum));
                                         } else {
-
+                                            // ShadeFlagBack == BGBlindOn
                                             Real64 t1k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef({1, 6}, 1));
                                             Real64 t2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef({1, 6}, 2));
                                             Real64 af2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).afBareSolCoef({1, 6}, 2));
@@ -8649,7 +8643,6 @@ namespace SolarShading {
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
-        using namespace std::chrono;
 
         static Real64 ThetaBig(0.0);   // Larger of ThetaBlock1 and ThetaBlock2 	//Autodesk Used uninitialized in some runs
         static Real64 ThetaSmall(0.0); // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
@@ -8740,10 +8733,6 @@ namespace SolarShading {
                     Surface(ISurf).activeStormWinShadedConstruction = Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
                 }
                 int IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
-
-//                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
-
-
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
                 Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
@@ -8784,16 +8773,16 @@ namespace SolarShading {
                 SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff; // Initialize shading flag to off
 
                 switch (WindowShadingControl(IShadingCtrl).ShadingControlType) {
-                    case AlwaysOn: // 'ALWAYSON'
+                    case WindowShadingControlType::AlwaysOn: // 'ALWAYSON'
                         SurfWinShadingFlag(ISurf) = ShType;
                         break;
-                    case AlwaysOff: // 'ALWAYSOFF'
+                    case WindowShadingControlType::AlwaysOff: // 'ALWAYSOFF'
                         SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff;
                         break;
-                    case OnIfScheduled: // 'ONIFSCHEDULEALLOWS'
+                    case WindowShadingControlType::OnIfScheduled: // 'ONIFSCHEDULEALLOWS'
                         if (SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
                         break;
-                    case HiSolar: // 'ONIFHIGHSOLARONWINDOW'
+                    case WindowShadingControlType::HiSolar: // 'ONIFHIGHSOLARONWINDOW'
                         // ! Direct plus diffuse solar intensity on window
                         if (state.dataEnvrn->SunIsUp) {
                             if (SolarOnWindow > SetPoint && SchedAllowsControl) {
@@ -8804,7 +8793,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case HiHorzSolar: // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
+                    case WindowShadingControlType::HiHorzSolar: // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
                         if (state.dataEnvrn->SunIsUp) {
                             if (HorizSolar > SetPoint && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -8814,7 +8803,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case HiOutAirTemp: // 'OnIfHighOutdoorAirTemperature'
+                    case WindowShadingControlType::HiOutAirTemp: // 'OnIfHighOutdoorAirTemperature'
                         if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -8822,7 +8811,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case HiZoneAirTemp: // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
+                    case WindowShadingControlType::HiZoneAirTemp: // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
                         if (MAT(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -8830,7 +8819,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnHiOutTemp_HiSolarWindow: // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
+                    case WindowShadingControlType::OnHiOutTemp_HiSolarWindow: // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
                         if (state.dataEnvrn->SunIsUp) {
                             if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 &&
                                 SchedAllowsControl) {
@@ -8841,7 +8830,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnHiOutTemp_HiHorzSolar: // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
+                    case WindowShadingControlType::OnHiOutTemp_HiHorzSolar: // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
                         if (state.dataEnvrn->SunIsUp) {
                             if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 &&
                                 SchedAllowsControl) {
@@ -8852,7 +8841,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnHiZoneTemp_HiSolarWindow: // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
+                    case WindowShadingControlType::OnHiZoneTemp_HiSolarWindow: // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
                         if (state.dataEnvrn->SunIsUp) {
                             if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -8862,7 +8851,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnHiZoneTemp_HiHorzSolar: // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
+                    case WindowShadingControlType::OnHiZoneTemp_HiHorzSolar: // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
                         if (state.dataEnvrn->SunIsUp) {
                             if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -8872,7 +8861,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case HiZoneCooling: [[unlikely]]
+                    case WindowShadingControlType::HiZoneCooling:
                         // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
                         // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
                         // used in other CASEs) are not allocated at this point for the first time step of the simulation.
@@ -8885,7 +8874,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case HiGlare: [[unlikely]]
+                    case WindowShadingControlType::HiGlare:
                         // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
                         // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
                         // by control schedule.
@@ -8895,7 +8884,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case MeetDaylIlumSetp: [[unlikely]]
+                    case WindowShadingControlType::MeetDaylIlumSetp:
                         // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
                         // Only switchable glazing does daylight illuminance control
                         if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
@@ -8904,7 +8893,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNightLoOutTemp_OffDay: [[unlikely]]// 'OnNightIfLowOutdoorTempAndOffDay'
+                    case WindowShadingControlType::OnNightLoOutTemp_OffDay: // 'OnNightIfLowOutdoorTempAndOffDay'
                         if (!state.dataEnvrn->SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -8912,7 +8901,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNightLoInTemp_OffDay: [[unlikely]]// 'OnNightIfLowInsideTempAndOffDay')
+                    case WindowShadingControlType::OnNightLoInTemp_OffDay: // 'OnNightIfLowInsideTempAndOffDay')
                         if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
@@ -8920,7 +8909,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNightIfHeating_OffDay: [[unlikely]]// 'OnNightIfHeatingAndOffDay'
+                    case WindowShadingControlType::OnNightIfHeating_OffDay: // 'OnNightIfHeatingAndOffDay'
                         if (!state.dataGlobal->BeginSimFlag) {
                             if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
@@ -8930,7 +8919,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNightLoOutTemp_OnDayCooling: [[unlikely]]// 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
+                    case WindowShadingControlType::OnNightLoOutTemp_OnDayCooling: // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
                         if (!state.dataGlobal->BeginSimFlag) {
                             if (!state.dataEnvrn->SunIsUp) { // Night
                                 if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
@@ -8945,7 +8934,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNightIfHeating_OnDayCooling: [[unlikely]]// 'OnNightIfHeatingAndOnDayIfCooling'
+                    case WindowShadingControlType::OnNightIfHeating_OnDayCooling: // 'OnNightIfHeatingAndOnDayIfCooling'
                         if (!state.dataGlobal->BeginSimFlag) {
                             if (!state.dataEnvrn->SunIsUp) { // Night
                                 if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
@@ -8960,7 +8949,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OffNight_OnDay_HiSolarWindow: [[unlikely]]// 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                    case WindowShadingControlType::OffNight_OnDay_HiSolarWindow: // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
                         if (!state.dataGlobal->BeginSimFlag) {
                             if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
@@ -8970,7 +8959,7 @@ namespace SolarShading {
                         }
                         break;
 
-                    case OnNight_OnDay_HiSolarWindow: [[unlikely]]// 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                    case WindowShadingControlType::OnNight_OnDay_HiSolarWindow: // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
                         if (!state.dataGlobal->BeginSimFlag) {
                             if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
@@ -8981,9 +8970,9 @@ namespace SolarShading {
                             }
                         }
                         break;
-                    default: [[unlikely]]
-                        std::cout << "Invalid Selection\n";
-                        break;
+                    default:
+                        ShowWarningError(state, "Invalid Selection of Window Shading Control Type for Surface " +
+                                                Surface(ISurf).Name);
                 }
 
                 // Set switching factor to fully switched if ShadingFlag = 2

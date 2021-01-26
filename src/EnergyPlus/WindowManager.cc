@@ -3062,7 +3062,7 @@ namespace WindowManager {
                         Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::ExtScreen) {
+                    if (IS_EXT_SHADED(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(3) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(4) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3245,7 +3245,7 @@ namespace WindowManager {
                         Aface(8, 8) = hr(8) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::ExtScreen) {
+                    if (IS_EXT_SHADED(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(7) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(8) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3371,7 +3371,7 @@ namespace WindowManager {
                         Aface(10, 10) = hr(10) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::ExtScreen) {
+                    if (IS_EXT_SHADED(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(9) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(10) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3519,8 +3519,7 @@ namespace WindowManager {
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
-            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::BGShade ||
-                ShadeFlag == WinShadingType::BGBlind || ShadeFlag == WinShadingType::ExtScreen) {
+            if (IS_SHADE_SCREEN_ON(ShadeFlag) || IS_BLIND_ON(ShadeFlag)) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;

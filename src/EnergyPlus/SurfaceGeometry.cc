@@ -8205,27 +8205,27 @@ namespace SurfaceGeometry {
 
         static Array1D<WindowShadingControlType> const ValidWindowShadingControlTypes(
             NumValidWindowShadingControlTypes,
-            {AlwaysOn,
-             AlwaysOff,
-             OnIfScheduled,
-             HiSolar,
-             HiHorzSolar,
-             HiOutAirTemp,
-             HiZoneAirTemp,
-             HiZoneCooling,
-             HiGlare,
-             MeetDaylIlumSetp,
-             OnNightLoOutTemp_OffDay,
-             OnNightLoInTemp_OffDay,
-             OnNightIfHeating_OffDay,
-             OnNightLoOutTemp_OnDayCooling,
-             OnNightIfHeating_OnDayCooling,
-             OffNight_OnDay_HiSolarWindow,
-             OnNight_OnDay_HiSolarWindow,
-             OnHiOutTemp_HiSolarWindow,
-             OnHiOutTemp_HiHorzSolar,
-             OnHiZoneTemp_HiSolarWindow,
-             OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
+            {WindowShadingControlType::AlwaysOn,
+             WindowShadingControlType::AlwaysOff,
+             WindowShadingControlType::OnIfScheduled,
+             WindowShadingControlType::HiSolar,
+             WindowShadingControlType::HiHorzSolar,
+             WindowShadingControlType::HiOutAirTemp,
+             WindowShadingControlType::HiZoneAirTemp,
+             WindowShadingControlType::HiZoneCooling,
+             WindowShadingControlType::HiGlare,
+             WindowShadingControlType::MeetDaylIlumSetp,
+             WindowShadingControlType::OnNightLoOutTemp_OffDay,
+             WindowShadingControlType::OnNightLoInTemp_OffDay,
+             WindowShadingControlType::OnNightIfHeating_OffDay,
+             WindowShadingControlType::OnNightLoOutTemp_OnDayCooling,
+             WindowShadingControlType::OnNightIfHeating_OnDayCooling,
+             WindowShadingControlType::OffNight_OnDay_HiSolarWindow,
+             WindowShadingControlType::OnNight_OnDay_HiSolarWindow,
+             WindowShadingControlType::OnHiOutTemp_HiSolarWindow,
+             WindowShadingControlType::OnHiOutTemp_HiHorzSolar,
+             WindowShadingControlType::OnHiZoneTemp_HiSolarWindow,
+             WindowShadingControlType::OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
                                           // | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ',
                                           // & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE
                                           // ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING
@@ -8451,7 +8451,7 @@ namespace SurfaceGeometry {
                                 cAlphaArgs(8) + "\".");
             }
 
-            if ((WindowShadingControl(ControlNum).ShadingControlType == OnIfScheduled) &&
+            if ((WindowShadingControl(ControlNum).ShadingControlType == WindowShadingControlType::OnIfScheduled) &&
                 (!WindowShadingControl(ControlNum).ShadingControlIsScheduled)) { // CR 7709 BG
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + " = \"" + WindowShadingControl(ControlNum).Name + "\" invalid, " + cAlphaFieldNames(7) +

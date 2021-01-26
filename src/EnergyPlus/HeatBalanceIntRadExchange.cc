@@ -335,7 +335,7 @@ namespace HeatBalanceIntRadExchange {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                 } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
-                    if (SurfIterations == 0 && (SurfWinShadingFlag(SurfNum) == WinShadingType::NoShade || SurfWinShadingFlag(SurfNum) == WinShadingType::ShadeOff)) {
+                    if (SurfIterations == 0 && !IS_SHADED(SurfWinShadingFlag(SurfNum))) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.

@@ -393,6 +393,7 @@ int RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & filepat
     // METHODOLOGY EMPLOYED:
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
+
     int status = initializeEnergyPlus(state, filepath);
     if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
     try {

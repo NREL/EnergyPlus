@@ -147,7 +147,7 @@ namespace DataSurfaces {
         ShadeOff = 10
     };
 
-    enum WindowShadingControlType {
+    enum class WindowShadingControlType : int{
         UnControlled = 0,
         AlwaysOn = 1,
         AlwaysOff = 2,
@@ -1191,7 +1191,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(UnControlled),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(WindowShadingControlType::UnControlled),
               Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {
