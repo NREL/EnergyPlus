@@ -9913,20 +9913,18 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (!state.dataCostEstimateManager->DoCostEstimate) return;
 
+        WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+
+        // compute floor area if no ABUPS
+        if (ort->buildingConditionedFloorArea == 0.0) {
+            DetermineBuildingFloorArea(state);
+        }
+
         for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
             iUnitsStyle unitsStyle_cur = ort->unitsStyle;
             bool produceTabular = true;
             bool produceSQLite = false;
             if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
-
-            if (produceTabular) {
-                WriteReportHeaders(state, "Component Cost Economics Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            }
-
-            // compute floor area if no ABUPS
-            if (ort->buildingConditionedFloorArea == 0.0) {
-                DetermineBuildingFloorArea(state);
-            }
 
             // 1st sub-table with total Costs and normalized with area
             rowHead.allocate(10);
@@ -10089,7 +10087,8 @@ namespace EnergyPlus::OutputReportTabular {
             for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
                 tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
                 tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-                if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                // if (ort->unitsStyle == iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
                     LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
                     if (unitConvIndex != 0) {
                         IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
