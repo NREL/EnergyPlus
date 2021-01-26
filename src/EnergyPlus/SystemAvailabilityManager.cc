@@ -4367,7 +4367,7 @@ namespace SystemAvailabilityManager {
                         ShowSevereError(state, "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" +
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                         ShowContinueError(state, "Ventilation Control Mode Schedule Name =\"" +
-                                          Schedule(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr).Name +
+                                          state.dataScheduleMgr->Schedule(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr).Name +
                                           "\", When the schedule value is 5 or 6, operative temperature control is requested. ");
                         ShowContinueError(state, "However, AdaptiveASH55 is not entered in the Thermal Comfort Model Type fields in the People object.");
                         ErrorsFound = true;

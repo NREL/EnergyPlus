@@ -515,7 +515,7 @@ protected:
         state->dataDXCoils->DXCoil(2).PLFFPLR(1) = Sch1;
 
         // set up schedules
-        ScheduleManager::Schedule.allocate(10);
+        state->dataScheduleMgr->Schedule.allocate(10);
     }
 
     virtual void TearDown()
@@ -542,10 +542,10 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     // node number set up in fixture
     EXPECT_EQ(ZoneInletAirNode, thisTU.VRFTUOutletNodeNum);
 
-    Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0;  // enable the VRF condenser
-    Schedule(thisTU.SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(curSysNum).SchedPtr).CurrentValue = 1.0;  // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(thisTU.SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
+    state->dataScheduleMgr->Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
+    state->dataScheduleMgr->Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
@@ -3720,10 +3720,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     GetZoneEquipmentData(*state);                                  // read equipment list and connections
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
 
-    Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
@@ -4031,7 +4031,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 400.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -4055,7 +4055,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 900.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 800.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -4091,7 +4091,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     EXPECT_EQ(Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
               0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -5573,10 +5573,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum); // trigger GetVRFInput by calling a mining function
     state->dataAirLoop->AirLoopInputsFilled = true;
 
-    Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
 
     // Test coil sizing
 
@@ -5729,7 +5729,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -6452,9 +6452,9 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;                            // turn on TU
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;                    // turn on fan
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;                   // set continuous fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;                            // turn on TU
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;                    // turn on fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;                   // set continuous fan operating mode
     InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
     ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil);               // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
@@ -6463,12 +6463,12 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
 
     // test availability manager operation
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 0.0; // turn off fan
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     EXPECT_EQ(0.0, Node(OutsideAirNode).MassFlowRate);
     EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOn);
     EXPECT_FALSE(DataHVACGlobals::ZoneCompTurnFansOff);
-    EXPECT_EQ(0.0, Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
+    EXPECT_EQ(0.0, state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue);
 
     // turn on "Turn Fan On" flag for availability manager, result should be the same as previous non-zero result
     DataHVACGlobals::ZoneCompTurnFansOn = true;
@@ -11188,10 +11188,10 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     // get zone input and connections
     GetZoneEquipmentData(*state);
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);
-    Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
     // set the zone cooling and heat requirements
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
@@ -12920,10 +12920,10 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     GetZoneEquipmentData(*state);
     GetVRFInput(*state);
     state->dataHVACVarRefFlow->GetVRFInputFlag = false;
-    Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
     // set the zone cooling and heat requirements
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;
@@ -14974,7 +14974,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
     // Initialize terminal unit
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;            // set continuous fan operating mode
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0;            // set continuous fan operating mode
 
     // Reset the err stream, which has warnings about curves values not equal to 1.0 (+ or - 10%) at rated conditions
     EXPECT_TRUE(has_err_output(true));
@@ -15596,10 +15596,10 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     // get zone input and connections
     GetZoneEquipmentData(*state);
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);
-    Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0;
     // set the zone cooling and heat requirements
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -5000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = -5000.0;

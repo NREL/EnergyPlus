@@ -766,17 +766,17 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataMixedAir->OAController(1).MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7;
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
-    Schedule(2).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
     TotPeople = 1;
     People.allocate(1);
     People(1).Name = "WestPeople";
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 3;
     Zone(1).TotOccupants = 3;
-    Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     state->dataContaminantBalance->OutdoorCO2 = 400;
@@ -1348,7 +1348,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
     ; // OA inlet (actuated) air nodes, dry air
 
     state->dataMixedAir->OAController(1).CoolCoilFreezeCheck = true;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->OAController(OAControllerNum).CalcOAController(*state, AirLoopNum, true);
 
@@ -5284,8 +5284,8 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     EXPECT_EQ(1.5, OAMassFlow);
 
     // Case 4 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, set zone OA schedules to alwaysoff
-    ScheduleManager::Schedule.allocate(1);
-    ScheduleManager::Schedule(1).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(1) = 1;
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(2) = 1;
 
@@ -5295,7 +5295,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     EXPECT_EQ(0.0, OAMassFlow);
 
     state->dataContaminantBalance->ZoneSysContDemand.deallocate();
-    ScheduleManager::Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
@@ -5498,17 +5498,17 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 
     // Case 2 - Turn off Zone 4-6
     OAMassFlow = 0.0;
-    ScheduleManager::Schedule(4).CurrentValue = 0.0;
-    ScheduleManager::Schedule(5).CurrentValue = 0.0;
-    ScheduleManager::Schedule(6).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_NEAR(41.0, OAMassFlow, 0.00001);
 
     // Case 3 - Turn off remaining zones
     OAMassFlow = 0.0;
-    ScheduleManager::Schedule(1).CurrentValue = 0.0;
-    ScheduleManager::Schedule(2).CurrentValue = 0.0;
-    ScheduleManager::Schedule(3).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
@@ -5630,18 +5630,18 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataMixedAir->OAController(1).MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7;
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
-    Schedule(2).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
     TotPeople = 1;
     People.allocate(1);
     People(1).Name = "WestPeople";
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 3;
     Zone(1).TotOccupants = 3;
-    Schedule(3).CurrentValue = 0.1;
-    Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0.1;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     state->dataContaminantBalance->OutdoorCO2 = 400;
@@ -5661,12 +5661,12 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ZoneIntGain.allocate(1);
     ZoneIntGain(1).NOFOCC = 0.1;
-    Schedule(5).CurrentValue = 900.0;
-    Schedule(6).CurrentValue = 300.0;
-    Schedule(7).CurrentValue = 900.0;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 900.0;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 300.0;
+    state->dataScheduleMgr->Schedule(7).CurrentValue = 900.0;
     Zone(1).ZoneMinCO2SchedIndex = 6;
     Zone(1).ZoneMaxCO2SchedIndex = 7;
-    Schedule(8).CurrentValue = 0.01;
+    state->dataScheduleMgr->Schedule(8).CurrentValue = 0.01;
 
     state->dataMixedAir->OAController(1).CalcOAController(*state, 1, true);
 

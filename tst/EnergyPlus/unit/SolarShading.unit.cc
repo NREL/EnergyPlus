@@ -2588,26 +2588,26 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     WindowShadingControl(2).Schedule = 2;
     WindowShadingControl(3).Schedule = 3;
 
-    ScheduleManager::Schedule.allocate(3);
-    ScheduleManager::Schedule(1).CurrentValue = 0;
-    ScheduleManager::Schedule(2).CurrentValue = 0;
-    ScheduleManager::Schedule(3).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule.allocate(3);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 3);
 
-    ScheduleManager::Schedule(1).CurrentValue = 0;
-    ScheduleManager::Schedule(2).CurrentValue = 1;
-    ScheduleManager::Schedule(3).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 2);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1;
-    ScheduleManager::Schedule(2).CurrentValue = 0;
-    ScheduleManager::Schedule(3).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];

@@ -91,65 +91,7 @@ namespace EnergyPlus::ScheduleManager {
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
-//<<<<<<< HEAD
-//    // Using/Aliasing
-//    using DataEnvironment::DayOfMonthTomorrow;
-//    using DataEnvironment::DayOfWeek;
-//    using DataEnvironment::DayOfWeekTomorrow;
-//    using DataEnvironment::DSTIndicator;
-//    using DataEnvironment::HolidayIndex;
-//    using DataEnvironment::HolidayIndexTomorrow;
-//    using DataEnvironment::MonthTomorrow;
-//
-//=======
-//    // MODULE PARAMETER DEFINITIONS
-//    int const MaxDayTypes(12);
-//>>>>>>> origin/develop
     static std::string const BlankString;
-
-    // Integer Variables for the Module
-    int NumScheduleTypes(0);
-    int NumDaySchedules(0);
-    int NumWeekSchedules(0);
-    int NumSchedules(0);
-
-    // Logical Variables for Module
-    bool ScheduleInputProcessed(false); // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued(false);
-    bool ScheduleFileShadingProcessed(false);
-    bool CheckScheduleValueMinMaxRunOnceOnly(true);
-    bool DoScheduleReportingSetup(true);
-
-    // Object Data
-    Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
-    Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
-    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
-    Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
-    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
-    Array1D<ScheduleData> Schedule; // Schedule Storage
-    std::unordered_map<std::string, std::string> UniqueScheduleNames;
-    std::vector<InterpretedScheduleFileData> interpretedFileData;
-
-    // Clears the global data in ScheduleManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumScheduleTypes = 0;
-        NumDaySchedules = 0;
-        NumWeekSchedules = 0;
-        NumSchedules = 0;
-        ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
-        CheckScheduleValueMinMaxRunOnceOnly = true;
-        ScheduleType.deallocate();
-        DaySchedule.deallocate();
-        UniqueDayScheduleNames.clear();
-        WeekSchedule.deallocate();
-        UniqueWeekScheduleNames.clear();
-        Schedule.deallocate();
-        UniqueScheduleNames.clear();
-        DoScheduleReportingSetup = true;
-    }
 
     void ProcessScheduleInput(EnergyPlusData &state)
     {
@@ -289,17 +231,17 @@ namespace EnergyPlus::ScheduleManager {
         int ifld;
         int hrLimitCount;
 
-        if (ScheduleInputProcessed) {
+        if (state.dataScheduleMgr->ScheduleInputProcessed) {
             return;
         }
-        ScheduleInputProcessed = true;
+        state.dataScheduleMgr->ScheduleInputProcessed = true;
 
         MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
         MaxAlps = 0;
 
         CurrentModuleObject = "ScheduleTypeLimits";
-        NumScheduleTypes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        if (NumScheduleTypes > 0) {
+        state.dataScheduleMgr->NumScheduleTypes = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        if (state.dataScheduleMgr->NumScheduleTypes > 0) {
             inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, Count, NumAlphas, NumNumbers);
             MaxNums = max(MaxNums, NumNumbers);
             MaxAlps = max(MaxAlps, NumAlphas);
@@ -592,7 +534,7 @@ namespace EnergyPlus::ScheduleManager {
             }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
-            ScheduleFileShadingProcessed = true;
+            state.dataScheduleMgr->ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
                 ShowWarningError(
@@ -609,46 +551,46 @@ namespace EnergyPlus::ScheduleManager {
 
         // include additional schedules in with count
         NumRegDaySchedules = NumHrDaySchedules + NumIntDaySchedules + NumLstDaySchedules;
-        NumDaySchedules = NumRegDaySchedules + AddDaySch;
-        NumWeekSchedules = NumRegWeekSchedules + NumCptWeekSchedules + AddWeekSch;
-        NumSchedules = NumRegSchedules + NumCptSchedules + NumCommaFileSchedules + NumConstantSchedules + NumExternalInterfaceSchedules +
+        state.dataScheduleMgr->NumDaySchedules = NumRegDaySchedules + AddDaySch;
+        state.dataScheduleMgr->NumWeekSchedules = NumRegWeekSchedules + NumCptWeekSchedules + AddWeekSch;
+        state.dataScheduleMgr->NumSchedules = NumRegSchedules + NumCptSchedules + NumCommaFileSchedules + NumConstantSchedules + NumExternalInterfaceSchedules +
                        NumExternalInterfaceFunctionalMockupUnitImportSchedules + NumExternalInterfaceFunctionalMockupUnitExportSchedules +
                        NumCSVAllColumnsSchedules;
 
         //!  Most initializations in the schedule data structures are taken care of in
         //!  the definitions (see above)
 
-        ScheduleType.allocate({0, NumScheduleTypes});
+        state.dataScheduleMgr->ScheduleType.allocate({0, state.dataScheduleMgr->NumScheduleTypes});
 
-        DaySchedule.allocate({0, NumDaySchedules});
-        UniqueDayScheduleNames.reserve(static_cast<unsigned>(NumDaySchedules));
+        state.dataScheduleMgr->DaySchedule.allocate({0, state.dataScheduleMgr->NumDaySchedules});
+        state.dataScheduleMgr->UniqueDayScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumDaySchedules));
         //    Initialize
-        for (LoopIndex = 0; LoopIndex <= NumDaySchedules; ++LoopIndex) {
-            DaySchedule(LoopIndex).TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+        for (LoopIndex = 0; LoopIndex <= state.dataScheduleMgr->NumDaySchedules; ++LoopIndex) {
+            state.dataScheduleMgr->DaySchedule(LoopIndex).TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
             for (Count = 1; Count <= 24; ++Count) {
                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    DaySchedule(LoopIndex).TSValue(TS, Count) = 0.0;
+                    state.dataScheduleMgr->DaySchedule(LoopIndex).TSValue(TS, Count) = 0.0;
                 }
             }
         }
 
-        WeekSchedule.allocate({0, NumWeekSchedules});
-        UniqueWeekScheduleNames.reserve(static_cast<unsigned>(NumWeekSchedules));
+        state.dataScheduleMgr->WeekSchedule.allocate({0, state.dataScheduleMgr->NumWeekSchedules});
+        state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
 
-        Schedule.allocate({-1, NumSchedules});
+        state.dataScheduleMgr->Schedule.allocate({-1, state.dataScheduleMgr->NumSchedules});
         //		UniqueScheduleNames.clear();
-        UniqueScheduleNames.reserve(static_cast<unsigned>(NumSchedules));
-        Schedule(-1).ScheduleTypePtr = -1;
-        Schedule(-1).WeekSchedulePointer = 1;
-        Schedule(0).ScheduleTypePtr = 0;
-        Schedule(0).WeekSchedulePointer = 0;
+        state.dataScheduleMgr->UniqueScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumSchedules));
+        state.dataScheduleMgr->Schedule(-1).ScheduleTypePtr = -1;
+        state.dataScheduleMgr->Schedule(-1).WeekSchedulePointer = 1;
+        state.dataScheduleMgr->Schedule(0).ScheduleTypePtr = 0;
+        state.dataScheduleMgr->Schedule(0).WeekSchedulePointer = 0;
 
         print(state.files.audit.ensure_open(state, "ProcessScheduleInput", state.files.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
 
         //!! Get Schedule Types
 
         CurrentModuleObject = "ScheduleTypeLimits";
-        for (LoopIndex = 1; LoopIndex <= NumScheduleTypes; ++LoopIndex) {
+        for (LoopIndex = 1; LoopIndex <= state.dataScheduleMgr->NumScheduleTypes; ++LoopIndex) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           LoopIndex,
@@ -663,28 +605,28 @@ namespace EnergyPlus::ScheduleManager {
                                           cNumericFields);
             UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
-            ScheduleType(LoopIndex).Name = Alphas(1);
+            state.dataScheduleMgr->ScheduleType(LoopIndex).Name = Alphas(1);
             if (lNumericBlanks(1) || lNumericBlanks(2)) {
-                ScheduleType(LoopIndex).Limited = false;
+                state.dataScheduleMgr->ScheduleType(LoopIndex).Limited = false;
             } else if (!lNumericBlanks(1) && !lNumericBlanks(2)) {
-                ScheduleType(LoopIndex).Limited = true;
+                state.dataScheduleMgr->ScheduleType(LoopIndex).Limited = true;
             }
             if (!lNumericBlanks(1)) {
-                ScheduleType(LoopIndex).Minimum = Numbers(1);
+                state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum = Numbers(1);
             }
             if (!lNumericBlanks(2)) {
-                ScheduleType(LoopIndex).Maximum = Numbers(2);
+                state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum = Numbers(2);
             }
-            if (ScheduleType(LoopIndex).Limited) {
+            if (state.dataScheduleMgr->ScheduleType(LoopIndex).Limited) {
                 if (Alphas(2) == "DISCRETE" || Alphas(2) == "INTEGER") {
-                    ScheduleType(LoopIndex).IsReal = false;
+                    state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal = false;
                 } else {
                     if (Alphas(2) != "CONTINUOUS" && Alphas(2) != "REAL") {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ScheduleType(LoopIndex).Name + "\", invalid " + cAlphaFields(2) +
+                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->ScheduleType(LoopIndex).Name + "\", invalid " + cAlphaFields(2) +
                                          '=' + Alphas(2));
                         ErrorsFound = true;
                     }
-                    ScheduleType(LoopIndex).IsReal = true;
+                    state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal = true;
                 }
             }
             if (NumAlphas >= 3) {
@@ -705,26 +647,26 @@ namespace EnergyPlus::ScheduleManager {
                                                                             "Percent",
                                                                             "Control",
                                                                             "Mode"});
-                    ScheduleType(LoopIndex).UnitType =
+                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType =
                         UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
-                    if (ScheduleType(LoopIndex).UnitType == 0) {
+                    if (state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType == 0) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                          "\" is invalid.");
                     }
                 }
             }
-            if (ScheduleType(LoopIndex).Limited) {
-                if (ScheduleType(LoopIndex).Minimum > ScheduleType(LoopIndex).Maximum) {
-                    if (ScheduleType(LoopIndex).IsReal) {
+            if (state.dataScheduleMgr->ScheduleType(LoopIndex).Limited) {
+                if (state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum > state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum) {
+                    if (state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal) {
                         ShowSevereError(state,
                                         format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
                                                RoutineName,
                                                CurrentModuleObject,
                                                Alphas(1),
                                                cNumericFields(1),
-                                               ScheduleType(LoopIndex).Minimum,
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
                                                cNumericFields(2),
-                                               ScheduleType(LoopIndex).Maximum));
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     } else {
                         ShowSevereError(state,
@@ -733,9 +675,9 @@ namespace EnergyPlus::ScheduleManager {
                                                CurrentModuleObject,
                                                Alphas(1),
                                                cNumericFields(1),
-                                               ScheduleType(LoopIndex).Minimum,
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
                                                cNumericFields(2),
-                                               ScheduleType(LoopIndex).Maximum));
+                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
                         ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
                     }
                 }
@@ -760,12 +702,12 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
-            DaySchedule(Count).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -775,27 +717,27 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    DaySchedule(Count).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr = CheckIndex;
                 }
             }
             for (Hr = 1; Hr <= 24; ++Hr) {
-                DaySchedule(Count).TSValue({1, state.dataGlobal->NumOfTimeStepInHour}, Hr) = Numbers(Hr);
+                state.dataScheduleMgr->DaySchedule(Count).TSValue({1, state.dataGlobal->NumOfTimeStepInHour}, Hr) = Numbers(Hr);
             }
-            DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
-            SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
-            if (ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
+            state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
+            SchedTypePtr = state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr;
+            if (state.dataScheduleMgr->ScheduleType(SchedTypePtr).Limited) {
+                if (any_lt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Minimum) ||
+                    any_gt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Maximum)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
                                      cAlphaFields(2) + '=' + Alphas(2));
                 }
             }
-            if (!ScheduleType(SchedTypePtr).IsReal) {
+            if (!state.dataScheduleMgr->ScheduleType(SchedTypePtr).IsReal) {
                 // Make sure each is integer
                 NumErrorFlag = false; // only show error message once
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        if (DaySchedule(Count).TSValue(TS, Hr) != int(DaySchedule(Count).TSValue(TS, Hr))) {
+                        if (state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) != int(state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr))) {
                             if (!NumErrorFlag) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                  "\", One or more values are not integer as required by " + cAlphaFields(2) + '=' + Alphas(2));
@@ -826,12 +768,12 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
-            DaySchedule(Count).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -841,7 +783,7 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    DaySchedule(Count).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr = CheckIndex;
                 }
             }
             NumFields = NumAlphas - 3;
@@ -854,11 +796,11 @@ namespace EnergyPlus::ScheduleManager {
 
             // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
             if (UtilityRoutines::SameString(Alphas(3), "NO")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
             } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
             } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
                                 Alphas(3) + "\"");
@@ -874,13 +816,13 @@ namespace EnergyPlus::ScheduleManager {
                                   ErrorsFound,
                                   Alphas(1),
                                   CurrentModuleObject,
-                                  DaySchedule(Count).IntervalInterpolated);
-            if (DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
+                                  state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated);
+            if (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     SCount = 1;
                     CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
+                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                         SCount = CurMinute + 1;
                         CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
@@ -889,26 +831,26 @@ namespace EnergyPlus::ScheduleManager {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
                         CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             }
 
-            SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
-            if (ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
+            SchedTypePtr = state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr;
+            if (state.dataScheduleMgr->ScheduleType(SchedTypePtr).Limited) {
+                if (any_lt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Minimum) ||
+                    any_gt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Maximum)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
                                      cAlphaFields(2) + '=' + Alphas(2));
                 }
             }
-            if (!ScheduleType(SchedTypePtr).IsReal) {
+            if (!state.dataScheduleMgr->ScheduleType(SchedTypePtr).IsReal) {
                 // Make sure each is integer
                 NumErrorFlag = false; // only show error message once
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        if (DaySchedule(Count).TSValue(TS, Hr) != int(DaySchedule(Count).TSValue(TS, Hr))) {
+                        if (state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) != int(state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr))) {
                             if (!NumErrorFlag) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                  "\", , One or more values are not integer as required by " + cAlphaFields(2) + '=' + Alphas(2));
@@ -936,12 +878,12 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++Count;
-            DaySchedule(Count).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -951,17 +893,17 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    DaySchedule(Count).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr = CheckIndex;
                 }
             }
 
             // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
             if (UtilityRoutines::SameString(Alphas(3), "NO")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
             } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
             } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
-                DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
+                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
                                 Alphas(3) + "\"");
@@ -1017,12 +959,12 @@ namespace EnergyPlus::ScheduleManager {
 
             // Now parcel into TS Value....
 
-            if (DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
+            if (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     SCount = 1;
                     CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
+                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                         SCount = CurMinute + 1;
                         CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
@@ -1031,26 +973,26 @@ namespace EnergyPlus::ScheduleManager {
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     CurMinute = state.dataGlobal->MinutesPerTimeStep;
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
                         CurMinute += state.dataGlobal->MinutesPerTimeStep;
                     }
                 }
             }
 
-            SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
-            if (ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
+            SchedTypePtr = state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr;
+            if (state.dataScheduleMgr->ScheduleType(SchedTypePtr).Limited) {
+                if (any_lt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Minimum) ||
+                    any_gt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Maximum)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
                                      cAlphaFields(2) + '=' + Alphas(2));
                 }
             }
-            if (!ScheduleType(SchedTypePtr).IsReal) {
+            if (!state.dataScheduleMgr->ScheduleType(SchedTypePtr).IsReal) {
                 // Make sure each is integer
                 NumErrorFlag = false; // only show error message once
                 for (Hr = 1; Hr <= 24; ++Hr) {
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        if (DaySchedule(Count).TSValue(TS, Hr) != int(DaySchedule(Count).TSValue(TS, Hr))) {
+                        if (state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) != int(state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr))) {
                             if (!NumErrorFlag) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                  "\", , One or more values are not integer as required by " + cAlphaFields(2) + '=' + Alphas(2));
@@ -1078,18 +1020,18 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            WeekSchedule(LoopIndex).Name = Alphas(1);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataScheduleMgr->WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 1; InLoopIndex <= MaxDayTypes; ++InLoopIndex) {
-                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), DaySchedule({1, NumRegDaySchedules}));
+                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
                                     OptionalOutputFileRef{state.files.audit});
                     ErrorsFound = true;
                 } else {
-                    WeekSchedule(LoopIndex).DaySchedulePointer(InLoopIndex) = DayIndex;
+                    state.dataScheduleMgr->WeekSchedule(LoopIndex).DaySchedulePointer(InLoopIndex) = DayIndex;
                 }
             }
         }
@@ -1111,14 +1053,14 @@ namespace EnergyPlus::ScheduleManager {
                                           cAlphaFields,
                                           cNumericFields);
             if (Count > 0) {
-                GlobalNames::VerifyUniqueInterObjectName(state, UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueWeekScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++Count;
-            WeekSchedule(Count).Name = Alphas(1);
+            state.dataScheduleMgr->WeekSchedule(Count).Name = Alphas(1);
             AllDays = false;
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 2; InLoopIndex <= NumAlphas; InLoopIndex += 2) {
-                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), DaySchedule({1, NumRegDaySchedules}));
+                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
                                         Alphas(InLoopIndex + 1) + "\" not Found",
@@ -1135,7 +1077,7 @@ namespace EnergyPlus::ScheduleManager {
                     } else {
                         for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
                             if (TheseDays(Hr)) {
-                                WeekSchedule(Count).DaySchedulePointer(Hr) = DayIndex;
+                                state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(Hr) = DayIndex;
                             }
                         }
                     }
@@ -1167,12 +1109,12 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            Schedule(LoopIndex).Name = Alphas(1);
-            Schedule(LoopIndex).SchType = ScheduleInput::Year;
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            state.dataScheduleMgr->Schedule(LoopIndex).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(LoopIndex).SchType = ScheduleInput::Year;
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -1182,14 +1124,14 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    Schedule(LoopIndex).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->Schedule(LoopIndex).ScheduleTypePtr = CheckIndex;
                 }
             }
             NumPointer = 0;
             DaysInYear = 0;
             // Rest of Alphas (Weekschedules) are processed into Pointers
             for (InLoopIndex = 3; InLoopIndex <= NumAlphas; ++InLoopIndex) {
-                WeekIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex), WeekSchedule({1, NumRegWeekSchedules}));
+                WeekIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex), state.dataScheduleMgr->WeekSchedule({1, NumRegWeekSchedules}));
                 if (WeekIndex == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex) + "=\"" +
                                         Alphas(InLoopIndex) + "\" not found.",
@@ -1207,16 +1149,16 @@ namespace EnergyPlus::ScheduleManager {
                     if (StartPointer <= EndPointer) {
                         for (Count = StartPointer; Count <= EndPointer; ++Count) {
                             ++DaysInYear(Count);
-                            Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
+                            state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
                         }
                     } else {
                         for (Count = StartPointer; Count <= 366; ++Count) {
                             ++DaysInYear(Count);
-                            Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
+                            state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
                         }
                         for (Count = 1; Count <= EndPointer; ++Count) {
                             ++DaysInYear(Count);
-                            Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
+                            state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(Count) = WeekIndex;
                         }
                     }
                 }
@@ -1225,15 +1167,15 @@ namespace EnergyPlus::ScheduleManager {
             // Do special test for Feb 29.  Make equal to Feb 28.
             if (DaysInYear(60) == 0) {
                 DaysInYear(60) = DaysInYear(59);
-                Schedule(LoopIndex).WeekSchedulePointer(60) = Schedule(LoopIndex).WeekSchedulePointer(59);
+                state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(60) = state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(59);
             }
             if (any_eq(DaysInYear, 0)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name + "\" has missing days in its schedule pointers",
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(LoopIndex).Name + "\" has missing days in its schedule pointers",
                                 OptionalOutputFileRef{state.files.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(LoopIndex).Name +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(LoopIndex).Name +
                                     "\" has overlapping days in its schedule pointers",
                                 OptionalOutputFileRef{state.files.audit});
                 ErrorsFound = true;
@@ -1241,11 +1183,11 @@ namespace EnergyPlus::ScheduleManager {
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(state, "Schedule:Year",
-                                 Schedule(LoopIndex).Name,
+                                 state.dataScheduleMgr->Schedule(LoopIndex).Name,
                                  "Schedule Value",
                                  "[ ]",
-                                 Schedule(LoopIndex).EMSActuatedOn,
-                                 Schedule(LoopIndex).EMSValue);
+                                 state.dataScheduleMgr->Schedule(LoopIndex).EMSActuatedOn,
+                                 state.dataScheduleMgr->Schedule(LoopIndex).EMSValue);
             }
         }
 
@@ -1286,12 +1228,12 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::Compact;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::Compact;
             // Validate ScheduleType
-            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -1301,7 +1243,7 @@ namespace EnergyPlus::ScheduleManager {
                                      " input -- will not be validated.");
                 }
             } else {
-                Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
             }
             NumPointer = 0;
             DaysInYear = 0;
@@ -1315,7 +1257,7 @@ namespace EnergyPlus::ScheduleManager {
             while (NumField < NumAlphas) {
                 //   Process "Through"
                 if (!has_prefix(Alphas(NumField), "THROUGH:") && !has_prefix(Alphas(NumField), "THROUGH")) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Expecting \"Through:\" date");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + "\", Expecting \"Through:\" date");
                     ShowContinueError(state, "Instead, found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
@@ -1332,12 +1274,12 @@ namespace EnergyPlus::ScheduleManager {
                 ErrorHere = false;
                 ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
                 if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else if (ErrorHere) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
@@ -1345,7 +1287,7 @@ namespace EnergyPlus::ScheduleManager {
                     EndPointer = General::OrdinalDay(EndMonth, EndDay, 1);
                     if (EndPointer == 366) {
                         if (FullYearSet) {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
+                            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
                                             R"(", New "Through" entry when "full year" already set)");
                             ShowContinueError(state, "\"Through\" field=" + CurrentThrough);
                             ErrorsFound = true;
@@ -1355,10 +1297,10 @@ namespace EnergyPlus::ScheduleManager {
                 }
                 ++WkCount;
                 ++AddWeekSch;
-                WeekSchedule(AddWeekSch).Name = format("{}_wk_{}", Alphas(1), WkCount);
-                WeekSchedule(AddWeekSch).Used = true;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = format("{}_wk_{}", Alphas(1), WkCount);
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Used = true;
                 for (Hr = StartPointer; Hr <= EndPointer; ++Hr) {
-                    Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
                     ++DaysInYear(Hr);
                 }
                 StartPointer = EndPointer + 1;
@@ -1371,9 +1313,9 @@ namespace EnergyPlus::ScheduleManager {
                     if (has_prefix(Alphas(NumField), "FOR")) {
                         ++DyCount;
                         ++AddDaySch;
-                        DaySchedule(AddDaySch).Name = format("{}_dy_{}", Alphas(1), DyCount);
-                        DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
-                        DaySchedule(AddDaySch).Used = true;
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).Name = format("{}_dy_{}", Alphas(1), DyCount);
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
                         TheseDays = false;
                         ErrorHere = false;
                         LastFor = Alphas(NumField);
@@ -1385,7 +1327,7 @@ namespace EnergyPlus::ScheduleManager {
                         } else {
                             for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
                                 if (TheseDays(Hr)) {
-                                    WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
+                                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
                                 }
                             }
                         }
@@ -1402,11 +1344,11 @@ namespace EnergyPlus::ScheduleManager {
                     ++NumField;
                     if (has_prefix(Alphas(NumField), "INTERPOLATE")) {
                         if (has(Alphas(NumField), "NO")) {
-                            DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::No;
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::No;
                         } else if (has(Alphas(NumField), "AVERAGE")) {
-                            DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Average;
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Average;
                         } else if (has(Alphas(NumField), "LINEAR")) {
-                            DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
                         } else {
                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(NumField) +
                                             "\" field=\"" + Alphas(NumField) + "\"");
@@ -1416,11 +1358,11 @@ namespace EnergyPlus::ScheduleManager {
                     } else {
                         if (!has_prefix(Alphas(NumField), "UNTIL")) {
                             if (has(Alphas(NumField), "NO")) {
-                                DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::No;
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::No;
                             } else if (has(Alphas(NumField), "AVERAGE")) {
-                                DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Average;
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Average;
                             } else if (has(Alphas(NumField), "LINEAR")) {
-                                DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
                             } else {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                                 "\", Illegal Field entered =" + Alphas(NumField));
@@ -1468,20 +1410,20 @@ namespace EnergyPlus::ScheduleManager {
                                               MinuteValue,
                                               SetMinuteValue,
                                               ErrorHere,
-                                              DaySchedule(AddDaySch).Name,
+                                              state.dataScheduleMgr->DaySchedule(AddDaySch).Name,
                                               CurrentModuleObject + " DaySchedule Fields",
-                                              DaySchedule(AddDaySch).IntervalInterpolated);
+                                              state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated);
                         // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
                         if (ErrorHere) {
                             ShowContinueError(state, "ref " + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
                             ErrorsFound = true;
                         }
-                        if (DaySchedule(AddDaySch).IntervalInterpolated ==
+                        if (state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated ==
                             ScheduleInterpolation::No) { // No validation done on the value of the interpolation field
                             for (Hr = 1; Hr <= 24; ++Hr) {
                                 CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
                                     CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
@@ -1491,7 +1433,7 @@ namespace EnergyPlus::ScheduleManager {
                                 CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                                     //                tempval=SUM(MinuteValue(Hr,SCount:CurMinute))/REAL(MinutesPerTimeStep,r64)
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
+                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                                     SCount = CurMinute + 1;
                                     CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
@@ -1501,7 +1443,7 @@ namespace EnergyPlus::ScheduleManager {
                 }
             For_exit:;
                 if (!all(AllDays)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
                                      "\" has missing day types in Through=" + CurrentThrough);
                     ShowContinueError(state, "Last \"For\" field=" + LastFor);
                     errmsg = "Missing day types=,";
@@ -1518,15 +1460,15 @@ namespace EnergyPlus::ScheduleManager {
         Through_exit:;
             if (DaysInYear(60) == 0) {
                 DaysInYear(60) = DaysInYear(59);
-                Schedule(LoopIndex).WeekSchedulePointer(60) = Schedule(LoopIndex).WeekSchedulePointer(59);
+                state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(60) = state.dataScheduleMgr->Schedule(LoopIndex).WeekSchedulePointer(59);
             }
             if (any_eq(DaysInYear, 0)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\" has missing days in its schedule pointers",
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + "\" has missing days in its schedule pointers",
                                 OptionalOutputFileRef{state.files.audit});
                 ErrorsFound = true;
             }
             if (any_gt(DaysInYear, 1)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
                                     "\" has overlapping days in its schedule pointers",
                                 OptionalOutputFileRef{state.files.audit});
                 ErrorsFound = true;
@@ -1534,7 +1476,7 @@ namespace EnergyPlus::ScheduleManager {
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(state,
-                    "Schedule:Compact", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
+                    "Schedule:Compact", state.dataScheduleMgr->Schedule(SchNum).Name, "Schedule Value", "[ ]", state.dataScheduleMgr->Schedule(SchNum).EMSActuatedOn, state.dataScheduleMgr->Schedule(SchNum).EMSValue);
             }
         }
 
@@ -1604,14 +1546,14 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::File;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::File;
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex = 0;
-                if (!lAlphaBlanks(2)) CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+                if (!lAlphaBlanks(2)) CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
@@ -1621,7 +1563,7 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
                 }
             }
             hourlyFileValues = 0.0; // set default values to zero
@@ -1732,7 +1674,7 @@ namespace EnergyPlus::ScheduleManager {
 
                 bool fileConfigFoundInCache = false;
                 Array1D<Real64> * cachedData = nullptr;
-                for (auto & cache : interpretedFileData) {
+                for (auto & cache : state.dataScheduleMgr->interpretedFileData) {
                     if (cache.isItAMatch(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount)) {
                         fileConfigFoundInCache = true;
                         break;
@@ -1837,12 +1779,12 @@ namespace EnergyPlus::ScheduleManager {
                         if (rowCnt == rowLimitCount) break;
                     }
                     SchdFile.close();
-                    interpretedFileData.push_back(cacheToWrite);
+                    state.dataScheduleMgr->interpretedFileData.push_back(cacheToWrite);
                 }
 
                 // whether we had to read from the file or we got it from the cache, just get the values now
                 int numErrors = 0;
-                for (auto & cache : interpretedFileData) {
+                for (auto & cache : state.dataScheduleMgr->interpretedFileData) {
                     if (cache.isItAMatch(state.files.TempFullFileName.fileName, ColumnSep, skiprowCount)) {
                         bool errorFlag = false;
                         auto & singleColumnData = cache.getDataReferenceForColumn(curcolCount, errorFlag);
@@ -1897,22 +1839,22 @@ namespace EnergyPlus::ScheduleManager {
                     ++AddWeekSch;
                     ++AddDaySch;
                     // define week schedule
-                    WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
                     // for all day types point the week schedule to the newly defined day schedule
                     for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                        WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                        state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                     }
                     // day schedule
-                    DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
-                    DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
+                    state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
+                    state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
                     // schedule is pointing to the week schedule
-                    Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
                     if (MinutesPerItem == 60) {
                         for (jHour = 1; jHour <= 24; ++jHour) {
                             ++ifld;
                             curHrVal = hourlyFileValues(ifld); // hourlyFileValues((hDay - 1) * 24 + jHour)
                             for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                             }
                         }
                     } else { // Minutes Per Item < 60
@@ -1931,7 +1873,7 @@ namespace EnergyPlus::ScheduleManager {
                                 SCount = 1;
                                 CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
+                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                                     SCount = CurMinute + 1;
                                     CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
@@ -1940,7 +1882,7 @@ namespace EnergyPlus::ScheduleManager {
                             for (Hr = 1; Hr <= 24; ++Hr) {
                                 CurMinute = state.dataGlobal->MinutesPerTimeStep;
                                 for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
                                     CurMinute += state.dataGlobal->MinutesPerTimeStep;
                                 }
                             }
@@ -1949,14 +1891,14 @@ namespace EnergyPlus::ScheduleManager {
                     if (iDay == 59 && rowCnt < 8784 * hrLimitCount) { // 28 Feb
                         // Dup 28 Feb to 29 Feb (60)
                         ++iDay;
-                        Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
                     }
                 }
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(state,
-                    "Schedule:File", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
+                    "Schedule:File", state.dataScheduleMgr->Schedule(SchNum).Name, "Schedule Value", "[ ]", state.dataScheduleMgr->Schedule(SchNum).EMSActuatedOn, state.dataScheduleMgr->Schedule(SchNum).EMSValue);
             }
         }
         if (NumCommaFileSchedules > 0) {
@@ -1968,10 +1910,10 @@ namespace EnergyPlus::ScheduleManager {
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
             timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
-            Schedule(SchNum).Name = curName;
-            Schedule(SchNum).SchType = ScheduleInput::File;
+            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::File;
 
             iDay = 0;
             ifld = 0;
@@ -1987,28 +1929,28 @@ namespace EnergyPlus::ScheduleManager {
                 ++AddWeekSch;
                 ++AddDaySch;
                 // define week schedule
-                WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
                 // for all day types point the week schedule to the newly defined day schedule
                 for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                    WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                 }
                 // day schedule
-                DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
-                DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
                 // schedule is pointing to the week schedule
-                Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
 
                 for (jHour = 1; jHour <= 24; ++jHour) {
                     for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                         ++ifld;
                         curHrVal = timestepColumnValues(ifld);
-                        DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
                     }
                 }
                 if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
                     // Dup 28 Feb to 29 Feb (60)
                     ++iDay;
-                    Schedule(SchNum).WeekSchedulePointer(iDay) = Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
                 }
             }
         }
@@ -2031,13 +1973,13 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::Constant;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::Constant;
             // Validate ScheduleType
-            if (NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -2047,28 +1989,28 @@ namespace EnergyPlus::ScheduleManager {
                                          " input -- will not be validated.");
                     }
                 } else {
-                    Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                    state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
                 }
             }
             ++AddWeekSch;
             ++AddDaySch;
             // define week schedule
-            WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_";
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_";
             // for all day types point the week schedule to the newly defined day schedule
             for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
             }
             // day schedule
-            DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_";
-            DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_";
+            state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
             // schedule is pointing to the week schedule
-            Schedule(SchNum).WeekSchedulePointer = AddWeekSch;
+            state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer = AddWeekSch;
             curHrVal = Numbers(1);
-            DaySchedule(AddDaySch).TSValue = Numbers(1);
+            state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue = Numbers(1);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
                 SetupEMSActuator(state,
-                    "Schedule:Constant", Schedule(SchNum).Name, "Schedule Value", "[ ]", Schedule(SchNum).EMSActuatedOn, Schedule(SchNum).EMSValue);
+                    "Schedule:Constant", state.dataScheduleMgr->Schedule(SchNum).Name, "Schedule Value", "[ ]", state.dataScheduleMgr->Schedule(SchNum).EMSActuatedOn, state.dataScheduleMgr->Schedule(SchNum).EMSValue);
             }
         }
 
@@ -2087,13 +2029,13 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::External;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
-            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -2103,20 +2045,20 @@ namespace EnergyPlus::ScheduleManager {
                                      " input -- will not be validated.");
                 }
             } else {
-                Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
             }
             ++AddWeekSch;
-            WeekSchedule(AddWeekSch).Name = Alphas(1);
-            WeekSchedule(AddWeekSch).Used = true;
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1);
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Used = true;
             for (Hr = 1; Hr <= 366; ++Hr) {
-                Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
             }
             ++AddDaySch;
-            DaySchedule(AddDaySch).Name = Alphas(1);
-            DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
-            DaySchedule(AddDaySch).Used = true;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
             for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
-                WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
@@ -2146,21 +2088,21 @@ namespace EnergyPlus::ScheduleManager {
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueScheduleNames,
+                                                         state.dataScheduleMgr->UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::External;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
-            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -2170,20 +2112,20 @@ namespace EnergyPlus::ScheduleManager {
                                      " input -- will not be validated.");
                 }
             } else {
-                Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
             }
             ++AddWeekSch;
-            WeekSchedule(AddWeekSch).Name = Alphas(1);
-            WeekSchedule(AddWeekSch).Used = true;
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1);
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Used = true;
             for (Hr = 1; Hr <= 366; ++Hr) {
-                Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
             }
             ++AddDaySch;
-            DaySchedule(AddDaySch).Name = Alphas(1);
-            DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
-            DaySchedule(AddDaySch).Used = true;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
             for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
-                WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
@@ -2213,22 +2155,22 @@ namespace EnergyPlus::ScheduleManager {
 
             if (NumExternalInterfaceSchedules >= 1) {
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                    UniqueScheduleNames,
+                                                         state.dataScheduleMgr->UniqueScheduleNames,
                     Alphas(1),
                     CurrentModuleObject,
                     cAlphaFields(1) + "(defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This "
                                       "will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport)",
                     ErrorsFound);
             } else {
-                GlobalNames::VerifyUniqueInterObjectName(state, UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             }
 
             ++SchNum;
-            Schedule(SchNum).Name = Alphas(1);
-            Schedule(SchNum).SchType = ScheduleInput::External;
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = ScheduleInput::External;
 
             // Validate ScheduleType
-            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), ScheduleType({1, NumScheduleTypes}));
+            CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
@@ -2238,20 +2180,20 @@ namespace EnergyPlus::ScheduleManager {
                                      " input -- will not be validated.");
                 }
             } else {
-                Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
             }
             ++AddWeekSch;
-            WeekSchedule(AddWeekSch).Name = Alphas(1);
-            WeekSchedule(AddWeekSch).Used = true;
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1);
+            state.dataScheduleMgr->WeekSchedule(AddWeekSch).Used = true;
             for (Hr = 1; Hr <= 366; ++Hr) {
-                Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(Hr) = AddWeekSch;
             }
             ++AddDaySch;
-            DaySchedule(AddDaySch).Name = Alphas(1);
-            DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
-            DaySchedule(AddDaySch).Used = true;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1);
+            state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+            state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
             for (Hr = 1; Hr <= MaxDayTypes; ++Hr) {
-                WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(Hr) = AddDaySch;
             }
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
@@ -2264,16 +2206,16 @@ namespace EnergyPlus::ScheduleManager {
         }
 
         // Validate by ScheduleLimitsType
-        for (SchNum = 1; SchNum <= NumSchedules; ++SchNum) {
-            NumPointer = Schedule(SchNum).ScheduleTypePtr;
-            if (!ScheduleType(NumPointer).Limited) continue;
-            if (CheckScheduleValueMinMax(state, SchNum, ">=", ScheduleType(NumPointer).Minimum, "<=", ScheduleType(NumPointer).Maximum)) continue;
-            ShowSevereError(state, RoutineName + "Schedule=\"" + Schedule(SchNum).Name + "\" has values outside its Schedule Type (" +
-                            ScheduleType(NumPointer).Name + ") range");
+        for (SchNum = 1; SchNum <= state.dataScheduleMgr->NumSchedules; ++SchNum) {
+            NumPointer = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+            if (!state.dataScheduleMgr->ScheduleType(NumPointer).Limited) continue;
+            if (CheckScheduleValueMinMax(state, SchNum, ">=", state.dataScheduleMgr->ScheduleType(NumPointer).Minimum, "<=", state.dataScheduleMgr->ScheduleType(NumPointer).Maximum)) continue;
+            ShowSevereError(state, RoutineName + "Schedule=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + "\" has values outside its Schedule Type (" +
+                    state.dataScheduleMgr->ScheduleType(NumPointer).Name + ") range");
             ShowContinueError(state,
                               format("  Minimum should be >={:.3R} and Maximum should be <={:.3R}",
-                                     ScheduleType(NumPointer).Minimum,
-                                     ScheduleType(NumPointer).Maximum));
+                                     state.dataScheduleMgr->ScheduleType(NumPointer).Minimum,
+                                     state.dataScheduleMgr->ScheduleType(NumPointer).Maximum));
             ErrorsFound = true;
         }
 
@@ -2281,7 +2223,7 @@ namespace EnergyPlus::ScheduleManager {
             ShowFatalError(state, RoutineName + "Preceding Errors cause termination.");
         }
 
-        if (NumScheduleTypes + NumDaySchedules + NumWeekSchedules + NumSchedules > 0) { // Report to EIO file
+        if (state.dataScheduleMgr->NumScheduleTypes + state.dataScheduleMgr->NumDaySchedules + state.dataScheduleMgr->NumWeekSchedules + state.dataScheduleMgr->NumSchedules > 0) { // Report to EIO file
             CurrentModuleObject = "Output:Schedules";
             NumFields = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -2424,19 +2366,19 @@ namespace EnergyPlus::ScheduleManager {
                         "! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
                 print(state.files.eio, "{}\n", SchSFmt);
 
-                for (Count = 1; Count <= NumScheduleTypes; ++Count) {
-                    if (ScheduleType(Count).Limited) {
+                for (Count = 1; Count <= state.dataScheduleMgr->NumScheduleTypes; ++Count) {
+                    if (state.dataScheduleMgr->ScheduleType(Count).Limited) {
                         NoAverageLinear = "Average";
-                        Num1 = format("{:.2R}", ScheduleType(Count).Minimum);
+                        Num1 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Minimum);
                         strip(Num1);
-                        Num2 = format("{:.2R}", ScheduleType(Count).Maximum);
+                        Num2 = format("{:.2R}", state.dataScheduleMgr->ScheduleType(Count).Maximum);
                         strip(Num2);
-                        if (ScheduleType(Count).IsReal) {
+                        if (state.dataScheduleMgr->ScheduleType(Count).IsReal) {
                             YesNo2 = "Yes";
                         } else {
                             YesNo2 = "No";
-                            Num1 = fmt::to_string(static_cast<int>(ScheduleType(Count).Minimum));
-                            Num2 = fmt::to_string(static_cast<int>(ScheduleType(Count).Maximum));
+                            Num1 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Minimum));
+                            Num2 = fmt::to_string(static_cast<int>(state.dataScheduleMgr->ScheduleType(Count).Maximum));
                         }
                     } else {
                         NoAverageLinear = "No";
@@ -2445,14 +2387,14 @@ namespace EnergyPlus::ScheduleManager {
                         YesNo2 = "N/A";
                     }
                     static constexpr auto SchTFmtdata("ScheduleTypeLimits,{},{},{},{},{}\n");
-                    print(state.files.eio, SchTFmtdata, ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
+                    print(state.files.eio, SchTFmtdata, state.dataScheduleMgr->ScheduleType(Count).Name, NoAverageLinear, Num1, Num2, YesNo2);
                 }
 
                 //      WRITE(Num1,*) NumOfTimeStepInHour*24
                 //      Num1=ADJUSTL(Num1)
                 //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
-                for (Count = 1; Count <= NumDaySchedules; ++Count) {
-                    switch (DaySchedule(Count).IntervalInterpolated) {
+                for (Count = 1; Count <= state.dataScheduleMgr->NumDaySchedules; ++Count) {
+                    switch (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated) {
                         case ScheduleInterpolation::Average:
                             NoAverageLinear = "Average";
                             break;
@@ -2465,15 +2407,15 @@ namespace EnergyPlus::ScheduleManager {
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            RoundTSValue(TS, Hr) = format("{:.2R}", DaySchedule(Count).TSValue(TS, Hr));
+                            RoundTSValue(TS, Hr) = format("{:.2R}", state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr));
                         }
                     }
                     static constexpr auto SchDFmtdata0("DaySchedule,{},{},{},{}");
                     if (LevelOfDetail == ReportLevelDetail::Hourly) {
                         print(state.files.eio,
                               SchDFmtdata0,
-                              DaySchedule(Count).Name,
-                              ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name,
+                              state.dataScheduleMgr->DaySchedule(Count).Name,
+                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
                               NoAverageLinear,
                               "Values:");
                         for (Hr = 1; Hr <= 24; ++Hr) {
@@ -2484,8 +2426,8 @@ namespace EnergyPlus::ScheduleManager {
                     } else if (LevelOfDetail == ReportLevelDetail::TimeStepDetailed) {
                         print(state.files.eio,
                               SchDFmtdata0,
-                              DaySchedule(Count).Name,
-                              ScheduleType(DaySchedule(Count).ScheduleTypePtr).Name,
+                              state.dataScheduleMgr->DaySchedule(Count).Name,
+                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr).Name,
                               NoAverageLinear,
                               "Values:");
                         for (Hr = 1; Hr <= 24; ++Hr) {
@@ -2497,33 +2439,33 @@ namespace EnergyPlus::ScheduleManager {
                     }
                 }
 
-                for (Count = 1; Count <= NumWeekSchedules; ++Count) {
+                for (Count = 1; Count <= state.dataScheduleMgr->NumWeekSchedules; ++Count) {
                     static constexpr auto SchWFmtdata("Schedule:Week:Daily,{}");
-                    print(state.files.eio, SchWFmtdata, WeekSchedule(Count).Name);
+                    print(state.files.eio, SchWFmtdata, state.dataScheduleMgr->WeekSchedule(Count).Name);
                     for (NumF = 1; NumF <= MaxDayTypes; ++NumF) {
-                        print(state.files.eio, ",{}", DaySchedule(WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
+                        print(state.files.eio, ",{}", state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(Count).DaySchedulePointer(NumF)).Name);
                     }
                     print(state.files.eio, "\n");
                 }
 
-                for (Count = 1; Count <= NumSchedules; ++Count) {
+                for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
                     NumF = 1;
-                    print(state.files.eio, "Schedule,{},{}", Schedule(Count).Name,
-                          ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                    print(state.files.eio, "Schedule,{},{}", state.dataScheduleMgr->Schedule(Count).Name,
+                          state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
-                        TS = Schedule(Count).WeekSchedulePointer(NumF);
+                        TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
                         static constexpr auto ThruFmt(",Through {} {:02},{}");
-                        while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+                        while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
-                                print(state.files.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
+                                print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
                             }
                             ++NumF;
                             if (NumF > 366) break; // compound If might have a problem unless this included.
                         }
                         if (NumF <= 366) {
                             General::InvOrdinalDay(NumF - 1, PMon, PDay, 1);
-                            print(state.files.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
+                            print(state.files.eio, ThruFmt, Months(PMon), PDay, state.dataScheduleMgr->WeekSchedule(TS).Name);
                         }
                     }
                     print(state.files.eio, "\n");
@@ -2532,29 +2474,29 @@ namespace EnergyPlus::ScheduleManager {
                 break;
             case ReportLevelDetail::IDF: {
                 {
-                    for (Count = 1; Count <= NumSchedules; ++Count) {
+                    for (Count = 1; Count <= state.dataScheduleMgr->NumSchedules; ++Count) {
                         print(state.files.debug, "\n");
                         print(state.files.debug, "  Schedule:Compact,\n");
-                        print(state.files.debug, "    {},           !- Name\n", Schedule(Count).Name);
+                        print(state.files.debug, "    {},           !- Name\n", state.dataScheduleMgr->Schedule(Count).Name);
                         print(state.files.debug, "    {},          !- ScheduleTypeLimits\n",
-                              ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
+                              state.dataScheduleMgr->ScheduleType(state.dataScheduleMgr->Schedule(Count).ScheduleTypePtr).Name);
                         NumF = 1;
                         while (NumF <= 366) {
-                            TS = Schedule(Count).WeekSchedulePointer(NumF);
-                            while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
+                            TS = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF);
+                            while (state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                                 if (NumF == 366) {
                                     General::InvOrdinalDay(NumF, PMon, PDay, 1);
                                     print(state.files.debug, "    Through: {}/{},\n", PMon, PDay);
                                     iDayP = 0;
                                     for (DT = 2; DT <= 6; ++DT) {
                                         print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                        iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                        iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                        iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                        iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                         if (iDay != iDayP) {
                                             for (Hr = 1; Hr <= 24; ++Hr) {
                                                 print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
                                                       ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                      DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
+                                                      state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
                                                                                 Hr));
                                             }
                                         } else {
@@ -2564,13 +2506,13 @@ namespace EnergyPlus::ScheduleManager {
                                     }
                                     DT = 1;
                                     print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                    iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                    iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
                                             print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
                                                   ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
                                         print(state.files.debug, "    Same as previous\n");
@@ -2578,13 +2520,13 @@ namespace EnergyPlus::ScheduleManager {
                                     iDayP = iDay;
                                     for (DT = 7; DT <= MaxDayTypes; ++DT) {
                                         print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                        iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                        iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                        iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                        iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                         if (iDay != iDayP) {
                                             for (Hr = 1; Hr <= 24; ++Hr) {
                                                 print(state.files.debug, "    Until: {}:{},{:.2R},\n", Hr,
                                                       ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                      DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
+                                                      state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour,
                                                                                 Hr));
                                             }
                                         } else {
@@ -2602,15 +2544,15 @@ namespace EnergyPlus::ScheduleManager {
                                 iDayP = 0;
                                 for (DT = 2; DT <= 6; ++DT) {
                                     print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                    iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                    iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
                                             print(state.files.debug,
                                                   "    Until: {}:{},{:.2R},\n",
                                                   Hr,
                                                   ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
                                         print(state.files.debug, "    Same as previous\n");
@@ -2619,15 +2561,15 @@ namespace EnergyPlus::ScheduleManager {
                                 }
                                 DT = 1;
                                 print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                 if (iDay != iDayP) {
                                     for (Hr = 1; Hr <= 24; ++Hr) {
                                         print(state.files.debug,
                                               "    Until: {}:{},{:.2R},\n",
                                               Hr,
                                               ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                              DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                              state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                     }
                                 } else {
                                     print(state.files.debug, "    Same as previous\n");
@@ -2635,15 +2577,15 @@ namespace EnergyPlus::ScheduleManager {
                                 iDayP = iDay;
                                 for (DT = 7; DT <= MaxDayTypes; ++DT) {
                                     print(state.files.debug, "    For: {},\n", ValidDayTypes(DT));
-                                    iWeek = Schedule(Count).WeekSchedulePointer(NumF - 1);
-                                    iDay = WeekSchedule(iWeek).DaySchedulePointer(DT);
+                                    iWeek = state.dataScheduleMgr->Schedule(Count).WeekSchedulePointer(NumF - 1);
+                                    iDay = state.dataScheduleMgr->WeekSchedule(iWeek).DaySchedulePointer(DT);
                                     if (iDay != iDayP) {
                                         for (Hr = 1; Hr <= 24; ++Hr) {
                                             print(state.files.debug,
                                                   "    Until: {}:{},{:.2R},\n",
                                                   Hr,
                                                   ShowMinute(state.dataGlobal->NumOfTimeStepInHour),
-                                                  DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
+                                                  state.dataScheduleMgr->DaySchedule(iDay).TSValue(state.dataGlobal->NumOfTimeStepInHour, Hr));
                                         }
                                     } else {
                                         print(state.files.debug, "    Same as previous\n");
@@ -2664,7 +2606,7 @@ namespace EnergyPlus::ScheduleManager {
     }
 
     Real64 ScheduleData::GetCurrentScheduleValue(EnergyPlusData &state) const {
-        if (!ScheduleDSTSFileWarningIssued) {
+        if (!state.dataScheduleMgr->ScheduleDSTSFileWarningIssued) {
             if (state.dataEnvrn->DSTIndicator == 1) {
                 if (this->SchType == ScheduleInput::File) {
                     ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + this->Name + "\" is a Schedule:File");
@@ -2674,7 +2616,7 @@ namespace EnergyPlus::ScheduleManager {
                     ShowContinueError(state, "...   If you have already done this, you can ignore this message.");
                     ShowContinueError(state, "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as "
                                       "the original.");
-                    ScheduleDSTSFileWarningIssued = true;
+                    state.dataScheduleMgr->ScheduleDSTSFileWarningIssued = true;
                 }
             }
         }
@@ -2749,7 +2691,7 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             return 0.0;
         } else {
-            return Schedule(ScheduleIndex).GetCurrentScheduleValue(state);
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).GetCurrentScheduleValue(state);
         }
     }
 
@@ -2771,16 +2713,16 @@ namespace EnergyPlus::ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
-            if (Schedule(ScheduleIndex).EMSActuatedOn) {
-                Schedule(ScheduleIndex).CurrentValue = Schedule(ScheduleIndex).EMSValue;
+        for (int ScheduleIndex = 1; ScheduleIndex <= state.dataScheduleMgr->NumSchedules; ++ScheduleIndex) {
+            if (state.dataScheduleMgr->Schedule(ScheduleIndex).EMSActuatedOn) {
+                state.dataScheduleMgr->Schedule(ScheduleIndex).CurrentValue = state.dataScheduleMgr->Schedule(ScheduleIndex).EMSValue;
             } else {
-                Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
+                state.dataScheduleMgr->Schedule(ScheduleIndex).CurrentValue = LookUpScheduleValue(state, ScheduleIndex, state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
             }
         }
     }
@@ -2798,7 +2740,7 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             return 0.0;
         } else {
-            return Schedule(ScheduleIndex).LookUpScheduleValue(state, ThisHour, ThisTimeStep);
+            return state.dataScheduleMgr->Schedule(ScheduleIndex).LookUpScheduleValue(state, ThisHour, ThisTimeStep);
         }
     }
 
@@ -2817,9 +2759,9 @@ namespace EnergyPlus::ScheduleManager {
         // This function provides a method to look up schedule values for any hour, timestep, day
         // of the year (rather than just the "current time").
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         //  so, current date, but maybe TimeStep added
@@ -2848,14 +2790,14 @@ namespace EnergyPlus::ScheduleManager {
         // TODO: the (thisDayOfWeek < 7) looks fishy and maybe unnecessary... how about if there are more than 7 holidays?
         // It should use 7 + thisHolidayIndex in that case but it won't
         if (thisDayOfWeek <= 7 && thisHolidayIndex > 0) {
-            DaySchedulePointer = WeekSchedule(WeekScheduleIndex).DaySchedulePointer(7 + thisHolidayIndex);
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekScheduleIndex).DaySchedulePointer(7 + thisHolidayIndex);
         } else {
-            DaySchedulePointer = WeekSchedule(WeekScheduleIndex).DaySchedulePointer(thisDayOfWeek);
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekScheduleIndex).DaySchedulePointer(thisDayOfWeek);
         }
 
         // If Unspecified or equal to zero, use NumOfTimeStepInHour, otherwise use supplied
         int thisTimeStep = ThisTimeStep > 0 ? ThisTimeStep : state.dataGlobal->NumOfTimeStepInHour;
-        return DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
+        return state.dataScheduleMgr->DaySchedule(DaySchedulePointer).TSValue(thisTimeStep, thisHour);
     }
 
     int GetScheduleIndex(EnergyPlusData &state, std::string const &ScheduleName)
@@ -2877,21 +2819,21 @@ namespace EnergyPlus::ScheduleManager {
         int DayCtr;
         int WeekCtr;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if (NumSchedules > 0) {
-            GetScheduleIndex = UtilityRoutines::FindItemInList(ScheduleName, Schedule({1, NumSchedules}));
+        if (state.dataScheduleMgr->NumSchedules > 0) {
+            GetScheduleIndex = UtilityRoutines::FindItemInList(ScheduleName, state.dataScheduleMgr->Schedule({1, state.dataScheduleMgr->NumSchedules}));
             if (GetScheduleIndex > 0) {
-                if (!Schedule(GetScheduleIndex).Used) {
-                    Schedule(GetScheduleIndex).Used = true;
+                if (!state.dataScheduleMgr->Schedule(GetScheduleIndex).Used) {
+                    state.dataScheduleMgr->Schedule(GetScheduleIndex).Used = true;
                     for (WeekCtr = 1; WeekCtr <= 366; ++WeekCtr) {
-                        if (Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr) > 0) {
-                            WeekSchedule(Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).Used = true;
+                        if (state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr) > 0) {
+                            state.dataScheduleMgr->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).Used = true;
                             for (DayCtr = 1; DayCtr <= MaxDayTypes; ++DayCtr) {
-                                DaySchedule(WeekSchedule(Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).DaySchedulePointer(DayCtr)).Used =
+                                state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(state.dataScheduleMgr->Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).DaySchedulePointer(DayCtr)).Used =
                                     true;
                             }
                         }
@@ -2923,15 +2865,15 @@ namespace EnergyPlus::ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int curSchType;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if ((ScheduleIndex > 0) && (ScheduleIndex <= NumSchedules)) {
-            curSchType = Schedule(ScheduleIndex).ScheduleTypePtr;
-            if ((curSchType > 0) && (curSchType <= NumScheduleTypes)) {
-                TypeOfSchedule = ScheduleType(curSchType).Name;
+        if ((ScheduleIndex > 0) && (ScheduleIndex <= state.dataScheduleMgr->NumSchedules)) {
+            curSchType = state.dataScheduleMgr->Schedule(ScheduleIndex).ScheduleTypePtr;
+            if ((curSchType > 0) && (curSchType <= state.dataScheduleMgr->NumScheduleTypes)) {
+                TypeOfSchedule = state.dataScheduleMgr->ScheduleType(curSchType).Name;
             } else {
                 TypeOfSchedule = "";
             }
@@ -2956,15 +2898,15 @@ namespace EnergyPlus::ScheduleManager {
         // Return value
         int GetDayScheduleIndex;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if (NumDaySchedules > 0) {
-            GetDayScheduleIndex = UtilityRoutines::FindItemInList(ScheduleName, DaySchedule({1, NumDaySchedules}));
+        if (state.dataScheduleMgr->NumDaySchedules > 0) {
+            GetDayScheduleIndex = UtilityRoutines::FindItemInList(ScheduleName, state.dataScheduleMgr->DaySchedule({1, state.dataScheduleMgr->NumDaySchedules}));
             if (GetDayScheduleIndex > 0) {
-                DaySchedule(GetDayScheduleIndex).Used = true;
+                state.dataScheduleMgr->DaySchedule(GetDayScheduleIndex).Used = true;
             }
         } else {
             GetDayScheduleIndex = 0;
@@ -2992,9 +2934,9 @@ namespace EnergyPlus::ScheduleManager {
         int WeekSchedulePointer;
         int DaySchedulePointer;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (ScheduleIndex == -1) {
@@ -3007,26 +2949,26 @@ namespace EnergyPlus::ScheduleManager {
 
         // Determine which Week Schedule is used
         if (!present(JDay)) {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(state.dataEnvrn->DayOfYear_Schedule);
+            WeekSchedulePointer = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(state.dataEnvrn->DayOfYear_Schedule);
         } else {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
+            WeekSchedulePointer = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
         }
 
         // Now, which day?
         if (!present(CurDayofWeek)) {
             if (state.dataEnvrn->DayOfWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
+                DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
             } else {
-                DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
+                DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(state.dataEnvrn->DayOfWeek);
             }
         } else if (CurDayofWeek <= 7 && state.dataEnvrn->HolidayIndex > 0) {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + state.dataEnvrn->HolidayIndex);
         } else {
-            DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(CurDayofWeek);
+            DaySchedulePointer = state.dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(CurDayofWeek);
         }
 
         // Return Values
-        DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = DaySchedule(DaySchedulePointer).TSValue;
+        DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = state.dataScheduleMgr->DaySchedule(DaySchedulePointer).TSValue;
     }
 
     void GetSingleDayScheduleValues(EnergyPlusData &state,
@@ -3047,13 +2989,13 @@ namespace EnergyPlus::ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         // Return Values
-        DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = DaySchedule(DayScheduleIndex).TSValue;
+        DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = state.dataScheduleMgr->DaySchedule(DayScheduleIndex).TSValue;
     }
 
     void ExternalInterfaceSetSchedule(EnergyPlusData &state,
@@ -3078,7 +3020,7 @@ namespace EnergyPlus::ScheduleManager {
         // Assign the value of the variable
         for (int Hr = 1; Hr <= 24; ++Hr) {
             for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                DaySchedule(ScheduleIndex).TSValue(TS, Hr) = Value;
+                state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue(TS, Hr) = Value;
             }
         }
     }
@@ -3597,38 +3539,38 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+                MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                    MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+        MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
         return (MinValueOk && MaxValueOk);
@@ -3666,12 +3608,12 @@ namespace EnergyPlus::ScheduleManager {
         bool MinValueOk(true);
         bool MaxValueOk(true);
         // precompute the dayschedule max and min so that it is not in nested loop
-        if (CheckScheduleValueMinMaxRunOnceOnly) {
-            for (Loop = 0; Loop <= NumDaySchedules; ++Loop) {
-                DaySchedule(Loop).TSValMin = minval(DaySchedule(Loop).TSValue);
-                DaySchedule(Loop).TSValMax = maxval(DaySchedule(Loop).TSValue);
+        if (state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly) {
+            for (Loop = 0; Loop <= state.dataScheduleMgr->NumDaySchedules; ++Loop) {
+                state.dataScheduleMgr->DaySchedule(Loop).TSValMin = minval(state.dataScheduleMgr->DaySchedule(Loop).TSValue);
+                state.dataScheduleMgr->DaySchedule(Loop).TSValMax = maxval(state.dataScheduleMgr->DaySchedule(Loop).TSValue);
             }
-            CheckScheduleValueMinMaxRunOnceOnly = false;
+            state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly = false;
         }
 
         if (ScheduleIndex == -1) {
@@ -3680,44 +3622,44 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMin;
-                MaxValue = DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMax;
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMin;
+                MaxValue = state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMax;
                 for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
-                    MaxValue = max(MaxValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
+                    MinValue = min(MinValue, state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
+                    MaxValue = max(MaxValue, state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
-                        MaxValue = max(MaxValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
+                        MinValue = min(MinValue, state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
+                        MaxValue = max(MaxValue, state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
         }
 
         //  Min/max for schedule has been set.  Test.
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue <= Maximum);
         if (MaxString == "<") {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
+            MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
         return (MinValueOk && MaxValueOk);
@@ -3759,38 +3701,38 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+                MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                    MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+        MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
         return (MinValueOk && MaxValueOk);
@@ -3834,29 +3776,29 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+                MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                    MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
         }
 
@@ -3864,16 +3806,16 @@ namespace EnergyPlus::ScheduleManager {
         MinValueOk = true;
         MaxValueOk = true;
         if (MinString == ">") {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue <= Maximum);
         if (MaxString == "<") {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
+            MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
         return (MinValueOk && MaxValueOk);
@@ -3905,16 +3847,16 @@ namespace EnergyPlus::ScheduleManager {
             CheckScheduleValue = (Value == 1.0);
         } else if (ScheduleIndex == 0) {
             CheckScheduleValue = (Value == 0.0);
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValue called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
             CheckScheduleValue = false;
             for (int Loop = 1; Loop <= 366; ++Loop) {
-                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                 for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                    if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, Value)) {
+                    if (any_eq(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, Value)) {
                         CheckScheduleValue = true;
                         goto DayLoop_exit;
                     }
@@ -3951,15 +3893,15 @@ namespace EnergyPlus::ScheduleManager {
             CheckScheduleValue = (Value == 1);
         } else if (ScheduleIndex == 0) {
             CheckScheduleValue = (Value == 0);
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValue called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
             for (int Loop = 1; Loop <= 366; ++Loop) {
-                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                 for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                    if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, double(Value))) {
+                    if (any_eq(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, double(Value))) {
                         CheckScheduleValue = true;
                         goto DayLoop_exit;
                     }
@@ -4006,13 +3948,13 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumDaySchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
             ShowFatalError(state, "CheckDayScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            MinValue = minval(DaySchedule(ScheduleIndex).TSValue);
-            MaxValue = maxval(DaySchedule(ScheduleIndex).TSValue);
+            MinValue = minval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
+            MaxValue = maxval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
         }
 
         //  Min/max for schedule has been set.  Test.
@@ -4075,13 +4017,13 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumDaySchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
             ShowFatalError(state, "CheckDayScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            MinValue = minval(DaySchedule(ScheduleIndex).TSValue);
-            MaxValue = maxval(DaySchedule(ScheduleIndex).TSValue);
+            MinValue = minval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
+            MaxValue = maxval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
         }
 
         //  Min/max for schedule has been set.  Test.
@@ -4126,19 +4068,19 @@ namespace EnergyPlus::ScheduleManager {
 
         if (ScheduleIndex == -1 || ScheduleIndex == 0) {
 
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "HasFractionalScheduleValue called with ScheduleIndex out of range");
         }
 
         HasFractions = false;
 
         if (ScheduleIndex > 0) {
-            int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+            int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
             for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                 for (int Hour = 1; Hour <= 24; ++Hour) {
                     for (int TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
-                        if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
-                            DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
+                        if (state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
+                                state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
                             HasFractions = true;
                             goto DayTLoop_exit;
                         }
@@ -4148,12 +4090,12 @@ namespace EnergyPlus::ScheduleManager {
         DayTLoop_exit:;
             if (!HasFractions) {
                 for (int Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         for (int Hour = 1; Hour <= 24; ++Hour) {
                             for (int TStep = 1; TStep <= state.dataGlobal->NumOfTimeStepInHour; ++TStep) {
-                                if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
-                                    DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
+                                if (state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) > 0.0 &&
+                                        state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TStep, Hour) < 1.0) {
                                     HasFractions = true;
                                     goto DayTLoop2_exit;
                                 }
@@ -4194,33 +4136,33 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "GetScheduleMinValue called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+                MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                    MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (int Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
 
             //  Min/max for schedule has been set.
-            MinimumValue = Schedule(ScheduleIndex).MinValue;
+            MinimumValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
         } else {
             MinimumValue = MinValue;
         }
@@ -4254,34 +4196,34 @@ namespace EnergyPlus::ScheduleManager {
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
             MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleMaxValue called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
-            if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
-                MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
+                MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
-                    MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                    MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (int Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
                     for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                        MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MinValue = min(MinValue, minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        MaxValue = max(MaxValue, maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                Schedule(ScheduleIndex).MaxMinSet = true;
-                Schedule(ScheduleIndex).MinValue = MinValue;
-                Schedule(ScheduleIndex).MaxValue = MaxValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
+                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
             }
 
             //  Min/max for schedule has been set.
 
-            MaximumValue = Schedule(ScheduleIndex).MaxValue;
+            MaximumValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue;
         } else {
             MaximumValue = MaxValue;
         }
@@ -4301,14 +4243,14 @@ namespace EnergyPlus::ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the schedule name from the Schedule Index.
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         std::string ScheduleName;
         if (ScheduleIndex > 0) {
-            ScheduleName = Schedule(ScheduleIndex).Name;
+            ScheduleName = state.dataScheduleMgr->Schedule(ScheduleIndex).Name;
         } else if (ScheduleIndex == -1) {
             ScheduleName = "Constant-1.0";
         } else if (ScheduleIndex == 0) {
@@ -4332,23 +4274,23 @@ namespace EnergyPlus::ScheduleManager {
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
-            for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
+        if (state.dataScheduleMgr->DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
+            for (int ScheduleIndex = 1; ScheduleIndex <= state.dataScheduleMgr->NumSchedules; ++ScheduleIndex) {
                 // Set Up Reporting
                 SetupOutputVariable(state,
                                     "Schedule Value",
                                     OutputProcessor::Unit::None,
-                                    Schedule(ScheduleIndex).CurrentValue,
+                                    state.dataScheduleMgr->Schedule(ScheduleIndex).CurrentValue,
                                     "Zone",
                                     "Average",
-                                    Schedule(ScheduleIndex).Name);
+                                    state.dataScheduleMgr->Schedule(ScheduleIndex).Name);
             }
-            DoScheduleReportingSetup = false;
+            state.dataScheduleMgr->DoScheduleReportingSetup = false;
         }
 
         // TODO: Is this needed?
@@ -4378,15 +4320,15 @@ namespace EnergyPlus::ScheduleManager {
         NeedUseMessage = false;
         NumCount = 0;
 
-        for (Item = 1; Item <= NumSchedules; ++Item) {
-            if (Schedule(Item).Used) continue;
+        for (Item = 1; Item <= state.dataScheduleMgr->NumSchedules; ++Item) {
+            if (state.dataScheduleMgr->Schedule(Item).Used) continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
             if (state.dataGlobal->DisplayUnusedSchedules) {
-                ShowMessage(state, "Schedule:Year or Schedule:Compact or Schedule:File or Schedule:Constant=" + Schedule(Item).Name);
+                ShowMessage(state, "Schedule:Year or Schedule:Compact or Schedule:File or Schedule:Constant=" + state.dataScheduleMgr->Schedule(Item).Name);
             } else {
                 ++NumCount;
             }
@@ -4400,16 +4342,16 @@ namespace EnergyPlus::ScheduleManager {
         NeedOrphanMessage = true;
         NumCount = 0;
 
-        for (Item = 1; Item <= NumWeekSchedules; ++Item) {
-            if (WeekSchedule(Item).Used) continue;
-            if (WeekSchedule(Item).Name == BlankString) continue;
+        for (Item = 1; Item <= state.dataScheduleMgr->NumWeekSchedules; ++Item) {
+            if (state.dataScheduleMgr->WeekSchedule(Item).Used) continue;
+            if (state.dataScheduleMgr->WeekSchedule(Item).Name == BlankString) continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following week schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
             if (state.dataGlobal->DisplayUnusedSchedules) {
-                ShowMessage(state, "Schedule:Week:Daily or Schedule:Week:Compact=" + WeekSchedule(Item).Name);
+                ShowMessage(state, "Schedule:Week:Daily or Schedule:Week:Compact=" + state.dataScheduleMgr->WeekSchedule(Item).Name);
             } else {
                 ++NumCount;
             }
@@ -4423,16 +4365,16 @@ namespace EnergyPlus::ScheduleManager {
         NeedOrphanMessage = true;
         NumCount = 0;
 
-        for (Item = 1; Item <= NumDaySchedules; ++Item) {
-            if (DaySchedule(Item).Used) continue;
-            if (DaySchedule(Item).Name == BlankString) continue;
+        for (Item = 1; Item <= state.dataScheduleMgr->NumDaySchedules; ++Item) {
+            if (state.dataScheduleMgr->DaySchedule(Item).Used) continue;
+            if (state.dataScheduleMgr->DaySchedule(Item).Name == BlankString) continue;
             if (NeedOrphanMessage && state.dataGlobal->DisplayUnusedSchedules) {
                 ShowWarningError(state, "The following day schedule names are \"Unused Schedules\".  These schedules are in the idf");
                 ShowContinueError(state, " file but are never obtained by the simulation and therefore are NOT used.");
                 NeedOrphanMessage = false;
             }
             if (state.dataGlobal->DisplayUnusedSchedules) {
-                ShowMessage(state, "Schedule:Day:Hourly or Schedule:Day:Interval or Schedule:Day:List=" + DaySchedule(Item).Name);
+                ShowMessage(state, "Schedule:Day:Hourly or Schedule:Day:Interval or Schedule:Day:List=" + state.dataScheduleMgr->DaySchedule(Item).Name);
             } else {
                 ++NumCount;
             }
@@ -4463,7 +4405,7 @@ namespace EnergyPlus::ScheduleManager {
             DaysInYear = 365;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > NumSchedules) {
+        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range");
         }
 
@@ -4473,8 +4415,8 @@ namespace EnergyPlus::ScheduleManager {
         if (DayT == 0) return TotalHours;
 
         for (int Loop = 1; Loop <= DaysInYear; ++Loop) {
-            int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-            TotalHours += sum(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue) / double(state.dataGlobal->NumOfTimeStepInHour);
+            int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+            TotalHours += sum(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue) / double(state.dataGlobal->NumOfTimeStepInHour);
             ++DayT;
             if (DayT > 7) DayT = 1;
         }
@@ -4507,7 +4449,7 @@ namespace EnergyPlus::ScheduleManager {
             WeeksInYear = 365.0 / 7.0;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > NumSchedules) {
+        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range");
         }
 
@@ -4533,7 +4475,7 @@ namespace EnergyPlus::ScheduleManager {
             DaysInYear = 365;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > NumSchedules) {
+        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleHoursGT1perc called with ScheduleIndex out of range");
         }
 
@@ -4543,10 +4485,10 @@ namespace EnergyPlus::ScheduleManager {
         if (DayT == 0) return TotalHours;
 
         for (int Loop = 1; Loop <= DaysInYear; ++Loop) {
-            int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
+            int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
             for (int hrOfDay = 1; hrOfDay <= 24; ++hrOfDay) {
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    if (DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TS, hrOfDay)) {
+                    if (state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue(TS, hrOfDay)) {
                         TotalHours += state.dataGlobal->TimeStepZone;
                     }
                 }
@@ -4559,7 +4501,7 @@ namespace EnergyPlus::ScheduleManager {
         return TotalHours;
     }
 
-    int GetNumberOfSchedules()
+    int GetNumberOfSchedules(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -4570,7 +4512,7 @@ namespace EnergyPlus::ScheduleManager {
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the number of schedules.
-        return NumSchedules;
+        return state.dataScheduleMgr->NumSchedules;
     }
 
 } // namespace EnergyPlus

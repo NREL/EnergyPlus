@@ -1303,8 +1303,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     MSHeatPump(2).TotCoolEnergyRate = 1000.0;
     MSHeatPump(1).FlowFraction = 1.0;
     MSHeatPump(2).FlowFraction = 1.0;
-    ScheduleManager::Schedule(17).CurrentValue = 1.0;
-    ScheduleManager::Schedule(9).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutHumRat = 0.012;

@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     ZoneSizingRunDone = true;
@@ -425,7 +425,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     ZoneSizingRunDone = true;
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     ZoneSizingRunDone = true;
@@ -785,7 +785,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     // GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     ZoneSizingRunDone = false;
@@ -935,7 +935,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     ZoneSizingRunDone = true;

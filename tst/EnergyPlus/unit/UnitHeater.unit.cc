@@ -1337,7 +1337,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     ZoneCompTurnFansOn = true;
     ZoneCompTurnFansOff = false;
 
-    Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 

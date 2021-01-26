@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     int const SysNum(1);
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
-    Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // run SimConstVolNoReheat() function
     state->dataSingleDuct->sd_airterminal(SysNum).SimConstVolNoReheat(*state);
     // check the TA outlet air mass flow rate
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
-    Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
 
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -669,7 +669,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
-    Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
@@ -1024,7 +1024,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     int const ZonePtr = thisAirTerminal.ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
 
-    Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
+    state->dataScheduleMgr->Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
     ;
     // design maximum air mass flow rate
     Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;

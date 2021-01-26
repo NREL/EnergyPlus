@@ -678,8 +678,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -1009,8 +1009,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -1423,8 +1423,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -1836,8 +1836,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(PTUnit(PTUnitNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -2517,8 +2517,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -3193,8 +3193,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -4945,8 +4945,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -6697,8 +6697,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
 
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -6935,9 +6935,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 5000.0;
     state->dataUnitVentilators->QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
 
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr).CurrentValue = 0.5;    // min OA fraction is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr).CurrentValue = 0.5;    // min OA fraction is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -7172,9 +7172,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired = 5000.0;
     QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired;
 
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
-    Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr).CurrentValue = 0.5;    // min OA fraction is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr).CurrentValue = 0.5;    // min OA fraction is always available
 
     // set secondary air mass flow rate to zero
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).MassFlowRate = 0.0;
@@ -7541,7 +7541,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
 
     auto &thisFanCoil(FanCoil(1));
@@ -7969,7 +7969,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
 

@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
@@ -486,7 +486,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
@@ -723,7 +723,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
@@ -960,7 +960,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
@@ -1157,7 +1157,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
     state->dataWaterCoils->MySizeFlag(1) = true;
@@ -1371,7 +1371,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     GetZoneSizingInput(*state);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
     GetWaterCoilInput(*state);
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;

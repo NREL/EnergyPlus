@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataSizing::OARequirements.allocate(1);
     DataHeatBalance::ZoneIntGain.allocate(1);
     DataHeatBalance::People.allocate(1);
-    ScheduleManager::Schedule.allocate(2);
+    state->dataScheduleMgr->Schedule.allocate(2);
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneSysContDemand.allocate(1);
@@ -121,8 +121,8 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.002;
     DataSizing::OARequirements(1).OAFlowPerArea = 0.003;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.5;
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    ScheduleManager::Schedule(2).CurrentValue = 131.881995;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 131.881995;
 
     Real64 OAVolumeFlowRate;
     // Test ZOAM_ProportionalControlSchOcc
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::Zone.deallocate();
     DataSizing::OARequirements.deallocate();
     DataHeatBalance::ZoneIntGain.deallocate();
-    ScheduleManager::Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
     DataHeatBalance::People.deallocate();
     state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();

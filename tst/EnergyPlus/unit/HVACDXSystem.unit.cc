@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataGlobal->MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;
     bool FirstHVACIteration = true;
@@ -682,7 +682,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataGlobal->MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables(*state);
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;
     bool FirstHVACIteration = true;

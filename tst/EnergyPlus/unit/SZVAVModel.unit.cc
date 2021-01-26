@@ -213,8 +213,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    ScheduleManager::Schedule.allocate(1);
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     PTUnit.allocate(1);
     PTUnit(1) = thisUnit;
@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     DataLoopNode::Node(5).Enthalpy = 52120.0;
 
     // turn the availability schedule on
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
     PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(FanCoil(1));
     EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);

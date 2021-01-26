@@ -1113,7 +1113,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     GetMaterialData(*state, ErrorsFound);
@@ -1536,11 +1536,11 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     NumOfCFloLowTempRadSys = 1;
     CFloRadSys.allocate(NumOfCFloLowTempRadSys);
     CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
-    Schedule.allocate(3);
+    state->dataScheduleMgr->Schedule.allocate(3);
     DataHeatBalFanSys::MAT.allocate(1);
-    Schedule(1).CurrentValue = 1;
-    Schedule(2).CurrentValue = 22.0;
-    Schedule(3).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 25.0;
     DataHeatBalFanSys::MAT(1) = 21.0;
     CFloRadSys(RadSysNum).NumOfSurfaces = 0;
     TotalNumOfRadSystems = 0;
@@ -1580,7 +1580,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     EXPECT_EQ(NotOperating, CFloRadSys(RadSysNum).OperatingMode);
 
     CFloRadSys.deallocate();
-    Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
     DataHeatBalFanSys::MAT.deallocate();
 }
 
@@ -1598,11 +1598,11 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys.allocate(NumOfHydrLowTempRadSys);
     HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
     HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
-    Schedule.allocate(3);
+    state->dataScheduleMgr->Schedule.allocate(3);
     DataHeatBalFanSys::MAT.allocate(1);
-    Schedule(1).CurrentValue = 1;
-    Schedule(2).CurrentValue = 22.0;
-    Schedule(3).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 22.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 25.0;
     DataHeatBalFanSys::MAT(1) = 21.0;
     HydrRadSys(RadSysNum).NumOfSurfaces = 0;
     TotalNumOfRadSystems = 0;
@@ -1635,7 +1635,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     EXPECT_EQ(NotOperating, HydrRadSys(RadSysNum).OperatingMode);
 
     HydrRadSys.deallocate();
-    Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
     DataHeatBalFanSys::MAT.deallocate();
 }
 

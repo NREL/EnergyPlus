@@ -4006,7 +4006,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(11).Temp = -10.0;
     DataLoopNode::Node(11).HumRat = 0.0008;
     DataLoopNode::Node(70).TempSetPoint = 4.5;
-    Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet

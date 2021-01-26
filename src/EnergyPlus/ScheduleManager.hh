@@ -166,8 +166,6 @@ namespace ScheduleManager {
 
     };
 
-    void clear_state();
-
     void ProcessScheduleInput(EnergyPlusData &state);
 
     enum class ReportLevelDetail {Hourly, TimeStepDetailed, IDF};
@@ -307,7 +305,7 @@ namespace ScheduleManager {
                                 bool isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    int GetNumberOfSchedules();
+    int GetNumberOfSchedules(EnergyPlusData &state);
 
     struct SingleColumnOfData {
         int columnNumber = 0;
@@ -357,28 +355,46 @@ namespace ScheduleManager {
         }
     };
 
-    extern std::vector<InterpretedScheduleFileData> interpretedFileData;
-    extern int NumScheduleTypes;
-    extern int NumDaySchedules;
-    extern int NumWeekSchedules;
-    extern int NumSchedules;
-    extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
-    extern bool ScheduleDSTSFileWarningIssued;
-    extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
-    extern bool CheckScheduleValueMinMaxRunOnceOnly;
-    extern bool DoScheduleReportingSetup;
-    extern Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
-    extern Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
-    extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
-    extern Array1D<ScheduleData> Schedule;         // Schedule Storage
-
 } // namespace ScheduleManager
 
 struct ScheduleManagerData : BaseGlobalStruct {
 
+    int NumScheduleTypes;
+    int NumDaySchedules;
+    int NumWeekSchedules;
+    int NumSchedules;
+    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
+    bool ScheduleDSTSFileWarningIssued = false;
+    bool ScheduleFileShadingProcessed = false;
+    bool CheckScheduleValueMinMaxRunOnceOnly = true;
+    bool DoScheduleReportingSetup = true;
+    Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
+    Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
+    std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
+    Array1D<ScheduleManager::WeekScheduleData> WeekSchedule; // Week Schedule Storage
+    std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
+    Array1D<ScheduleManager::ScheduleData> Schedule; // Schedule Storage
+    std::unordered_map<std::string, std::string> UniqueScheduleNames;
+    std::vector<ScheduleManager::InterpretedScheduleFileData> interpretedFileData;
+
     void clear_state() override
     {
-
+        NumScheduleTypes = 0;
+        NumDaySchedules = 0;
+        NumWeekSchedules = 0;
+        NumSchedules = 0;
+        ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
+        ScheduleDSTSFileWarningIssued = false;
+        ScheduleFileShadingProcessed = false;
+        CheckScheduleValueMinMaxRunOnceOnly = true;
+        DoScheduleReportingSetup = true;
+        ScheduleType.clear(); // Allowed Schedule Types
+        DaySchedule.clear();   // Day Schedule Storage
+        UniqueDayScheduleNames.clear();
+        UniqueWeekScheduleNames.clear();
+        WeekSchedule.clear(); // Week Schedule Storage
+        Schedule.clear();         // Schedule Storage
+        interpretedFileData.clear();
     }
 };
 

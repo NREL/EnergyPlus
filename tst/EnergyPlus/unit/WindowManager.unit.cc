@@ -2824,7 +2824,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
-    ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Calculate temperature based on supply flow rate
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);

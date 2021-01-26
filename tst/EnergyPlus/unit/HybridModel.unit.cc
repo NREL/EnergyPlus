@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredHumRat1.allocate(1);
     PreviousMeasuredHumRat2.allocate(1);
     PreviousMeasuredHumRat3.allocate(1);
-    Schedule.allocate(6);
+    state->dataScheduleMgr->Schedule.allocate(6);
 
     // CalcZoneComponentLoadSums variable initialization
     MCPI.allocate(1);
@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredHumRat2(1) = 0.0011172070768;
     PreviousMeasuredHumRat3(1) = 0.0011155109625;
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
-    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.001120003;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.001120003;
     MCPV(1) = 539.49;
     MCPTV(1) = 270.10;
     state->dataEnvrn->OutBaroPress = 99500;
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPV(1) = 5163.5;    // Assign TempDepCoef
     MCPTV(1) = -15956.8; // Assign TempIndCoef
     HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
-    Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
@@ -389,7 +389,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredHumRat2(1) = 0.002489048;
     PreviousMeasuredHumRat3(1) = 0.002480404;
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
-    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
 
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
@@ -420,9 +420,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr = 2;
     HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
-    Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = 15.56;
-    Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.7974274;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = 15.56;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.7974274;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.49, Zone(1).InfilOAAirChangeRateHM, 0.01);
@@ -451,9 +451,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirHumidityRatioSchedulePtr = 2;
     HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
-    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.00792;
-    Schedule(HybridModelZone(1).ZoneSupplyAirHumidityRatioSchedulePtr).CurrentValue = 0.015;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.8345;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.00792;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirHumidityRatioSchedulePtr).CurrentValue = 0.015;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.8345;
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
@@ -487,12 +487,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr = 4;
     HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr = 5;
     HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr = 6;
-    Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = 21.11;
-    Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.446145794;
-    Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
-    Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
-    Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = 21.11;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.446145794;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
@@ -523,12 +523,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr = 4;
     HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr = 5;
     HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr = 6;
-    Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.01107774;
-    Schedule(HybridModelZone(1).ZoneSupplyAirHumidityRatioSchedulePtr).CurrentValue = 0.015;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.485334886;
-    Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
-    Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
-    Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.01107774;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirHumidityRatioSchedulePtr).CurrentValue = 0.015;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.485334886;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
@@ -615,7 +615,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     CTMFL.deallocate();
     state->dataContaminantBalance->ZoneAirDensityCO.deallocate();
     state->dataContaminantBalance->ZoneGCGain.deallocate();
-    Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
@@ -647,7 +647,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->CO2ZoneTimeMinus1.allocate(1);
     state->dataContaminantBalance->CO2ZoneTimeMinus2.allocate(1);
     state->dataContaminantBalance->CO2ZoneTimeMinus3.allocate(1);
-    Schedule.allocate(7);
+    state->dataScheduleMgr->Schedule.allocate(7);
 
     // CalcZoneComponentLoadSums variable initialization
     MCPI.allocate(1);
@@ -772,7 +772,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 389.084601;
     state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 388.997009;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
-    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
@@ -802,7 +802,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->CO2ZoneTimeMinus2(1) = 387.676037;
     state->dataContaminantBalance->CO2ZoneTimeMinus3(1) = 387.2385685;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
-    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
     CorrectZoneContaminants(*state, false, true, 10 / 60);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
@@ -830,9 +830,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr = 2;
     HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr = 3;
-    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.2075472;
-    Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 388.54049;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.898375186;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.2075472;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 388.54049;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.898375186;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
@@ -866,13 +866,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr = 5;
     HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr = 6;
     HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr = 7;
-    Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.795807;
-    Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 387.2253194;
-    Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.427583795;
-    Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
-    Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
-    Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
-    Schedule(HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr).CurrentValue = 0.0000000382;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.795807;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 387.2253194;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 1.427583795;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleActivityLevelSchedulePtr).CurrentValue = 120;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
+    state->dataScheduleMgr->Schedule(HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr).CurrentValue = 0.0000000382;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
     EXPECT_NEAR(7.27, Zone(1).NumOccHM, 0.1);
@@ -939,5 +939,5 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataContaminantBalance->ZoneCO2GainExceptPeople.deallocate();
     state->dataContaminantBalance->ZoneGCGain.deallocate();
     state->dataContaminantBalance->MixingMassFlowCO2.deallocate();
-    Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
 }

@@ -1179,7 +1179,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -1661,7 +1661,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -1965,7 +1965,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -2261,7 +2261,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -2559,7 +2559,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -2857,7 +2857,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -3155,7 +3155,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -3453,7 +3453,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
@@ -3751,7 +3751,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);

@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     WaterManager::GetWaterManagerInput(*state);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     WaterManager::UpdatePrecipitation(*state);
 
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     WaterManager::UpdatePrecipitation(*state);
 

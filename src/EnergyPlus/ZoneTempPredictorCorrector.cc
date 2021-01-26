@@ -7798,22 +7798,22 @@ namespace ZoneTempPredictorCorrector {
 
         // get the value at the selected time
         int const firstTimeStep = 1;
-        int weekSchIndexSelect = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
-        int daySchIndexSelect = ScheduleManager::WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
-        Real64 valueAtSelectTime = ScheduleManager::DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);
+        int weekSchIndexSelect = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
+        int daySchIndexSelect = state.dataScheduleMgr->WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
+        Real64 valueAtSelectTime = state.dataScheduleMgr->DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);
         int countOfSame = 0;
 
         // count the number of times with that same value
         for (int jdateOfYear = 1; jdateOfYear <= DaysInYear; ++jdateOfYear) {
-            int wkSch = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateOfYear);
+            int wkSch = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateOfYear);
             if (wkSch == weekSchIndexSelect) { // if same week schedule can short circuit rest of testing and increment counter
                 ++countOfSame;
             } else {
-                int daySch = ScheduleManager::WeekSchedule(wkSch).DaySchedulePointer(dayOfWeek);
+                int daySch = state.dataScheduleMgr->WeekSchedule(wkSch).DaySchedulePointer(dayOfWeek);
                 if (daySch == daySchIndexSelect) { // if same day schedule can short circuit rest of testing and increment counter
                     ++countOfSame;
                 } else {
-                    Real64 valueAt = ScheduleManager::DaySchedule(daySch).TSValue(firstTimeStep, hourSelect);
+                    Real64 valueAt = state.dataScheduleMgr->DaySchedule(daySch).TSValue(firstTimeStep, hourSelect);
                     if (valueAt == valueAtSelectTime) {
                         ++countOfSame;
                     }

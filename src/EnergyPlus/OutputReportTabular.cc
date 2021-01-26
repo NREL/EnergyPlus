@@ -6217,8 +6217,8 @@ namespace EnergyPlus::OutputReportTabular {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
         }
         // LEED schedule sub table
-        for (long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch) {
-            std::string curSchName = ScheduleManager::Schedule(iSch).Name;
+        for (long iSch = 1; iSch <= state.dataScheduleMgr->NumSchedules; ++iSch) {
+            std::string curSchName = state.dataScheduleMgr->Schedule(iSch).Name;
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(state,

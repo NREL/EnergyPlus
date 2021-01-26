@@ -212,9 +212,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     CTMFL.allocate(1);
     MDotOA.allocate(1);
     MDotOA(1) = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 
@@ -553,9 +553,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     CTMFL.allocate(3);
     MDotOA.allocate(3);
     MDotOA = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 
@@ -761,9 +761,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     CTMFL.allocate(3);
     MDotOA.allocate(3);
     MDotOA = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 

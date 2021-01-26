@@ -1594,7 +1594,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 

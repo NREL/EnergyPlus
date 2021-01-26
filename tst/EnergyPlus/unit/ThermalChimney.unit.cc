@@ -1113,7 +1113,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     SurfaceGeometry::GetSurfaceData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     DataHeatBalance::Zone(2).HasWindow = true;
     DataHeatBalance::Zone(4).HasWindow = true;
@@ -1139,7 +1139,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalFanSys::MCPThermChim.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
     ThermalChimney::GetThermalChimney(*state, localErrorsFound);

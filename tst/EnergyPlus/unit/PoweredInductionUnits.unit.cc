@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -393,7 +393,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;

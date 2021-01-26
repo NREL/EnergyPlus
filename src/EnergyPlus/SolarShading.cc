@@ -376,8 +376,6 @@ namespace SolarShading {
         using DataSystemVariables::ShadingMethod;
         using DataSystemVariables::shadingMethod;
         using DataSystemVariables::SlaterBarsky;
-        using ScheduleManager::ScheduleFileShadingProcessed;
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -435,7 +433,7 @@ namespace SolarShading {
                 shadingMethod = ShadingMethod::Scheduled;
                 cAlphaArgs(aNum) = "Scheduled";
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
-                if (ScheduleFileShadingProcessed) {
+                if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
                     shadingMethod = ShadingMethod::Imported;
                     cAlphaArgs(aNum) = "Imported";
                 } else {

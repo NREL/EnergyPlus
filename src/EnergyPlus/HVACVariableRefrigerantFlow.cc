@@ -5642,7 +5642,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                 ShowContinueError(state, "When using set point control, fan operating mode must be continuous (fan "
                                                                   "operating mode schedule values > 0).");
                                                 ShowContinueError(state, "Error found in Supply Air Fan Operating Mode Schedule Name = " +
-                                                                  ScheduleManager::Schedule(state.dataHVACVarRefFlow->VRFTU(TUIndex).FanOpModeSchedPtr).Name);
+                                                                  state.dataScheduleMgr->Schedule(state.dataHVACVarRefFlow->VRFTU(TUIndex).FanOpModeSchedPtr).Name);
                                                 ShowContinueError(state, "...schedule values must be (>0., <=1.)");
                                                 ErrorsFound = true;
                                             }
