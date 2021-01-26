@@ -620,6 +620,8 @@ namespace OutputReportTabular {
 
     int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para);
+
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
     void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);

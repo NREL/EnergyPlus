@@ -12216,7 +12216,9 @@ namespace EnergyPlus::OutputReportTabular {
                         for (int iCol = 1; iCol <= numCols; ++iCol) {
                             columnHead(iCol) = headerFields.at(iCol);
                             // set the unit conversions
-                            colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
+                            // colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
+                            // JY 2021-01-26 use overloaded version for dual units
+                            colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol), unitsStyle_cur);
                         }
                         // look for data lines
                         int rowNum = 0;
@@ -12229,7 +12231,8 @@ namespace EnergyPlus::OutputReportTabular {
                                     std::vector<std::string> dataFields = splitCommaString(bodyLine);
                                     rowHead(rowNum) = fmt::to_string(rowNum);
                                     for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                        if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
+                                        // if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
+                                        if (unitsStyle_cur == iUnitsStyle::InchPound || unitsStyle_cur == iUnitsStyle::JtoKWH) {
                                             if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
                                                 int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                                 Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
@@ -12238,8 +12241,11 @@ namespace EnergyPlus::OutputReportTabular {
                                                        iCol > 1) { // if it is the last column and the
                                                                    // header is Value then treat the
                                                                    // previous column as source of units
-                                                int indexUnitConv =
-                                                    unitsFromHeading(state, tableBody(iCol - 1, rowNum)); // base units on previous column
+                                                // int indexUnitConv =
+                                                //    unitsFromHeading(state, tableBody(iCol - 1, rowNum)); // base units on previous column
+                                                // JY 2021-01-26 use overloaded version for dual units
+                                                int indexUnitConv = unitsFromHeading(state, tableBody(iCol - 1, rowNum), unitsStyle_cur);     // base units on previous column
+
                                                 int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
                                                 Real64 convertedVal = ConvertIP(state, indexUnitConv, StrToReal(dataFields[iCol]));
                                                 tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
@@ -12283,6 +12289,26 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->unitsStyle == iUnitsStyle::InchPound) {
             LookupSItoIP(state, heading, unitConv, curHeading);
         } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
+            LookupJtokWH(state, heading, unitConv, curHeading);
+        } else {
+            curHeading = heading;
+        }
+        heading = curHeading;
+        return (unitConv);
+    }
+
+    // JY 2021-01-26 Overloaded this function to accomondate dual units output needs
+    // changes the heading that contains and SI to IP as well as providing the unit conversion index
+    // Glazer Nov 2016
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para)
+    {
+        // auto &ort(state.dataOutRptTab);
+
+        std::string curHeading = "";
+        int unitConv = 0;
+        if (unitsStyle_para == iUnitsStyle::InchPound) {
+            LookupSItoIP(state, heading, unitConv, curHeading);
+        } else if (unitsStyle_para == iUnitsStyle::JtoKWH) {
             LookupJtokWH(state, heading, unitConv, curHeading);
         } else {
             curHeading = heading;
