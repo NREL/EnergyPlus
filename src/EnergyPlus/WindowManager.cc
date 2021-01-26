@@ -2415,7 +2415,7 @@ namespace WindowManager {
                 // Interior or exterior blind, shade or screen is on.
                 // Fill gap between blind/shade and adjacent glass with air properties.
                 ++IGap;
-                if (IS_SHADE_ON(ShadeFlag)) { // Interior or exterior shade
+                if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) { // Interior or exterior shade
                     state.dataWindowManager->gap(IGap) = state.dataMaterial->Material(ShadeLayPtr).WinShadeToGlassDist;
                 } else { // Interior or exterior blind
                     state.dataWindowManager->gap(IGap) = Blind(SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
@@ -2983,7 +2983,7 @@ namespace WindowManager {
                 (Surface(SurfNum).IntConvCoeff == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
-                if (IS_EXT_SHADED(ShadeFlag)) {
+                if (IS_INT_SHADED(ShadeFlag)) {
                     InsideFaceIndex = state.dataWindowManager->nglfacep;
                 } else {
                     InsideFaceIndex = state.dataWindowManager->nglface;

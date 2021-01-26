@@ -1074,47 +1074,47 @@ namespace HeatBalanceSurfaceManager {
                             }
                             {
                                 auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingControlType);
-                                if (SELECT_CASE_var1 == WSCT_AlwaysOn) {
+                                if (SELECT_CASE_var1 == AlwaysOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "AlwaysOn");
-                                } else if (SELECT_CASE_var1 == WSCT_AlwaysOff) {
+                                } else if (SELECT_CASE_var1 == AlwaysOff) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "AlwaysOff");
-                                } else if (SELECT_CASE_var1 == WSCT_OnIfScheduled) {
+                                } else if (SELECT_CASE_var1 == OnIfScheduled) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfScheduleAllows");
-                                } else if (SELECT_CASE_var1 == WSCT_HiSolar) {
+                                } else if (SELECT_CASE_var1 == HiSolar) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighSolarOnWindow");
-                                } else if (SELECT_CASE_var1 == WSCT_HiHorzSolar) {
+                                } else if (SELECT_CASE_var1 == HiHorzSolar) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighHorizontalSolar");
-                                } else if (SELECT_CASE_var1 == WSCT_HiOutAirTemp) {
+                                } else if (SELECT_CASE_var1 == HiOutAirTemp) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTemperature");
-                                } else if (SELECT_CASE_var1 == WSCT_HiZoneAirTemp) {
+                                } else if (SELECT_CASE_var1 == HiZoneAirTemp) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTemperature");
-                                } else if (SELECT_CASE_var1 == WSCT_HiZoneCooling) {
+                                } else if (SELECT_CASE_var1 == HiZoneCooling) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneCooling");
-                                } else if (SELECT_CASE_var1 == WSCT_HiGlare) {
+                                } else if (SELECT_CASE_var1 == HiGlare) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighGlare");
-                                } else if (SELECT_CASE_var1 == WSCT_MeetDaylIlumSetp) {
+                                } else if (SELECT_CASE_var1 == MeetDaylIlumSetp) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "MeetDaylightIlluminanceSetpoint");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNightLoOutTemp_OffDay) {
+                                } else if (SELECT_CASE_var1 == OnNightLoOutTemp_OffDay) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOffDay");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNightLoInTemp_OffDay) {
+                                } else if (SELECT_CASE_var1 == OnNightLoInTemp_OffDay) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowInsideTempAndOffDay");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNightIfHeating_OffDay) {
+                                } else if (SELECT_CASE_var1 == OnNightIfHeating_OffDay) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfHeatingAndOffDay");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNightLoOutTemp_OnDayCooling) {
+                                } else if (SELECT_CASE_var1 == OnNightLoOutTemp_OnDayCooling) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfLowOutdoorTempAndOnDayIfCooling");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNightIfHeating_OnDayCooling) {
+                                } else if (SELECT_CASE_var1 == OnNightIfHeating_OnDayCooling) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightIfHeatingAndOnDayIfCooling");
-                                } else if (SELECT_CASE_var1 == WSCT_OffNight_OnDay_HiSolarWindow) {
+                                } else if (SELECT_CASE_var1 == OffNight_OnDay_HiSolarWindow) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OffNightAndOnDayIfCoolingAndHighSolarOnWindow");
-                                } else if (SELECT_CASE_var1 == WSCT_OnNight_OnDay_HiSolarWindow) {
+                                } else if (SELECT_CASE_var1 == OnNight_OnDay_HiSolarWindow) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnNightAndOnDayIfCoolingAndHighSolarOnWindow");
-                                } else if (SELECT_CASE_var1 == WSCT_OnHiOutTemp_HiSolarWindow) {
+                                } else if (SELECT_CASE_var1 == OnHiOutTemp_HiSolarWindow) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighSolarOnWindow");
-                                } else if (SELECT_CASE_var1 == WSCT_OnHiOutTemp_HiHorzSolar) {
+                                } else if (SELECT_CASE_var1 == OnHiOutTemp_HiHorzSolar) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighOutdoorAirTempAndHighHorizontalSolar");
-                                } else if (SELECT_CASE_var1 == WSCT_OnHiZoneTemp_HiSolarWindow) {
+                                } else if (SELECT_CASE_var1 == OnHiZoneTemp_HiSolarWindow) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighSolarOnWindow");
-                                } else if (SELECT_CASE_var1 == WSCT_OnHiZoneTemp_HiHorzSolar) {
+                                } else if (SELECT_CASE_var1 == OnHiZoneTemp_HiHorzSolar) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "OnIfHighZoneAirTempAndHighHorizontalSolar");
                                 }
                             }
@@ -2858,7 +2858,7 @@ namespace HeatBalanceSurfaceManager {
                 }
                 int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
                         // Exclude special shading surfaces which required QRadSWOut calculations above
                         int RoughIndexMovInsul = 0; // Roughness index of movable insulation

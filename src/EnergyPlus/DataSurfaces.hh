@@ -147,6 +147,32 @@ namespace DataSurfaces {
         ShadeOff = 10
     };
 
+    enum WindowShadingControlType {
+        UnControlled = 0,
+        AlwaysOn = 1,
+        AlwaysOff = 2,
+        OnIfScheduled = 3,
+        HiSolar = 4,
+        HiHorzSolar = 5,
+        HiOutAirTemp = 6,
+        HiZoneAirTemp = 7,
+        HiZoneCooling = 8,
+        HiGlare = 9,
+        MeetDaylIlumSetp = 10,
+        OnNightLoOutTemp_OffDay = 11,
+        OnNightLoInTemp_OffDay = 12,
+        OnNightIfHeating_OffDay = 13,
+        OnNightLoOutTemp_OnDayCooling = 14,
+        OnNightIfHeating_OnDayCooling = 15,
+        OffNight_OnDay_HiSolarWindow = 16,
+        OnNight_OnDay_HiSolarWindow = 17,
+        OnHiOutTemp_HiSolarWindow = 18,
+        OnHiOutTemp_HiHorzSolar = 19,
+        OnHiZoneTemp_HiSolarWindow = 20,
+        OnHiZoneTemp_HiHorzSolar = 21
+
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -265,29 +291,6 @@ namespace DataSurfaces {
     extern int const InConvWinLoc_WindowAboveThis;         // this is a wall with window above it
     extern int const InConvWinLoc_WindowBelowThis;         // this is a wall with window below it
     extern int const InConvWinLoc_LargePartOfExteriorWall; // this is a big window taking up most of wall
-
-    // WindowShadingControl Control Types
-    extern int const WSCT_AlwaysOn;                      // AlwaysOn
-    extern int const WSCT_AlwaysOff;                     // AlwaysOff
-    extern int const WSCT_OnIfScheduled;                 // OnIfScheduleAllows
-    extern int const WSCT_HiSolar;                       // OnIfHighSolarOnWindow
-    extern int const WSCT_HiHorzSolar;                   // OnIfHighHorizontalSolar
-    extern int const WSCT_HiOutAirTemp;                  // OnIfHighOutsideAirTemp
-    extern int const WSCT_HiZoneAirTemp;                 // OnIfHighZoneAirTemp
-    extern int const WSCT_HiZoneCooling;                 // OnIfHighZoneCooling
-    extern int const WSCT_HiGlare;                       // OnIfHighGlare
-    extern int const WSCT_MeetDaylIlumSetp;              // MeetDaylightIlluminanceSetpoint
-    extern int const WSCT_OnNightLoOutTemp_OffDay;       // OnNightIfLowOutsideTemp/OffDay
-    extern int const WSCT_OnNightLoInTemp_OffDay;        // OnNightIfLowInsideTemp/OffDay
-    extern int const WSCT_OnNightIfHeating_OffDay;       // OnNightIfHeating/OffDay
-    extern int const WSCT_OnNightLoOutTemp_OnDayCooling; // OnNightIfLowOutsideTemp/OnDayIfCooling
-    extern int const WSCT_OnNightIfHeating_OnDayCooling; // OnNightIfHeating/OnDayIfCooling
-    extern int const WSCT_OffNight_OnDay_HiSolarWindow;  // OffNight/OnDayIfCoolingAndHighSolarOnWindow
-    extern int const WSCT_OnNight_OnDay_HiSolarWindow;   // OnNight/OnDayIfCoolingAndHighSolarOnWindow
-    extern int const WSCT_OnHiOutTemp_HiSolarWindow;     // OnIfHighOutsideAirTempAndHighSolarOnWindow
-    extern int const WSCT_OnHiOutTemp_HiHorzSolar;       // OnIfHighOutsideAirTempAndHighHorizontalSolar
-    extern int const WSCT_OnHiZoneTemp_HiSolarWindow;    // OnIfHighZoneAirTempAndHighSolarOnWindow
-    extern int const WSCT_OnHiZoneTemp_HiHorzSolar;      // OnIfHighZoneAirTempAndHighHorizontalSolar
 
     // WindowShadingControl Slat Angle Control for Blinds
     extern int const WSC_SAC_FixedSlatAngle;
@@ -1114,7 +1117,7 @@ namespace DataSurfaces {
         //  ExteriorShade,BetweenGlassShade,InteriorBlind,ExteriorBlind,BetweenGlassBlind,
         //  ExteriorScreen;
         //  this must be a Material:WindowShade, Material:WindowScreen, or Material:WindowBlind
-        int ShadingControlType; // Takes one of the following values that specifies type of shading control
+        WindowShadingControlType ShadingControlType; // Takes one of the following values that specifies type of shading control
         //  CHARACTER(len=60) :: ShadingControlType =' ' ! Takes one of the following values that specifies type of shading control
         // (control is active only when schedule value = 1; if no schedule
         // specified, schedule value defaults to 1)
@@ -1188,7 +1191,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WinShadingType::NoShade), getInputShadedConstruction(0), ShadingDevice(0), ShadingControlType(UnControlled),
               Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false), FenestrationCount(0)
         {

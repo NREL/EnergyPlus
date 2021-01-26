@@ -8203,40 +8203,40 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
 
-        static Array1D_int const ValidWindowShadingControlTypes(
+        static Array1D<WindowShadingControlType> const ValidWindowShadingControlTypes(
             NumValidWindowShadingControlTypes,
-            {WSCT_AlwaysOn,
-             WSCT_AlwaysOff,
-             WSCT_OnIfScheduled,
-             WSCT_HiSolar,
-             WSCT_HiHorzSolar,
-             WSCT_HiOutAirTemp,
-             WSCT_HiZoneAirTemp,
-             WSCT_HiZoneCooling,
-             WSCT_HiGlare,
-             WSCT_MeetDaylIlumSetp,
-             WSCT_OnNightLoOutTemp_OffDay,
-             WSCT_OnNightLoInTemp_OffDay,
-             WSCT_OnNightIfHeating_OffDay,
-             WSCT_OnNightLoOutTemp_OnDayCooling,
-             WSCT_OnNightIfHeating_OnDayCooling,
-             WSCT_OffNight_OnDay_HiSolarWindow,
-             WSCT_OnNight_OnDay_HiSolarWindow,
-             WSCT_OnHiOutTemp_HiSolarWindow,
-             WSCT_OnHiOutTemp_HiHorzSolar,
-             WSCT_OnHiZoneTemp_HiSolarWindow,
-             WSCT_OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
-                                              // | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ',
-                                              // & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE
-                                              // ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING
-                                              // ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT
-                                              // ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY
-                                              // ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & |
-                                              // 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING
-                                              // ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & |
-                                              // 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ',
-                                              // & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW
-                                              // ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
+            {AlwaysOn,
+             AlwaysOff,
+             OnIfScheduled,
+             HiSolar,
+             HiHorzSolar,
+             HiOutAirTemp,
+             HiZoneAirTemp,
+             HiZoneCooling,
+             HiGlare,
+             MeetDaylIlumSetp,
+             OnNightLoOutTemp_OffDay,
+             OnNightLoInTemp_OffDay,
+             OnNightIfHeating_OffDay,
+             OnNightLoOutTemp_OnDayCooling,
+             OnNightIfHeating_OnDayCooling,
+             OffNight_OnDay_HiSolarWindow,
+             OnNight_OnDay_HiSolarWindow,
+             OnHiOutTemp_HiSolarWindow,
+             OnHiOutTemp_HiHorzSolar,
+             OnHiZoneTemp_HiSolarWindow,
+             OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
+                                          // | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ',
+                                          // & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE
+                                          // ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING
+                                          // ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT
+                                          // ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY
+                                          // ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & |
+                                          // 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING
+                                          // ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & |
+                                          // 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ',
+                                          // & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW
+                                          // ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -8451,7 +8451,7 @@ namespace SurfaceGeometry {
                                 cAlphaArgs(8) + "\".");
             }
 
-            if ((WindowShadingControl(ControlNum).ShadingControlType == WSCT_OnIfScheduled) &&
+            if ((WindowShadingControl(ControlNum).ShadingControlType == OnIfScheduled) &&
                 (!WindowShadingControl(ControlNum).ShadingControlIsScheduled)) { // CR 7709 BG
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + " = \"" + WindowShadingControl(ControlNum).Name + "\" invalid, " + cAlphaFieldNames(7) +
