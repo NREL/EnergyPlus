@@ -10546,8 +10546,8 @@ namespace EnergyPlus::OutputReportTabular {
                                             if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
                                         }
                                     }
-                                    if (produceTabular) {
-                                        if (DetailedWWR) {
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
                                             print(state.files.debug,
                                                   "{},Wall,{:.1R},{:.1R}\n",
                                                   Surface(iSurf).Name,
@@ -14432,7 +14432,8 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(rGrdTot) = "Grand Total";
 
                 columnHead.allocate(cPerArea);
-                if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                // if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
                     columnHead(cSensInst) = "Sensible - Instant [W]";
                     columnHead(cSensDelay) = "Sensible - Delayed [W]";
                     columnHead(cSensRA) = "Sensible - Return Air [W]";
@@ -14441,7 +14442,6 @@ namespace EnergyPlus::OutputReportTabular {
                     columnHead(cPerc) = "%Grand Total";
                     columnHead(cArea) = "Related Area [m2]";
                     columnHead(cPerArea) = "Total per Area [W/m2]";
-
                 } else {
                     columnHead(cSensInst) = "Sensible - Instant [Btu/h]";
                     columnHead(cSensDelay) = "Sensible - Delayed [Btu/h]";
