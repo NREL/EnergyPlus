@@ -11772,6 +11772,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayComponentSizing) {
+            WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 iUnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -11779,9 +11780,6 @@ namespace EnergyPlus::OutputReportTabular {
                 bool produceSQLite = false;
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-                if (produceTabular) {
-                    WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-                } 
                 // The arrays that look for unique headers are dimensioned in the
                 // running program since the size of the number of entries is
                 // not previouslly known. Use the size of all entries since that
@@ -11874,7 +11872,7 @@ namespace EnergyPlus::OutputReportTabular {
                         curColHeadWithSI = uniqueDesc(jUnique);
                         // if (ort->unitsStyle == iUnitsStyle::InchPound) {
                         if (unitsStyle_cur == iUnitsStyle::InchPound) {
-                                LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
+                            LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
                             colUnitConv(jUnique) = indexUnitConv;
                         } else {
                             curColHead = curColHeadWithSI;
@@ -11929,18 +11927,23 @@ namespace EnergyPlus::OutputReportTabular {
                     // write the table
                     if (produceTabular) {
                         WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
-                        if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
+                    }
+                    
+                    if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
-                            WriteTable(state,
-                                       tableBody,
-                                       rowHead,
-                                       columnHead,
-                                       columnWidth,
-                                       false,
-                                       "User-Specified values were used. Design Size values were used if no User-Specified values were provided. "
-                                       "Design Size "
-                                       "values may be derived from alternate User-Specified values.");
-                        } else {
+                            if (produceTabular) {
+                                WriteTable(state,
+                                           tableBody,
+                                           rowHead,
+                                           columnHead,
+                                           columnWidth,
+                                           false,
+                                           "User-Specified values were used. Design Size values were used if no User-Specified values were provided. "
+                                           "Design Size "
+                                           "values may be derived from alternate User-Specified values.");
+                            }
+                    } else {
+                        if (produceTabular) {
                             WriteTable(state,
                                        tableBody,
                                        rowHead,
@@ -11950,6 +11953,7 @@ namespace EnergyPlus::OutputReportTabular {
                                        "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
                         }
                     }
+                    
                     if (produceSQLite) {
                         if (sqlite) {
                             sqlite->createSQLiteTabularDataRecords(tableBody,
