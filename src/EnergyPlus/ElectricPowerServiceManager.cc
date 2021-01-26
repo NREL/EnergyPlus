@@ -3268,6 +3268,16 @@ ElectricStorage::ElectricStorage( // main constructor
                                       &qdotRadZone_);
                 break;
             }
+            case StorageModelType::liIonNmcBattery: {
+                SetupZoneInternalGain(state, zoneNum_,
+                                      "ElectricLoadCenter:Storage:LiIonNMCBattery",
+                                      name_,
+                                      DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
+                break;
+            }
             case StorageModelType::storageTypeNotSet: {
                 // do nothing
                 break;
