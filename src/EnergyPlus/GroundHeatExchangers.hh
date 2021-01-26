@@ -297,6 +297,8 @@ namespace GroundHeatExchangers {
         virtual Real64 calcHXResistance(EnergyPlusData &state) = 0;
 
         virtual void getAnnualTimeConstant() = 0;
+
+        virtual void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) = 0;
     };
 
     struct GLHEVert : GLHEBase
@@ -370,6 +372,8 @@ namespace GroundHeatExchangers {
         Real64 calcPipeResistance(EnergyPlusData &state);
 
         void combineShortAndLongTimestepGFunctions();
+
+        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
     };
 
     struct GLHESlinky : GLHEBase
@@ -428,6 +432,8 @@ namespace GroundHeatExchangers {
         void makeThisGLHECacheStruct() override;
 
         void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
+
+        void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
     };
 
     void GetGroundHeatExchangerInput(EnergyPlusData &state);

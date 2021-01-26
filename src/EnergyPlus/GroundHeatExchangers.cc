@@ -3231,14 +3231,9 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // Using/Aliasing
         using DataPlant::TypeOf_GrndHtExchgSystem;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char * RoutineName("initGLHESimVars");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
@@ -3269,28 +3264,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         }
 
         if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-
-            this->myEnvrnFlag = false;
-
-            Real64 fluidDensity = GetDensityGlycol(
-                state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-            this->designMassFlow = this->designFlow * fluidDensity;
-            InitComponentNodes(
-                0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
-
-            this->lastQnSubHr = 0.0;
-            Node(this->inletNodeNum).Temp = this->tempGround;
-            Node(this->outletNodeNum).Temp = this->tempGround;
-
-            // zero out all history arrays
-            this->QnHr = 0.0;
-            this->QnMonthlyAgg = 0.0;
-            this->QnSubHr = 0.0;
-            this->LastHourN = 0;
-            state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
-            state.dataGroundHeatExchanger->currentSimTime = 0.0;
-            this->QGLHE = 0.0;
-            this->prevHour = 1;
+            this->initEnvironment(state, currTime);
         }
 
         // Calculate the average ground temperature over the depth of the borehole
@@ -3322,6 +3296,36 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
+    void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
+    {
+
+        constexpr const char *RoutineName("initEnvironment");
+
+        this->myEnvrnFlag = false;
+
+        Real64 fluidDensity = FluidProperties::GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+        this->designMassFlow = this->designFlow * fluidDensity;
+        PlantUtilities::InitComponentNodes(
+            0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+
+        this->lastQnSubHr = 0.0;
+        Node(this->inletNodeNum).Temp = this->tempGround;
+        Node(this->outletNodeNum).Temp = this->tempGround;
+
+        // zero out all history arrays
+        this->QnHr = 0.0;
+        this->QnMonthlyAgg = 0.0;
+        this->QnSubHr = 0.0;
+        this->LastHourN = 0;
+        state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
+        state.dataGroundHeatExchanger->currentSimTime = 0.0;
+        this->QGLHE = 0.0;
+        this->prevHour = 1;
+    }
+
+    //******************************************************************************
+
     void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
@@ -3332,15 +3336,10 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // Using/Aliasing
         using DataPlant::TypeOf_GrndHtExchgSlinky;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
         using namespace GroundTemperatureManager;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char * RoutineName("initGLHESimVars");
 
         Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                           (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
@@ -3370,29 +3369,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         }
 
         if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-
-            this->myEnvrnFlag = false;
-
-            Real64 fluidDensity = GetDensityGlycol(
-                state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
-            this->designMassFlow = this->designFlow * fluidDensity;
-            InitComponentNodes(
-                0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
-
-            this->lastQnSubHr = 0.0;
-            Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-            Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-
-            // zero out all history arrays
-
-            this->QnHr = 0.0;
-            this->QnMonthlyAgg = 0.0;
-            this->QnSubHr = 0.0;
-            this->LastHourN = 0;
-            state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
-            state.dataGroundHeatExchanger->currentSimTime = 0.0;
-            this->QGLHE = 0.0;
-            this->prevHour = 1;
+            this->initEnvironment(state, CurTime);
         }
 
         this->tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
@@ -3405,6 +3382,36 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // Reset local environment init flag
         if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
+    }
+
+    //******************************************************************************
+
+    void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const & CurTime)
+    {
+
+        constexpr const char *RoutineName("initEnvironment");
+
+        this->myEnvrnFlag = false;
+
+        Real64 fluidDensity = FluidProperties::GetDensityGlycol(
+            state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
+        this->designMassFlow = this->designFlow * fluidDensity;
+        PlantUtilities::InitComponentNodes(
+            0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
+
+        this->lastQnSubHr = 0.0;
+        Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+
+        // zero out all history arrays
+        this->QnHr = 0.0;
+        this->QnMonthlyAgg = 0.0;
+        this->QnSubHr = 0.0;
+        this->LastHourN = 0;
+        state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
+        state.dataGroundHeatExchanger->currentSimTime = 0.0;
+        this->QGLHE = 0.0;
+        this->prevHour = 1;
     }
 
     //******************************************************************************
