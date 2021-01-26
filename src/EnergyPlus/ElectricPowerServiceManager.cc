@@ -2965,28 +2965,21 @@ ElectricStorage::ElectricStorage( // main constructor
     int testStorageIndex = 0;
     int storageIDFObjectNum = 0;
 
-    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Simple", objectName);
-    if (testStorageIndex > 0) {
-        foundStorage = true;
-        storageIDFObjectNum = testStorageIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Simple";
-        storageModelMode_ = StorageModelType::simpleBucketStorage;
-    }
+    const std::array<std::pair<std::string, StorageModelType>, 3> storageTypes{{
+        {"ElectricLoadCenter:Storage:Simple", StorageModelType::simpleBucketStorage},
+        {"ElectricLoadCenter:Storage:Battery", StorageModelType::kiBaMBattery},
+        {"ElectricLoadCenter:Storage:LiIonNMCBattery", StorageModelType::liIonNmcBattery}
+    }};
 
-    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Battery", objectName);
-    if (testStorageIndex > 0) {
-        foundStorage = true;
-        storageIDFObjectNum = testStorageIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Battery";
-        storageModelMode_ = StorageModelType::kiBaMBattery;
-    }
-
-    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:LiIonNMCBattery", objectName);
-    if (testStorageIndex > 0) {
-        foundStorage = true;
-        storageIDFObjectNum = testStorageIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:LiIonNMCBattery";
-        storageModelMode_ = StorageModelType::liIonNmcBattery;
+    for (auto &item : storageTypes) {
+        testStorageIndex = inputProcessor->getObjectItemNum(state, item.first, objectName);
+        if (testStorageIndex > 0) {
+            foundStorage = true;
+            storageIDFObjectNum = testStorageIndex;
+            DataIPShortCuts::cCurrentModuleObject = item.first;
+            storageModelMode_ = item.second;
+            break;
+        }
     }
 
     if (foundStorage) {
