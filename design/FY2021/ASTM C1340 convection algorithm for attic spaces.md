@@ -25,8 +25,6 @@ Table 1 shows the correlations for convection coefficients from ASTM C1340 Stand
 ASTM C1340 Convection algorithm will be implemented for SurfaceConvectionAlgorithm:Inside. 
 For radiant barriers, it can be selected Zone Inside Convection Algorithm of attic zone in Zone object.
 
-
-
 ## Testing/Validation/Data Sources ##
 
 Standard unit tests will be used to verify that the convective coefficients are calculated properly.
