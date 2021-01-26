@@ -9371,6 +9371,8 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayDemandEndUse) {
+            // show the headers of the report
+            WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 iUnitsStyle unitsStyle_cur = ort->unitsStyle;
@@ -9378,8 +9380,6 @@ namespace EnergyPlus::OutputReportTabular {
                 bool produceSQLite = false;
                 if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;                
 
-                // show the headers of the report
-                WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 // totals - select which additional fuel to display and which other district heating
                 collapsedTotal = 0.0;
                 collapsedTotal(1) = ort->gatherDemandTotal(1); // electricity
@@ -9829,18 +9829,18 @@ namespace EnergyPlus::OutputReportTabular {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                             PreDefTableEntry(state,
-                                             resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
-                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                             collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                                 collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (ort->needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state,
-                                             resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                             endUseSubOther(iResource, jEndUse));
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                                 endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
