@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -425,14 +425,14 @@ namespace PondGroundHeatExchanger {
                 ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
             }
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                            DataPrecisionGlobals::constant_zero,
-                                                           DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                DataPrecisionGlobals::constant_zero,
-                                                               DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                RoutineName);
             this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
             this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
@@ -461,7 +461,7 @@ namespace PondGroundHeatExchanger {
         this->PondTemp = this->BulkTemperature;
 
         // Hypothetical design flow rate
-        Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
+        Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(state,
             this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
         PlantUtilities::SetComponentFlowRate(state,
@@ -608,7 +608,7 @@ namespace PondGroundHeatExchanger {
 
         // specific heat from fluid prop routines
         Real64 SpecHeat = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, max(this->InletTemp, 0.0), state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
         // heat transfer with fluid - heat exchanger analogy.
 
         // convective flux
@@ -748,11 +748,11 @@ namespace PondGroundHeatExchanger {
         // evaluate properties at pipe fluid temperature for given pipe fluid
 
         Real64 SpecificHeat = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, InsideTemperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Real64 Conductivity = FluidProperties::GetConductivityGlycol(
-            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, InsideTemperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
         Real64 Viscosity = FluidProperties::GetViscosityGlycol(
-            state, DataPlant::PlantLoop(this->LoopNum).FluidName, InsideTemperature, DataPlant::PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
+            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, InsideTemperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, CalledFrom);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
         Real64 ReynoldsNum = 4.0 * massFlowRate / (DataGlobalConstants::Pi * Viscosity * this->TubeInDiameter * this->NumCircuits);
@@ -865,11 +865,11 @@ namespace PondGroundHeatExchanger {
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
         Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                 this->InletTemp,
-                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
-        PlantUtilities::SafeCopyPlantNode(InletNodeNum, OutletNodeNum);
+        PlantUtilities::SafeCopyPlantNode(state, InletNodeNum, OutletNodeNum);
 
         // update outlet temp
         if ((CpFluid > 0.0) && (this->MassFlowRate > 0.0)) {

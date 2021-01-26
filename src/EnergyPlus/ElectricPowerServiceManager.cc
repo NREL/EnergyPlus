@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1959,7 +1959,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
     Real64 thermalLoad = 0.0;
     for (auto &g : elecGenCntrlObj) {
         if (g->plantInfoFound) {
-            thermalLoad += DataPlant::PlantLoop(g->cogenLocation.loopNum)
+            thermalLoad += state.dataPlnt->PlantLoop(g->cogenLocation.loopNum)
                                .LoopSide(g->cogenLocation.loopSideNum)
                                .Branch(g->cogenLocation.branchNum)
                                .Comp(g->cogenLocation.compNum)
@@ -2175,7 +2175,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state);
 
-        if (!DataPlant::PlantFirstSizeCompleted) break;
+        if (!state.dataPlnt->PlantFirstSizeCompleted) break;
 
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(state,
                                                                                                                        runFlag,

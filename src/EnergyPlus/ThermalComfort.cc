@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2173,7 +2173,6 @@ namespace ThermalComfort {
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHeatBalFanSys::ZoneThermostatSetPointHiAver;
         using DataHeatBalFanSys::ZoneThermostatSetPointLoAver;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using namespace OutputReportPredefined;
         using DataHVACGlobals::deviationFromSetPtThresholdClg;
         using DataHVACGlobals::deviationFromSetPtThresholdHtg;
@@ -2197,7 +2196,7 @@ namespace ThermalComfort {
         state.dataThermalComforts->AnyZoneNotMetHeatingOccupied = 0.0;
         state.dataThermalComforts->AnyZoneNotMetCoolingOccupied = 0.0;
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            SensibleLoadPredictedNoAdj = ZoneSysEnergyDemand(iZone).TotalOutputRequired;
+            SensibleLoadPredictedNoAdj = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(iZone).TotalOutputRequired;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCooling = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetHeating = 0.0;
             state.dataThermalComforts->ThermalComfortSetPoint(iZone).notMetCoolingOccupied = 0.0;
