@@ -2051,11 +2051,6 @@ namespace EnergyPlus::GroundHeatExchangers {
         //       MODIFIED         Arun Murugappan
         //       RE-ENGINEERED    na
 
-        // Using/Aliasing
-        using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
-
         bool errorsFound = false;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
@@ -2376,38 +2371,38 @@ namespace EnergyPlus::GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum = GetOnlySingleNode(state,
-                                                          DataIPShortCuts::cAlphaArgs(2),
-                                                          errorsFound,
-                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                          NodeType_Water,
-                                                          NodeConnectionType_Inlet,
-                                                          1,
-                                                          ObjectIsNotParent);
+                thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            DataIPShortCuts::cAlphaArgs(2),
+                                                                            errorsFound,
+                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                            NodeType_Water,
+                                                                            NodeConnectionType_Inlet,
+                                                                            1,
+                                                                            ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum = GetOnlySingleNode(state,
-                                                           DataIPShortCuts::cAlphaArgs(3),
-                                                           errorsFound,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                           NodeType_Water,
-                                                           NodeConnectionType_Outlet,
-                                                           1,
-                                                           ObjectIsNotParent);
+                thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                             DataIPShortCuts::cAlphaArgs(3),
+                                                                             errorsFound,
+                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             NodeType_Water,
+                                                                             NodeConnectionType_Outlet,
+                                                                             1,
+                                                                             ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(state,
-                            DataIPShortCuts::cCurrentModuleObject,
-                            DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3),
-                            "Condenser Water Nodes");
+                BranchNodeConnections::TestCompSet(state,
+                                                   DataIPShortCuts::cCurrentModuleObject,
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   "Condenser Water Nodes");
 
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
-                RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
+                PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
 
                 thisGLHE.soil.k = DataIPShortCuts::rNumericArgs(2);
                 thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3);
@@ -2532,8 +2527,12 @@ namespace EnergyPlus::GroundHeatExchangers {
                                     "System",
                                     "Average",
                                     thisGLHE.name);
-                SetupOutputVariable(
-                    state, "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
+                SetupOutputVariable(state,
+                                    "Ground Heat Exchanger Heat Transfer Rate",
+                                    OutputProcessor::Unit::W,
+                                    thisGLHE.QGLHE, "System",
+                                    "Average",
+                                    thisGLHE.name);
                 SetupOutputVariable(state,
                                     "Ground Heat Exchanger Inlet Temperature",
                                     OutputProcessor::Unit::C,
@@ -2620,39 +2619,39 @@ namespace EnergyPlus::GroundHeatExchangers {
                 thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
 
                 // get inlet node num
-                thisGLHE.inletNodeNum = GetOnlySingleNode(state,
-                                                          DataIPShortCuts::cAlphaArgs(2),
-                                                          errorsFound,
-                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                          NodeType_Water,
-                                                          NodeConnectionType_Inlet,
-                                                          1,
-                                                          ObjectIsNotParent);
+                thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            DataIPShortCuts::cAlphaArgs(2),
+                                                                            errorsFound,
+                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                            NodeType_Water,
+                                                                            NodeConnectionType_Inlet,
+                                                                            1,
+                                                                            ObjectIsNotParent);
 
                 // get outlet node num
-                thisGLHE.outletNodeNum = GetOnlySingleNode(state,
-                                                           DataIPShortCuts::cAlphaArgs(3),
-                                                           errorsFound,
-                                                           DataIPShortCuts::cCurrentModuleObject,
-                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                           NodeType_Water,
-                                                           NodeConnectionType_Outlet,
-                                                           1,
-                                                           ObjectIsNotParent);
+                thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                             DataIPShortCuts::cAlphaArgs(3),
+                                                                             errorsFound,
+                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             NodeType_Water,
+                                                                             NodeConnectionType_Outlet,
+                                                                             1,
+                                                                             ObjectIsNotParent);
                 thisGLHE.available = true;
                 thisGLHE.on = true;
 
-                TestCompSet(state,
-                            DataIPShortCuts::cCurrentModuleObject,
-                            DataIPShortCuts::cAlphaArgs(1),
-                            DataIPShortCuts::cAlphaArgs(2),
-                            DataIPShortCuts::cAlphaArgs(3),
-                            "Condenser Water Nodes");
+                BranchNodeConnections::TestCompSet(state,
+                                                   DataIPShortCuts::cCurrentModuleObject,
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   "Condenser Water Nodes");
 
                 // load data
                 thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
-                RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
+                PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
 
                 thisGLHE.soil.k = DataIPShortCuts::rNumericArgs(2);
                 thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3) * DataIPShortCuts::rNumericArgs(4);
