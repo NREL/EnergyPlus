@@ -191,6 +191,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     thisGLHE.massFlowRate = 0.01;
     thisGLHE.numTrenches = 1;
     thisGLHE.pipe.outDia = 0.02667;
+    thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2.0;
     thisGLHE.pipe.thickness = 0.004;
     thisGLHE.pipe.k = 0.4;
 
@@ -226,6 +227,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger
     thisGLHE.coilDepth = 1.5;
     thisGLHE.coilDiameter = 0.8;
     thisGLHE.pipe.outDia = 0.034;
+    thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2.0;
     thisGLHE.trenchSpacing = 3.0;
     thisGLHE.soil.diffusivity = 3.0e-007;
     thisGLHE.AGG = 192;

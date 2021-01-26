@@ -302,9 +302,9 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             // Using Simpson's rule the number of points (n+1) must be odd, therefore an even number of panels is required
             // Starting from i = 0 to i <= NumPanels produces an odd number of points
-            int numPanels_i = 50;
-            int numPanels_ii = 50;
-            int numPanels_j = 560;
+            constexpr int numPanels_i = 50;
+            constexpr int numPanels_ii = 50;
+            constexpr int numPanels_j = 560;
 
             thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
             for (int i = 0; i <= numPanels_i; ++i) {
@@ -382,6 +382,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 }
             }
         }
+
         // If we didn't find it, fatal
         ShowFatalError(state, "Ground Heat Exchanger Factory: Error getting inputs for GHX named: " + objectName);
         // Shut up the compiler
@@ -437,22 +438,22 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Simpson's method. After that, all points are summed together and divided by 3.
 
         Real64 sum_f = 0;
-        int index = 0;
+        int i = 0;
         int const lastIndex_j = static_cast<int>(bh_j->pointLocations_j.size() - 1u);
         for (auto &point_j : bh_j->pointLocations_j) {
             std::vector<Real64> dists = distances(point_i, point_j);
             Real64 const f = calcResponse(dists, currTime);
 
             // Integrate using Simpson's
-            if (index == 0 || index == lastIndex_j) {
+            if (i == 0 || i == lastIndex_j) {
                 sum_f += f;
-            } else if (isEven(index)) {
+            } else if (isEven(i)) {
                 sum_f += 2 * f;
             } else {
                 sum_f += 4 * f;
             }
 
-            ++index;
+            ++i;
         }
 
         return (bh_j->dl_j / 3.0) * sum_f;
@@ -470,22 +471,22 @@ namespace EnergyPlus::GroundHeatExchangers {
         if (bh_i == bh_j) {
 
             Real64 sum_f = 0;
-            int index = 0;
+            int i = 0;
             int const lastIndex = static_cast<int>(bh_i->pointLocations_ii.size() - 1u);
             for (auto &thisPoint : bh_i->pointLocations_ii) {
 
                 Real64 f = integral(thisPoint, bh_j, currTime);
 
                 // Integrate using Simpson's
-                if (index == 0 || index == lastIndex) {
+                if (i == 0 || i == lastIndex) {
                     sum_f += f;
-                } else if (isEven(index)) {
+                } else if (isEven(i)) {
                     sum_f += 2 * f;
                 } else {
                     sum_f += 4 * f;
                 }
 
-                ++index;
+                ++i;
             }
 
             return (bh_i->dl_ii / 3.0) * sum_f;
@@ -493,22 +494,22 @@ namespace EnergyPlus::GroundHeatExchangers {
         } else {
 
             Real64 sum_f = 0;
-            int index = 0;
+            int i = 0;
             int const lastIndex = static_cast<int>(bh_i->pointLocations_i.size() - 1u);
             for (auto &thisPoint : bh_i->pointLocations_i) {
 
                 Real64 f = integral(thisPoint, bh_j, currTime);
 
                 // Integrate using Simpson's
-                if (index == 0 || index == lastIndex) {
+                if (i == 0 || i == lastIndex) {
                     sum_f += f;
-                } else if (isEven(index)) {
+                } else if (isEven(i)) {
                     sum_f += 2 * f;
                 } else {
                     sum_f += 4 * f;
                 }
 
-                ++index;
+                ++i;
             }
 
             return (bh_i->dl_i / 3.0) * sum_f;
@@ -539,17 +540,17 @@ namespace EnergyPlus::GroundHeatExchangers {
     void GLHEVert::calcLongTimestepGFunctions(EnergyPlusData &state)
     {
 
-        int const numDaysInYear(365);
+        constexpr int numDaysInYear(365);
+        constexpr Real64 lnttsStepSize = 0.5;
 
         // Minimum simulation time for which finite line source method is applicable
-        Real64 const lntts_min_for_long_timestep = -8.5;
+        constexpr Real64 lntts_min_for_long_timestep = -8.5;
 
         // Time scale constant
         Real64 const t_s = pow_2(this->bhLength) / (9 * this->soil.diffusivity);
 
         // Temporary vector for holding the LNTTS vals
         std::vector<Real64> tempLNTTS;
-        Real64 const lnttsStepSize = 0.5;
 
         tempLNTTS.push_back(lntts_min_for_long_timestep);
 
@@ -604,7 +605,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcShortTimestepGFunctions");
+        constexpr const char * RoutineName("calcShortTimestepGFunctions");
 
         enum class CellType
         {
@@ -642,9 +643,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         std::vector<Cell> Cells;
 
         // setup pipe, convection, and fluid layer geometries
-        int const num_pipe_cells = 4;
-        int const num_conv_cells = 1;
-        int const num_fluid_cells = 3;
+        constexpr int num_pipe_cells = 4;
+        constexpr int num_conv_cells = 1;
+        constexpr int num_fluid_cells = 3;
         Real64 const pipe_thickness = this->pipe.thickness;
         Real64 const pcf_cell_thickness = pipe_thickness / num_pipe_cells;
         Real64 const radius_pipe_out = std::sqrt(2) * this->pipe.outRadius;
@@ -653,13 +654,13 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 const radius_fluid = radius_conv - (num_fluid_cells - 0.5) * pcf_cell_thickness; // accounts for half thickness of boundary cell
 
         // setup grout layer geometry
-        int const num_grout_cells = 27;
+        constexpr int num_grout_cells = 27;
         Real64 const radius_grout = this->bhRadius;
         Real64 const grout_cell_thickness = (radius_grout - radius_pipe_out) / num_grout_cells;
 
         // setup soil layer geometry
-        int const num_soil_cells = 500;
-        Real64 const radius_soil = 10;
+        constexpr int num_soil_cells = 500;
+        constexpr Real64 radius_soil = 10;
         Real64 const soil_cell_thickness = (radius_soil - radius_grout) / num_soil_cells;
 
         // use design flow rate
@@ -1141,33 +1142,15 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tLg_max(0.0);
-        Real64 tLg_min(-2);
-        Real64 tLg_grid(0.25);
-        Real64 ts(3600);
+        constexpr Real64 tLg_min(-2);
+        constexpr Real64 tLg_grid(0.25);
+        constexpr Real64 ts(3600);
         Real64 tLg;
-        Real64 t;
-        Real64 convertYearsToSeconds(356 * 24 * 60 * 60);
-        int NT;
-        int numLC;
-        int numRC;
-        int coil;
-        int trench;
+        constexpr Real64 convertYearsToSeconds(356 * 24 * 60 * 60);
         Real64 fraction;
         Array2D<Real64> valStored({0, this->numTrenches}, {0, this->numCoils}, -1.0);
-        Real64 gFunc;
-        Real64 gFuncin;
-        int m1;
-        int n1;
-        int m;
-        int n;
-        int mm1;
-        int nn1;
-        int i;
-        Real64 disRing;
         int I0;
         int J0;
-        Real64 doubleIntegralVal;
-        Real64 midFieldVal;
 
         DisplayString(state, "Initializing GroundHeatExchanger:Slinky: " + this->name);
 
@@ -1175,18 +1158,18 @@ namespace EnergyPlus::GroundHeatExchangers {
         this->Y0.allocate(this->numTrenches);
 
         // Calculate the number of g-functions required
-        tLg_max = std::log10(maxSimYears * convertYearsToSeconds / ts);
+        tLg_max = std::log10(this->maxSimYears * convertYearsToSeconds / ts);
         int NPairs = static_cast<int>((tLg_max - tLg_min) / (tLg_grid) + 1);
 
         // Allocate and setup g-function arrays
         this->myRespFactors->GFNC.allocate(NPairs);
         this->myRespFactors->LNTTS.allocate(NPairs);
-        this->QnMonthlyAgg.allocate(static_cast<int>(maxSimYears * 12));
+        this->QnMonthlyAgg.allocate(static_cast<int>(this->maxSimYears * 12));
         this->QnHr.allocate(730 + this->AGG + this->SubAGG);
         this->QnSubHr.allocate(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1));
         this->LastHourN.allocate(this->SubAGG + 1);
 
-        for (i = 1; i <= NPairs; ++i) {
+        for (int i = 1; i <= NPairs; ++i) {
             this->myRespFactors->GFNC(i) = 0.0;
             this->myRespFactors->LNTTS(i) = 0.0;
         }
@@ -1195,15 +1178,15 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Due to the symmetry of a slinky GHX field, we need only calculate about
         // on quarter of the rings' tube wall temperature perturbation to get the
         // mean wall temperature perturbation of the entire slinky GHX field.
-        numLC = std::ceil(this->numCoils / 2.0);
-        numRC = std::ceil(this->numTrenches / 2.0);
+        int numLC = std::ceil(this->numCoils / 2.0);
+        int numRC = std::ceil(this->numTrenches / 2.0);
 
         // Calculate coordinates (X0, Y0, Z0) of a ring's center
-        for (coil = 1; coil <= this->numCoils; ++coil) {
+        for (int coil = 1; coil <= this->numCoils; ++coil) {
             this->X0(coil) = coilPitch * (coil - 1);
         }
-        for (trench = 1; trench <= this->numTrenches; ++trench) {
-            this->Y0(trench) = (trench - 1) * trenchSpacing;
+        for (int trench = 1; trench <= this->numTrenches; ++trench) {
+            this->Y0(trench) = (trench - 1) * this->trenchSpacing;
         }
         this->Z0 = this->coilDepth;
 
@@ -1216,30 +1199,30 @@ namespace EnergyPlus::GroundHeatExchangers {
         }
 
         // Calculate the corresponding time of each temperature response factor
-        for (NT = 1; NT <= NPairs; ++NT) {
+        for (int NT = 1; NT <= NPairs; ++NT) {
             tLg = tLg_min + tLg_grid * (NT - 1);
-            t = std::pow(10, tLg) * ts;
+            Real64 t = std::pow(10, tLg) * ts;
 
             // Set the average temperature response of the whole field to zero
-            gFunc = 0;
+            Real64 gFunc = 0;
 
             valStored = -1.0;
 
-            for (m1 = 1; m1 <= numRC; ++m1) {
-                for (n1 = 1; n1 <= numLC; ++n1) {
-                    for (m = 1; m <= this->numTrenches; ++m) {
-                        for (n = 1; n <= this->numCoils; ++n) {
+            for (int m1 = 1; m1 <= numRC; ++m1) {
+                for (int n1 = 1; n1 <= numLC; ++n1) {
+                    for (int m = 1; m <= this->numTrenches; ++m) {
+                        for (int n = 1; n <= this->numCoils; ++n) {
 
                             // Zero out val after each iteration
-                            doubleIntegralVal = 0.0;
-                            midFieldVal = 0.0;
+                            Real64 doubleIntegralVal = 0.0;
+                            Real64 midFieldVal = 0.0;
 
                             // Calculate the distance between ring centers
-                            disRing = distToCenter(m, n, m1, n1);
+                            Real64 disRing = distToCenter(m, n, m1, n1);
 
                             // Save mm1 and nn1
-                            mm1 = std::abs(m - m1);
-                            nn1 = std::abs(n - n1);
+                            int mm1 = std::abs(m - m1);
+                            int nn1 = std::abs(n - n1);
 
                             // If we're calculating a ring's temperature response to itself as a ring source,
                             // then we need some extra effort in calculating the double integral
@@ -1250,6 +1233,8 @@ namespace EnergyPlus::GroundHeatExchangers {
                                 I0 = 33;
                                 J0 = 561;
                             }
+
+                            Real64 gFuncin;
 
                             // if the ring(n1, m1) is the near-field ring of the ring(n,m)
                             if (disRing <= 2.5 + this->coilDiameter) {
@@ -1341,31 +1326,22 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Calculates the temperature response of from one near-field point to another
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 distance1;
-        Real64 distance2;
-        Real64 errFunc1;
-        Real64 errFunc2;
-        Real64 sqrtAlphaT;
-        Real64 sqrtDistDepth;
-
-        distance1 = distance(m, n, m1, n1, eta, theta);
-
-        sqrtAlphaT = std::sqrt(this->soil.diffusivity * t);
+        Real64 distance1 = distance(m, n, m1, n1, eta, theta);
+        Real64 sqrtAlphaT = std::sqrt(this->soil.diffusivity * t);
 
         if (!verticalConfig) {
 
-            sqrtDistDepth = std::sqrt(pow_2(distance1) + 4 * pow_2(this->coilDepth));
-            errFunc1 = std::erfc(0.5 * distance1 / sqrtAlphaT);
-            errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
+            Real64 sqrtDistDepth = std::sqrt(pow_2(distance1) + 4 * pow_2(this->coilDepth));
+            Real64 errFunc1 = std::erfc(0.5 * distance1 / sqrtAlphaT);
+            Real64 errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
 
             return errFunc1 / distance1 - errFunc2 / sqrtDistDepth;
 
         } else {
 
-            distance2 = distanceToFictRing(m, n, m1, n1, eta, theta);
-
-            errFunc1 = std::erfc(0.5 * distance1 / sqrtAlphaT);
-            errFunc2 = std::erfc(0.5 * distance2 / sqrtAlphaT);
+            Real64 distance2 = distanceToFictRing(m, n, m1, n1, eta, theta);
+            Real64 errFunc1 = std::erfc(0.5 * distance1 / sqrtAlphaT);
+            Real64 errFunc2 = std::erfc(0.5 * distance2 / sqrtAlphaT);
 
             return errFunc1 / distance1 - errFunc2 / distance2;
         }
@@ -1385,19 +1361,13 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Calculates the temperature response of from one mid-field point to another
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 errFunc1;
-        Real64 errFunc2;
-        Real64 sqrtAlphaT;
-        Real64 sqrtDistDepth;
-        Real64 distance;
+        Real64 sqrtAlphaT = std::sqrt(this->soil.diffusivity * t);
 
-        sqrtAlphaT = std::sqrt(this->soil.diffusivity * t);
+        Real64 distance = distToCenter(m, n, m1, n1);
+        Real64 sqrtDistDepth = std::sqrt(pow_2(distance) + 4 * pow_2(this->coilDepth));
 
-        distance = distToCenter(m, n, m1, n1);
-        sqrtDistDepth = std::sqrt(pow_2(distance) + 4 * pow_2(this->coilDepth));
-
-        errFunc1 = std::erfc(0.5 * distance / sqrtAlphaT);
-        errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
+        Real64 errFunc1 = std::erfc(0.5 * distance / sqrtAlphaT);
+        Real64 errFunc2 = std::erfc(0.5 * sqrtDistDepth / sqrtAlphaT);
 
         return 4 * pow_2(DataGlobalConstants::Pi) * (errFunc1 / distance - errFunc2 / sqrtDistDepth);
     }
@@ -1415,8 +1385,6 @@ namespace EnergyPlus::GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the distance between any two points on any two loops
 
-        Real64 pipeOuterRadius = this->pipe.outDia / 2.0;
-
         Real64 const cos_theta = std::cos(theta);
         Real64 const sin_theta = std::sin(theta);
         Real64 const cos_eta = std::cos(eta);
@@ -1425,11 +1393,11 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 x = this->X0(n) + cos_theta * (this->coilDiameter / 2.0);
         Real64 y = this->Y0(m) + sin_theta * (this->coilDiameter / 2.0);
 
-        Real64 xIn = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 - pipeOuterRadius);
-        Real64 yIn = this->Y0(m1) + sin_eta * (this->coilDiameter / 2.0 - pipeOuterRadius);
+        Real64 xIn = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 - this->pipe.outRadius);
+        Real64 yIn = this->Y0(m1) + sin_eta * (this->coilDiameter / 2.0 - this->pipe.outRadius);
 
-        Real64 xOut = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 + pipeOuterRadius);
-        Real64 yOut = this->Y0(m1) + sin_eta * (this->coilDiameter / 2.0 + pipeOuterRadius);
+        Real64 xOut = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 + this->pipe.outRadius);
+        Real64 yOut = this->Y0(m1) + sin_eta * (this->coilDiameter / 2.0 + this->pipe.outRadius);
 
         if (!verticalConfig) {
 
@@ -1439,8 +1407,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             Real64 z = this->Z0 + sin_theta * (this->coilDiameter / 2.0);
 
-            Real64 zIn = this->Z0 + sin_eta * (this->coilDiameter / 2.0 - pipeOuterRadius);
-            Real64 zOut = this->Z0 + sin_eta * (this->coilDiameter / 2.0 + pipeOuterRadius);
+            Real64 zIn = this->Z0 + sin_eta * (this->coilDiameter / 2.0 - this->pipe.outRadius);
+            Real64 zOut = this->Z0 + sin_eta * (this->coilDiameter / 2.0 + this->pipe.outRadius);
 
             return 0.5 * std::sqrt(pow_2(x - xIn) + pow_2(this->Y0(m1) - this->Y0(m)) + pow_2(z - zIn)) +
                    0.5 * std::sqrt(pow_2(x - xOut) + pow_2(this->Y0(m1) - this->Y0(m)) + pow_2(z - zOut));
@@ -1460,24 +1428,22 @@ namespace EnergyPlus::GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the distance between any two points between real and fictitious rings
 
-        Real64 pipeOuterRadius = this->pipe.outDia / 2.0;
-
         Real64 const sin_theta = std::sin(theta);
         Real64 const cos_theta = std::cos(theta);
         Real64 const sin_eta = std::sin(eta);
         Real64 const cos_eta = std::cos(eta);
 
         Real64 x = this->X0(n) + cos_theta * (this->coilDiameter / 2.0);
-        // Real64 y = Y0( m ) + sin_theta * ( coilDiameter / 2.0 );
+        // Real64 y = Y0( m ) + sin_theta * (coilDiameter / 2.0);
         Real64 z = this->Z0 + sin_theta * (this->coilDiameter / 2.0) + 2 * this->coilDepth;
 
-        Real64 xIn = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 - pipeOuterRadius);
-        // Real64 yIn = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 - pipeOuterRadius );
-        Real64 zIn = this->Z0 + sin_eta * (this->coilDiameter / 2.0 - pipeOuterRadius);
+        Real64 xIn = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 - this->pipe.outRadius);
+        // Real64 yIn = Y0( m1 ) + sin_eta * (coilDiameter / 2.0 - pipe.outRadius);
+        Real64 zIn = this->Z0 + sin_eta * (this->coilDiameter / 2.0 - this->pipe.outRadius);
 
-        Real64 xOut = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 + pipeOuterRadius);
-        // Real64 yOut = Y0( m1 ) + sin_eta * ( coilDiameter / 2.0 + pipeOuterRadius );
-        Real64 zOut = this->Z0 + sin_eta * (this->coilDiameter / 2.0 + pipeOuterRadius);
+        Real64 xOut = this->X0(n1) + cos_eta * (this->coilDiameter / 2.0 + this->pipe.outRadius);
+        // Real64 yOut = Y0( m1 ) + sin_eta * (coilDiameter / 2.0 + outRadius);
+        Real64 zOut = this->Z0 + sin_eta * (this->coilDiameter / 2.0 + this->pipe.outRadius);
 
         return 0.5 * std::sqrt(pow_2(x - xIn) + pow_2(this->Y0(m1) - this->Y0(m)) + pow_2(z - zIn)) +
                0.5 * std::sqrt(pow_2(x - xOut) + pow_2(this->Y0(m1) - this->Y0(m)) + pow_2(z - zOut));
@@ -1539,16 +1505,14 @@ namespace EnergyPlus::GroundHeatExchangers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 sumIntF(0.0);
         Real64 theta(0.0);
-        Real64 theta1(0.0);
-        Real64 theta2(2 * DataGlobalConstants::Pi);
-        Real64 h;
-        int j;
+        constexpr Real64 theta1(0.0);
+        constexpr Real64 theta2(2 * DataGlobalConstants::Pi);
         Array1D<Real64> f(J0, 0.0);
 
-        h = (theta2 - theta1) / (J0 - 1);
+        Real64 h = (theta2 - theta1) / (J0 - 1);
 
         // Calculate the function at various equally spaced x values
-        for (j = 1; j <= J0; ++j) {
+        for (int j = 1; j <= J0; ++j) {
 
             theta = theta1 + (j - 1) * h;
 
@@ -1586,20 +1550,18 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Simpson's 1/3 rule of integration
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        constexpr Real64 eta1(0.0);
+        constexpr Real64 eta2(2 * DataGlobalConstants::Pi);
+
         Real64 sumIntF(0.0);
-        Real64 eta(0.0);
-        Real64 eta1(0.0);
-        Real64 eta2(2 * DataGlobalConstants::Pi);
-        Real64 h;
-        int i;
         Array1D<Real64> g(I0, 0.0);
 
-        h = (eta2 - eta1) / (I0 - 1);
+        Real64 h = (eta2 - eta1) / (I0 - 1);
 
         // Calculates the value of the function at various equally spaced values
-        for (i = 1; i <= I0; ++i) {
+        for (int i = 1; i <= I0; ++i) {
 
-            eta = eta1 + (i - 1) * h;
+            Real64 eta = eta1 + (i - 1) * h;
             g(i) = integral(m, n, m1, n1, t, eta, J0);
 
             if (i == 1 || i == I0) {
@@ -1629,7 +1591,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate annual time constant for ground conduction
 
-        this->timeSS = (pow_2(this->bhLength) / (9.0 * this->soil.diffusivity)) / DataGlobalConstants::SecInHour / 8760.0;
+        constexpr Real64 hrInYear(8760);
+
+        this->timeSS = (pow_2(this->bhLength) / (9.0 * this->soil.diffusivity)) / DataGlobalConstants::SecInHour / hrInYear;
         this->timeSSFactor = this->timeSS * 8760.0;
     }
 
@@ -1685,33 +1649,12 @@ namespace EnergyPlus::GroundHeatExchangers {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE ARGUMENT DEFINITIONS
-        static std::string const RoutineName("CalcGroundHeatExchanger");
+        constexpr const char * RoutineName("CalcGroundHeatExchanger");
 
         // LOCAL PARAMETERS
-        Real64 fluidDensity;
-        Real64 kGroundFactor;
-        Real64 cpFluid;
-        Real64 gFuncVal; // Interpolated G function value at a sub-hour
         Real64 fluidAveTemp;
-        Real64 C_1;
-        int numOfMonths;       // the number of months of simulation elapsed
-        int currentMonth;      // The Month up to which the monthly blocks are superposed
-        Real64 sumQnMonthly;   // tmp variable which holds the sum of the Temperature difference due to Aggregated heat extraction/rejection step
-        Real64 sumQnHourly;    // same as above for hourly
-        Real64 sumQnSubHourly; // same as above for sub-hourly( with no aggregation]
-        Real64 RQMonth;
-        Real64 RQHour;
-        Real64 RQSubHr;
-        int I;
         Real64 tmpQnSubHourly; // current Qn sub-hourly value
-        int hourlyLimit;       // number of hours to be taken into account in superposition
-        int subHourlyLimit;    // number of sub-hourly to be taken into account in sub-hourly superposition
         Real64 sumTotal(0.0);  // sum of all the Qn (load) blocks
-        Real64 C0;             // **Intermediate constants used
-        Real64 C1;             // **Intermediate constants used
-        Real64 C2;             // **in explicit  calculation of the
-        Real64 C3;             // **temperature at the U tube outlet.
-        int IndexN;            // Used to index the LastHourN array
 
         // Calculate G-Functions
         if (this->firstTime) {
@@ -1727,18 +1670,13 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         this->inletTemp = Node(this->inletNodeNum).Temp;
 
-        cpFluid = GetSpecificHeatGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                        this->inletTemp,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                        RoutineName);
-        fluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                        this->inletTemp,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                        RoutineName);
+        Real64 cpFluid = GetSpecificHeatGlycol(state,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                               this->inletTemp,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                               RoutineName);
 
-        kGroundFactor = 2.0 * DataGlobalConstants::Pi * this->soil.k;
+        Real64 kGroundFactor = 2.0 * DataGlobalConstants::Pi * this->soil.k;
 
         // Get time constants
         getAnnualTimeConstant();
@@ -1800,9 +1738,9 @@ namespace EnergyPlus::GroundHeatExchangers {
                 fluidAveTemp = this->tempGround;
                 this->ToutNew = this->inletTemp;
             } else {
-                gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
+                Real64 gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
 
-                C_1 = (this->totalTubeLength) / (2.0 * this->massFlowRate * cpFluid);
+                Real64 C_1 = (this->totalTubeLength) / (2.0 * this->massFlowRate * cpFluid);
                 tmpQnSubHourly = (this->tempGround - this->inletTemp) / (gFuncVal / (kGroundFactor) + this->HXResistance + C_1);
                 fluidAveTemp = this->tempGround - tmpQnSubHourly * this->HXResistance;
                 this->ToutNew = this->tempGround - tmpQnSubHourly * (gFuncVal / (kGroundFactor) + this->HXResistance - C_1);
@@ -1813,52 +1751,55 @@ namespace EnergyPlus::GroundHeatExchangers {
 
                 // Calculate the Sub Hourly Superposition
 
-                sumQnSubHourly = 0.0;
+                // same as above for sub-hourly( with no aggregation]
+                Real64 sumQnSubHourly = 0.0;
+                int IndexN;
                 if (int(state.dataGroundHeatExchanger->currentSimTime) < this->SubAGG) {
                     IndexN = int(state.dataGroundHeatExchanger->currentSimTime) + 1;
                 } else {
                     IndexN = this->SubAGG + 1;
                 }
-                subHourlyLimit = state.dataGroundHeatExchanger->N - this->LastHourN(IndexN); // Check this when running simulation
 
-                for (I = 1; I <= subHourlyLimit; ++I) {
+                int subHourlyLimit = state.dataGroundHeatExchanger->N - this->LastHourN(IndexN); // Check this when running simulation
+                for (int I = 1; I <= subHourlyLimit; ++I) {
                     if (I == subHourlyLimit) {
                         if (int(state.dataGroundHeatExchanger->currentSimTime) >= this->SubAGG) {
-                            gFuncVal =
+                            Real64 gFuncVal =
                                 getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
                                          (this->timeSSFactor));
-                            RQSubHr = gFuncVal / (kGroundFactor);
+                            Real64 RQSubHr = gFuncVal / (kGroundFactor);
                             sumQnSubHourly += (this->QnSubHr(I) - this->QnHr(IndexN)) * RQSubHr;
                         } else {
-                            gFuncVal =
+                            Real64 gFuncVal =
                                 getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
                                          (this->timeSSFactor));
-                            RQSubHr = gFuncVal / (kGroundFactor);
+                            Real64 RQSubHr = gFuncVal / (kGroundFactor);
                             sumQnSubHourly += this->QnSubHr(I) * RQSubHr;
                         }
                         break;
                     }
                     // prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
-                    gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
+                    Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
                                         (this->timeSSFactor));
-                    RQSubHr = gFuncVal / (kGroundFactor);
+                    Real64 RQSubHr = gFuncVal / (kGroundFactor);
                     sumQnSubHourly += (this->QnSubHr(I) - this->QnSubHr(I + 1)) * RQSubHr;
                 }
 
                 // Calculate the Hourly Superposition
+                // same as above for hourly
+                Real64 sumQnHourly = 0.0;
 
-                hourlyLimit = int(state.dataGroundHeatExchanger->currentSimTime);
-                sumQnHourly = 0.0;
-                for (I = this->SubAGG + 1; I <= hourlyLimit; ++I) {
+                int hourlyLimit = int(state.dataGroundHeatExchanger->currentSimTime);
+                for (int I = this->SubAGG + 1; I <= hourlyLimit; ++I) {
                     if (I == hourlyLimit) {
-                        gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
-                        RQHour = gFuncVal / (kGroundFactor);
+                        Real64 gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
+                        Real64 RQHour = gFuncVal / (kGroundFactor);
                         sumQnHourly += this->QnHr(I) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
+                    Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
                                         (this->timeSSFactor));
-                    RQHour = gFuncVal / (kGroundFactor);
+                    Real64 RQHour = gFuncVal / (kGroundFactor);
                     sumQnHourly += (this->QnHr(I) - this->QnHr(I + 1)) * RQHour;
                 }
 
@@ -1866,20 +1807,20 @@ namespace EnergyPlus::GroundHeatExchangers {
                 sumTotal = sumQnSubHourly + sumQnHourly;
 
                 // Calculate the sub-hourly temperature due the Last Time steps Load
-                gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(2)) /
+                Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(2)) /
                                     (this->timeSSFactor));
-                RQSubHr = gFuncVal / kGroundFactor;
+                Real64 RQSubHr = gFuncVal / kGroundFactor;
 
                 if (this->massFlowRate <= 0.0) {
                     tmpQnSubHourly = 0.0;
                     fluidAveTemp = this->tempGround - sumTotal; // Q(N)*RB = 0
                     this->ToutNew = this->inletTemp;
                 } else {
-                    // Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
-                    C0 = RQSubHr;
-                    C1 = this->tempGround - (sumTotal - this->QnSubHr(1) * RQSubHr);
-                    C2 = this->totalTubeLength / (2.0 * this->massFlowRate * cpFluid);
-                    C3 = this->massFlowRate * cpFluid / (this->totalTubeLength);
+                    // Dr.Sitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
+                    Real64 C0 = RQSubHr;
+                    Real64 C1 = this->tempGround - (sumTotal - this->QnSubHr(1) * RQSubHr);
+                    Real64 C2 = this->totalTubeLength / (2.0 * this->massFlowRate * cpFluid);
+                    Real64 C3 = this->massFlowRate * cpFluid / (this->totalTubeLength);
                     tmpQnSubHourly = (C1 - this->inletTemp) / (this->HXResistance + C0 - C2 + (1 / C3));
                     fluidAveTemp = C1 - (C0 + this->HXResistance) * tmpQnSubHourly;
                     this->ToutNew = C1 + (C2 - C0 - this->HXResistance) * tmpQnSubHourly;
@@ -1887,7 +1828,11 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             } else { // Monthly Aggregation and super position
 
-                numOfMonths = static_cast<int>((state.dataGroundHeatExchanger->currentSimTime + 1) / hrsPerMonth);
+                // the number of months of simulation elapsed
+                int numOfMonths = static_cast<int>((state.dataGroundHeatExchanger->currentSimTime + 1) / hrsPerMonth);
+
+                // The Month up to which the monthly blocks are superposed
+                int currentMonth;
 
                 if (state.dataGroundHeatExchanger->currentSimTime < ((numOfMonths)*hrsPerMonth) + this->AGG + this->SubAGG) {
                     currentMonth = numOfMonths - 1;
@@ -1896,59 +1841,61 @@ namespace EnergyPlus::GroundHeatExchangers {
                 }
 
                 // Monthly superposition
-                sumQnMonthly = 0.0;
-                for (I = 1; I <= currentMonth; ++I) {
+                // tmp variable which holds the sum of the Temperature difference due to Aggregated heat extraction/rejection step
+                Real64 sumQnMonthly = 0.0;
+
+                for (int I = 1; I <= currentMonth; ++I) {
                     if (I == 1) {
-                        gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
-                        RQMonth = gFuncVal / (kGroundFactor);
+                        Real64 gFuncVal = getGFunc(state.dataGroundHeatExchanger->currentSimTime / (this->timeSSFactor));
+                        Real64 RQMonth = gFuncVal / (kGroundFactor);
                         sumQnMonthly += this->QnMonthlyAgg(I) * RQMonth;
                         continue;
                     }
-                    gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - (I - 1) * hrsPerMonth) / (this->timeSSFactor));
-                    RQMonth = gFuncVal / (kGroundFactor);
+                    Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - (I - 1) * hrsPerMonth) / (this->timeSSFactor));
+                    Real64 RQMonth = gFuncVal / (kGroundFactor);
                     sumQnMonthly += (this->QnMonthlyAgg(I) - this->QnMonthlyAgg(I - 1)) * RQMonth;
                 }
 
                 // Hourly Superposition
-                hourlyLimit = int(state.dataGroundHeatExchanger->currentSimTime - currentMonth * hrsPerMonth);
-                sumQnHourly = 0.0;
-                for (I = 1 + this->SubAGG; I <= hourlyLimit; ++I) {
+                Real64 sumQnHourly = 0.0;
+                int hourlyLimit = int(state.dataGroundHeatExchanger->currentSimTime - currentMonth * hrsPerMonth);
+                for (int I = 1 + this->SubAGG; I <= hourlyLimit; ++I) {
                     if (I == hourlyLimit) {
-                        gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
+                        Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
                                             (this->timeSSFactor));
-                        RQHour = gFuncVal / (kGroundFactor);
+                        Real64 RQHour = gFuncVal / (kGroundFactor);
                         sumQnHourly += (this->QnHr(I) - this->QnMonthlyAgg(currentMonth)) * RQHour;
                         break;
                     }
-                    gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
+                    Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - int(state.dataGroundHeatExchanger->currentSimTime) + I) /
                                         (this->timeSSFactor));
-                    RQHour = gFuncVal / (kGroundFactor);
+                    Real64 RQHour = gFuncVal / (kGroundFactor);
                     sumQnHourly += (this->QnHr(I) - this->QnHr(I + 1)) * RQHour;
                 }
 
                 // sub-hourly Superposition
-                subHourlyLimit = state.dataGroundHeatExchanger->N - this->LastHourN(this->SubAGG + 1);
-                sumQnSubHourly = 0.0;
-                for (I = 1; I <= subHourlyLimit; ++I) {
+                int subHourlyLimit = state.dataGroundHeatExchanger->N - this->LastHourN(this->SubAGG + 1);
+                Real64 sumQnSubHourly = 0.0;
+                for (int I = 1; I <= subHourlyLimit; ++I) {
                     if (I == subHourlyLimit) {
-                        gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
+                        Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
                                             (this->timeSSFactor));
-                        RQSubHr = gFuncVal / (kGroundFactor);
+                        Real64 RQSubHr = gFuncVal / (kGroundFactor);
                         sumQnSubHourly += (this->QnSubHr(I) - this->QnHr(this->SubAGG + 1)) * RQSubHr;
                         break;
                     }
-                    gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
+                    Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(I + 1)) /
                                         (this->timeSSFactor));
-                    RQSubHr = gFuncVal / (kGroundFactor);
+                    Real64 RQSubHr = gFuncVal / (kGroundFactor);
                     sumQnSubHourly += (this->QnSubHr(I) - this->QnSubHr(I + 1)) * RQSubHr;
                 }
 
                 sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
 
                 // Calculate the sub-hourly temperature due the Last Time steps Load
-                gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(2)) /
+                Real64 gFuncVal = getGFunc((state.dataGroundHeatExchanger->currentSimTime - state.dataGroundHeatExchanger->prevTimeSteps(2)) /
                                     (this->timeSSFactor));
-                RQSubHr = gFuncVal / (kGroundFactor);
+                Real64 RQSubHr = gFuncVal / (kGroundFactor);
 
                 if (this->massFlowRate <= 0.0) {
                     tmpQnSubHourly = 0.0;
@@ -1956,10 +1903,10 @@ namespace EnergyPlus::GroundHeatExchangers {
                     this->ToutNew = this->inletTemp;
                 } else {
                     // Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
-                    C0 = RQSubHr;
-                    C1 = this->tempGround - (sumTotal - this->QnSubHr(1) * RQSubHr);
-                    C2 = this->totalTubeLength / (2 * this->massFlowRate * cpFluid);
-                    C3 = this->massFlowRate * cpFluid / (this->totalTubeLength);
+                    Real64 C0 = RQSubHr;
+                    Real64 C1 = this->tempGround - (sumTotal - this->QnSubHr(1) * RQSubHr);
+                    Real64 C2 = this->totalTubeLength / (2 * this->massFlowRate * cpFluid);
+                    Real64 C3 = this->massFlowRate * cpFluid / (this->totalTubeLength);
                     tmpQnSubHourly = (C1 - this->inletTemp) / (this->HXResistance + C0 - C2 + (1 / C3));
                     fluidAveTemp = C1 - (C0 + this->HXResistance) * tmpQnSubHourly;
                     this->ToutNew = C1 + (C2 - C0 - this->HXResistance) * tmpQnSubHourly;
@@ -1994,11 +1941,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE ARGUMENT DEFINITIONS
-        static std::string const RoutineName("UpdateGroundHeatExchanger");
+        constexpr const char * RoutineName("UpdateGroundHeatExchanger");
 
-        Real64 fluidDensity;
-        Real64 const deltaTempLimit(100.0); // temp limit for warnings
-        Real64 GLHEdeltaTemp;               // ABS(Outlet temp -inlet temp)
+        constexpr Real64 deltaTempLimit(100.0); // temp limit for warnings
 
         SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
@@ -2009,15 +1954,15 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
                                                                                       RoutineName);
 
-        GLHEdeltaTemp = std::abs(this->outletTemp - this->inletTemp);
+        Real64 GLHEdeltaTemp = std::abs(this->outletTemp - this->inletTemp);
 
         if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < state.dataGroundHeatExchanger->numVerticalGLHEs &&
             !state.dataGlobal->WarmupFlag) {
-            fluidDensity = GetDensityGlycol(state,
-                                            state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                            this->inletTemp,
-                                            state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                            RoutineName);
+            Real64 fluidDensity = GetDensityGlycol(state,
+                                                   state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                   this->inletTemp,
+                                                   state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                   RoutineName);
             this->designMassFlow = this->designFlow * fluidDensity;
             ShowWarningError(state, "Check GLHE design inputs & g-functions for consistency");
             ShowContinueError(state, "For GroundHeatExchanger: " + this->name + "GLHE delta Temp > 100C.");
@@ -2054,21 +1999,16 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
         //   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
 
-        // LOCAL VARIABLES
-        Real64 SumQnMonth; // intermediate variable to store the monthly heat rejection/
-        Real64 SumQnHr;
-        int MonthNum;
-        int J; // Loop counter
-
         if (state.dataGroundHeatExchanger->currentSimTime <= 0.0) return;
 
         // FOR EVERY HOUR UPDATE THE HOURLY QN this->QnHr(J)
         // THIS IS DONE BY AGGREGATING THE sub-hourly QN FROM THE PREVIOUS HOUR TO UNTIL THE CURRENT HOUR
-        // AND STORING IT IN  verticalGLHE(GLHENum)%this->QnHr(J)
+        // AND STORING IT IN  verticalGLHE(GLHENum)%QnHr(J)
 
         // sub-hourly Qn IS NOT AGGREGATED . IT IS THE BASIC LOAD
         if (this->prevHour != state.dataGroundHeatExchanger->locHourOfDay) {
-            SumQnHr = 0.0;
+            Real64 SumQnHr = 0.0;
+            int J;
             for (J = 1; J <= (state.dataGroundHeatExchanger->N - this->LastHourN(1)); ++J) {
                 SumQnHr += this->QnSubHr(J) *
                            std::abs(state.dataGroundHeatExchanger->prevTimeSteps(J) - state.dataGroundHeatExchanger->prevTimeSteps(J + 1));
@@ -2086,11 +2026,11 @@ namespace EnergyPlus::GroundHeatExchangers {
         if (mod(((state.dataGroundHeatExchanger->locDayOfSim - 1) * DataGlobalConstants::HoursInDay + (state.dataGroundHeatExchanger->locHourOfDay)),
                 hrsPerMonth) == 0 &&
             this->prevHour != state.dataGroundHeatExchanger->locHourOfDay) {
-            MonthNum = static_cast<int>(
+            Real64 MonthNum = static_cast<int>(
                 (state.dataGroundHeatExchanger->locDayOfSim * DataGlobalConstants::HoursInDay + state.dataGroundHeatExchanger->locHourOfDay) /
                 hrsPerMonth);
-            SumQnMonth = 0.0;
-            for (J = 1; J <= int(hrsPerMonth); ++J) {
+            Real64 SumQnMonth = 0.0;
+            for (int J = 1; J <= int(hrsPerMonth); ++J) {
                 SumQnMonth += this->QnHr(J);
             }
             SumQnMonth /= hrsPerMonth;
@@ -2720,6 +2660,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 thisGLHE.pipe.rho = DataIPShortCuts::rNumericArgs(6);
                 thisGLHE.pipe.cp = DataIPShortCuts::rNumericArgs(7);
                 thisGLHE.pipe.outDia = DataIPShortCuts::rNumericArgs(8);
+                thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2.0;
                 thisGLHE.pipe.thickness = DataIPShortCuts::rNumericArgs(9);
 
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "VERTICAL")) {
@@ -2921,8 +2862,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcBHResistance");
+        constexpr const char * RoutineName("calcBHResistance");
 
         if (this->massFlowRate <= 0.0) {
             return 0;
@@ -2963,7 +2903,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calcPipeConvectionResistance");
+        constexpr const char * RoutineName("calcPipeConvectionResistance");
 
         // Get fluid props
         this->inletTemp = Node(this->inletNodeNum).Temp;
@@ -2985,11 +2925,10 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                          RoutineName);
 
         // Smoothing fit limits
-        Real64 const lower_limit = 2000;
-        Real64 const upper_limit = 4000;
+        constexpr Real64 lower_limit = 2000;
+        constexpr Real64 upper_limit = 4000;
 
         Real64 const bhMassFlowRate = this->massFlowRate / this->myRespFactors->numBoreholes;
-
         Real64 const reynoldsNum = 4 * bhMassFlowRate / (fluidViscosity * DataGlobalConstants::Pi * this->pipe.innerDia);
 
         Real64 nusseltNum = 0.0;
@@ -3000,8 +2939,8 @@ namespace EnergyPlus::GroundHeatExchangers {
             Real64 const f = frictionFactor(reynoldsNum); // turbulent
             Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
             Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
-            Real64 const sigma = 1 / (1 + std::exp(-(reynoldsNum - 3000) / 150.0)); // smoothing function
-            nusseltNum = (1 - sigma) * nu_low + sigma * nu_high;
+            Real64 const sf = 1 / (1 + std::exp(-(reynoldsNum - 3000) / 150.0)); // smoothing function
+            nusseltNum = (1 - sf) * nu_low + sf * nu_high;
         } else {
             Real64 const f = frictionFactor(reynoldsNum);
             Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
@@ -3023,8 +2962,8 @@ namespace EnergyPlus::GroundHeatExchangers {
         // In Advances in Heat Transfer, ed. T.F. Irvine and J.P. Hartnett, Vol. 6. New York Academic Press.
 
         // limits picked be within about 1% of actual values
-        Real64 const lower_limit = 1500;
-        Real64 const upper_limit = 5000;
+        constexpr Real64 lower_limit = 1500;
+        constexpr Real64 upper_limit = 5000;
 
         if (reynoldsNum < lower_limit) {
             return 64.0 / reynoldsNum; // pure laminar flow
@@ -3075,80 +3014,65 @@ namespace EnergyPlus::GroundHeatExchangers {
         using FluidProperties::GetViscosityGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcSlinkyGroundHeatExchanger");
+        constexpr const char * RoutineName("CalcSlinkyGroundHeatExchanger");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 cpFluid;
-        Real64 kFluid;
-        Real64 fluidDensity;
-        Real64 fluidViscosity;
-        Real64 pipeInnerDia;
-        Real64 singleSlinkyMassFlowRate;
-        Real64 pipeOuterRad;
-        Real64 pipeInnerRad;
         Real64 nusseltNum;
-        Real64 reynoldsNum;
-        Real64 prandtlNum;
-        Real64 hci;
-        Real64 Rcond;
         Real64 Rconv;
-        Real64 smoothingFunction;
-        Real64 A(3150);
-        Real64 B(350);
-        Real64 laminarNusseltNo(4.364);
-        Real64 turbulentNusseltNo;
+        constexpr Real64 A(3150);
+        constexpr Real64 B(350);
+        constexpr Real64 laminarNusseltNo(4.364);
 
-        cpFluid = GetSpecificHeatGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                        this->inletTemp,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                        RoutineName);
-        kFluid = GetConductivityGlycol(state,
-                                       state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                       this->inletTemp,
-                                       state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                       RoutineName);
-        fluidDensity = GetDensityGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                        this->inletTemp,
-                                        state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                        RoutineName);
-        fluidViscosity = GetViscosityGlycol(state,
-                                            state.dataPlnt->PlantLoop(this->loopNum).FluidName,
-                                            this->inletTemp,
-                                            state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
-                                            RoutineName);
+        Real64 cpFluid = GetSpecificHeatGlycol(state,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                               this->inletTemp,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                               RoutineName);
+        Real64 kFluid = GetConductivityGlycol(state,
+                                              state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                              this->inletTemp,
+                                              state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                              RoutineName);
+        Real64 fluidDensity = GetDensityGlycol(state,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                               this->inletTemp,
+                                               state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                               RoutineName);
+        Real64 fluidViscosity = GetViscosityGlycol(state,
+                                                   state.dataPlnt->PlantLoop(this->loopNum).FluidName,
+                                                   this->inletTemp,
+                                                   state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
+                                                   RoutineName);
 
         // calculate mass flow rate
-        singleSlinkyMassFlowRate = this->massFlowRate / this->numTrenches;
+        Real64 singleSlinkyMassFlowRate = this->massFlowRate / this->numTrenches;
 
-        pipeOuterRad = this->pipe.outDia / 2.0;
-        pipeInnerRad = pipeOuterRad - this->pipe.thickness;
-        pipeInnerDia = 2.0 * pipeInnerRad;
+        Real64 pipeInnerRad = this->pipe.outRadius - this->pipe.thickness;
+        Real64 pipeInnerDia = 2.0 * pipeInnerRad;
 
         if (singleSlinkyMassFlowRate == 0.0) {
             Rconv = 0.0;
         } else {
             // Re=Rho*V*D/Mu
-            reynoldsNum = fluidDensity * pipeInnerDia * (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi * pow_2(pipeInnerRad))) /
-                          fluidViscosity;
-            prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
+            Real64 reynoldsNum = fluidDensity * pipeInnerDia *
+                                 (singleSlinkyMassFlowRate / fluidDensity / (DataGlobalConstants::Pi * pow_2(pipeInnerRad))) / fluidViscosity;
+            Real64 prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
             //   Convection Resistance
             if (reynoldsNum <= 2300) {
                 nusseltNum = laminarNusseltNo;
             } else if (reynoldsNum > 2300 && reynoldsNum <= 4000) {
-                smoothingFunction = 0.5 + 0.5 * std::tanh((reynoldsNum - A) / B);
-                turbulentNusseltNo = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
-                nusseltNum = laminarNusseltNo * (1 - smoothingFunction) + turbulentNusseltNo * smoothingFunction;
+                Real64 sf = 0.5 + 0.5 * std::tanh((reynoldsNum - A) / B);
+                Real64 turbulentNusseltNo = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
+                nusseltNum = laminarNusseltNo * (1 - sf) + turbulentNusseltNo * sf;
             } else {
                 nusseltNum = 0.023 * std::pow(reynoldsNum, 0.8) * std::pow(prandtlNum, 0.35);
             }
-            hci = nusseltNum * kFluid / pipeInnerDia;
+            Real64 hci = nusseltNum * kFluid / pipeInnerDia;
             Rconv = 1.0 / (2.0 * DataGlobalConstants::Pi * pipeInnerDia * hci);
         }
 
         //   Conduction Resistance
-        Rcond = std::log(pipeOuterRad / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi * this->pipe.k) / 2.0; // pipe in parallel so /2
+        Real64 Rcond = std::log(this->pipe.outRadius / pipeInnerRad) / (2.0 * DataGlobalConstants::Pi * this->pipe.k) / 2.0; // pipe in parallel so /2
 
         return Rcond + Rconv;
     }
@@ -3183,10 +3107,6 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // Binary Search Algorithms Variables
         // REFERENCE      :  DATA STRUCTURES AND ALGORITHM ANALYSIS IN C BY MARK ALLEN WEISS
-        int Mid;
-        int Low;
-        int High;
-        bool Found;
 
         // The following IF loop determines the g-function for the case
         // when LnTTsVal is less than the first element of the LnTTs array.
@@ -3218,9 +3138,10 @@ namespace EnergyPlus::GroundHeatExchangers {
         // equal to one of the LnTTs elements.  In this case the g-function
         // must be found by interpolation.
         // USING BINARY SEARCH TO FIND THE ELEMENT
-        Found = false;
-        Low = 1;
-        High = NPairs;
+        bool Found = false;
+        int Low = 1;
+        int High = NPairs;
+        int Mid;
         while (Low <= High) {
             Mid = (Low + High) / 2;
             if (this->myRespFactors->LNTTS(Mid) < LnTTsVal) {
@@ -3268,10 +3189,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Gets the g-function for slinky GHXs
         // Note: Base 10 here.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 LNTTS;
-
-        LNTTS = std::log10(time);
+        Real64 LNTTS = std::log10(time);
 
         return interpGFunc(LNTTS);
     }
@@ -3290,16 +3208,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Gets the g-function for vertical GHXs
         // Note: Base e here.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 RATIO;
-        Real64 gFuncVal;
-        Real64 LNTTS;
-
-        LNTTS = std::log(time);
-
-        gFuncVal = interpGFunc(LNTTS);
-
-        RATIO = this->bhRadius / this->bhLength;
+        Real64 LNTTS = std::log(time);
+        Real64 gFuncVal = interpGFunc(LNTTS);
+        Real64 RATIO = this->bhRadius / this->bhLength;
 
         if (RATIO != this->myRespFactors->gRefRatio) {
             gFuncVal -= std::log(this->bhRadius / (this->bhLength * this->myRespFactors->gRefRatio));
@@ -3327,12 +3238,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("initGLHESimVars");
+        constexpr const char * RoutineName("initGLHESimVars");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 fluidDensity;
-        bool errFlag;
-
         Real64 currTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
                            (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
                           DataGlobalConstants::SecInHour;
@@ -3340,7 +3248,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         // Init more variables
         if (this->myFlag) {
             // Locate the hx on the plant loops for later usage
-            errFlag = false;
+            bool errFlag = false;
             ScanPlantLoopsForObject(state,
                                     this->name,
                                     TypeOf_GrndHtExchgSystem,
@@ -3364,7 +3272,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             this->myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(
+            Real64 fluidDensity = GetDensityGlycol(
                 state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
             this->designMassFlow = this->designFlow * fluidDensity;
             InitComponentNodes(
@@ -3432,21 +3340,16 @@ namespace EnergyPlus::GroundHeatExchangers {
         using namespace GroundTemperatureManager;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("initGLHESimVars");
+        constexpr const char * RoutineName("initGLHESimVars");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 fluidDensity;
-        bool errFlag;
-        Real64 CurTime;
-
-        CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
-                   (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
-                  DataGlobalConstants::SecInHour;
+        Real64 CurTime = ((state.dataGlobal->DayOfSim - 1) * 24 + (state.dataGlobal->HourOfDay - 1) +
+                          (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed) *
+                         DataGlobalConstants::SecInHour;
 
         // Init more variables
         if (this->myFlag) {
             // Locate the hx on the plant loops for later usage
-            errFlag = false;
+            bool errFlag = false;
             ScanPlantLoopsForObject(state,
                                     this->name,
                                     TypeOf_GrndHtExchgSlinky,
@@ -3470,7 +3373,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
             this->myEnvrnFlag = false;
 
-            fluidDensity = GetDensityGlycol(
+            Real64 fluidDensity = GetDensityGlycol(
                 state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
             this->designMassFlow = this->designFlow * fluidDensity;
             InitComponentNodes(
