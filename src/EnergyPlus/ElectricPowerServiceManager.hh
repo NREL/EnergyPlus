@@ -318,7 +318,8 @@ private: // data
     {
         storageTypeNotSet = 0,
         simpleBucketStorage,
-        kiBaMBattery
+        kiBaMBattery,
+        liIonNmcBattery,
     };
 
     enum class BatteyDegredationModelType : int
@@ -356,16 +357,30 @@ private: // data
     int cycleBinNum_;                              // [ ] number of cycle bins
     Real64 startingSOC_;                           // [ ] initial fractional state of charge
     Real64 maxAhCapacity_;                         // [Ah]maximum capacity
-    Real64 availableFrac_;                         // [ ] fraction of available charge capacity
+    Real64 maxSOC_;                                // [ ] maximum fraction of available charge capacity
+    Real64 minSOC_;                                // [ ] minimum fraction of available charge capacity
     Real64 chargeConversionRate_;                  // [1/h]change rate from bound charge energy to available charge
     Real64 chargedOCV_;                            // [V] fully charged open circuit voltage
     Real64 dischargedOCV_;                         // [V] fully discharged open circuit voltage
     Real64 internalR_;                             // [ohm]internal electric resistance
     Real64 maxDischargeI_;                         // [A] maximum discharging current
     Real64 cutoffV_;                               // [V] cut-off voltage
-    Real64 maxChargeRate_;                         // [1/h]charge rate limit
-    BatteyDegredationModelType lifeCalculation_;   // [ ]battery life calculation: Yes or No
-    int lifeCurveNum_;                             // [ ]battery life curve name index number
+    Real64 maxChargeRate_;                         // [1/h] charge rate limit
+    BatteyDegredationModelType lifeCalculation_;   // [ ] battery life calculation: Yes or No
+    int lifeCurveNum_;                             // [ ] battery life curve name index number
+    Real64 liIon_dcToDcChargingEff_;               // [ ] DC to DC Charging Efficiency (Li-ion NMC model)
+    Real64 liIon_mass_;                            // [kg] mass of battery (Li-ion NMC model)
+    Real64 liIon_surfaceArea_;                     // [m2] battery surface area (Li-ion NMC model)
+    Real64 liIon_Cp_;                              // [J/kg-K] battery specific heat capacity (Li-ion NMC model)
+    Real64 liIon_heatTransferCoef_;                // [W/m2-K] Heat Transfer Coefficient Between Battery and Ambient (Li-ion NMC model)
+    Real64 liIon_Vfull_;                           // [V] Fully charged cell voltage (Li-ion NMC model)
+    Real64 liIon_Vexp_;                            // [V] Cell Voltage at End of Exponential Zone (Li-ion NMC model)
+    Real64 liIon_Vnom_;                            // [V] Cell voltage at end of nominal zone (Li-ion NMC model)
+    Real64 liIon_Vnom_default_;                    // [V] Default nominal cell voltage (Li-ion NMC model)
+    Real64 liIon_Qfull_;                           // [A-h] Fully charged cell capacity (Li-ion NMC model)
+    Real64 liIon_Qexp_;                            // [A-h] Cell capacity at end of exponential zone (Li-ion NMC model)
+    Real64 liIon_Qnom_;                            // [A-h] Cell capacity at end of nominal zone (Li-ion NMC model)
+    Real64 liIon_C_rate_;                          // [ ] Rate at which voltage vs capacity curve input (Li-ion NMC model)
     // calculated and from elsewhere vars
     Real64 thisTimeStepStateOfCharge_; // [J]
     Real64 lastTimeStepStateOfCharge_; // [J]

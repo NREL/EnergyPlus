@@ -80,6 +80,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
+// SSC Headers
+#include <../third_party/ssc/shared/lib_battery.h>
+
 namespace EnergyPlus {
 
 std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
@@ -2941,13 +2944,15 @@ ElectricStorage::ElectricStorage( // main constructor
       maxRainflowArrayInc_(100), myWarmUpFlag_(false), storageModelMode_(StorageModelType::storageTypeNotSet), availSchedPtr_(0),
       heatLossesDestination_(ThermalLossDestination::heatLossNotDetermined), zoneNum_(0), zoneRadFract_(0.0), startingEnergyStored_(0.0),
       energeticEfficCharge_(0.0), energeticEfficDischarge_(0.0), maxPowerDraw_(0.0), maxPowerStore_(0.0), maxEnergyCapacity_(0.0), parallelNum_(0),
-      seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0),
-      availableFrac_(0.0), chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
+      seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0), maxSOC_(0.0),
+      chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
       maxChargeRate_(0.0), lifeCalculation_(BatteyDegredationModelType::degredationNotSet), lifeCurveNum_(0), thisTimeStepStateOfCharge_(0.0),
       lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0),
       timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0), lastTimeStepBound_(0.0),
       lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0), thermLossRate_(0.0), thermLossEnergy_(0.0),
-      storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0), batteryDamage_(0.0)
+      storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0), batteryDamage_(0.0),
+      liIon_dcToDcChargingEff_(0.0), liIon_mass_(0.0), liIon_surfaceArea_(0.0), liIon_Cp_(0.0), liIon_heatTransferCoef_(0.0), liIon_Vfull_(0.0),
+      liIon_Vexp_(0.0), liIon_Vnom_(0.0), liIon_Vnom_default_(0.0), liIon_Qfull_(0.0), liIon_Qexp_(0.0), liIon_Qnom_(0.0), liIon_C_rate_(0.0)
 {
 
     std::string const routineName = "ElectricStorage constructor ";
@@ -2974,6 +2979,14 @@ ElectricStorage::ElectricStorage( // main constructor
         storageIDFObjectNum = testStorageIndex;
         DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Battery";
         storageModelMode_ = StorageModelType::kiBaMBattery;
+    }
+
+    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:LiIonNMCBattery", objectName);
+    if (testStorageIndex > 0) {
+        foundStorage = true;
+        storageIDFObjectNum = testStorageIndex;
+        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:LiIonNMCBattery";
+        storageModelMode_ = StorageModelType::liIonNmcBattery;
     }
 
     if (foundStorage) {
@@ -3125,7 +3138,7 @@ ElectricStorage::ElectricStorage( // main constructor
             numBattery_ = parallelNum_ * seriesNum_;
             maxAhCapacity_ = DataIPShortCuts::rNumericArgs(4);
             startingSOC_ = DataIPShortCuts::rNumericArgs(5);
-            availableFrac_ = DataIPShortCuts::rNumericArgs(6);
+            maxSOC_ = DataIPShortCuts::rNumericArgs(6);
             chargeConversionRate_ = DataIPShortCuts::rNumericArgs(7);
             chargedOCV_ = DataIPShortCuts::rNumericArgs(8);
             dischargedOCV_ = DataIPShortCuts::rNumericArgs(9);
@@ -3148,6 +3161,54 @@ ElectricStorage::ElectricStorage( // main constructor
             if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
                 SetupOutputVariable(state, "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, "System", "Average", name_);
             }
+            break;
+        }
+        case StorageModelType::liIonNmcBattery: {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "KandlerSmith") or DataIPShortCuts::lAlphaFieldBlanks(4)) {
+                lifeCalculation_ = BatteyDegredationModelType::lifeCalculationYes;
+            } else {
+                lifeCalculation_ = BatteyDegredationModelType::lifeCalculationNo;
+            }
+            seriesNum_ = DataIPShortCuts::lNumericFieldBlanks(2) ? 3 : static_cast<int>(DataIPShortCuts::rNumericArgs(2));
+            parallelNum_ = DataIPShortCuts::lNumericFieldBlanks(3) ? 1 : static_cast<int>(DataIPShortCuts::rNumericArgs(3));
+            minSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.15 : DataIPShortCuts::rNumericArgs(4);
+            maxSOC_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
+            if (minSOC_ >= maxSOC_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(4) + " should be less than " + DataIPShortCuts::cNumericFieldNames(5));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
+                errorsFound = true;
+            }
+            startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(6) ? 0.5 : DataIPShortCuts::rNumericArgs(6);
+            if (startingSOC_ > maxSOC_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(6) + " should be less than or equal to " + DataIPShortCuts::cNumericFieldNames(5));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
+                errorsFound = true;
+            }
+            if (startingSOC_ < minSOC_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(6) + " should be greater than or equal to " + DataIPShortCuts::cNumericFieldNames(4));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
+                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
+                errorsFound = true;
+            }
+            liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(7) ? 0.95 : DataIPShortCuts::rNumericArgs(7);
+            liIon_mass_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 95.1255 : DataIPShortCuts::rNumericArgs(8);
+            liIon_surfaceArea_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 0.5 : DataIPShortCuts::rNumericArgs(9);
+            liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 1500.0 : DataIPShortCuts::rNumericArgs(10);
+            liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 7.5 : DataIPShortCuts::rNumericArgs(11);
+            liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 4.2 : DataIPShortCuts::rNumericArgs(12);
+            liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.53 : DataIPShortCuts::rNumericArgs(13);
+            liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.342 : DataIPShortCuts::rNumericArgs(14);
+            liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 3.342 : DataIPShortCuts::rNumericArgs(15);
+            liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 1.0 : DataIPShortCuts::rNumericArgs(16);
+            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 0.1925 : DataIPShortCuts::rNumericArgs(17);
+            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.0231 : DataIPShortCuts::rNumericArgs(18);
+            liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(19) ? 1.0 : DataIPShortCuts::rNumericArgs(19);
+            internalR_ = DataIPShortCuts::lNumericFieldBlanks(20) ? 0.09 : DataIPShortCuts::rNumericArgs(20);
             break;
         }
         case StorageModelType::storageTypeNotSet: {
@@ -3251,12 +3312,12 @@ void ElectricStorage::reinitAtBeginEnvironment()
 
     if (storageModelMode_ == StorageModelType::kiBaMBattery) {
         Real64 initialCharge = maxAhCapacity_ * startingSOC_;
-        lastTwoTimeStepAvailable_ = initialCharge * availableFrac_;
-        lastTwoTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        lastTimeStepAvailable_ = initialCharge * availableFrac_;
-        lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        thisTimeStepAvailable_ = initialCharge * availableFrac_;
-        thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        lastTwoTimeStepAvailable_ = initialCharge * maxSOC_;
+        lastTwoTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        lastTimeStepAvailable_ = initialCharge * maxSOC_;
+        lastTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        thisTimeStepAvailable_ = initialCharge * maxSOC_;
+        thisTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
         if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3288,12 +3349,12 @@ void ElectricStorage::reinitAtEndWarmup()
     thisTimeStepStateOfCharge_ = startingEnergyStored_;
     if (storageModelMode_ == StorageModelType::kiBaMBattery) {
         Real64 initialCharge = maxAhCapacity_ * startingSOC_;
-        lastTwoTimeStepAvailable_ = initialCharge * availableFrac_;
-        lastTwoTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        lastTimeStepAvailable_ = initialCharge * availableFrac_;
-        lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        thisTimeStepAvailable_ = initialCharge * availableFrac_;
-        thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        lastTwoTimeStepAvailable_ = initialCharge * maxSOC_;
+        lastTwoTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        lastTimeStepAvailable_ = initialCharge * maxSOC_;
+        lastTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        thisTimeStepAvailable_ = initialCharge * maxSOC_;
+        thisTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
         if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3511,7 +3572,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     E0c = chargedOCV_;
     E0d = dischargedOCV_;
     k = chargeConversionRate_;
-    c = availableFrac_;
+    c = maxSOC_;
 
     if (charging) {
 

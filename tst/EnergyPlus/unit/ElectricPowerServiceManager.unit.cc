@@ -1023,3 +1023,62 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_PVWatts)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
 }
+
+TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Constructor)
+{
+    std::string const idf_objects = delimited_string({
+        "ElectricLoadCenter:Storage:LiIonNMCBattery,",
+        "  Battery1,       !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction",
+        "  KandlerSmith,   !- Lifetime Model",
+        "  5,              !- Number of Cells in Series",
+        "  3,              !- Number of Strings in Parallel",
+        "  0.1,            !- Minimum Available State of Charge",
+        "  0.95,           !- Maximum Availabls State of Charge",
+        "  0.95,           !- Initial Fractional State of Charge",
+        "  ,               !- DC to DC Charging Efficiency",
+        "  100,            !- Battery Mass",
+        "  0.75,           !- Battery Surface Area",
+        "  1500,           !- Battery Specific Heat Capacity",
+        "  8.1;            !- Heat Transfer Coefficient Between Battery and Ambient",
+
+        "ElectricLoadCenter:Storage:LiIonNMCBattery,",
+        "  Battery2,       !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction",
+        "  None,           !- Lifetime Model",
+        "  ,               !- Number of Cells in Series",
+        "  3,              !- Number of Strings in Parallel",
+        "  0.9,            !- Minimum Available State of Charge",
+        "  0.1,           !- Maximum Availabls State of Charge",
+        "  0.5;           !- Initial Fractional State of Charge",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ElectricStorage battery1{*state, "Battery1"};
+    ASSERT_TRUE(UtilityRoutines::SameString(battery1.name(), "Battery1"));
+
+    ASSERT_THROW(ElectricStorage battery2(*state, "Battery2"), EnergyPlus::FatalError);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Minimum Available State of Charge should be less than Maximum Available State of Charge",
+        "   **   ~~~   ** Minimum Available State of Charge = 0.900.",
+        "   **   ~~~   ** Maximum Available State of Charge = 0.100.",
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Initial Fractional State of Charge should be less than or equal to Maximum Available State of Charge",
+        "   **   ~~~   ** Initial Fractional State of Charge = 0.500.",
+        "   **   ~~~   ** Maximum Available State of Charge = 0.100.",
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Initial Fractional State of Charge should be greater than or equal to Minimum Available State of Charge",
+        "   **   ~~~   ** Initial Fractional State of Charge = 0.500.",
+        "   **   ~~~   ** Minimum Available State of Charge = 0.900.",
+        "   **  Fatal  ** ElectricStorage constructor Preceding errors terminate program.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=3",
+        "   ..... Last severe error=ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry."
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
