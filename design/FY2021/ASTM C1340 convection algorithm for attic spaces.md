@@ -1,9 +1,9 @@
-ASTM C1340 Convection Algorithm for Radiant Barriers
+ASTM C1340 Convection Coefficient Algorithm for Radiant Barriers
 ================
 
 **Dareum Nam, NREL**
 
- - First draft 1/21/2021
+ - Original Date 1/25/2021
  
 
 ## Justification for New Feature ##
