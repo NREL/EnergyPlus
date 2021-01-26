@@ -3675,7 +3675,7 @@ namespace EnergyPlus::DaylightingManager {
                         state.dataDaylightingManager->EDIRSUdisk(iHour, 1) = RAYCOS(3) * TVISS * ObTransDisk; // Bare window
 
                         TransBmBmMult = 0.0;
-                        if (IS_BLIND_ON(ShType)) {
+                        if (ANY_BLIND(ShType)) {
                             ProfileAngle(IWin, RAYCOS, Blind(BlNum).SlatOrientation, ProfAng);
                             // Contribution of beam passing through slats and reaching reference point
                             for (JB = 1; JB <= MaxSlatAngs; ++JB) {
@@ -3729,7 +3729,7 @@ namespace EnergyPlus::DaylightingManager {
                             XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) / std::pow(WindowSolidAngleDaylightPoint, 0.8);
                             state.dataDaylightingManager->AVWLSUdisk(iHour, 1) = XAVWL * TVISS * ObTransDisk; // Bare window
 
-                            if (IS_BLIND_ON(ShType)) {
+                            if (ANY_BLIND(ShType)) {
                                 for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                     // IF (.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                     state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) = XAVWL * TVISS * TransBmBmMult(JB) * ObTransDisk;
@@ -3842,7 +3842,7 @@ namespace EnergyPlus::DaylightingManager {
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, 1) += SunVecMir(3) * SpecReflectance * TVisRefl; // Bare window
 
                                 TransBmBmMultRefl = 0.0;
-                                if (IS_BLIND_ON(ShType)) {
+                                if (ANY_BLIND(ShType)) {
                                     ProfileAngle(IWin, SunVecMir, Blind(BlNum).SlatOrientation, ProfAng);
                                     // Contribution of reflected beam passing through slats and reaching reference point
                                     Real64 const Pi_SlatAng_fac(DataGlobalConstants::Pi / (MaxSlatAngs - 1));
@@ -3879,7 +3879,7 @@ namespace EnergyPlus::DaylightingManager {
                                     XAVWL = 14700.0 * std::sqrt(0.000068 * POSFAC) * double(NWX * NWY) /
                                             std::pow(SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint), 0.8);
                                     state.dataDaylightingManager->AVWLSUdisk(iHour, 1) += XAVWL * TVisRefl * SpecReflectance; // Bare window
-                                    if (IS_BLIND_ON(ShType)) {
+                                    if (ANY_BLIND(ShType)) {
                                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                             // IF(.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                             state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl(JB);
@@ -3898,7 +3898,7 @@ namespace EnergyPlus::DaylightingManager {
 
         } // Last pass
 
-        if ((ICtrl > 0 && (IS_BLIND_ON(ShType) || IS_SHADE_SCREEN_ON(ShType))) || SurfWinSolarDiffusing(IWin)) {
+        if ((ICtrl > 0 && (ANY_BLIND(ShType) || ANY_SHADE_SCREEN(ShType))) || SurfWinSolarDiffusing(IWin)) {
 
             // ----- CASE II -- WINDOW WITH SCREEN, SHADE, BLIND, OR DIFFUSING WINDOW
 
@@ -7936,8 +7936,8 @@ namespace EnergyPlus::DaylightingManager {
                     BlNum = SurfWinBlindNumber(IWin);
                     //					ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
-                    ShadeOn = IS_SHADE_ON(ShType);
-                    BlindOn = IS_BLIND_ON(ShType);
+                    ShadeOn = ANY_SHADE(ShType);
+                    BlindOn = ANY_BLIND(ShType);
                     ScreenOn = (ShType == WinShadingType::ExtScreen);
                 }
 

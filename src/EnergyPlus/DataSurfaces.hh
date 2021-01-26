@@ -70,12 +70,12 @@
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
 #define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
-#define IS_SHADE_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
-#define IS_SHADE_SCREEN_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
-#define IS_BLIND_ON(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
-#define IS_INT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind))
-#define IS_EXT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen))
-#define IS_BG_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
+#define ANY_SHADE(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
+#define ANY_SHADE_SCREEN(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
+#define ANY_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
+#define ANY_INTERIOR_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::IntBlind))
+#define ANY_EXTERIOR_SHADE_BLIND_SCREEN(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::ExtScreen))
+#define ANY_BETWEENGLASS_SHADE_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
 
 
 namespace EnergyPlus {
@@ -172,6 +172,7 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiHorzSolar = 21
 
     };
+    extern std::map<WindowShadingControlType, std::string> WindowShadingControlTypeToStr;
 
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):

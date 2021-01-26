@@ -4770,7 +4770,7 @@ namespace SurfaceGeometry {
                 if (ConstrNumSh > 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNumSh;
                 } else {
-                    if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType) || IS_EXT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
+                    if (ANY_INTERIOR_SHADE_BLIND(WindowShadingControl(WSCPtr).ShadingType) || ANY_EXTERIOR_SHADE_BLIND_SCREEN(WindowShadingControl(WSCPtr).ShadingType)) {
                         ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
                         if (ShDevNum > 0) {
                             CreateShadedWindowConstruction(state, SurfNum, WSCPtr, ShDevNum, shadeControlIndex);
@@ -4785,7 +4785,7 @@ namespace SurfaceGeometry {
             ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
             if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
 
-                if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
+                if (ANY_INTERIOR_SHADE_BLIND(WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -4808,7 +4808,7 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                if (IS_EXT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
+                if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -8159,87 +8159,54 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumValidShadingTypes(8);
-        static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
-                                                       {"INTERIORSHADE",
-                                                        "EXTERIORSHADE",
-                                                        "EXTERIORSCREEN",
-                                                        "INTERIORBLIND",
-                                                        "EXTERIORBLIND",
-                                                        "BETWEENGLASSSHADE",
-                                                        "BETWEENGLASSBLIND",
-                                                        "SWITCHABLEGLAZING"});
-        static Array1D<WinShadingType> const ValidShadingTypes(NumValidShadingTypes,
-                                                               {WinShadingType::IntShade,
-                                                                WinShadingType::ExtShade,
-                                                                WinShadingType::ExtScreen,
-                                                                WinShadingType::IntBlind,
-                                                                WinShadingType::ExtBlind,
-                                                                WinShadingType::BGShade,
-                                                                WinShadingType::BGBlind,
-                                                                WinShadingType::SwitchableGlazing});
 
-        int const NumValidWindowShadingControlTypes(21);
-        static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
-                                                                    {"ALWAYSON",
-                                                                     "ALWAYSOFF",
-                                                                     "ONIFSCHEDULEALLOWS",
-                                                                     "ONIFHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONEAIRTEMPERATURE",
-                                                                     "ONIFHIGHZONECOOLING",
-                                                                     "ONIFHIGHGLARE",
-                                                                     "MEETDAYLIGHTILLUMINANCESETPOINT",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY",
-                                                                     "ONNIGHTIFLOWINSIDETEMPANDOFFDAY",
-                                                                     "ONNIGHTIFHEATINGANDOFFDAY",
-                                                                     "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING",
-                                                                     "ONNIGHTIFHEATINGANDONDAYIFCOOLING",
-                                                                     "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
-                                                                     "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
+        std::map<std::string, WinShadingType> WindowShadingStrToType = {
+                {"INTERIORSHADE",WinShadingType::IntShade},
+                {"EXTERIORSHADE", WinShadingType::ExtShade},
+                {"EXTERIORSCREEN", WinShadingType::ExtScreen},
+                {"INTERIORBLIND", WinShadingType::IntBlind},
+                {"EXTERIORBLIND", WinShadingType::ExtBlind},
+                {"BETWEENGLASSSHADE", WinShadingType::BGShade, },
+                {"BETWEENGLASSBLIND", WinShadingType::BGBlind, },
+                {"SWITCHABLEGLAZING", WinShadingType::SwitchableGlazing, }
+        };
 
-        static Array1D<WindowShadingControlType> const ValidWindowShadingControlTypes(
-            NumValidWindowShadingControlTypes,
-            {WindowShadingControlType::AlwaysOn,
-             WindowShadingControlType::AlwaysOff,
-             WindowShadingControlType::OnIfScheduled,
-             WindowShadingControlType::HiSolar,
-             WindowShadingControlType::HiHorzSolar,
-             WindowShadingControlType::HiOutAirTemp,
-             WindowShadingControlType::HiZoneAirTemp,
-             WindowShadingControlType::HiZoneCooling,
-             WindowShadingControlType::HiGlare,
-             WindowShadingControlType::MeetDaylIlumSetp,
-             WindowShadingControlType::OnNightLoOutTemp_OffDay,
-             WindowShadingControlType::OnNightLoInTemp_OffDay,
-             WindowShadingControlType::OnNightIfHeating_OffDay,
-             WindowShadingControlType::OnNightLoOutTemp_OnDayCooling,
-             WindowShadingControlType::OnNightIfHeating_OnDayCooling,
-             WindowShadingControlType::OffNight_OnDay_HiSolarWindow,
-             WindowShadingControlType::OnNight_OnDay_HiSolarWindow,
-             WindowShadingControlType::OnHiOutTemp_HiSolarWindow,
-             WindowShadingControlType::OnHiOutTemp_HiHorzSolar,
-             WindowShadingControlType::OnHiZoneTemp_HiSolarWindow,
-             WindowShadingControlType::OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
-                                          // | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ',
-                                          // & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE
-                                          // ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING
-                                          // ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT
-                                          // ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY
-                                          // ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & |
-                                          // 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING
-                                          // ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & |
-                                          // 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ',
-                                          // & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW
-                                          // ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
+        WindowShadingControlTypeToStr = {
+                {WindowShadingControlType::UnControlled, "Uncontrolled"},
+                {WindowShadingControlType::AlwaysOn, "AlwaysOn"},
+                {WindowShadingControlType::AlwaysOff, "AlwaysOff"},
+                {WindowShadingControlType::OnIfScheduled, "OnIfScheduleAllows"},
+                {WindowShadingControlType::HiSolar, "OnIfHighSolarOnWindow"},
+                {WindowShadingControlType::HiHorzSolar, "OnIfHighHorizontalSolar"},
+                {WindowShadingControlType::HiOutAirTemp, "OnIfHighOutdoorAirTemperature"},
+                {WindowShadingControlType::HiZoneAirTemp, "OnIfHighZoneAirTemperature"},
+                {WindowShadingControlType::HiZoneCooling, "OnIfHighZoneCooling"},
+                {WindowShadingControlType::HiGlare, "OnIfHighGlare"},
+                {WindowShadingControlType::MeetDaylIlumSetp, "MeetDaylightIlluminanceSetpoint"},
+                {WindowShadingControlType::OnNightLoOutTemp_OffDay, "OnNightIfLowOutdoorTempAndOffDay"},
+                {WindowShadingControlType::OnNightLoInTemp_OffDay, "OnNightIfLowInsideTempAndOffDay"},
+                {WindowShadingControlType::OnNightIfHeating_OffDay, "OnNightIfHeatingAndOffDay"},
+                {WindowShadingControlType::OnNightLoOutTemp_OnDayCooling, "OnNightIfLowOutdoorTempAndOnDayIfCooling"},
+                {WindowShadingControlType::OnNightIfHeating_OnDayCooling, "OnNightIfHeatingAndOnDayIfCooling"},
+                {WindowShadingControlType::OffNight_OnDay_HiSolarWindow, "OffNightAndOnDayIfCoolingAndHighSolarOnWindow"},
+                {WindowShadingControlType::OnNight_OnDay_HiSolarWindow, "OnNightAndOnDayIfCoolingAndHighSolarOnWindow"},
+                {WindowShadingControlType::OnHiOutTemp_HiSolarWindow, "OnIfHighOutdoorAirTempAndHighSolarOnWindow"},
+                {WindowShadingControlType::OnHiOutTemp_HiHorzSolar, "OnIfHighOutdoorAirTempAndHighHorizontalSolar"},
+                {WindowShadingControlType::OnHiZoneTemp_HiSolarWindow, "OnIfHighZoneAirTempAndHighSolarOnWindow"},
+                {WindowShadingControlType::OnHiZoneTemp_HiHorzSolar, "OnIfHighZoneAirTempAndHighHorizontalSolar"}
+        };
+        std::map<std::string, WindowShadingControlType> WindowShadingControlStrToType;
+        for (auto &type: WindowShadingControlTypeToStr) {
+            std::string str_type = type.second;
+            std::transform(str_type.begin(), str_type.end(), str_type.begin(), ::toupper);
+            WindowShadingControlStrToType.insert({str_type, type.first});
+        }
+
+        std::string str = "Hello World";
+
+        boost::to_upper(str);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int IOStat;          // IO Status when calling get input subroutine
         int ControlNumAlpha; // Number of control alpha names being passed
         int ControlNumProp;  // Number of control properties being passed
@@ -8430,13 +8397,13 @@ namespace SurfaceGeometry {
             }
 
             // Error if illegal control type
-            Found = UtilityRoutines::FindItemInList(ControlType, cValidWindowShadingControlTypes, NumValidWindowShadingControlTypes);
+            Found = WindowShadingControlStrToType.count(ControlType);
             if (Found == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) + "=\"" +
                                 cAlphaArgs(5) + "\".");
             } else {
-                WindowShadingControl(ControlNum).ShadingControlType = ValidWindowShadingControlTypes(Found);
+                WindowShadingControl(ControlNum).ShadingControlType = WindowShadingControlStrToType[ControlType];
             }
 
             // Error checks
@@ -8494,13 +8461,13 @@ namespace SurfaceGeometry {
             }
 
             // Check for illegal shading type name
-            Found = UtilityRoutines::FindItemInList(cAlphaArgs(3), cValidShadingTypes, NumValidShadingTypes);
+            Found = WindowShadingStrToType.count(cAlphaArgs(3));
             if (Found == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
                                 cAlphaArgs(3) + "\".");
             } else {
-                WindowShadingControl(ControlNum).ShadingType = ValidShadingTypes(Found);
+                WindowShadingControl(ControlNum).ShadingType = WindowShadingStrToType[cAlphaArgs(3)];
             }
 
             WinShadingType ShTyp = WindowShadingControl(ControlNum).ShadingType;
@@ -11681,7 +11648,7 @@ namespace SurfaceGeometry {
         ShDevName = state.dataMaterial->Material(ShDevNum).Name;
         ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
         ConstrName = state.dataConstruction->Construct(ConstrNum).Name;
-        if (IS_INT_SHADED(WindowShadingControl(WSCPtr).ShadingType)) {
+        if (ANY_INTERIOR_SHADE_BLIND(WindowShadingControl(WSCPtr).ShadingType)) {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":INT";
         } else {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":EXT";
