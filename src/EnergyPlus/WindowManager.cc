@@ -2089,9 +2089,8 @@ namespace WindowManager {
         y30ils1 = 0.0;
         y30new = 0.0;
 
-        for (i = 2; i <= state.dataWindowManager->nume;
-             ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle values prevented this
-                    // violation from occurring in practice
+        for (i = 2; i <= state.dataWindowManager->nume; ++i) { // Autodesk:BoundsViolation e|wle|p(i-1) @ i=1: Changed start index from 1 to 2: wle
+                                                               // values prevented this violation from occurring in practice
             // Restrict to visible range
             if (state.dataWindowManager->wle(i) >= 0.37 && state.dataWindowManager->wle(i) <= 0.78) {
                 Interpolate(state.dataWindowManager->wlt3,
@@ -3438,70 +3437,109 @@ namespace WindowManager {
                         hgap(1) = hgap(1) * SurfWinEdgeGlCorrFac(SurfNum) + state.dataWindowManager->hrgap(1) * (SurfWinEdgeGlCorrFac(SurfNum) - 1.0);
                     }
 
-                    Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                    if (!(ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn)) {
+                        D(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
                                state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
-                    Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
-                    Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
-                    Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) +
+                        D(2) = state.dataWindowManager->AbsRadGlassFace(2);
+                        D(3) = state.dataWindowManager->AbsRadGlassFace(3);
+                        D(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) +
                                state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(4);
 
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
-                    Aface(2, 1) = -state.dataWindowManager->scon(1);
+                        A(1) = 0.0;
+                        B(1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+                        C(1) = -state.dataWindowManager->scon(1);
 
-                    Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
+                        A(2) = -state.dataWindowManager->scon(1);
+                        B(2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
+                        C(2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
 
-                    Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
-                    Aface(4, 3) = -state.dataWindowManager->scon(2);
+                        A(3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
+                        B(3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
+                        C(3) = -state.dataWindowManager->scon(2);
 
-                    Aface(3, 4) = -state.dataWindowManager->scon(2);
-                    Aface(4, 4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
+                        A(4) = -state.dataWindowManager->scon(2);
+                        B(4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
+                        C(4) = 0.0;
+                        iMatrixSize = 4;
 
-                    if (ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                        Bface(2) = state.dataWindowManager->AbsRadGlassFace(2) + hcvAirflowGap * TAirflowGapNew;
-                        Bface(3) = state.dataWindowManager->AbsRadGlassFace(3) + hcvAirflowGap * TAirflowGapNew;
-                        Aface(2, 2) = state.dataWindowManager->scon(1) + hcvAirflowGap - state.dataWindowManager->A23P * hr(2);
-                        Aface(3, 2) = -state.dataWindowManager->A32P * hr(3);
-                        Aface(2, 3) = state.dataWindowManager->A23P * hr(2);
-                        Aface(3, 3) = hcvAirflowGap + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
-                    }
+                        if (ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                            D(2) = state.dataWindowManager->AbsRadGlassFace(2) + hcvAirflowGap * TAirflowGapNew;
+                            D(3) = state.dataWindowManager->AbsRadGlassFace(3) + hcvAirflowGap * TAirflowGapNew;
+                            B(2) = state.dataWindowManager->scon(1) + hcvAirflowGap - state.dataWindowManager->A23P * hr(2);
+                            C(2) = -state.dataWindowManager->A32P * hr(3);
+                            A(3) = state.dataWindowManager->A23P * hr(2);
+                            B(3) = hcvAirflowGap + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
+                        }
 
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
-                        Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
+                        if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                            D(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(4);
-                        Bface(5) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
-                        Bface(6) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin +
+                            D(5) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
+                            D(6) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin +
                                    AbsRadShadeFace(2);
 
-                        Aface(4, 4) = hr(4) * (1 - RhoShIR1) / ShGlReflFacIR + state.dataWindowManager->scon(2) + hcv;
-                        Aface(5, 4) = -state.dataWindowManager->emis(4) * hr(5) / ShGlReflFacIR;
-                        Aface(4, 5) = -hr(4) * EpsShIR1 / ShGlReflFacIR;
-                        Aface(5, 5) = hr(5) * (1 - RhoGlIR2 * (EpsShIR1 + RhoShIR1)) / ShGlReflFacIR + sconsh + hcv;
-                        Aface(6, 5) = -sconsh;
-                        Aface(5, 6) = -sconsh;
-                        Aface(6, 6) = hr(6) + sconsh + state.dataWindowManager->hcin;
-                    }
+                            B(4) = hr(4) * (1 - RhoShIR1) / ShGlReflFacIR + state.dataWindowManager->scon(2) + hcv;
+                            C(4) = -state.dataWindowManager->emis(4) * hr(5) / ShGlReflFacIR;
+                            A(5) = -hr(4) * EpsShIR1 / ShGlReflFacIR;
+                            B(5) = hr(5) * (1 - RhoGlIR2 * (EpsShIR1 + RhoShIR1)) / ShGlReflFacIR + sconsh + hcv;
+                            C(5) = -sconsh;
+                            A(6) = -sconsh;
+                            B(6) = hr(6) + sconsh + state.dataWindowManager->hcin;
+                            C(6) = 0.0;
+                            iMatrixSize = 6;
+                        }
 
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
-                        Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
+                        if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+
+                            Real64 Temp;
+                            Temp = D(2);
+                            D(1) = D(4);
+                            D(2) = D(3);
+                            D(3) = Temp;
+                            D(4) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(1);
-                        Bface(5) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout +
+                            D(5) =
+                                state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
+                            D(6) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout +
                                    AbsRadShadeFace(1);
-                        Bface(6) =
-                            state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
 
-                        Aface(1, 1) = hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
-                        Aface(6, 1) = -state.dataWindowManager->emis(1) * hr(6) / ShGlReflFacIR;
-                        Aface(5, 5) = hr(5) + sconsh + state.dataWindowManager->hcout;
-                        Aface(6, 5) = -sconsh;
-                        Aface(1, 6) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
-                        Aface(5, 6) = -sconsh;
-                        Aface(6, 6) = hr(6) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
-                    }
+                            Temp = B(2);
+                            B(1) = B(4);
+                            B(2) = B(3);
+                            B(3) = Temp;
+                            Temp = C(3);
+                            C(3) = A(2);
+                            A(2) = Temp;
+                            Temp = C(2);
+                            C(2) = A(3);
+                            A(3) = Temp;
+                            Temp = C(1);
+                            C(1) = A(4);
+                            A(4) = Temp;
 
-                    if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+                            B(4) = hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
+                            C(4) = -state.dataWindowManager->emis(1) * hr(6) / ShGlReflFacIR;
+                            A(5) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
+                            B(5) = hr(6) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
+                            C(5) = -sconsh;
+                            A(6) = -sconsh;
+                            B(6) = hr(5) + sconsh + state.dataWindowManager->hcout;
+                            C(6) = 0.0;
+                            iMatrixSize = 6;
+                        }
+                    } else {
+                        Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                                   state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+                        Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) +
+                                   state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(4);
+
+                        Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+                        Aface(2, 1) = -state.dataWindowManager->scon(1);
+                        Aface(1, 2) = -state.dataWindowManager->scon(1);
+                        Aface(4, 3) = -state.dataWindowManager->scon(2);
+                        Aface(3, 4) = -state.dataWindowManager->scon(2);
+                        Aface(4, 4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
+
                         for (i = 1; i <= 6; ++i) {
                             RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir(i) - state.dataWindowManager->emis(i));
                         }
@@ -3782,10 +3820,22 @@ namespace WindowManager {
             if (state.dataWindowManager->ngllayer == 1) {
                 TriDiagonal_Matrix_Algorithm(iMatrixSize, A, B, C, D, X);
                 if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
-                        Bface(2) = X(1);
-                        Bface(1) = X(2);
-                        Bface(4) = X(3);
-                        Bface(3) = X(4);
+                    Bface(2) = X(1);
+                    Bface(1) = X(2);
+                    Bface(4) = X(3);
+                    Bface(3) = X(4);
+                } else {
+                    Bface = X;
+                }
+            } else if (state.dataWindowManager->ngllayer == 2 && !(ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn)) {
+                TriDiagonal_Matrix_Algorithm(iMatrixSize, A, B, C, D, X);
+                if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                    Bface(4) = X(1);
+                    Bface(3) = X(2);
+                    Bface(2) = X(3);
+                    Bface(1) = X(4);
+                    Bface(6) = X(5);
+                    Bface(5) = X(6);
                 } else {
                     Bface = X;
                 } 
