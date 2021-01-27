@@ -143,24 +143,7 @@ namespace EnergyPlus::PlantManager {
         using namespace DataLoopNode;
         using namespace FluidProperties;
 
-        // MODULE PARAMETER DEFINITIONS
-        int const TempSetPt(1001);
-        bool InitLoopEquip(true);
-        bool GetCompSizFac(true);
-
         static std::string const fluidNameSteam("STEAM");
-
-        Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-        Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-        Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-
-        void clear_state() {
-            InitLoopEquip = true;
-            GetCompSizFac = true;
-            SupplySideInletNode.deallocate();
-            SupplySideOutletNode.deallocate();
-            DemandSideInletNode.deallocate();
-        }
 
         void ManagePlantLoops(EnergyPlusData &state,
                               bool const FirstHVACIteration,
@@ -326,7 +309,7 @@ namespace EnergyPlus::PlantManager {
             int CondLoopNum;
             Array1D_string Alpha(18); // dimension to num of alpha fields in input
             Array1D<Real64> Num(30);  // dimension to num of numeric data fields in input
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             std::string LoadingScheme;
             bool ErrFound;
             std::string CurrentModuleObject; // for ease in renaming.
@@ -774,7 +757,7 @@ namespace EnergyPlus::PlantManager {
 
             bool SplitInBranch;
             bool MixerOutBranch;
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             bool ASeriesBranchHasPump;
             bool AParallelBranchHasPump;
 
@@ -2099,7 +2082,7 @@ namespace EnergyPlus::PlantManager {
             int CompNum;   // plant side component counter
             int SensedNode;
 
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             bool FinishSizingFlag;
 
             static bool SupplyEnvrnFlag(true);
@@ -2181,10 +2164,10 @@ namespace EnergyPlus::PlantManager {
                 state.dataPlnt->PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
                 state.dataPlnt->PlantFirstSizesOkayToReport = false;
                 state.dataPlnt->PlantFinalSizesOkayToReport = false;
-                GetCompSizFac = true;
+                state.dataPlantMgr->GetCompSizFac = true;
                 for (passNum = 1;
                      passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
-                    InitLoopEquip = true;
+                    state.dataPlantMgr->InitLoopEquip = true;
 
                     // Step 2, call component models it  using PlantCallingOrderInfo for sizing
                     for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
@@ -2196,7 +2179,7 @@ namespace EnergyPlus::PlantManager {
                              BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                             } //-CompNum
                         }     //-BranchNum
                     }
@@ -2217,7 +2200,7 @@ namespace EnergyPlus::PlantManager {
                             SizePlantLoop(state, LoopNum, FinishSizingFlag);
                         }
                     }
-                    GetCompSizFac = false;
+                    state.dataPlantMgr->GetCompSizFac = false;
                 } // iterative passes thru sizing related routines.  end while?
 
                 // Step 5 now one more time for the final
@@ -2245,7 +2228,7 @@ namespace EnergyPlus::PlantManager {
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
@@ -2264,8 +2247,8 @@ namespace EnergyPlus::PlantManager {
             if (state.dataGlobal->RedoSizesHVACSimulation && !state.dataPlnt->PlantReSizingCompleted) {
 
                 // cycle through plant equipment calling with InitLoopEquip true
-                InitLoopEquip = true;
-                GetCompSizFac = false;
+                state.dataPlantMgr->InitLoopEquip = true;
+                state.dataPlantMgr->GetCompSizFac = false;
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
@@ -2275,7 +2258,7 @@ namespace EnergyPlus::PlantManager {
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                 }
@@ -2286,7 +2269,7 @@ namespace EnergyPlus::PlantManager {
                     ResizePlantLoopLevelSizes(state, LoopNum);
                 }
 
-                InitLoopEquip = true;
+                state.dataPlantMgr->InitLoopEquip = true;
 
                 // now call everything again to reporting turned on
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
@@ -2298,7 +2281,7 @@ namespace EnergyPlus::PlantManager {
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
@@ -2309,7 +2292,7 @@ namespace EnergyPlus::PlantManager {
                 state.dataPlnt->PlantFinalSizesOkayToReport = false;
             }
             //*****************************************************************
-            // END Resizing Pass for HVAC Sizing Simultion Adjustments
+            // END Resizing Pass for HVAC Sizing Simulation Adjustments
             //*****************************************************************
             //*****************************************************************
             // BEGIN ONE TIME ENVIRONMENT INITS
@@ -3022,7 +3005,7 @@ namespace EnergyPlus::PlantManager {
             // calculate a loop sizing factor and a branch sizing factor. Note that components without a sizing factor
             // are assigned sizing factors of zero in this calculation
             if (PlantSizNum > 0) {
-                if (GetCompSizFac) {
+                if (state.dataPlantMgr->GetCompSizFac) {
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
                         BranchSizFac = 0.0;
@@ -3035,7 +3018,7 @@ namespace EnergyPlus::PlantManager {
                             continue;
                         for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true, localInitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true, localInitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                             BranchSizFac = max(BranchSizFac,
                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
                                                        CompNum).SizFac);
@@ -3355,24 +3338,6 @@ namespace EnergyPlus::PlantManager {
             // 3.  third call all condenser demand sides
             // 4.  fourth call all condenser supply sides
 
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int OrderIndex; // local
             int I;          // local loop
@@ -3429,24 +3394,8 @@ namespace EnergyPlus::PlantManager {
             // simple rule-based allocation of which order to call the half loops
             // Examine for interconnected components and rearrange to impose the following rules
 
-            // REFERENCES:
-            // na
-
             // Using/Aliasing
             using PlantUtilities::ShiftPlantLoopSideCallingOrder;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int HalfLoopNum;

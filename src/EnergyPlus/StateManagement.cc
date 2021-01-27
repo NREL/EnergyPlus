@@ -138,7 +138,6 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -248,7 +247,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PhotovoltaicThermalCollectors::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
-    PlantManager::clear_state();
     PlantUtilities::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
