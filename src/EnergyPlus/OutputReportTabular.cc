@@ -7084,6 +7084,23 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 leedSiteTotal(0.0);
         Real64 unconvert;
 
+        // JY 2021-01-26 Added temp storage
+        Real64 gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
+        Real64 gtPowerPV = ort->gatherPowerPV;
+        Real64 gtPowerWind = ort->gatherPowerWind;
+        Real64 gtPowerHTGeothermal = ort->gatherPowerHTGeothermal;
+        Real64 gtPowerConversion = ort->gatherPowerConversion;
+        Real64 gtElecProduced = ort->gatherElecProduced;
+        Real64 gtElecPUrchased = ort->gatherElecPurchased;
+        Real64 gtElecSurplusSold = ort->gatherElecSurplusSold;
+
+        Real64 gtWaterHeatRecovery = ort->gatherWaterHeatRecovery;
+        Real64 gtAirHeatRecoveryCool = ort->gatherAirHeatRecoveryCool;
+        Real64 gtAirHeatRecoveryHeat = ort->gatherAirHeatRecoveryHeat;
+        Real64 gtHeatHTGeothermal = ort->gatherHeatHTGeothermal;
+        Real64 gtHeatSolarWater = ort->gatherHeatSolarWater;
+        Real64 gtHeatSolarAir = ort->gatherHeatSolarAir;
+
         if (ort->displayTabularBEPS || ort->displayLEEDSummary) {
             // show the headers of the report
             if (ort->displayTabularBEPS) {
@@ -7231,6 +7248,25 @@ namespace EnergyPlus::OutputReportTabular {
 
                 collapsedTotal(13) = WaterConversionFunct(collapsedTotal(13), waterConversionFactor);
 
+                if (iUnitSystem == 0) {
+                    gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
+                    gtPowerPV = ort->gatherPowerPV;
+                    gtPowerWind = ort->gatherPowerWind;
+                    gtPowerHTGeothermal = ort->gatherPowerHTGeothermal;
+                    gtPowerConversion = ort->gatherPowerConversion;
+                    gtElecProduced = ort->gatherElecProduced;
+                    gtElecPUrchased = ort->gatherElecPurchased;
+                    gtElecSurplusSold = ort->gatherElecSurplusSold;
+                } else { // if(iUnitSystem == 1)
+                    ort->gatherPowerFuelFireGen = gtPowerFuelFireGen;
+                    ort->gatherPowerPV = gtPowerPV;
+                    ort->gatherPowerWind = gtPowerWind;
+                    ort->gatherPowerHTGeothermal = gtPowerHTGeothermal;
+                    ort->gatherPowerConversion = gtPowerConversion;
+                    ort->gatherElecProduced = gtElecProduced;
+                    ort->gatherElecPurchased = gtElecPUrchased;
+                    ort->gatherElecSurplusSold = gtElecSurplusSold;
+                }
                 // convert to GJ
                 ort->gatherPowerFuelFireGen /= largeConversionFactor;
                 ort->gatherPowerPV /= largeConversionFactor;
@@ -8651,6 +8687,21 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody = "";
 
                 // convert to GJ
+                if (iUnitSystem == 0) {
+                    gtWaterHeatRecovery = ort->gatherWaterHeatRecovery;
+                    gtAirHeatRecoveryCool = ort->gatherAirHeatRecoveryCool;
+                    gtAirHeatRecoveryHeat = ort->gatherAirHeatRecoveryHeat;
+                    gtHeatHTGeothermal = ort->gatherHeatHTGeothermal;
+                    gtHeatSolarWater = ort->gatherHeatSolarWater;
+                    gtHeatSolarAir = ort->gatherHeatSolarAir;
+                } else {
+                    ort->gatherWaterHeatRecovery = gtWaterHeatRecovery;
+                    ort->gatherAirHeatRecoveryCool = gtAirHeatRecoveryCool;
+                    ort->gatherAirHeatRecoveryHeat = gtAirHeatRecoveryHeat;
+                    ort->gatherHeatHTGeothermal = gtHeatHTGeothermal;
+                    ort->gatherHeatSolarWater = gtHeatSolarWater;
+                    ort->gatherHeatSolarAir = gtHeatSolarAir;
+                }
 
                 ort->gatherWaterHeatRecovery /= largeConversionFactor;
                 ort->gatherAirHeatRecoveryCool /= largeConversionFactor;

@@ -9324,3 +9324,285 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
         EXPECT_NEAR(std::get<2>(v), return_val, 0.01) << "Failed for RowName=" << rowName << "; ColumnName=" << columnName;
     }
 }
+
+TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    Real64 enerConv = getSpecificUnitDivider(*state, "GJ", "kBtu"); // 948.45
+    EXPECT_NEAR(1.0/enerConv, 948.0, 0.5);
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject();
+
+    SetPredefinedTables(*state);
+
+    Real64 extLitUse = 1e8;
+    Real64 CoalHeating = 2e8;
+    Real64 GasolineHeating = 3e8;
+    Real64 PropaneHeating = 4e8;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite1",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite2",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "AnotherEndUseSubCat");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        "Zone",
+                        "Sum",
+                        "Lite3",
+                        _,
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+    SetupOutputVariable(
+        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
+    SetupOutputVariable(
+        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
+    SetupOutputVariable(
+        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers(*state, "Zone", timeStep);
+    SetupTimePointers(*state, "HVAC", timeStep);
+
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+
+    GetInputOutputTableSummaryReports(*state);
+
+    state->dataEnvrn->Month = 12;
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(
+        extLitUse * 3, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 1,
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(
+        extLitUse * 6, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 4,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    EXPECT_NEAR(
+        extLitUse * 9, state->dataOutRptTab->gatherEndUseBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)), 1.);
+    // General
+    EXPECT_NEAR(extLitUse * 6,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+    // AnotherEndUseSubCat
+    EXPECT_NEAR(extLitUse * 3,
+                state->dataOutRptTab->gatherEndUseSubBEPS(2, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights), 1),
+                1.);
+
+    OutputReportTabular::WriteBEPSTable(*state);
+    OutputReportTabular::WriteDemandEndUseSummary(*state);
+
+    EnergyPlus::sqlite->sqliteCommit();
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General", "AnotherEndUseSubCat"};
+
+    std::string endUseName = "Exterior Lighting";
+    std::string endUseSubCategoryName = "AnotherEndUseSubCat";
+    std::string rowName = endUseName + ":" + endUseSubCategoryName;
+    std::string columnName = "Electricity";
+
+    for (auto &endUseSubCategoryName : endUseSubCategoryNames) {
+        for (auto &reportName : testReportNames) {
+
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE TableName = 'End Uses By Subcategory'"
+                              "  AND ColumnName = 'Electricity'"
+                              "  AND ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND RowName = '" +
+                              endUseName + ":" + endUseSubCategoryName + "'"); // Now Like 'Exterior Lighting:General'
+
+            auto result = queryResult(query, "TabularDataWithStrings");
+
+            ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+        }
+    }
+
+    for (auto &reportName : testReportNames) {
+
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ColumnName = 'Electricity'"
+                          "  AND ReportName = '" +
+                          reportName +
+                          "'"
+                          "  AND RowName = '" +
+                          endUseName + "'");
+
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(1ul, result.size()) << "Query crashed for reportName=" << reportName;
+    }
+
+    // Specifically get the electricity usage for End Use = Exterior Lighting, and End Use Subcat = AnotherEndUseSubCat,
+    // and make sure it's the right number that's returned
+    std::string query("SELECT Value From TabularDataWithStrings"
+                      "  WHERE TableName = 'End Uses By Subcategory'"
+                      "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                      "  AND ColumnName = 'Electricity'"
+                      "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+    Real64 return_val = execAndReturnFirstDouble(query);
+
+    // EXPECT_NEAR(extLitUse * 3 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    Real64 expected_value = extLitUse * 3.0 / 1.0e9 / enerConv;
+    EXPECT_NEAR(expected_value, return_val, 0.01) << "Failed for query: " << query;
+
+    // Get all Interior Lighting End Uses (all subcats) for Electricity
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Electricity'"
+                          "  AND RowName LIKE 'Exterior Lighting:%'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(2u, result.size()) << "Failed for query: " << query;
+    }
+
+    // Get all subcat usage for all fuels (13)
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+    }
+
+    // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
+    // and make sure it's the right number that's returned
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Coal'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val1 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(CoalHeating * 3 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
+        Real64 expected_coalHt = CoalHeating * 3 / 1.0e9 / enerConv;
+        EXPECT_NEAR(expected_coalHt, return_val1, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Gasoline'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val2 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(GasolineHeating * 3 / 3.6e6, return_val2, 0.01) << "Failed for query: " << query;
+        EXPECT_NEAR(GasolineHeating * 3 / 1.0e9 / enerConv, return_val2, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'Propane'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+        Real64 return_val3 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        // EXPECT_NEAR(PropaneHeating * 3 / 3.6e6, return_val3, 0.01) << "Failed for query: " << query;
+        EXPECT_NEAR(PropaneHeating * 3 / 1.0e9 / enerConv, return_val3, 0.01) << "Failed for query: " << query;
+    }
+
+    // Check the heating category has the result size of 13 (including all disaggregated additional fuels) in both reports)
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'DemandEndUseComponentsSummary'"
+                          "  AND RowName = 'Heating'");
+        auto result = queryResult(query, "TabularDataWithStrings");
+
+        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+    }
+}
