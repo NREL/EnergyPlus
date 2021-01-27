@@ -4515,13 +4515,13 @@ This numeric field contains the design cooling capacity of the heat pump in W. T
 
 This numeric field is the design electric power consumption for cooling, in W.  This corresponds to the electic power use at the Reference Cooling Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
-\paragraph{Fields: Cooling Capacity Coefficients 1-5}\label{fields-cooling-capacity-coefficients-1-5}
+\paragraph{Fields: Cooling Capacity Curve Name}\label{fields-cooling-capacity-curve-name}
 
-Five fields are used to describe the coefficients for the Cooling Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Cooling Capacity curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
-\paragraph{Field: Cooling Compressor Power Coefficients 1-5}\label{field-cooling-compressor-power-coefficients-1-5}
+\paragraph{Field: Cooling Compressor Power Curve Name}\label{field-cooling-compressor-power-curve-name}
 
-Five fields are used to decribe the coefficients for the Cooling Compressor Power curve.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Cooling Compressor Power curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
 \paragraph{Field: Reference Coefficient of Performance}\label{field-cooling-nom-COP}
 
@@ -4553,19 +4553,47 @@ HeatPump:WaterToWater:EquationFit:Cooling,
   1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
   39890.91,                !- Reference Cooling Capacity {W}
   4790.00,                 !- Reference Cooling Power Consumption {W}
-  -1.52030596,             !- Cooling Capacity Coefficient 1
-  3.46625667,              !- Cooling Capacity Coefficient 2
-  -1.32267797,             !- Cooling Capacity Coefficient 3
-  0.09395678,              !- Cooling Capacity Coefficient 4
-  0.038975504,             !- Cooling Capacity Coefficient 5
-  -8.59564386,             !- Cooling Compressor Power Coefficient 1
-  0.96265085,              !- Cooling Compressor Power Coefficient 2
-  8.69489229,              !- Cooling Compressor Power Coefficient 3
-  0.02501669,              !- Cooling Compressor Power Coefficient 4
-  -0.20132665,             !- Cooling Compressor Power Coefficient 5
+  CoolCapCurve,            !- Cooling Capacity Curve Name
+  CoolPowCurve,            !- Cooling Compressor Power Curve Name
   8.32,                    !- Reference Coefficient of Performance
   1.0,                     !- Sizing Factor
   GshpHeating;             !- Companion Heating Heat Pump Name
+
+  Curve:QuadLinear,
+  CoolCapCurve,            !- Curve Name
+  -1.52030596,             !- CoefficientC1
+  3.46625667,              !- CoefficientC2
+  -1.32267797,             !- CoefficientC3
+  0.09395678,              !- CoefficientC4
+  0.038975504,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+  CoolPowCurve,            !- Curve Name
+  -8.59564386,             !- CoefficientC1
+  0.96265085,              !- CoefficientC2
+  8.69489229,              !- CoefficientC3
+  0.02501669,              !- CoefficientC4
+  -0.20132665,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-004}
@@ -4687,13 +4715,13 @@ This numeric field contains the design heating capacity of the heat pump in W. T
 
 This numeric field contains the design electric power consumption for heating, in W. This corresponds to the electic power use at the Reference Heating Capacity. This field is autosizable.  When autosized, the field called Reference Coefficient of Performance must be used.
 
-\paragraph{Fields: Heating Capacity Coefficients 1-5}\label{fields-heating-capacity-coefficients-1-5}
+\paragraph{Fields: Heating Capacity Curve Name}\label{fields-heating-capacity-curve-name}
 
-Five fields are used to describe the coefficients for the Heating Capacity curve. More details on how these coefficients are used are described in the Engineering Reference.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Heating Capacity curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
-\paragraph{Field: Heating Compressor Power Coefficients 1-5}\label{field-heating-compressor-power-coefficients-1-5}
+\paragraph{Field: Heating Compressor Power Curve Name}\label{field-heating-compressor-power-curve-name}
 
-Five fields are used to describe the coefficients for the Heating Compressor Power curve.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the Heating Compressor Power curve. More details on how these coefficients in the curve are used are described in the Engineering Reference.
 
 \paragraph{Field: Reference Coefficient of Performance}\label{field-heating-nom-COP}
 
@@ -4726,19 +4754,47 @@ HeatPump:WaterToWater:EquationFit:Heating,
   1.89E-03,                !- Reference Source Side Flow Rate {m3/s}
   39040.92,                !- Reference Heating Capacity {W}
   5130.00,                 !- Reference Heating Power Consumption {W}
-  -3.33491153,             !- Heating Capacity Coefficient 1
-  -0.51451946,             !- Heating Capacity Coefficient 2
-  4.51592706,              !- Heating Capacity Coefficient 3
-  0.01797107,              !- Heating Capacity Coefficient 4
-  0.155797661,             !- Heating Capacity Coefficient 5
-  -8.93121751,             !- Heating Compressor Power Coefficient 1
-  8.57035762,              !- Heating Compressor Power Coefficient 2
-  1.29660976,              !- Heating Compressor Power Coefficient 3
-  -0.21629222,             !- Heating Compressor Power Coefficient 4
-  0.033862378,             !- Heating Compressor Power Coefficient 5
+  HeatCapCurve,            !- Heating Capacity Curve Name
+  HeatPowCurve,            !- Heating Compressor Power Curve Name
   7.61,                    !- Reference Coefficient of Performance
   1.0,                     !- Sizing Factor
   GshpCLG;                 !- Companion Cooling Heat Pump Name
+
+  Curve:QuadLinear,
+  HeatCapCurve,            !- Curve Name
+  -3.33491153,             !- CoefficientC1
+  -0.51451946,             !- CoefficientC2
+  4.51592706,              !- CoefficientC3
+  0.01797107,              !- CoefficientC4
+  0.155797661,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
+
+  Curve:QuadLinear,
+  HeatPowCurve,            !- Curve Name
+  -8.93121751,             !- CoefficientC1
+  8.57035762,              !- CoefficientC2
+  1.29660976,              !- CoefficientC3
+  -0.21629222,             !- CoefficientC4
+  0.033862378,             !- CoefficientC5
+  -100,                    !- Minimum Value of w
+  100,                     !- Maximum Value of w
+  -100,                    !- Minimum Value of x
+  100,                     !- Maximum Value of x
+  0,                       !- Minimum Value of y
+  100,                     !- Maximum Value of y
+  0,                       !- Minimum Value of z
+  100,                     !- Maximum Value of z
+  0,                       !- Minimum Curve Output
+  38;                      !- Maximum Curve Output
 \end{lstlisting}
 
 Next, the parameter estimation model objects are described. This model has two sets of parameters, one for the heating mode and other for the cooling mode.
