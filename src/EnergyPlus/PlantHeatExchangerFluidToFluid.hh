@@ -65,9 +65,48 @@ struct EnergyPlusData;
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    extern int const CoolingDifferentialOnOff;
-    extern int const CoolingSetPointOnOffWithComponentOverride;
-    extern int const DryBulbTemperature;
+    enum class iFluidHXType
+    {
+        Unassigned,
+        CrossFlowBothUnMixed,
+        CrossFlowBothMixed,
+        CrossFlowSupplyLoopMixedDemandLoopUnMixed,
+        CrossFlowSupplyLoopUnMixedDemandLoopMixed,
+        CounterFlow,
+        ParallelFlow,
+        Ideal,
+    };
+
+    enum class iCtrlType
+    {
+        Unassigned,
+        UncontrolledOn,
+        OperationSchemeModulated,
+        OperationSchemeOnOff,
+        HeatingSetPointModulated,
+        HeatingSetPointOnOff,
+        CoolingSetPointModulated,
+        CoolingSetPointOnOff,
+        DualDeadBandSetPointModulated,
+        DualDeadBandSetPointOnOff,
+        CoolingDifferentialOnOff,
+        CoolingSetPointOnOffWithComponentOverride,
+        TrackComponentOnOff,
+    };
+
+    enum class iCtrlTemp
+    {
+        Unassigned,
+        WetBulbTemperature,
+        DryBulbTemperature,
+        LoopTemperature,
+    };
+
+    enum class iHXAction
+    {
+        HeatingSupplySideLoop,
+        CoolingSupplySideLoop,
+    };
 
     extern int NumberOfPlantFluidHXs;
 
@@ -113,13 +152,13 @@ namespace PlantHeatExchangerFluidToFluid {
         // Members
         std::string Name;
         int AvailSchedNum;
-        int HeatExchangeModelType;
+        iFluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
-        int ControlMode;
+        iCtrlType ControlMode;
         int SetPointNodeNum;
         Real64 TempControlTol;
-        int ControlSignalTemp;
+        iCtrlTemp ControlSignalTemp;
         Real64 MinOperationTemp;
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
@@ -144,11 +183,11 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(0), UA(0.0), UAWasAutoSized(false), ControlMode(0), SetPointNodeNum(0), TempControlTol(0.0),
-              ControlSignalTemp(0), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0),
-              HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
-              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
-              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
+              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
+              MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
+              OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
+              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -170,7 +209,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
+        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, iHXAction HXActionMode);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,
@@ -189,9 +228,17 @@ namespace PlantHeatExchangerFluidToFluid {
 
 struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct {
 
+    int NumberOfPlantFluidHXs = 0;
+    bool GetInput = true;
+    Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
+    Array1D_bool CheckFluidHXs;
+
     void clear_state() override
     {
-
+        this->NumberOfPlantFluidHXs = 0;
+        this->GetInput = true;
+        this->FluidHX.deallocate();
+        this->CheckFluidHXs.deallocate();
     }
 };
 
