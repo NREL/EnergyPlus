@@ -125,13 +125,72 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
+    GLHEResponseFactors::GLHEResponseFactors(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
+    {
+
+        // Check for duplicates
+        for (auto &existingObj : state.dataGroundHeatExchanger->vertPropsVector) {
+            if (objName == existingObj->name) {
+                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingObj->name);
+            }
+        }
+
+        this->name = objName;
+        this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"]));        this->numBoreholes = j["number_of_boreholes"];
+        this->gRefRatio = j["g_function_reference_ratio"];
+        this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
+
+        auto const vars = j.at("g_functions");
+        std::vector<Real64> tmpLntts;
+        std::vector<Real64> tmpGvals;
+
+        for (auto const &var : vars){
+            try {
+                tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
+            } catch (nlohmann::json::out_of_range& e) {
+                // out of range
+            }
+
+            try {
+                tmpGvals.push_back(var.at("g_function_g_value"));
+            } catch (nlohmann::json::out_of_range& e) {
+                // out of range
+            }
+
+        }
+
+        bool errorsFound = false;
+
+        if (tmpLntts.size() == tmpLntts.size()) {
+            this->numGFuncPairs = static_cast<int>(tmpLntts.size());
+        } else {
+            errorsFound = true;
+            ShowSevereError(state, "Errors found processing response factor input for Response Factor= " + this->name);
+            ShowSevereError(state, "Uneven number of g-function pairs");
+        }
+
+        this->LNTTS.dimension(this->numGFuncPairs, 0.0);
+        this->GFNC.dimension(this->numGFuncPairs, 0.0);
+
+        for (size_t i = 1; i <= tmpLntts.size(); ++i) {
+            this->LNTTS(i) = tmpLntts[i - 1];
+            this->GFNC(i) = tmpGvals[i - 1];
+        }
+
+        if (errorsFound) {
+            ShowFatalError(state, "Errors found in processing input for " + this->moduleName);
+        }
+    }
+
+    //******************************************************************************
+
     GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
     {
 
         // Check for duplicates
-        for (auto &existingVertProp : state.dataGroundHeatExchanger->vertPropsVector) {
-            if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
-                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingVertProp->name);
+        for (auto &existingObj : state.dataGroundHeatExchanger->vertPropsVector) {
+            if (objName == existingObj->name) {
+                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingObj->name);
             }
         }
 
@@ -2110,13 +2169,12 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         if (state.dataGroundHeatExchanger->numVertProps > 0) {
 
-            std::string sProps = "GroundHeatExchanger:Vertical:Properties";
+            std::string currObj = "GroundHeatExchanger:Vertical:Properties";
 
-            auto const instances = inputProcessor->epJSON.find(sProps);
+            auto const instances = inputProcessor->epJSON.find(currObj);
             if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(
-                    state,                                                                                                  // LCOV_EXCL_LINE
-                    "GroundHeatExchanger:Vertical:Properties: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
+                                currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
             }
 
             auto &instancesValue = instances.value();
@@ -2124,91 +2182,30 @@ namespace EnergyPlus::GroundHeatExchangers {
                 auto const &instance = it.value();
                 auto const &objName = it.key();
                 auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
-                inputProcessor->markObjectAsUsed(sProps, objName);
-                std::shared_ptr<GLHEVertProps> thisProp(new GLHEVertProps(state, objNameUC, instance));
-                state.dataGroundHeatExchanger->vertPropsVector.push_back(thisProp);
+                inputProcessor->markObjectAsUsed(currObj, objName);
+                std::shared_ptr<GLHEVertProps> thisObj(new GLHEVertProps(state, objNameUC, instance));
+                state.dataGroundHeatExchanger->vertPropsVector.push_back(thisObj);
             }
         }
 
         if (state.dataGroundHeatExchanger->numResponseFactors > 0) {
 
-            DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:ResponseFactors";
+            std::string currObj = "GroundHeatExchanger:ResponseFactors";
 
-            for (int rfNum = 1; rfNum <= state.dataGroundHeatExchanger->numResponseFactors; ++rfNum) {
+            auto const instances = inputProcessor->epJSON.find(currObj);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
+                                currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
 
-                // just a few vars to pass in and out to GetObjectItem
-                int ioStatus;
-                int numAlphas;
-                int numNumbers;
-
-                // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
-                                              rfNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              numAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              numNumbers,
-                                              ioStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-
-                // the input processor validates the numeric inputs based on the IDD definition
-                // still validate the name to make sure there aren't any duplicates or blanks
-                // blanks are easy: fatal if blank
-                if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
-                }
-
-                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVertProp : state.dataGroundHeatExchanger->vertPropsVector) {
-                    if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
-                        ShowFatalError(state,
-                                       "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-                                           " object: Duplicate name found: " + existingVertProp->name);
-                    }
-                }
-
-                // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
-                thisRF->name = DataIPShortCuts::cAlphaArgs(1);
-                thisRF->props = GetVertProps(state, DataIPShortCuts::cAlphaArgs(2));
-                thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
-                thisRF->gRefRatio = DataIPShortCuts::rNumericArgs(2);
-
-                thisRF->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
-
-                int numPreviousFields = 2;
-                int numFields = 0;
-                for (auto &isFieldBlank : DataIPShortCuts::lNumericFieldBlanks) {
-                    if (!isFieldBlank) {
-                        numFields += 1;
-                    } else if (isFieldBlank) {
-                        break;
-                    }
-                }
-
-                if ((numFields - numPreviousFields) % 2 == 0) {
-                    thisRF->numGFuncPairs = (numFields - numPreviousFields) / 2;
-                } else {
-                    errorsFound = true;
-                    ShowSevereError(state, "Errors found processing response factor input for Response Factor= " + thisRF->name);
-                    ShowSevereError(state, "Uneven number of g-function pairs");
-                }
-
-                thisRF->LNTTS.dimension(thisRF->numGFuncPairs, 0.0);
-                thisRF->GFNC.dimension(thisRF->numGFuncPairs, 0.0);
-
-                int indexNum = 3;
-                for (int pairNum = 1; pairNum <= thisRF->numGFuncPairs; ++pairNum) {
-                    thisRF->LNTTS(pairNum) = DataIPShortCuts::rNumericArgs(indexNum);
-                    thisRF->GFNC(pairNum) = DataIPShortCuts::rNumericArgs(indexNum + 1);
-                    indexNum += 2;
-                }
-
-                state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisRF);
+            auto &instancesValue = instances.value();
+            for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
+                auto const &instance = it.value();
+                auto const &objName = it.key();
+                auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+                inputProcessor->markObjectAsUsed(currObj, objName);
+                std::shared_ptr<GLHEResponseFactors> thisObj(new GLHEResponseFactors(state, objNameUC, instance));
+                state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisObj);
             }
         }
 

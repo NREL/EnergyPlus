@@ -187,6 +187,7 @@ namespace GroundHeatExchangers {
         ~GLHEResponseFactors() = default;
 
         // Members
+        std::string const moduleName = "GroundHeatExchanger:ResponseFactors";
         std::string name;                                        // Name
         int numBoreholes;                                        // Number of boreholes
         int numGFuncPairs;                                       // Number of g-function pairs
@@ -201,6 +202,9 @@ namespace GroundHeatExchangers {
         GLHEResponseFactors() : numBoreholes(0), numGFuncPairs(0), gRefRatio(0.0), maxSimYears(0.0)
         {
         }
+
+        GLHEResponseFactors(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
+
     };
 
     struct GLHEBase : PlantComponent
