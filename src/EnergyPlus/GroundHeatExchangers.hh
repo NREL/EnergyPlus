@@ -170,6 +170,7 @@ namespace GroundHeatExchangers {
         ~GLHEVertArray() = default;
 
         // Members
+        std::string const moduleName = "GroundHeatExchanger:Vertical:Array";
         std::string name;                     // Name
         int numBHinXDirection;                // Number of boreholes in X direction
         int numBHinYDirection;                // Number of boreholes in Y direction
@@ -179,6 +180,9 @@ namespace GroundHeatExchangers {
         GLHEVertArray() : numBHinXDirection(0), numBHinYDirection(0), bhSpacing(0.0)
         {
         }
+
+        GLHEVertArray(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
+
     };
 
     struct GLHEResponseFactors
