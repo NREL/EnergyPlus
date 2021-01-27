@@ -215,8 +215,6 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
         using DataHVACGlobals::ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
 
         // Locals
@@ -270,11 +268,11 @@ namespace HybridUnitaryAirConditioners {
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneHybridEvap; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", ZoneHybridUnitaryAirConditioner(Loop).Name)) {
-                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
+                    ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state,
                         "InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = " + ZoneHybridUnitaryAirConditioner(Loop).Name +
@@ -353,32 +351,21 @@ namespace HybridUnitaryAirConditioners {
         //       MODIFIED
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        //
-
-        // METHODOLOGY EMPLOYED:
-        //
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using namespace DataLoopNode;
         using namespace Psychrometrics;
+
         Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 
         Real64 ZoneCoolingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
         Real64 ZoneHeatingLoad =
-            ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
         Real64 OutputRequiredToHumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToHumidifyingSP; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
 
         Real64 OutputRequiredToDehumidify =
-            ZoneSysMoistureDemand(ZoneNum)
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum)
                 .OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
 
         SensibleOutputProvided = 0;
@@ -389,11 +376,12 @@ namespace HybridUnitaryAirConditioners {
         EnvRelHumm = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
         RoomRelHum = ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
 
-        bool UseOccSchFlag = 1;
-        bool UseMinOASchFlag = 1;
+        bool UseOccSchFlag = true;
+        bool UseMinOASchFlag = true;
 
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-        DesignMinVR = CalcDesignSpecificationOutdoorAir(state, ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+        DesignMinVR = CalcDesignSpecificationOutdoorAir(state,
+                                                        ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
                                                         ZoneNum,
                                                         UseOccSchFlag,
                                                         UseMinOASchFlag); //[m3/s]

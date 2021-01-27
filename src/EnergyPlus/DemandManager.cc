@@ -576,8 +576,6 @@ namespace EnergyPlus::DemandManager {
         using DataHeatBalance::LightsObjects;
         using DataHeatBalance::ZoneElectric;
         using DataHeatBalance::ZoneElectricObjects;
-        using DataZoneControls::TempControlledZone;
-        using DataZoneControls::TStatObjects;
 
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
@@ -1142,11 +1140,11 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to controlled zones
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), TStatObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TStatObjects);
                     if (LoadPtr > 0) {
-                        DemandMgr(MgrNum).NumOfLoads += TStatObjects(LoadPtr).NumOfZones;
+                        DemandMgr(MgrNum).NumOfLoads += state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), TempControlledZone);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataZoneCtrls->TempControlledZone);
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
@@ -1161,14 +1159,14 @@ namespace EnergyPlus::DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     LoadNum = 0;
                     for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), TStatObjects);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TStatObjects);
                         if (LoadPtr > 0) {
-                            for (Item1 = 1; Item1 <= TStatObjects(LoadPtr).NumOfZones; ++Item1) {
+                            for (Item1 = 1; Item1 <= state.dataZoneCtrls->TStatObjects(LoadPtr).NumOfZones; ++Item1) {
                                 ++LoadNum;
-                                DemandMgr(MgrNum).Load(LoadNum) = TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataZoneCtrls->TStatObjects(LoadPtr).TempControlledZoneStartPtr + Item1 - 1;
                             }
                         } else {
-                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), TempControlledZone);
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataZoneCtrls->TempControlledZone);
                             if (LoadPtr > 0) {
                                 ++LoadNum;
                                 DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1283,7 +1281,7 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to air controllers
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                    LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
+                    LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
                     if (LoadPtr > 0) {
                         ++DemandMgr(MgrNum).NumOfLoads;
                     } else {
@@ -1296,7 +1294,7 @@ namespace EnergyPlus::DemandManager {
                 if (DemandMgr(MgrNum).NumOfLoads > 0) {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     for (LoadNum = 1; LoadNum <= NumAlphas - AlphaShift; ++LoadNum) {
-                        LoadPtr = GetOAController(AlphArray(LoadNum + AlphaShift));
+                        LoadPtr = GetOAController(state, AlphArray(LoadNum + AlphaShift));
                         if (LoadPtr > 0) {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
                         }
@@ -1478,7 +1476,6 @@ namespace EnergyPlus::DemandManager {
         // Using/Aliasing
         using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
-        using DataZoneControls::TempControlledZone;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1703,9 +1700,6 @@ namespace EnergyPlus::DemandManager {
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-        using DataZoneControls::ComfortControlledZone;
-        using DataZoneControls::NumComfortControlledZones;
-        using DataZoneControls::TempControlledZone;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
         using MixedAir::OASetDemandManagerVentilationFlow;
@@ -1757,28 +1751,28 @@ namespace EnergyPlus::DemandManager {
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeThermostats) {
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (ZoneThermostatSetPointLo(TempControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
-                        ZoneThermostatSetPointHi(TempControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
+                    if (ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
+                        ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
                         CanReduceDemand = true; // Heating | Cooling
                 } else if (Action == DemandAction::SetLimit) {
-                    TempControlledZone(LoadPtr).ManageDemand = true;
-                    TempControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                    TempControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+                    state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = true;
+                    state.dataZoneCtrls->TempControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
+                    state.dataZoneCtrls->TempControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
                 } else if (Action == DemandAction::ClearLimit) {
-                    TempControlledZone(LoadPtr).ManageDemand = false;
+                    state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
                 }
-                if (NumComfortControlledZones > 0) {
-                    if (ComfortControlType(TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
+                if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
+                    if (ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
                         if (Action == DemandAction::CheckCanReduce) {
-                            if (ZoneThermostatSetPointLo(ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
-                                ZoneThermostatSetPointHi(ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
+                            if (ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) > DemandMgr(MgrNum).LowerLimit ||
+                                ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) < DemandMgr(MgrNum).UpperLimit)
                                 CanReduceDemand = true; // Heating
                         } else if (Action == DemandAction::SetLimit) {
-                            ComfortControlledZone(LoadPtr).ManageDemand = true;
-                            ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                            ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
                         } else if (Action == DemandAction::ClearLimit) {
-                            ComfortControlledZone(LoadPtr).ManageDemand = false;
+                            state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = false;
                         }
                     }
                 }
@@ -1789,7 +1783,7 @@ namespace EnergyPlus::DemandManager {
                 if (Action == DemandAction::CheckCanReduce) {
                     CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    OASetDemandManagerVentilationState(LoadPtr, true);
+                    OASetDemandManagerVentilationState(state, LoadPtr, true);
                     if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitFixed) {
                         OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
                     } else if (DemandMgr(MgrNum).LimitControl == Limit::ManagerLimitReductionRatio) {
@@ -1798,7 +1792,7 @@ namespace EnergyPlus::DemandManager {
                         OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
                     }
                 } else if (Action == DemandAction::ClearLimit) {
-                    OASetDemandManagerVentilationState(LoadPtr, false);
+                    OASetDemandManagerVentilationState(state, LoadPtr, false);
                 }
             }
         }

@@ -369,7 +369,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZCoolingSetPointManager : SPBase // Derived type for the Single Zone Cooling Setpoint Manager data
@@ -391,7 +391,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZMinHumSetPointManager : SPBase // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
@@ -410,7 +410,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZMaxHumSetPointManager : SPBase // Derived Type for Single Zone Maximum Humidity Setpoint Manager data
@@ -429,7 +429,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineMixedAirSetPointManager : SPBase
@@ -870,7 +870,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZOneStageHeatingSetPointManager : SPBase // Derived type for the Single Zone One Stage Heating Setpoint Manager data
@@ -891,7 +891,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineReturnWaterChWSetPointManager : SPBase // derived type for SetpointManager:SupplyResetForReturnTemperature:ChilledWater data

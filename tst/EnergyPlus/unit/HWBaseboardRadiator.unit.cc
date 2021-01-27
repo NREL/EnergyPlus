@@ -80,14 +80,14 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 
     Node.allocate(1);
     HWBaseboard.allocate(1);
-    ZoneSysEnergyDemand.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
 
     Node(1).MassFlowRate = 0.40;
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
     BBNum = 1;
     LoadMet = 0.0;
     HWBaseboard(1).ZonePtr = 1;
@@ -113,8 +113,8 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 
     Node.deallocate();
     HWBaseboard.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
     QBBRadSource.deallocate();
 }
@@ -129,13 +129,13 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     Node.allocate(2);
     HWBaseboard.allocate(1);
-    ZoneSysEnergyDemand.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
 
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
 
     HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
     HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
@@ -195,8 +195,8 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     // clear
     Node.deallocate();
     HWBaseboard.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
     QBBRadSource.deallocate();
 }
