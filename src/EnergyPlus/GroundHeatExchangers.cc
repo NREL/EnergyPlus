@@ -125,7 +125,46 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEVertPropsStruct> GetVertProps(EnergyPlusData &state, std::string const &objectName)
+    GLHEVertProps::GLHEVertProps(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
+    {
+
+        // Check for duplicates
+        for (auto &existingVertProp : state.dataGroundHeatExchanger->vertPropsVector) {
+            if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
+                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingVertProp->name);
+            }
+        }
+
+        // Load data from JSON
+        this->name = objName;
+        this->bhTopDepth = j["depth_of_top_of_borehole"];
+        this->bhLength = j["borehole_length"];
+        this->bhDiameter = j["borehole_diameter"];
+        this->grout.k = j["grout_thermal_conductivity"];
+        this->grout.rhoCp = j["grout_thermal_heat_capacity"];
+        this->pipe.k = j["pipe_thermal_conductivity"];
+        this->pipe.rhoCp = j["pipe_thermal_heat_capacity"];
+        this->pipe.outDia = j["pipe_outer_diameter"];
+        this->pipe.thickness = j["pipe_thickness"];
+        this->bhUTubeDist = j["u_tube_distance"];
+
+        // Verify u-tube spacing is valid
+        if (this->bhUTubeDist < this->pipe.outDia) {
+            ShowWarningError(
+                state, "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
+            ShowWarningError(state, "Shank spacing is set to the outer pipe diameter.");
+            this->bhUTubeDist = this->pipe.outDia;
+        }
+
+        // Set remaining data derived from previous inputs
+        this->pipe.innerDia = this->pipe.outDia - 2 * this->pipe.thickness;
+        this->pipe.outRadius = this->pipe.outDia / 2;
+        this->pipe.innerRadius = this->pipe.innerDia / 2;
+    }
+
+    //******************************************************************************
+
+    std::shared_ptr<GLHEVertProps> GetVertProps(EnergyPlusData &state, std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisProp : state.dataGroundHeatExchanger->vertPropsVector) {
@@ -140,7 +179,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEVertSingleStruct> GetSingleBH(EnergyPlusData &state, std::string const &objectName)
+    std::shared_ptr<GLHEVertSingle> GetSingleBH(EnergyPlusData &state, std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
@@ -155,7 +194,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEVertArrayStruct> GetVertArray(EnergyPlusData &state, std::string const &objectName)
+    std::shared_ptr<GLHEVertArray> GetVertArray(EnergyPlusData &state, std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisProp : state.dataGroundHeatExchanger->vertArraysVector) {
@@ -170,7 +209,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEResponseFactorsStruct> GetResponseFactor(EnergyPlusData &state, std::string const &objectName)
+    std::shared_ptr<GLHEResponseFactors> GetResponseFactor(EnergyPlusData &state, std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisRF : state.dataGroundHeatExchanger->responseFactorsVector) {
@@ -185,11 +224,11 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEResponseFactorsStruct> BuildAndGetResponseFactorObjectFromArray(EnergyPlusData &state,
-                                                                                        std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr)
+    std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(EnergyPlusData &state,
+                                                                                        std::shared_ptr<GLHEVertArray> const &arrayObjectPtr)
     {
         // Make new response factor object and store it for later use
-        std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+        std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
         thisRF->name = arrayObjectPtr->name;
         thisRF->props = arrayObjectPtr->props;
 
@@ -200,7 +239,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             int yLoc = 0;
             for (int yBH = 1; yBH <= arrayObjectPtr->numBHinYDirection; ++yBH) {
                 bhCounter += 1;
-                std::shared_ptr<GLHEVertSingleStruct> thisBH(new GLHEVertSingleStruct);
+                std::shared_ptr<GLHEVertSingle> thisBH(new GLHEVertSingle);
                 thisBH->name = format("{} BH {} loc: ({}, {})", thisRF->name, bhCounter, xLoc, yLoc);
                 thisBH->props = GetVertProps(state, arrayObjectPtr->props->name);
                 thisBH->xLoc = xLoc;
@@ -220,15 +259,15 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    std::shared_ptr<GLHEResponseFactorsStruct>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingleStruct>> const &singleBHsForRFVect)
+    std::shared_ptr<GLHEResponseFactors>
+    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
     {
         // Make new response factor object and store it for later use
-        std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+        std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
         thisRF->name = format("Response Factor Object Auto Generated No: {}", state.dataGroundHeatExchanger->numAutoGeneratedResponseFactors + 1);
 
         // Make new props object which has the mean values of the other props objects referenced by the individual BH objects
-        std::shared_ptr<GLHEVertPropsStruct> thisProps(new GLHEVertPropsStruct);
+        std::shared_ptr<GLHEVertProps> thisProps(new GLHEVertProps);
         thisProps->name =
             format("Response Factor Auto Generated Mean Props No: {}", state.dataGroundHeatExchanger->numAutoGeneratedResponseFactors + 1);
         int numBH = singleBHsForRFVect.size();
@@ -296,7 +335,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactorsStruct> &thisRF)
+    void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF)
     {
         for (auto &thisBH : thisRF->myBorholes) {
 
@@ -428,7 +467,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingleStruct> const &bh_j, Real64 const &currTime)
+    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
     {
 
         // This code could be optimized in a number of ways.
@@ -461,8 +500,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
-    Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingleStruct> const &bh_i,
-                                    std::shared_ptr<GLHEVertSingleStruct> const &bh_j,
+    Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i,
+                                    std::shared_ptr<GLHEVertSingle> const &bh_j,
                                     Real64 const &currTime)
     {
 
@@ -2071,70 +2110,22 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         if (state.dataGroundHeatExchanger->numVertProps > 0) {
 
-            DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Vertical:Properties";
+            std::string sProps = "GroundHeatExchanger:Vertical:Properties";
 
-            for (int propNum = 1; propNum <= state.dataGroundHeatExchanger->numVertProps; ++propNum) {
+            auto const instances = inputProcessor->epJSON.find(sProps);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(
+                    state,                                                                                                  // LCOV_EXCL_LINE
+                    "GroundHeatExchanger:Vertical:Properties: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
 
-                // just a few vars to pass in and out to GetObjectItem
-                int ioStatus;
-                int numAlphas;
-                int numNumbers;
-
-                // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
-                                              propNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              numAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              numNumbers,
-                                              ioStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-
-                // the input processor validates the numeric inputs based on the IDD definition
-                // still validate the name to make sure there aren't any duplicates or blanks
-                // blanks are easy: fatal if blank
-                if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
-                }
-
-                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVertProp : state.dataGroundHeatExchanger->vertPropsVector) {
-                    if (DataIPShortCuts::cAlphaArgs(1) == existingVertProp->name) {
-                        ShowFatalError(state,
-                                       "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-                                           " object: Duplicate name found: " + existingVertProp->name);
-                    }
-                }
-
-                // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertPropsStruct> thisProp(new GLHEVertPropsStruct);
-                thisProp->name = DataIPShortCuts::cAlphaArgs(1);
-                thisProp->bhTopDepth = DataIPShortCuts::rNumericArgs(1);
-                thisProp->bhLength = DataIPShortCuts::rNumericArgs(2);
-                thisProp->bhDiameter = DataIPShortCuts::rNumericArgs(3);
-                thisProp->grout.k = DataIPShortCuts::rNumericArgs(4);
-                thisProp->grout.rhoCp = DataIPShortCuts::rNumericArgs(5);
-                thisProp->pipe.k = DataIPShortCuts::rNumericArgs(6);
-                thisProp->pipe.rhoCp = DataIPShortCuts::rNumericArgs(7);
-                thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs(8);
-                thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs(9);
-                thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs(10);
-
-                if (thisProp->bhUTubeDist < thisProp->pipe.outDia) {
-                    ShowWarningError(
-                        state, "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
-                    ShowWarningError(state, "Shank spacing is set to the outer pipe diameter.");
-                    thisProp->bhUTubeDist = thisProp->pipe.outDia;
-                }
-
-                thisProp->pipe.innerDia = thisProp->pipe.outDia - 2 * thisProp->pipe.thickness;
-                thisProp->pipe.outRadius = thisProp->pipe.outDia / 2;
-                thisProp->pipe.innerRadius = thisProp->pipe.innerDia / 2;
-
+            auto &instancesValue = instances.value();
+            for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
+                auto const &instance = it.value();
+                auto const &objName = it.key();
+                auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+                inputProcessor->markObjectAsUsed(sProps, objName);
+                std::shared_ptr<GLHEVertProps> thisProp(new GLHEVertProps(state, objNameUC, instance));
                 state.dataGroundHeatExchanger->vertPropsVector.push_back(thisProp);
             }
         }
@@ -2181,7 +2172,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
                 thisRF->name = DataIPShortCuts::cAlphaArgs(1);
                 thisRF->props = GetVertProps(state, DataIPShortCuts::cAlphaArgs(2));
                 thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
@@ -2263,7 +2254,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertArrayStruct> thisArray(new GLHEVertArrayStruct);
+                std::shared_ptr<GLHEVertArray> thisArray(new GLHEVertArray);
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
                 thisArray->props = GetVertProps(state, DataIPShortCuts::cAlphaArgs(2));
                 thisArray->numBHinXDirection = DataIPShortCuts::rNumericArgs(1);
@@ -2315,7 +2306,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertSingleStruct> thisArray(new GLHEVertSingleStruct);
+                std::shared_ptr<GLHEVertSingle> thisArray(new GLHEVertSingle);
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
                 thisArray->props = GetVertProps(state, DataIPShortCuts::cAlphaArgs(2));
                 thisArray->xLoc = DataIPShortCuts::rNumericArgs(1);
@@ -2432,11 +2423,11 @@ namespace EnergyPlus::GroundHeatExchangers {
                     }
 
                     // Calculate response factors from individual boreholes
-                    std::vector<std::shared_ptr<GLHEVertSingleStruct>> tempVectOfBHObjects;
+                    std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
 
                     for (int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index) {
                         if (!DataIPShortCuts::lAlphaFieldBlanks(index)) {
-                            std::shared_ptr<GLHEVertSingleStruct> tempBHptr = GetSingleBH(state, DataIPShortCuts::cAlphaArgs(index));
+                            std::shared_ptr<GLHEVertSingle> tempBHptr = GetSingleBH(state, DataIPShortCuts::cAlphaArgs(index));
                             if (tempBHptr) {
                                 tempVectOfBHObjects.push_back(tempBHptr);
                             } else {
@@ -2677,7 +2668,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                 thisGLHE.maxSimYears = DataIPShortCuts::rNumericArgs(16);
 
                 // Need to add a response factor object for the slinky model
-                std::shared_ptr<GLHEResponseFactorsStruct> thisRF(new GLHEResponseFactorsStruct);
+                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
                 thisRF->name =
                     "Response Factor Object Auto Generated No: " + fmt::to_string(state.dataGroundHeatExchanger->numAutoGeneratedResponseFactors + 1);
                 thisGLHE.myRespFactors = thisRF;
@@ -3005,7 +2996,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // PURPOSE OF THIS SUBROUTINE:
         //    Calculates the resistance of the slinky HX from the fluid to the
-        //	  outer tube wall.
+        //    outer tube wall.
 
         using FluidProperties::GetConductivityGlycol;
         using FluidProperties::GetDensityGlycol;
