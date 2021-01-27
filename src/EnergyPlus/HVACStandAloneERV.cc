@@ -2047,4 +2047,66 @@ namespace EnergyPlus::HVACStandAloneERV {
         return GetStandAloneERVReturnAirNode;
     }
 
+    bool StandAloneERVAFNExceptions(EnergyPlusData &state, int const NodeNumber)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jeremy Lerond & Yan Chen
+        //       DATE WRITTEN   January 2021
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Check if a node is used by a stand alone ERV.
+
+        // Return value
+        bool StandSloneERVAFNException;
+
+        int StandAloneERVIndex;
+
+        if (state.dataHVACStandAloneERV->GetERVInputFlag) {
+            GetStandAloneERV(state);
+            state.dataHVACStandAloneERV->GetERVInputFlag = false;
+        }
+
+        StandSloneERVAFNException = false;
+
+        for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) { 
+
+            auto StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
+
+            // Supply air inlet node
+            if (NodeNumber == StandAloneERV.SupplyAirInletNode) {
+                StandSloneERVAFNException = true;
+                break;
+            }
+
+            bool ErrorsFound{false};
+            int SupplyFanInletNodeIndex(0);
+            int SupplyFanOutletNodeIndex(0);
+
+            // ZoneHVAC:EnergyRecoveryVentilator only accepts Fan:SystemModel or Fan:OnOff
+            if (StandAloneERV.SupplyAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                // Fan:SystemModel
+                SupplyFanInletNodeIndex = HVACFan::fanObjs[StandAloneERV.SupplyAirFanIndex]->inletNodeNum;
+                SupplyFanOutletNodeIndex = HVACFan::fanObjs[StandAloneERV.SupplyAirFanIndex]->outletNodeNum;
+            } else {
+                // Fan:OnOff
+                SupplyFanInletNodeIndex = Fans::GetFanInletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
+                SupplyFanOutletNodeIndex = Fans::GetFanOutletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
+                if (ErrorsFound) {
+                    ShowWarningError(state, "Could not retrieve fan outlet node for this unit=\"" + StandAloneERV.Name + "\".");
+                    ErrorsFound = true;
+                }
+            }
+
+            if (NodeNumber == SupplyFanInletNodeIndex || NodeNumber == SupplyFanOutletNodeIndex) {
+                StandSloneERVAFNException = true;
+                break;
+            }
+
+        }
+
+        return StandSloneERVAFNException;
+    }
+
 } // namespace EnergyPlus

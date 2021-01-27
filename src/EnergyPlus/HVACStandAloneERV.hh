@@ -192,6 +192,8 @@ namespace HVACStandAloneERV {
 
     int GetStandAloneERVReturnAirNode(EnergyPlusData &state, int const StandAloneERVNum);
 
+    bool StandAloneERVAFNExceptions(EnergyPlusData &state, int const NodeNumber);
+
 } // namespace HVACStandAloneERV
 
 struct HVACStandAloneERVData : BaseGlobalStruct {

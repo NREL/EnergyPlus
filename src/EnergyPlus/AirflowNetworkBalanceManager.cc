@@ -101,6 +101,8 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 
 namespace EnergyPlus {
 
@@ -9476,6 +9478,8 @@ namespace AirflowNetworkBalanceManager {
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
+        using WaterThermalTanks::HeatPumpWaterHeaterNodeAFNExceptions;
+        using HVACStandAloneERV::StandAloneERVAFNExceptions;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ValidateDistributionSystem: "); // include trailing blank space
@@ -9583,6 +9587,12 @@ namespace AirflowNetworkBalanceManager {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
             if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
+
+            // Skip HPWH nodes that don't have to be included in the AFN
+            if (HeatPumpWaterHeaterNodeAFNExceptions(state, i)) NodeFound(i) = true;
+
+            // Skip Standalone ERV nodes that don't have to be included in the AFN
+            if (StandAloneERVAFNExceptions(state, i)) NodeFound(i) = true;
 
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;

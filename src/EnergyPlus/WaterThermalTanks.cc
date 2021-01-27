@@ -11855,6 +11855,93 @@ namespace WaterThermalTanks {
         }
     }
 
+    bool HeatPumpWaterHeaterNodeAFNExceptions(EnergyPlusData &state, int const NodeNumber)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Jeremy Lerond & Yan Chen
+        //       DATE WRITTEN   January 2021
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Check if a node is used by a heat pump water heater
+        // and can be excluded from an airflow network.
+
+        // Return value
+        bool HeatPumpWaterHeaterNodeException; 
+
+        int HeatPumpWaterHeaterIndex;
+
+        if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput(state);
+            state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+        }
+
+        HeatPumpWaterHeaterNodeException = false;
+
+        for (HeatPumpWaterHeaterIndex = 1; HeatPumpWaterHeaterIndex <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HeatPumpWaterHeaterIndex) {
+
+            // Get heat pump water heater data
+            HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HeatPumpWaterHeaterIndex);
+
+            // "Zone and outdoor air" configuration is expected to change the zone pressure balance
+            if (HPWH.InletAirConfiguration != AmbientTempEnum::ZoneAndOA) {
+
+                // Air outlet node
+                if (NodeNumber == HPWH.HeatPumpAirOutletNode) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+                // Air inlet node
+                if (NodeNumber == HPWH.HeatPumpAirInletNode) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+                // Get fan inlet node index
+                bool ErrorsFound{false};
+                int FanInletNodeIndex(0);
+                if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                    FanInletNodeIndex = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
+                } else {
+                    FanInletNodeIndex = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, ErrorsFound);
+                    if (ErrorsFound) {
+                        ShowWarningError(state, "Could not retrieve fan outlet node for this unit=\"" + HPWH.Name + "\".");
+                        ErrorsFound = true;
+                    }
+                }
+
+                // Fan inlet node
+                if (NodeNumber == FanInletNodeIndex) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+                // Fan outlet node
+                if (NodeNumber == HPWH.FanOutletNode) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+                // Outside air node
+                if (NodeNumber == HPWH.OutsideAirNode) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+                // Exhaust air node
+                if (NodeNumber == HPWH.ExhaustAirNode) {
+                    HeatPumpWaterHeaterNodeException = true;
+                    break;
+                }
+
+            }
+        }
+
+        return HeatPumpWaterHeaterNodeException;
+    }
+
 } // namespace WaterThermalTanks
 
 } // namespace EnergyPlus
