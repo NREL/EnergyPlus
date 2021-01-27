@@ -461,8 +461,7 @@ namespace EnergyPlus::ScheduleManager {
                         // no more commas
                         subString = LineIn.data.substr(wordStart);
                         if (firstLine && subString == BlankString) {
-                            ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName +
-                                             "\"  first line does not contain the indicated column separator=comma.");
+                            ShowWarningError(state, format("{}:\"{}\" first line does not contain the indicated column separator=comma.", RoutineName, ShadingSunlitFracFileName));
                             ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                             firstLine = false;
                         }
@@ -472,11 +471,10 @@ namespace EnergyPlus::ScheduleManager {
                     if (colCnt > 1) {
                         if (rowCnt == 1) {
                             if (subString == BlankString) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": invalid blank column header.");
+                                ShowWarningError(state, format("{}:\"{}\": invalid blank column header.", RoutineName, ShadingSunlitFracFileName));
                                 errFlag = true;
                             } else if (CSVAllColumnNames.count(subString)) {
-                                ShowWarningError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\": duplicated column header: \"" + subString +
-                                                 "\".");
+                                ShowWarningError(state, format(R"({}:"{}": duplicated column header: "{}".)", RoutineName, ShadingSunlitFracFileName, subString));
                                 ShowContinueError(state, "The first occurrence of the same surface name would be used.");
                                 errFlag = true;
                             }
@@ -1263,12 +1261,7 @@ namespace EnergyPlus::ScheduleManager {
                 CurrentThrough = Alphas(NumField);
                 ErrorHere = false;
                 General::ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
-                if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
-                    ShowContinueError(state, "Found entry=" + Alphas(NumField));
-                    ErrorsFound = true;
-                    goto Through_exit;
-                } else if (ErrorHere) {
+                if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth || ErrorHere) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError(state, "Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
@@ -1433,8 +1426,7 @@ namespace EnergyPlus::ScheduleManager {
                 }
             For_exit:;
                 if (!all(AllDays)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                     "\" has missing day types in Through=" + CurrentThrough);
+                    ShowWarningError(state, format("{}{}=\"{}\" has missing day types in Through={}", RoutineName, CurrentModuleObject, state.dataScheduleMgr->Schedule(SchNum).Name, CurrentThrough));
                     ShowContinueError(state, "Last \"For\" field=" + LastFor);
                     errmsg = "Missing day types=,";
                     for (kdy = 1; kdy <= MaxDayTypes; ++kdy) {
@@ -1919,13 +1911,13 @@ namespace EnergyPlus::ScheduleManager {
                 ++AddWeekSch;
                 ++AddDaySch;
                 // define week schedule
-                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = format("{}_shading_wk_{}", curName, ExtraField);
                 // for all day types point the week schedule to the newly defined day schedule
                 for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
                     state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
                 }
                 // day schedule
-                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = format("{}_shading_dy_{}", curName, ExtraField);
                 state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
                 // schedule is pointing to the week schedule
                 state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
@@ -3055,8 +3047,7 @@ namespace EnergyPlus::ScheduleManager {
             if (SHr == EHr) {
                 for (Min = SMin; Min <= EMin; ++Min) {
                     if (SetMinuteValue(Min, SHr)) {
-                        ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " +
-                                        ErrContext + '=' + DayScheduleName);
+                        ShowSevereError(state, format("ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, {}={}", ErrContext, DayScheduleName));
                         ErrorsFound = true;
                         goto UntilLoop_exit;
                     }
@@ -3075,8 +3066,7 @@ namespace EnergyPlus::ScheduleManager {
                     SMin = 1;
                 }
             } else if (EHr < SHr) {
-                ShowSevereError(state, "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext +
-                                '=' + DayScheduleName);
+                ShowSevereError(state, format("ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, {}={}", ErrContext, DayScheduleName));
                 ErrorsFound = true;
             } else {
                 if (interpolationKind == ScheduleInterpolation::Linear) {
