@@ -108,8 +108,6 @@ namespace PlantHeatExchangerFluidToFluid {
         CoolingSupplySideLoop,
     };
 
-    extern int NumberOfPlantFluidHXs;
-
     struct PlantConnectionStruct : PlantLocation
     {
         // Members
@@ -217,12 +215,7 @@ namespace PlantHeatExchangerFluidToFluid {
         );
     };
 
-    // Object Data
-    extern Array1D<HeatExchangerStruct> FluidHX;
-
     void GetFluidHeatExchangerInput(EnergyPlusData &state);
-
-    void clear_state();
 
 } // namespace PlantHeatExchangerFluidToFluid
 
@@ -231,14 +224,12 @@ struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct {
     int NumberOfPlantFluidHXs = 0;
     bool GetInput = true;
     Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
-    Array1D_bool CheckFluidHXs;
 
     void clear_state() override
     {
         this->NumberOfPlantFluidHXs = 0;
         this->GetInput = true;
         this->FluidHX.deallocate();
-        this->CheckFluidHXs.deallocate();
     }
 };
 
