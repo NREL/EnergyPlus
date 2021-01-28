@@ -64,15 +64,6 @@ struct EnergyPlusData;
 
 namespace HeatPumpWaterToWaterSimple {
 
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const HPEqFitHeating;
-    extern std::string const HPEqFitHeatingUC;
-    extern std::string const HPEqFitCooling;
-    extern std::string const HPEqFitCoolingUC;
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumGSHPs; // Number of GSHPs specified in input
-
     struct GshpSpecs : public PlantComponent
     {
         // Members
@@ -198,8 +189,6 @@ namespace HeatPumpWaterToWaterSimple {
 
         static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
 
-        static void clear_state();
-
         static void GetWatertoWaterHPInput(EnergyPlusData &state);
 
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
@@ -228,16 +217,21 @@ namespace HeatPumpWaterToWaterSimple {
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
 
-    // Object Data
-    extern Array1D<GshpSpecs> GSHP;
-
 } // namespace HeatPumpWaterToWaterSimple
 
 struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct {
 
+    int NumGSHPs = 0;
+    bool GetInputFlag = true;
+    Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
+    std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
+
     void clear_state() override
     {
-
+        this->NumGSHPs = 0;
+        this->GetInputFlag = true;
+        this->GSHP.deallocate();
+        this->HeatPumpWaterUniqueNames.clear();
     }
 };
 

@@ -112,7 +112,6 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
@@ -138,8 +137,6 @@
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -204,7 +201,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
     HeatPumpWaterToWaterCOOLING::clear_state();
     HeatPumpWaterToWaterHEATING::clear_state();
     HeatRecovery::clear_state();
