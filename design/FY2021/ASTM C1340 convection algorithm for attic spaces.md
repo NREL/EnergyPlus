@@ -25,7 +25,7 @@ Table 1 shows the correlations for convection coefficients from ASTM C1340 Stand
 ![figure1](https://github.com/dareumnam/EnergyPlus/blob/RadiantBarrier/design/FY2021/table1.PNG)
 
 ASTM C1340 Convection algorithm will be implemented for SurfaceConvectionAlgorithm:Inside. 
-For radiant barriers, it can be selected Zone Inside Convection Algorithm of attic zone in Zone object.
+For radiant barriers, it can be selected `Zone Inside Convection Algorithm` of attic zone in `Zone` object.
 - Energyplus has a range of 0 to 180 degree of tilt angle of a surface. Flat roofs are tilted 0 degree, walls are tilted 90 degrees, and flat floors are tilted 180 degrees. Each case (horizontal surface, tilted surface, and vertical surface) can be classfied by this tilt angle. 
 - Heat flow direction (up and down) can be determined the temperature difference between the surface and the air.
 - For calculating the convection heat transfer coefficient, following inputs for each surface are needed:
