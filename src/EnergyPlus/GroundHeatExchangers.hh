@@ -264,13 +264,14 @@ namespace GroundHeatExchangers {
         int PrevN;             // The saved value of N at previous time step
         bool updateCurSimTime; // Used to reset the CurSimTime to reset after WarmupFlag
         bool triggerDesignDayReset;
+        bool needToSetupOutputVars;
 
         GLHEBase()
             : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
               aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
               totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
-              updateCurSimTime(true), triggerDesignDayReset(false)
+              updateCurSimTime(true), triggerDesignDayReset(false), needToSetupOutputVars(true)
         {
         }
 
@@ -311,6 +312,8 @@ namespace GroundHeatExchangers {
         virtual void getAnnualTimeConstant() = 0;
 
         virtual void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) = 0;
+
+        void setupOutput(EnergyPlusData &state);
     };
 
     struct GLHEVert : GLHEBase

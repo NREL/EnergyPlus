@@ -302,6 +302,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"]));
         this->xLoc = j["x_location"];
         this->yLoc = j["y_location"];
+        this->dl_i = 0.0;
+        this->dl_ii = 0.0;
+        this->dl_j = 0.0;
     }
 
     //******************************************************************************
@@ -648,6 +651,11 @@ namespace EnergyPlus::GroundHeatExchangers {
                             [[maybe_unused]] Real64 &CurLoad,
                             [[maybe_unused]] bool const RunFlag)
     {
+
+        if (this->needToSetupOutputVars) {
+            this->setupOutput(state);
+            this->needToSetupOutputVars = false;
+        }
 
         if (state.dataGlobal->KickOffSimulation) {
             this->initGLHESimVars(state);
@@ -2468,59 +2476,6 @@ namespace EnergyPlus::GroundHeatExchangers {
                 inputProcessor->markObjectAsUsed(currObj, objName);
                 state.dataGroundHeatExchanger->verticalGLHE.emplace_back(state, objNameUC, instance);
             }
-
-            // Set up report variables
-            for (int GLHENum = 0; GLHENum < state.dataGroundHeatExchanger->numVerticalGLHEs; ++GLHENum) {
-                auto &thisGLHE(state.dataGroundHeatExchanger->verticalGLHE[GLHENum]);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Average Borehole Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.bhTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
-                                    thisGLHE.QGLHE, "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.inletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.outletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisGLHE.massFlowRate,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Average Fluid Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.aveFluidTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Farfield Ground Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.tempGround,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-            }
         }
 
         // SLINKY GLHE
@@ -2694,49 +2649,61 @@ namespace EnergyPlus::GroundHeatExchangers {
 
                 state.dataGroundHeatExchanger->slinkyGLHE.push_back(thisGLHE);
             }
-
-            // Set up report variables
-            for (int GLHENum = 0; GLHENum < state.dataGroundHeatExchanger->numSlinkyGLHEs; ++GLHENum) {
-                auto &thisGLHE(state.dataGroundHeatExchanger->slinkyGLHE[GLHENum]);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Average Borehole Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.bhTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(
-                    state, "Ground Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, thisGLHE.QGLHE, "System", "Average", thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Inlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.inletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Outlet Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.outletTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    thisGLHE.massFlowRate,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-                SetupOutputVariable(state,
-                                    "Ground Heat Exchanger Average Fluid Temperature",
-                                    OutputProcessor::Unit::C,
-                                    thisGLHE.aveFluidTemp,
-                                    "System",
-                                    "Average",
-                                    thisGLHE.name);
-            }
         }
+    }
+
+    //******************************************************************************
+
+    void GLHEBase::setupOutput(EnergyPlusData &state)
+    {
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Average Borehole Temperature",
+                            OutputProcessor::Unit::C,
+                            this->bhTemp,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->QGLHE, "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->inletTemp,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->outletTemp,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->massFlowRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Average Fluid Temperature",
+                            OutputProcessor::Unit::C,
+                            this->aveFluidTemp,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable(state,
+                            "Ground Heat Exchanger Farfield Ground Temperature",
+                            OutputProcessor::Unit::C,
+                            this->tempGround,
+                            "System",
+                            "Average",
+                            this->name);
     }
 
     //******************************************************************************
