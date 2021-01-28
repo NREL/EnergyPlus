@@ -6257,7 +6257,7 @@ namespace ZoneTempPredictorCorrector {
                 auto const shading_flag(SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
-                if (shading_flag == WinShadingType::IntShade || shading_flag == WinShadingType::IntBlind) {
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -6271,7 +6271,7 @@ namespace ZoneTempPredictorCorrector {
                 if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (shading_flag == WinShadingType::IntShade || shading_flag == WinShadingType::IntBlind) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
                 if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
@@ -6299,7 +6299,7 @@ namespace ZoneTempPredictorCorrector {
                     HA += HA_surf;
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && shading_flag != WinShadingType::IntShade && shading_flag != WinShadingType::IntBlind) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     Real64 const HA_surf(HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
                     SumHATsurf += HA_surf * SurfWinDividerTempSurfIn(SurfNum);
@@ -6588,7 +6588,7 @@ namespace ZoneTempPredictorCorrector {
             if (Surface(SurfNum).Class == SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade || SurfWinShadingFlag(SurfNum) == WinShadingType::IntBlind) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -6602,7 +6602,7 @@ namespace ZoneTempPredictorCorrector {
                 if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade || SurfWinShadingFlag(SurfNum) == WinShadingType::IntBlind)
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
                     SumIntGains += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
@@ -6621,8 +6621,7 @@ namespace ZoneTempPredictorCorrector {
                                     (SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != WinShadingType::IntShade &&
-                    SurfWinShadingFlag(SurfNum) != WinShadingType::IntBlind) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHADTsurfs += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                     (SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);

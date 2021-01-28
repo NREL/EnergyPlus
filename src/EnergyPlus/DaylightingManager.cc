@@ -5588,7 +5588,7 @@ namespace EnergyPlus::DaylightingManager {
         } // End of loop over light well objects
     }
 
-    int findWinShadingIndex(int const IWin) {
+    inline int findWinShadingIndex(int const IWin) {
         int WinShadingIndex = 1; // 1=unshaded, 2=shaded
         bool WinShadedNoGlareControl = IS_SHADED(SurfWinShadingFlag(IWin)) && !SurfWinGlareControlIsActive(IWin);
         if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
@@ -6281,7 +6281,7 @@ namespace EnergyPlus::DaylightingManager {
                 }
             }
 
-            bool ShadedOrDiffusingGlassWin = (SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+            bool ShadedOrDiffusingGlassWin = SurfWinWindowModelType(IWin) != WindowBSDFModel &&
                                              (IS_SHADED(SurfWinShadingFlag(IWin)) || SurfWinSolarDiffusing(IWin));
 
             // Loop over reference points
@@ -6645,6 +6645,7 @@ namespace EnergyPlus::DaylightingManager {
 
                         // Reset shading flag to indicate that window is shaded by being partially or fully switched
                         SurfWinShadingFlag(IWin) = WinShadingType::SwitchableGlazing;
+                        SurfWinGlareControlIsActive(IWin) = false;
 
                         // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
                         // so completely switch all daylight-switchable windows to minimize solar gain
@@ -6724,7 +6725,6 @@ namespace EnergyPlus::DaylightingManager {
         Array2D<Real64> RBACLU(
             NREFPT,
             state.dataDaylightingData->ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
-
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
@@ -7034,7 +7034,7 @@ namespace EnergyPlus::DaylightingManager {
                 }     // end of for(auto IWin : listOfExtWin)
                 if (breakOuterLoop) break;
             } // for group
-        }     // GlareFlag
+        } // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off

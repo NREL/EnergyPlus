@@ -558,8 +558,6 @@ namespace DataSurfaces {
     bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
-    // String to item maps.
-    std::map<WindowShadingControlType, std::string> WindowShadingControlTypeToStr;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 

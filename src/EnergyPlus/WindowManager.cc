@@ -2320,8 +2320,7 @@ namespace WindowManager {
             //   blind/shade and glass 3.
 
             IConst = ConstrNum;
-            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::BGShade ||
-                ShadeFlag == WinShadingType::BGBlind || ShadeFlag == WinShadingType::ExtScreen) {
+            if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 IConst = surface.activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
             }
@@ -3222,7 +3221,7 @@ namespace WindowManager {
                     Aface(5, 6) = -state.dataWindowManager->scon(3);
                     Aface(6, 6) = hr(6) + state.dataWindowManager->scon(3) + state.dataWindowManager->hcin;
 
-                    if (ShadeFlag != WinShadingType::BGShade && ShadeFlag != WinShadingType::BGBlind && SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    if (!ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag) && SurfWinAirflowThisTS(SurfNum) > 0.0) {
                         Bface(4) = state.dataWindowManager->AbsRadGlassFace(4) + hcvAirflowGap * TAirflowGapNew;
                         Bface(5) = state.dataWindowManager->AbsRadGlassFace(5) + hcvAirflowGap * TAirflowGapNew;
                         Aface(4, 4) = state.dataWindowManager->scon(2) + hcvAirflowGap - state.dataWindowManager->A45P * hr(4);
@@ -3243,9 +3242,7 @@ namespace WindowManager {
                         Aface(8, 7) = -sconsh;
                         Aface(7, 8) = -sconsh;
                         Aface(8, 8) = hr(8) + sconsh + state.dataWindowManager->hcin;
-                    }
-
-                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
+                    } else if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(7) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(8) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3257,9 +3254,7 @@ namespace WindowManager {
                         Aface(1, 8) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
                         Aface(7, 8) = -sconsh;
                         Aface(8, 8) = hr(8) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
-                    }
-
-                    if (ShadeFlag == WinShadingType::BGShade || ShadeFlag == WinShadingType::BGBlind) {
+                    } else if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                         for (i = 1; i <= 8; ++i) {
                             RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir(i) - state.dataWindowManager->emis(i));
                         }
@@ -3538,7 +3533,7 @@ namespace WindowManager {
             }
 
             // Save hcv for use in divider calc with interior or exterior shade (see CalcWinFrameAndDividerTemps)
-            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::ExtScreen)
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag) || ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag))
                 SurfWinConvCoeffWithShade(SurfNum) = hcv;
         } else {
             // No convergence after MaxIterations even with relaxed error tolerance
@@ -6145,7 +6140,7 @@ namespace WindowManager {
             if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == 5) ShadeFlag = WinShadingType::BGBlind;
         }
 
-        if (ShadeFlag == WinShadingType::BGShade || ShadeFlag == WinShadingType::BGBlind) {
+        if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
             errFlag = 2;
             return;
         }

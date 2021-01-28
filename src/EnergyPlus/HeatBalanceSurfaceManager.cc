@@ -1050,20 +1050,43 @@ namespace HeatBalanceSurfaceManager {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, WindowShadingControl(curWSC).Name);
                             // shading report
-                            std::map<WinShadingType, std::string> WindowShadingTypeToStr = {
-                                    {WinShadingType::IntShade, "No Shade"},
-                                    {WinShadingType::IntShade, "Interior Shade"},
-                                    {WinShadingType::ExtShade, "Exterior Shade"},
-                                    {WinShadingType::ExtScreen, "Exterior Screen"},
-                                    {WinShadingType::IntBlind, "Interior Blind"},
-                                    {WinShadingType::ExtBlind, "Exterior Blind"},
-                                    {WinShadingType::BGShade, "Between Glass Shade"},
-                                    {WinShadingType::BGBlind, "Between Glass Blind"},
-                                    {WinShadingType::SwitchableGlazing, "Switchable Glazing"}
+                            std::vector<std::string> WindowShadingTypeStr = {
+                                    "No Shade", // WinShadingType::NoShade
+                                    "Interior Shade", // WinShadingType::IntShade
+                                    "Switchable Glazing",
+                                    "Exterior Shade",
+                                    "Exterior Screen",
+                                    "Interior Blind",
+                                    "Exterior Blind",
+                                    "Between Glass Shade",
+                                    "Between Glass Blind",
                             };
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, WindowShadingTypeToStr[WindowShadingControl(curWSC).ShadingType]);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName,
-                                             DataSurfaces::WindowShadingControlTypeToStr[WindowShadingControl(curWSC).ShadingControlType]);
+                            std::vector<std::string> WindowShadingControlTypeStr = {
+                                    "Uncontrolled",
+                                    "AlwaysOn",
+                                    "AlwaysOff",
+                                    "OnIfScheduleAllows",
+                                    "OnIfHighSolarOnWindow",
+                                    "OnIfHighHorizontalSolar",
+                                    "OnIfHighOutdoorAirTemperature",
+                                    "OnIfHighZoneAirTemperature",
+                                    "OnIfHighZoneCooling",
+                                    "OnIfHighGlare",
+                                    "MeetDaylightIlluminanceSetpoint",
+                                    "OnNightIfLowOutdoorTempAndOffDay",
+                                    "OnNightIfLowInsideTempAndOffDay",
+                                    "OnNightIfHeatingAndOffDay",
+                                    "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+                                    "OnNightIfHeatingAndOnDayIfCooling",
+                                    "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                    "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                    "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+                                    "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+                                    "OnIfHighZoneAirTempAndHighSolarOnWindow",
+                                    "OnIfHighZoneAirTempAndHighHorizontalSolar"
+                            };
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, WindowShadingTypeStr[int(WindowShadingControl(curWSC).ShadingType)]);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, WindowShadingControlTypeStr[int(WindowShadingControl(curWSC).ShadingControlType)]);
 
                             // output list of all possible shading contructions for shaded windows including those with storms
                             std::string names = "";
@@ -2886,7 +2909,7 @@ namespace HeatBalanceSurfaceManager {
                                         SurfWinExtDiffAbsByShade(SurfNum) *= SurfWinGlazedFrac(SurfNum);
 
                                     if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
-                                        Real64 SwitchFac = SurfWinSwitchingFactor( SurfNum); // Switching factor for switchable glazing
+                                        Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum); // Switching factor for switchable glazing
                                         for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                             AbsDiffWin(Lay) = InterpSw(SwitchFac, AbsDiffWin(Lay), state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay));
                                         }

@@ -140,10 +140,10 @@ namespace DataSurfaces {
         SwitchableGlazing = 2,
         ExtShade = 3,
         ExtScreen = 4,
-        IntBlind = 6,
-        ExtBlind = 7,
-        BGShade = 8,
-        BGBlind = 9,
+        IntBlind = 5,
+        ExtBlind = 6,
+        BGShade = 7,
+        BGBlind = 8,
         ShadeOff = 10
     };
 
@@ -170,9 +170,7 @@ namespace DataSurfaces {
         OnHiOutTemp_HiHorzSolar = 19,
         OnHiZoneTemp_HiSolarWindow = 20,
         OnHiZoneTemp_HiHorzSolar = 21
-
     };
-    extern std::map<WindowShadingControlType, std::string> WindowShadingControlTypeToStr;
 
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
