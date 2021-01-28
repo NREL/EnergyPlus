@@ -191,26 +191,31 @@ namespace HeatPumpWaterToWaterSimple {
 
         static void GetWatertoWaterHPInput(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
         void InitWatertoWaterHP(EnergyPlusData &state,
-                                int const GSHPTypeNum,       // Type of GSHP
+                                int GSHPTypeNum,             // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
-                                bool const FirstHVACIteration,
-                                Real64 const MyLoad // Demand Load
+                                bool FirstHVACIteration,
+                                Real64 MyLoad // Demand Load
         );
 
         void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
 
         void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
 
-        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
-        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
 
@@ -219,7 +224,8 @@ namespace HeatPumpWaterToWaterSimple {
 
 } // namespace HeatPumpWaterToWaterSimple
 
-struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct {
+struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
+{
 
     int NumGSHPs = 0;
     bool GetInputFlag = true;

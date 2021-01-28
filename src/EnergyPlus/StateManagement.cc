@@ -110,7 +110,6 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -201,7 +200,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterCOOLING::clear_state();
     HeatPumpWaterToWaterHEATING::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
