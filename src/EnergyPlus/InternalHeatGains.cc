@@ -1582,8 +1582,8 @@ namespace InternalHeatGains {
                     // setup internal gains
                     int returnNodeNum = 0;
                     if ((Lights(Loop).ZoneReturnNum > 0) &&
-                        (Lights(Loop).ZoneReturnNum <= DataZoneEquipment::ZoneEquipConfig(Lights(Loop).ZonePtr).NumReturnNodes)) {
-                        returnNodeNum = DataZoneEquipment::ZoneEquipConfig(Lights(Loop).ZonePtr).ReturnNode(Lights(Loop).ZoneReturnNum);
+                        (Lights(Loop).ZoneReturnNum <= state.dataZoneEquip->ZoneEquipConfig(Lights(Loop).ZonePtr).NumReturnNodes)) {
+                        returnNodeNum = state.dataZoneEquip->ZoneEquipConfig(Lights(Loop).ZonePtr).ReturnNode(Lights(Loop).ZoneReturnNum);
                     }
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state, Lights(Loop).ZonePtr,
@@ -3967,8 +3967,8 @@ namespace InternalHeatGains {
 
                 // check supply air node for matches with zone equipment supply air node
                 int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, Zone(ZoneITEq(Loop).ZonePtr).Name);
-                auto itStart = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                auto itEnd = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
                 auto key = ZoneITEq(Loop).SupplyAirNodeNum;
                 bool supplyNodeFound = false;
                 if (std::find(itStart, itEnd, key) != itEnd) {
@@ -5258,7 +5258,6 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
         using DataSizing::CurOverallSimDay;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DaylightingDevices::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
         using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
@@ -5452,7 +5451,7 @@ namespace InternalHeatGains {
                 // Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
                 if (Zone(NZ).IsControlled) {
                     int retNum = Lights(Loop).ZoneReturnNum;
-                    int ReturnZonePlenumCondNum = ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
+                    int ReturnZonePlenumCondNum = state.dataZoneEquip->ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
                         ReturnPlenumTemp = state.dataZonePlenum->ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
                         FractionReturnAir =
@@ -5709,7 +5708,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).HasAdjustedReturnTempByITE && Zone(ZoneNum).HasLtsRetAirGain) {
@@ -5737,7 +5735,6 @@ namespace InternalHeatGains {
 
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataZoneEquipment::ZoneEquipConfig;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
@@ -5902,7 +5899,7 @@ namespace InternalHeatGains {
                     WAirIn = ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-                    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+                    int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                     TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);

@@ -873,9 +873,9 @@ namespace RoomAirModelUserTempPattern {
         }
 
         int zoneEquipNum = Zone(ZoneNum).ZoneEqNum;
-        for (int nodeCount = 1; nodeCount <= DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
+        for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
             // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-            int ReturnNode = DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
+            int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
             ZoneNode = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID;
             ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
@@ -896,7 +896,7 @@ namespace RoomAirModelUserTempPattern {
             WinGapTtoRA = 0.0;
             WinGapFlowTtoRA = 0.0;
 
-            if (DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
+            if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {

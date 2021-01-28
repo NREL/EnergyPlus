@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
-    DataZoneEquipment::ZoneEquipAvail.allocate(6);
+    state->dataZoneEquip->ZoneEquipAvail.allocate(6);
 
     state->dataGlobal->NumOfZones = 6;
 
@@ -274,33 +274,33 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataHeatBalance::Zone(5).Name = "ZONE 5";
     DataHeatBalance::Zone(6).Name = "ZONE 6";
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "Zone 1";
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    DataZoneEquipment::ZoneEquipConfig(2).ZoneName = "Zone 2";
-    DataZoneEquipment::ZoneEquipConfig(2).ActualZoneNum = 2;
-    DataZoneEquipment::ZoneEquipConfig(2).ZoneNode = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 2;
 
-    DataZoneEquipment::ZoneEquipConfig(3).ZoneName = "Zone 3";
-    DataZoneEquipment::ZoneEquipConfig(3).ActualZoneNum = 3;
-    DataZoneEquipment::ZoneEquipConfig(3).ZoneNode = 3;
+    state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
+    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
+    state->dataZoneEquip->ZoneEquipConfig(3).ZoneNode = 3;
 
-    DataZoneEquipment::ZoneEquipConfig(4).ZoneName = "Zone 4";
-    DataZoneEquipment::ZoneEquipConfig(4).ActualZoneNum = 4;
-    DataZoneEquipment::ZoneEquipConfig(4).ZoneNode = 4;
+    state->dataZoneEquip->ZoneEquipConfig(4).ZoneName = "Zone 4";
+    state->dataZoneEquip->ZoneEquipConfig(4).ActualZoneNum = 4;
+    state->dataZoneEquip->ZoneEquipConfig(4).ZoneNode = 4;
 
-    DataZoneEquipment::ZoneEquipConfig(5).ZoneName = "Zone 5";
-    DataZoneEquipment::ZoneEquipConfig(5).ActualZoneNum = 5;
-    DataZoneEquipment::ZoneEquipConfig(5).ZoneNode = 5;
+    state->dataZoneEquip->ZoneEquipConfig(5).ZoneName = "Zone 5";
+    state->dataZoneEquip->ZoneEquipConfig(5).ActualZoneNum = 5;
+    state->dataZoneEquip->ZoneEquipConfig(5).ZoneNode = 5;
 
-    DataZoneEquipment::ZoneEquipConfig(6).ZoneName = "Zone 6";
-    DataZoneEquipment::ZoneEquipConfig(6).ActualZoneNum = 6;
-    DataZoneEquipment::ZoneEquipConfig(6).ZoneNode = 6;
+    state->dataZoneEquip->ZoneEquipConfig(6).ZoneName = "Zone 6";
+    state->dataZoneEquip->ZoneEquipConfig(6).ActualZoneNum = 6;
+    state->dataZoneEquip->ZoneEquipConfig(6).ZoneNode = 6;
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     DataHeatBalFanSys::TempTstatAir.allocate(6);
     DataHeatBalFanSys::TempTstatAir(1) = 18.0; // all zones have different space temperature
@@ -316,11 +316,11 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     DataHeatBalFanSys::ZoneThermostatSetPointLo = 19.0; // all zones use same set point temperature
     DataHeatBalFanSys::ZoneThermostatSetPointHi = 24.0;
 
-    DataZoneControls::OccRoomTSetPointHeat.allocate(6);
-    DataZoneControls::OccRoomTSetPointCool.allocate(6);
+    state->dataZoneCtrls->OccRoomTSetPointHeat.allocate(6);
+    state->dataZoneCtrls->OccRoomTSetPointCool.allocate(6);
 
-    DataZoneControls::OccRoomTSetPointHeat = 19.0; // all zones use same set point temperature
-    DataZoneControls::OccRoomTSetPointCool = 24.0;
+    state->dataZoneCtrls->OccRoomTSetPointHeat = 19.0; // all zones use same set point temperature
+    state->dataZoneCtrls->OccRoomTSetPointCool = 24.0;
 
     SystemAvailabilityManager::ManageSystemAvailability(*state); // 1st time through just gets input
 
@@ -792,10 +792,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "SPACE1-1";
-    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "SPACE1-1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).Name = "System Avail";
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlType = state->dataSystemAvailabilityManager->CycleOnAny;

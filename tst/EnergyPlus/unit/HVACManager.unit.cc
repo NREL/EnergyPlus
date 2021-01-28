@@ -84,14 +84,14 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalance::CrossMixing.allocate(NumOfCrossMixing);
     DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::CrossMixingReportFlag.allocate(NumOfCrossMixing);
+    state->dataZoneEquip->CrossMixingReportFlag.allocate(NumOfCrossMixing);
     DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
-    DataZoneEquipment::CrossMixingReportFlag(1) = true;
+    state->dataZoneEquip->CrossMixingReportFlag(1) = true;
     DataHVACGlobals::TimeStepSys = 1.0;
     DataHeatBalFanSys::MCPI = 0.0;
     DataHeatBalFanSys::MCPV = 0.0;
@@ -106,13 +106,13 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalance::CrossMixing(1).ZonePtr = 1;
     DataHeatBalance::CrossMixing(1).FromZone = 2;
     DataHeatBalance::CrossMixing(1).DesiredAirFlowRate = 0.1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataHeatBalance::CrossMixing.deallocate();
     DataHeatBalance::ZnAirRpt.deallocate();
-    DataZoneEquipment::CrossMixingReportFlag.deallocate();
+    state->dataZoneEquip->CrossMixingReportFlag.deallocate();
     DataHeatBalFanSys::MCPI.deallocate();
     DataHeatBalFanSys::MCPV.deallocate();
     DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate();
@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalance::TotVentilation = 1;
     DataHeatBalance::Ventilation.allocate(DataHeatBalance::TotVentilation);
-    DataZoneEquipment::VentMCP.allocate(1);
+    state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
@@ -173,16 +173,16 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     DataHeatBalance::Ventilation(1).ZonePtr = 1;
     DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
-    DataZoneEquipment::VentMCP(1) = DataHeatBalFanSys::MCPV(1);
+    state->dataZoneEquip->VentMCP(1) = DataHeatBalFanSys::MCPV(1);
     // Call HVACManager
     ReportAirHeatBalance(*state);
 
@@ -235,15 +235,15 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
     state->dataFans->NumFans = 1;

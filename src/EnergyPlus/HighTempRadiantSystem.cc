@@ -701,24 +701,8 @@ namespace HighTempRadiantSystem {
         // METHODOLOGY EMPLOYED:
         // Simply initializes whatever needs initializing.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Intermediate variable for keeping track of the zone number
@@ -737,7 +721,7 @@ namespace HighTempRadiantSystem {
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumOfHighTempRadSys; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys(Loop).Name)) continue;

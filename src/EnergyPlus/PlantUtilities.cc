@@ -253,10 +253,8 @@ namespace PlantUtilities {
             DataLoopNode::Node(OutletNode).MassFlowRateMinAvail = max(DataLoopNode::Node(InletNode).MassFlowRateMinAvail, DataLoopNode::Node(InletNode).MassFlowRateMin);
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
             // virtual 2-way valve (was tried but it clamps down demand side component's flow options so they can't find proper solutions)
-            //  Node(OutletNode)%MassFlowRateMinAvail = MAX(Node(InletNode)%MassFlowRateMinAvail , CompFlow)
-            //  Node(OutletNode)%MassFlowRateMaxAvail = MIN(Node(InletNode)%MassFlowRateMaxAvail , CompFlow)
         } else {
-            // DSU lodge the original request for all types
+            // lodge the original request for all types
             DataLoopNode::Node(InletNode).MassFlowRateRequest = CompFlow;
         }
 

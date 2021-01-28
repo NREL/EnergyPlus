@@ -81,9 +81,7 @@
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
-namespace EnergyPlus {
-
-namespace SizingManager {
+namespace EnergyPlus::SizingManager {
 
     // MODULE INFORMATION:
     //       AUTHOR         Fred Buhl
@@ -103,7 +101,6 @@ namespace SizingManager {
     using DataStringGlobals::CharComma;
     using DataStringGlobals::CharSpace;
     using DataStringGlobals::CharTab;
-    using DataZoneEquipment::ZoneEquipConfig;
 
     void ManageSizing(EnergyPlusData &state)
     {
@@ -572,7 +569,7 @@ namespace SizingManager {
         // report sizing results to eio file
         if (ZoneSizingRunDone) {
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-                if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneNum = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
                 if (FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow > 0.0) {
                     TimeStepAtPeak = FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
@@ -721,8 +718,8 @@ namespace SizingManager {
                                      " is zero.");
                     ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
                 }
-                std::string coolPeakLoadKind = "";
-                std::string coolPeakDDDate = "";
+                std::string coolPeakLoadKind;
+                std::string coolPeakDDDate;
                 int coolPeakDD = 0;
                 Real64 coolCap = 0.;
                 if (FinalSysSizing(AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
@@ -973,7 +970,8 @@ namespace SizingManager {
                                 bool UseMinOASchFlag = false;
                                 Real64 designOAductFlow(0.0);
                                 designOAductFlow =
-                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state, DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
+                                    DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
+                                                                                         DualDuct::dd_airterminal(dualDuctATUNum).OARequirementsPtr,
                                                                                          DualDuct::dd_airterminal(dualDuctATUNum).ActualZoneNum,
                                                                                          UseOccSchFlag,
                                                                                          UseMinOASchFlag);
@@ -2197,7 +2195,7 @@ namespace SizingManager {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + OARequirements(OAIndex).Name + "\",");
                 ShowContinueError(state, "...Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\",");
                 ShowContinueError(state, "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum, IndoorAirQualityProcedure, "
-                                  "ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedonOccupancySchedule.");
+                                  "ProportionalControlBasedOnDesignOccupancy, and ProportionalControlBasedOnOccupancySchedule.");
                 ErrorsFound = true;
             }
         } else {
@@ -3849,7 +3847,7 @@ namespace SizingManager {
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                     ShowContinueError(state, "...incorrect " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
-                    ShowContinueError(state, "...Valid values are \"Heating\", \"Cooling\", \"Condenser\" or \"Steam\".");
+                    ShowContinueError(state, R"(...Valid values are "Heating", "Cooling", "Condenser" or "Steam".)");
                     ErrorsFound = true;
                 }
             }
@@ -3864,7 +3862,7 @@ namespace SizingManager {
                     } else {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                         ShowContinueError(state, "...incorrect " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
-                        ShowContinueError(state, "...Valid values are \"NonCoincident\" or \"Coincident\".");
+                        ShowContinueError(state, R"(...Valid values are "NonCoincident" or "Coincident".)");
                         ErrorsFound = true;
                     }
                 }
@@ -4883,7 +4881,7 @@ namespace SizingManager {
             Real64 wghtdCoolDOASHeatAdd = 0.;
             Real64 wghtdCoolDOASLatAdd = 0.;
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-                if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 Real64 curCoolLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
                 if (curCoolLoad > 0.0) {
                     sumCoolLoad += curCoolLoad;
@@ -5065,6 +5063,4 @@ namespace SizingManager {
             }
         }
     }
-} // namespace SizingManager
-
 } // namespace EnergyPlus

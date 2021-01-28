@@ -384,15 +384,15 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
     BaseboardRadiator::GetBaseboardInput(*state);
 
     DataSizing::FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
     DataSizing::ZoneSizingRunDone = true;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(3);
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(3);
 
     BaseboardNum = 1;
     CntrlZoneNum = 1;
@@ -402,8 +402,8 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     // do baseboard sizing
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).WaterVolFlowRateMax = DataSizing::AutoSize;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA = DataSizing::AutoSize; // reset to autosize to test new calculation
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
-    EXPECT_EQ(DataZoneEnergyDemands::ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP, 2000.0); // design load = 2000
+    EXPECT_EQ(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP, 2000.0); // design load = 2000
     EXPECT_EQ(state->dataBaseboardRadiator->Baseboard(BaseboardNum).UA, 2000.0);                                       // UA = design load
 
     BaseboardNum = 2;
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
-    DataZoneEnergyDemands::CurDeadBandOrSetback(CntrlZoneNum) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
     FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;

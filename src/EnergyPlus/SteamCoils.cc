@@ -783,7 +783,7 @@ namespace SteamCoils {
                     if (DesCoilLoad >= SmallLoad) {
                         // TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
                         // TempSteamIn=PlantSizData(PltSizSteamNum)%ExitTemp
-                        TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
+                        TempSteamIn = 100.0; // Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
                         // RefrigIndex is set during GetInput for this module
                         EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                         EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
