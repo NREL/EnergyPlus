@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3191,16 +3191,6 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Go through the reports and create links
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using EconomicLifeCycleCost::LCCparamPresent;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const Entire_Facility("Entire Facility");
         static std::string const Annual_Building_Utility_Performance_Summary("Annual Building Utility Performance Summary");
@@ -3238,7 +3228,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         // normally do not add to the table of contents here but the order of calls is different for the life-cycle costs
-        if (ort->displayLifeCycleCostReport && LCCparamPresent) {
+        if (ort->displayLifeCycleCostReport && state.dataEconLifeCycleCost->LCCparamPresent) {
             AddTOCEntry(state, "Life-Cycle Cost Report", "Entire Facility");
         }
 
@@ -4324,8 +4314,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using DXCoils::DXCoil;
-        using DXCoils::NumDXCoils;
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
@@ -4333,10 +4321,6 @@ namespace EnergyPlus::OutputReportTabular {
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
-        using HVACVariableRefrigerantFlow::NumVRFCond;
-        using HVACVariableRefrigerantFlow::VRF;
-        using MixedAir::NumOAControllers;
-        using MixedAir::OAController;
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
 
@@ -4355,8 +4339,8 @@ namespace EnergyPlus::OutputReportTabular {
         SysTotalHVACRejectHeatLoss = 0;
 
         // HVAC relief air
-        for (iOACtrl = 1; iOACtrl <= NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
+        for (iOACtrl = 1; iOACtrl <= state.dataMixedAir->NumOAControllers; ++iOACtrl) {
+            SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
 
         // Condenser water loop
@@ -4373,32 +4357,32 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
-            if (state.dataPlantChillers->ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
-            if (state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
-            if (state.dataPlantChillers->GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->GTChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
-            if (state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataPlantChillers->ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
-            if (state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataChillerElectricEIR->ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
-            if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WATERCOOLED) {
+            if (state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += state.dataChillerReformulatedEIR->ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
@@ -4409,25 +4393,25 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // DX Coils air to air
-        for (iCoil = 1; iCoil <= NumDXCoils; ++iCoil) {
-            if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
-                                                  DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
-                } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
-                                                  DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
+        for (iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
+            if (state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
+                if (state.dataDXCoils->DXCoil(iCoil).CondenserType(1) == AirCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).ElecCoolingConsumption + state.dataDXCoils->DXCoil(iCoil).DefrostConsumption +
+                                                  state.dataDXCoils->DXCoil(iCoil).CrankcaseHeaterConsumption + state.dataDXCoils->DXCoil(iCoil).TotalCoolingEnergy;
+                } else if (state.dataDXCoils->DXCoil(iCoil).CondenserType(1) == EvapCooled) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).EvapCondPumpElecConsumption + state.dataDXCoils->DXCoil(iCoil).BasinHeaterConsumption +
+                                                  state.dataDXCoils->DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
-                if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
+                if (state.dataDXCoils->DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
+                    SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
-            } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
-                       DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
-                                              DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
+            } else if (state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
+                       state.dataDXCoils->DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                SysTotalHVACRejectHeatLoss += state.dataDXCoils->DXCoil(iCoil).ElecHeatingConsumption + state.dataDXCoils->DXCoil(iCoil).DefrostConsumption + state.dataDXCoils->DXCoil(iCoil).FuelConsumed +
+                                              state.dataDXCoils->DXCoil(iCoil).CrankcaseHeaterConsumption - state.dataDXCoils->DXCoil(iCoil).TotalHeatingEnergy;
             }
         }
         // VAV coils - air to air
@@ -4474,16 +4458,16 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Variable Refrigerant Flow
-        for (iCoil = 1; iCoil <= NumVRFCond; ++iCoil) {
-            if (VRF(iCoil).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
-                                              VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
-                                              (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
-            } else if (VRF(iCoil).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
-                                              VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
-            } else if (VRF(iCoil).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
+        for (iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
+            if (state.dataHVACVarRefFlow->VRF(iCoil).CondenserType == AirCooled) {
+                SysTotalHVACRejectHeatLoss += state.dataHVACVarRefFlow->VRF(iCoil).CoolElecConsumption + state.dataHVACVarRefFlow->VRF(iCoil).HeatElecConsumption +
+                                              state.dataHVACVarRefFlow->VRF(iCoil).CrankCaseHeaterElecConsumption + state.dataHVACVarRefFlow->VRF(iCoil).DefrostConsumption +
+                                              (state.dataHVACVarRefFlow->VRF(iCoil).TotalCoolingCapacity - state.dataHVACVarRefFlow->VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
+            } else if (state.dataHVACVarRefFlow->VRF(iCoil).CondenserType == EvapCooled) {
+                SysTotalHVACRejectHeatLoss += state.dataHVACVarRefFlow->VRF(iCoil).EvapCondPumpElecConsumption + state.dataHVACVarRefFlow->VRF(iCoil).BasinHeaterConsumption +
+                                              state.dataHVACVarRefFlow->VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
+            } else if (state.dataHVACVarRefFlow->VRF(iCoil).CondenserType == WaterCooled) {
+                SysTotalHVACRejectHeatLoss += state.dataHVACVarRefFlow->VRF(iCoil).QCondEnergy;
             }
         }
 
@@ -6626,8 +6610,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
             } // jTables
@@ -6830,8 +6814,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 // create statistics table
@@ -6878,8 +6862,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
             }
@@ -7382,8 +7366,8 @@ namespace EnergyPlus::OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                 }
 
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
                 }
             }
@@ -7536,8 +7520,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Site to Source Energy Conversion Factors");
                 }
 
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -7587,8 +7571,8 @@ namespace EnergyPlus::OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                 }
 
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
                 }
             }
@@ -7842,8 +7826,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
                 }
             }
@@ -8013,8 +7997,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "End Uses By Subcategory");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
                                                                                                 rowHeadTemp,
                                                                                                 columnHeadTemp,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -8178,8 +8162,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -8208,8 +8192,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Total Floor Area");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -8296,8 +8280,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
                 }
             }
@@ -8372,8 +8356,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
                 }
             }
@@ -8467,8 +8451,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
                 }
             }
@@ -8506,8 +8490,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -8549,8 +8533,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "Comfort and Setpoint Not Met Summary");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Annual Building Utility Performance Summary",
@@ -8787,8 +8771,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                        "Entire Facility",
                                                        "Source Energy End Use Components Summary");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                             rowHead,
                                                                                             columnHead,
                                                                                             "Source Energy End Use Components Summary",
@@ -8869,8 +8853,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Component Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -8905,8 +8889,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Components Per Total Floor Area");
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
                                                                                                 rowHead,
                                                                                                 columnHead,
                                                                                                 "Source Energy End Use Components Summary",
@@ -9213,8 +9197,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
             }
 
@@ -9336,8 +9320,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
             rowHeadTemp.deallocate();
@@ -9589,8 +9573,8 @@ namespace EnergyPlus::OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
 
@@ -9646,8 +9630,8 @@ namespace EnergyPlus::OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
     }
@@ -9909,8 +9893,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
             }
 
@@ -10131,8 +10115,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
             }
 
@@ -10199,8 +10183,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
 
@@ -10233,8 +10217,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
             }
 
@@ -10488,8 +10472,8 @@ namespace EnergyPlus::OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
             }
         }
@@ -10584,8 +10568,8 @@ namespace EnergyPlus::OutputReportTabular {
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
-            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
             }
         }
@@ -11039,8 +11023,8 @@ namespace EnergyPlus::OutputReportTabular {
                             sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
                         }
-                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
                         }
                     }
@@ -11263,8 +11247,8 @@ namespace EnergyPlus::OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -11409,8 +11393,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                                "Entire Facility",
                                                                "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -11428,8 +11412,8 @@ namespace EnergyPlus::OutputReportTabular {
                                                                "Entire Facility",
                                                                "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -11610,7 +11594,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11633,7 +11616,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (state.dataGlobal->CompLoadReportIsReq) {
             if (ort->displayZoneComponentLoadSummary) {
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     AddTOCEntry(state, "Zone Component Load Summary", Zone(iZone).Name);
                 }
             }
@@ -11829,7 +11812,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSizing::CalcFinalZoneSizing;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -11858,7 +11840,7 @@ namespace EnergyPlus::OutputReportTabular {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (ZoneNum == 0) continue;
-            if (!ZoneEquipConfig(ZoneNum).IsControlled) continue;
+            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             CoolDesSelected = CalcFinalZoneSizing(ZoneNum).CoolDDNum;
             // loop over timesteps after pulse occurred
             if (CoolDesSelected != 0) {
@@ -11964,7 +11946,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::SurfWinGainConvGlazToZoneRep;
         using DataSurfaces::SurfWinGainConvShadeToZoneRep;
         using DataSurfaces::SurfWinGainFrameDividerToZoneRep;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -12164,7 +12145,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSizing::CalcFinalZoneSizing;
         using DataSizing::SysSizPeakDDNum;
         using DataSurfaces::TotSurfaces;
-        using DataZoneEquipment::ZoneEquipConfig;
         auto &ort(state.dataOutRptTab);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
@@ -12323,7 +12303,7 @@ namespace EnergyPlus::OutputReportTabular {
         // ZoneComponentLoadSummary
         if (ort->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
                     coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
                     ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
@@ -12476,7 +12456,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute
                 // them for specific design day and time of max
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
                     if (ort->displayZoneComponentLoadSummary &&
                         (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
@@ -12597,7 +12577,7 @@ namespace EnergyPlus::OutputReportTabular {
             timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
 
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
                 // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
@@ -12694,7 +12674,7 @@ namespace EnergyPlus::OutputReportTabular {
         // ZoneComponentLoadSummary: Now we convert and Display
         if (ort->displayZoneComponentLoadSummary) {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(CalcFinalZoneSizing)) {
                     LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
                     LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
@@ -13650,8 +13630,8 @@ namespace EnergyPlus::OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
 
@@ -13732,8 +13712,8 @@ namespace EnergyPlus::OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
 
@@ -13780,8 +13760,8 @@ namespace EnergyPlus::OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
-                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
 
@@ -13815,8 +13795,8 @@ namespace EnergyPlus::OutputReportTabular {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
-                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                 }

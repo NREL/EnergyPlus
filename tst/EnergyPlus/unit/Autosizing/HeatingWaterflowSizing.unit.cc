@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -261,8 +261,8 @@ TEST_F(AutoSizingFixture, HeatingWaterflowSizingGauntlet)
     DataSizing::ZoneEqUnitHeater = false;
     DataSizing::DataWaterLoopNum = 1;
     DataSizing::DataWaterCoilSizHeatDeltaT = 10.0;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidName = "Water";
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidName = "Water";
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing

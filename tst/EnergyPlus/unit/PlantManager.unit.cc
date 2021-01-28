@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,19 +51,15 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 namespace PlantManager {
@@ -76,15 +72,15 @@ namespace PlantManager {
 
     TEST_F(EnergyPlusFixture, PlantManager_SizePlantLoopTest)
     {
-        PlantLoop.allocate(1);
-        PlantLoop(1).VolumeWasAutoSized = true;
-        PlantLoop(1).MaxVolFlowRate = 5;
-        PlantLoop(1).CirculationTime = 2;
-        PlantLoop(1).FluidType = NodeType_Water;
-        PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop.allocate(1);
+        state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
+        state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 5;
+        state->dataPlnt->PlantLoop(1).CirculationTime = 2;
+        state->dataPlnt->PlantLoop(1).FluidType = NodeType_Water;
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
         SizePlantLoop(*state, 1, true);
         int TestVolume = 600;
-        EXPECT_EQ(TestVolume, PlantLoop(1).Volume);
+        EXPECT_EQ(TestVolume, state->dataPlnt->PlantLoop(1).Volume);
     }
 
     TEST_F(EnergyPlusFixture, PlantManager_TwoWayCommonPipeSetPointManagerTest)
