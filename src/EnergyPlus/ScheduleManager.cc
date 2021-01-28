@@ -93,6 +93,86 @@ namespace EnergyPlus::ScheduleManager {
 
     static std::string const BlankString;
 
+    ScheduleTypeData::ScheduleTypeData(EnergyPlusData &state, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, [[maybe_unused]] int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields) {
+        static constexpr auto routineName = "ScheduleTypeData::ScheduleTypeData";
+        UtilityRoutines::IsNameEmpty(state, Alphas(1), EnergyPlus::ScheduleManager::ScheduleTypeData::objectTypeName, this->errorFoundDuringInputProcessing);
+        this->Name = Alphas(1);
+        if (lNumericBlanks(1) || lNumericBlanks(2)) {
+            this->Limited = false;
+        } else if (!lNumericBlanks(1) && !lNumericBlanks(2)) {
+            this->Limited = true;
+        }
+        if (!lNumericBlanks(1)) {
+            this->Minimum = Numbers(1);
+        }
+        if (!lNumericBlanks(2)) {
+            this->Maximum = Numbers(2);
+        }
+        if (this->Limited) {
+            if (Alphas(2) == "DISCRETE" || Alphas(2) == "INTEGER") {
+                this->IsReal = false;
+            } else {
+                if (Alphas(2) != "CONTINUOUS" && Alphas(2) != "REAL") {
+                    ShowWarningError(state, format("{}: {}=\"{}\", invalid {}={}", routineName, EnergyPlus::ScheduleManager::ScheduleTypeData::objectTypeName, this->Name, cAlphaFields(2), Alphas(2)));
+                    this->errorFoundDuringInputProcessing = true;
+                }
+                this->IsReal = true;
+            }
+        }
+        if (NumAlphas >= 3) {
+            if (!lAlphaBlanks(3)) {
+                int constexpr NumScheduleTypeLimitUnitTypes = 14;
+                Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes, {
+                        "Dimensionless",
+                        "Temperature",
+                        "DeltaTemperature",
+                        "PrecipitationRate",
+                        "Angle",
+                        "ConvectionCoefficient",
+                        "ActivityLevel",
+                        "Velocity",
+                        "Capacity",
+                        "Power",
+                        "Availability",
+                        "Percent",
+                        "Control",
+                        "Mode"});
+                this->UnitType =
+                        UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
+                if (this->UnitType == 0) {
+                    ShowWarningError(state, format("{}: {}=\"{}\", {}=\"{}\" is invalid.", routineName, EnergyPlus::ScheduleManager::ScheduleTypeData::objectTypeName, Alphas(1), cAlphaFields(3), Alphas(3)));
+                }
+            }
+        }
+        if (this->Limited) {
+            if (this->Minimum > this->Maximum) {
+                if (this->IsReal) {
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
+                                           routineName,
+                                           EnergyPlus::ScheduleManager::ScheduleTypeData::objectTypeName,
+                                           Alphas(1),
+                                           cNumericFields(1),
+                                           this->Minimum,
+                                           cNumericFields(2),
+                                           this->Maximum));
+                    ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
+                } else {
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
+                                           routineName,
+                                           EnergyPlus::ScheduleManager::ScheduleTypeData::objectTypeName,
+                                           Alphas(1),
+                                           cNumericFields(1),
+                                           this->Minimum,
+                                           cNumericFields(2),
+                                           this->Maximum));
+                    ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
+                }
+            }
+        }
+    }
+    
     void ProcessScheduleInput(EnergyPlusData &state)
     {
 
@@ -591,85 +671,9 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
-
-            state.dataScheduleMgr->ScheduleType(LoopIndex).Name = Alphas(1);
-            if (lNumericBlanks(1) || lNumericBlanks(2)) {
-                state.dataScheduleMgr->ScheduleType(LoopIndex).Limited = false;
-            } else if (!lNumericBlanks(1) && !lNumericBlanks(2)) {
-                state.dataScheduleMgr->ScheduleType(LoopIndex).Limited = true;
-            }
-            if (!lNumericBlanks(1)) {
-                state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum = Numbers(1);
-            }
-            if (!lNumericBlanks(2)) {
-                state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum = Numbers(2);
-            }
-            if (state.dataScheduleMgr->ScheduleType(LoopIndex).Limited) {
-                if (Alphas(2) == "DISCRETE" || Alphas(2) == "INTEGER") {
-                    state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal = false;
-                } else {
-                    if (Alphas(2) != "CONTINUOUS" && Alphas(2) != "REAL") {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->ScheduleType(LoopIndex).Name + "\", invalid " + cAlphaFields(2) +
-                                         '=' + Alphas(2));
-                        ErrorsFound = true;
-                    }
-                    state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal = true;
-                }
-            }
-            if (NumAlphas >= 3) {
-                if (!lAlphaBlanks(3)) {
-                    int constexpr NumScheduleTypeLimitUnitTypes = 14;
-                    Array1D_string const ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes, {
-                                                                           "Dimensionless",
-                                                                            "Temperature",
-                                                                            "DeltaTemperature",
-                                                                            "PrecipitationRate",
-                                                                            "Angle",
-                                                                            "ConvectionCoefficient",
-                                                                            "ActivityLevel",
-                                                                            "Velocity",
-                                                                            "Capacity",
-                                                                            "Power",
-                                                                            "Availability",
-                                                                            "Percent",
-                                                                            "Control",
-                                                                            "Mode"});
-                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType =
-                        UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
-                    if (state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType == 0) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                         "\" is invalid.");
-                    }
-                }
-            }
-            if (state.dataScheduleMgr->ScheduleType(LoopIndex).Limited) {
-                if (state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum > state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum) {
-                    if (state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.2R}] > {} [{:.2R}].",
-                                               RoutineName,
-                                               CurrentModuleObject,
-                                               Alphas(1),
-                                               cNumericFields(1),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
-                                               cNumericFields(2),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
-                        ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
-                    } else {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\", {} [{:.0R}] > {} [{:.0R}].",
-                                               RoutineName,
-                                               CurrentModuleObject,
-                                               Alphas(1),
-                                               cNumericFields(1),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Minimum,
-                                               cNumericFields(2),
-                                               state.dataScheduleMgr->ScheduleType(LoopIndex).Maximum));
-                        ShowContinueError(state, "  Other warning/severes about schedule values may appear.");
-                    }
-                }
-            }
+            state.dataScheduleMgr->ScheduleType.emplace_back(state, NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
+            // update errors found flag if an issue was found during construction of the last schedule type
+            ErrorsFound |= state.dataScheduleMgr->ScheduleType.back().errorFoundDuringInputProcessing;
         }
 
         //!! Get Day Schedules (all types)

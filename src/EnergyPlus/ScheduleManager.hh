@@ -90,18 +90,16 @@ namespace ScheduleManager {
 
     struct ScheduleTypeData
     {
+        static constexpr auto objectTypeName = "ScheduleTypeLimits";
         // Members
         std::string Name; // Schedule Type Name
-        bool Limited;     // True if this Schedule Type has limits
-        Real64 Minimum;   // Minimum for limited schedule
-        Real64 Maximum;   // Maximum for limited schedule
-        bool IsReal;      // True if this is a "real" schedule, false if integer
-        int UnitType;     // reference ScheduleTypeLimit table
-
-        // Default Constructor
-        ScheduleTypeData() : Limited(false), Minimum(0.0), Maximum(0.0), IsReal(true), UnitType(0)
-        {
-        }
+        bool Limited = false;     // True if this Schedule Type has limits
+        Real64 Minimum = 0.0;   // Minimum for limited schedule
+        Real64 Maximum = 0.0;   // Maximum for limited schedule
+        bool IsReal = true;      // True if this is a "real" schedule, false if integer
+        int UnitType = 0;     // reference ScheduleTypeLimit table
+        bool errorFoundDuringInputProcessing = false;
+        ScheduleTypeData(EnergyPlusData &state, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
     };
 
     struct DayScheduleData
