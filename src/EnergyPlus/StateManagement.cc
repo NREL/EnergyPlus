@@ -244,7 +244,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    PlantUtilities::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();

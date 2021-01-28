@@ -4190,7 +4190,7 @@ namespace EnergyPlus::PlantManager {
                                                                   BranchCtr).Name);
                                         ShowContinueError(state, "Occurs in Plant Loop=" + state.dataPlnt->PlantLoop(LoopCtr).Name);
                                         ShowContinueError(state, "SetupBranchControlTypes: and the simulation continues");
-                                        // DSU3 note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
+                                        //  note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
                                         //   this used to fatal in older PlantFlowResolver.
                                     }
 
