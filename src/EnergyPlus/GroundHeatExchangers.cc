@@ -125,6 +125,23 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
+    GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
+    {
+        // Check for duplicates
+        for (auto &existingObj : state.dataGroundHeatExchanger->singleBoreholesVector) {
+            if (objName == existingObj->name) {
+                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingObj->name);
+            }
+        }
+
+        this->name = objName;
+        this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"]));
+        this->xLoc = j["x_location"];
+        this->yLoc = j["y_location"];
+    }
+
+    //******************************************************************************
+
     GLHEVertArray::GLHEVertArray(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
     {
         // Check for duplicates
@@ -2250,53 +2267,22 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         if (state.dataGroundHeatExchanger->numSingleBorehole > 0) {
 
-            DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Vertical:Single";
+            std::string currObj = "GroundHeatExchanger:Vertical:Single";
 
-            for (int bhNum = 1; bhNum <= state.dataGroundHeatExchanger->numSingleBorehole; ++bhNum) {
+            auto const instances = inputProcessor->epJSON.find(currObj);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
+                                currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
 
-                // just a few vars to pass in and out to GetObjectItem
-                int ioStatus;
-                int numAlphas;
-                int numNumbers;
-
-                // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
-                                              bhNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              numAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              numNumbers,
-                                              ioStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-
-                // the input processor validates the numeric inputs based on the IDD definition
-                // still validate the name to make sure there aren't any duplicates or blanks
-                // blanks are easy: fatal if blank
-                if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
-                }
-
-                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingSingleBH : state.dataGroundHeatExchanger->singleBoreholesVector) {
-                    if (DataIPShortCuts::cAlphaArgs(1) == existingSingleBH->name) {
-                        ShowFatalError(state,
-                                       "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-                                           " object: Duplicate name found: " + existingSingleBH->name);
-                    }
-                }
-
-                // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertSingle> thisArray(new GLHEVertSingle);
-                thisArray->name = DataIPShortCuts::cAlphaArgs(1);
-                thisArray->props = GetVertProps(state, DataIPShortCuts::cAlphaArgs(2));
-                thisArray->xLoc = DataIPShortCuts::rNumericArgs(1);
-                thisArray->yLoc = DataIPShortCuts::rNumericArgs(2);
-
-                state.dataGroundHeatExchanger->singleBoreholesVector.push_back(thisArray);
+            auto &instancesValue = instances.value();
+            for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
+                auto const &instance = it.value();
+                auto const &objName = it.key();
+                auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+                inputProcessor->markObjectAsUsed(currObj, objName);
+                std::shared_ptr<GLHEVertSingle> thisObj(new GLHEVertSingle(state, objNameUC, instance));
+                state.dataGroundHeatExchanger->singleBoreholesVector.push_back(thisObj);
             }
         }
 

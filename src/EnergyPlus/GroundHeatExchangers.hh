@@ -146,6 +146,7 @@ namespace GroundHeatExchangers {
         ~GLHEVertSingle() = default;
 
         // Members
+        std::string const moduleName = "GroundHeatExchanger:Vertical:Single";
         std::string name;                     // Name
         Real64 xLoc;                          // X-direction location {m}
         Real64 yLoc;                          // Y-direction location {m}
@@ -162,6 +163,8 @@ namespace GroundHeatExchangers {
         GLHEVertSingle() : xLoc(0.0), yLoc(0.0), dl_i(0.0), dl_ii(0.0), dl_j(0.0)
         {
         }
+
+        GLHEVertSingle(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
     };
 
     struct GLHEVertArray
@@ -182,7 +185,6 @@ namespace GroundHeatExchangers {
         }
 
         GLHEVertArray(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
-
     };
 
     struct GLHEResponseFactors
@@ -208,7 +210,6 @@ namespace GroundHeatExchangers {
         }
 
         GLHEResponseFactors(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
-
     };
 
     struct GLHEBase : PlantComponent
