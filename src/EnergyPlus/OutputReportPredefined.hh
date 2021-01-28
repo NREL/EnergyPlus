@@ -695,6 +695,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
     int pdstOAtotAirByLoop = 0;
     int pdchOaTaAlMechVent = 0;
+    int pdchOaTaAlNatVent = 0;
+    int pdchOaTaAlTotVent = 0;
     int pdchOaTaAlSumDynTrgVent = 0;
     int pdchOaTaAlTmBelow = 0;
     int pdchOaTaAlTmAt = 0;
@@ -703,6 +705,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
     int pdstOAavgOccByLoop = 0;
     int pdchOaOccAlMechVent = 0;
+    int pdchOaOccAlNatVent = 0;
+    int pdchOaOccAlTotVent = 0;
     int pdchOaOccAlSumDynTrgVent = 0;
     int pdchOaOccAlTmBelow = 0;
     int pdchOaOccAlTmAt = 0;
@@ -1139,13 +1143,20 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
     // Totals for OA report
     Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
-    Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at targe Voz-Dyn
+    Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at target Voz-Dyn
     Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn
     Real64 TotalAnyZoneBelowVozDynOccForOA = 0.0; // total time any zone below target Voz-Dyn
-    Real64 TotalAllZonesAtVozDynOccForOA = 0.0; // total time all zones at targe Voz-Dyn
+    Real64 TotalAllZonesAtVozDynOccForOA = 0.0; // total time all zones at target Voz-Dyn
     Real64 TotalAnyZoneAboveVozDynOccForOA = 0.0; // total time any zone above target Voz-Dyn
     Real64 TotalAnyZoneVentUnoccForOA = 0.0; // total time any zone has ventilation when unoccupied
 
+    Real64 TotalAnyAirLoopBelowVozDynForOA = 0.0; // total time any air loop below target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynForOA = 0.0; // total time all air loops at target Voz-Dyn
+    Real64 TotalAnyAirLoopAboveVozDynForOA = 0.0; // total time any air loop above target Voz-Dyn
+    Real64 TotalAnyAirLoopBelowVozDynOccForOA = 0.0; // total time any air loop below target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynOccForOA = 0.0; // total time all air loops at target Voz-Dyn
+    Real64 TotalAnyAirLoopAboveVozDynOccForOA = 0.0; // total time any air loop above target Voz-Dyn
+    Real64 TotalAnyAirLoopVentUnoccForOA = 0.0; // total time any air loop has ventilation when unoccupied
 
     Array1D<OutputReportPredefined::reportNameType> reportName;
     Array1D<OutputReportPredefined::SubTableType> subTable;
@@ -1600,6 +1611,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
         this->pdstOAtotAirByLoop = 0;
         this->pdchOaTaAlMechVent = 0;
+        this->pdchOaTaAlNatVent = 0;
+        this->pdchOaTaAlTotVent = 0;
         this->pdchOaTaAlSumDynTrgVent = 0;
         this->pdchOaTaAlTmBelow = 0;
         this->pdchOaTaAlTmAt = 0;
@@ -1608,6 +1621,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
 
         this->pdstOAavgOccByLoop = 0;
         this->pdchOaOccAlMechVent = 0;
+        this->pdchOaOccAlNatVent = 0;
+        this->pdchOaOccAlTotVent = 0;
         this->pdchOaOccAlSumDynTrgVent = 0;
         this->pdchOaOccAlTmBelow = 0;
         this->pdchOaOccAlTmAt = 0;
@@ -1999,6 +2014,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->TotalAllZonesAtVozDynOccForOA = 0.0;
         this->TotalAnyZoneAboveVozDynOccForOA = 0.0;
         this->TotalAnyZoneVentUnoccForOA = 0.0;
+        this->TotalAnyAirLoopBelowVozDynForOA = 0.0;
+        this->TotalAllAirLoopsAtVozDynForOA = 0.0;
+        this->TotalAnyAirLoopAboveVozDynForOA = 0.0;
+        this->TotalAnyAirLoopBelowVozDynOccForOA = 0.0;
+        this->TotalAllAirLoopsAtVozDynOccForOA = 0.0;
+        this->TotalAnyAirLoopAboveVozDynOccForOA = 0.0;
+        this->TotalAnyAirLoopVentUnoccForOA = 0.0;
         this->reportName.deallocate();
         this->subTable.deallocate();
         this->columnTag.deallocate();

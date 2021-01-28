@@ -661,11 +661,11 @@ namespace OutputReportPredefined {
         s->pdchOaTaBzTotVent = newPreDefColumn(state, s->pdstOAtotAirByZone, "Total Ventilation [m3]");
         s->pdchOaTaBzInfil = newPreDefColumn(state, s->pdstOAtotAirByZone, "Infiltration [m3]");
         s->pdchOaTaBzTotVentInfil = newPreDefColumn(state, s->pdstOAtotAirByZone, "Total Ventilation and Infiltration [m3]");
-        s->pdchOaTaBzDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByZone, "Dynamic Target Ventilation - Voz-dyn [m3]"); //todo
-        s->pdchOaTaBzTmBelow = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Below Voz-dyn [hr]"); //todo
-        s->pdchOaTaBzTmAt = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time At Voz-dyn [hr]"); //todo
-        s->pdchOaTaBzTmAbove = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Voz-dyn [hr]"); //todo
-        s->pdchOaTaBzTmAboveUnocc = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Zero When Unoccupied [hr]"); //todo
+        s->pdchOaTaBzDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByZone, "Dynamic Target Ventilation - Voz-dyn [m3]");
+        s->pdchOaTaBzTmBelow = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Below Voz-dyn [hr]");
+        s->pdchOaTaBzTmAt = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time At Voz-dyn [hr]");
+        s->pdchOaTaBzTmAbove = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Voz-dyn [hr]");
+        s->pdchOaTaBzTmAboveUnocc = newPreDefColumn(state, s->pdstOAtotAirByZone, "Time Above Zero When Unoccupied [hr]");
 
         s->pdstOAavgOccByZone = newPreDefSubTable(state, s->pdrOutsideAir, "Average Outdoor Air During Occupancy by Zone - Flow Rates");
         s->pdchOaOccBzMechVent = newPreDefColumn(state, s->pdstOAavgOccByZone, "Mechanical Ventilation [m3/s]");
@@ -673,13 +673,15 @@ namespace OutputReportPredefined {
         s->pdchOaOccBzTotVent = newPreDefColumn(state, s->pdstOAavgOccByZone, "Total Ventilation [m3/s]");
         s->pdchOaOccBzInfil = newPreDefColumn(state, s->pdstOAavgOccByZone, "Infiltration [m3/s]");
         s->pdchOaOccBzTotVentInfil = newPreDefColumn(state, s->pdstOAavgOccByZone, "Total Ventilation and Infiltration [m3/s]");
-        s->pdchOaOccBzDynTrgVent = newPreDefColumn(state, s->pdstOAavgOccByZone, "Dynamic Target Ventilation - Voz-dyn [m3/s]"); //todo
-        s->pdchOaOccBzTmBelow = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Below Voz-dyn [hr]"); //todo
-        s->pdchOaOccBzTmAt = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time At Voz-dyn [hr]"); //todo
-        s->pdchOaOccBzTmAbove = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Above Voz-dyn [hr]"); //todo
+        s->pdchOaOccBzDynTrgVent = newPreDefColumn(state, s->pdstOAavgOccByZone, "Dynamic Target Ventilation - Voz-dyn [m3/s]");
+        s->pdchOaOccBzTmBelow = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Below Voz-dyn [hr]");
+        s->pdchOaOccBzTmAt = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time At Voz-dyn [hr]");
+        s->pdchOaOccBzTmAbove = newPreDefColumn(state, s->pdstOAavgOccByZone, "Time Above Voz-dyn [hr]");
 
         s->pdstOAtotAirByLoop = newPreDefSubTable(state, s->pdrOutsideAir, "Total Outdoor Air by Airloop");
         s->pdchOaTaAlMechVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Mechanical Ventilation [m3]"); //todo
+        s->pdchOaTaAlNatVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Natural Ventilation [m3/s]");
+        s->pdchOaTaAlTotVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Total Ventilation [m3/s]");
         s->pdchOaTaAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3]"); //todo
         s->pdchOaTaAlTmBelow = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time Below Voz-sum-dyn [hr]"); //todo
         s->pdchOaTaAlTmAt = newPreDefColumn(state, s->pdstOAtotAirByLoop, "Time At Voz-sum-dyn [hr]"); //todo
@@ -688,6 +690,8 @@ namespace OutputReportPredefined {
 
         s->pdstOAavgOccByLoop = newPreDefSubTable(state, s->pdrOutsideAir, "Average Outdoor Air During Occupancy by Airloop");
         s->pdchOaOccAlMechVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Mechanical Ventilation [m3/s]"); //todo
+        s->pdchOaOccAlNatVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Natural Ventilation [m3/s]");
+        s->pdchOaOccAlTotVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Total Ventilation [m3/s]");
         s->pdchOaOccAlSumDynTrgVent = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Sum Zone Dynamic Zone Outdoor Airflow - Voz-sum-dyn [m3/s]"); //todo
         s->pdchOaOccAlTmBelow = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time Below Voz-sum-dyn [hr]"); //todo
         s->pdchOaOccAlTmAt = newPreDefColumn(state, s->pdstOAavgOccByLoop, "Time At Voz-sum-dyn [hr]"); //todo

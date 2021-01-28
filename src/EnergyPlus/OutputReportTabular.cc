@@ -5959,6 +5959,14 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 totalNatVentRateOcc = 0;
         Real64 totalInfilRateOcc = 0;
         Real64 totalVozDynOcc = 0;
+        Real64 totalAirLoopsMechVentVol = 0;
+        Real64 totalAirLoopsNatVentVol = 0;
+        Real64 totalAirLoopsInfilVol = 0;
+        Real64 totalAirLoopsVozDyn = 0;
+        Real64 totalAirLoopsMechVentRateOcc = 0;
+        Real64 totalAirLoopsNatVentRateOcc = 0;
+        Real64 totalAirLoopsInfilRateOcc = 0;
+        Real64 totalAirLoopsVozDynOcc = 0;
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
