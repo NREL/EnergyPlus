@@ -955,7 +955,7 @@ namespace DataSizing {
             // Get schedule value for the zone air distribution effectiveness
             zoneEz = ScheduleManager::GetCurrentScheduleValue(state, this->ZoneADEffSchPtr);
         } else {
-            Real64 zoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            Real64 zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
 
             // Zone in cooling mode
             if (zoneLoad < 0.0) zoneEz = this->ZoneADEffCooling;

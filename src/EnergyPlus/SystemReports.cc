@@ -2134,35 +2134,35 @@ namespace EnergyPlus::SystemReports {
                                 state.dataSysRpts->ZoneTargetVentilationFlowVoz(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Ventilation Below Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->ZoneTimeBelowVozDyn(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Ventilation At Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->ZoneTimeAtVozDyn(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Ventilation Above Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->ZoneTimeAboveVozDyn(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Ventilation When Unoccupied Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->ZoneTimeVentUnocc(ZoneIndex),
                                 "HVAC",
                                 "Sum",
-                                ZoneEquipConfig(ZoneIndex).ZoneName);
+                                state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         }
 
@@ -4240,11 +4240,11 @@ namespace EnergyPlus::SystemReports {
             bool const UseOccSchFlag = true;
             bool const UseMinOASchFlag = true;
             state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                state, ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
-            if (ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
+                state, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
+            if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
                 state.dataSysRpts->ZoneTargetVentilationFlowVoz =
                     state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) /
-                    DataSizing::ZoneAirDistribution(ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
+                    DataSizing::ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
 

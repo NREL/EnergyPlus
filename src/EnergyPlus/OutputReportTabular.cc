@@ -5972,8 +5972,8 @@ namespace EnergyPlus::OutputReportTabular {
                 std::string airLoopName = "";
                 int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
                 if (ctrlZoneNum > 0) {
-                    for (int zoneInNode = 1; zoneInNode <= DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
-                        int airLoopNumber = DataZoneEquipment::ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
+                        int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
                         if (airLoopNumber > 0) {
                             if (airLoopName.empty()) {
                                 airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
