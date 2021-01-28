@@ -125,6 +125,170 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     //******************************************************************************
 
+    GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
+    {
+        // Check for duplicates
+        for (auto &existingObj : state.dataGroundHeatExchanger->singleBoreholesVector) {
+            if (objName == existingObj->name) {
+                ShowFatalError(state, "Invalid input for " + this->moduleName + " object: Duplicate name found: " + existingObj->name);
+            }
+        }
+
+        bool errorsFound = false;
+
+        this->name = objName;
+
+        // get inlet node num
+        std::string const inletNodeName = UtilityRoutines::MakeUPPERCase(j["inlet_node_name"]);
+        this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                 inletNodeName,
+                                                                 errorsFound,
+                                                                 this->moduleName,
+                                                                 objName,
+                                                                 NodeType_Water,
+                                                                 NodeConnectionType_Inlet,
+                                                                 1,
+                                                                 ObjectIsNotParent);
+
+        // get outlet node num
+        std::string const outletNodeName = UtilityRoutines::MakeUPPERCase(j["outlet_node_name"]);
+        this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                  outletNodeName,
+                                                                  errorsFound,
+                                                                  this->moduleName,
+                                                                  objName,
+                                                                  NodeType_Water,
+                                                                  NodeConnectionType_Outlet,
+                                                                  1,
+                                                                  ObjectIsNotParent);
+        this->available = true;
+        this->on = true;
+
+        BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
+
+        this->designFlow = j["design_flow_rate"];
+        PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
+
+        this->soil.k = j["ground_thermal_conductivity"];
+        this->soil.rhoCp = j["ground_thermal_heat_capacity"];
+
+        if (j.find("ghe_vertical_responsefactors_object_name") != j.end()) {
+            // Response factors come from IDF object
+            this->myRespFactors = GetResponseFactor(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_responsefactors_object_name"]));
+            this->gFunctionsExist = true;
+
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
+            }
+        } else if (j.find("ghe_vertical_array_object_name") != j.end()) {
+            // Response factors come from array object
+            this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
+                state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_array_object_name"])));
+
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
+            }
+        } else {
+            if (j.find("vertical_well_locations") == j.end()) {
+                // No ResponseFactors, GHEArray, or SingleBH object are referenced
+                ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single objects found");
+                ShowFatalError(state, "Check references to these objects for GHE:System object: " + this->name);
+            }
+
+            auto const vars = j.at("vertical_well_locations");
+
+            // Calculate response factors from individual boreholes
+            std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
+
+            for (auto const &var : vars) {
+                if (!var.at("ghe_vertical_single_object_name").empty()) {
+                    std::shared_ptr<GLHEVertSingle> tempBHptr =
+                        GetSingleBH(state, UtilityRoutines::MakeUPPERCase(var.at("ghe_vertical_single_object_name")));
+                    if (tempBHptr) {
+                        tempVectOfBHObjects.push_back(tempBHptr);
+                    } else {
+                        errorsFound = true;
+                        std::string const tmpName = var.at("ghe_vertical_single_object_name");
+                        ShowSevereError(state, "Borehole= " + tmpName + " not found.");
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            this->myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
+
+            if (!this->myRespFactors) {
+                errorsFound = true;
+                ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
+            }
+        }
+
+        this->bhDiameter = this->myRespFactors->props->bhDiameter;
+        this->bhRadius = this->bhDiameter / 2.0;
+        this->bhLength = this->myRespFactors->props->bhLength;
+        this->bhUTubeDist = this->myRespFactors->props->bhUTubeDist;
+
+        // pull pipe and grout data up from response factor struct for simplicity
+        this->pipe.outDia = this->myRespFactors->props->pipe.outDia;
+        this->pipe.innerDia = this->myRespFactors->props->pipe.innerDia;
+        this->pipe.outRadius = this->pipe.outDia / 2;
+        this->pipe.innerRadius = this->pipe.innerDia / 2;
+        this->pipe.thickness = this->myRespFactors->props->pipe.thickness;
+        this->pipe.k = this->myRespFactors->props->pipe.k;
+        this->pipe.rhoCp = this->myRespFactors->props->pipe.rhoCp;
+
+        this->grout.k = this->myRespFactors->props->grout.k;
+        this->grout.rhoCp = this->myRespFactors->props->grout.rhoCp;
+
+        this->myRespFactors->gRefRatio = this->bhRadius / this->bhLength;
+
+        // Number of simulation years from RunPeriod
+        this->myRespFactors->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
+
+        // total tube length
+        this->totalTubeLength = this->myRespFactors->numBoreholes * this->myRespFactors->props->bhLength;
+
+        // ground thermal diffusivity
+        this->soil.diffusivity = this->soil.k / this->soil.rhoCp;
+
+        // multipole method constants
+        this->theta_1 = this->bhUTubeDist / (2 * this->bhRadius);
+        this->theta_2 = this->bhRadius / this->pipe.outRadius;
+        this->theta_3 = 1 / (2 * this->theta_1 * this->theta_2);
+        this->sigma = (this->grout.k - this->soil.k) / (this->grout.k + this->soil.k);
+
+        this->SubAGG = 15;
+        this->AGG = 192;
+
+        // Allocation of all the dynamic arrays
+        this->QnMonthlyAgg.dimension(static_cast<int>(this->myRespFactors->maxSimYears * 12), 0.0);
+        this->QnHr.dimension(730 + this->AGG + this->SubAGG, 0.0);
+        this->QnSubHr.dimension(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1), 0.0);
+        this->LastHourN.dimension(this->SubAGG + 1, 0);
+
+        state.dataGroundHeatExchanger->prevTimeSteps.allocate(static_cast<int>((this->SubAGG + 1) * maxTSinHr + 1));
+        state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
+
+        // Initialize ground temperature model and get pointer reference
+        this->groundTempModel = GetGroundTempModelAndInit(state,
+                                                          UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_type"]),
+                                                          UtilityRoutines::MakeUPPERCase(j["undisturbed_ground_temperature_model_name"]));
+        if (this->groundTempModel) {
+            errorsFound = this->groundTempModel->errorsFound;
+        }
+
+        // Check for Errors
+        if (errorsFound) {
+            ShowFatalError(state, "Errors found in processing input for " + this->moduleName);
+        }
+    }
+
+    //******************************************************************************
+
     GLHEVertSingle::GLHEVertSingle(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j)
     {
         // Check for duplicates
@@ -171,27 +335,27 @@ namespace EnergyPlus::GroundHeatExchangers {
         }
 
         this->name = objName;
-        this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"]));        this->numBoreholes = j["number_of_boreholes"];
+        this->props = GetVertProps(state, UtilityRoutines::MakeUPPERCase(j["ghe_vertical_properties_object_name"]));
+        this->numBoreholes = j["number_of_boreholes"];
         this->gRefRatio = j["g_function_reference_ratio"];
         this->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
 
         auto const vars = j.at("g_functions");
         std::vector<Real64> tmpLntts;
         std::vector<Real64> tmpGvals;
-
-        for (auto const &var : vars){
+        // TODO: add unit test for mis-matched g-functions, maybe don't need to do bounds checking
+        for (auto const &var : vars) {
             try {
                 tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
-            } catch (nlohmann::json::out_of_range& e) {
+            } catch (nlohmann::json::out_of_range &e) {
                 // out of range
             }
 
             try {
                 tmpGvals.push_back(var.at("g_function_g_value"));
-            } catch (nlohmann::json::out_of_range& e) {
+            } catch (nlohmann::json::out_of_range &e) {
                 // out of range
             }
-
         }
 
         bool errorsFound = false;
@@ -244,8 +408,8 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // Verify u-tube spacing is valid
         if (this->bhUTubeDist < this->pipe.outDia) {
-            ShowWarningError(
-                state, "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
+            ShowWarningError(state,
+                             "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
             ShowWarningError(state, "Shank spacing is set to the outer pipe diameter.");
             this->bhUTubeDist = this->pipe.outDia;
         }
@@ -2288,194 +2452,21 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         if (state.dataGroundHeatExchanger->numVerticalGLHEs > 0) {
 
-            DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:System";
+            std::string currObj = "GroundHeatExchanger:System";
 
-            for (int GLHENum = 1; GLHENum <= state.dataGroundHeatExchanger->numVerticalGLHEs; ++GLHENum) {
+            auto const instances = inputProcessor->epJSON.find(currObj);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(state,                                                                     // LCOV_EXCL_LINE
+                                currObj + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
 
-                // just a few vars to pass in and out to GetObjectItem
-                int ioStatus;
-                int numAlphas;
-                int numNumbers;
-
-                // get the input data and store it in the Shortcuts structures
-                inputProcessor->getObjectItem(state,
-                                              DataIPShortCuts::cCurrentModuleObject,
-                                              GLHENum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              numAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              numNumbers,
-                                              ioStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              DataIPShortCuts::lAlphaFieldBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
-
-                // the input processor validates the numeric inputs based on the IDD definition
-                // still validate the name to make sure there aren't any duplicates or blanks
-                // blanks are easy: fatal if blank
-                if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
-                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
-                }
-
-                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-                for (auto &existingVerticalGLHE : state.dataGroundHeatExchanger->verticalGLHE) {
-                    if (DataIPShortCuts::cAlphaArgs(1) == existingVerticalGLHE.name) {
-                        ShowFatalError(state,
-                                       "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-                                           " object: Duplicate name found: " + existingVerticalGLHE.name);
-                    }
-                }
-
-                // Build out new instance
-                GLHEVert thisGLHE;
-                thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
-
-                // get inlet node num
-                thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                            DataIPShortCuts::cAlphaArgs(2),
-                                                                            errorsFound,
-                                                                            DataIPShortCuts::cCurrentModuleObject,
-                                                                            DataIPShortCuts::cAlphaArgs(1),
-                                                                            NodeType_Water,
-                                                                            NodeConnectionType_Inlet,
-                                                                            1,
-                                                                            ObjectIsNotParent);
-
-                // get outlet node num
-                thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                             DataIPShortCuts::cAlphaArgs(3),
-                                                                             errorsFound,
-                                                                             DataIPShortCuts::cCurrentModuleObject,
-                                                                             DataIPShortCuts::cAlphaArgs(1),
-                                                                             NodeType_Water,
-                                                                             NodeConnectionType_Outlet,
-                                                                             1,
-                                                                             ObjectIsNotParent);
-                thisGLHE.available = true;
-                thisGLHE.on = true;
-
-                BranchNodeConnections::TestCompSet(state,
-                                                   DataIPShortCuts::cCurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(2),
-                                                   DataIPShortCuts::cAlphaArgs(3),
-                                                   "Condenser Water Nodes");
-
-                thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
-                PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
-
-                thisGLHE.soil.k = DataIPShortCuts::rNumericArgs(2);
-                thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3);
-
-                if (!DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                    // Response factors come from IDF object
-                    thisGLHE.myRespFactors = GetResponseFactor(state, DataIPShortCuts::cAlphaArgs(6));
-                    thisGLHE.gFunctionsExist = true;
-
-                    if (!thisGLHE.myRespFactors) {
-                        errorsFound = true;
-                        ShowSevereError(state, "GroundHeatExchanger:ResponseFactors object not found.");
-                    }
-                } else if (!DataIPShortCuts::lAlphaFieldBlanks(7)) {
-                    // Response factors come from array object
-                    thisGLHE.myRespFactors = BuildAndGetResponseFactorObjectFromArray(state, GetVertArray(state, DataIPShortCuts::cAlphaArgs(7)));
-
-                    if (!thisGLHE.myRespFactors) {
-                        errorsFound = true;
-                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Array object not found.");
-                    }
-                } else {
-                    if (DataIPShortCuts::lAlphaFieldBlanks(8)) {
-                        // No ResponseFactors, GHEArray, or SingleBH object are referenced
-                        ShowSevereError(state, "No GHE:ResponseFactors, GHE:Vertical:Array, or GHE:Vertical:Single object found");
-                        ShowFatalError(state, "Check references to these object for GHE:System object= " + thisGLHE.name);
-                    }
-
-                    // Calculate response factors from individual boreholes
-                    std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
-
-                    for (int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index) {
-                        if (!DataIPShortCuts::lAlphaFieldBlanks(index)) {
-                            std::shared_ptr<GLHEVertSingle> tempBHptr = GetSingleBH(state, DataIPShortCuts::cAlphaArgs(index));
-                            if (tempBHptr) {
-                                tempVectOfBHObjects.push_back(tempBHptr);
-                            } else {
-                                errorsFound = true;
-                                ShowSevereError(state, "Borehole= " + DataIPShortCuts::cAlphaArgs(index) + " not found.");
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-
-                    thisGLHE.myRespFactors = BuildAndGetResponseFactorsObjectFromSingleBHs(state, tempVectOfBHObjects);
-
-                    if (!thisGLHE.myRespFactors) {
-                        errorsFound = true;
-                        ShowSevereError(state, "GroundHeatExchanger:Vertical:Single objects not found.");
-                    }
-                }
-
-                thisGLHE.bhDiameter = thisGLHE.myRespFactors->props->bhDiameter;
-                thisGLHE.bhRadius = thisGLHE.bhDiameter / 2.0;
-                thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
-                thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
-
-                // pull pipe and grout data up from response factor struct for simplicity
-                thisGLHE.pipe.outDia = thisGLHE.myRespFactors->props->pipe.outDia;
-                thisGLHE.pipe.innerDia = thisGLHE.myRespFactors->props->pipe.innerDia;
-                thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2;
-                thisGLHE.pipe.innerRadius = thisGLHE.pipe.innerDia / 2;
-                thisGLHE.pipe.thickness = thisGLHE.myRespFactors->props->pipe.thickness;
-                thisGLHE.pipe.k = thisGLHE.myRespFactors->props->pipe.k;
-                thisGLHE.pipe.rhoCp = thisGLHE.myRespFactors->props->pipe.rhoCp;
-
-                thisGLHE.grout.k = thisGLHE.myRespFactors->props->grout.k;
-                thisGLHE.grout.rhoCp = thisGLHE.myRespFactors->props->grout.rhoCp;
-
-                thisGLHE.myRespFactors->gRefRatio = thisGLHE.bhRadius / thisGLHE.bhLength;
-
-                // Number of simulation years from RunPeriod
-                thisGLHE.myRespFactors->maxSimYears = state.dataEnvrn->MaxNumberSimYears;
-
-                // total tube length
-                thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->bhLength;
-
-                // ground thermal diffusivity
-                thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
-
-                // multipole method constants
-                thisGLHE.theta_1 = thisGLHE.bhUTubeDist / (2 * thisGLHE.bhRadius);
-                thisGLHE.theta_2 = thisGLHE.bhRadius / thisGLHE.pipe.outRadius;
-                thisGLHE.theta_3 = 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2);
-                thisGLHE.sigma = (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k);
-
-                thisGLHE.SubAGG = 15;
-                thisGLHE.AGG = 192;
-
-                // Allocation of all the dynamic arrays
-                thisGLHE.QnMonthlyAgg.dimension(static_cast<int>(thisGLHE.myRespFactors->maxSimYears * 12), 0.0);
-                thisGLHE.QnHr.dimension(730 + thisGLHE.AGG + thisGLHE.SubAGG, 0.0);
-                thisGLHE.QnSubHr.dimension(static_cast<int>((thisGLHE.SubAGG + 1) * maxTSinHr + 1), 0.0);
-                thisGLHE.LastHourN.dimension(thisGLHE.SubAGG + 1, 0);
-
-                state.dataGroundHeatExchanger->prevTimeSteps.allocate(static_cast<int>((thisGLHE.SubAGG + 1) * maxTSinHr + 1));
-                state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
-
-                // Initialize ground temperature model and get pointer reference
-                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
-                if (thisGLHE.groundTempModel) {
-                    errorsFound = thisGLHE.groundTempModel->errorsFound;
-                }
-
-                // Check for Errors
-                if (errorsFound) {
-                    ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
-                }
-
-                state.dataGroundHeatExchanger->verticalGLHE.push_back(thisGLHE);
+            auto &instancesValue = instances.value();
+            for (auto it = instancesValue.begin(); it != instancesValue.end(); ++it) {
+                auto const &instance = it.value();
+                auto const &objName = it.key();
+                auto const &objNameUC = UtilityRoutines::MakeUPPERCase(objName);
+                inputProcessor->markObjectAsUsed(currObj, objName);
+                state.dataGroundHeatExchanger->verticalGLHE.emplace_back(state, objNameUC, instance);
             }
 
             // Set up report variables

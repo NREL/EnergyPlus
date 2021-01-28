@@ -320,6 +320,7 @@ namespace GroundHeatExchangers {
         ~GLHEVert() override = default;
 
         // Members
+        std::string const moduleName = "GroundHeatExchanger:System";
         Real64 bhDiameter;  // Diameter of borehole {m}
         Real64 bhRadius;    // Radius of borehole {m}
         Real64 bhLength;    // Length of borehole {m}
@@ -339,6 +340,8 @@ namespace GroundHeatExchangers {
         GLHEVert() : bhDiameter(0.0), bhRadius(0.0), bhLength(0.0), bhUTubeDist(0.0), theta_1(0.0), theta_2(0.0), theta_3(0.0), sigma(0.0)
         {
         }
+
+        GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
 
         static std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
 
