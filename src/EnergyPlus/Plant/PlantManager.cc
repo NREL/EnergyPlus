@@ -2730,8 +2730,8 @@ namespace EnergyPlus::PlantManager {
                     e.EnthalpyLastTimestep = e.Enthalpy;
                 }
             }
-            if (DataPlant::TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
-                for (auto &loop : PlantLoop) {
+            if (state.dataPlnt->TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
+                for (auto &loop : state.dataPlnt->PlantLoop) {
                     for (auto &side : loop.LoopSide) {
                         if (loop.OutletNodeFlowrate > DataHVACGlobals::SmallMassFlow) {
                             // Accumulate total time loop is active
@@ -4327,8 +4327,8 @@ namespace EnergyPlus::PlantManager {
                                      " Demand Side is storing excess heat the majority of the time.");
                     ShowContinueError(state,
                                       format("Excesss Storage Time=[{:.2R}], Total Time=[{:.2R}]",
-                                             PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
-                                             PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime >
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TotalTime / 2) {
@@ -4336,8 +4336,8 @@ namespace EnergyPlus::PlantManager {
                                      " Supply Side is storing excess heat the majority of the time.");
                     ShowContinueError(state,
                                       format("Excesss Storage Time=[{:.2R}], Total Loop Active Time=[{:.2R}]",
-                                             PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
-                                             PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_CapExcessStorageTime,
+                                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime));
                 }
             }
         }
