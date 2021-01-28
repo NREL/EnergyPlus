@@ -8154,34 +8154,44 @@ namespace ConvectionCoefficients {
         Real64 Volume = Zone(ZoneNum).Volume; // Volume of the zone in m3
         Real64 AirStreamV = std::pow(Volume, OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
 
-        if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-            ShowFatalError(state, "ASTM C1340 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
-        } else {
-            HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, AirStreamV, 
-                                                      Surface(SurfNum).Tilt);
-        }
-         
+        HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, AirStreamV, Surface(SurfNum).Tilt);
+                 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
     }
 
     Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const AirStreamV, Real64 const Tilt)
     {
-        static constexpr Real64 OneThird((1.0 / 3.0)); // 1/3 in highest precision
-        int ZoneNum = Surface(SurfNum).Zone;
-        Real64 DeltaTemp;                              // Temperature difference between TSurf and Tair
-        Real64 L; // characteristic length: the length along the heat flow direction (the square root of surface area for floors and ceilings, average
-                  // height for gables and walls, and length of pitched roof from soffit to ridge
-        Real64 v;   // the velocity of the air stream in m/s, (for interior surfaces), "Surface Outside Face Outdoor Air Wind Speed” variable (for
-                    // exterior surfaces)
-        Real64 Nun; // Nusselt number for natural convection
-        Real64 Nuf; // Nusselt number for forced convection
-        Real64 hn;  // Natural convection coefficient
-        Real64 hf;  // Forced convection coefficient
-        Real64 h;   // Combined convection coefficient
-        Real64 Grc; // Critical Grashof number
 
-        if (Tilt == 0 || Tilt == 180) {
+
+        // Return Value
+        Real64 h;           // Combined convection coefficient
+
+        Real64 Nun;         // Nusselt number for natural convection
+        Real64 Nuf;         // Nusselt number for forced convection
+        Real64 hn;          // Natural convection coefficient
+        Real64 hf;          // Forced convection coefficient
+        Real64 Grc;         // Critical Grashof number
+        Real64 DeltaTemp;   // Temperature difference between TSurf and Tair
+        Real64 L;           // characteristic length: the length along the heat flow direction 
+                            // (the square root of surface area for floors and ceilings, average height for gables and walls, and length of pitched roof from soffit to ridge)
+        Real64 v;           // the velocity of the air stream in m/s, (for interior surfaces)
+                            // Surface Outside Face Outdoor Air Wind Speed (for exterior surfaces)
+        Real64 g(9.80665);  // acceleration of gravity, m/s2
+        Real64 Pr;          // Prandtl number
+        Real64 beta_SI;     // volume coefficient of expansion of air, 1/K
+        Real64 rho_SI;      // density of air, kg/m3
+        Real64 cp_SI;       // specific heat of air, J/kg.k
+        Real64 dv;
+        Real64 visc;        // kinematic viscosity of air, m2/s
+        Real64 k_SI_n;
+        Real64 k_SI_d;
+        Real64 k_SI;        // thermal conductivity of air, W/m.K
+        Real64 Ra;          // Rayleigh number
+        Real64 Re;          // Reynolds number
+        static constexpr Real64 OneThird((1.0 / 3.0));  // 1/3 in highest precision
+
+        if (Tilt == 0 || Tilt == 180) {             // Horizontal roof or floor
             L = std::sqrt(Surface(SurfNum).Area);
         } else {
             L = Surface(SurfNum).Height;
@@ -8192,26 +8202,25 @@ namespace ConvectionCoefficients {
         } else {
             v = AirStreamV;
         }
-
-        Real64 g(9.80665);                                                              // acceleration of gravity, m/s2
-        Real64 Pr = 0.7880 - (2.631 * std::pow(10, -4) * (Tair + 273.15));              // Prandtl number
-        Real64 beta_SI = 1 / (Tair + 273.15);                                           // volume coefficient of expansion of air, 1/K
-        Real64 rho_SI = (22.0493 / (Tair + 273.15)) * 16;                               // density of air, kg/m3
-        Real64 cp_SI = 0.068559 * (3.4763 + (1.066 * std::pow(10, -4) * (Tair + 273.15))) * 4186.8; // specific heat of air, J/kg.k
-        Real64 dv = (241.9 * std::pow(10, -7)) * (145.8 * (Tair + 273.15) * std::pow((Tair + 273.15), 0.5)) / ((Tair + 273.15) + 110.4);
-        Real64 visc = dv * (0.45359237 / (0.3048 * 3600)) / rho_SI;                     // kinematic viscosity of air, m2/s
-        Real64 k_SI_n = (0.6325 * std::pow(10, -5) * std::pow((Tair + 273.15), 0.5) * 241.77);
-        Real64 k_SI_d = (1.0 + (245.4 * std::pow(10, (-12 / (Tair + 273.15)))) / (Tair + 273.15));
-        Real64 k_SI = 1.730735 * (k_SI_n / k_SI_d);                                     // thermal conductivity of air, W/m.K
+                                                                    
+        Pr = 0.7880 - (2.631 * std::pow(10, -4) * (Tair + 273.15));
+        beta_SI = 1 / (Tair + 273.15);                       
+        rho_SI = (22.0493 / (Tair + 273.15)) * 16;              
+        cp_SI = 0.068559 * (3.4763 + (1.066 * std::pow(10, -4) * (Tair + 273.15))) * 4186.8;
+        dv = (241.9 * std::pow(10, -7)) * (145.8 * (Tair + 273.15) * std::pow((Tair + 273.15), 0.5)) / ((Tair + 273.15) + 110.4);
+        visc = dv * (0.45359237 / (0.3048 * 3600)) / rho_SI;
+        k_SI_n = (0.6325 * std::pow(10, -5) * std::pow((Tair + 273.15), 0.5) * 241.77);
+        k_SI_d = (1.0 + (245.4 * std::pow(10, (-12 / (Tair + 273.15)))) / (Tair + 273.15));
+        k_SI = 1.730735 * (k_SI_n / k_SI_d);
 
         // Calculation of DeltaTemp
         DeltaTemp = Tsurf - Tair;
 
-        Real64 Ra = std::abs(g * beta_SI * rho_SI * cp_SI * DeltaTemp * (L * L * L)) / (visc * k_SI);
-        Real64 Re = (v * L) / visc;
+        Ra = std::abs(g * beta_SI * rho_SI * cp_SI * DeltaTemp * (L * L * L)) / (visc * k_SI);
+        Re = (v * L) / visc;
 
-        // for natural convection (Nun)
-        if (Tilt == 0) {                       // Roof
+        // Natural convection (Nun)
+        if (Tilt == 0) {                       // Horizontal surface: Roof
             if (DeltaTemp > 0) {               // heat flow down
                 Nun = 0.58 * std::pow(Ra, 0.2);
             } else if (Ra < 8000000) {         // heat flow up
@@ -8219,12 +8228,12 @@ namespace ConvectionCoefficients {
             } else {
                 Nun = 0.15 * std::pow(Ra, OneThird);
             }
-        } else if (Tilt > 0 && Tilt < 90) {    // tilted roof
+        } else if (Tilt > 0 && Tilt < 90) {    // Tilted roof
             if (DeltaTemp > 0) {               // heat flow down
                 if (Tilt < 2) {
                     Nun = 0.58 * std::pow(Ra, 0.2);
                 } else {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
                 }
             } else {                           // heat flow up
                 if (Tilt < 15) {
@@ -8238,23 +8247,23 @@ namespace ConvectionCoefficients {
                     Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
                 } else {
                     Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
-                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
                 }
             }
-        } else if (Tilt == 180) {               // Floor
+        } else if (Tilt == 180) {               // Horizontal surface: Floor
             if (DeltaTemp <= 0) {               // heat flow down
                 Nun = 0.58 * std::pow(Ra, 0.2);
-            } else if (Ra < 8000000) {          // Horizontal surface, heat flow up
+            } else if (Ra < 8000000) {          // heat flow up
                 Nun = 0.54 * std::pow(Ra, 0.25);
             } else {
                 Nun = 0.15 * std::pow(Ra, OneThird);
             }
-        } else if (Tilt > 90 && Tilt < 180) {  // tilted Floor
+        } else if (Tilt > 90 && Tilt < 180) {  // Tilted Floor
             if (DeltaTemp <= 0) {              // heat flow down
                 if (Tilt > 178) {
                     Nun = 0.58 * std::pow(Ra, 0.2);
                 } else {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
                 }
             } else {                            // heat flow up
                 if (Tilt > 165) {
@@ -8265,13 +8274,13 @@ namespace ConvectionCoefficients {
                     Grc = 5000000000;
                 }
                 if ((Ra / Pr) <= Grc) {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
                 } else {
                     Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
-                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
                 }
             }
-        } else {                                // vertical wall
+        } else {                                // Vertical wall
             if (Ra < 1000000000) {
                 Nun = 0.59 * std::pow(Ra, 0.25);
             } else {
@@ -8279,14 +8288,14 @@ namespace ConvectionCoefficients {
             }
         }
 
-        // for forced convection (Nuf)
-
+        // Forced convection (Nuf)
         if (Re < 500000) {
             Nuf = 0.664 * std::pow(Pr, OneThird) * std::pow(Re, 0.5);
         } else {
             Nuf = std::pow(Pr, OneThird) * ((0.037 * std::pow(Re, 0.8)) - 850);
         }
 
+        // Combined convection coefficient
         hf = Nuf * k_SI / L;
         hn = Nun * k_SI / L;
         h = std::pow((std::pow(hf, 3) + std::pow(hn, 3)), OneThird);
