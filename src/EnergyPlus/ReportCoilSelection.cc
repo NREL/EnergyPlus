@@ -443,8 +443,8 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
         // see if there is an OA controller
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -489,7 +489,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
     c->zoneNum.resize(1);
-    c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
+    c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
     c->zoneName.resize(1);
     c->zoneName[0] = DataHeatBalance::Zone(c->zoneNum[0]).Name;
     c->typeHVACname = "Zone Equipment"; // init
@@ -505,8 +505,8 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     if (c->airloopNum > 0) {
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
-            for (int loop = 1; loop <= MixedAir::NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == MixedAir::OAController(loop).RetNode) {
+            for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -543,44 +543,44 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         c->typeHVACname = "Unknown";
         c->userNameforHVACsystem = "Unknown";
         // now search equiment
-        if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-            c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(1);
-            c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(1);
+        if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
+            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
+            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
             c->coilLocation = "Zone Equipment";
-            c->zoneHVACTypeNum = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(1);
-            c->zoneHVACIndex = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipIndex(1);
-        } else if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+            c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(1);
+            c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(1);
+        } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
             bool foundOne(false);
-            for (int equipLoop = 1; equipLoop <= DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
+            for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                 // go with the first ZoneHVAC device in the list
-                if ((DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                      DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                    (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
+                    (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
                     if (!foundOne) {
-                        c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                        c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                        c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         foundOne = true;
                         c->coilLocation = "Zone Equipment";
-                        c->zoneHVACTypeNum = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop);
-                        c->zoneHVACIndex = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
+                        c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop);
+                        c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
                     } else { // or may have found another
-                        c->typeHVACname += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                        c->userNameforHVACsystem += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                        c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                        c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                     }
                 }
             }
@@ -600,45 +600,45 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->typeHVACname = "Unknown";
             c->userNameforHVACsystem = "Unknown";
             // now search equiment
-            if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(1);
-                c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(1);
+            if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
+                c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
+                c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
                 c->coilLocation = "Zone Equipment";
-            } else if (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+            } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
                 bool foundOne(false);
-                for (int equipLoop = 1; equipLoop <= DataZoneEquipment::ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
+                for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                     // go with the first ZoneHVAC device in the list
-                    if ((DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                    if ((state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) ||
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) ||
-                        (DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
+                        (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType_Num(equipLoop) ==
                          DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX)) {
                         if (!foundOne) {
-                            c->typeHVACname = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem = DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                             foundOne = true;
                             c->coilLocation = "Zone Equipment";
                         } else { // or may have found another
-                            c->typeHVACname += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                            c->userNameforHVACsystem += " or " + DataZoneEquipment::ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
+                            c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         }
                     }
                 }
@@ -1331,8 +1331,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).CoolDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak;
@@ -1555,8 +1555,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     } else if (curZoneEqNum > 0 && allocated(DataSizing::FinalZoneSizing)) {
         c->zoneNum.resize(1);
         c->zoneName.resize(1);
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneNum[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
-        if (allocated(DataZoneEquipment::ZoneEquipConfig)) c->zoneName[0] = DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum;
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig)) c->zoneName[0] = state.dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName;
         c->desDayNameAtSensPeak = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay;
         c->oaPeakTemp = DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak;
         c->oaPeakHumRat = DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak;
