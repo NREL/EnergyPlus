@@ -86,7 +86,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -185,7 +184,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     Fans::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
-    FuelCellElectricGenerator::clear_state();
     Furnaces::clear_state();
     General::clear_state();
     GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
