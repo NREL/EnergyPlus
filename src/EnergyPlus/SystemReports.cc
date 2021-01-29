@@ -4242,7 +4242,7 @@ namespace EnergyPlus::SystemReports {
             state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
                 state, state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex, ActualZoneNum, UseOccSchFlag, UseMinOASchFlag);
             if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
-                state.dataSysRpts->ZoneTargetVentilationFlowVoz =
+                state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) =
                     state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) /
                     DataSizing::ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }

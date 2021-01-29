@@ -404,20 +404,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
     DataZoneEquipment::GetZoneEquipmentData(*state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
-    state->dataSysRpts->ZoneOAMassFlow.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneOAMass.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneOAVolFlowStdRho.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneOAVolFlowCrntRho.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneOAVolStdRho.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneOAVolCrntRho.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->ZoneMechACH.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     MAT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->MaxHeatingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->MaxOverheatingByVent.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->MaxCoolingLoadMetByVent.allocate(state->dataGlobal->NumOfZones);
-    state->dataSysRpts->MaxOvercoolingByVent.allocate(state->dataGlobal->NumOfZones);
+    SystemReports::AllocateAndSetUpVentReports(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     state->dataZoneEquip->ZoneEquipList(state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
