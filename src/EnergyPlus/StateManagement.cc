@@ -121,6 +121,7 @@
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorIceRink.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -238,6 +239,7 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
+    IceRink::clear_state();
     MicroCHPElectricGenerator::clear_state();
     MicroturbineElectricGenerator::clear_state();
     MixerComponent::clear_state();

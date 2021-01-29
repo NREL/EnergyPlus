@@ -59,6 +59,7 @@ namespace EnergyPlus::DataPlant {
     // Condenser Loops.
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
+
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",
@@ -155,7 +156,8 @@ namespace EnergyPlus::DataPlant {
                                              "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
                                              "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
                                              "HEATPUMP:PLANTLOOP:EIR:COOLING",
-                                             "HEATPUMP:PLANTLOOP:EIR:HEATING"});
+                                             "HEATPUMP:PLANTLOOP:EIR:HEATING",
+                                             "ICERINK:INDOOR"});
 
     Array1D_string const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
                                               {"Boiler:HotWater",
@@ -253,7 +255,8 @@ namespace EnergyPlus::DataPlant {
                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
                                                "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
                                                "HeatPump:PlantLoop:EIR:Cooling",
-                                               "HeatPump:PlantLoop:EIR:Heating"});
+                                               "HeatPump:PlantLoop:EIR:Heating",
+                                               "IceRink:Indoor"});
 
     Array1D<LoopType> const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,
@@ -268,7 +271,8 @@ namespace EnergyPlus::DataPlant {
          LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
          LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
          LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
-         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both});
+         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,
+         LoopType::Both});
 
     Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
 

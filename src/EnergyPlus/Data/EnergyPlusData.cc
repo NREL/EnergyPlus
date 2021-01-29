@@ -45,16 +45,18 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include <memory>
 
 namespace EnergyPlus {
 
-    EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
+EnergyPlusData::EnergyPlusData()
+{
+    // todo, try to eliminate the need for the singleton
+    IOFiles::setSingleton(&files);
+
 
         this->dataAirLoop = std::make_unique<DataAirLoopData>();
         this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
@@ -172,6 +174,7 @@ namespace EnergyPlus {
         this->dataHybridUnitaryAC = std::make_unique<HybridUnitaryAirConditionersData>();
         this->dataHysteresisPhaseChange = std::make_unique<HysteresisPhaseChangeData>();
         this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
+        this->dataIceRink = std::make_unique<IceRinkData>();
         this->dataIPShortCut = std::make_unique<IPShortCutsData>();
         this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
         this->dataIntegratedHP = std::make_unique<IntegratedHeatPumpGlobalData>();
@@ -417,6 +420,7 @@ namespace EnergyPlus {
         this->dataHybridUnitaryAC->clear_state();
         this->dataHysteresisPhaseChange->clear_state();
         this->dataICEngElectGen->clear_state();
+        this->dataIceRink->clear_state();
         this->dataIPShortCut->clear_state();
         this->dataIceThermalStorage->clear_state();
         this->dataIntegratedHP->clear_state();
@@ -553,4 +557,4 @@ namespace EnergyPlus {
         this->files.ssz.close();
         this->files.zsz.close();
     }
-}
+}// namespace EnergyPlus
