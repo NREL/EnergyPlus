@@ -85,7 +85,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -185,7 +184,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
-    FluidCoolers::clear_state();
     FluidProperties::clear_state();
     FuelCellElectricGenerator::clear_state();
     Furnaces::clear_state();
