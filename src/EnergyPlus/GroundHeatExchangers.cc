@@ -151,12 +151,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         this->available = true;
         this->on = true;
 
-        BranchNodeConnections::TestCompSet(state,
-                                           this->moduleName,
-                                           this->name,
-                                           inletNodeName,
-                                           outletNodeName,
-                                           "Condenser Water Nodes");
+        BranchNodeConnections::TestCompSet(state, this->moduleName, this->name, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
         // load data
         this->designFlow = j["design_flow_rate"];
@@ -200,8 +195,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         this->numCoils = static_cast<int>(this->trenchLength / this->coilPitch);
 
         // Total tube length
-        this->totalTubeLength =
-            DataGlobalConstants::Pi * this->coilDiameter * this->trenchLength * this->numTrenches / this->coilPitch;
+        this->totalTubeLength = DataGlobalConstants::Pi * this->coilDiameter * this->trenchLength * this->numTrenches / this->coilPitch;
 
         // Get g function data
         this->SubAGG = 15;
@@ -2631,174 +2625,6 @@ namespace EnergyPlus::GroundHeatExchangers {
                 inputProcessor->markObjectAsUsed(currObj, objName);
                 state.dataGroundHeatExchanger->slinkyGLHE.emplace_back(state, objNameUC, instance);
             }
-
-//            DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:Slinky";
-//
-//            for (int GLHENum = 1; GLHENum <= state.dataGroundHeatExchanger->numSlinkyGLHEs; ++GLHENum) {
-//
-//                // just a few vars to pass in and out to GetObjectItem
-//                int ioStatus;
-//                int numAlphas;
-//                int numNumbers;
-//
-//                // get the input data and store it in the Shortcuts structures
-//                inputProcessor->getObjectItem(state,
-//                                              DataIPShortCuts::cCurrentModuleObject,
-//                                              GLHENum,
-//                                              DataIPShortCuts::cAlphaArgs,
-//                                              numAlphas,
-//                                              DataIPShortCuts::rNumericArgs,
-//                                              numNumbers,
-//                                              ioStatus,
-//                                              DataIPShortCuts::lNumericFieldBlanks,
-//                                              DataIPShortCuts::lAlphaFieldBlanks,
-//                                              DataIPShortCuts::cAlphaFieldNames,
-//                                              DataIPShortCuts::cNumericFieldNames);
-//
-//                // the input processor validates the numeric inputs based on the IDD definition
-//                // still validate the name to make sure there aren't any duplicates or blanks
-//                // blanks are easy: fatal if blank
-//                if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-//                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
-//                }
-//
-//                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
-//                for (auto &existingSlinkyGLHE : state.dataGroundHeatExchanger->slinkyGLHE) {
-//                    if (DataIPShortCuts::cAlphaArgs(1) == existingSlinkyGLHE.name) {
-//                        ShowFatalError(state,
-//                                       "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
-//                                           " object: Duplicate name found: " + existingSlinkyGLHE.name);
-//                    }
-//                }
-//
-//                // Build out new instance
-//                GLHESlinky thisGLHE;
-//                thisGLHE.name = DataIPShortCuts::cAlphaArgs(1);
-//
-//                // get inlet node num
-//                thisGLHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-//                                                                            DataIPShortCuts::cAlphaArgs(2),
-//                                                                            errorsFound,
-//                                                                            DataIPShortCuts::cCurrentModuleObject,
-//                                                                            DataIPShortCuts::cAlphaArgs(1),
-//                                                                            NodeType_Water,
-//                                                                            NodeConnectionType_Inlet,
-//                                                                            1,
-//                                                                            ObjectIsNotParent);
-//
-//                // get outlet node num
-//                thisGLHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-//                                                                             DataIPShortCuts::cAlphaArgs(3),
-//                                                                             errorsFound,
-//                                                                             DataIPShortCuts::cCurrentModuleObject,
-//                                                                             DataIPShortCuts::cAlphaArgs(1),
-//                                                                             NodeType_Water,
-//                                                                             NodeConnectionType_Outlet,
-//                                                                             1,
-//                                                                             ObjectIsNotParent);
-//                thisGLHE.available = true;
-//                thisGLHE.on = true;
-//
-//                BranchNodeConnections::TestCompSet(state,
-//                                                   DataIPShortCuts::cCurrentModuleObject,
-//                                                   DataIPShortCuts::cAlphaArgs(1),
-//                                                   DataIPShortCuts::cAlphaArgs(2),
-//                                                   DataIPShortCuts::cAlphaArgs(3),
-//                                                   "Condenser Water Nodes");
-//
-//                // load data
-//                thisGLHE.designFlow = DataIPShortCuts::rNumericArgs(1);
-//                PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
-//
-//                thisGLHE.soil.k = DataIPShortCuts::rNumericArgs(2);
-//                thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3) * DataIPShortCuts::rNumericArgs(4);
-//                thisGLHE.pipe.k = DataIPShortCuts::rNumericArgs(5);
-//                thisGLHE.pipe.rho = DataIPShortCuts::rNumericArgs(6);
-//                thisGLHE.pipe.cp = DataIPShortCuts::rNumericArgs(7);
-//                thisGLHE.pipe.outDia = DataIPShortCuts::rNumericArgs(8);
-//                thisGLHE.pipe.outRadius = thisGLHE.pipe.outDia / 2.0;
-//                thisGLHE.pipe.thickness = DataIPShortCuts::rNumericArgs(9);
-//
-//                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "VERTICAL")) {
-//                    thisGLHE.verticalConfig = true;
-//                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "HORIZONTAL")) {
-//                    thisGLHE.verticalConfig = false;
-//                }
-//
-//                thisGLHE.coilDiameter = DataIPShortCuts::rNumericArgs(10);
-//                thisGLHE.coilPitch = DataIPShortCuts::rNumericArgs(11);
-//                thisGLHE.trenchDepth = DataIPShortCuts::rNumericArgs(12);
-//                thisGLHE.trenchLength = DataIPShortCuts::rNumericArgs(13);
-//                thisGLHE.numTrenches = DataIPShortCuts::rNumericArgs(14);
-//                thisGLHE.trenchSpacing = DataIPShortCuts::rNumericArgs(15);
-//                thisGLHE.maxSimYears = DataIPShortCuts::rNumericArgs(16);
-//
-//                // Need to add a response factor object for the slinky model
-//                std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
-//                thisRF->name =
-//                    "Response Factor Object Auto Generated No: " + fmt::to_string(state.dataGroundHeatExchanger->numAutoGeneratedResponseFactors + 1);
-//                thisGLHE.myRespFactors = thisRF;
-//                state.dataGroundHeatExchanger->responseFactorsVector.push_back(thisRF);
-//
-//                // Number of coils
-//                thisGLHE.numCoils = static_cast<int>(thisGLHE.trenchLength / thisGLHE.coilPitch);
-//
-//                // Total tube length
-//                thisGLHE.totalTubeLength =
-//                    DataGlobalConstants::Pi * thisGLHE.coilDiameter * thisGLHE.trenchLength * thisGLHE.numTrenches / thisGLHE.coilPitch;
-//
-//                // Get g function data
-//                thisGLHE.SubAGG = 15;
-//                thisGLHE.AGG = 192;
-//
-//                // Average coil depth
-//                if (thisGLHE.verticalConfig) {
-//                    // Vertical configuration
-//                    if (thisGLHE.trenchDepth - thisGLHE.coilDiameter < 0.0) {
-//                        // Error: part of the coil is above ground
-//                        ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-//                        ShowContinueError(state, format("...{}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(13), thisGLHE.trenchDepth));
-//                        ShowContinueError(state, format("...{}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(10), thisGLHE.coilDepth));
-//                        ShowContinueError(state, "...Average coil depth will be <=0.");
-//                        errorsFound = true;
-//
-//                    } else {
-//                        // Entire coil is below ground
-//                        thisGLHE.coilDepth = thisGLHE.trenchDepth - (thisGLHE.coilDiameter / 2.0);
-//                    }
-//
-//                } else {
-//                    // Horizontal configuration
-//                    thisGLHE.coilDepth = thisGLHE.trenchDepth;
-//                }
-//
-//                // Thermal diffusivity of the ground
-//                thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
-//
-//                state.dataGroundHeatExchanger->prevTimeSteps.allocate(static_cast<int>((thisGLHE.SubAGG + 1) * maxTSinHr + 1));
-//                state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
-//
-//                if (thisGLHE.pipe.thickness >= thisGLHE.pipe.outDia / 2.0) {
-//                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + thisGLHE.name + "\", invalid value in field.");
-//                    ShowContinueError(state, format("...{}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(12), thisGLHE.pipe.thickness));
-//                    ShowContinueError(state, format("...{}=[{:.3R}].", DataIPShortCuts::cNumericFieldNames(10), thisGLHE.pipe.outDia));
-//                    ShowContinueError(state, "...Radius will be <=0.");
-//                    errorsFound = true;
-//                }
-//
-//                // Initialize ground temperature model and get pointer reference
-//                thisGLHE.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(5), DataIPShortCuts::cAlphaArgs(6));
-//                if (thisGLHE.groundTempModel) {
-//                    errorsFound = thisGLHE.groundTempModel->errorsFound;
-//                }
-//
-//                // Check for Errors
-//                if (errorsFound) {
-//                    ShowFatalError(state, "Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
-//                }
-//
-//                state.dataGroundHeatExchanger->slinkyGLHE.push_back(thisGLHE);
-//            }
         }
     }
 
