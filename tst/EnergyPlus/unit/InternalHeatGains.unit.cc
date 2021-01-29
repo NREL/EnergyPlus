@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -70,9 +72,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -691,13 +690,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(*state);
-    totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
+    totConvGains = state->dataOutRptTab->peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2
@@ -888,7 +887,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalance::ZnRpt.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;

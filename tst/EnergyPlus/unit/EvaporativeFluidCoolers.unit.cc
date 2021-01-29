@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,17 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -130,25 +128,25 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     DataLoopNode::Node(1).MassFlowRateMin = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.05;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.05;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLocked;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).MyLoad = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).ON = false;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).CurOpSchemeType = 0;
     thisEFC.DesignWaterFlowRateWasAutoSized = false;
     thisEFC.LowSpeedAirFlowRateWasAutoSized = false;
     thisEFC.HighSpeedEvapFluidCoolerUAWasAutoSized = false;
     thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantFinalSizesOkayToReport = false;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantFinalSizesOkayToReport = false;
     DataSizing::SaveNumPlantComps = 0;
     thisEFC.DesignWaterFlowRate = 0.001;
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     DataSizing::PlantSizData(1).ExitTemp = 20.0;
 
     // Now set the specific data for the actual test

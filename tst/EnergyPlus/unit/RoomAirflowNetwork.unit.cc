@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -68,9 +70,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
@@ -85,8 +84,6 @@ using namespace EnergyPlus::RoomAirModelAirflowNetwork;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
-using DataZoneEquipment::ZoneEquipConfig;
-using DataZoneEquipment::ZoneEquipList;
 
 class RoomAirflowNetworkTest : public EnergyPlusFixture
 {
@@ -104,8 +101,8 @@ protected:
         int NumOfSurfaces = 2;
         state->dataRoomAirMod->RoomAirflowNetworkZoneInfo.allocate(state->dataGlobal->NumOfZones);
         Zone.allocate(state->dataGlobal->NumOfZones);
-        ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-        ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+        state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
@@ -233,20 +230,20 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW = 0.01;
     AirflowNetwork::AirflowNetworkLinkSimu(5).FLOW2 = 0.0;
 
-    ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
-    ZoneEquipList(ZoneNum).EquipName.allocate(1);
-    ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
 
-    ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
-    ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
-    ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
-    ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ActualZoneNum = ZoneNum;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1) = 1;
     NodeID.allocate(NumOfNodes);
     Node.allocate(NumOfNodes);
-    ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
-    ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Zone(ZoneNum).Volume = 100;
     Zone(ZoneNum).IsControlled = true;
