@@ -1515,7 +1515,7 @@
     ,                        !- EMS Program or Subroutine Name
     ;                        !- Units
 
-  EnergyManagementSystem:OutputVariable,
+1.0  EnergyManagementSystem:OutputVariable,
     Erl Zn001:Wall001:Win001 Incident Angle,  !- Name
     IncidentAngle,           !- EMS Variable Name
     Averaged,                !- Type of Data in Variable

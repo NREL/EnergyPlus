@@ -161,7 +161,7 @@ namespace SurfaceGeometry {
 
         SurfWinShadingFlag.dimension(NumSurfaces, WinShadingType::ShadeOff);
         SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
-        SurfWinShadingFlagEMSValue.dimension(NumSurfaces, WinShadingType::ShadeOff);
+        SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0.0);
         SurfWinGlareControlIsActive.dimension(NumSurfaces, false);
         SurfWinStormWinFlag.dimension(NumSurfaces, 0);
         SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
@@ -8158,16 +8158,17 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        int const NumValidShadingTypes(8);
+        int const NumValidShadingTypes(9);
         static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
-                                                       {"INTERIORSHADE", // 1
-                                                        "SWITCHABLEGLAZING", // 2
-                                                        "EXTERIORSHADE", // 3
-                                                        "EXTERIORSCREEN", // 4
-                                                        "INTERIORBLIND", // 5
-                                                        "EXTERIORBLIND", // 6
-                                                        "BETWEENGLASSSHADE", // 7
-                                                        "BETWEENGLASSBLIND" // 8
+                                                       {"SHADEOFF", // 1
+                                                        "INTERIORSHADE", // 2
+                                                        "SWITCHABLEGLAZING", // 3
+                                                        "EXTERIORSHADE", // 4
+                                                        "EXTERIORSCREEN", // 5
+                                                        "INTERIORBLIND", // 6
+                                                        "EXTERIORBLIND", // 7
+                                                        "BETWEENGLASSSHADE", // 8
+                                                        "BETWEENGLASSBLIND" // 9
                                                         });
 
         int const NumValidWindowShadingControlTypes(21);
@@ -8450,7 +8451,7 @@ namespace SurfaceGeometry {
 
             // Check for illegal shading type name
             Found = UtilityRoutines::FindItemInList(cAlphaArgs(3), cValidShadingTypes, NumValidShadingTypes);
-            if (Found == 0) {
+            if (Found > 1) {
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
                                 cAlphaArgs(3) + "\".");

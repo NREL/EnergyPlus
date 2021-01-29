@@ -1051,8 +1051,9 @@ namespace HeatBalanceSurfaceManager {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, WindowShadingControl(curWSC).Name);
                             // shading report
                             std::vector<std::string> WindowShadingTypeStr = {
-                                    "No Shade", // WinShadingType::NoShade
-                                    "Interior Shade", // WinShadingType::IntShade
+                                    "No Shade", // 0
+                                    "Shade Off", // 1
+                                    "Interior Shade",
                                     "Switchable Glazing",
                                     "Exterior Shade",
                                     "Exterior Screen",

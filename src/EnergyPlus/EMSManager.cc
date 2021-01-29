@@ -1891,7 +1891,7 @@ namespace EMSManager {
                                  "Control Status",
                                  "[ShadeStatus]",
                                  DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
-                                 (int &)DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
+                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
                 if (DataSurfaces::SurfWinMovableSlats(loopSurfNum)) {
                     SetupEMSActuator(state, "Window Shading Control",
                                      Surface(loopSurfNum).Name,
@@ -1906,7 +1906,7 @@ namespace EMSManager {
                                  "Control Status",
                                  "[ShadeStatus]",
                                  DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
-                                 (int &)DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
+                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WinShadingType::SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +

@@ -494,7 +494,7 @@ namespace WindowManager {
         auto aGas = getAir();
         auto thickness = 0.0;
 
-        if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(m_SurfNum))) {
+        if (SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntBlind || SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtBlind) {
             thickness = Blind(SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntShade || SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtShade || SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtScreen) {

@@ -9128,10 +9128,53 @@ namespace SolarShading {
 
                 // EMS Actuator Point: override setting if ems flag on
                 if (SurfWinShadingFlagEMSOn(ISurf)) {
-                    SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMSValue(ISurf);
+                    WinShadingType SurfWinShadingFlagEMS = findValueInEnumeration(SurfWinShadingFlagEMSValue(ISurf));
+                    if (SurfWinShadingFlagEMS != WinShadingType::INVALID) {
+                        SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMS;
+                    } else {
+                        ShowWarningError(state, "Invalid EMS value of Window Shading Control Type for Surface " +
+                                                Surface(ISurf).Name);
+                    }
                 }
             } // End of surface loop
         }
+    }
+
+    DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue) {
+        // This is a workaround to translate EMS Shading control numerical values
+        // EMS control of window shading devices involves setting the control values for shading control actuators with
+        // one of these values.  The variable names can be used or replaced, it is the whole number values that trigger
+        // changes in the modeling.
+        // Shades and Blinds are either fully on or fully off, partial positions require multiple windows.
+        // the window shading control flag values follow
+        // -1: if window has no shading device
+        // 0: if shading device is off
+        // 1: if interior shade is on
+        // 2: if glazing is switched to darker state
+        // 3: if exterior shade is on
+        // 4: if exterior screen is on
+        // 6: if interior blind is on
+        // 7: if exterior blind is on
+        // 8: if between-glass shade is on
+        // 9: if between-glass blind is on
+        // 10: window has interior shade that is off but may be triggered on later to control daylight glare
+        // 20: window has switchable glazing that is unswitched but may be switched later to control daylight glare or daylight illuminance
+        // 30: window has exterior shade that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 60: window has interior blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 70: window has exterior blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 80: window has between-glass shade that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 90: window has between-glass blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        if (controlValue == -1.0) return WinShadingType::NoShade;
+        if (controlValue == 0.0) return WinShadingType::ShadeOff;
+        if (controlValue == 1.0) return WinShadingType::IntShade;
+        if (controlValue == 2.0) return WinShadingType::SwitchableGlazing;
+        if (controlValue == 3.0) return WinShadingType::ExtShade;
+        if (controlValue == 4.0) return WinShadingType::ExtScreen;
+        if (controlValue == 6.0) return WinShadingType::IntBlind;
+        if (controlValue == 7.0) return WinShadingType::ExtBlind;
+        if (controlValue == 8.0) return WinShadingType::BGShade;
+        if (controlValue == 9.0) return WinShadingType::BGBlind;
+        return WinShadingType::INVALID;
     }
 
     int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface)

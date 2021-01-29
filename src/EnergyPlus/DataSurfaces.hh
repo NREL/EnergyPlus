@@ -135,16 +135,17 @@ namespace DataSurfaces {
     };
 
     enum class WinShadingType : int {
+        INVALID = -1,
         NoShade = 0,
-        IntShade = 1,
-        SwitchableGlazing = 2,
-        ExtShade = 3,
-        ExtScreen = 4,
-        IntBlind = 5,
-        ExtBlind = 6,
-        BGShade = 7,
-        BGBlind = 8,
-        ShadeOff = 10
+        ShadeOff = 1,
+        IntShade = 2,
+        SwitchableGlazing = 3,
+        ExtShade = 4,
+        ExtScreen = 5,
+        IntBlind = 6,
+        ExtBlind = 7,
+        BGShade = 8,
+        BGBlind = 9
     };
 
     enum class WindowShadingControlType : int{
@@ -521,7 +522,7 @@ namespace DataSurfaces {
 
     extern Array1D<WinShadingType> SurfWinShadingFlag;                       // -1: window has no shading device
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    extern Array1D<WinShadingType> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    extern Array1D<Real64> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
     extern Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
