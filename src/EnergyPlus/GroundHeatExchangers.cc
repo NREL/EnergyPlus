@@ -473,19 +473,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         auto const vars = j.at("g_functions");
         std::vector<Real64> tmpLntts;
         std::vector<Real64> tmpGvals;
-        // TODO: add unit test for mis-matched g-functions, maybe don't need to do bounds checking
         for (auto const &var : vars) {
-            try {
-                tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
-            } catch (nlohmann::json::out_of_range &e) {
-                // out of range
-            }
-
-            try {
-                tmpGvals.push_back(var.at("g_function_g_value"));
-            } catch (nlohmann::json::out_of_range &e) {
-                // out of range
-            }
+            tmpLntts.push_back(var.at("g_function_ln_t_ts_value"));
+            tmpGvals.push_back(var.at("g_function_g_value"));
         }
 
         bool errorsFound = false;

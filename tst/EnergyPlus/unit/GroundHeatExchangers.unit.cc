@@ -471,6 +471,35 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
     EXPECT_EQ(12.778359, thisRF->GFNC(76));
 }
 
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_Mismatched_Pairs)
+{
+    std::string const idf_objects = delimited_string({"GroundHeatExchanger:Vertical:Properties,",
+                                                      "    GHE-1 Props,        !- Name",
+                                                      "    1,                  !- Depth of Top of Borehole {m}",
+                                                      "    100,                !- Borehole Length {m}",
+                                                      "    0.109982,           !- Borehole Diameter {m}",
+                                                      "    0.744,              !- Grout Thermal Conductivity {W/m-K}",
+                                                      "    3.90E+06,           !- Grout Thermal Heat Capacity {J/m3-K}",
+                                                      "    0.389,              !- Pipe Thermal Conductivity {W/m-K}",
+                                                      "    1.77E+06,           !- Pipe Thermal Heat Capacity {J/m3-K}",
+                                                      "    0.0267,             !- Pipe Outer Diameter {m}",
+                                                      "    0.00243,            !- Pipe Thickness {m}",
+                                                      "    0.04556;            !- U-Tube Distance {m}",
+
+                                                      "GroundHeatExchanger:ResponseFactors,",
+                                                      "    GHE-1 g-functions,       !- Name",
+                                                      "    GHE-1 Props,             !- GHE Properties",
+                                                      "    4,                       !- Number of Boreholes",
+                                                      "    0.00043,                 !- G-Function Reference Ratio {dimensionless}",
+                                                      "    -15.585075,              !- G-Function Ln(T/Ts) Value 1",
+                                                      "    -2.672011,               !- G-Function G Value 1",
+                                                      "    2.275000,                !- G-Function Ln(T/Ts) Value 2",
+                                                      "    12.729288,               !- G-Function G Value 2",
+                                                      "    3.003000;                !- G-Function Ln(T/Ts) Value 3"});
+
+    EXPECT_FALSE(process_idf(idf_objects, false));
+}
+
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check)
 {
     std::string const idf_objects = delimited_string({
