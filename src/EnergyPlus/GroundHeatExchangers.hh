@@ -401,6 +401,7 @@ namespace GroundHeatExchangers {
         ~GLHESlinky() override = default;
 
         // Members
+        std::string const moduleName = "GroundHeatExchanger:Slinky";
         bool verticalConfig;  // HX Configuration Flag
         Real64 coilDiameter;  // Diameter of the slinky coils [m]
         Real64 coilPitch;     // Center-to-center slinky coil spacing [m]
@@ -422,6 +423,8 @@ namespace GroundHeatExchangers {
               trenchSpacing(0.0), numCoils(0), monthOfMinSurfTemp(0), maxSimYears(0.0), minSurfTemp(0.0), Z0(0.0)
         {
         }
+
+        GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
 
         Real64 calcHXResistance(EnergyPlusData &state) override;
 
