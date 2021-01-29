@@ -7,7 +7,14 @@ Allow zone HVAC terminal units to draw return air from return air plenum and ret
 
  - Original draft, 12/15/20
 
- - First revision- 011521
+ - First revision- 011521 
+	Cover the first conference call on 1/13/21 and follow up E-mail communications
+
+ - Second revision 01/25/21
+	Add design document
+
+ - Third revision 01/29/21
+	Cover the second conference call on 1/27/21 and follow up E-mail communications
  
 
 ## Justification for New Feature ##
@@ -126,6 +133,86 @@ No, the equipment inlet node should be in the ZonePlenum Induced Air Node List, 
 In this configuration, a Return Air Node in the same zone needs to be one of the ReturnPlenum inlet nodes.
 
 Mike
+
+### Second Conference call on 1/27/21
+
+A conference call was held on 1/27/21 to discuss 4 NFPs. This NFP is one of 4 NFPs discussed.
+
+Attendees: 23 people.
+
+Rich raised an issue to allow Return Air Node to be the Inlet Node of zone equipment for the scenario to draw air from return duct.
+
+Mike mentioned to be careful to handle zone equipment airflow merged at the return air node for the scenario to draw air from return plenum.
+
+### Follwou up E_mail communications after the second conference call ###
+
+1. After E-mail communications, Mike preferred to use the exhaust node to draw air from return duct. Rich agreed to use Zone exhaust node, instead of Return Air Node.
+
+Mike provided detailed clarifications for the scenario to draw air from return plenum:
+
+Mike:
+
+Thanks for detailed clarification.
+
+Here is your concern as:
+
+The remaining flow (PTAC flow) should get placed at the plenum return inlet but I'm not sure if the current return flow allocation will be happy with this.
+
+I will check your concern during coding.
+
+Gu
+
+From: Michael J. Witte [mailto:mjwitte@gard.com] 
+Sent: Thursday, January 28, 2021 10:05 AM
+To: Lixing Gu <gu@fsec.ucf.edu>; 'Richard Raustad' <rraustad@fsec.ucf.edu>
+Cc: 'Brent Griffith' <brent.griffith@energyarchmage.com>; 'Lee, Edwin' <Edwin.Lee@nrel.gov>
+Subject: Re: Use return air node as inlet node of zone equipment to draw zone air
+
+Gu:
+Here's my proposal. 
+Let's say you have a PTAC drawing from a plenum in a zone that also has an airloop and both return through the plenum.
+
+PTAC
+PTAC Inlet Node !- Air Inlet Node Name
+PTAC Outlet Node !- Air Outlet Node Name
+
+AirLoopHVAC:ReturnPlenum
+PTAC Inlet Node, !- Induced Air Outlet Node
+Plenum Return From Zone !- Inlet 1 Node Name
+
+ZoneHVAC:AirDistributionUnit
+ADU Supply Outlet, !- Air Distribution Unit Outlet Node Name
+
+ZoneHVAC:EquipmentConnections
+Zone Supply Nodes, !- Zone Air Inlet Node or NodeList Name
+<blank>, !- Zone Air Exhaust Node or NodeList Name
+Zone Air Node, !- Zone Air Node Name
+Plenum Return From Zone , !- Zone Return Air Node or NodeList Name
+
+NodeList,
+Zone Supply Nodes, !- Name
+ADU Supply Outlet
+PTAC Outlet Node 
+
+Supply will enter the zone from the ADU and the PTAC.
+Flow to the return node will equal the sum of the ADU and PTAC supply flows with the current zone mass flow calculations.
+The PTAC will draw from the plenum induced air node.
+The flow back to the airloop will equal the ADU supply flow.
+
+I think this should work with no code changes other than allowing the PTAC to use an induced air node as an inlet.
+
+If for some reason, there is a separate return for the air loop and the plenum just recirculates PTAC flow, then there would be to return nodes. The current logic will match the ADU supply flow with the air loop return flow. The remaining flow (PTAC flow) should get placed at the plenum return inlet but I'm not sure if the current return flow allocation will be happy with this.
+
+Mike
+
+#### Conlusions for the third revision ####
+
+The proposed approach and design document remain the same. It should be careful to treat zone equipment mass flow rate to be merged at the Return Air Node during coding at different scenarios:
+
+1. Zone equipment operation only
+2. Zone equipment and AirLoop operate simultaneously
+3. AirLoop operates alone (no changes)  
+
 
 ## Overview ##
 
