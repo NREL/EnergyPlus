@@ -2203,21 +2203,25 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER ===========
 
+   ZoneHVAC:Baseboard:RadiantConvective:Water:Design,
+     SPACE2-1 Baseboard Design,      !- Name
+     HeatingDesignCapacity,   !- Heating Design Capacity Method
+     100,                !- Heating Design Capacity {W}
+     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+     ,                        !- Fraction of Autosized Heating Design Capacity
+     0.001,                   !- Convergence Tolerance
+     0.3,                     !- Fraction Radiant
+     0.3;                     !- Fraction of Radiant Energy Incident on People
+
   ZoneHVAC:Baseboard:RadiantConvective:Water,
     SPACE2-1 Baseboard,      !- Name
+    SPACE2-1 Baseboard Design,      !- Design Object Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE2-1 Zone Coil Water In Node,  !- Inlet Node Name
     SPACE2-1 Zone Coil Water Out Node,  !- Outlet Node Name
     87.78,                   !- Rated Average Water Temperature {C}
     0.063,                   !- Rated Water Mass Flow Rate {kg/s}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    0.001,                   !- Convergence Tolerance
-    0.3,                     !- Fraction Radiant
-    0.3,                     !- Fraction of Radiant Energy Incident on People
     RIGHT-1,                 !- Surface 1 Name
     0.4,                     !- Fraction of Radiant Energy to Surface 1
     C2-1,                    !- Surface 2 Name
@@ -2227,19 +2231,13 @@
 
   ZoneHVAC:Baseboard:RadiantConvective:Water,
     SPACE4-1 Baseboard,      !- Name
+    SPACE2-1 Baseboard Design,      !- Design Object Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE4-1 Zone Coil Water In Node,  !- Inlet Node Name
     SPACE4-1 Zone Coil Water Out Node,  !- Outlet Node Name
     82.22,                   !- Rated Average Water Temperature {C}
     0.063,                   !- Rated Water Mass Flow Rate {kg/s}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
-    0.001,                   !- Convergence Tolerance
-    0.3,                     !- Fraction Radiant
-    0.3,                     !- Fraction of Radiant Energy Incident on People
     LEFT-1,                  !- Surface 1 Name
     0.4,                     !- Fraction of Radiant Energy to Surface 1
     C4-1,                    !- Surface 2 Name
