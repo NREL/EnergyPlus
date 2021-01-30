@@ -2570,6 +2570,7 @@ namespace EnergyPlus::PurchasedAirManager {
             if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
                 SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
             }
+            SupplyEnthalpy = PsyHFnTdbW(SupplyTemp, SupplyHumRat);
 
             if (SupplyMassFlowRate > 0.0) {
                 PurchAir(PurchAirNum).FinalMixedAirTemp = MixedAirTemp;
