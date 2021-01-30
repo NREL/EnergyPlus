@@ -8978,6 +8978,8 @@ namespace SolarShading {
                         else if (ShType == WinShadingType::ExtShade) SurfWinShadingFlag(ISurf) = WinShadingType::ExtShadeConditionallyOff;
                         else if (ShType == WinShadingType::IntBlind) SurfWinShadingFlag(ISurf) = WinShadingType::IntBlindConditionallyOff;
                         else if (ShType == WinShadingType::ExtBlind) SurfWinShadingFlag(ISurf) = WinShadingType::ExtBlindConditionallyOff;
+                        else if (ShType == WinShadingType::BGShade) SurfWinShadingFlag(ISurf) = WinShadingType::BGShadeConditionallyOff;
+                        else if (ShType == WinShadingType::BGBlind) SurfWinShadingFlag(ISurf) = WinShadingType::BGBlindConditionallyOff;
                     }
                 }
 
@@ -8997,7 +8999,10 @@ namespace SolarShading {
                 SurfWinSlatAngThisTS(ISurf) = 0.0;
                 SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
                 SurfWinSlatsBlockBeam(ISurf) = false;
-                if (ANY_BLIND(SurfWinShadingFlag(ISurf))) {
+                if (ANY_BLIND(SurfWinShadingFlag(ISurf)) ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::IntBlindConditionallyOff ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::ExtBlindConditionallyOff ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::BGBlindConditionallyOff) {
                     // Blind in place or may be in place due to glare control
                     int BlNum = SurfWinBlindNumber(ISurf);
                     if (BlNum > 0) {
@@ -9180,6 +9185,13 @@ namespace SolarShading {
         if (controlValue == 7.0) return WinShadingType::ExtBlind;
         if (controlValue == 8.0) return WinShadingType::BGShade;
         if (controlValue == 9.0) return WinShadingType::BGBlind;
+        if (controlValue == 10.0) return WinShadingType::IntShadeConditionallyOff;
+        if (controlValue == 20.0) return WinShadingType::GlassConditionallyLightened;
+        if (controlValue == 30.0) return WinShadingType::ExtShadeConditionallyOff;
+        if (controlValue == 60.0) return WinShadingType::IntBlindConditionallyOff;
+        if (controlValue == 70.0) return WinShadingType::ExtBlindConditionallyOff;
+        if (controlValue == 80.0) return WinShadingType::BGShadeConditionallyOff;
+        if (controlValue == 90.0) return WinShadingType::BGBlindConditionallyOff;
         return WinShadingType::INVALID;
     }
 

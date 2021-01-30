@@ -164,7 +164,9 @@ namespace DataSurfaces {
         GlassConditionallyLightened = 11,
         ExtShadeConditionallyOff = 12,
         IntBlindConditionallyOff = 13,
-        ExtBlindConditionallyOff = 14
+        ExtBlindConditionallyOff = 14,
+        BGShadeConditionallyOff = 15,
+        BGBlindConditionallyOff = 16
     };
 
     enum class WindowShadingControlType : int{
