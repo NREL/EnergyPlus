@@ -69,7 +69,21 @@
 #define BITF(B) (1 << (int(B)))
 #define BITF_TEST_ANY(V, B) (((V) & (B)) != 0)
 
-#define IS_SHADED(SHADE_FLAG) !BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
+// IS_SHADED is the flag to indicate window has no shading device or shading device is off, and no daylight glare control
+// original expression: SHADE_FLAG == ShadeOff || SHADE_FLAG == ShadeOff
+#define NOT_SHADED(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::NoShade) | BITF(WinShadingType::ShadeOff))
+
+// IS_SHADED is the flag to indicate window has shade on or temporarily off but may be triggered on later to control daylight glare
+// original expression: SHADE_FLAG > ShadeOff
+#define IS_SHADED(SHADE_FLAG) !NOT_SHADED(SHADE_FLAG)
+
+// IS_SHADED_NO_GLARE is the flag to indicate window has shade and no daylight glare control
+// original expression: IntShade <= SHADE_FLAG <= BGBlind
+#define IS_SHADED_NO_GLARE_CTRL(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), \
+                                                     BITF(WinShadingType::IntShade) | BITF(WinShadingType::SwitchableGlazing) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtScreen) |\
+                                                     BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::BGBlind))
+
+// ANY_SHADE: if SHADE_FLAG is any of the shading types including interior, exterior or between glass shades
 #define ANY_SHADE(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade))
 #define ANY_SHADE_SCREEN(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntShade) | BITF(WinShadingType::ExtShade) | BITF(WinShadingType::BGShade) | BITF(WinShadingType::ExtScreen))
 #define ANY_BLIND(SHADE_FLAG) BITF_TEST_ANY(BITF(SHADE_FLAG), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind) | BITF(WinShadingType::BGBlind))
@@ -145,7 +159,12 @@ namespace DataSurfaces {
         IntBlind = 6,
         ExtBlind = 7,
         BGShade = 8,
-        BGBlind = 9
+        BGBlind = 9,
+        IntShadeConditionallyOff = 10,
+        GlassConditionallyLightened = 11,
+        ExtShadeConditionallyOff = 12,
+        IntBlindConditionallyOff = 13,
+        ExtBlindConditionallyOff = 14
     };
 
     enum class WindowShadingControlType : int{
@@ -520,14 +539,13 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     extern Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    extern Array1D<WinShadingType> SurfWinShadingFlag;                       // -1: window has no shading device
+    extern Array1D<WinShadingType> SurfWinShadingFlag;             // -1: window has no shading device
     extern Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    extern Array1D<Real64> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
-    extern Array1D<bool> SurfWinGlareControlIsActive;              // True if glare control is active
+    extern Array1D<Real64> SurfWinShadingFlagEMSValue;             // EMS control value for Shading Flag
     extern Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     extern Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    extern Array1D<WinShadingType> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    extern Array1D<WinShadingType> SurfWinExtIntShadePrevTS;       // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     extern Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     extern Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     extern Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window

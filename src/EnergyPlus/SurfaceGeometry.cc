@@ -162,7 +162,6 @@ namespace SurfaceGeometry {
         SurfWinShadingFlag.dimension(NumSurfaces, WinShadingType::ShadeOff);
         SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
         SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0.0);
-        SurfWinGlareControlIsActive.dimension(NumSurfaces, false);
         SurfWinStormWinFlag.dimension(NumSurfaces, 0);
         SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
         SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);

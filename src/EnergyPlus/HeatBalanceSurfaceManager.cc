@@ -667,7 +667,7 @@ namespace HeatBalanceSurfaceManager {
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-                if (IS_SHADED(SurfWinShadingFlag(SurfNum)) || SurfWinGlareControlIsActive(SurfNum)) {
+                if (IS_SHADED(SurfWinShadingFlag(SurfNum))) {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
                 } else {
                     SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
@@ -3538,7 +3538,7 @@ namespace HeatBalanceSurfaceManager {
                         SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     }
 
-                    if (!IS_SHADED(ShadeFlag)) { // No window shading
+                    if (NOT_SHADED(ShadeFlag)) { // No window shading
                         for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             SurfWinQRadSWwinAbs(IGlass, SurfNum) +=
                                     QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
@@ -3693,7 +3693,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                     int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
-                    if (!IS_SHADED(ShadeFlag)) { // No window shading
+                    if (NOT_SHADED(ShadeFlag)) { // No window shading
                         for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             SurfWinQRadSWwinAbs(IGlass, SurfNum) += SurfWinInitialDifSolwinAbs(IGlass, SurfNum);
                         }
@@ -3746,7 +3746,7 @@ namespace HeatBalanceSurfaceManager {
                         TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     }
                     WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
-                    if (!IS_SHADED(ShadeFlag) || SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // No window shading
+                    if (NOT_SHADED(ShadeFlag) || SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // No window shading
                         for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                             // Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
                             SurfInitialDifSolInAbsReport(SurfNum) +=

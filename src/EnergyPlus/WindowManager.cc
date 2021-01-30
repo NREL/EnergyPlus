@@ -3499,7 +3499,7 @@ namespace WindowManager {
             }
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
-            if (!IS_SHADED(ShadeFlag)) {
+            if (NOT_SHADED(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff;
             } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
