@@ -312,6 +312,20 @@ struct SystemReportsData : BaseGlobalStruct {
     Real64 AllZonesTimeAtVozDynOcc = 0.0;         // time [hrs] that all zones mech+nat vent is = VozTarget within 1% and > zero during occupied
     Real64 AnyZoneTimeAboveVozDynOcc = 0.0;       // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
 
+    Array1D<Real64> SysNatVentFlow;              // air loop natural vent total volume OA at standard density {m3/s}
+    Array1D<Real64> SysTargetVentilationFlowVoz; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+    Array1D<Real64> SysTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+    Array1D<Real64> SysTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Array1D<Real64> SysTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+    Array1D<Real64> SysTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during UNoccupied
+    Real64 AnySysTimeBelowVozDyn = 0.0;          // time [hrs] that any air loop mechanical+natural ventilation is < VozTarget - 1%
+    Real64 AllSyssTimeAtVozDyn = 0.0;            // time [hrs] that all air loops mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Real64 AnySysTimeAboveVozDyn = 0.0;          // time [hrs] that any air loop mechanical+natural ventilation is > VozTarget + 1%
+    Real64 AnySysTimeVentUnocc = 0.0;            // time [hrs] that any air loop mechanical+natural ventilation is > zero during UNoccupied
+    Real64 AnySysTimeBelowVozDynOcc = 0.0;       // time [hrs] that any air loop mechanical+natural ventilation is < VozTarget - 1% during occupied
+    Real64 AllSyssTimeAtVozDynOcc = 0.0;         // time [hrs] that all air loops mech+nat vent is = VozTarget within 1% and > zero during occupied
+    Real64 AnySysTimeAboveVozDynOcc = 0.0;       // time [hrs] that any air loop mechanical+natural ventilation is > VozTarget + 1% during occupied
+
     bool AirLoopLoadsReportEnabled = true;
     bool VentLoadsReportEnabled = true;
     bool VentEnergyReportEnabled = false;
@@ -422,6 +436,19 @@ struct SystemReportsData : BaseGlobalStruct {
         this->AnyZoneTimeBelowVozDynOcc = 0.0;
         this->AllZonesTimeAtVozDynOcc = 0.0;
         this->AnyZoneTimeAboveVozDynOcc = 0.0;
+        this->SysNatVentFlow = 0.0;
+        this->SysTargetVentilationFlowVoz.deallocate();
+        this->SysTimeBelowVozDyn.deallocate();
+        this->SysTimeAtVozDyn.deallocate();
+        this->SysTimeAboveVozDyn.deallocate();
+        this->SysTimeVentUnocc.deallocate();
+        this->AnySysTimeBelowVozDyn = 0.0;
+        this->AllSyssTimeAtVozDyn = 0.0;
+        this->AnySysTimeAboveVozDyn = 0.0;
+        this->AnySysTimeVentUnocc = 0.0;
+        this->AnySysTimeBelowVozDynOcc = 0.0;
+        this->AllSyssTimeAtVozDynOcc = 0.0;
+        this->AnySysTimeAboveVozDynOcc = 0.0;
         this->AirLoopLoadsReportEnabled = true;
         this->VentLoadsReportEnabled = true;
         this->VentEnergyReportEnabled = false;
