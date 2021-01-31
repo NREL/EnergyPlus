@@ -85,6 +85,7 @@ namespace HWBaseboardRadiator {
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool SetLoopIndexFlag; // get loop number flag
+    extern int NumOfHWBaseboardSysDes; // Number of HW Baseboard systems design objects
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
@@ -95,6 +96,8 @@ namespace HWBaseboardRadiator {
         // Members
         std::string EquipID;
         int EquipType;
+        std::string designObjectName;   // Design Object
+        int DesignObjectPtr;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
@@ -110,7 +113,6 @@ namespace HWBaseboardRadiator {
         Real64 WaterTempAvg;
         Real64 RatedCapacity;
         Real64 UA;
-        Real64 Offset;
         Real64 WaterMassFlowRate;
         Real64 WaterMassFlowRateMax;
         Real64 WaterMassFlowRateStd;
@@ -151,8 +153,8 @@ namespace HWBaseboardRadiator {
 
         // Default Constructor
         HWBaseboardParams()
-            : EquipType(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
-              CompErrIndex(0), AirMassFlowRate(0.0), AirMassFlowRateStd(0.0), WaterTempAvg(0.0), RatedCapacity(0.0), UA(0.0), Offset(0.0),
+            : EquipType(0), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0), ControlCompTypeNum(0),
+              CompErrIndex(0), AirMassFlowRate(0.0), AirMassFlowRateStd(0.0), WaterTempAvg(0.0), RatedCapacity(0.0), UA(0.0),
               WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), WaterMassFlowRateStd(0.0), WaterVolFlowRateMax(0.0), WaterInletTempStd(0.0),
               WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0), WaterOutletEnthalpy(0.0),
               AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0), FracRadiant(0.0),
@@ -161,6 +163,19 @@ namespace HWBaseboardRadiator {
               BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
+    };
+
+    struct HWBaseboardDesignData : HWBaseboardParams
+    {
+        // Members
+        std::string designName;
+        Real64 Offset;
+
+        // Default Constructor
+        HWBaseboardDesignData()
+                :  Offset(0.0)
+        {
+            }
     };
 
     struct HWBaseboardNumericFieldData
@@ -174,9 +189,22 @@ namespace HWBaseboardRadiator {
         }
     };
 
+    struct HWBaseboardDesignNumericFieldData
+    {
+        // Members
+        Array1D_string FieldNames;
+
+        // Default Constructor
+        HWBaseboardDesignNumericFieldData()
+        {
+        }
+    };
+
     // Object Data
     extern Array1D<HWBaseboardParams> HWBaseboard;
+    extern Array1D<HWBaseboardDesignData> HWBaseboardDesignObject;
     extern Array1D<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
+    extern Array1D<HWBaseboardDesignNumericFieldData> HWBaseboardDesignNumericFields;
 
     // Functions
 
