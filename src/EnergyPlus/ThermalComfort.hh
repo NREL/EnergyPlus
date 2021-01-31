@@ -87,6 +87,10 @@ namespace ThermalComfort {
         Real64 TComfCEN15251;
         Real64 ASHRAE55RunningMeanOutdoorTemp;
         Real64 CEN15251RunningMeanOutdoorTemp;
+        Real64 CoolingEffectASH55;
+        Real64 CoolingEffectAdjustedPMVASH55;
+        Real64 CoolingEffectAdjustedPPDASH55;
+        Real64 AnkleDraftPPDASH55;
 
         // Default Constructor
         ThermalComfortDataType()
@@ -94,7 +98,8 @@ namespace ThermalComfort {
               PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0),
               ThermalComfortAdaptiveASH5590(0), ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0),
               ThermalComfortAdaptiveCEN15251CatII(0), ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0),
-              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0)
+              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0), CoolingEffectASH55(0.0), CoolingEffectAdjustedPMVASH55(0.0),
+              CoolingEffectAdjustedPPDASH55(0.0), AnkleDraftPPDASH55(0.0)
         {
         }
     };
@@ -176,6 +181,16 @@ namespace ThermalComfort {
 
     void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
 
+    Real64 CalcStandardEffectiveTemp(EnergyPlusData &state,
+                                     Real64 AirTemp,
+                                     Real64 RadTemp,
+                                     Real64 RelHum,
+                                     Real64 AirVel,
+                                     Real64 ActMet,
+                                     Real64 CloUnit,
+                                     Real64 WorkEff
+    );
+
     void CalcThermalComfortKSU(EnergyPlusData &state);
 
     void DERIV(EnergyPlusData &state, int &TempIndiceNum,         // Number of temperature indices  unused1208
@@ -231,6 +246,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
     Real64 const ActLevelConv = 58.2;   // Converter for activity level (1Met = 58.2 W/m2)
     Real64 const BodySurfArea = 1.8;    // Dubois body surface area of the human body (m2)
+    Real64 const BodySurfAreaPierce = 1.8258;    // Pierce two node body surface area of the human body (m2)
     Real64 const RadSurfEff = 0.72;     // Fraction of surface effective for radiation
     Real64 const StefanBoltz = 5.6697e-8; // Stefan-Boltzmann constant (W/m2K4)
 
@@ -254,6 +270,8 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 CoreTempNeut = 0.0;              // Body core temperature of neutral state
     Real64 CoreThermCap = 0.0;              // Thermal capacity of core
     Real64 DryHeatLoss = 0.0;               // Heat loss from clothing surface due to both convection and radiation
+    Real64 DryHeatLossET = 0.0;             // Effective heat loss from clothing surface due to both convection and radiation
+    Real64 DryHeatLossSET = 0.0;             // Standard effective heat loss from clothing surface due to both convection and radiation
     Real64 DryRespHeatLoss = 0.0;           // Dry respiration heat loss
     Real64 EvapHeatLoss = 0.0;              // Evaporative heat loss from skin
     Real64 EvapHeatLossDiff = 0.0;          // Evaporative heat loss due to moisture diffusion through skin
@@ -274,6 +292,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     int MaxZoneNum = 0;                     // Number of zones
     int MRTCalcType = 0;                    // The type of MRT calculation (ZoneAveraged or SurfaceWeighted)
     Real64 OpTemp = 0.0;                    // Operative temperature
+    Real64 EffTemp = 0.0;                   // Effective temperature
     int PeopleNum = 0;                      // People number
     Real64 RadHeatLoss = 0.0;               // Radiant heat loss
     Real64 RadTemp = 0.0;                   // Radiant temperature; C
@@ -292,6 +311,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 SkinWetTot = 0.0;                // Total skin wettedness
     Real64 SkinVapPress = 0.0;              // Vapor pressure at skin
     Real64 SurfaceTemp = 0.0;               // Surface temperature when MRTType is 'SurfaceWeighted'
+    Real64 AvgBodyTemp = 0.0;               // Weighted average body temperature considering core and skin temperature
     Real64 ThermCndct = 0.0;                // Thermal conductance of skin
     Real64 ThermSensTransCoef = 0.0;        // Theraml sensation coefficient for PMV
     Real64 Time = 0.0;                      // Time, hr
@@ -361,6 +381,8 @@ struct ThermalComfortsData : BaseGlobalStruct {
         CoreTempNeut = 0.0;
         CoreThermCap = 0.0;
         DryHeatLoss = 0.0;
+        DryHeatLossET = 0.0;
+        DryHeatLossSET = 0.0;
         DryRespHeatLoss = 0.0;
         EvapHeatLoss = 0.0;
         EvapHeatLossDiff = 0.0;
@@ -381,6 +403,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
         MaxZoneNum = 0;
         MRTCalcType = 0;
         OpTemp = 0.0;
+        EffTemp = 0.0;
         PeopleNum = 0;
         RadHeatLoss = 0.0;
         RadTemp = 0.0;
@@ -399,6 +422,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
         SkinWetTot = 0.0;
         SkinVapPress = 0.0;
         SurfaceTemp = 0.0;
+        AvgBodyTemp = 0.0;
         ThermCndct = 0.0;
         ThermSensTransCoef = 0.0;
         Time = 0.0;

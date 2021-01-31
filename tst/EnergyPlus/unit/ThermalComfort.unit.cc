@@ -986,6 +986,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QElecBaseboardToPerson(1) = 0.0;
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
+    Real64 WorkEff = 0.0;
 
     const std::vector<double> TAir = {25, 0, 40, 25, 25, 25, 25, 25};
     const std::vector<double> RH = {0.5, 0.5, 0.5, 0.9, 0.5, 0.5, 0.5, 0.5};
@@ -993,23 +994,42 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     const std::vector<double> TRad = {25, 25, 25, 25, 25, 40, 25, 25};
     const std::vector<double> MET = {1, 1, 1, 1, 1, 1, 2, 1};
     const std::vector<double> Clo = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2};
-
     const std::vector<double> SET = {23.8, 12.3, 34.3, 24.9, 18.8, 31.8, 29.7, 32.5};
+
     for (unsigned i = 0; i < TAir.size(); i++) {
-        ZTAVComf(1) = TAir[i];
-        MRT(1) = TRad[i];
-        ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RH[i], state->dataEnvrn->OutBaroPress);
-        People(1).ActivityLevelPtr = 1;
-        People(1).ClothingPtr = 2;
-        People(1).AirVelocityPtr = 3;
-        ScheduleManager::Schedule.allocate(3);
-        ScheduleManager::Schedule(1).CurrentValue = MET[i] * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
-        ScheduleManager::Schedule(2).CurrentValue = Clo[i];
-        ScheduleManager::Schedule(3).CurrentValue = Vel[i];
-
-        CalcThermalComfortPierceASHRAE(*state);
-
-        EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, SET[i], 0.1);
+        Real64 SETResult = CalcStandardEffectiveTemp(*state, TAir[i], TRad[i], RH[i], Vel[i], MET[i], Clo[i], WorkEff);
+        EXPECT_NEAR(SETResult, SET[i], 0.1);
     }
 
+    // Test cooling effect
+    People(1).CoolingEffectASH55 = true;
+    Real64 AirTemp = 25.0;
+    Real64 RadTemp = 25.0;
+    Real64 RelHum = 0.5;
+    Real64 ActMet = 0.5;
+    Real64 CloUnit = 0.5;
+    People(1).ActivityLevelPtr = 1;
+    People(1).ClothingPtr = 2;
+    People(1).AirVelocityPtr = 3;
+    ScheduleManager::Schedule.allocate(3);
+    ZTAVComf(1) = AirTemp;
+    MRT(1) = RadTemp;
+    ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1),RelHum, state->dataEnvrn->OutBaroPress);
+    ScheduleManager::Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    ScheduleManager::Schedule(2).CurrentValue = CloUnit;
+
+    Real64 AirVel = 0.15;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortPierceASHRAE(*state);
+    Real64 CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    Real64 StillAirVel = 0.1;
+    Real64 CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, state->dataThermalComforts->ThermalComfortData(1).PierceSET, 0.1);
+
+    AirVel = 3;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortPierceASHRAE(*state);
+    CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, state->dataThermalComforts->ThermalComfortData(1).PierceSET, 0.1);
 }

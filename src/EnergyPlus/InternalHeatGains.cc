@@ -749,6 +749,16 @@ namespace InternalHeatGains {
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
+                                } else if (thermalComfortType == "COOLINGEFFECTASH55") {
+                                    People(Loop).CoolingEffectASH55 = true;
+                                    MustInpSch = true;
+                                    UsingThermalComfort = true;
+
+                                } else if (thermalComfortType == "ANKLEDRAFTASH55") {
+                                    People(Loop).AnkleDraftASH55 = true;
+                                    MustInpSch = true;
+                                    UsingThermalComfort = true;
+
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
 
                                 } else { // An invalid keyword was entered--warn but ignore
@@ -756,7 +766,7 @@ namespace InternalHeatGains {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(OptionNum) + " Option=" + AlphaName(OptionNum));
                                         ShowContinueError(state,
-                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\"");
+                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\", \"CoolingEffectASH55\", \"AnkleDraftASH55\"");
                                     }
                                 }
                             }
@@ -766,6 +776,8 @@ namespace InternalHeatGains {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
                             People(Loop).MRTCalcType = ZoneAveraged;
+
+                            bool ThermalComfortRuns = People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
                             {
@@ -777,14 +789,13 @@ namespace InternalHeatGains {
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     People(Loop).MRTCalcType = SurfaceWeighted;
                                     People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
-                                    if (People(Loop).SurfacePtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    if (People(Loop).SurfacePtr == 0 && ThermalComfortRuns) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr &&
-                                               (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr && ThermalComfortRuns) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
                                                         cAlphaFieldNames(7) + '=' + AlphaName(8) + " in different zone.");
                                         ShowContinueError(state, "Surface is in Zone=" + Zone(Surface(People(Loop).SurfacePtr).Zone).Name + " and " +
@@ -797,12 +808,12 @@ namespace InternalHeatGains {
                                     People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
-                                    if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU))
+                                    if (MustInpSch && Item1 == 1 && ThermalComfortRuns)
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                          cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
-                                    if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    if (MustInpSch && Item1 == 1 && ThermalComfortRuns) {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(7) + '=' + AlphaName(7));
                                         ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
@@ -855,7 +866,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                            } else if (MustInpSch && ThermalComfortRuns) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
                                                     " is required for this item.");
@@ -869,7 +880,7 @@ namespace InternalHeatGains {
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         People(Loop).ClothingType = 1;
                                         People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (People(Loop).ClothingPtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                        if (People(Loop).ClothingPtr == 0 && ThermalComfortRuns) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(12) + " entered=" + AlphaName(12));
@@ -983,7 +994,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                            } else if (MustInpSch && ThermalComfortRuns) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
@@ -4827,11 +4838,11 @@ namespace InternalHeatGains {
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
                       "Number of People,Nominal Maximum Number of People");
-                if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
+                if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
-                          "Calculation,KSU Calculation\n");
+                          "Calculation,KSU Calculation,Cooling Effect Calculation,Ankle Draft Calculation\n");
                 } else {
                     print(state.files.eio, "\n");
                 }
@@ -4880,7 +4891,8 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.4R},", People(Loop).CO2RateFactor);
             print(state.files.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
 
-            if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
+            // TODO
+            if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
 
                 if (People(Loop).MRTCalcType == ZoneAveraged) {
@@ -4924,6 +4936,16 @@ namespace InternalHeatGains {
                     print(state.files.eio, "No,");
                 }
                 if (People(Loop).KSU) {
+                    print(state.files.eio, "Yes\n");
+                } else {
+                    print(state.files.eio, "No\n");
+                }
+                if (People(Loop).CoolingEffectASH55) {
+                    print(state.files.eio, "Yes\n");
+                } else {
+                    print(state.files.eio, "No\n");
+                }
+                if (People(Loop).AnkleDraftASH55) {
                     print(state.files.eio, "Yes\n");
                 } else {
                     print(state.files.eio, "No\n");
