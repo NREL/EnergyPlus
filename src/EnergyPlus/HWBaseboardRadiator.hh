@@ -146,7 +146,7 @@ namespace HWBaseboardRadiator {
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
         int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
+        // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
         // Default Constructor
@@ -167,13 +167,18 @@ namespace HWBaseboardRadiator {
     {
         // Members
         std::string designName;
+        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        // FracOfAutosizedHeatingCapacity)
+        bool HeatingCapFlag;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
         Real64 Offset;
         Real64 FracRadiant;
         Real64 FracDistribPerson;
 
         // Default Constructor
         HWBaseboardDesignData()
-                :  Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
+                :  HeatingCapMethod(0), HeatingCapFlag(false), ScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
         {
             }
     };
