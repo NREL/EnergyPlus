@@ -3202,6 +3202,47 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.0231 : DataIPShortCuts::rNumericArgs(18);
             liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(19) ? 1.0 : DataIPShortCuts::rNumericArgs(19);
             internalR_ = DataIPShortCuts::lNumericFieldBlanks(20) ? 0.09 : DataIPShortCuts::rNumericArgs(20);
+
+            ssc_battery_ = std::unique_ptr<battery_t>(
+                new battery_t(
+                    DataHVACGlobals::TimeStepSys,
+                    battery_params::CHEM::LITHIUM_ION,
+                    new capacity_lithium_ion_t(
+                        liIon_Qfull_ * seriesNum_ * parallelNum_,  // Capacity of the whole battery
+                        startingSOC_,
+                        maxSOC_,
+                        minSOC_,
+                        DataHVACGlobals::TimeStepSys
+                        ),
+                    new voltage_dynamic_t(
+                        seriesNum_,
+                        parallelNum_,
+                        liIon_Vnom_default_,
+                        liIon_Vfull_,
+                        liIon_Vexp_,
+                        liIon_Vnom_,
+                        liIon_Qfull_,  // Capacity of one cell
+                        liIon_Qexp_,
+                        liIon_Qnom_,
+                        liIon_C_rate_,
+                        internalR_,
+                        DataHVACGlobals::TimeStepSys
+                        ),
+                    new lifetime_nmc_t(
+                        DataHVACGlobals::TimeStepSys
+                        ),
+                    new thermal_t(
+                        DataHVACGlobals::TimeStepSys,
+                        liIon_mass_,
+                        liIon_surfaceArea_,
+                        internalR_ * seriesNum_,  // Electric resistance of the whole battery
+                        liIon_Cp_,
+                        liIon_heatTransferCoef_,
+                        20.0  // Picking a temperature for now, will reset before each run.
+                        ),
+                    new losses_t()
+                    )
+                );
             break;
         }
         case StorageModelType::storageTypeNotSet: {

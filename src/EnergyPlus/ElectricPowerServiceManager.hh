@@ -62,6 +62,9 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
+// SSC Headers
+#include <../third_party/ssc/shared/lib_battery.h>
+
 namespace EnergyPlus {
 
 enum class ThermalLossDestination : int
@@ -396,6 +399,8 @@ private: // data
     Real64 lastTimeStepBound_;         // [Ah] bound charge at the previous timestep
     Real64 lastTwoTimeStepAvailable_;  // [Ah] available charge at the previous two timesteps
     Real64 lastTwoTimeStepBound_;      // [Ah] bound charge at the previous two timesteps
+    // Li-ion NMC battery object from SAM Simulation Core lib_battery
+    std::unique_ptr<battery_t> ssc_battery_;
     // battery life calculation variables
     int count0_;
     std::vector<Real64> b10_;
