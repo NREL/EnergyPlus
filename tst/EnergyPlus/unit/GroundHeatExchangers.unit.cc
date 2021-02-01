@@ -279,6 +279,68 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
     EXPECT_EQ(0.04556, thisProp->bhUTubeDist);
 }
 
+TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_IDF_Check)
+{
+    std::string const idf_objects =
+        delimited_string({"GroundHeatExchanger:Slinky,",
+                          "    Slinky GHX,              !- Name",
+                          "    GHE Inlet Node,          !- Inlet Node Name",
+                          "    GHE Outlet Node,         !- Outlet Node Name",
+                          "    0.0033,                  !- Design Flow Rate {m3/s}",
+                          "    1.2,                     !- Soil Thermal Conductivity {W/m-K}",
+                          "    3200,                    !- Soil Density {kg/m3}",
+                          "    850,                     !- Soil Specific Heat {J/kg-K}",
+                          "    1.8,                     !- Pipe Thermal Conductivity {W/m-K}",
+                          "    920,                     !- Pipe Density {kg/m3}",
+                          "    2200,                    !- Pipe Specific Heat {J/kg-K}",
+                          "    0.02667,                 !- Pipe Outer Diameter {m}",
+                          "    0.002413,                !- Pipe Thickness {m}",
+                          "    Vertical,                !- Heat Exchanger Configuration",
+                          "    1,                       !- Coil Diameter {m}",
+                          "    0.2,                     !- Coil Pitch {m}",
+                          "    2.5,                     !- Trench Depth {m}",
+                          "    40,                      !- Trench Length {m}",
+                          "    15,                      !- Number of Trenches",
+                          "    2,                       !- Horizontal Spacing Between Pipes {m}",
+                          "    Site:GroundTemperature:Undisturbed:KusudaAchenbach,  !- Undisturbed Ground Temperature Model Type",
+                          "    KATemps,                 !- Undisturbed Ground Temperature Model Name",
+                          "    10;                      !- Maximum Length of Simulation {years}",
+                          "",
+                          "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
+                          "    KATemps,                 !- Name",
+                          "    1.8,                     !- Soil Thermal Conductivity {W/m-K}",
+                          "    920,                     !- Soil Density {kg/m3}",
+                          "    2200,                    !- Soil Specific Heat {J/kg-K}",
+                          "    15.5,                    !- Average Soil Surface Temperature {C}",
+                          "    3.2,                     !- Average Amplitude of Surface Temperature {deltaC}",
+                          "    8;                       !- Phase Shift of Minimum Surface Temperature {days}"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetGroundHeatExchangerInput(*state);
+
+    EXPECT_EQ(1u, state->dataGroundHeatExchanger->slinkyGLHE.size());
+
+    auto &thisGHE(state->dataGroundHeatExchanger->slinkyGLHE[0]);
+
+    EXPECT_NEAR(thisGHE.designFlow, 0.0033, 0.000001);
+    EXPECT_NEAR(thisGHE.soil.k, 1.2, 0.001);
+    EXPECT_NEAR(thisGHE.soil.rho, 3200, 1.0);
+    EXPECT_NEAR(thisGHE.soil.cp, 850, 1.0);
+    EXPECT_NEAR(thisGHE.pipe.k, 1.8, 0.001);
+    EXPECT_NEAR(thisGHE.pipe.rho, 920, 1.0);
+    EXPECT_NEAR(thisGHE.pipe.cp, 2200, 1.0);
+    EXPECT_NEAR(thisGHE.pipe.outDia, 0.02667, 0.00001);
+    EXPECT_NEAR(thisGHE.pipe.thickness, 0.002413, 0.00001);
+    EXPECT_NEAR(thisGHE.pipe.thickness, 0.002413, 0.00001);
+    EXPECT_NEAR(thisGHE.coilDiameter, 1.0, 0.01);
+    EXPECT_NEAR(thisGHE.coilPitch, 0.2, 0.01);
+    EXPECT_NEAR(thisGHE.trenchDepth, 2.5, 0.01);
+    EXPECT_NEAR(thisGHE.trenchLength, 40.0, 0.01);
+    EXPECT_NEAR(thisGHE.numTrenches, 15.0, 0.1);
+    EXPECT_NEAR(thisGHE.trenchSpacing, 2.0, 0.1);
+}
+
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 {
     std::string const idf_objects = delimited_string({"GroundHeatExchanger:Vertical:Properties,",

@@ -71,7 +71,7 @@ namespace GroundHeatExchangers {
     // Using/Aliasing
     using namespace GroundTemperatureManager;
 
-    struct ThermophysicalProps
+    struct ThermophysicalProps // LCOV_EXCL_LINE
     {
         // Destructor
         virtual ~ThermophysicalProps() = default;
@@ -87,7 +87,7 @@ namespace GroundHeatExchangers {
         }
     };
 
-    struct PipeProps : ThermophysicalProps
+    struct PipeProps : ThermophysicalProps // LCOV_EXCL_LINE
     {
         // Destructor
         ~PipeProps() override = default;
@@ -212,7 +212,7 @@ namespace GroundHeatExchangers {
         GLHEResponseFactors(EnergyPlusData &state, std::string const &objName, nlohmann::json const &j);
     };
 
-    struct GLHEBase : PlantComponent
+    struct GLHEBase : PlantComponent // LCOV_EXCL_LINE
     {
         // Destructor
         virtual ~GLHEBase() = default;
@@ -316,7 +316,7 @@ namespace GroundHeatExchangers {
         void setupOutput(EnergyPlusData &state);
     };
 
-    struct GLHEVert : GLHEBase
+    struct GLHEVert : GLHEBase // LCOV_EXCL_LINE
     {
 
         // Destructor
@@ -394,7 +394,7 @@ namespace GroundHeatExchangers {
         void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
     };
 
-    struct GLHESlinky : GLHEBase
+    struct GLHESlinky : GLHEBase // LCOV_EXCL_LINE
     {
 
         // Destructor

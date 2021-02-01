@@ -158,10 +158,9 @@ namespace EnergyPlus::GroundHeatExchangers {
         PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
 
         this->soil.k = j["soil_thermal_conductivity"];
-
-        Real64 const rho = j["soil_density"];
-        Real64 const cp = j["soil_specific_heat"];
-        this->soil.rhoCp = rho * cp;
+        this->soil.rho = j["soil_density"];
+        this->soil.cp = j["soil_specific_heat"];
+        this->soil.rhoCp = this->soil.rho * this->soil.cp;
         this->pipe.k = j["pipe_thermal_conductivity"];
         this->pipe.rho = j["pipe_density"];
         this->pipe.cp = j["pipe_specific_heat"];
