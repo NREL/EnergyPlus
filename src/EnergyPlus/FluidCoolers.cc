@@ -76,9 +76,7 @@
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace FluidCoolers {
+namespace EnergyPlus::FluidCoolers {
 
     // Module containing the routines dealing with the objects FluidCooler:SingleSpeed and
     // FluidCooler:TwoSpeed
@@ -106,7 +104,7 @@ namespace FluidCoolers {
     Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
 
-    PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
+    PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
     {
         if (GetFluidCoolerInputFlag) {
             GetFluidCoolerInput(state);
@@ -179,9 +177,9 @@ namespace FluidCoolers {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                // Number of elements in the alpha array
-        int NumNums;                  // Number of elements in the numeric array
-        int IOStat;                   // IO Status when calling get input subroutine
+        int NumAlphas = 0;                // Number of elements in the alpha array
+        int NumNums = 0;                  // Number of elements in the numeric array
+        int IOStat = 0;                   // IO Status when calling get input subroutine
         bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(16); // Numeric input data array
         Array1D_string AlphArray(5);  // Character string input data array
@@ -203,7 +201,7 @@ namespace FluidCoolers {
         SimpleFluidCooler.allocate(NumSimpleFluidCoolers);
         UniqueSimpleFluidCoolerNames.reserve(NumSimpleFluidCoolers);
 
-        int FluidCoolerNum;
+        int FluidCoolerNum = 0;
 
         // Load data structures with fluid cooler input data
         cCurrentModuleObject = cFluidCooler_SingleSpeed;
@@ -680,6 +678,46 @@ namespace FluidCoolers {
         return ErrorsFound;
     }
 
+    void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state) {
+        bool ErrorsFound = false;
+        // Locate the tower on the plant loops for later usage
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                this->FluidCoolerType_Num,
+                                                this->LoopNum,
+                                                this->LoopSideNum,
+                                                this->BranchNum,
+                                                this->CompNum,
+                                                ErrorsFound,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
+        }
+    }
+
+    void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state) {
+        static std::string const RoutineName("FluidCoolerspecs::initEachEnvironment");
+        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                             DataGlobalConstants::InitConvTemp,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                             RoutineName);
+        this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
+        PlantUtilities::InitComponentNodes(0.0,
+                                           this->DesWaterMassFlowRate,
+                                           this->WaterInletNodeNum,
+                                           this->WaterOutletNodeNum,
+                                           this->LoopNum,
+                                           this->LoopSideNum,
+                                           this->BranchNum,
+                                           this->CompNum);
+    }
+
     void FluidCoolerspecs::initialize(EnergyPlusData &state)
     {
 
@@ -699,55 +737,18 @@ namespace FluidCoolers {
         // REFERENCES:
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitFluidCooler");
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Flag if input data errors are found
 
-        if (this->oneTimeInit) {
-
+        if (this->oneTimeInitFlag) {
             this->setupOutputVars(state);
-
-            // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->FluidCoolerType_Num,
-                                                    this->LoopNum,
-                                                    this->LoopSideNum,
-                                                    this->BranchNum,
-                                                    this->CompNum,
-                                                    ErrorsFound,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-
-            if (ErrorsFound) {
-                ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
-            }
-
-            this->oneTimeInit = false;
+            this->oneTimeInit(state);
+            this->oneTimeInitFlag = false;
         }
 
         // Begin environment initializations
         if (this->beginEnvrnInit && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
-
-            Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                 RoutineName);
-            this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-            PlantUtilities::InitComponentNodes(0.0,
-                                               this->DesWaterMassFlowRate,
-                                               this->WaterInletNodeNum,
-                                               this->WaterOutletNodeNum,
-                                               this->LoopNum,
-                                               this->LoopSideNum,
-                                               this->BranchNum,
-                                               this->CompNum);
+            this->initEachEnvironment(state);
             this->beginEnvrnInit = false;
         }
 
@@ -1665,7 +1666,6 @@ namespace FluidCoolers {
         // See methodology for Single Speed or Two Speed Fluid Cooler model
 
         // Locals
-        Real64 _InletWaterTemp; // Water inlet temperature
         Real64 _Qactual;        // Actual heat transfer rate between fluid cooler water and air [W]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1674,7 +1674,7 @@ namespace FluidCoolers {
         if (UAdesign == 0.0) return;
 
         // set local fluid cooler inlet and outlet temperature variables
-        _InletWaterTemp = SimpleFluidCooler(FluidCoolerNum).WaterTemp;
+        Real64 _InletWaterTemp = SimpleFluidCooler(FluidCoolerNum).WaterTemp;
         _OutletWaterTemp = _InletWaterTemp;
         Real64 InletAirTemp = SimpleFluidCooler(FluidCoolerNum).AirTemp;
 
@@ -1743,13 +1743,12 @@ namespace FluidCoolers {
         // par(5) = water specific heat [J/(kg*C)]
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutWaterTemp; // outlet water temperature [C]
+        Real64 OutWaterTemp = 0.0; // outlet water temperature [C]
 
         int FluidCoolerIndex = int(Par(2));
         CalcFluidCoolerOutlet(state, FluidCoolerIndex, Par(3), Par(4), UA, OutWaterTemp);
         Real64 const Output = Par(5) * Par(3) * (SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
-        Real64 Residuum = (Par(1) - Output) / Par(1);
-        return Residuum;
+        return (Par(1) - Output) / Par(1);
     }
 
     void FluidCoolerspecs::update(EnergyPlusData &state)
@@ -1868,7 +1867,5 @@ namespace FluidCoolers {
         UniqueSimpleFluidCoolerNames.clear();
         GetFluidCoolerInputFlag = true;
     }
-
-} // namespace FluidCoolers
 
 } // namespace EnergyPlus

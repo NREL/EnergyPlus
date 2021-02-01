@@ -105,7 +105,6 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     auto &thisEFC = SimpleEvapFluidCooler(1);
     thisEFC.TypeOf_Num = DataPlant::TypeOf_EvapFluidCooler_TwoSpd;
     thisEFC.MyOneTimeFlag = false;
-    thisEFC.OneTimeFlagForEachEvapFluidCooler = false;
     thisEFC.MyEnvrnFlag = false;
     state->dataGlobal->BeginEnvrnFlag = true;
     thisEFC.WaterInletNodeNum = 1;
