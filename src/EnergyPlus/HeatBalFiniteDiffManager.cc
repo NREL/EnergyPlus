@@ -927,6 +927,8 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld = 0;
             SurfaceFD(Surf).PhaseChangeStateOldOld = 0;
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
+            SurfaceFD(Surf).condNodeReport = 0.0;
+            SurfaceFD(Surf).specHeatNodeReport = 0.0;
 
             // Setup EMS data
             for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
