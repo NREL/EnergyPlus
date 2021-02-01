@@ -840,7 +840,7 @@ bool byCost::operator() (grid_point const& a, grid_point const& b)
 
 bool byLowestMarginalCost::operator() (grid_point const& a, grid_point const& b)
 {
-   
+
     if (fabs(a.MarginalCost() - b.MarginalCost()) < 1e-7)
     {
         if (fabs(a.Grid()) < 1e-7 || fabs(b.Grid()) < 1e-7)
@@ -855,5 +855,5 @@ bool byLowestMarginalCost::operator() (grid_point const& a, grid_point const& b)
     }
 
     return a.MarginalCost() < b.MarginalCost();
-    
+
 }

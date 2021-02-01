@@ -2134,7 +2134,6 @@ void cm_pvsamv1::exec()
                 dcPowerNetPerMppt_kW[m] = PVSystem->p_dcPowerNetPerMppt[m][idx] * util::watt_to_kilowatt;
             }
 
-            double power_before_battery = 0.0;
 			//run AC power calculation
 			if (en_batt && (batt_topology == ChargeController::DC_CONNECTED)) // DC-connected battery
 			{

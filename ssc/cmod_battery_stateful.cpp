@@ -69,13 +69,14 @@ var_info vtab_battery_stateful_inputs[] = {
         { SSC_INPUT,        SSC_MATRIX,      "cap_vs_temp",                                "Table with Temperature and Capacity % as columns",        "[[C,%]]",  "",                     "ParamsPack",       "*",                           "",                             "" },
 
         // lifetime inputs
-        { SSC_INPUT,		SSC_MATRIX,      "cycling_matrix",                             "Table with DOD %, Cycle #, and Capacity % columns",       "[[%, #, %]]","",                     "ParamsCell",       "*",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,      "calendar_choice",                            "Calendar life degradation input option",                  "0/1/2",    "0=None,1=LithiomIonModel,2=InputLossTable",  "ParamsCell",       "*",       "",                             "" },
-        { SSC_INPUT,        SSC_MATRIX,      "calendar_matrix",                            "Table with Day # and Capacity % columns",                 "[[#, %]]", "",                     "ParamsCell",       "calendar_choice=2",        "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,      "calendar_q0",                                "Calendar life model initial capacity cofficient",         "",         "",                     "ParamsCell",       "calendar_choice=1",        "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,      "calendar_a",                                 "Calendar life model coefficient",                         "1/sqrt(day)","",                   "ParamsCell",       "calendar_choice=1",        "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,      "calendar_b",                                 "Calendar life model coefficient",                         "K",        "",                     "ParamsCell",       "calendar_choice=1",        "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,      "calendar_c",                                 "Calendar life model coefficient",                         "K",        "",                     "ParamsCell",       "calendar_choice=1",        "",                             "" },
+        { SSC_INPUT,		SSC_NUMBER,      "life_model",                                 "Battery life model specifier",                            "0/1",      "0=calendar/cycle,1=NMC", "ParamsCell",       "*",                                   "",                             "" },
+        { SSC_INPUT,		SSC_MATRIX,      "cycling_matrix",                             "Table with DOD %, Cycle #, and Capacity % columns",       "[[%, #, %]]","",                     "ParamsCell",       "life_model=0",                        "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,      "calendar_choice",                            "Calendar life degradation input option",                  "0/1/2",    "0=None,1=LithiomIonModel,2=InputLossTable",  "ParamsCell",       "life_model=0",    "",                             "" },
+        { SSC_INPUT,        SSC_MATRIX,      "calendar_matrix",                            "Table with Day # and Capacity % columns",                 "[[#, %]]", "",                     "ParamsCell",       "life_model=0&calendar_choice=2",        "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,      "calendar_q0",                                "Calendar life model initial capacity cofficient",         "",         "",                     "ParamsCell",       "life_model=0&calendar_choice=1",        "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,      "calendar_a",                                 "Calendar life model coefficient",                         "1/sqrt(day)","",                   "ParamsCell",       "life_model=0&calendar_choice=1",        "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,      "calendar_b",                                 "Calendar life model coefficient",                         "K",        "",                     "ParamsCell",       "life_model=0&calendar_choice=1",        "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,      "calendar_c",                                 "Calendar life model coefficient",                         "K",        "",                     "ParamsCell",       "life_model=0&calendar_choice=1",        "",                             "" },
 
         // losses
         { SSC_INPUT,        SSC_NUMBER,      "loss_choice",                                "Loss power input option",                                 "0/1",        "0=Monthly,1=TimeSeries", "ParamsPack",       "?=0",                        "",                             "" },
@@ -176,10 +177,15 @@ void write_battery_state(const battery_state& state, var_table* vt) {
     vt->assign_match_case("charge_mode", cap->charge_mode);
     vt->assign_match_case("prev_charge", cap->prev_charge);
     vt->assign_match_case("chargeChange", cap->chargeChange);
-    vt->assign_match_case("q1_0", cap->leadacid.q1_0);
-    vt->assign_match_case("q2_0", cap->leadacid.q2_0);
-    vt->assign_match_case("qn", cap->leadacid.q1);
-    vt->assign_match_case("q2", cap->leadacid.q2);
+
+    int choice;
+    vt_get_int(vt, "chem", &choice);
+    if (choice == battery_params::CHEM::LEAD_ACID) {
+        vt->assign_match_case("q1_0", cap->leadacid.q1_0);
+        vt->assign_match_case("q2_0", cap->leadacid.q2_0);
+        vt->assign_match_case("qn", cap->leadacid.q1);
+        vt->assign_match_case("q2", cap->leadacid.q2);
+    }
 
     vt->assign_match_case("cell_voltage", state.voltage->cell_voltage);
 
@@ -192,19 +198,26 @@ void write_battery_state(const battery_state& state, var_table* vt) {
 
     auto lifetime = state.lifetime;
     vt->assign_match_case("q_relative", lifetime->q_relative);
-    vt->assign_match_case("q_relative_cycle", lifetime->cycle->q_relative_cycle);
-    vt->assign_match_case("n_cycles", lifetime->cycle->n_cycles);
-    vt->assign_match_case("range", lifetime->cycle->range);
-    vt->assign_match_case("average_range", lifetime->cycle->average_range);
-    vt->assign_match_case("rainflow_Xlt", lifetime->cycle->rainflow_Xlt);
-    vt->assign_match_case("rainflow_Ylt", lifetime->cycle->rainflow_Ylt);
-    vt->assign_match_case("rainflow_jlt", lifetime->cycle->rainflow_jlt);
-    if (!lifetime->cycle->rainflow_peaks.empty()) {
-        vt->assign_match_case("rainflow_peaks", lifetime->cycle->rainflow_peaks);
+    vt->assign_match_case("n_cycles", lifetime->n_cycles);
+    vt->assign_match_case("range", lifetime->range);
+    vt->assign_match_case("average_range", lifetime->average_range);
+    vt->assign_match_case("day_age_of_battery", lifetime->day_age_of_battery);
+
+    vt_get_int(vt, "life_model", &choice);
+    if (choice == lifetime_params::CALCYC) {
+        vt->assign_match_case("q_relative_cycle", lifetime->cycle->q_relative_cycle);
+        vt->assign_match_case("rainflow_Xlt", lifetime->cycle->rainflow_Xlt);
+        vt->assign_match_case("rainflow_Ylt", lifetime->cycle->rainflow_Ylt);
+        vt->assign_match_case("rainflow_jlt", lifetime->cycle->rainflow_jlt);
+        if (!lifetime->cycle->rainflow_peaks.empty()) {
+            vt->assign_match_case("rainflow_peaks", lifetime->cycle->rainflow_peaks);
+        }
+        vt->assign_match_case("q_relative_calendar", lifetime->calendar->q_relative_calendar);
+        vt->assign_match_case("dq_relative_calendar_old", lifetime->calendar->dq_relative_calendar_old);
     }
-    vt->assign_match_case("q_relative_calendar", lifetime->calendar->q_relative_calendar);
-    vt->assign_match_case("day_age_of_battery", lifetime->calendar->day_age_of_battery);
-    vt->assign_match_case("dq_relative_calendar_old", lifetime->calendar->dq_relative_calendar_old);
+    else {
+
+    }
 
     vt->assign_match_case("loss_kw", state.losses->loss_kw);
 
@@ -235,10 +248,15 @@ void read_battery_state(battery_state& state, var_table* vt) {
     vt_get_int(vt, "charge_mode", &cap->charge_mode);
     vt_get_int(vt, "prev_charge", &cap->prev_charge);
     vt_get_bool(vt, "chargeChange", &cap->chargeChange);
-    vt_get_number(vt, "q1_0", &cap->leadacid.q1_0);
-    vt_get_number(vt, "q2_0", &cap->leadacid.q2_0);
-    vt_get_number(vt, "qn", &cap->leadacid.q1);
-    vt_get_number(vt, "q2", &cap->leadacid.q2);
+
+    int choice;
+    vt_get_int(vt, "chem", &choice);
+    if (choice == battery_params::CHEM::LEAD_ACID) {
+        vt_get_number(vt, "q1_0", &cap->leadacid.q1_0);
+        vt_get_number(vt, "q2_0", &cap->leadacid.q2_0);
+        vt_get_number(vt, "qn", &cap->leadacid.q1);
+        vt_get_number(vt, "q2", &cap->leadacid.q2);
+    }
 
     vt_get_number(vt, "cell_voltage", &state.voltage->cell_voltage);
 
@@ -252,20 +270,27 @@ void read_battery_state(battery_state& state, var_table* vt) {
     auto lifetime = state.lifetime;
     vt_get_number(vt, "q_relative", &lifetime->q_relative);
     vt_get_number(vt, "q_relative_cycle", &lifetime->cycle->q_relative_cycle);
-    vt_get_int(vt, "n_cycles", &lifetime->cycle->n_cycles);
-    vt_get_number(vt, "range", &lifetime->cycle->range);
-    vt_get_number(vt, "average_range", &lifetime->cycle->average_range);
-    vt_get_number(vt, "rainflow_Xlt", &lifetime->cycle->rainflow_Xlt);
-    vt_get_number(vt, "rainflow_Ylt", &lifetime->cycle->rainflow_Ylt);
-    vt_get_int(vt, "rainflow_jlt", &lifetime->cycle->rainflow_jlt);
-    if (vt->is_assigned("rainflow_peaks"))
-    {
-        vt_get_array_vec(vt, "rainflow_peaks", lifetime->cycle->rainflow_peaks);
-        // If not assigned, leave empty
+    vt_get_int(vt, "n_cycles", &lifetime->n_cycles);
+    vt_get_number(vt, "range", &lifetime->range);
+    vt_get_number(vt, "average_range", &lifetime->average_range);
+    vt_get_int(vt, "day_age_of_battery", &lifetime->day_age_of_battery);
+
+    vt_get_int(vt, "life_model", &choice);
+    if (choice == lifetime_params::CALCYC) {
+        vt_get_number(vt, "rainflow_Xlt", &lifetime->cycle->rainflow_Xlt);
+        vt_get_number(vt, "rainflow_Ylt", &lifetime->cycle->rainflow_Ylt);
+        vt_get_int(vt, "rainflow_jlt", &lifetime->cycle->rainflow_jlt);
+        if (vt->is_assigned("rainflow_peaks"))
+        {
+            vt_get_array_vec(vt, "rainflow_peaks", lifetime->cycle->rainflow_peaks);
+            // If not assigned, leave empty
+        }
+        vt_get_number(vt, "q_relative_calendar", &lifetime->calendar->q_relative_calendar);
+        vt_get_number(vt, "dq_relative_calendar_old", &lifetime->calendar->dq_relative_calendar_old);
     }
-    vt_get_number(vt, "q_relative_calendar", &lifetime->calendar->q_relative_calendar);
-    vt_get_int(vt, "day_age_of_battery", &lifetime->calendar->day_age_of_battery);
-    vt_get_number(vt, "dq_relative_calendar_old", &lifetime->calendar->dq_relative_calendar_old);
+    else {
+
+    }
 
     vt_get_number(vt, "loss_kw", &state.losses->loss_kw);
 
@@ -278,6 +303,7 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
     int chem;
     vt_get_int(vt, "chem", &chem);
     params->chem = static_cast<battery_params::CHEM>(chem);
+    params->dt_hr = dt_hr;
 
     // voltage
     auto voltage = params->voltage;
@@ -317,7 +343,7 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
     vt_get_number(vt, "initial_SOC", &capacity->initial_SOC);
     vt_get_number(vt, "maximum_soc", &capacity->maximum_SOC);
     vt_get_number(vt, "minimum_soc", &capacity->minimum_SOC);
-    params->dt_hour = dt_hr;
+    capacity->dt_hr = dt_hr;
     if (params->chem == battery_params::LEAD_ACID) {
         vt_get_number(vt, "leadacid_tn", &capacity->leadacid.tn);
         vt_get_number(vt, "leadacid_qn", &capacity->leadacid.qn);
@@ -335,23 +361,27 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
 
     // lifetime
     auto lifetime = params->lifetime;
-    vt_get_int(vt, "calendar_choice", &choice);
-    lifetime->calendar_choice = static_cast<lifetime_params::CALENDAR_CHOICE>(choice);
-    lifetime->dt_hour = dt_hr;
-    vt_get_matrix(vt, "cycling_matrix", lifetime->cycling_matrix);
-    if (lifetime->calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL) {
-        vt_get_number(vt, "calendar_q0", &lifetime->calendar_q0);
-        vt_get_number(vt, "calendar_a", &lifetime->calendar_a);
-        vt_get_number(vt, "calendar_b", &lifetime->calendar_b);
-        vt_get_number(vt, "calendar_c", &lifetime->calendar_c);
-    }
-    else if (lifetime->calendar_choice == lifetime_params::CALENDAR_CHOICE::TABLE) {
-        vt_get_matrix(vt, "calendar_matrix", lifetime->calendar_matrix);
+    vt_get_int(vt, "life_model", &choice);
+    lifetime->model_choice = static_cast<lifetime_params::MODEL_CHOICE>(choice);
+    if (lifetime->model_choice == lifetime_params::CALCYC) {
+        vt_get_int(vt, "calendar_choice", &choice);
+        lifetime->cal_cyc->calendar_choice = static_cast<calendar_cycle_params::CALENDAR_CHOICE>(choice);
+        lifetime->dt_hr = dt_hr;
+        vt_get_matrix(vt, "cycling_matrix", lifetime->cal_cyc->cycling_matrix);
+        if (lifetime->cal_cyc->calendar_choice == calendar_cycle_params::CALENDAR_CHOICE::MODEL) {
+            vt_get_number(vt, "calendar_q0", &lifetime->cal_cyc->calendar_q0);
+            vt_get_number(vt, "calendar_a", &lifetime->cal_cyc->calendar_a);
+            vt_get_number(vt, "calendar_b", &lifetime->cal_cyc->calendar_b);
+            vt_get_number(vt, "calendar_c", &lifetime->cal_cyc->calendar_c);
+        }
+        else if (lifetime->cal_cyc->calendar_choice == calendar_cycle_params::CALENDAR_CHOICE::TABLE) {
+            vt_get_matrix(vt, "calendar_matrix", lifetime->cal_cyc->calendar_matrix);
+        }
     }
 
     // thermal
     auto thermal = params->thermal;
-    thermal->dt_hour = dt_hr;
+    thermal->dt_hr = dt_hr;
     thermal->option = thermal_params::VALUE;
     thermal->resistance = params->voltage->resistance;
     vt_get_number(vt, "mass", &thermal->mass);
@@ -389,7 +419,7 @@ std::shared_ptr<battery_params> create_battery_params(var_table *vt, double dt_h
 }
 
 cm_battery_stateful::cm_battery_stateful():
-        dt_hour(0),
+        dt_hr(0),
         control_mode(0){
     add_var_info(vtab_battery_stateful_inputs);
     add_var_info(vtab_battery_state);
@@ -401,9 +431,9 @@ cm_battery_stateful::cm_battery_stateful(var_table* vt) :
     try {
         if (!compute_module::verify("precheck input", SSC_INPUT))
             throw exec_error("battery_stateful", log(0)->text);
-        dt_hour = as_number("dt_hr");
+        dt_hr = as_number("dt_hr");
         control_mode = as_integer("control_mode");
-        params = create_battery_params(m_vartab, dt_hour);
+        params = create_battery_params(m_vartab, dt_hr);
         battery = std::unique_ptr<battery_t>(new battery_t(params));
         write_battery_state(battery->get_state(), m_vartab);
     }
@@ -416,6 +446,7 @@ void cm_battery_stateful::exec() {
     if (!battery)
         throw exec_error("battery_stateful", "Battery model must be initialized first.");
 
+    // Update state
     battery_state state;
     try {
         read_battery_state(state, m_vartab);
@@ -427,6 +458,15 @@ void cm_battery_stateful::exec() {
         throw runtime_error(err);
     }
 
+    // Update controls
+    control_mode = static_cast<MODE>(as_integer("control_mode"));
+    double control_dt_hr = as_float("dt_hr");
+    if (fabs(control_dt_hr - dt_hr) > 1e-7) {
+        dt_hr = control_dt_hr;
+        battery->ChangeTimestep(dt_hr);
+    }
+
+    // Simulate
     if (static_cast<MODE>(as_integer("control_mode")) == MODE::CURRENT) {
         double I = as_number("input_current");
         battery->runCurrent(I);
@@ -435,6 +475,7 @@ void cm_battery_stateful::exec() {
         double P = as_number("input_power");
         battery->runPower(P);
     }
+
     write_battery_state(battery->get_state(), m_vartab);
 }
 

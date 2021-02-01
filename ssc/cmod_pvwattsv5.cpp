@@ -674,7 +674,7 @@ public:
         double tamb = as_double("tamb");
         double wspd = as_double("wspd");
         double alb = as_double("alb");
-        double elev, tdry, pres;
+        double elev, pres;
         if (!is_assigned("elevation")) {
             elev = 0; //assume 0 meter elevation if none is provided
         }

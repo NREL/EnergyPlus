@@ -31,6 +31,10 @@ set(SHARED_SRC
 		lib_battery_dispatch_manual.h
         lib_battery_lifetime.cpp
         lib_battery_lifetime.h
+        lib_battery_lifetime_calendar_cycle.cpp
+        lib_battery_lifetime_calendar_cycle.h
+        lib_battery_lifetime_nmc.cpp
+        lib_battery_lifetime_nmc.h
         lib_battery_powerflow.cpp
         lib_battery_powerflow.h
         lib_battery_voltage.cpp
