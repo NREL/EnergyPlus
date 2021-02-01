@@ -4012,8 +4012,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                     Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
                                         max(0.0, Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
                                 } else {
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate =
-                                        Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
+                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                                 }
                             } else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
                                 if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
