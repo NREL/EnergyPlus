@@ -73,7 +73,8 @@ namespace {
 		ssc_data_set_number(data, "batt_minimum_SOC", 15);
 		ssc_data_set_number(data, "batt_maximum_SOC", 95);
 		ssc_data_set_number(data, "batt_minimum_modetime", 10);
-		ssc_number_t p_batt_lifetime_matrix[18] = { 20, 0, 100, 20, 5000, 80, 20, 10000, 60, 80, 0, 100, 80, 1000, 80, 80, 2000, 60 };
+        ssc_data_set_number(data, "batt_life_model", 0);
+        ssc_number_t p_batt_lifetime_matrix[18] = { 20, 0, 100, 20, 5000, 80, 20, 10000, 60, 80, 0, 100, 80, 1000, 80, 80, 2000, 60 };
 		ssc_data_set_matrix(data, "batt_lifetime_matrix", p_batt_lifetime_matrix, 6, 3);
 		ssc_data_set_number(data, "batt_calendar_choice", 1);
 		ssc_number_t p_batt_calendar_lifetime_matrix[6] = { 0, 100, 3650, 80, 7300, 50 };
