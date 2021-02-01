@@ -4041,13 +4041,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         // Zone has no infiltration objects
                         MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                     }
-
+                }
+                //
+                if (ZoneMassBalanceFlag(ZoneNum)) {
                     MassConservation(ZoneNum).InMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                     MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
-                //
-
                 TotSupplyAirMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate -
                                            (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh) -
                                            state.dataZoneEquip->ZoneEquipConfig(ZoneNum).PlenumMassFlow;
