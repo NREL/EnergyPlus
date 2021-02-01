@@ -881,7 +881,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
         "Test_InsideHVACSystemIterationLoop,",
         "set Mdot = 0.1,",
         "set Tsupply = 18,",
-        "set HRsupply = 0.008;"
+        "set HRsupply = 0.010;",
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
