@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -943,6 +943,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                 } else {
                     PVWatts::PVWattsGenerator &pvwGen = PVWatts::GetOrCreatePVWattsGenerator(state, generatorController->name);
                     totalDCCapacity += pvwGen.getDCSystemCapacity();
+
+                    // Pass the inverter properties to the PVWatts generator class
+                    pvwGen.setDCtoACRatio(inverterObj->pvWattsDCtoACSizeRatio());
+                    pvwGen.setInverterEfficiency(inverterObj->pvWattsInverterEfficiency());
                 }
             }
             if (!errorsFound) {
@@ -1959,7 +1963,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
     Real64 thermalLoad = 0.0;
     for (auto &g : elecGenCntrlObj) {
         if (g->plantInfoFound) {
-            thermalLoad += DataPlant::PlantLoop(g->cogenLocation.loopNum)
+            thermalLoad += state.dataPlnt->PlantLoop(g->cogenLocation.loopNum)
                                .LoopSide(g->cogenLocation.loopSideNum)
                                .Branch(g->cogenLocation.branchNum)
                                .Comp(g->cogenLocation.compNum)
@@ -2175,7 +2179,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state);
 
-        if (!DataPlant::PlantFirstSizeCompleted) break;
+        if (!state.dataPlnt->PlantFirstSizeCompleted) break;
 
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(state,
                                                                                                                        runFlag,
@@ -2503,6 +2507,16 @@ Real64 DCtoACInverter::pvWattsDCCapacity()
     return ratedPower_ * pvWattsDCtoACSizeRatio_;
 }
 
+Real64 DCtoACInverter::pvWattsInverterEfficiency()
+{
+    return pvWattsInverterEfficiency_;
+}
+
+Real64 DCtoACInverter::pvWattsDCtoACSizeRatio()
+{
+    return pvWattsDCtoACSizeRatio_;
+}
+
 Real64 DCtoACInverter::thermLossRate() const
 {
     return thermLossRate_;
@@ -2601,6 +2615,9 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
         break;
     }
     case InverterModelType::pvWatts: {
+        // This code is lifted from ssc cmod_pvwatts5.cpp:powerout() method.
+        // It was easier to do this calculation here because we have a many to one relationship between inverter
+        // and generator whereas theirs is one to one.
         Real64 const etaref = 0.9637;
         Real64 const A = -0.0162;
         Real64 const B = -0.0059;
@@ -2617,6 +2634,8 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
                 // clipping
                 ac = ratedPower_;
             }
+            // make sure no negative AC values (no parasitic nighttime losses calculated)
+            if (ac < 0) ac = 0;
             efficiency_ = ac / dCPowerIn_;
         } else {
             efficiency_ = 0.0;

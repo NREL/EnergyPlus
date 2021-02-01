@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -9080,7 +9080,7 @@ namespace EnergyPlus::RefrigeratedCase {
         auto &Condenser(state.dataRefrigCase->Condenser);
 
         // initialize plant topology information, if applicable
-        if (state.dataRefrigCase->MyReferPlantScanFlag && allocated(DataPlant::PlantLoop)) {
+        if (state.dataRefrigCase->MyReferPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             for (int RefCondLoop = 1; RefCondLoop <= DataHeatBalance::NumRefrigCondensers; ++RefCondLoop) {
                 if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
@@ -9103,9 +9103,9 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidName,
                                                                20.0,
-                                                               DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
                 if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
@@ -9137,9 +9137,9 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidName,
                                                                20.0,
-                                                               DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
                 if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
@@ -9162,9 +9162,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidName,
                                                                    20.0,
-                                                                   DataPlant::PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                                    RoutineName);
 
                     if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
@@ -9186,9 +9186,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidName,
                                                                    20.0,
-                                                                   DataPlant::PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                                    RoutineName);
 
                     if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
@@ -10057,10 +10057,16 @@ namespace EnergyPlus::RefrigeratedCase {
         // Make demand request on first HVAC iteration
 
         // get cooling fluid properties
-        Real64 rho = FluidProperties::GetDensityGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+        Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                       this->InletTemp,
+                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                       RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                           this->InletTemp,
+                                                           state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                           RoutineName);
 
         if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
 
@@ -10069,16 +10075,17 @@ namespace EnergyPlus::RefrigeratedCase {
             if (this->OutletTemp == this->InletTemp) {
 
                 if (this->HighInletWarnIndex == 0) {
-                    ShowSevereError(state, ErrIntro + ", \"" + this->Name +
-                                    "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
+                    ShowSevereError(
+                        state, ErrIntro + ", \"" + this->Name + "\" : has inlet water temp equal to desired outlet temp. Excessive flow resulting. ");
                     ShowContinueError(state, "cooling water is not cold enough to reach desired outlet temperature");
                 }
-                ShowRecurringWarningErrorAtEnd(state, ErrIntro + ", \"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               ErrIntro + ", \"" + this->Name +
                                                    "\" : has inlet water temp equal to desired outlet temp.... continues. ",
                                                this->HighInletWarnIndex);
                 this->VolFlowRate = 9999.0;
                 this->MassFlowRate = this->VolFlowRate * rho;
-                } else {
+            } else {
                 Real64 DeltaT = this->OutletTemp - this->InletTemp;
                 this->MassFlowRate = state.dataRefrigCase->TotalCondenserHeat / Cp / DeltaT;
                 // Check for maximum flow in the component
@@ -10088,11 +10095,11 @@ namespace EnergyPlus::RefrigeratedCase {
                         ShowContinueError(state, "Requested condenser water mass flow rate greater than maximum allowed value. ");
                         ShowContinueError(state, "Flow reset to maximum value.");
                     } // HighFlowWarnIndex
-                    ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues",
-                                                   this->HighFlowWarnIndex);
+                    ShowRecurringWarningErrorAtEnd(
+                        state, ErrIntro + this->Name + " - Flow rate higher than maximum allowed ... continues", this->HighFlowWarnIndex);
                     // END IF
                     this->MassFlowRate = this->MassFlowRateMax;
-            }
+                }
             } // compare outlet T to inlet T
 
         } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
@@ -10105,8 +10112,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
         } // on flow type
         // check against plant, might get changed.
-        PlantUtilities::SetComponentFlowRate(state,
-            this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
 
         this->VolFlowRate = this->MassFlowRate / rho;
 
@@ -10116,25 +10123,26 @@ namespace EnergyPlus::RefrigeratedCase {
             this->OutletTemp = this->InletTemp;
             if ((state.dataRefrigCase->TotalCondenserHeat > 0.0) && (!FirstHVACIteration)) {
 
-                ShowRecurringWarningErrorAtEnd(state,
+                ShowRecurringWarningErrorAtEnd(
+                    state,
                     TypeName + this->Name +
                         "Water-cooled condenser has no cooling water flow. Heat is not being rejected from compressor rack condenser.",
                     this->NoFlowWarnIndex);
             }
-                    }
+        }
         // Check outlet water temp for max value
         if (this->OutletTemp > this->OutletTempMax) {
             if (this->HighTempWarnIndex == 0) {
                 ShowWarningMessage(state, TypeName + this->Name);
-                ShowContinueError(state,
-                    "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
-                        }
-            ShowRecurringWarningErrorAtEnd(state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues",
-                                           this->HighTempWarnIndex);
-                    }
+                ShowContinueError(
+                    state, "Water-cooled condenser outlet temp higher than maximum allowed temp. Check flow rates and/or temperature setpoints.");
+            }
+            ShowRecurringWarningErrorAtEnd(
+                state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", this->HighTempWarnIndex);
+        }
 
-        this->UpdateCondenser();
-                    }
+        this->UpdateCondenser(state);
+    }
 
     PlantComponent *RefrigRackData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -10217,9 +10225,9 @@ namespace EnergyPlus::RefrigeratedCase {
 
         // get cooling fluid properties
         Real64 rho = FluidProperties::GetDensityGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, DataPlant::PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName, this->InletTemp, state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex, RoutineName);
 
         if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
             this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
@@ -10293,10 +10301,10 @@ namespace EnergyPlus::RefrigeratedCase {
                 state, ErrIntro + this->Name + " - Condenser outlet temp higher than maximum allowed ... continues", HighTempWarnIndex);
         }
 
-        this->UpdateCondenser();
+        this->UpdateCondenser(state);
     }
 
-    void RefrigCondenserData::UpdateCondenser()
+    void RefrigCondenserData::UpdateCondenser(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10309,13 +10317,13 @@ namespace EnergyPlus::RefrigeratedCase {
         // Updates the node variables with local variables.
 
         // Pass all variables from inlet to outlet node
-        PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
 
         // Set outlet node variables that are possibly changed
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
-    void RefrigRackData::UpdateCondenser()
+    void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10328,7 +10336,7 @@ namespace EnergyPlus::RefrigeratedCase {
         // Updates the node variables with local variables.
 
         // Pass all variables from inlet to outlet node
-        PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
 
         // Set outlet node variables that are possibly changed
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
@@ -14185,7 +14193,7 @@ namespace EnergyPlus::RefrigeratedCase {
             }
         } // FirstHVACIteration
 
-        RemainingOutputToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // RemainingOutputToCoolingSP in Watts, < 0 for cooling demand
 
         if (RemainingOutputToCoolingSP < 0.0 && DataHeatBalFanSys::TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
