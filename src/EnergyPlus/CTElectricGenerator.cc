@@ -649,8 +649,6 @@ namespace CTElectricGenerator {
         }
     }
 
-    void CTGeneratorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state) {}
-
     void CTGeneratorData::InitCTGenerators(EnergyPlusData &state,
                                            bool const RunFlag, // TRUE when Generator operating
                                            bool const FirstHVACIteration)

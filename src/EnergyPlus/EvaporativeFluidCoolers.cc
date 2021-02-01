@@ -79,7 +79,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 
-namespace EnergyPlus::EvaporativeFluidCoolers {
+namespace EnergyPlus {
+
+namespace EvaporativeFluidCoolers {
 
     // MODULE INFORMATION:
     //       AUTHOR         Chandan Sharma
@@ -142,9 +144,9 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         // B.A. Qureshi and S.M. Zubair , Prediction of evaporation losses in evaporative fluid coolers
         // Applied thermal engineering 27 (2007) 520-527
 
-        int NumAlphas = 0;                // Number of elements in the alpha array
-        int NumNums = 0;                  // Number of elements in the numeric array
-        int IOStat = 0;                   // IO Status when calling get input subroutine
+        int NumAlphas;                // Number of elements in the alpha array
+        int NumNums;                  // Number of elements in the numeric array
+        int IOStat;                   // IO Status when calling get input subroutine
         bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(25); // Numeric input data array
         Array1D_string AlphArray(13); // Character string input data array
@@ -1025,80 +1027,6 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         this->ReportEvapFluidCooler(RunFlag);
     }
 
-    void EvapFluidCoolerSpecs::oneTimeInit(EnergyPlusData &state) {
-        bool ErrorsFound = false;
-        this->FluidIndex = state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).FluidIndex;
-        std::string FluidName = FluidProperties::GetGlycolNameByIndex(this->FluidIndex);
-        if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
-            this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
-            if (FluidName != "WATER") {
-                ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + this->Name +
-                                       R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
-                ShowContinueError(state, "Currently, Fluid Type = " + FluidName +
-                                         " in CondenserLoop = " + state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).Name);
-                ErrorsFound = true;
-            }
-        }
-        // Locate the tower on the plant loops for later usage
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                this->TypeOf_Num,
-                                                this->LoopNum,
-                                                this->LoopSideNum,
-                                                this->BranchNum,
-                                                this->CompNum,
-                                                ErrorsFound,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
-        }
-
-        if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
-            if (this->DesignWaterFlowRate > 0.0) {
-                if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
-                    ShowSevereError(state, "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                           "\". Low speed air flow rate must be less than the high speed air flow rate.");
-                    ErrorsFound = true;
-                }
-                if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
-                    (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
-                    ShowSevereError(state,
-                                    "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                    "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
-                    ErrorsFound = true;
-                }
-            }
-        }
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
-        }
-
-    }
-
-    void EvapFluidCoolerSpecs::initEachEnvironment(EnergyPlusData &state) {
-        std::string const RoutineName("EvapFluidCoolerSpecs::initEachEnvironment");
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                       DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                       RoutineName);
-        this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-        PlantUtilities::InitComponentNodes(0.0,
-                                           this->DesWaterMassFlowRate,
-                                           this->WaterInletNodeNum,
-                                           this->WaterOutletNodeNum,
-                                           this->LoopNum,
-                                           this->LoopSideNum,
-                                           this->BranchNum,
-                                           this->CompNum);
-    }
-
     void EvapFluidCoolerSpecs::InitEvapFluidCooler(EnergyPlusData &state)
     {
 
@@ -1118,16 +1046,91 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
+        std::string const RoutineName("InitEvapFluidCooler");
+
         bool ErrorsFound(false); // Flag if input data errors are found
         if (this->MyOneTimeFlag) {
+
             this->setupOutputVars(state);
-            this->oneTimeInit(state);
+
+            this->FluidIndex = state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).FluidIndex;
+            std::string FluidName = FluidProperties::GetGlycolNameByIndex(this->FluidIndex);
+
+            if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
+                this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
+                if (FluidName != "WATER") {
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + this->Name +
+                                    R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
+                    ShowContinueError(state, "Currently, Fluid Type = " + FluidName +
+                                      " in CondenserLoop = " + state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).Name);
+                    ErrorsFound = true;
+                }
+            }
+
             this->MyOneTimeFlag = false;
+        }
+
+        if (this->OneTimeFlagForEachEvapFluidCooler) {
+            // Locate the tower on the plant loops for later usage
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    this->TypeOf_Num,
+                                                    this->LoopNum,
+                                                    this->LoopSideNum,
+                                                    this->BranchNum,
+                                                    this->CompNum,
+                                                    ErrorsFound,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+
+            if (ErrorsFound) {
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
+            }
+
+            if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
+                if (this->DesignWaterFlowRate > 0.0) {
+                    if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
+                        ShowSevereError(state, "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
+                                        "\". Low speed air flow rate must be less than the high speed air flow rate.");
+                        ErrorsFound = true;
+                    }
+                    if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
+                        (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
+                        ShowSevereError(state,
+                            "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
+                            "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at high fan speed.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
+
+            if (ErrorsFound) {
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
+            }
+
+            this->OneTimeFlagForEachEvapFluidCooler = false;
         }
 
         // Begin environment initializations
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
-            this->initEachEnvironment(state);
+
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                           RoutineName);
+            this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
+            PlantUtilities::InitComponentNodes(0.0,
+                                               this->DesWaterMassFlowRate,
+                                               this->WaterInletNodeNum,
+                                               this->WaterOutletNodeNum,
+                                               this->LoopNum,
+                                               this->LoopSideNum,
+                                               this->BranchNum,
+                                               this->CompNum);
             this->MyEnvrnFlag = false;
         }
 
@@ -1193,11 +1196,11 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         Real64 const Acc(0.0001); // Accuracy of result
         std::string const CalledFrom("SizeEvapFluidCooler");
 
-        int SolFla = 0;                      // Flag of solver
-        Real64 UA = 0.0;                       // Calculated UA value [W/C]
-        Real64 OutWaterTempAtUA0 = 0.0;        // Water outlet temperature at UA0
-        Real64 OutWaterTempAtUA1 = 0.0;        // Water outlet temperature at UA1
-        Real64 DesignEnteringAirWetBulb = 0.0; // Intermediate variable to check that design exit
+        int SolFla;                      // Flag of solver
+        Real64 UA;                       // Calculated UA value [W/C]
+        Real64 OutWaterTempAtUA0;        // Water outlet temperature at UA0
+        Real64 OutWaterTempAtUA1;        // Water outlet temperature at UA1
+        Real64 DesignEnteringAirWetBulb; // Intermediate variable to check that design exit
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
@@ -1943,9 +1946,9 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         // is stored at the loop. Current choices are Water and Steam,
         // needs to expand for glycols
 
-        Real64 AirFlowRate = 0.0;
+        Real64 AirFlowRate;
         Real64 UAdesign = 0.0; // UA value at design conditions (entered by user or calculated)
-        Real64 CpWater = 0.0;
+        Real64 CpWater;
         Real64 TempSetPoint = 0.0;
 
         // set inlet and outlet nodes
@@ -2155,6 +2158,7 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
             Real64 UAdesign = this->LowSpeedEvapFluidCoolerUA;
             AirFlowRate = this->LowSpeedAirFlowRate;
             Real64 FanPowerLow = this->LowSpeedFanPower;
+            Real64 FanPowerHigh;
             this->SimSimpleEvapFluidCooler(state, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
             if (OutletWaterTemp1stStage <= TempSetPoint) {
@@ -2167,7 +2171,7 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
                 //         Setpoint was not met, turn on evaporative fluid cooler 2nd stage fan
                 UAdesign = this->HighSpeedEvapFluidCoolerUA;
                 AirFlowRate = this->HighSpeedAirFlowRate;
-                Real64 FanPowerHigh = this->HighSpeedFanPower;
+                FanPowerHigh = this->HighSpeedFanPower;
 
                 this->SimSimpleEvapFluidCooler(state, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
@@ -2265,7 +2269,7 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
             Real64 UAactual = UAdesign * CpAirside / CpAir;
             Real64 NumTransferUnits = UAactual / CapacityRatioMin;
             // calculate heat exchanger effectiveness
-            Real64 effectiveness = 0.0;
+            Real64 effectiveness;
             if (CapacityRatio <= 0.995) {
                 effectiveness = (1.0 - std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio))) /
                                 (1.0 - CapacityRatio * std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio)));
@@ -2312,16 +2316,21 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         // REFERENCES:
         // Based on SimpleTowerUAResidual by Fred Buhl, May 2002
 
+        Real64 Residuum; // residual to be minimized to zero
+
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // Par(2) = design water mass flow rate [kg/s]
         // Par(3) = design air volume flow rate [m3/s]
         // Par(4) = water specific heat [J/(kg*C)]
 
-        Real64 OutWaterTemp = 0.0;  // outlet water temperature [C]
+        Real64 OutWaterTemp;  // outlet water temperature [C]
+        Real64 CoolingOutput; // Evaporative fluid cooler cooling output [W]
+
         this->SimSimpleEvapFluidCooler(state, Par(2), Par(3), UA, OutWaterTemp);
-        Real64 CoolingOutput = Par(4) * Par(2) * (this->inletConds.WaterTemp - OutWaterTemp);
-        return (Par(1) - CoolingOutput) / Par(1);
+        CoolingOutput = Par(4) * Par(2) * (this->inletConds.WaterTemp - OutWaterTemp);
+        Residuum = (Par(1) - CoolingOutput) / Par(1);
+        return Residuum;
     }
 
     void EvapFluidCoolerSpecs::CalculateWaterUsage(EnergyPlusData &state)
@@ -2538,7 +2547,10 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the evaporative fluid cooler.
 
-        Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        Real64 ReportingConstant;
+
+        ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+
         if (!RunFlag) {
             this->fluidCoolerInletWaterTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
             this->fluidCoolerOutletWaterTemp = DataLoopNode::Node(this->WaterInletNode).Temp;
@@ -2563,5 +2575,7 @@ namespace EnergyPlus::EvaporativeFluidCoolers {
         SimpleEvapFluidCooler.deallocate();
         UniqueSimpleEvapFluidCoolerNames.clear();
     }
+
+} // namespace EvaporativeFluidCoolers
 
 } // namespace EnergyPlus
