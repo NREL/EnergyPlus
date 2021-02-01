@@ -11375,7 +11375,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
-    //EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
+    EXPECT_EQ(1, mySys.ControlZoneNum);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
@@ -11523,7 +11523,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     EXPECT_TRUE(mySys.ATMixerExists);
     EXPECT_EQ(DataHVACGlobals::ATMixer_SupplySide, mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
-    //EXPECT_EQ(0, mySys.ControlZoneNum); // control zone name/index not required for setpoint control
+    EXPECT_EQ(1, mySys.ControlZoneNum);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
@@ -15559,11 +15559,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     UnitarySys mySys;
     mySys.Name = "Bath_ZN_1_FLR_1 ZN-PTAC Unitary";
     state->dataUnitarySystems->unitarySys.push_back(mySys);
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataGlobal->NumOfZones = 1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
     mySys.getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
     ASSERT_EQ(ErrorsFound, true);
 }
@@ -16344,7 +16344,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     thisSys->AirInNode = 3;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     DataLoopNode::NodeID.allocate(20);
