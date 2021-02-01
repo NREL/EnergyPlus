@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -65,7 +66,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -114,8 +114,6 @@ namespace TranspiredCollector {
     // Using/Aliasing
     using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
-
-    static std::string const BlankString;
 
     void SimTranspiredCollector(EnergyPlusData &state,
                                 std::string const &CompName, // component name
@@ -415,7 +413,7 @@ namespace TranspiredCollector {
             }
             state.dataTranspiredCollector->UTSC(Item).OSCMPtr = Found;
             if (lAlphaFieldBlanks(3)) {
-                state.dataTranspiredCollector->UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataTranspiredCollector->UTSC(Item).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataTranspiredCollector->UTSC(Item).SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (state.dataTranspiredCollector->UTSC(Item).SchedPtr == 0) {
@@ -626,10 +624,10 @@ namespace TranspiredCollector {
                 if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Triangle) {                                                   // 'TRIANGLE'
                     state.dataTranspiredCollector->UTSC(Item).Porosity = 0.907 * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia / state.dataTranspiredCollector->UTSC(Item).Pitch);             // Kutscher equation, Triangle layout
                 } else if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Square) {                                              // 'SQUARE'
-                    state.dataTranspiredCollector->UTSC(Item).Porosity = (DataGlobalConstants::Pi() / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) / pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
+                    state.dataTranspiredCollector->UTSC(Item).Porosity = (DataGlobalConstants::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) / pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
                 }
             }
-            TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians();
+            TiltRads = std::abs(AvgTilt) * DataGlobalConstants::DegToRadians;
             tempHdeltaNPL = std::sin(TiltRads) * state.dataTranspiredCollector->UTSC(Item).Height / 4.0;
             state.dataTranspiredCollector->UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, state.dataTranspiredCollector->UTSC(Item).PlenGapThick);
 
@@ -732,7 +730,6 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         int UTSCUnitNum;
         static Array1D_bool MyEnvrnFlag;
@@ -784,7 +781,7 @@ namespace TranspiredCollector {
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);
                                     ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
@@ -1031,9 +1028,9 @@ namespace TranspiredCollector {
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
             InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
-            AbsThermSurf = dataMaterial.Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
-            TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv();
-            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv();
+            AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
+            TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
         //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
@@ -1151,7 +1148,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutEnth = PsyHFnTdbW(state.dataTranspiredCollector->UTSC(UTSCNum).SupOutTemp, state.dataTranspiredCollector->UTSC(UTSCNum).SupOutHumRat);
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = Mdot;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = SensHeatingRate;
-        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = SensHeatingRate * TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = 0.0;
@@ -1281,7 +1278,7 @@ namespace TranspiredCollector {
         state.dataTranspiredCollector->UTSC(UTSCNum).SupOutMassFlow = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingRate = 0.0;
         state.dataTranspiredCollector->UTSC(UTSCNum).SensHeatingEnergy = 0.0;
-        state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (state.dataTranspiredCollector->UTSC(UTSCNum).ProjArea * state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick)) * DataGlobalConstants::SecInHour();
+        state.dataTranspiredCollector->UTSC(UTSCNum).PassiveACH = (MdotVent / RhoAir) * (1.0 / (state.dataTranspiredCollector->UTSC(UTSCNum).ProjArea * state.dataTranspiredCollector->UTSC(UTSCNum).PlenGapThick)) * DataGlobalConstants::SecInHour;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotVent = MdotVent;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotWind = VdotWind * RhoAir;
         state.dataTranspiredCollector->UTSC(UTSCNum).PassiveMdotTherm = VdotThermal * RhoAir;

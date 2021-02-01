@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -428,9 +428,9 @@ private: // methods
 
     void doFinalProcessingOfCoilData(EnergyPlusData &state);
 
-    void writeCoilSelectionOutput();
+    void writeCoilSelectionOutput(EnergyPlusData &state);
 
-    void writeCoilSelectionOutput2();
+    void writeCoilSelectionOutput2(EnergyPlusData &state);
 
     int getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType  // idf input object class name of coil
@@ -447,6 +447,14 @@ extern std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
 void createCoilSelectionReportObj();
 
 void clearCoilSelectionReportObj();
+
+struct ReportCoilSelectionData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

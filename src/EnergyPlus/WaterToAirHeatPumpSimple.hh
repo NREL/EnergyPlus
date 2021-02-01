@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -335,7 +335,7 @@ namespace WaterToAirHeatPumpSimple {
 
         // Default Constructor
         WaterToAirHeatPumpSimpleData()
-            : CelsiustoKelvin(DataGlobalConstants::KelvinConv()), NumWatertoAirHPs(0), GetCoilsInputFlag(true),
+            : CelsiustoKelvin(DataGlobalConstants::KelvinConv), NumWatertoAirHPs(0), GetCoilsInputFlag(true),
               SourceSideMassFlowRate(0.0), SourceSideInletTemp(0.0), SourceSideInletEnth(0.0), LoadSideMassFlowRate(0.0),
               LoadSideInletDBTemp(0.0), LoadSideInletWBTemp(0.0), LoadSideInletHumRat(0.0), LoadSideInletEnth(0.0),
               LoadSideOutletDBTemp(0.0), LoadSideOutletHumRat(0.0), LoadSideOutletEnth(0.0), QSensible(0.0),

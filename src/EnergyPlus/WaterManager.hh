@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,6 +120,7 @@ namespace WaterManager {
         bool MyEnvrnFlag;   // flag for init once at start of environment
         bool MyWarmupFlag; // flag for init after warmup complete
         bool MyTankDemandCheckFlag;
+        Real64 overflowTwater = 0.0;
 
         void clear_state() override
         {
@@ -128,11 +129,12 @@ namespace WaterManager {
             this->MyEnvrnFlag = true;
             this->MyWarmupFlag = false;
             this->MyTankDemandCheckFlag = true;
+            this->overflowTwater = 0.0;
         }
 
         // Default Constructor
         WaterManagerData()
-            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
+            :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true), overflowTwater(0.0)
         {
         }
     };

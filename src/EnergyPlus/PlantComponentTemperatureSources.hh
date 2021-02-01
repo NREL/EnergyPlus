@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -66,12 +67,11 @@ struct EnergyPlusData;
 namespace PlantComponentTemperatureSources {
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const modTempSpecType_Constant;
-    extern int const modTempSpecType_Schedule;
-
-    // MODULE VARIABLES
-    extern int NumSources;
-    extern bool getWaterSourceInput; // then TRUE, calls subroutine to read input file.
+    enum class iTempSpecType {
+        Unassigned,
+        Constant,
+        Schedule,
+    };
 
     struct WaterSourceSpecs : PlantComponent
     {
@@ -85,7 +85,7 @@ namespace PlantComponentTemperatureSources {
         bool EMSOverrideOnMassFlowRateMax;      // if true EMS is calling to override maximum mass flow
         Real64 EMSOverrideValueMassFlowRateMax; // value to use if EMS is overriding max mass flow
         Real64 MassFlowRate;
-        int TempSpecType; // temperature specification type
+        iTempSpecType TempSpecType; // temperature specification type
         std::string TempSpecScheduleName;
         int TempSpecScheduleNum;
         Real64 BoundaryTemp;
@@ -103,9 +103,9 @@ namespace PlantComponentTemperatureSources {
         // Default Constructor
         WaterSourceSpecs()
             : InletNodeNum(0), OutletNodeNum(0), DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
-              EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), TempSpecType(0), TempSpecScheduleNum(0),
-              BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), Location(0, 0, 0, 0), SizFac(0.0),
-              CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
+              EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), TempSpecType(iTempSpecType::Unassigned),
+              TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), Location(0, 0, 0, 0),
+              SizFac(0.0), CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
         {
         }
 
@@ -133,17 +133,23 @@ namespace PlantComponentTemperatureSources {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    // Object Data
-    extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
-
     void GetWaterSourceInput(EnergyPlusData &state);
 
-    // object data
-    extern Array1D<WaterSourceSpecs> WaterSource;
-
-    void clear_state();
-
 } // namespace PlantComponentTemperatureSources
+
+struct PlantCompTempSrcData : BaseGlobalStruct {
+
+    int NumSources = 0;
+    bool getWaterSourceInput = true;
+    Array1D<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
+
+    void clear_state() override
+    {
+        this->NumSources = 0;
+        this->getWaterSourceInput = true;
+        this->WaterSource.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

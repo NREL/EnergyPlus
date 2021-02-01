@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,21 +58,17 @@ extern "C" {
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/char.functions.hh>
-// #include <ObjexxFCL/Array1.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
-#include "StringUtilities.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -83,6 +79,7 @@ extern "C" {
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -90,8 +87,8 @@ extern "C" {
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -643,9 +640,9 @@ namespace UtilityRoutines {
             sqlite->updateSQLiteSimulationRecord(true, false);
         }
 
-        AbortProcessing = true;
-        if (AskForConnectionsReport) {
-            AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
+        state.dataErrTracking->AbortProcessing = true;
+        if (state.dataErrTracking->AskForConnectionsReport) {
+            state.dataErrTracking->AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage(state, "Fatal error -- final processing.  More error messages may appear.");
             SetupNodeVarsForReporting(state);
@@ -668,12 +665,12 @@ namespace UtilityRoutines {
                 ReportLoopConnections(state);
             }
 
-        } else if (!ExitDuringSimulations) {
+        } else if (!state.dataErrTracking->ExitDuringSimulations) {
             ShowMessage(state, "Warning:  Node connection errors not checked - most system input has not been read (see previous warning).");
             ShowMessage(state, "Fatal error -- final processing.  Program exited before simulations began.  See previous error messages.");
         }
 
-        if (AskForSurfacesReport) {
+        if (state.dataErrTracking->AskForSurfacesReport) {
             ReportSurfaces(state);
         }
 
@@ -682,12 +679,12 @@ namespace UtilityRoutines {
         ShowRecurringErrors(state);
         SummarizeErrors(state);
         CloseMiscOpenFiles(state);
-        NumWarnings = fmt::to_string(TotalWarningErrors);
-        NumSevere = fmt::to_string(TotalSevereErrors);
-        NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
-        NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
-        NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
-        NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
+        NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
+        NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
+        NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
+        NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
+        NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
+        NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
         // catch up with timings if in middle
         Time_Finish = epElapsedTime();
@@ -705,10 +702,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -734,7 +731,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -826,17 +823,17 @@ namespace UtilityRoutines {
         ShowRecurringErrors(state);
         SummarizeErrors(state);
         CloseMiscOpenFiles(state);
-        NumWarnings = fmt::to_string(TotalWarningErrors);
+        NumWarnings = fmt::to_string(state.dataErrTracking->TotalWarningErrors);
         strip(NumWarnings);
-        NumSevere = fmt::to_string(TotalSevereErrors);
+        NumSevere = fmt::to_string(state.dataErrTracking->TotalSevereErrors);
         strip(NumSevere);
-        NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
+        NumWarningsDuringWarmup = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringWarmup);
         strip(NumWarningsDuringWarmup);
-        NumSevereDuringWarmup = fmt::to_string(TotalSevereErrorsDuringWarmup);
+        NumSevereDuringWarmup = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringWarmup);
         strip(NumSevereDuringWarmup);
-        NumWarningsDuringSizing = fmt::to_string(TotalWarningErrorsDuringSizing);
+        NumWarningsDuringSizing = fmt::to_string(state.dataErrTracking->TotalWarningErrorsDuringSizing);
         strip(NumWarningsDuringSizing);
-        NumSevereDuringSizing = fmt::to_string(TotalSevereErrorsDuringSizing);
+        NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
         strip(NumSevereDuringSizing);
 
         Time_Finish = epElapsedTime();
@@ -856,10 +853,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
@@ -884,7 +881,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -1043,8 +1040,8 @@ namespace UtilityRoutines {
         DisplayString(state, "**FATAL:" + ErrorMessage);
 
         ShowErrorMessage(state, " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2);
-        ShowErrorMessage(state, format(" ..... Reference severe error count={}", TotalSevereErrors), OutUnit1, OutUnit2);
-        ShowErrorMessage(state, " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2);
+        ShowErrorMessage(state, format(" ..... Reference severe error count={}", state.dataErrTracking->TotalSevereErrors), OutUnit1, OutUnit2);
+        ShowErrorMessage(state, " ..... Last severe error=" + state.dataErrTracking->LastSevereError, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
@@ -1076,14 +1073,14 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
-        ++TotalSevereErrors;
-        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalSevereErrorsDuringWarmup;
-        if (state.dataGlobal->DoingSizing) ++TotalSevereErrorsDuringSizing;
+        ++state.dataErrTracking->TotalSevereErrors;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataErrTracking->AbortProcessing) ++state.dataErrTracking->TotalSevereErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalSevereErrorsDuringSizing;
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
-        LastSevereError = ErrorMessage;
+        state.dataErrTracking->LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
 
@@ -1119,11 +1116,11 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Severe  ** " + ErrorMessage, OutUnit1, OutUnit2);
-        LastSevereError = ErrorMessage;
+        state.dataErrTracking->LastSevereError = ErrorMessage;
 
         //  Could set a variable here that gets checked at some point?
 
@@ -1272,12 +1269,12 @@ namespace UtilityRoutines {
         int Loop;
 
         for (Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
-        ++TotalWarningErrors;
-        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !AbortProcessing) ++TotalWarningErrorsDuringWarmup;
-        if (state.dataGlobal->DoingSizing) ++TotalWarningErrorsDuringSizing;
+        ++state.dataErrTracking->TotalWarningErrors;
+        if (state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation && !state.dataErrTracking->AbortProcessing) ++state.dataErrTracking->TotalWarningErrorsDuringWarmup;
+        if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->TotalWarningErrorsDuringSizing;
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
 
         if (sqlite) {
@@ -1309,7 +1306,7 @@ namespace UtilityRoutines {
         using namespace DataErrorTracking;
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-            if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
+            if (has(ErrorMessage, MessageSearch(Loop))) ++state.dataErrTracking->MatchCounts(Loop);
         }
 
         ShowErrorMessage(state, " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
@@ -1355,13 +1352,13 @@ namespace UtilityRoutines {
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
             if (has(Message, MessageSearch(Loop))) {
-                ++MatchCounts(Loop);
+                ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
         }
         bool bNewMessageFound = true;
-        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+        for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
                 bNewMessageFound = false;
                 MsgIndex = Loop;
                 break;
@@ -1371,7 +1368,7 @@ namespace UtilityRoutines {
             MsgIndex = 0;
         }
 
-        ++TotalSevereErrors;
+        ++state.dataErrTracking->TotalSevereErrors;
         StoreRecurringErrorMessage(state,
             " ** Severe  ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
@@ -1410,13 +1407,13 @@ namespace UtilityRoutines {
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
             if (has(Message, MessageSearch(Loop))) {
-                ++MatchCounts(Loop);
+                ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
         }
         bool bNewMessageFound = true;
-        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+        for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
                 bNewMessageFound = false;
                 MsgIndex = Loop;
                 break;
@@ -1426,7 +1423,7 @@ namespace UtilityRoutines {
             MsgIndex = 0;
         }
 
-        ++TotalWarningErrors;
+        ++state.dataErrTracking->TotalWarningErrors;
         StoreRecurringErrorMessage(state,
             " ** Warning ** " + Message, MsgIndex, ReportMaxOf, ReportMinOf, ReportSumOf, ReportMaxUnits, ReportMinUnits, ReportSumUnits);
     }
@@ -1465,13 +1462,13 @@ namespace UtilityRoutines {
 
         for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
             if (has(Message, MessageSearch(Loop))) {
-                ++MatchCounts(Loop);
+                ++state.dataErrTracking->MatchCounts(Loop);
                 break;
             }
         }
         bool bNewMessageFound = true;
-        for (int Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-            if (UtilityRoutines::SameString(RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
+        for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+            if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
                 bNewMessageFound = false;
                 MsgIndex = Loop;
                 break;
@@ -1512,54 +1509,54 @@ namespace UtilityRoutines {
         using namespace DataErrorTracking;
         // If Index is zero, then assign next available index and reallocate array
         if (ErrorMsgIndex == 0) {
-            RecurringErrors.redimension(++NumRecurringErrors);
-            ErrorMsgIndex = NumRecurringErrors;
+            state.dataErrTracking->RecurringErrors.redimension(++state.dataErrTracking->NumRecurringErrors);
+            ErrorMsgIndex = state.dataErrTracking->NumRecurringErrors;
             // The message string only needs to be stored once when a new recurring message is created
-            RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
-            RecurringErrors(ErrorMsgIndex).Count = 1;
-            if (state.dataGlobal->WarmupFlag) RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
-            if (state.dataGlobal->DoingSizing) RecurringErrors(ErrorMsgIndex).SizingCount = 1;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Message = ErrorMessage;
+            state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count = 1;
+            if (state.dataGlobal->WarmupFlag) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount = 1;
+            if (state.dataGlobal->DoingSizing) state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount = 1;
 
             // For max, min, and sum values, store the current value when a new recurring message is created
             if (present(ErrorReportMaxOf)) {
-                RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
-                RecurringErrors(ErrorMsgIndex).ReportMax = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue = ErrorReportMaxOf;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
                 if (!ErrorReportMaxUnits.empty()) {
-                    RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
+                    state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxUnits = ErrorReportMaxUnits;
                 }
             }
             if (present(ErrorReportMinOf)) {
-                RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
-                RecurringErrors(ErrorMsgIndex).ReportMin = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue = ErrorReportMinOf;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
                 if (!ErrorReportMinUnits.empty()) {
-                    RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
+                    state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinUnits = ErrorReportMinUnits;
                 }
             }
             if (present(ErrorReportSumOf)) {
-                RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
-                RecurringErrors(ErrorMsgIndex).ReportSum = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue = ErrorReportSumOf;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
                 if (!ErrorReportSumUnits.empty()) {
-                    RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
+                    state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumUnits = ErrorReportSumUnits;
                 }
             }
 
         } else if (ErrorMsgIndex > 0) {
             // Do stats and store
-            ++RecurringErrors(ErrorMsgIndex).Count;
-            if (state.dataGlobal->WarmupFlag) ++RecurringErrors(ErrorMsgIndex).WarmupCount;
-            if (state.dataGlobal->DoingSizing) ++RecurringErrors(ErrorMsgIndex).SizingCount;
+            ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).Count;
+            if (state.dataGlobal->WarmupFlag) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).WarmupCount;
+            if (state.dataGlobal->DoingSizing) ++state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SizingCount;
 
             if (present(ErrorReportMaxOf)) {
-                RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, RecurringErrors(ErrorMsgIndex).MaxValue);
-                RecurringErrors(ErrorMsgIndex).ReportMax = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue = max(ErrorReportMaxOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MaxValue);
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMax = true;
             }
             if (present(ErrorReportMinOf)) {
-                RecurringErrors(ErrorMsgIndex).MinValue = min(ErrorReportMinOf, RecurringErrors(ErrorMsgIndex).MinValue);
-                RecurringErrors(ErrorMsgIndex).ReportMin = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue = min(ErrorReportMinOf, state.dataErrTracking->RecurringErrors(ErrorMsgIndex).MinValue);
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportMin = true;
             }
             if (present(ErrorReportSumOf)) {
-                RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
-                RecurringErrors(ErrorMsgIndex).ReportSum = true;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).SumValue += ErrorReportSumOf;
+                state.dataErrTracking->RecurringErrors(ErrorMsgIndex).ReportSum = true;
             }
         } else {
             // If ErrorMsgIndex < 0, then do nothing
@@ -1639,12 +1636,12 @@ namespace UtilityRoutines {
         std::string::size_type StartC;
         std::string::size_type EndC;
 
-        if (any_gt(MatchCounts, 0)) {
+        if (any_gt(state.dataErrTracking->MatchCounts, 0)) {
             ShowMessage(state, "");
             ShowMessage(state, "===== Final Error Summary =====");
             ShowMessage(state, "The following error categories occurred.  Consider correcting or noting.");
             for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
-                if (MatchCounts(Loop) > 0) {
+                if (state.dataErrTracking->MatchCounts(Loop) > 0) {
                     ShowMessage(state, Summaries(Loop));
                     if (MoreDetails(Loop) != "") {
                         StartC = 0;
@@ -1689,12 +1686,12 @@ namespace UtilityRoutines {
         std::string MinOut;
         std::string SumOut;
 
-        if (NumRecurringErrors > 0) {
+        if (state.dataErrTracking->NumRecurringErrors > 0) {
             ShowMessage(state, "");
             ShowMessage(state, "===== Recurring Error Summary =====");
             ShowMessage(state, "The following recurring error messages occurred.");
-            for (Loop = 1; Loop <= NumRecurringErrors; ++Loop) {
-                auto const &error(RecurringErrors(Loop));
+            for (Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
+                auto const &error(state.dataErrTracking->RecurringErrors(Loop));
                 // Suppress reporting the count if it is a continue error
                 if (has_prefix(error.Message, " **   ~~~   ** ")) {
                     ShowMessage(state, error.Message);

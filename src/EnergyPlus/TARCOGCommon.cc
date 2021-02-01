@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,10 +111,10 @@ namespace TARCOGCommon {
 
         LDSumMax = 0.0;
         for (i = 1; i <= mmax; i += 2) {
-            Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2()));
+            Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
             for (j = 1; j <= nmax; j += 2) {
-                LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2())) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
+                LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
             } // do j = 1, nmax, 2
         }     // do i = 1, mmax, 2
 
@@ -135,7 +135,7 @@ namespace TARCOGCommon {
         Real64 LDSumMean;
 
         // Locals
-        static Real64 const Pi_squared(DataGlobalConstants::Pi() * DataGlobalConstants::Pi());
+        static Real64 const Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
         int i;
         int j;
 
@@ -232,7 +232,7 @@ namespace TARCOGCommon {
             }
 
             // second row
-            a(k, k + 1) = emis(front) * DataGlobalConstants::StefanBoltzmann() * pow_3(theta(front));
+            a(k, k + 1) = emis(front) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(front));
             a(k + 1, k + 1) = -1.0;
             if (i != 1) {
                 a(k - 2, k + 1) = rir(front);
@@ -243,7 +243,7 @@ namespace TARCOGCommon {
 
             // third row
             a(k + 2, k + 2) = -1.0;
-            a(k + 3, k + 2) = emis(back) * DataGlobalConstants::StefanBoltzmann() * pow_3(theta(back));
+            a(k + 3, k + 2) = emis(back) * DataGlobalConstants::StefanBoltzmann * pow_3(theta(back));
             if (i != 1) {
                 a(k - 2, k + 2) = tir(front);
             }

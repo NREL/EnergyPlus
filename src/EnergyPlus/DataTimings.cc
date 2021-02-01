@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -318,9 +318,6 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
 
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
-
         // Return value
         Real64 totalTimeUsed;
 
@@ -334,7 +331,7 @@ namespace DataTimings {
             found = loop;
         }
 
-        if (found == 0 && !AbortProcessing) {
+        if (found == 0 && !state.dataErrTracking->AbortProcessing) {
             ShowFatalError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
         } else {
             ShowSevereError(state, "epGetTimeUsed: No element=" + ctimingElementstring);
@@ -357,9 +354,6 @@ namespace DataTimings {
         // PURPOSE OF THIS FUNCTION:
         // Provides outside function to getting time used on a particular element
         // per Call.
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing;
 
         // Return value
         Real64 averageTimeUsed;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,43 +78,23 @@ namespace HVACMultiSpeedHeatPump {
     extern int const SuppHeatingCoilElec; // Supplymental heating coil type: COIL:ELECTRIC:HEATING
     extern int const SuppHeatingCoilRec;  // Supplymental heating coil type: COIL:ENGINEHEATRECOVERY:HEATING
 
-    // Curve Types
-    extern int const Linear;      // Linear curve type
-    extern int const BiLinear;    // Bi-linear curve type
-    extern int const Quadratic;   // Quadratic curve type
-    extern int const BiQuadratic; // Bi-quadratic curve type
-    extern int const Cubic;       // Cubic curve type
-
     // Mode of operation
-    extern int const CoolingMode; // System operating mode is cooling
-    extern int const HeatingMode; // System operating mode is heating
+    enum class ModeOfOperation {
+        Unassigned,
+        CoolingMode, // System operating mode is cooling
+        HeatingMode, // System operating mode is heating
+    };
 
-    // Airflow control for contant fan mode
-    extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    extern int const UseCompressorOffFlow; // set compressor OFF air flow rate equal to user defined value
+    // Airflow control for constant fan mode
+    enum class AirflowControl {
+        Unassigned,
+        UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+    };
+
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumMSHeatPumps; // Number of multi speed heat pumps
-    extern int AirLoopPass;    // Number of air loop pass
-    extern Real64 TempSteamIn; // steam coil steam inlet temperature
-
-    extern std::string CurrentModuleObject; // Object type for getting and error messages
-    extern Real64 CompOnMassFlow;           // System air mass flow rate w/ compressor ON
-    extern Real64 CompOffMassFlow;          // System air mass flow rate w/ compressor OFF
-    extern Real64 CompOnFlowRatio;          // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;         // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;            // fan speed ratio passed to on/off fan object
-    extern Real64 SupHeaterLoad;            // load to be met by supplemental heater [W]
-    extern Real64 SaveLoadResidual;         // Saved load residual used to check convergence
-    extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Types
 
@@ -186,8 +166,8 @@ namespace HVACMultiSpeedHeatPump {
         Array1D<Real64> HeatingSpeedRatio;  // Fan speed ratio in heating mode
         Array1D<Real64> CoolingSpeedRatio;  // Fan speed ratio in cooling mode
         bool CheckFanFlow;                  // Supply airflow check
-        int LastMode;                       // MSHP operation mode
-        int HeatCoolMode;                   // System operating mode (0 = floating, 1 = cooling, 2 = heating)
+        ModeOfOperation LastMode;           // MSHP operation mode
+        ModeOfOperation HeatCoolMode;       // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int AirLoopNumber;                  // Air loop served by the engine driven heat pump system
         int NumControlledZones;             // Number of controlled zones for this system
         int ZoneInletNode;                  // Zone inlet node number in the controlled zone
@@ -205,7 +185,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 HeatRecoveryInletTemp;       // Inlet temperature for heat recovery rate [C]
         Real64 HeatRecoveryOutletTemp;      // Outlet temperature for heat recovery rate [C]
         Real64 HeatRecoveryMassFlowRate;    // Mass flow rate for heat recovery rate [kg/s]
-        int AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        AirflowControl AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         int ErrIndexCyc;                    // Error index at low speed
         int ErrIndexVar;                    // Error index at high speed
         Real64 LoadLoss;                    // Air distribution system loss
@@ -264,10 +244,10 @@ namespace HVACMultiSpeedHeatPump {
               AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
               HRCompNum(0), AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
-              NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(0), HeatCoolMode(0), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
+              NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(ModeOfOperation::Unassigned), HeatCoolMode(ModeOfOperation::Unassigned), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
               CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0),
               SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0),
-              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(0), ErrIndexCyc(0),
+              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(AirflowControl::Unassigned), ErrIndexCyc(0),
               ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0), SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0),
               MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0), HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0),
@@ -413,6 +393,14 @@ namespace HVACMultiSpeedHeatPump {
     );
 
 } // namespace HVACMultiSpeedHeatPump
+
+struct HVACMultiSpeedHeatPumpData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -133,9 +133,6 @@ namespace ZoneDehumidifier {
         // Call appropriate subroutines to get input values, initialize variables, model performanc
         // update node information, report model outputs.
 
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
         Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
@@ -173,7 +170,7 @@ namespace ZoneDehumidifier {
             }
         }
 
-        QZnDehumidReq = ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
+        QZnDehumidReq = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).RemainingOutputReqToDehumidSP; // Negative means dehumidify
 
         InitZoneDehumidifier(state, ZoneDehumidNum);
 
@@ -263,7 +260,7 @@ namespace ZoneDehumidifier {
 
             // A2,  \field Availability Schedule Name
             if (lAlphaBlanks(2)) {
-                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr = GetScheduleIndex(state, Alphas(2)); // Convert schedule name to pointer
                 if (state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).SchedPtr == 0) {
@@ -555,7 +552,6 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbRhPb;
 
@@ -590,7 +586,7 @@ namespace ZoneDehumidifier {
         }
 
         // Need to check all dehumidifiers to see if they are on Zone Equipment List or issue warning
-        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataZoneDehumidifier->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataZoneDehumidifier->ZoneEquipmentListChecked = true;
             for (LoopIndex = 1; LoopIndex <= state.dataZoneDehumidifier->NumDehumidifiers; ++LoopIndex) {
                 if (CheckZoneEquipmentList(state, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).UnitType, state.dataZoneDehumidifier->ZoneDehumid(LoopIndex).Name)) continue;
@@ -798,7 +794,7 @@ namespace ZoneDehumidifier {
             WaterRemovalVolRate = WaterRemovalRateFactor * state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumNum).RatedWaterRemoval;
 
             WaterRemovalMassRate =
-                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour() * 1000.0) *
+                WaterRemovalVolRate / (24.0 * DataGlobalConstants::SecInHour * 1000.0) *
                 RhoH2O(max((InletAirTemp - 11.0), 1.0)); //(L/d)/(24 hr/day *3600 sec/hr * 1000 L/m3) | Density of water, minimum temp = 1.0C
 
             if (WaterRemovalMassRate > 0.0) {
@@ -1078,7 +1074,7 @@ namespace ZoneDehumidifier {
         Real64 OutletAirTemp;     // Dry-bulb temperature of air leaving the dehumidifier (C)
         int AirInletNodeNum;      // Node number corresponding to the air entering dehumidifier
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingEnergy = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).SensHeatingRate * ReportingConstant;
         state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemoved = state.dataZoneDehumidifier->ZoneDehumid(DehumidNum).WaterRemovalRate * ReportingConstant;

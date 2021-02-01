@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
@@ -65,8 +65,6 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 
 namespace EnergyPlus {
 
@@ -192,12 +190,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
-    ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
+    ScheduleManager::Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 
     Real64 zoneAssumedTemperature1 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv1(fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv1(*state, fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
 
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
@@ -206,13 +204,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
     Real64 coolingSetpoint2 = 24.0;
     Real64 zoneAssumedTemperature2 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv2(fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv2(*state, fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
 
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
@@ -221,7 +219,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
@@ -230,7 +228,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv3(fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv3(*state, fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
 
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
@@ -239,7 +237,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
@@ -247,7 +245,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv4(*state, fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
 
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature
@@ -256,7 +254,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv(), 0.001);
+    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
 }
 
 } // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,8 +69,8 @@ namespace TARCOGGassesParams {
 
     // REAL(r64), parameter :: pi       = 3.14159265358979323846d0
     // REAL(r64), parameter :: UniversalGasConst = 8314.462175d0 !(J/mol*K)
-    extern Real64 const alpha1;             // accomodation coefficient for low pressure gas calculations
-    extern Real64 const alpha2;             // accomodation coefficient for low pressure gas calculations
+    extern Real64 const alpha1;             // accommodation coefficient for low pressure gas calculations
+    extern Real64 const alpha2;             // accommodation coefficient for low pressure gas calculations
     extern Real64 const InputDataTolerance; // coefficient used for input data tolerance in case for displaying error message
 
 } // namespace TARCOGGassesParams

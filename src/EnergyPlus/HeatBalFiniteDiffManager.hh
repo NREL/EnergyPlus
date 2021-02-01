@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -110,6 +111,16 @@ namespace HeatBalFiniteDiffManager {
         }
     };
 
+    struct MaterialActuatorData {
+        std::string actuatorName;
+        bool isActuated;
+        Real64 actuatedValue;
+
+        MaterialActuatorData () :
+            isActuated(false), actuatedValue(0.0)
+        {}
+    };
+
     struct SurfaceDataFD
     {
         // Members
@@ -144,6 +155,10 @@ namespace HeatBalFiniteDiffManager {
         Array1D<int> PhaseChangeStateOld;
         Array1D<int> PhaseChangeStateOldOld;
         Array1D<Real64> PhaseChangeTemperatureReverse;
+        Array1D<MaterialActuatorData> condMaterialActuators;
+        Array1D<MaterialActuatorData> specHeatMaterialActuators;
+        Array1D<Real64> condNodeReport;
+        Array1D<Real64> specHeatNodeReport;
 
         // Default Constructor
         SurfaceDataFD()
@@ -202,6 +217,8 @@ namespace HeatBalFiniteDiffManager {
     void InitHeatBalFiniteDiff(EnergyPlusData &state);
 
     void InitialInitHeatBalFiniteDiff(EnergyPlusData &state);
+
+    int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName);
 
     void CalcHeatBalFiniteDiff(EnergyPlusData &state,
                                int const Surf,
@@ -301,6 +318,14 @@ namespace HeatBalFiniteDiffManager {
                                         Real64 &updatedThermalConductivity);
 
 } // namespace HeatBalFiniteDiffManager
+
+struct HeatBalFiniteDiffMgr : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

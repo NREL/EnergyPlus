@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <map>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -144,31 +145,31 @@ namespace DataGlobalConstants {
         ReadAllWeatherData = 6          // a weather period for reading all weather data prior to the simulation
     };
 
-    Real64 constexpr MaxEXPArg () { return 709.78; }                        // maximum exponent in EXP() function
-    Real64 constexpr Pi () { return 3.14159265358979324; }                  // Pi 3.1415926535897932384626435
-    Real64 constexpr PiOvr2 () { return Pi() / 2.0; }                       // Pi/2
-    Real64 constexpr TwoPi () { return 2.0 * Pi(); }                        // 2*Pi 6.2831853071795864769252868
-    Real64 constexpr GravityConstant () { return 9.807; }
-    Real64 constexpr DegToRadians () { return Pi() / 180.0; }               // Conversion for Degrees to Radians
-    Real64 constexpr RadToDeg () { return 180.0 / Pi(); }                   // Conversion for Radians to Degrees
-    Real64 constexpr SecInHour () { return 3600.0; }                        // Conversion for hours to seconds
-    Real64 constexpr HoursInDay () { return 24.0; }                         // Number of Hours in Day
-    Real64 constexpr SecsInDay () { return SecInHour() * HoursInDay(); }    // Number of seconds in Day
-    Real64 constexpr BigNumber () { return std::numeric_limits< Real64 >::max(); }  // Max Number real used for initializations
-    Real64 constexpr rTinyValue () { return std::numeric_limits< Real64 >::epsilon(); }   // Tiny value to replace use of TINY(x)
-    std::string::size_type constexpr MaxNameLength () { return 100; }       // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
-    Real64 constexpr KelvinConv () { return 273.15; }                       // Conversion factor for C to K and K to C
-    Real64 constexpr InitConvTemp () { return 5.05; }                       // [deg C], standard init vol to mass flow conversion temp
-    Real64 constexpr AutoCalculate () { return -99999.0; }                  // automatically calculate some fields.
-    Real64 constexpr CWInitConvTemp () { return 5.05; }                     // [deg C], standard init chilled water vol to mass flow conversion temp
-    Real64 constexpr HWInitConvTemp () { return 60.0; }                     // [deg C], standard init hot water vol to mass flow conversion temp
-    Real64 constexpr SteamInitConvTemp () { return 100.0; }                 // [deg C], standard init steam vol to mass flow conversion temp
-    Real64 constexpr StefanBoltzmann () { return 5.6697E-8; }               // Stefan-Boltzmann constant in W/(m2*K4)
-    Real64 constexpr UniversalGasConst () { return 8314.462175; }           // Universal Gas Constant (J/mol*K)
-    Real64 constexpr convertJtoGJ () { return 1.0E-9; }                     // Conversion factor for J to GJ
-    int constexpr MaxSpeedLevels () { return 10; }                          // Maximum number of speed that supports
-    int constexpr ScheduleAlwaysOn () { return -1; }                        // Value when passed to schedule routines gives back 1.0 (on)
-    int constexpr MaxCTFTerms () { return 19; }                             // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
+    Real64 constexpr MaxEXPArg = 709.78;                         // maximum exponent in EXP() function
+    Real64 constexpr Pi = 3.14159265358979324;                   // Pi 3.1415926535897932384626435
+    Real64 constexpr PiOvr2 = Pi / 2.0;                          // Pi/2
+    Real64 constexpr TwoPi = 2.0 * Pi;                           // 2*Pi 6.2831853071795864769252868
+    Real64 constexpr GravityConstant = 9.807;
+    Real64 constexpr DegToRadians = Pi / 180.0;                  // Conversion for Degrees to Radians
+    Real64 constexpr RadToDeg = 180.0 / Pi;                      // Conversion for Radians to Degrees
+    Real64 constexpr SecInHour = 3600.0;                         // Conversion for hours to seconds
+    Real64 constexpr HoursInDay = 24.0;                          // Number of Hours in Day
+    Real64 constexpr SecsInDay = SecInHour * HoursInDay;     // Number of seconds in Day
+    Real64 constexpr BigNumber = std::numeric_limits< Real64 >::max();   // Max Number real used for initializations
+    Real64 constexpr rTinyValue = std::numeric_limits< Real64 >::epsilon();    // Tiny value to replace use of TINY(x)
+    std::string::size_type constexpr MaxNameLength = 100;        // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
+    Real64 constexpr KelvinConv = 273.15;                        // Conversion factor for C to K and K to C
+    Real64 constexpr InitConvTemp = 5.05;                        // [deg C], standard init vol to mass flow conversion temp
+    Real64 constexpr AutoCalculate = -99999.0;                   // automatically calculate some fields.
+    Real64 constexpr CWInitConvTemp = 5.05;                      // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 constexpr HWInitConvTemp = 60.0;                      // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 constexpr SteamInitConvTemp = 100.0;                  // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 constexpr StefanBoltzmann = 5.6697E-8;                // Stefan-Boltzmann constant in W/(m2*K4)
+    Real64 constexpr UniversalGasConst = 8314.462175;            // Universal Gas Constant (J/mol*K)
+    Real64 constexpr convertJtoGJ = 1.0E-9;                      // Conversion factor for J to GJ
+    int constexpr MaxSpeedLevels = 10;                           // Maximum number of speed that supports
+    int constexpr ScheduleAlwaysOn = -1;                         // Value when passed to schedule routines gives back 1.0 (on)
+    int constexpr MaxCTFTerms = 19;                              // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);
     std::string GetResourceTypeChar(ResourceType ResourceTypeNum);
@@ -177,6 +178,14 @@ namespace DataGlobalConstants {
     extern std::map<EndUse, int> iEndUse;
 
 } // namespace DataGlobalConstants
+
+struct DataGlobalConstantsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

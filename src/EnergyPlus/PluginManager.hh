@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,7 +82,7 @@ namespace PluginManagement {
 
     void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void (void *)>& f);
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan);
-    void onBeginEnvironment();
+    void onBeginEnvironment(EnergyPlusData &state);
     std::string pythonStringForUsage(EnergyPlusData &state);
 
     void clear_state();
@@ -178,33 +178,33 @@ namespace PluginManagement {
 
     class PluginManager {
     public:
-        PluginManager(EnergyPlusData &state);
+        explicit PluginManager(EnergyPlusData &state);
         ~PluginManager();
 
-        static int numActiveCallbacks();
+        static int numActiveCallbacks(EnergyPlusData &state);
         static void addToPythonPath(EnergyPlusData &state, const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
-        void addGlobalVariable(const std::string& name);
+        void addGlobalVariable(EnergyPlusData &state, const std::string& name);
         static int getGlobalVariableHandle(EnergyPlusData &state, const std::string& name, bool suppress_warning = false);
         static Real64 getGlobalVariableValue(EnergyPlusData &state, int handle);
         static void setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value);
 
         int maxTrendVariableIndex = -1;
-        static int getTrendVariableHandle(const std::string& name);
-        static Real64 getTrendVariableValue(int handle, int timeIndex);
-        static size_t getTrendVariableHistorySize(int handle);
-        static Real64 getTrendVariableAverage(int handle, int count);
-        static Real64 getTrendVariableMin(int handle, int count);
-        static Real64 getTrendVariableMax(int handle, int count);
-        static Real64 getTrendVariableSum(int handle, int count);
-        static Real64 getTrendVariableDirection(int handle, int count);
+        static int getTrendVariableHandle(EnergyPlusData &state, const std::string& name);
+        static Real64 getTrendVariableValue(EnergyPlusData &state, int handle, int timeIndex);
+        static size_t getTrendVariableHistorySize(EnergyPlusData &state, int handle);
+        static Real64 getTrendVariableAverage(EnergyPlusData &state, int handle, int count);
+        static Real64 getTrendVariableMin(EnergyPlusData &state, int handle, int count);
+        static Real64 getTrendVariableMax(EnergyPlusData &state, int handle, int count);
+        static Real64 getTrendVariableSum(EnergyPlusData &state, int handle, int count);
+        static Real64 getTrendVariableDirection(EnergyPlusData &state, int handle, int count);
 
         static void updatePluginValues(EnergyPlusData &state);
 
-        static int getLocationOfUserDefinedPlugin(std::string const &programName);
+        static int getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName);
         static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
     };
@@ -224,16 +224,38 @@ namespace PluginManagement {
         }
     };
 
-    extern std::unique_ptr<PluginManager> pluginManager;
-    extern std::vector<PluginTrendVariable> trends;
-    extern std::vector<std::string> globalVariableNames;
-    extern std::vector<Real64> globalVariableValues;
-
-    // some flags
-    extern bool fullyReady;
-    extern bool apiErrorFlag;
-
 }
+
+struct PluginManagerData : BaseGlobalStruct {
+    std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
+    std::unique_ptr<PluginManagement::PluginManager> pluginManager;
+    std::vector<PluginManagement::PluginTrendVariable> trends;
+    std::vector<PluginManagement::PluginInstance> plugins;
+
+    std::vector<std::string> globalVariableNames;
+    std::vector<Real64> globalVariableValues;
+    bool fullyReady = false;
+    bool apiErrorFlag = false;
+
+    void clear_state() override {
+        callbacks.clear();
+#if LINK_WITH_PYTHON == 1
+        for (auto &plugin : plugins) {
+            plugin.shutdown(); // clear unmanaged memory first
+        }
+        trends.clear();
+        globalVariableNames.clear();
+        globalVariableValues.clear();
+        plugins.clear();
+        fullyReady = false;
+        apiErrorFlag = false;
+        auto * p = pluginManager.release();
+        delete p;
+#endif
+    }
+
+};
+
 }
 
 #endif // EPLUS_PLUGIN_MANAGER_HH

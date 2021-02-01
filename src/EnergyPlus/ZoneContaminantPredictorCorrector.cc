@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,8 @@
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -1119,7 +1117,7 @@ namespace ZoneContaminantPredictorCorrector {
 
             state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedule = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn(); // (Returns 1.0)
+                state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn; // (Returns 1.0)
             } else {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
@@ -1195,7 +1193,7 @@ namespace ZoneContaminantPredictorCorrector {
             if (NumAlphas > 6) {
                 state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedule = cAlphaArgs(7);
                 if (lAlphaFieldBlanks(7)) {
-                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).GCAvaiSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
                     if (state.dataContaminantBalance->ContaminantControlledZone(ContControlledZoneNum).AvaiSchedPtr == 0) {
@@ -1252,7 +1250,6 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Using/Aliasing
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalCO2Gains;
         using InternalHeatGains::SumAllInternalCO2GainsExceptPeople; // Added for hybrid model
         using InternalHeatGains::SumAllInternalGenericContamGains;
@@ -1467,16 +1464,16 @@ namespace ZoneContaminantPredictorCorrector {
             state.dataZoneContaminantPredictorCorrector->MyDayFlag = true;
         }
 
-        if (allocated(ZoneEquipConfig) && state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag) {
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataZoneContaminantPredictorCorrector->MyConfigOneTimeFlag) {
             for (ContZoneNum = 1; ContZoneNum <= state.dataContaminantBalance->NumContControlledZones; ++ContZoneNum) {
                 ZoneNum = state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).ActualZoneNum;
-                for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
-                    int AirLoopNum = ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++zoneInNode) {
+                    int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(zoneInNode);
                     state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).NumOfZones = 0;
                     for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                        if (!ZoneEquipConfig(Loop).IsControlled) continue;
-                        for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
-                            if (AirLoopNum == ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(Loop).IsControlled) continue;
+                        for (int zoneInNode2 = 1; zoneInNode2 <= state.dataZoneEquip->ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
+                            if (AirLoopNum == state.dataZoneEquip->ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
                                 ++state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).NumOfZones;
                                 break; // only count a zone once
                             }
@@ -1486,9 +1483,9 @@ namespace ZoneContaminantPredictorCorrector {
                         state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).ControlZoneNum.allocate(state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).NumOfZones);
                         I = 1;
                         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
-                            if (!ZoneEquipConfig(Loop).IsControlled) continue;
-                            for (int zoneInNode2 = 1; zoneInNode2 <= ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
-                                if (AirLoopNum == ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
+                            if (!state.dataZoneEquip->ZoneEquipConfig(Loop).IsControlled) continue;
+                            for (int zoneInNode2 = 1; zoneInNode2 <= state.dataZoneEquip->ZoneEquipConfig(Loop).NumInletNodes; ++zoneInNode2) {
+                                if (AirLoopNum == state.dataZoneEquip->ZoneEquipConfig(Loop).InletNodeAirLoopNum(zoneInNode2)) {
                                     state.dataContaminantBalance->ContaminantControlledZone(ContZoneNum).ControlZoneNum(I) = Loop;
                                     ++I;
                                     break; // only count a zone once
@@ -1816,7 +1813,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     CO2Gain = state.dataContaminantBalance->ZoneCO2Gain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone CO2.  The A, B, C coefficients are analogous to the CO2 balance.
@@ -1923,7 +1920,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // to determine system added/subtracted moisture.
                     GCGain = state.dataContaminantBalance->ZoneGCGain(ZoneNum) * RhoAir * 1.0e6;
 
-                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
+                    SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
                     // Calculate the coefficients for the 3rd Order derivative for final
                     // zone GC.  The A, B, C coefficients are analogous to the GC balance.
@@ -2139,7 +2136,7 @@ namespace ZoneContaminantPredictorCorrector {
         Real64 UpperBound(0.0); // Upper bound of number of people
 
         Real64 SysTimeStepInSeconds(0.0);
-        SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
+        SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
         Zone(ZoneNum).ZoneMeasuredCO2Concentration = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredCO2ConcentrationSchedulePtr);
 
@@ -2185,8 +2182,8 @@ namespace ZoneContaminantPredictorCorrector {
                 }
 
                 // Add threshold for air change rate
-                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / DataGlobalConstants::SecInHour() * Zone(ZoneNum).Volume)));
-                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / DataGlobalConstants::SecInHour();
+                ACH_inf = max(0.0, min(10.0, M_inf / (CpAir * AirDensity / DataGlobalConstants::SecInHour * Zone(ZoneNum).Volume)));
+                M_inf = ACH_inf * Zone(ZoneNum).Volume * AirDensity / DataGlobalConstants::SecInHour;
                 Zone(ZoneNum).MCPIHM = M_inf;
                 Zone(ZoneNum).InfilOAAirChangeRateHM = ACH_inf;
             }
@@ -2274,11 +2271,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataZoneEquipment::ZoneEquipConfig;
-        //using ZonePlenum::NumZoneReturnPlenums;
-        //using ZonePlenum::NumZoneSupplyPlenums;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
+
 
         static std::string const RoutineName("CorrectZoneContaminants");
 
@@ -2394,7 +2387,7 @@ namespace ZoneContaminantPredictorCorrector {
             ControlledZoneAirFlag = false;
             for (ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigNum) {
                 if (!Zone(ZoneEquipConfigNum).IsControlled) continue;
-                if (ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
+                if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).ActualZoneNum != ZoneNum) continue;
                 ControlledZoneAirFlag = true;
                 break;
             } // ZoneEquipConfigNum
@@ -2416,19 +2409,19 @@ namespace ZoneContaminantPredictorCorrector {
             if (ControlledZoneAirFlag) { // If there is system flow then calculate the flow rates
 
                 // Calculate moisture flow rate into each zone
-                for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
 
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        CO2MassFlowRate += (Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                            Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).CO2) /
+                        CO2MassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                                            Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).CO2) /
                                            ZoneMult;
                     }
                     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        GCMassFlowRate += (Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
-                                           Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).GenContam) /
+                        GCMassFlowRate += (Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
+                                           Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).GenContam) /
                                           ZoneMult;
                     }
-                    ZoneMassFlowRate += Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
+                    ZoneMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate / ZoneMult;
                 } // NodeNum
 
                 // Do the calculations for the plenum zone
@@ -2487,7 +2480,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneMassFlowRate += Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate / ZoneMult;
             }
 
-            SysTimeStepInSeconds = DataGlobalConstants::SecInHour() * TimeStepSys;
+            SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
             // Calculate the coefficients for the 3rd order derivative for final
             // zone humidity ratio.  The A, B, C coefficients are analogous to the

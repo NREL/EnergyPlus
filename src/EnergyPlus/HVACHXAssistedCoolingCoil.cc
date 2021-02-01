@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,11 +54,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -105,13 +105,6 @@ namespace HVACHXAssistedCoolingCoil {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
-
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
     int TotalNumHXAssistedCoils(0);             // The total number of HXAssistedCoolingCoil compound objects
@@ -160,7 +153,8 @@ namespace HVACHXAssistedCoolingCoil {
         CheckEquipName.deallocate();
     }
 
-    void SimHXAssistedCoolingCoil(EnergyPlusData &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+    void SimHXAssistedCoolingCoil(EnergyPlusData &state,
+                                  std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -231,7 +225,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         // Initialize HXAssistedCoolingCoil Flows
-        InitHXAssistedCoolingCoil(HXAssistedCoilNum);
+        InitHXAssistedCoolingCoil(state, HXAssistedCoilNum);
 
         if (present(HXUnitEnable)) {
             HXUnitOn = HXUnitEnable;
@@ -800,7 +794,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHXAssistedCoolingCoil(int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
+    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum) // index for HXAssistedCoolingCoil
     {
 
         // SUBROUTINE INFORMATION:
@@ -815,33 +809,12 @@ namespace HVACHXAssistedCoolingCoil {
         // METHODOLOGY EMPLOYED:
         //  Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-
-        // Using/Aliasing
-        using DXCoils::DXCoilFullLoadOutAirHumRat;
-        using DXCoils::DXCoilFullLoadOutAirTemp;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        //  na
-
-        // DERIVED TYPE DEFINITIONS
-        //  na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  na
-
         // Do these initializations every time
         HXAssistedCoil(HXAssistedCoilNum).MassFlowRate = Node(HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum).MassFlowRate;
 
         if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            DXCoilFullLoadOutAirTemp(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
-            DXCoilFullLoadOutAirHumRat(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+            state.dataDXCoils->DXCoilFullLoadOutAirTemp(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
+            state.dataDXCoils->DXCoilFullLoadOutAirHumRat(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
         } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             //
         }

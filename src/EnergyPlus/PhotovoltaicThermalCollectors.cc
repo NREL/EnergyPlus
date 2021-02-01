@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,7 +155,7 @@ namespace PhotovoltaicThermalCollectors {
         this->initialize(state, FirstHVACIteration);
         this->control();
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void GetPVTcollectorsInput(EnergyPlusData &state)
@@ -470,7 +470,7 @@ namespace PhotovoltaicThermalCollectors {
         }
 
         if (this->SetLoopIndexFlag) {
-            if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -521,7 +521,7 @@ namespace PhotovoltaicThermalCollectors {
                         } else {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
+                                PVT(PVTindex).HVACOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, DataHVACGlobals::SetPointErrorFlag);
                             if (DataHVACGlobals::SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
                                 ShowContinueError(state, "Add a setpoint manager to outlet node of PVT named " + PVT(PVTindex).Name);
@@ -578,9 +578,9 @@ namespace PhotovoltaicThermalCollectors {
                 if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
 
                     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp(),
-                                                                   DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
                                                                    RoutineName);
 
                     this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
@@ -658,10 +658,10 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
 
             if (!allocated(DataSizing::PlantSizData)) return;
-            if (!allocated(DataPlant::PlantLoop)) return;
+            if (!allocated(state.dataPlnt->PlantLoop)) return;
 
             if (this->WLoopNum > 0) {
-                PltSizNum = DataPlant::PlantLoop(this->WLoopNum).PlantSizNum;
+                PltSizNum = state.dataPlnt->PlantLoop(this->WLoopNum).PlantSizNum;
             }
             if (this->WLoopSideNum == DataPlant::SupplySide) {
                 if (PltSizNum > 0) {
@@ -672,13 +672,13 @@ namespace PhotovoltaicThermalCollectors {
                     }
                 } else {
                     if (this->DesignVolFlowRateWasAutoSized) {
-                        if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                        if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             ShowSevereError(state, "Autosizing of PVT solar collector design flow rate requires a Sizing:Plant object");
                             ShowContinueError(state, "Occurs in PVT object=" + this->Name);
                             ErrorsFound = true;
                         }
                     } else { // Hardsized
-                        if (DataPlant::PlantFinalSizesOkayToReport && this->DesignVolFlowRate > 0.0) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport && this->DesignVolFlowRate > 0.0) {
                             BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
                                                          "User-Specified Design Flow Rate [m3/s]",
@@ -691,11 +691,11 @@ namespace PhotovoltaicThermalCollectors {
             }
             if (this->DesignVolFlowRateWasAutoSized) {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
-                if (DataPlant::PlantFinalSizesOkayToReport) {
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                         "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                 }
-                if (DataPlant::PlantFirstSizesOkayToReport) {
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
                                                  "Initial Design Size Design Flow Rate [m3/s]",
@@ -704,7 +704,7 @@ namespace PhotovoltaicThermalCollectors {
                 PlantUtilities::RegisterPlantCompDesignFlow(this->PlantInletNodeNum, this->DesignVolFlowRate);
 
             } else { // Hardsized with sizing data
-                if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
+                if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
                     Real64 DesignVolFlowRateUser = this->DesignVolFlowRate;
                     BaseSizer::reportSizerOutput(state, "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
@@ -946,7 +946,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermEfficiency = Eff;
                 this->Report.ThermHeatGain = PotentialHeatGain;
                 this->Report.ThermPower = this->Report.ThermHeatGain;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermHeatLoss = 0.0;
                 this->Report.TinletWorkFluid = Tinlet;
                 this->Report.MdotWorkFluid = mdot;
@@ -1012,7 +1012,7 @@ namespace PhotovoltaicThermalCollectors {
                 this->Report.ThermHeatLoss = mdot * CpInlet * (Tinlet - this->Report.ToutletWorkFluid);
                 this->Report.ThermHeatGain = 0.0;
                 this->Report.ThermPower = -1.0 * this->Report.ThermHeatLoss;
-                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+                this->Report.ThermEnergy = this->Report.ThermPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
                 this->Report.ThermEfficiency = 0.0;
                 this->Simple.LastCollectorTemp = Tcollector;
                 this->Report.BypassStatus = BypassFraction;
@@ -1031,7 +1031,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::update()
+    void PVTCollectorStruct::update(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1049,7 +1049,7 @@ namespace PhotovoltaicThermalCollectors {
                 InletNode = this->PlantInletNodeNum;
                 OutletNode = this->PlantOutletNodeNum;
 
-                PlantUtilities::SafeCopyPlantNode(InletNode, OutletNode);
+                PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
                 DataLoopNode::Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
 
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
