@@ -417,6 +417,7 @@ ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDaylightingAndShadeControl.idf EPW_FILE
 ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDaylightingAngleFac.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PurchAirWithDoubleFacadeDaylighting.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 if (LINK_WITH_PYTHON)
+ADD_SIMULATION_TEST(IDF_FILE PythonPlugin1ZoneUncontrolledCondFD.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginAirflowNetworkOpeningControlByHumidity.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginConstantVolumePurchasedAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE PythonPluginCurveOverride_PackagedTerminalHeatPump.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
