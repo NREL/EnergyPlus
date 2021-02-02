@@ -5106,7 +5106,7 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
+        //       MODIFIED       J. Yuan Jan 2021 for dual unit accommondation
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -5118,17 +5118,9 @@ namespace EnergyPlus::OutputReportTabular {
         FillRemainingPredefinedEntries(state);
         auto &ort(state.dataOutRptTab);
 
-        if (unitSQLiteTable == 0) {
-            ort->unitsStyle_SQLite = iUnitsStyle::None;
-        } else if (unitSQLiteTable == 1) {
-            ort->unitsStyle_SQLite = iUnitsStyle::JtoKWH;
-        } else if (unitSQLiteTable == 2) {
-            ort->unitsStyle_SQLite = iUnitsStyle::JtoMJ;
-        } else if (unitSQLiteTable == 3) {
-            ort->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
-        } else if (unitSQLiteTable == 4) {
-            ort->unitsStyle_SQLite = iUnitsStyle::InchPound;
-        } else {
+        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc) 
+        // when ort->unitStyle is concretely processed and assigned.
+        if (ort->unitsStyle_SQLite == iUnitsStyle::NotFound) {
             ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
         }
 
