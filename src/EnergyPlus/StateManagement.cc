@@ -212,8 +212,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    MoistureBalanceEMPDManager::clear_state();
-    NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
