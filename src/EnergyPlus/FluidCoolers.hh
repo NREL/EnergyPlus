@@ -61,17 +61,11 @@ namespace EnergyPlus {
 
 namespace FluidCoolers {
 
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cFluidCooler_SingleSpeed;
-    extern std::string const cFluidCooler_TwoSpeed;
-
     enum class PerfInputMethod
     {
         NOMINAL_CAPACITY,
         U_FACTOR
     };
-
-    extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
 
     struct FluidCoolerspecs : PlantComponent
     {
@@ -204,10 +198,8 @@ namespace FluidCoolers {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string const &objectName);
     };
-
-    extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
     void GetFluidCoolerInput(EnergyPlusData &state);
 
@@ -218,15 +210,21 @@ namespace FluidCoolers {
                                        Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 
-    void clear_state();
-
 } // namespace FluidCoolers
 
 struct FluidCoolersData : BaseGlobalStruct {
 
+    bool GetFluidCoolerInputFlag = true;
+    int NumSimpleFluidCoolers = 0;
+    Array1D<FluidCoolers::FluidCoolerspecs> SimpleFluidCooler;
+    std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
+
     void clear_state() override
     {
-
+        this->GetFluidCoolerInputFlag = true;
+        this->NumSimpleFluidCoolers = 0;
+        this->SimpleFluidCooler.deallocate();
+        this->UniqueSimpleFluidCoolerNames.clear();
     }
 };
 

@@ -847,9 +847,6 @@ namespace HVACControllers {
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
-        // Set again in ReportController() to ControllerProps(ControlNum)%NextActuatedValue
-        //  IF (FirstHVACIteration) THEN
-        // DSU3    Node(ActuatedNode)%MassFlowRate = 0.0d0
         NoFlowResetValue = 0.0;
         SetActuatedBranchFlowRate(state, NoFlowResetValue,
                                   ControllerProps(ControlNum).ActuatedNode,
