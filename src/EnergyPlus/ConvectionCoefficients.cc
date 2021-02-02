@@ -8193,7 +8193,7 @@ namespace ConvectionCoefficients {
         if (Tilt == 0 || Tilt == 180) {             // Horizontal roof or floor
             L = std::sqrt(Surface(SurfNum).Area);
         } else {
-            L = Surface(SurfNum).Height;
+            L = Surface(SurfNum).Height;            // 
         }
 
         if (Surface(SurfNum).ExtBoundCond == 0) {
@@ -8219,67 +8219,71 @@ namespace ConvectionCoefficients {
         Re = (v * L) / visc;
 
         // Natural convection (Nun)
-        if (Tilt == 0) {                       // Horizontal surface: Roof
-            if (DeltaTemp > 0) {               // heat flow down
-                Nun = 0.58 * std::pow(Ra, 0.2);
-            } else if (Ra < 8000000) {         // heat flow up
-                Nun = 0.54 * std::pow(Ra, 0.25);
-            } else {
-                Nun = 0.15 * std::pow(Ra, OneThird);
-            }
-        } else if (Tilt > 0 && Tilt < 90) {    // Tilted roof
-            if (DeltaTemp > 0) {               // heat flow down
-                if (Tilt < 2) {
+        if (Surface(SurfNum).Class == SurfaceClass::Roof) {
+            if (Tilt == 0) {         // Horizontal surface
+                if (DeltaTemp > 0) { // heat flow down
                     Nun = 0.58 * std::pow(Ra, 0.2);
+                } else if (Ra < 8000000) { // heat flow up
+                    Nun = 0.54 * std::pow(Ra, 0.25);
                 } else {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    Nun = 0.15 * std::pow(Ra, OneThird);
                 }
-            } else {                           // heat flow up
-                if (Tilt < 15) {
-                    Grc = 1000000;
-                } else if (Tilt <= 75.0) {
-                    Grc = std::pow(10, Tilt / (1.1870 + (0.0870 * Tilt)));
-                } else {
-                    Grc = 5000000000;
-                }
-                if ((Ra / Pr) <= Grc) {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
-                } else {
-                    Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
-                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+            } else {                 // Tilted surface
+                if (DeltaTemp > 0) { // heat flow down
+                    if (Tilt < 2) {
+                        Nun = 0.58 * std::pow(Ra, 0.2);
+                    } else {
+                        Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    }
+                } else { // heat flow up
+                    if (Tilt < 15) {
+                        Grc = 1000000;
+                    } else if (Tilt <= 75.0) {
+                        Grc = std::pow(10, Tilt / (1.1870 + (0.0870 * Tilt)));
+                    } else {
+                        Grc = 5000000000;
+                    }
+                    if ((Ra / Pr) <= Grc) {
+                        Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * 3.14159 / 180)), 0.25);
+                    } else {
+                        Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
+                              0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    }
                 }
             }
-        } else if (Tilt == 180) {               // Horizontal surface: Floor
-            if (DeltaTemp <= 0) {               // heat flow down
-                Nun = 0.58 * std::pow(Ra, 0.2);
-            } else if (Ra < 8000000) {          // heat flow up
-                Nun = 0.54 * std::pow(Ra, 0.25);
-            } else {
-                Nun = 0.15 * std::pow(Ra, OneThird);
-            }
-        } else if (Tilt > 90 && Tilt < 180) {  // Tilted Floor
-            if (DeltaTemp <= 0) {              // heat flow down
-                if (Tilt > 178) {
+        } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
+            if (Tilt == 180) {        // Horizontal surface
+                if (DeltaTemp <= 0) { // heat flow down
                     Nun = 0.58 * std::pow(Ra, 0.2);
+                } else if (Ra < 8000000) { // heat flow up
+                    Nun = 0.54 * std::pow(Ra, 0.25);
                 } else {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    Nun = 0.15 * std::pow(Ra, OneThird);
                 }
-            } else {                            // heat flow up
-                if (Tilt > 165) {
-                    Grc = 1000000;
-                } else if (Tilt <= 105.0) {
-                    Grc = std::pow(10, Tilt / (1.1870 + (0.0870 * Tilt)));
-                } else {
-                    Grc = 5000000000;
-                }
-                if ((Ra / Pr) <= Grc) {
-                    Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
-                } else {
-                    Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
-                          0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+            } else {                  // Tilted surface
+                if (DeltaTemp <= 0) { // heat flow down
+                    if (Tilt > 178) {
+                        Nun = 0.58 * std::pow(Ra, 0.2);
+                    } else {
+                        Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    }
+                } else { // heat flow up
+                    if (Tilt > 165) {
+                        Grc = 1000000;
+                    } else if (Tilt <= 105.0) {
+                        Grc = std::pow(10, Tilt / (1.1870 + (0.0870 * Tilt)));
+                    } else {
+                        Grc = 5000000000;
+                    }
+                    if ((Ra / Pr) <= Grc) {
+                        Nun = 0.56 * std::pow(Ra * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    } else {
+                        Nun = 0.14 * (std::pow(Ra, OneThird) - std::pow(Grc * Pr, OneThird)) +
+                              0.56 * std::pow(Grc * Pr * (std::sin(Tilt * DataGlobalConstants::DegToRadians)), 0.25);
+                    }
                 }
             }
-        } else {                                // Vertical wall
+        } else if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::IntMass) { // Vertical wall
             if (Ra < 1000000000) {
                 Nun = 0.59 * std::pow(Ra, 0.25);
             } else {

@@ -1965,6 +1965,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     // Horizontal Roof, heat flow down
     DataSurfaces::Surface(1).Zone = 1;
     DataHeatBalance::Zone(1).Volume = 1000;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
     DataSurfaces::Surface(1).Tilt = 0;
     DataSurfaces::Surface(1).Area = 100;
     DataSurfaces::Surface(1).ExtBoundCond = 0;
@@ -1982,6 +1983,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     //Pitched Roof, heat flow up
     DataSurfaces::Surface(2).Zone = 2;
     DataHeatBalance::Zone(2).Volume = 1000;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Roof;
     DataSurfaces::Surface(2).Tilt = 20;
     DataSurfaces::Surface(2).Area = 100;
     DataSurfaces::Surface(2).ExtBoundCond = 0;
@@ -2000,6 +2002,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     // Vertical Wall
     DataSurfaces::Surface(3).Zone = 3;
     DataHeatBalance::Zone(3).Volume = 1000;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(3).Tilt = 90;
     DataSurfaces::Surface(3).Area = 100;
     DataSurfaces::Surface(3).ExtBoundCond = 1;
