@@ -368,6 +368,34 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex = GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex = GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex = GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Total Cooling Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,
+                                                            {5},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Sensible Cooling Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Cooling Power Consumption Curve Name");                                                       
+            }
+            
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(6);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(7);
             DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
@@ -479,6 +507,24 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPHeat = NumArray(4);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex = GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex = GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Heating Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Heating Power Consumption Curve Name");                                                       
+            }
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);

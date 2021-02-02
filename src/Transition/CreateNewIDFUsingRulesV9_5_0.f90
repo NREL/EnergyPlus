@@ -403,10 +403,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  nodiff=.false.
                  OutArgs(1:10)=InArgs(1:10)
                  OutArgs(14:CurArgs-13)=InArgs(27:CurArgs)
-                 write(OutArgs(11),'(A6,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
-                 write(OutArgs(12),'(A6,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
-                 write(OutArgs(13),'(A6,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
                  wahpEqFtCoolIndex = wahpEqFtCoolIndex + 1
+                 write(OutArgs(11),'(A19,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
+                 write(OutArgs(12),'(A20,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
+                 write(OutArgs(13),'(A16,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
                  CurArgs = CurArgs - 13
                  ! Write the now truncated equationfit coil object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
@@ -414,7 +414,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for total capacity
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
+                 write(OutArgs(1),'(A19,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
                  ! Now copy things over from the coil object
                  OutArgs(2:6)=InArgs(11:15)
                  DO i = 7, 14, 2
@@ -427,7 +427,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quintlinear curve for sensible capacity
                  ObjectName='Curve:QuintLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
+                 write(OutArgs(1),'(A20,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
                  ! Now copy things over from the coil object
                  OutArgs(2:7)=InArgs(16:21)
                  DO i = 8, 17, 2
@@ -440,7 +440,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for power consumption
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
+                 write(OutArgs(1),'(A16,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
                  ! Now copy things over from the coil object
                  OutArgs(2:6)=InArgs(22:26)
                  DO i = 7, 14, 2
@@ -449,14 +449,15 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  END DO
                  ! Write the new curve object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
                  
              CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:9)=InArgs(1:9)
-                 write(OutArgs(10),'(A6,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
-                 write(OutArgs(11),'(A6,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
                  wahpEqFtHeatIndex = wahpEqFtHeatIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
+                 write(OutArgs(11),'(A16,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
                  CurArgs = CurArgs - 8
                  ! Write the now truncated equationfit coil object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
@@ -464,7 +465,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for capacity
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
+                 write(OutArgs(1),'(A16,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
                  ! Now copy things over from the coil object
                  OutArgs(2:6)=InArgs(10:14)
                  DO i = 7, 14, 2
@@ -477,7 +478,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for power consumption
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
+                 write(OutArgs(1),'(A16,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
                  ! Now copy things over from the coil object
                  OutArgs(2:6)=InArgs(15:19)
                  DO i = 7, 14, 2
@@ -486,6 +487,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  END DO
                  ! Write the new curve object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
                  
               ! If your original object starts with D, insert the rules here
 
@@ -501,9 +503,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  nodiff=.false.
                  OutArgs(1:9)=InArgs(1:9)
                  OutArgs(12:CurArgs-8)=InArgs(20:CurArgs)
-                 write(OutArgs(10),'(A6,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
-                 write(OutArgs(11),'(A6,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
                  wwhpEqFtCoolIndex = wwhpEqFtCoolIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
+                 write(OutArgs(11),'(A16,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
                  CurArgs = CurArgs - 8
                  ! Write the now truncated equationfit heat pump object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
@@ -511,7 +513,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for capacity
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
+                 write(OutArgs(1),'(A16,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
                  ! Now copy things over from the heatpump object
                  OutArgs(2:6)=InArgs(10:14)
                  DO i = 7, 14, 2
@@ -524,7 +526,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for power consumption
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
+                 write(OutArgs(1),'(A16,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
                  ! Now copy things over from the heatpump object
                  OutArgs(2:6)=InArgs(15:19)
                  DO i = 7, 14, 2
@@ -533,15 +535,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  END DO
                  ! Write the new curve object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
                  
              CASE('HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:9)=InArgs(1:9)
                  OutArgs(12:CurArgs-8)=InArgs(20:CurArgs)
-                 write(OutArgs(10),'(A6,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
-                 write(OutArgs(11),'(A6,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
                  wwhpEqFtHeatIndex = wwhpEqFtHeatIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
+                 write(OutArgs(11),'(A16,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
                  CurArgs = CurArgs - 8
                  ! Write the now truncated equationfit heat pump object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
@@ -549,7 +552,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for capacity
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
+                 write(OutArgs(1),'(A16,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
                  ! Now copy things over from the heatpump object
                  OutArgs(2:6)=InArgs(10:14)
                  DO i = 7, 14, 2
@@ -563,7 +566,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Build new quadlinear curve for power consumption
                  ObjectName='Curve:QuadLinear'
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 write(OutArgs(1),'(A6,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
+                 write(OutArgs(1),'(A16,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
                  ! Now copy things over from the heatpump object
                  OutArgs(2:6)=InArgs(15:19)
                  DO i = 7, 14, 2
@@ -573,6 +576,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CurArgs = 14
                  ! Write the new curve object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
 
               ! If your original object starts with I, insert the rules here
 

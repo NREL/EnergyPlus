@@ -315,6 +315,24 @@ namespace HeatPumpWaterToWaterSimple {
             }
             GSHP(GSHPNum).CoolCapCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
             GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
+            if (GSHP(GSHPNum).CoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            GSHP(GSHPNum).CoolCapCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitCoolingUC,
+                                                            GSHP(GSHPNum).Name,
+                                                            "Cooling Capacity Curve Name");                                                       
+            }
+            if (GSHP(GSHPNum).CoolPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            GSHP(GSHPNum).CoolPowCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitCoolingUC,
+                                                            GSHP(GSHPNum).Name,
+                                                            "Cooling Compressor Power Curve Name");                                                       
+            }
 
             if (NumNums > 4) {
                 if (!DataIPShortCuts::lNumericFieldBlanks(5)) {
@@ -457,7 +475,24 @@ namespace HeatPumpWaterToWaterSimple {
 
             GSHP(GSHPNum).HeatCapCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
             GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
-
+            if (GSHP(GSHPNum).HeatCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            GSHP(GSHPNum).HeatCapCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitHeatingUC,
+                                                            GSHP(GSHPNum).Name,
+                                                            "Heating Capacity Curve Name");                                                       
+            }
+            if (GSHP(GSHPNum).HeatPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            GSHP(GSHPNum).HeatPowCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitHeatingUC,
+                                                            GSHP(GSHPNum).Name,
+                                                            "Heating Compressor Power Curve Name");                                                       
+            }
             if (NumNums > 4) {
                 if (!DataIPShortCuts::lNumericFieldBlanks(5)) {
                     GSHP(GSHPNum).refCOP = DataIPShortCuts::rNumericArgs(5);
