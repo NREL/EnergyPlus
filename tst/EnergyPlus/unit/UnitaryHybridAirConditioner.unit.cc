@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_FALSE(ErrorsFound);
     // Initialize unit
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
     // setup local variables for model inputs
     Real64 Tosa, Tra, Wra, Wosa, RHosa, RHra, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
     RHosa = 0;
@@ -443,7 +443,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
     pZoneHybridUnitaryAirConditioner->SecInletMassFlowRate = DesignMinVR;
     pZoneHybridUnitaryAirConditioner->doStep(*state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
-    ReportZoneHybridUnitaryAirConditioners(1);
+    ReportZoneHybridUnitaryAirConditioners(*state, 1);
 
     SystemReports::ReportMaxVentilationLoads(*state);
     // output results
@@ -582,7 +582,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(*state, ErrorsFound);
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     unsigned long expectedOperatingModesSize = 2;
@@ -626,7 +626,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(*state, ErrorsFound);
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     constexpr unsigned long expectedOperatingModesSize = 1;
@@ -832,7 +832,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     EXPECT_FALSE(ErrorsFound);
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 
@@ -1233,7 +1233,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ModelOperatingSetting
 
     InitZoneHybridUnitaryAirConditioners(*state, 1, 2);
 
-    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
 
     Real64 DesignMinVR = 1.622720855;       // Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate
     Real64 Tra = 22.93929413;               // Zone Hybrid Unitary HVAC Return Air Temperature

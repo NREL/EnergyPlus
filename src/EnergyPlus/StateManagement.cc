@@ -207,7 +207,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
-    HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
