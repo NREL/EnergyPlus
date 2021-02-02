@@ -210,10 +210,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HysteresisPhaseChange::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    OutAirNodeManager::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
-    OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();

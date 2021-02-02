@@ -1551,8 +1551,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     Node.allocate(3);
     NodeID.allocate(3);
     state->dataRuntimeLang->EMSActuatorUsed.allocate(3);
-    OutAirNodeManager::NumOutsideAirNodes = 3;
-    OutAirNodeManager::OutsideAirNodeList.allocate(3);
+    state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
 
     NodeID(1) = "Node1";
     NodeID(2) = "Node2";
@@ -1566,9 +1566,9 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     Node(2).MassFlowRate = 0.1;
     Node(3).MassFlowRate = 0.1;
 
-    OutAirNodeManager::OutsideAirNodeList(1) = 1;
-    OutAirNodeManager::OutsideAirNodeList(2) = 2;
-    OutAirNodeManager::OutsideAirNodeList(3) = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     state->dataRuntimeLang->EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
     state->dataRuntimeLang->EMSActuatorUsed(2).ComponentTypeName = "";
     state->dataRuntimeLang->EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";

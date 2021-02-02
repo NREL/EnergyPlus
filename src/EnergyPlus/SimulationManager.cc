@@ -2256,8 +2256,6 @@ namespace SimulationManager {
         using namespace DataPlant;
         using namespace DataZoneEquipment;
         using DualDuct::ReportDualDuctConnections;
-        using OutAirNodeManager::NumOutsideAirNodes;
-        using OutAirNodeManager::OutsideAirNodeList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
@@ -2275,12 +2273,12 @@ namespace SimulationManager {
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
-        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
-        if (NumOutsideAirNodes > 0) {
+        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", state.dataOutAirNodeMgr->NumOutsideAirNodes);
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
             print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
-        for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            print(state.files.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
+        for (int Count = 1; Count <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++Count) {
+            print(state.files.bnd, " Outdoor Air Node,{},{}\n", state.dataOutAirNodeMgr->OutsideAirNodeList(Count), NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
