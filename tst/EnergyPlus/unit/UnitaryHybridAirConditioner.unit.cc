@@ -1384,4 +1384,123 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateOptionalError
 
 }
 
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initialization)
+{
+    std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+    std::string string = delimited_string(snippet);
+    ASSERT_TRUE(process_idf(string));
+    // setup environment
+    bool ErrorsFound(false);
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Initialize schedule values
+    state->dataGlobal->TimeStep = 1;
+    DataHVACGlobals::TimeStepSys = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataGlobal->WarmupFlag = false;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
+    // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
+    DataHeatBalance::Zone(1).FloorArea = 232.26;
+    state->dataEnvrn->StdRhoAir = 1.225;
+    state->dataEnvrn->OutBaroPress = 101325;
+    DataHeatBalance::ZoneIntGain.allocate(1);
+
+    SizingManager::GetOARequirements(*state);
+    GetOAControllerInputs(*state);
+    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
+
+    // Setup performance tables
+    using namespace EnergyPlus::DataEnvironment;
+    // process schedules
+    ProcessScheduleInput(*state); // read schedules
+    UpdateScheduleValues(*state);
+    // Get Unitary system
+    GetInputZoneHybridUnitaryAirConditioners(*state, ErrorsFound);
+    // All to get OA requirements
+    GetOARequirements(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    // Initialize unit
+    InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
+    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    // setup local variables for model inputs
+    Real64 Tosa, Tra, Wra, Wosa, RHosa, RHra, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
+    RHosa = 0;
+    std::string TimeDate;
+    Real64 MsaRatio, OSAF;
+    MsaRatio = OSAF = 1;
+
+    Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
+
+    DesignMinVR = 1.622720855; // Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate
+    Tra = 22.93929413;         // Zone Hybrid Unitary HVAC Return Air Temperature
+    Tosa = 26.67733333;        // Zone Hybrid Unitary HVAC Outside Air Temperature
+    RHra = 17.3042157;         // Zone Hybrid Unitary HVAC Return Air Relative Humidity
+    RHosa = 13.1602401;        // Zone Hybrid Unitary HVAC Outside Air Relative Humidity
+    Wra = PsyWFnTdbRhPb(*state, Tra, RHra / 100, 101325);
+    Wosa = PsyWFnTdbRhPb(*state, Tosa, RHosa / 100, 101325);
+    pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
+    pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
+    pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(*state, Tra, RHra / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->InletRH = RHra / 100;
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+    pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(*state, Tosa, RHosa / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa / 100;
+
+    // Scenario 1: Low Cooling
+
+    Requestedheating = -64358.68966; //-
+    RequestedCooling = -633.6613591; // W
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->doStep(
+        *state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+
+    // output results
+    Real64 Setting0Mode = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Mode;
+    Real64 Setting0RuntimeFraction = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Runtime_Fraction;
+    Real64 Setting1Mode = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[1].Mode;
+    Real64 Setting1RuntimeFraction = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[1].Runtime_Fraction;
+
+    // checks
+    EXPECT_EQ(Setting0Mode, 1); // IEC Mode
+    EXPECT_NEAR(Setting0RuntimeFraction, 0.547, 0.001); // IEC RTF
+    EXPECT_EQ(Setting1Mode, 0); // Standby Mode
+    EXPECT_NEAR(Setting1RuntimeFraction, 0.453, 0.001); // Standby Mode
+
+    // Scenario 2: Outside of env conditions. should go to standby and have standby energy
+    Requestedheating = -55795.8058;
+    RequestedCooling = 8171.47128;
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0;
+    pZoneHybridUnitaryAirConditioner->doStep(
+        *state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, 0);
+
+    // output results
+    Setting0Mode = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Mode;
+    Setting0RuntimeFraction = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Runtime_Fraction;
+    Setting1Mode = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[1].Mode;
+    Setting1RuntimeFraction = pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[1].Runtime_Fraction;
+
+    // checks
+    EXPECT_EQ(Setting0Mode, 0); // Standby Mode
+    EXPECT_EQ(Setting0RuntimeFraction, 1); // Standby RTF
+    EXPECT_EQ(Setting1Mode, 0); // Standby Mode
+    EXPECT_EQ(Setting1RuntimeFraction, 0); // Standby RTF
+
+}
+
 } // namespace EnergyPlus

@@ -925,14 +925,14 @@ namespace RootFinder {
         // na
 
         // FLOW:
-        if (RootFinderData.MinPoint.DefinedFlag) { // DSU3 testing
+        if (RootFinderData.MinPoint.DefinedFlag) {
             if (X < RootFinderData.MinPoint.X) {
                 CheckMinMaxRange = false;
                 return CheckMinMaxRange;
             }
         }
 
-        if (RootFinderData.MaxPoint.DefinedFlag) { // DSU3 testing
+        if (RootFinderData.MaxPoint.DefinedFlag) {
             if (X > RootFinderData.MaxPoint.X) {
                 CheckMinMaxRange = false;
                 return CheckMinMaxRange;
@@ -991,14 +991,14 @@ namespace RootFinder {
         // FLOW:
 
         if (RootFinderData.LowerPoint.DefinedFlag) {
-            if (X < RootFinderData.LowerPoint.X) { // DSU3 test with < instead of <=
+            if (X < RootFinderData.LowerPoint.X) {
                 CheckLowerUpperBracket = false;
                 return CheckLowerUpperBracket;
             }
         }
 
         if (RootFinderData.UpperPoint.DefinedFlag) {
-            if (X > RootFinderData.UpperPoint.X) { // DSU3 test with > instead of >=
+            if (X > RootFinderData.UpperPoint.X) {
                 CheckLowerUpperBracket = false;
                 return CheckLowerUpperBracket;
             }
