@@ -213,7 +213,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    MicroturbineElectricGenerator::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();

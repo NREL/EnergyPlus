@@ -79,12 +79,10 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace MicroCHPElectricGenerator {
+namespace EnergyPlus::MicroCHPElectricGenerator {
 
     // MODULE INFORMATION:
-    //       AUTHOR         Brent Griffth
+    //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   June 2006
     //       MODIFIED       na
     //       RE-ENGINEERED  na
@@ -1365,6 +1363,4 @@ namespace MicroCHPElectricGenerator {
             DataLoopNode::Node(this->AirOutletNodeID).Temp = this->A42Model.Teng;
         }
     }
-} // namespace MicroCHPElectricGenerator
-
 } // namespace EnergyPlus
