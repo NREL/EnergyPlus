@@ -5185,7 +5185,19 @@ namespace EnergyPlus::OutputReportTabular {
     bool produceDualUnitsFlags(const int& iUnit_Sys, const iUnitsStyle& unitsStyle_Tab, const iUnitsStyle& unitsStyle_Sql, 
         iUnitsStyle& unitsStyle_Cur, bool& produce_Tab, bool& produce_Sql)
     {
-        bool brkflag = false;
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         J. Yuan
+        //       DATE WRITTEN   Jan 2021
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine sets the order and flags for tabular data and sqlite writing for a Dual-Unit reporting. 
+        // It will set the unit styles to used, a flag for tabular data writing, and a flag for sqlite writing.
+        // The function will return a false flag if only one round of writing is needed 
+        // and will return a true flag if a second round sqlite writing is not needed.
+
+        bool brkflag(false);
 
         if (iUnit_Sys == 0) {
             unitsStyle_Cur = unitsStyle_Tab; 
@@ -5195,16 +5207,19 @@ namespace EnergyPlus::OutputReportTabular {
             } else {
                 produce_Sql = false;
             }
-        } else { // iUnit_Sys == 1
+        } else { // iUnit_Sys == 1 
             unitsStyle_Cur = unitsStyle_Sql;
             produce_Tab = false;
             produce_Sql = true;
             if (unitsStyle_Sql == unitsStyle_Tab) {
+                //true if a separate sqlite round is needed
                 brkflag = true;
                 produce_Sql = false;
             }
         }
 
+        // True if a separate sqlite round is needed
+        // false if not
         return brkflag;
     }
 
