@@ -67,7 +67,7 @@ Three actuators, called ``Surface,''~ are available for controlling the temperat
 \item
   ``Outdoor Air Wind Direction.''~ This is the wind direction of the outdoor air exposed to the surface, in degree. This is the direction used for some surface convection heat transfer correlations for the outside-face of surfaces exposed to wind.
 \item
-  ``View Factor To Ground.''~ This is the view factor to ground of the outdoor air exposed to the surface. This is the view factor used for solar and radiant heat exchange. This is useful from the calling point named BeginZoneTimestepAfterInitHeatBalance and BeginZoneTimestepBeforeInitHeatBalance.
+  ``View Factor To Ground.''~ This is the view factor to ground of the outside face of the surface. This is the view factor used for ground diffuse solar and for radiant heat exchange. This is useful from the calling point named BeginZoneTimestepAfterInitHeatBalance and BeginZoneTimestepBeforeInitHeatBalance.
 \end{itemize}
 
 Four actuators, called ``Other Side Boundary Conditions,'' are available for controlling the convection and radiation boundary conditions for surfaces that use ``OtherSideConditionsModel.''~ Each instance of a SurfaceProperty:OtherSideConditionsModel object will make available these actuators with the following four control types:
