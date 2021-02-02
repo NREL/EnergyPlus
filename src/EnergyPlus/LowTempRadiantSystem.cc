@@ -718,34 +718,34 @@ namespace LowTempRadiantSystem {
 
             auto &thisRadSys(HydrRadSys(Item));
 
-            thisRadSys.designObjectName = Alphas(10);
-            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, VarFlowRadDesignNames);
-            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(thisRadSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-
             // General user input data
             thisRadSys.Name = Alphas(1);
 
-            thisRadSys.SchedName = Alphas(2);
-            if (lAlphaBlanks(2)) {
+            thisRadSys.designObjectName = Alphas(2);
+            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisRadSys.designObjectName, VarFlowRadDesignNames);
+            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(thisRadSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+
+            thisRadSys.SchedName = Alphas(3);
+            if (lAlphaBlanks(3)) {
                 thisRadSys.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
-                thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                thisRadSys.SchedPtr = GetScheduleIndex(state, Alphas(3));
                 if (thisRadSys.SchedPtr == 0) {
                     ShowSevereError(state, cAlphaFields(2) + " not found for " + Alphas(1));
-                    ShowContinueError(state, "Missing " + cAlphaFields(2) + " is " + Alphas(2));
+                    ShowContinueError(state, "Missing " + cAlphaFields(3) + " is " + Alphas(3));
                     ErrorsFound = true;
                 }
             }
 
-            thisRadSys.ZoneName = Alphas(3);
-            thisRadSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
+            thisRadSys.ZoneName = Alphas(4);
+            thisRadSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisRadSys.ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(4));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            thisRadSys.SurfListName = Alphas(4);
+            thisRadSys.SurfListName = Alphas(5);
             SurfListNum = 0;
             if (NumOfSurfaceLists > 0) SurfListNum = UtilityRoutines::FindItemInList(thisRadSys.SurfListName, SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
@@ -774,12 +774,12 @@ namespace LowTempRadiantSystem {
                 thisRadSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (thisRadSys.SurfacePtr(1) == 0) {
-                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(5) + " = " + Alphas(5));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
-                    ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
+                    ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (thisRadSys.SurfacePtr(1) != 0) {
@@ -796,7 +796,7 @@ namespace LowTempRadiantSystem {
             // To be fixed
 
             if (variableFlowDesignDataObject.HeatingWaterNodePresentCheckFlag) {
-                if ((!lAlphaBlanks(9)) || (!lAlphaBlanks(10))) {
+                if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
                     ShowSevereError(state, CurrentModuleObject + " = " + variableFlowDesignDataObject.Name);
                     ShowContinueError(state, "Input for " + cAlphaFields(2) + " = " + Alphas(2));
                     ShowContinueError(state, "Blank field not allowed for " + cNumericFields(5));
@@ -808,18 +808,18 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxHeat = Numbers(2);
 
             thisRadSys.HotWaterInNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(5)) || (!lAlphaBlanks(6))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Hot Water Nodes");
+            if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
             }
 
 // Fix lAlphaBlanks(10) condition which is now Heating Control Temperature Schedule Name in design object
             if ((thisRadSys.WaterVolFlowMaxHeat == AutoSize) &&
-                (lAlphaBlanks(5) || lAlphaBlanks(6) /*|| lAlphaBlanks(10)*/ || (thisRadSys.HotWaterInNode <= 0) || (thisRadSys.HotWaterOutNode <= 0) ||
+                (lAlphaBlanks(6) || lAlphaBlanks(7) /*|| lAlphaBlanks(10)*/ || (thisRadSys.HotWaterInNode <= 0) || (thisRadSys.HotWaterOutNode <= 0) ||
                  (variableFlowDesignDataObject.HotSetptSchedPtr == 0))) {
                 ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules.");
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (heating input) = " + Alphas(1));
@@ -831,18 +831,18 @@ namespace LowTempRadiantSystem {
             thisRadSys.WaterVolFlowMaxCool = Numbers(4);
 
             thisRadSys.ColdWaterInNode = GetOnlySingleNode(state,
-                Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
-                Alphas(8), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+                Alphas(9), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
 
-            if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
-                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Chilled Water Nodes");
+            if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
+                TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Chilled Water Nodes");
             }
 
-            if (UtilityRoutines::SameString(Alphas(9), OnePerSurf)) {
+            if (UtilityRoutines::SameString(Alphas(10), OnePerSurf)) {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(9), CalcFromLength)) {
+            } else if (UtilityRoutines::SameString(Alphas(10), CalcFromLength)) {
                 thisRadSys.NumCircCalcMethod = CalculateFromLength;
             } else {
                 thisRadSys.NumCircCalcMethod = OneCircuit;

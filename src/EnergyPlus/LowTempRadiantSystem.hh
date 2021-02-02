@@ -300,11 +300,11 @@ namespace LowTempRadiantSystem {
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
     {
         // Members
+        std::string designObjectName;   // Design Object
+        int DesignObjectPtr;
         Real64 WaterVolFlowMaxHeat;      // maximum water flow rate for heating, m3/s
         Real64 WaterFlowMaxHeat;         // maximum water flow rate for heating, kg/s
         Real64 HotThrottlRange;          // Throttling range for heating [C]
-        std::string designObjectName;   // Design Object
-        int DesignObjectPtr;
         Real64 WaterVolFlowMaxCool; // maximum water flow rate for cooling, m3/s
         Real64 WaterFlowMaxCool;    // maximum water flow rate for cooling, kg/s
         Real64 WaterMassFlowRate;     // water mass flow rate
@@ -312,8 +312,8 @@ namespace LowTempRadiantSystem {
 
         // Default Constructor
             VariableFlowRadiantSystemData()
-                : WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0), DesignObjectPtr(0), WaterVolFlowMaxCool(0.0),
-                  WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0)
+                : DesignObjectPtr(0), WaterVolFlowMaxHeat(0.0), WaterFlowMaxHeat(0.0), HotThrottlRange(0.0),
+                WaterVolFlowMaxCool(0.0), WaterFlowMaxCool(0.0), WaterMassFlowRate(0.0)
             {
             }
 

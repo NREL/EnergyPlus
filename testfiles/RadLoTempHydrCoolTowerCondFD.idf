@@ -1398,6 +1398,7 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     West Zone Radiant Floor, !- Name
+    JermyDesignObject2,      !- Design Object
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
@@ -1410,12 +1411,12 @@
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     ,                        !- Number of Circuits
-    ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    ;                   !- Circuit Length {m}
 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     East Zone Radiant Floor, !- Name
+    JermyDesignObject2,      !- Design Object
     RadiantSysAvailSched,    !- Availability Schedule Name
     East Zone,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
@@ -1428,11 +1429,11 @@
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     ,                        !- Number of Circuits
-    ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    ;                   !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     North Zone Radiant Floor,!- Name
+    JermyDesignObject2,      !- Design Object
     RadiantSysAvailSched,    !- Availability Schedule Name
     North Zone,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
@@ -1445,8 +1446,7 @@
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     ,                        !- Number of Circuits
-    ,                   !- Circuit Length {m}
-    JermyDesignObject2;                        !- Design Object
+    ;                   !- Circuit Length {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
