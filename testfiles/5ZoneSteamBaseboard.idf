@@ -2806,9 +2806,6 @@
 
   ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,
     SPACE1-1 Baseboard Design,      !- Name
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
     0.3;                     !- Fraction of Radiant Energy Incident on People
@@ -2819,7 +2816,10 @@
     REHEATCOILAVAILSCHED,    !- Availability Schedule Name
     SPACE1-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
     SPACE1-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     5,                       !- Degree of SubCooling {deltaC}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     FRONT-1,                 !- Surface 1 Name
@@ -2835,7 +2835,10 @@
     REHEATCOILAVAILSCHED,    !- Availability Schedule Name
     SPACE3-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
     SPACE3-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     5,                       !- Degree of SubCooling {deltaC}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     BACK-1,                  !- Surface 1 Name
