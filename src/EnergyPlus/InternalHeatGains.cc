@@ -694,7 +694,11 @@ namespace InternalHeatGains {
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
                         MustInpSch = false;
                         UsingThermalComfort = false;
-                        lastOption = NumAlpha;
+                        if (NumAlpha > 20) {
+                            lastOption = 20;
+                        } else {
+                            lastOption = NumAlpha;
+                        }
 
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
@@ -729,11 +733,13 @@ namespace InternalHeatGains {
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     People(Loop).Pierce = true;
+                                    AnyThermalComfortPierceModel = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     People(Loop).KSU = true;
+                                    AnyThermalComfortKSUModel = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
@@ -751,11 +757,13 @@ namespace InternalHeatGains {
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
                                     People(Loop).CoolingEffectASH55 = true;
+                                    AnyThermalComfortCoolingEffectModel = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
                                     People(Loop).AnkleDraftASH55 = true;
+                                    AnyThermalComfortAnkleDraftModel = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
@@ -998,6 +1006,25 @@ namespace InternalHeatGains {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
+                                    ErrorsFound = true;
+                                }
+                            }
+
+                            // TODO: why Item1 == 1 (first People object) required in all People input error logging?
+                            int indexAnkleAirVelPtr = 21;
+                            if (!lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "" ) {
+                                People(Loop).AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
+                                if (People(Loop).AnkleAirVelocityPtr == 0) {
+                                    if (Item1 == 1) {
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                               cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=" + AlphaName(indexAnkleAirVelPtr));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            } else if (People(Loop).AnkleDraftASH55) {
+                                if (Item1 == 1) {
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(indexAnkleAirVelPtr) +
+                                                           " is required for this item.");
                                     ErrorsFound = true;
                                 }
                             }

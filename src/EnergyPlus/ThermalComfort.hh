@@ -178,8 +178,26 @@ namespace ThermalComfort {
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
+    Real64 CalcFangerPMV(EnergyPlusData &state,
+                         Real64 AirTemp,
+                         Real64 RadTemp,
+                         Real64 RelHum,
+                         Real64 AirVel,
+                         Real64 ActLevel,
+                         Real64 CloUnit,
+                         Real64 WorkEff);
+
+    Real64 CalcFangerPPD(Real64 PMV);
+
+    Real64 CalcRelativeAirVelocity(Real64 AirVel, Real64 ActMet);
+
+    void GetThermalComfortInputsASHRAE(EnergyPlusData &state);
 
     void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
+
+    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state);
+
+    void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state);
 
     Real64 CalcStandardEffectiveTemp(EnergyPlusData &state,
                                      Real64 AirTemp,
@@ -241,6 +259,8 @@ struct ThermalComfortsData : BaseGlobalStruct {
 
     bool FirstTimeFlag = true;                // Flag set to make sure you get input once
     bool FirstTimeSurfaceWeightedFlag = true; // Flag set to make sure certain calcs related to surface weighted option are only done once
+    bool FirstTimeCoolingEffectWarning = true; // Flag set to make sure certain warnings related to cooling effect calcs are only done once
+    bool FirstTimeAnkleDraftWarning = true; // Flag set to make sure certain warnings related to ankle draft calcs are only done once
 
     // MODULE PARAMETER DEFINITIONS
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
@@ -256,6 +276,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 AbsRadTemp = 0.0;                // Absolute radiant temperature; K
     Real64 AcclPattern = 0.0;               // The pattern of acclimation
     Real64 ActLevel = 0.0;                  // Metabolic rate; w/m2
+    Real64 ActMet = 0.0;                    // Metabolic rate; []
     Real64 AirVel = 0.0;                    // Air velocity; m/s
     Real64 AirTemp = 0.0;                   // Air temperature; C
     Real64 CloBodyRat = 0.0;                // Ratio of clothed body
@@ -367,6 +388,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
         AbsRadTemp = 0.0;
         AcclPattern = 0.0;
         ActLevel = 0.0;
+        ActMet = 0.0;
         AirVel = 0.0;
         AirTemp = 0.0;
         CloBodyRat = 0.0;

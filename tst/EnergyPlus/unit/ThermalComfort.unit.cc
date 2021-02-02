@@ -942,7 +942,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 
 }
 
-TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 {
 
     // Set the data for the test
@@ -987,7 +987,14 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     Real64 BodySurfaceArea = 1.8258;
     state->dataEnvrn->OutBaroPress = 101325.;
     Real64 WorkEff = 0.0;
+    People(1).ActivityLevelPtr = 1;
+    People(1).ClothingPtr = 2;
+    People(1).AirVelocityPtr = 3;
+    People(1).AnkleAirVelocityPtr = 4;
+    ScheduleManager::Schedule.allocate(4);
 
+    // Part 1: Test SET calculations.
+    // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D - Table D3 Validation Table for SET Computer Model
     const std::vector<double> TAir = {25, 0, 40, 25, 25, 25, 25, 25};
     const std::vector<double> RH = {0.5, 0.5, 0.5, 0.9, 0.5, 0.5, 0.5, 0.5};
     const std::vector<double> Vel = {0.15, 0.15, 0.15, 0.15, 3, 0.15, 0.15, 0.15};
@@ -1001,35 +1008,47 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
         EXPECT_NEAR(SETResult, SET[i], 0.1);
     }
 
-    // Test cooling effect
+    // Part 2: Test cooling effect
     People(1).CoolingEffectASH55 = true;
     Real64 AirTemp = 25.0;
     Real64 RadTemp = 25.0;
     Real64 RelHum = 0.5;
-    Real64 ActMet = 0.5;
+    Real64 ActMet = 1;
     Real64 CloUnit = 0.5;
-    People(1).ActivityLevelPtr = 1;
-    People(1).ClothingPtr = 2;
-    People(1).AirVelocityPtr = 3;
-    ScheduleManager::Schedule.allocate(3);
+
     ZTAVComf(1) = AirTemp;
     MRT(1) = RadTemp;
     ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1),RelHum, state->dataEnvrn->OutBaroPress);
     ScheduleManager::Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
     ScheduleManager::Schedule(2).CurrentValue = CloUnit;
 
+    // Test 1 - Air velocity = 0.15 m/s.
     Real64 AirVel = 0.15;
     ScheduleManager::Schedule(3).CurrentValue = AirVel;
-    CalcThermalComfortPierceASHRAE(*state);
+    CalcThermalComfortCoolingEffectASH(*state);
     Real64 CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
     Real64 StillAirVel = 0.1;
+    Real64 RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    Real64 InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
     Real64 CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
-    EXPECT_NEAR(CoolingEffectSET, state->dataThermalComforts->ThermalComfortData(1).PierceSET, 0.1);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
 
-    AirVel = 3;
+    // Test 2 - Air velocity = 1 m/s.
+    AirVel = 1;
     ScheduleManager::Schedule(3).CurrentValue = AirVel;
-    CalcThermalComfortPierceASHRAE(*state);
+    CalcThermalComfortCoolingEffectASH(*state);
     CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
     CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
-    EXPECT_NEAR(CoolingEffectSET, state->dataThermalComforts->ThermalComfortData(1).PierceSET, 0.1);
+
+    RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
+
+    People(1).AnkleDraftASH55 = true;
+    AirVel = 0.15;
+    Real64 AnkleAirVel = 0.3;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    ScheduleManager::Schedule(4).CurrentValue = AnkleAirVel;
+    CalcThermalComfortAnkleDraftASH(*state);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).AnkleDraftPPDASH55, 25.0, 0.1);
 }
