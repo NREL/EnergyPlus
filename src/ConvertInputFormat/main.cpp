@@ -147,7 +147,12 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, std::string outputDirectory, std::string & outputTypeStr)
+bool processInput(std::string const &inputFilePath,
+                  json const &schema,
+                  OutputTypes outputType,
+                  std::string outputDirectory,
+                  std::string &outputTypeStr,
+                  bool convertHVACTemplate)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -233,7 +238,7 @@ bool processInput(std::string const &inputFilePath, json const &schema, OutputTy
             }
 
             bool success = true;
-            epJSON = idf_parser->decode(input_file, schema, success);
+            epJSON = idf_parser->decode(input_file, schema, success, convertHVACTemplate);
             cleanEPJSON(epJSON);
         } else if (isCBOR) {
             epJSON = json::from_cbor(input_stream);
@@ -370,6 +375,16 @@ int main(int argc, const char *argv[])
             "--format",                                                        // Flag token.
             outputTypeValidation);
 
+    opt.add("",                              // Default.
+            0,                               // Required?
+            0,                               // Number of args expected.
+            0,                               // Delimiter if expecting multiple args.
+            "Convert HVACTemplate objects.", // Help description.
+            "-T",                            // Flag token.
+            "-t",                            // Flag token.
+            "--HVACTemplate"                 // Flag token.
+    );
+
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
     opt.add("",                            // Default.
@@ -421,6 +436,11 @@ int main(int argc, const char *argv[])
         std::string input_paths_file;
         opt.get("-i")->getString(input_paths_file);
         files = parse_input_paths(input_paths_file);
+    }
+
+    bool convertHVACTemplate = false;
+    if (opt.isSet("-t")) {
+        convertHVACTemplate = true;
     }
 
     std::string outputTypeStr;
@@ -502,7 +522,7 @@ int main(int argc, const char *argv[])
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {
-            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr);
+            bool successful = processInput(files[i], schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
 #pragma omp atomic
             ++fileCount;
             if (successful) {

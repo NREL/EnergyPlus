@@ -67,7 +67,7 @@ json IdfParser::decode(std::string const &idf, json const &schema)
     return decode(idf, schema, success);
 }
 
-json IdfParser::decode(std::string const &idf, json const &schema, bool &success)
+json IdfParser::decode(std::string const &idf, json const &schema, bool &success, bool const convertHVACTemplate)
 {
     success = true;
     cur_line_num = 1;
@@ -80,7 +80,7 @@ json IdfParser::decode(std::string const &idf, json const &schema, bool &success
     }
 
     size_t index = 0;
-    return parse_idf(idf, index, success, schema);
+    return parse_idf(idf, index, success, schema, convertHVACTemplate);
 }
 
 std::string IdfParser::encode(json const &root, json const &schema)
@@ -181,7 +181,7 @@ bool IdfParser::hasErrors()
     return !errors_.empty();
 }
 
-json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema)
+json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, json const &schema, bool const convertHVACTemplate)
 {
     json root;
     Token token;
@@ -233,7 +233,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
-            } else if (obj_name.find("Template") != std::string::npos) {
+            } else if ((obj_name.find("Template") != std::string::npos) && !convertHVACTemplate) {
                 errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
