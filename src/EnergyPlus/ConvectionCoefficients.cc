@@ -8152,17 +8152,16 @@ namespace ConvectionCoefficients {
     {
         int ZoneNum = Surface(SurfNum).Zone;
         Real64 Volume = Zone(ZoneNum).Volume; // Volume of the zone in m3
-        Real64 AirStreamV = std::pow(Volume, OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
+        Real64 Vair = std::pow(Volume, OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
 
-        HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, AirStreamV, Surface(SurfNum).Tilt);
+        HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, Vair, Surface(SurfNum).Tilt);
                  
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
     }
 
-    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const AirStreamV, Real64 const Tilt)
+    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt)
     {
-
 
         // Return Value
         Real64 h;           // Combined convection coefficient
@@ -8173,20 +8172,20 @@ namespace ConvectionCoefficients {
         Real64 hf;          // Forced convection coefficient
         Real64 Grc;         // Critical Grashof number
         Real64 DeltaTemp;   // Temperature difference between TSurf and Tair
-        Real64 L;           // characteristic length: the length along the heat flow direction 
+        Real64 L;           // Characteristic length: the length along the heat flow direction 
                             // (the square root of surface area for floors and ceilings, average height for gables and walls, and length of pitched roof from soffit to ridge)
-        Real64 v;           // the velocity of the air stream in m/s, (for interior surfaces)
+        Real64 v;           // The velocity of the air stream in m/s, (for interior surfaces)
                             // Surface Outside Face Outdoor Air Wind Speed (for exterior surfaces)
-        Real64 g(9.80665);  // acceleration of gravity, m/s2
+        Real64 g(9.80665);  // Acceleration of gravity, m/s2
         Real64 Pr;          // Prandtl number
-        Real64 beta_SI;     // volume coefficient of expansion of air, 1/K
-        Real64 rho_SI;      // density of air, kg/m3
-        Real64 cp_SI;       // specific heat of air, J/kg.k
+        Real64 beta_SI;     // Volume coefficient of expansion of air, 1/K
+        Real64 rho_SI;      // Density of air, kg/m3
+        Real64 cp_SI;       // Specific heat of air, J/kg.k
         Real64 dv;
-        Real64 visc;        // kinematic viscosity of air, m2/s
+        Real64 visc;        // Kinematic viscosity of air, m2/s
         Real64 k_SI_n;
         Real64 k_SI_d;
-        Real64 k_SI;        // thermal conductivity of air, W/m.K
+        Real64 k_SI;        // Thermal conductivity of air, W/m.K
         Real64 Ra;          // Rayleigh number
         Real64 Re;          // Reynolds number
         static constexpr Real64 OneThird((1.0 / 3.0));  // 1/3 in highest precision
@@ -8200,9 +8199,9 @@ namespace ConvectionCoefficients {
         if (Surface(SurfNum).ExtBoundCond == 0) {
             v = Surface(SurfNum).WindSpeed;
         } else {
-            v = AirStreamV;
+            v = Vair;
         }
-                                                                    
+
         Pr = 0.7880 - (2.631 * std::pow(10, -4) * (Tair + 273.15));
         beta_SI = 1 / (Tair + 273.15);                       
         rho_SI = (22.0493 / (Tair + 273.15)) * 16;              

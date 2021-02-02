@@ -869,7 +869,7 @@ namespace ConvectionCoefficients {
                                 Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const AirStreamV, Real64 const Tilt);
+    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt);
 
 } // namespace ConvectionCoefficients
 
