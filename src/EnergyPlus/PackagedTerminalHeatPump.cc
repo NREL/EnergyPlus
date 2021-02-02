@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
@@ -99,9 +98,7 @@
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 
-namespace EnergyPlus {
-
-namespace PackagedTerminalHeatPump {
+namespace EnergyPlus::PackagedTerminalHeatPump {
 
     // Module containing the routines for modeling packaged terminal air conditioners and heat pumps
 
@@ -146,14 +143,6 @@ namespace PackagedTerminalHeatPump {
         bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                           // namespace
 
-    // Last mode of operation
-    int const CoolingMode(1); // last compressor operating mode was in cooling
-    int const HeatingMode(2); // last compressor operating mode was in heating
-
-    // Airflow control for constant fan mode
-    int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
-
     // Unit type
     int const PTHPUnit(1);   // equivalent to PackagedTerminal:HeatPump:AirToAir
     int const PTACUnit(2);   // equivalent to PackagedTerminal:AirConditioner
@@ -163,8 +152,7 @@ namespace PackagedTerminalHeatPump {
     int const None(1);       // no special capacity control
     int const CCM_ASHRAE(2); // capacity control based on ASHRAE Standard 90.1
 
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const BlankString;
+    constexpr const char *fluidNameSteam("STEAM");
 
     // DERIVED TYPE DEFINITIONS
 
@@ -1403,13 +1391,13 @@ namespace PackagedTerminalHeatPump {
             //                              UseCompressorOffFlow = operate at value specified by user
             //   AirFlowControl only valid if fan opmode = ContFanCycCoil
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOnFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
             } else {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOffFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
             }
 
             //   Initialize last mode of compressor operation
-            PTUnit(PTUnitNum).LastMode = HeatingMode;
+            PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
 
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:OnOff") ||
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
@@ -2222,13 +2210,13 @@ namespace PackagedTerminalHeatPump {
             //                              UseCompressorOffFlow = operate at value specified by user
             //   AirFlowControl only valid if fan opmode = ContFanCycCoil
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOnFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
             } else {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOffFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
             }
 
             //   Initialize last mode of compressor operation
-            PTUnit(PTUnitNum).LastMode = HeatingMode;
+            PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
 
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:OnOff") ||
                 UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
@@ -3182,9 +3170,9 @@ namespace PackagedTerminalHeatPump {
 
             //   AirFlowControl only valid if fan opmode = ContFanCycCoil
             if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOnFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
             } else {
-                PTUnit(PTUnitNum).AirFlowControl = UseCompressorOffFlow;
+                PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
             }
 
             if (OANodeNums(1) > 0) {
@@ -4312,7 +4300,7 @@ namespace PackagedTerminalHeatPump {
                 Node(PTUnit(PTUnitNum).AirReliefNode).MassFlowRateMinAvail = 0.0;
             }
             MyEnvrnFlag(PTUnitNum) = false;
-            PTUnit(PTUnitNum).LastMode = HeatingMode;
+            PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
 
             //   set fluid-side hardware limits
             if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
@@ -4740,20 +4728,20 @@ namespace PackagedTerminalHeatPump {
                 CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
                 CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
                 OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
-                PTUnit(PTUnitNum).LastMode = HeatingMode;
+                PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
             } else if (CoolingLoad) {
                 CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
                 CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
                 OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
-                PTUnit(PTUnitNum).LastMode = CoolingMode;
+                PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
             } else {
                 CompOnMassFlow = PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
                 CompOnFlowRatio = PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
                 OACompOnMassFlow = PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
             }
 
-            if (PTUnit(PTUnitNum).AirFlowControl == UseCompressorOnFlow) {
-                if (PTUnit(PTUnitNum).LastMode == HeatingMode) {
+            if (PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow) {
+                if (PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
                     CompOffMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
                     CompOffFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
                     OACompOffMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
@@ -5145,7 +5133,7 @@ namespace PackagedTerminalHeatPump {
                 TempSize = PTUnit(PTUnitNum).MaxCoolAirVolFlow;
                 if (PTUnit(PTUnitNum).useVSCoilModel) {
                     SimVariableSpeedCoils(state,
-                                          BlankString,
+                                          std::string(),
                                           PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                           PTUnit(PTUnitNum).OpMode,
                                           PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
@@ -5997,7 +5985,7 @@ namespace PackagedTerminalHeatPump {
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
-                                          BlankString,
+                                          std::string(),
                                           PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                           QZnReq,
                                           dOne,
@@ -6039,7 +6027,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     SimWatertoAirHPSimple(state,
-                                          BlankString,
+                                          std::string(),
                                           PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                           dZero,
                                           dZero,
@@ -6128,7 +6116,7 @@ namespace PackagedTerminalHeatPump {
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                         SimWatertoAirHPSimple(state,
-                                              BlankString,
+                                              std::string(),
                                               PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                               QZnReq,
                                               dZero,
@@ -6198,7 +6186,7 @@ namespace PackagedTerminalHeatPump {
                                   OnOffAirFlowRatio);
                     } else if (SELECT_CASE_var == PTWSHPUnit) {
                         SimWatertoAirHPSimple(state,
-                                              BlankString,
+                                              std::string(),
                                               PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                               dZero,
                                               dZero,
@@ -7282,19 +7270,19 @@ namespace PackagedTerminalHeatPump {
         // Set latent load for heating
         if (HeatingLoad) {
             TotalZoneLatentLoad = 0.0;
-            PTUnit(PTUnitNum).HeatCoolMode = HeatingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
             // Set latent load for cooling and no sensible load condition
         } else {
             TotalZoneLatentLoad = QLatReq;
-            PTUnit(PTUnitNum).HeatCoolMode = CoolingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
         }
 
         if (HeatingLoad) {
-            PTUnit(PTUnitNum).HeatCoolMode = HeatingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
         } else if (CoolingLoad) {
-            PTUnit(PTUnitNum).HeatCoolMode = CoolingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
         } else {
-            PTUnit(PTUnitNum).HeatCoolMode = 0;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
         }
 
         // set the on/off flags
@@ -7494,13 +7482,13 @@ namespace PackagedTerminalHeatPump {
         // Get full load result
         PartLoadFrac = 1.0;
         SpeedRatio = 1.0;
-        if (PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) {
+        if (PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) {
             if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
                 SpeedNum = PTUnit(PTUnitNum).NumOfSpeedCooling;
             } else {
                 SpeedNum = PTUnit(PTUnitNum).NumOfSpeedHeating;
             }
-        } else if (PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) {
+        } else if (PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) {
             SpeedNum = PTUnit(PTUnitNum).NumOfSpeedCooling;
         } else {
             SpeedNum = 1;
@@ -8186,7 +8174,7 @@ namespace PackagedTerminalHeatPump {
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
 
             SimVariableSpeedCoils(state,
-                                  BlankString,
+                                  std::string(),
                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                   PTUnit(PTUnitNum).OpMode,
                                   PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
@@ -8203,7 +8191,7 @@ namespace PackagedTerminalHeatPump {
             SaveCompressorPLR = PartLoadFrac;
         } else { // cooling coil is off
             SimVariableSpeedCoils(state,
-                                  BlankString,
+                                  std::string(),
                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                   PTUnit(PTUnitNum).OpMode,
                                   PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
@@ -8221,7 +8209,7 @@ namespace PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).UnitType_Num != PTACUnit) { // PTHP
             if (HeatingLoad) {
                 SimVariableSpeedCoils(state,
-                                      BlankString,
+                                      std::string(),
                                       PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                       PTUnit(PTUnitNum).OpMode,
                                       PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
@@ -8239,7 +8227,7 @@ namespace PackagedTerminalHeatPump {
             } else {
                 //   heating coil is off
                 SimVariableSpeedCoils(state,
-                                      BlankString,
+                                      std::string(),
                                       PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                       PTUnit(PTUnitNum).OpMode,
                                       PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
@@ -8615,7 +8603,7 @@ namespace PackagedTerminalHeatPump {
                         MSHPMassFlowRateLow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum - 1);
                         MSHPMassFlowRateHigh = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                     }
-                } else if (PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) {
+                } else if (PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) {
                     if (SpeedNum == 1) {
                         CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
                         CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
@@ -8634,11 +8622,11 @@ namespace PackagedTerminalHeatPump {
 
             // Set up fan flow rate during compressor off time
             if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-                if (PTUnit(PTUnitNum).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+                if (PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
                     if (SpeedNum == 1) { // LOWEST SPEED USE IDLE FLOW
                         CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
                         CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
-                    } else if (PTUnit(PTUnitNum).LastMode == HeatingMode) {
+                    } else if (PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
                         CompOffMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                         CompOffFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
                     } else {
@@ -8734,29 +8722,29 @@ namespace PackagedTerminalHeatPump {
         OutNode = PTUnit(PTUnitNum).AirOutNode;
 
         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadRatio, OnOffAirFlowRatio);
-        // INTIALIZE FIXED SPEED FIRST, AND OVER-WRITE USING MUL-SPEED
+        // INITIALIZE FIXED SPEED FIRST, AND OVER-WRITE USING MUL-SPEED
 
         // FLOW:
 
         if (CoolingLoad) {
-            PTUnit(PTUnitNum).HeatCoolMode = CoolingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
         } else if (HeatingLoad) {
-            PTUnit(PTUnitNum).HeatCoolMode = HeatingMode;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
         } else {
-            PTUnit(PTUnitNum).HeatCoolMode = 0;
+            PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
         }
 
         // Set the inlet node mass flow rate
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
             // constant fan mode
-            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+            if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
-                PTUnit(PTUnitNum).LastMode = HeatingMode;
-            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+                PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
+            } else if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
-                PTUnit(PTUnitNum).LastMode = CoolingMode;
+                PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
             } else {
                 CompOnMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
                 CompOnFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
@@ -8765,10 +8753,10 @@ namespace PackagedTerminalHeatPump {
             CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
         } else {
             // cycling fan mode
-            if ((PTUnit(PTUnitNum).HeatCoolMode == HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+            if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
-            } else if ((PTUnit(PTUnitNum).HeatCoolMode == CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+            } else if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
                 CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                 CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
             } else {
@@ -8786,7 +8774,7 @@ namespace PackagedTerminalHeatPump {
                 Node(InNode).MassFlowRate = CompOnMassFlow;
                 PartLoadRatio = 0.0;
             } else {
-                if (PTUnit(PTUnitNum).HeatCoolMode != 0) {
+                if (PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Unassigned) {
                     PartLoadRatio = 1.0;
                 } else {
                     PartLoadRatio = 0.0;
@@ -9096,6 +9084,4 @@ namespace PackagedTerminalHeatPump {
 
         return Residuum;
     }
-} // namespace PackagedTerminalHeatPump
-
 } // namespace EnergyPlus

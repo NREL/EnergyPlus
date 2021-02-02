@@ -892,8 +892,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PTUnit(1).MaxNoCoolHeatAirMassFlow = PrimaryAirMassFlowRate;
     PTUnit(1).NoHeatCoolSpeedRatio = 1.0;
     PTUnit(1).NoCoolHeatOutAirMassFlow = PrimaryAirMassFlowRate;
-    PTUnit(1).AirFlowControl = UseCompressorOnFlow;
-    PTUnit(1).LastMode = 2;
+    PTUnit(1).AirFlowControl = PackagedTerminalHeatPump::iAirflowCtrlMode::UseCompressorOnFlow;
+    PTUnit(1).LastMode = PackagedTerminalHeatPump::iCompMode::HeatingMode;
 
     // initialized to false
     ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
