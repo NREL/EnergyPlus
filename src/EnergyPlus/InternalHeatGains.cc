@@ -4918,7 +4918,6 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.4R},", People(Loop).CO2RateFactor);
             print(state.files.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
 
-            // TODO
             if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
 

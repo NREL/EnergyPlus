@@ -193,12 +193,6 @@ namespace ThermalComfort {
 
     void GetThermalComfortInputsASHRAE(EnergyPlusData &state);
 
-    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
-
-    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state);
-
-    void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state);
-
     Real64 CalcStandardEffectiveTemp(EnergyPlusData &state,
                                      Real64 AirTemp,
                                      Real64 RadTemp,
@@ -208,6 +202,16 @@ namespace ThermalComfort {
                                      Real64 CloUnit,
                                      Real64 WorkEff
     );
+
+    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state,
+                                      Real64 &CoolingEffect,
+                                      Real64 &CoolingEffectAdjustedPMV);
+
+    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
+
+    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state);
+
+    void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state);
 
     void CalcThermalComfortKSU(EnergyPlusData &state);
 
@@ -225,6 +229,7 @@ namespace ThermalComfort {
     Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum);
 
     Real64 CalcSatVapPressFromTemp(Real64 const Temp);
+
     Real64 CalcSatVapPressFromTempTorr(Real64 const Temp);
 
     Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)

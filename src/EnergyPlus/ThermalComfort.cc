@@ -126,17 +126,9 @@ namespace ThermalComfort {
         //     AUTHOR         Rick Strand
         //     DATE WRITTEN   February 2000
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ASH55Flag(false);
-        static bool CEN15251Flag(false);
-
         if (state.dataThermalComforts->FirstTimeFlag) {
             InitThermalComfort(state); // Mainly sets up output stuff
             state.dataThermalComforts->FirstTimeFlag = false;
-            if (TotPeople > 0) {
-                if (std::any_of(People.begin(), People.end(), [](PeopleData const &e) { return e.AdaptiveASH55; })) ASH55Flag = true;
-                if (std::any_of(People.begin(), People.end(), [](PeopleData const &e) { return e.AdaptiveCEN15251; })) CEN15251Flag = true;
-            }
         }
 
         if (state.dataGlobal->DayOfSim == 1) {
@@ -169,8 +161,8 @@ namespace ThermalComfort {
             if (DataHeatBalance::AnyThermalComfortAnkleDraftModel) CalcThermalComfortAnkleDraftASH(state);
             CalcThermalComfortSimpleASH55(state);
             CalcIfSetPointMet(state);
-            if (ASH55Flag) CalcThermalComfortAdaptiveASH55(state, false);
-            if (CEN15251Flag) CalcThermalComfortAdaptiveCEN15251(state, false);
+            if (DataHeatBalance::AdaptiveComfortRequested_ASH55) CalcThermalComfortAdaptiveASH55(state, false);
+            if (DataHeatBalance::AdaptiveComfortRequested_CEN15251) CalcThermalComfortAdaptiveCEN15251(state, false);
         }
     }
 
@@ -798,134 +790,9 @@ namespace ThermalComfort {
         state.dataThermalComforts->ActMet = state.dataThermalComforts->ActLevel / state.dataThermalComforts->ActLevelConv;
     }
 
-    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state)
-    {
-        // This subroutine calculates ET, SET, SETPMV, SETPPD using Pierce two-node model.
-        // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D.
-
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
-
-            if (!People(state.dataThermalComforts->PeopleNum).Pierce) continue;
-
-            // STEP 1: Get input (TA, TR, RH, VEL, CLO, MET, WME)
-            GetThermalComfortInputsASHRAE(state);
-
-            // STEP 2: Calculate SET.
-            Real64 SET = CalcStandardEffectiveTemp(state, state.dataThermalComforts->AirTemp, state.dataThermalComforts->RadTemp,
-                    state.dataThermalComforts->RelHum, state.dataThermalComforts->AirVel, state.dataThermalComforts->ActMet, state.dataThermalComforts->CloUnit, state.dataThermalComforts->WorkEff);
-
-
-            // STEP 3: Report SET related variables.
-
-            // Fanger's comfort equation. Thermal transfer coefficient to calculate PMV
-            state.dataThermalComforts->ThermSensTransCoef = 0.303 * std::exp(-0.036 * state.dataThermalComforts->ActLevel) + 0.028;
-            // Fanger's reg. sweating at comfort threshold (PMV=0) is:
-            state.dataThermalComforts->EvapHeatLossRegComf = (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->ActLevelConv) * 0.42;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PiercePMVET =
-                state.dataThermalComforts->ThermSensTransCoef * (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->RespHeatLoss - state.dataThermalComforts->DryHeatLossET - state.dataThermalComforts->EvapHeatLossDiff - state.dataThermalComforts->EvapHeatLossRegComf);
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PiercePMVSET =
-                state.dataThermalComforts->ThermSensTransCoef * (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->RespHeatLoss - state.dataThermalComforts->DryHeatLossSET - state.dataThermalComforts->EvapHeatLossDiff - state.dataThermalComforts->EvapHeatLossRegComf);
-
-            // PHeat stress and heat strain indices derived from EvapHeatLoss, DISC (discomfort) varies with relative thermoregulatory strain
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceDISC =
-                5.0 * (state.dataThermalComforts->EvapHeatLossRegSweat - state.dataThermalComforts->EvapHeatLossRegComf) / (state.dataThermalComforts->EvapHeatLossMax - state.dataThermalComforts->EvapHeatLossRegComf - state.dataThermalComforts->EvapHeatLossDiff);
-
-            // Thermal sensation TSENS as function of mean body temp.-
-            // AvgBodyTempLow is AvgBodyTemp when DISC is 0. (lower limit of zone of evap. regul.)
-            Real64 AvgBodyTempLow = (0.185 / state.dataThermalComforts->ActLevelConv) * (state.dataThermalComforts->ActLevel - state.dataThermalComforts->WorkEff) + 36.313;
-            // AvgBodyTempHigh is AvgBodyTemp when HSI=100 (upper limit of zone of evap. regul.)
-            Real64 AvgBodyTempHigh = (0.359 / state.dataThermalComforts->ActLevelConv) * (state.dataThermalComforts->ActLevel - state.dataThermalComforts->WorkEff) + 36.664;
-
-            // TSENS=DISC=4.7 when HSI =1 00 (HSI is Belding's classic heat stress index)
-            // In cold, DISC &TSENS are the same and neg. fct of AvgBodyTemp
-            if (state.dataThermalComforts->AvgBodyTemp > AvgBodyTempLow) {
-                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS = 4.7 * (state.dataThermalComforts->AvgBodyTemp - AvgBodyTempLow) / (AvgBodyTempHigh - AvgBodyTempLow);
-
-            } else {
-                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS = 0.68175 * (state.dataThermalComforts->AvgBodyTemp - AvgBodyTempLow);
-                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceDISC = state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS;
-            }
-
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortMRT = state.dataThermalComforts->RadTemp;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortOpTemp = (state.dataThermalComforts->RadTemp + state.dataThermalComforts->AirTemp) / 2.0;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceSET = SET;
-        }
-    }
-
-    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state)
-    {
-        // This subroutine calculates ASHRAE Cooling effect adjusted PMV and PPD
-        // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D.
-
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
-
-            if (!People(state.dataThermalComforts->PeopleNum).CoolingEffectASH55) continue;
-
-            // STEP 1: Get input (TA, TR, RH, VEL, CLO, MET, WME)
-            GetThermalComfortInputsASHRAE(state);
-
-            // STEP 2: Calculate SET without cooling effect.
-            Real64 RelAirVel = CalcRelativeAirVelocity(state.dataThermalComforts->AirVel, state.dataThermalComforts->ActMet);
-            Real64 SET = CalcStandardEffectiveTemp(state, state.dataThermalComforts->AirTemp, state.dataThermalComforts->RadTemp,
-                                                   state.dataThermalComforts->RelHum, RelAirVel, state.dataThermalComforts->ActMet, state.dataThermalComforts->CloUnit, state.dataThermalComforts->WorkEff);
-
-
-            // STEP 3: Calculate elevated air cooling effect using the SET function.
-            Real64 StillAirVel = 0.1;
-            auto ce_root_function = [&state, &StillAirVel, &SET](Real64 x) {
-                return CalcStandardEffectiveTemp(state, state.dataThermalComforts->AirTemp - x,
-                                                 state.dataThermalComforts->RadTemp - x,
-                                                 state.dataThermalComforts->RelHum, StillAirVel,
-                                                 state.dataThermalComforts->ActMet,
-                                                 state.dataThermalComforts->CloUnit,
-                                                 state.dataThermalComforts->WorkEff) - SET;
-            };
-
-            auto ce_root_termination = [](Real64 min, Real64 max) {
-                return abs(max - min) <= 0.01;
-            };
-            Real64 lowerBound = 0.0;
-            Real64 upperBound = 50.0;
-            Real64 CoolingEffect = 0;
-            Real64 CoolingEffectAdjustedPMV;
-            try {
-                std::pair<Real64, Real64> solverResult = boost::math::tools::bisect(ce_root_function, lowerBound,
-                                                                                    upperBound, ce_root_termination);
-                CoolingEffect = (solverResult.first + solverResult.second) / 2;
-                CoolingEffectAdjustedPMV = CalcFangerPMV(state, state.dataThermalComforts->AirTemp - CoolingEffect,
-                                                         state.dataThermalComforts->RadTemp - CoolingEffect,
-                                                         state.dataThermalComforts->RelHum,
-                                                         StillAirVel,
-                                                         state.dataThermalComforts->ActLevel,
-                                                         state.dataThermalComforts->CloUnit,
-                                                         state.dataThermalComforts->WorkEff);
-            } catch (const std::exception &e) {
-                CoolingEffect = 0;
-                CoolingEffectAdjustedPMV = CalcFangerPMV(state, state.dataThermalComforts->AirTemp,
-                                                         state.dataThermalComforts->RadTemp,
-                                                         state.dataThermalComforts->RelHum,
-                                                         RelAirVel,
-                                                         state.dataThermalComforts->ActLevel,
-                                                         state.dataThermalComforts->CloUnit,
-                                                         state.dataThermalComforts->WorkEff);
-                if (state.dataThermalComforts->FirstTimeCoolingEffectWarning) {
-                    ShowWarningError(state, "The cooling effect could not be solved for People=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\"");
-                    ShowContinueError(state, "As a result, no cooling effect will be applied to adjust the PMV and PPD results.");
-                    state.dataThermalComforts->FirstTimeCoolingEffectWarning = false;
-                }
-            }
-
-            // STEP 4: Report.
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectASH55 = CoolingEffect;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectAdjustedPMVASH55 = CoolingEffectAdjustedPMV;
-            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectAdjustedPPDASH55 = CalcFangerPPD(CoolingEffectAdjustedPMV);
-        }
-    }
-
     Real64 CalcStandardEffectiveTemp(EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActMet, Real64 CloUnit, Real64 WorkEff) {
 
-        // Real64 const SkinBloodFlowConst(200.0); // Skin blood flow coefficient for average person; l/m2.hr.k
-        // Real64 const Str(0.1);                  // Constriction constant of skin blood flow for average person //TODO
+
 
         // Thermal const
         Real64 const CloFac(0.25);              // Clothing factor determined experimentally (var KCLO)
@@ -934,8 +801,8 @@ namespace ThermalComfort {
         Real64 const DriCoeffVasodilation(120);  // driving coefficient for vasodilation (var CDIL)
         Real64 const DriCoeffVasoconstriction(0.5);  // (var CSTR)
         Real64 const MaxSkinBloodFlow(90.0);    // Max. value of skin blood flow
-        Real64 const MinSkinBloodFlow(0.5);     // Min. value of skin blood flow //TODO
-        Real64 const RegSweatMax(500);          // Max. value of regulatory sweating; w/m2 //TODO
+        Real64 const MinSkinBloodFlow(0.5);     // Min. value of skin blood flow
+        Real64 const RegSweatMax(500);          // Max. value of regulatory sweating; w/m2
 
         // Standard condition const
         // Definition of vascular control signals CoreTempSet, SkinTempSet, and AvgBodyTempSet are the setpoints for core, skin and
@@ -946,17 +813,14 @@ namespace ThermalComfort {
         Real64 const SkinBloodFlowSet(6.3);  // (var SkinBloodFlowNeutral)
         Real64 const SkinMassRatSet(0.1);    // (var ALFA)
 
-        if (AirVel < 0.1) AirVel = 0.1; //TODO
+        if (AirVel < 0.1) AirVel = 0.1;
 
         // (var VaporPressure)
         state.dataThermalComforts->VapPress = RelHum * CalcSatVapPressFromTempTorr(AirTemp);
-//      state.dataThermalComforts->VapPress *= VapPressConv; // Torr to KPa (5.8662 kPa=44 mmHg; .017251=.0023*760 mmHg/101.325 kPa) //TODO - unit conversion?
         Real64 ActLevel = state.dataThermalComforts->ActLevelConv * ActMet;
         state.dataThermalComforts->IntHeatProd = ActLevel - WorkEff;
 
-
         // Step 2: CALCULATE VARIABLESS THAT REMAIN CONSTANT FOR AN HOUR
-//            if (state.dataThermalComforts->CloUnit < 0.01) state.dataThermalComforts->CloUnit = 0.01; //TODO
         Real64 PInAtmospheres = state.dataEnvrn->OutBaroPress / 101325;
         Real64 RClo = CloUnit * 0.155; // (var RCL)
         Real64 TotCloFac = 1.0 + 0.15 * CloUnit;
@@ -977,11 +841,11 @@ namespace ThermalComfort {
         } else {
             EvapEff = 0.59 * std::pow(AirVel, -0.08); // (var ICL)
             state.dataThermalComforts->CloInsul = 0.45;
-        } //TODO
+        }
 
         Real64 CorrectedHC = 3.0 * std::pow(PInAtmospheres, 0.53); // corrected convective heat transfer coefficient
         Real64 ForcedHC = 8.600001 * std::pow((AirVel * PInAtmospheres), 0.53); // forced convective heat transfer coefficient, W/(m2 °C) (CHCV)
-        state.dataThermalComforts->Hc = std::max(CorrectedHC, ForcedHC); // (CHC) //TODO
+        state.dataThermalComforts->Hc = std::max(CorrectedHC, ForcedHC); // (CHC)
         state.dataThermalComforts->Hr = 4.7; // (CHR)
         state.dataThermalComforts->EvapHeatLoss = 0.1 * ActMet;
         Real64 RAir = 1.0 / (TotCloFac * (state.dataThermalComforts->Hc + state.dataThermalComforts->Hr));  // resistance of air layer to dry heat (RA)
@@ -1101,7 +965,7 @@ namespace ThermalComfort {
             // Beginning of dripping (Sweat not evaporated on skin surface)
             if (state.dataThermalComforts->SkinWetTot >= EvapEff) {
                 state.dataThermalComforts->SkinWetTot = EvapEff;
-                state.dataThermalComforts->SkinWetSweat = EvapEff / 0.94; //TODO
+                state.dataThermalComforts->SkinWetSweat = EvapEff / 0.94;
                 state.dataThermalComforts->EvapHeatLossRegSweat = state.dataThermalComforts->SkinWetSweat * state.dataThermalComforts->EvapHeatLossMax;
                 state.dataThermalComforts->SkinWetDiff = (1.0 - state.dataThermalComforts->SkinWetSweat) * 0.06;
                 state.dataThermalComforts->EvapHeatLossDiff = state.dataThermalComforts->SkinWetDiff * state.dataThermalComforts->EvapHeatLossMax;
@@ -1112,7 +976,7 @@ namespace ThermalComfort {
             if (state.dataThermalComforts->EvapHeatLossMax < 0.0) {
                 state.dataThermalComforts->SkinWetDiff = 0.0;
                 state.dataThermalComforts->EvapHeatLossDiff = 0.0;
-                state.dataThermalComforts->EvapHeatLoss = 0.0; //TODO
+                state.dataThermalComforts->EvapHeatLoss = 0.0;
                 state.dataThermalComforts->SkinWetTot = EvapEff;
                 state.dataThermalComforts->SkinWetSweat = EvapEff;
                 state.dataThermalComforts->EvapHeatLossRegSweat = 0.0;
@@ -1189,6 +1053,146 @@ namespace ThermalComfort {
         // SPMV*(PMVSET in prgm) uses SET instead of OpTemp
         state.dataThermalComforts->DryHeatLossSET = StdH * StdEffectCloThermEff * (state.dataThermalComforts->SkinTemp - SET);
         return SET;
+    }
+
+    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state)
+    {
+        // This subroutine calculates ET, SET, SETPMV, SETPPD using Pierce two-node model.
+        // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D.
+
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+
+            if (!People(state.dataThermalComforts->PeopleNum).Pierce) continue;
+
+            // STEP 1: Get input (TA, TR, RH, VEL, CLO, MET, WME)
+            GetThermalComfortInputsASHRAE(state);
+
+            // STEP 2: Calculate SET.
+            Real64 SET = CalcStandardEffectiveTemp(state, state.dataThermalComforts->AirTemp, state.dataThermalComforts->RadTemp,
+                                                   state.dataThermalComforts->RelHum, state.dataThermalComforts->AirVel, state.dataThermalComforts->ActMet, state.dataThermalComforts->CloUnit, state.dataThermalComforts->WorkEff);
+
+            // STEP 3: Report SET related variables.
+            // Fanger's comfort equation. Thermal transfer coefficient to calculate PMV
+            state.dataThermalComforts->ThermSensTransCoef = 0.303 * std::exp(-0.036 * state.dataThermalComforts->ActLevel) + 0.028;
+            // Fanger's reg. sweating at comfort threshold (PMV=0) is:
+            state.dataThermalComforts->EvapHeatLossRegComf = (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->ActLevelConv) * 0.42;
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PiercePMVET =
+                    state.dataThermalComforts->ThermSensTransCoef * (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->RespHeatLoss - state.dataThermalComforts->DryHeatLossET - state.dataThermalComforts->EvapHeatLossDiff - state.dataThermalComforts->EvapHeatLossRegComf);
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PiercePMVSET =
+                    state.dataThermalComforts->ThermSensTransCoef * (state.dataThermalComforts->IntHeatProd - state.dataThermalComforts->RespHeatLoss - state.dataThermalComforts->DryHeatLossSET - state.dataThermalComforts->EvapHeatLossDiff - state.dataThermalComforts->EvapHeatLossRegComf);
+
+            // PHeat stress and heat strain indices derived from EvapHeatLoss, DISC (discomfort) varies with relative thermoregulatory strain
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceDISC =
+                    5.0 * (state.dataThermalComforts->EvapHeatLossRegSweat - state.dataThermalComforts->EvapHeatLossRegComf) / (state.dataThermalComforts->EvapHeatLossMax - state.dataThermalComforts->EvapHeatLossRegComf - state.dataThermalComforts->EvapHeatLossDiff);
+
+            // Thermal sensation TSENS as function of mean body temp.-
+            // AvgBodyTempLow is AvgBodyTemp when DISC is 0. (lower limit of zone of evap. regul.)
+            Real64 AvgBodyTempLow = (0.185 / state.dataThermalComforts->ActLevelConv) * (state.dataThermalComforts->ActLevel - state.dataThermalComforts->WorkEff) + 36.313;
+            // AvgBodyTempHigh is AvgBodyTemp when HSI=100 (upper limit of zone of evap. regul.)
+            Real64 AvgBodyTempHigh = (0.359 / state.dataThermalComforts->ActLevelConv) * (state.dataThermalComforts->ActLevel - state.dataThermalComforts->WorkEff) + 36.664;
+
+            // TSENS=DISC=4.7 when HSI =1 00 (HSI is Belding's classic heat stress index)
+            // In cold, DISC &TSENS are the same and neg. fct of AvgBodyTemp
+            if (state.dataThermalComforts->AvgBodyTemp > AvgBodyTempLow) {
+                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS = 4.7 * (state.dataThermalComforts->AvgBodyTemp - AvgBodyTempLow) / (AvgBodyTempHigh - AvgBodyTempLow);
+
+            } else {
+                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS = 0.68175 * (state.dataThermalComforts->AvgBodyTemp - AvgBodyTempLow);
+                state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceDISC = state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceTSENS;
+            }
+
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortMRT = state.dataThermalComforts->RadTemp;
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).ThermalComfortOpTemp = (state.dataThermalComforts->RadTemp + state.dataThermalComforts->AirTemp) / 2.0;
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).PierceSET = SET;
+        }
+    }
+
+    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state)
+    {
+        // This subroutine calculates ASHRAE Cooling effect adjusted PMV and PPD
+        // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D.
+
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+
+            if (!People(state.dataThermalComforts->PeopleNum).CoolingEffectASH55) continue;
+
+            // Get input (TA, TR, RH, VEL, CLO, MET, WME)
+            GetThermalComfortInputsASHRAE(state);
+
+            // Calculate elevated air cooling effect using the SET function.
+            Real64 CoolingEffect = 0;
+            Real64 CoolingEffectAdjustedPMV;
+            CalcCoolingEffectAdjustedPMV(state, CoolingEffect, CoolingEffectAdjustedPMV);
+
+            // Report.
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectASH55 = CoolingEffect;
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectAdjustedPMVASH55 = CoolingEffectAdjustedPMV;
+            state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).CoolingEffectAdjustedPPDASH55 = CalcFangerPPD(CoolingEffectAdjustedPMV);
+        }
+    }
+
+    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state, Real64 &CoolingEffect, Real64 &CoolingEffectAdjustedPMV) {
+        // Calculate SET without cooling effect.
+        Real64 RelAirVel = CalcRelativeAirVelocity(state.dataThermalComforts->AirVel, state.dataThermalComforts->ActMet);
+        Real64 SET = CalcStandardEffectiveTemp(state,
+                                               state.dataThermalComforts->AirTemp,
+                                               state.dataThermalComforts->RadTemp,
+                                               state.dataThermalComforts->RelHum,
+                                               RelAirVel,
+                                               state.dataThermalComforts->ActMet,
+                                               state.dataThermalComforts->CloUnit,
+                                               state.dataThermalComforts->WorkEff);
+
+        // TODO - This should use the ASHRAE55-2017 PMV calc program. The current Fanger PMV program are not consistent with the new standard.
+        Real64 ASHRAE55PMV = CalcFangerPMV(state, state.dataThermalComforts->AirTemp,
+                                           state.dataThermalComforts->RadTemp,
+                                           state.dataThermalComforts->RelHum,
+                                           RelAirVel,
+                                           state.dataThermalComforts->ActLevel,
+                                           state.dataThermalComforts->CloUnit,
+                                           state.dataThermalComforts->WorkEff);
+
+        Real64 StillAirVel = 0.1;
+        auto ce_root_function = [&state, &StillAirVel, &SET](Real64 x) {
+            return CalcStandardEffectiveTemp(state, state.dataThermalComforts->AirTemp - x,
+                                             state.dataThermalComforts->RadTemp - x,
+                                             state.dataThermalComforts->RelHum, StillAirVel,
+                                             state.dataThermalComforts->ActMet,
+                                             state.dataThermalComforts->CloUnit,
+                                             state.dataThermalComforts->WorkEff) - SET;
+        };
+
+        auto ce_root_termination = [](Real64 min, Real64 max) {
+            return abs(max - min) <= 0.01;
+        };
+        Real64 lowerBound = 0.0;
+        Real64 upperBound = 50.0;
+
+
+        try {
+            std::pair<Real64, Real64> solverResult = boost::math::tools::bisect(ce_root_function, lowerBound,
+                                                                                upperBound, ce_root_termination);
+            CoolingEffect = (solverResult.first + solverResult.second) / 2;
+        } catch (const std::exception &e) {
+            CoolingEffect = 0;
+            if (state.dataThermalComforts->FirstTimeCoolingEffectWarning) {
+                ShowWarningError(state, "The cooling effect could not be solved for People=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\"");
+                ShowContinueError(state, "As a result, no cooling effect will be applied to adjust the PMV and PPD results.");
+                state.dataThermalComforts->FirstTimeCoolingEffectWarning = false;
+            }
+        }
+
+        if (CoolingEffect > 0) {
+            CoolingEffectAdjustedPMV = CalcFangerPMV(state, state.dataThermalComforts->AirTemp - CoolingEffect,
+                                                     state.dataThermalComforts->RadTemp - CoolingEffect,
+                                                     state.dataThermalComforts->RelHum,
+                                                     StillAirVel,
+                                                     state.dataThermalComforts->ActLevel,
+                                                     state.dataThermalComforts->CloUnit,
+                                                     state.dataThermalComforts->WorkEff);
+        } else {
+            CoolingEffectAdjustedPMV = ASHRAE55PMV;
+        }
     }
 
     void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state) {
