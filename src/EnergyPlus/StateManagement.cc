@@ -184,7 +184,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FluidProperties::clear_state();
     Furnaces::clear_state();
     General::clear_state();
-    GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
     GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
@@ -213,7 +212,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();
     NodeInputManager::clear_state();
     OutAirNodeManager::clear_state();

@@ -2285,7 +2285,7 @@ namespace EnergyPlus::SimAirServingZones {
                     for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
                         int compType = thisRetPath.ComponentType_Num(compNum);
                         if (compType == ZoneMixer_Type) {
-                            auto const &thisMixer(MixerComponent::MixerCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisMixer.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
