@@ -209,7 +209,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HybridModel::clear_state();
     HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
     OutAirNodeManager::clear_state();
