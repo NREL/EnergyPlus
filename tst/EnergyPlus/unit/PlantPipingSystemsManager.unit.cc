@@ -132,7 +132,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
@@ -201,7 +201,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -270,7 +270,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName) 
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -477,7 +477,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -546,7 +546,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -615,7 +615,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -684,7 +684,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection) 
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -753,7 +753,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -822,7 +822,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -891,7 +891,7 @@ TEST_F(EnergyPlusFixture, DISABLED_SiteGroundDomainSlab_CheckInputs_BadTimeStepS
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadZoneCoupledDomainInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -960,7 +960,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
@@ -1029,7 +1029,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1098,7 +1098,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1167,7 +1167,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1236,7 +1236,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1305,7 +1305,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1374,7 +1374,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1443,7 +1443,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1512,7 +1512,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName) {
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1581,7 +1581,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
     GetOSCMData(*state, errorsFound);
     GetMaterialData(*state, errorsFound);
 
-    PlantPipingSystemsManager::domains.resize(1);
+    state->dataPlantPipingSysMgr->domains.resize(1);
     ReadBasementInputs(*state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
@@ -1734,17 +1734,17 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::TypeOf_PipingSystemPipeCircuit,
                                                                               "MY PIPE CIRCUIT");
 
-    EXPECT_EQ(2u, PlantPipingSystemsManager::domains.size());
+    EXPECT_EQ(2u, state->dataPlantPipingSysMgr->domains.size());
 
-    EXPECT_TRUE(PlantPipingSystemsManager::domains[0].HasAPipeCircuit);
-    EXPECT_EQ(2, PlantPipingSystemsManager::domains[0].Mesh.X.RegionMeshCount);
-    EXPECT_EQ(2, PlantPipingSystemsManager::domains[0].Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(6, PlantPipingSystemsManager::domains[0].Mesh.Z.RegionMeshCount);
+    EXPECT_TRUE(state->dataPlantPipingSysMgr->domains[0].HasAPipeCircuit);
+    EXPECT_EQ(2, state->dataPlantPipingSysMgr->domains[0].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(2, state->dataPlantPipingSysMgr->domains[0].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(6, state->dataPlantPipingSysMgr->domains[0].Mesh.Z.RegionMeshCount);
 
-    EXPECT_FALSE(PlantPipingSystemsManager::domains[1].HasAPipeCircuit);
-    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.X.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.Y.RegionMeshCount);
-    EXPECT_EQ(4, PlantPipingSystemsManager::domains[1].Mesh.Z.RegionMeshCount);
+    EXPECT_FALSE(state->dataPlantPipingSysMgr->domains[1].HasAPipeCircuit);
+    EXPECT_EQ(4, state->dataPlantPipingSysMgr->domains[1].Mesh.X.RegionMeshCount);
+    EXPECT_EQ(4, state->dataPlantPipingSysMgr->domains[1].Mesh.Y.RegionMeshCount);
+    EXPECT_EQ(4, state->dataPlantPipingSysMgr->domains[1].Mesh.Z.RegionMeshCount);
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;
