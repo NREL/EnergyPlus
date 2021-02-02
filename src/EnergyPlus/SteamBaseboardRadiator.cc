@@ -301,12 +301,12 @@ namespace SteamBaseboardRadiator {
         Real64 const MinSteamFlowRate(0.0);  // Minimum limit of steam volume flow rate in m3/s
         //    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20          ! Maximum number of surfaces that a baseboard heater can radiate to
         int const MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(6);             // get input index to steam baseboard Radiator system heating capacity sizing method
+        int const iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
-            2); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
+            1); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
+            2); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllFracsSummed; // Sum of the fractions radiant
@@ -362,39 +362,90 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName = cAlphaArgs(1);                     // Name of the baseboard
             SteamBaseboardDesignNames(BaseboardDesignNum) = cAlphaArgs(1);
 
-            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = rNumericArgs(1);
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = rNumericArgs(3);
             // Set default convergence tolerance
             if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset <= 0.0) {
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = 0.001;
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(1) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
                                         " was less than the allowable minimum.");
                 ShowContinueError(state, "...reset to default value=[0.001].");
             }
 
+            // Determine steam baseboard radiator system heating design capacity sizing method
+            if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = HeatingDesignCapacity;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = CapacityPerFloorArea;
+                if (!lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
+                    state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+                    if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity <= 0.0) {
+                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
+                                                 rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
+                        ErrorsFound = true;
+                    } else if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity == AutoSize) {
+                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                        ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+                    ErrorsFound = true;
+                }
+            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                if (!lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
+                    state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+                    if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).DesignScaledHeatingCapacity < 0.0) {
+                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                        ShowContinueError(state,
+                                          format("Illegal {} = {:.7T}",
+                                                 cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
+                                                 rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+                    ErrorsFound = true;
+                }
+            } else {
+                ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
+                ShowContinueError(state, "Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+                ErrorsFound = true;
+            }
+
             // Fraction of radiant heat out of the total heating rate of the unit
-            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant = rNumericArgs(2);
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant = rNumericArgs(4);
             if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant < MinFraction) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(4) +
                                         " was lower than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant = MinFraction;
             } else if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant > MaxFraction) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(4) +
                                         " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracRadiant = MaxFraction;
             }
 
             // Fraction of radiant heat addition to the people within the radiant heating capacity specified by the user
-            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson = rNumericArgs(3);
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson = rNumericArgs(5);
             if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson < MinFraction) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                         " was lower than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.3R}].", MinFraction));
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson = MinFraction;
             }
             if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson > MaxFraction) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                         " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.3R}].", MaxFraction));
                 state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).FracDistribPerson = MaxFraction;
@@ -455,9 +506,7 @@ namespace SteamBaseboardRadiator {
             TestCompSet(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam, cAlphaArgs(1), cAlphaArgs(4), cAlphaArgs(5), "Hot Steam Nodes");
 
             // Determine steam baseboard radiator system heating design capacity sizing method
-            if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
-
+            if (SteamBaseboardDesignDataObject.HeatingCapMethod == HeatingDesignCapacity) {
                 if (!lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0 && state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity != AutoSize) {
@@ -474,67 +523,24 @@ namespace SteamBaseboardRadiator {
                     ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).HeatingCapMethod = CapacityPerFloorArea;
-                if (!lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
-                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
-                    if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
-                                                 cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
-                                                 rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
-                        ErrorsFound = true;
-                    } else if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                        ShowContinueError(state, "Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
-                    ErrorsFound = true;
-                }
-            } else if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
-                if (!lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
-                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
-                    if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Illegal {} = {:.7T}",
-                                                 cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
-                                                 rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum)));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, "Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
-                    ErrorsFound = true;
-                }
-            } else {
-                ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + " = " + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                ShowContinueError(state, "Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-                ErrorsFound = true;
+            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == CapacityPerFloorArea) {
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = SteamBaseboardDesignDataObject.DesignScaledHeatingCapacity;
+            } else if (SteamBaseboardDesignDataObject.HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity = SteamBaseboardDesignDataObject.DesignScaledHeatingCapacity;
             }
 
-
             // Desired degree of cooling
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DegOfSubcooling = rNumericArgs(4);
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DegOfSubcooling = rNumericArgs(2);
             // Maximum steam flow rate
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = rNumericArgs(5);
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = rNumericArgs(3);
             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax >= MaxSteamFlowRate) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
                                  " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxSteamFlowRate));
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MaxSteamFlowRate;
             } else if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax <= MinSteamFlowRate &&
                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax != AutoSize) {
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
                                  " was less than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinSteamFlowRate));
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MinSteamFlowRate;
@@ -550,7 +556,7 @@ namespace SteamBaseboardRadiator {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect = 1.0 - AllFracsSummed;
             }
 
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 5;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 3;
             //      IF (SteamBaseboard(BaseboardNum)%TotSurfToDistrib > MaxDistribSurfaces) THEN
             //        CALL ShowWarningError(state, RoutineName//cCMO_BBRadiator_Steam//'="'//TRIM(cAlphaArgs(1))// &
             //          '", the number of surface/radiant fraction groups entered was higher than the allowable maximum.')
@@ -591,22 +597,22 @@ namespace SteamBaseboardRadiator {
 
             AllFracsSummed = SteamBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 6);
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
                     HeatBalanceIntRadExchange::GetRadiantSystemSurface(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr,
                                                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum),
                                                                        ErrorsFound);
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 5);
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 3);
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
-                    ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 5) +
+                    ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 3) +
                                      "was greater than the allowable maximum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.1R}].", MaxFraction));
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = MaxFraction;
                 }
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) < MinFraction) {
-                    ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 5) +
+                    ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 3) +
                                      "was less than the allowable minimum.");
                     ShowContinueError(state, format("...reset to maximum value=[{:.1R}].", MinFraction));
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
@@ -967,6 +973,9 @@ namespace SteamBaseboardRadiator {
         bool PrintFlag;                      // TRUE when sizing information is reported in the eio file
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
+        SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+
+
         // Find the appropriate steam plant sizing object
         PltSizSteamNum = PlantLoop(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum).PlantSizNum;
         //    PltSizSteamNum = MyPlantSizingIndex('Coil:Heating:Steam', SteamBaseboard(BaseboardNum)%EquipID, &
@@ -1000,7 +1009,7 @@ namespace SteamBaseboardRadiator {
                     FieldNum = 1;
                     PrintFlag = false;
                     SizingString = state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
-                    CapSizingMethod = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).HeatingCapMethod;
+                    CapSizingMethod = SteamBaseboardDesignDataObject.HeatingCapMethod;
                     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                         CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
