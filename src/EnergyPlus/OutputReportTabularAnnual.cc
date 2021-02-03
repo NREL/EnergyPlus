@@ -642,15 +642,13 @@ namespace OutputReportTabularAnnual {
             std::vector<AnnualTable>::iterator annualTableIt;
             for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
                 // annualTableIt->writeTable(state, state.dataOutRptTab->unitsStyle);
-                // JY 2021-01-12 Use overloaded function for Dual Units instead
-                // annualTableIt->writeTable(state, unitsStyle_cur, produceSQLite);
-                // JY 2021-01-17 added parameters rather than using overloading
+                // Jan 2021: Use the revised version with added parameters for dual-unit reporting
                 annualTableIt->writeTable(state, unitsStyle_cur, produceTabular, produceSQLite);
             }
         }
     }
 
-    // JY Jan 2021: This function has been modifed to accommondate more parameters for dual units
+    // Jan 2021: This function has been modifed to accommondate more parameters for dual-unit reporting
     void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
     {
         Array1D_string columnHead;

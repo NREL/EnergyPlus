@@ -124,9 +124,9 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                         } else if (UtilityRoutines::SameString(option2, "InchPound")) {
                             sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
                         } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
-                            // Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
-                            // the value "NotFound" is temporarily used for to stand for the "UseOutputControlTableStyles"; 
-                            // This will be concretely updated and assigned in OutputReportTabular::WriteTabularReports().
+                            // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
+                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point; 
+                            // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
                             sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;  // sql_ort->unitsStyle;
                         } 
                     }
