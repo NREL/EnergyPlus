@@ -531,127 +531,70 @@ namespace LowTempRadiantSystem {
             // General user input data
             thisRadSysDesign.designName         = Alphas(1);
 
-            thisRadSysDesign.VarFlowTubeConductivity = Numbers(1);
+
+            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state, Alphas(2));
+
+            thisRadSysDesign.TubeDiameterInner = Numbers(1);
+            thisRadSysDesign.TubeDiameterOuter = Numbers(2);
+
+            thisRadSysDesign.VarFlowTubeConductivity = Numbers(3);
 
             // Process the temperature control type
-            thisRadSysDesign.VarFlowControlType = thisRadSysDesign.processRadiantSystemControlInput(state, Alphas(2), cAlphaFields(2), LowTempRadiantSystem::SystemType::HydronicSystem);
+            thisRadSysDesign.VarFlowControlType = thisRadSysDesign.processRadiantSystemControlInput(state, Alphas(3), cAlphaFields(3), LowTempRadiantSystem::SystemType::HydronicSystem);
 
             // Process the setpoint type
-            thisRadSysDesign.VarFlowSetpointType = thisRadSysDesign.processRadiantSystemSetpointInput(state, Alphas(3), cAlphaFields(3));
+            thisRadSysDesign.VarFlowSetpointType = thisRadSysDesign.processRadiantSystemSetpointInput(state, Alphas(4), cAlphaFields(4));
+
+            // Refactor everything below to Alphas as HCMethod, etc
 
             // Determine Low Temp Radiant heating design capacity sizing method
-            if (UtilityRoutines::SameString(Alphas(4), "HeatingDesignCapacity")) {
+            if (UtilityRoutines::SameString(Alphas(5), "HeatingDesignCapacity")) {
                 thisRadSysDesign.HeatingCapMethod = HeatingDesignCapacity;
-                if (!lNumericBlanks(2)) {
-                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(2);
+                if (!lNumericBlanks(4)) {
+                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(4);
                     if (thisRadSysDesign.ScaledHeatingCapacity < 0.0 && thisRadSysDesign.ScaledHeatingCapacity != AutoSize) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                         ErrorsFound = true;
                     }
                 } else {
                     thisRadSysDesign.HeatingWaterNodePresentCheckFlag = true;
 
                 }
-            } else if (UtilityRoutines::SameString(Alphas(4), "CapacityPerFloorArea")) {
+            } else if (UtilityRoutines::SameString(Alphas(5), "CapacityPerFloorArea")) {
                 thisRadSysDesign.HeatingCapMethod = CapacityPerFloorArea;
-                if (!lNumericBlanks(3)) {
-                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(3);
+                if (!lNumericBlanks(5)) {
+                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(5);
                     if (thisRadSysDesign.ScaledHeatingCapacity <= 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(4) + " = " + Alphas(4));
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
+                        ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + Alphas(5));
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(5), Numbers(5)));
                         ErrorsFound = true;
                     } else if (thisRadSysDesign.ScaledHeatingCapacity == AutoSize) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(4) + " = " + Alphas(4));
-                        ShowContinueError(state, "Illegal " + cNumericFields(3) + " = Autosize");
+                        ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + Alphas(5));
+                        ShowContinueError(state, "Illegal " + cNumericFields(5) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
                     ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(4) + " = " + Alphas(4));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(3));
+                    ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + Alphas(5));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(5));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(4), "FractionOfAutosizedHeatingCapacity")) {
+            } else if (UtilityRoutines::SameString(Alphas(5), "FractionOfAutosizedHeatingCapacity")) {
                 thisRadSysDesign.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
-                if (!lNumericBlanks(4)) {
-                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(4);
-                    if (thisRadSysDesign.ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(4) + " = " + Alphas(4));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(4));
-                    ErrorsFound = true;
-                }
-            } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                ShowContinueError(state, "Illegal " + cAlphaFields(4) + " = " + Alphas(4));
-                ErrorsFound = true;
-            }
-
-            thisRadSysDesign.HotThrottlRange    = Numbers(5);
-
-            thisRadSysDesign.HotSetptSched = Alphas(5);
-            thisRadSysDesign.HotSetptSchedPtr = GetScheduleIndex(state,  thisRadSysDesign.HotSetptSched);
-            if ((thisRadSysDesign.HotSetptSchedPtr == 0) && (!lAlphaBlanks(5))) {
-                ShowSevereError(state, cAlphaFields(5) + " not found: " + Alphas(5));
-                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
-                ErrorsFound = true;
-            }
-
-            // Determine Low Temp Radiant cooling design capacity sizing method
-            if (UtilityRoutines::SameString(Alphas(6), "CoolingDesignCapacity")) {
-                thisRadSysDesign.CoolingCapMethod = CoolingDesignCapacity;
                 if (!lNumericBlanks(6)) {
-                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(6);
-                    if (thisRadSysDesign.ScaledCoolingCapacity < 0.0 && thisRadSysDesign.ScaledCoolingCapacity != AutoSize) {
+                    thisRadSysDesign.ScaledHeatingCapacity = Numbers(6);
+                    if (thisRadSysDesign.ScaledHeatingCapacity < 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(6), Numbers(6)));
                         ErrorsFound = true;
                     }
                 } else {
-                    thisRadSysDesign.CoolingWaterNodePresentCheckFlag = true;
-                }
-            } else if (UtilityRoutines::SameString(Alphas(6), "CapacityPerFloorArea")) {
-                thisRadSysDesign.CoolingCapMethod = CapacityPerFloorArea;
-                if (!lNumericBlanks(7)) {
-                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(7);
-                    if (thisRadSysDesign.ScaledCoolingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(6) + " = " + Alphas(6));
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(7), Numbers(7)));
-                        ErrorsFound = true;
-                    } else if (thisRadSysDesign.ScaledCoolingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(6) + " = " + Alphas(6));
-                        ShowContinueError(state, "Illegal " + cNumericFields(7) + " = Autosize");
-                        ErrorsFound = true;
-                    }
-                } else {
                     ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
                     ShowContinueError(state, "Input for " + cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(7));
-                    ErrorsFound = true;
-                }
-            } else if (UtilityRoutines::SameString(Alphas(6), "FractionOfAutosizedCoolingCapacity")) {
-                thisRadSysDesign.CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
-                if (!lNumericBlanks(8)) {
-                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(8);
-                    if (thisRadSysDesign.ScaledCoolingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(8), Numbers(8)));
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
-                    ShowContinueError(state, "Input for " + cAlphaFields(6) + " = " + Alphas(6));
-                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(8));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(6));
                     ErrorsFound = true;
                 }
             } else {
@@ -660,30 +603,92 @@ namespace LowTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            thisRadSysDesign.ColdThrottlRange = Numbers(9);
+            thisRadSysDesign.HotThrottlRange    = Numbers(7);
 
-            thisRadSysDesign.ColdSetptSched = Alphas(7);
-            thisRadSysDesign.ColdSetptSchedPtr = GetScheduleIndex(state, Alphas(7));
-            if ((thisRadSysDesign.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(7))) {
-                ShowSevereError(state, cAlphaFields(7) + " not found: " + Alphas(7));
+            thisRadSysDesign.HotSetptSched = Alphas(6);
+            thisRadSysDesign.HotSetptSchedPtr = GetScheduleIndex(state,  thisRadSysDesign.HotSetptSched);
+            if ((thisRadSysDesign.HotSetptSchedPtr == 0) && (!lAlphaBlanks(6))) {
+                ShowSevereError(state, cAlphaFields(6) + " not found: " + Alphas(6));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(8), Off)) {
+            // Determine Low Temp Radiant cooling design capacity sizing method
+            if (UtilityRoutines::SameString(Alphas(7), "CoolingDesignCapacity")) {
+                thisRadSysDesign.CoolingCapMethod = CoolingDesignCapacity;
+                if (!lNumericBlanks(8)) {
+                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(8);
+                    if (thisRadSysDesign.ScaledCoolingCapacity < 0.0 && thisRadSysDesign.ScaledCoolingCapacity != AutoSize) {
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(8), Numbers(8)));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    thisRadSysDesign.CoolingWaterNodePresentCheckFlag = true;
+                }
+            } else if (UtilityRoutines::SameString(Alphas(7), "CapacityPerFloorArea")) {
+                thisRadSysDesign.CoolingCapMethod = CapacityPerFloorArea;
+                if (!lNumericBlanks(9)) {
+                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(9);
+                    if (thisRadSysDesign.ScaledCoolingCapacity <= 0.0) {
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + Alphas(7));
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(9), Numbers(9)));
+                        ErrorsFound = true;
+                    } else if (thisRadSysDesign.ScaledCoolingCapacity == AutoSize) {
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + Alphas(7));
+                        ShowContinueError(state, "Illegal " + cNumericFields(9) + " = Autosize");
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                    ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + Alphas(7));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(9));
+                    ErrorsFound = true;
+                }
+            } else if (UtilityRoutines::SameString(Alphas(7), "FractionOfAutosizedCoolingCapacity")) {
+                thisRadSysDesign.CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
+                if (!lNumericBlanks(10)) {
+                    thisRadSysDesign.ScaledCoolingCapacity = Numbers(10);
+                    if (thisRadSysDesign.ScaledCoolingCapacity < 0.0) {
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(10), Numbers(10)));
+                        ErrorsFound = true;
+                    }
+                } else {
+                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                    ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + Alphas(7));
+                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(10));
+                    ErrorsFound = true;
+                }
+            } else {
+                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                ShowContinueError(state, "Illegal " + cAlphaFields(7) + " = " + Alphas(7));
+                ErrorsFound = true;
+            }
+
+            thisRadSysDesign.ColdThrottlRange = Numbers(11);
+
+            thisRadSysDesign.ColdSetptSched = Alphas(8);
+            thisRadSysDesign.ColdSetptSchedPtr = GetScheduleIndex(state, Alphas(8));
+            if ((thisRadSysDesign.ColdSetptSchedPtr == 0) && (!lAlphaBlanks(8))) {
+                ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8));
+                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
+                ErrorsFound = true;
+            }
+
+            if (UtilityRoutines::SameString(Alphas(9), Off)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(8), SimpleOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(9), SimpleOff)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(8), VariableOff)) {
+            } else if (UtilityRoutines::SameString(Alphas(9), VariableOff)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlVariedOff;
             } else {
                 thisRadSysDesign.CondCtrlType = CondCtrlSimpleOff;
             }
 
-            thisRadSysDesign.CondDewPtDeltaT    = Numbers(10);
-            thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state, Alphas(9));
-            thisRadSysDesign.TubeDiameterInner = Numbers(11);
-            thisRadSysDesign.TubeDiameterOuter = Numbers(12);
+            thisRadSysDesign.CondDewPtDeltaT    = Numbers(12);
 
             thisRadSysDesign.schedNameChangeoverDelay = Alphas(10);
             if (!lAlphaBlanks(11)) {
@@ -2743,7 +2748,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = HeatingCapacitySizing;
-                FieldNum = 2;
+                FieldNum = 4;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = HeatingCapMethod;
@@ -2904,7 +2909,7 @@ namespace LowTempRadiantSystem {
             if (CurZoneEqNum > 0) {
 
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 6;
+                FieldNum = 8;
                 PrintFlag = true;
                 SizingString = HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr).FieldNames(FieldNum) + " [W]";
                 CapSizingMethod = CoolingCapMethod;

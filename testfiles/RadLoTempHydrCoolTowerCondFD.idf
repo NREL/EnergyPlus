@@ -1351,6 +1351,9 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject1,      !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     HalfFlowPower,           !- Setpoint Control Type
@@ -1367,13 +1370,13 @@
    2.0,                     !- Cooling Control Throttling Range {deltaC}
    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
    ,                        !- Condensation Control Type
-   1,                       !- Condensation Control Dewpoint Offset {C}
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016;                   !- Hydronic Tubing Outside Diameter {m}
+   1;                       !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
    JermyDesignObject2,      !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     HalfFlowPower,           !- Setpoint Control Type
@@ -1390,10 +1393,7 @@
    2.0,                     !- Cooling Control Throttling Range {deltaC}
    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
    SimpleOff,               !- Condensation Control Type
-   1,                       !- Condensation Control Dewpoint Offset {C}
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016;                   !- Hydronic Tubing Outside Diameter {m}
+   1;                       !- Condensation Control Dewpoint Offset {C}
 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
