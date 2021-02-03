@@ -2144,6 +2144,14 @@ namespace EMSManager {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) continue;
 
+            SetupEMSActuator(state,
+                             "Surface",
+                             Surface(SurfNum).Name,
+                             "View Factor To Ground",
+                             "[ ]",
+                             Surface(SurfNum).ViewFactorGroundEMSOverrideOn,
+                             Surface(SurfNum).ViewFactorGroundEMSOverrideValue);
+
             SetupEMSActuator(state, "Surface",
                              Surface(SurfNum).Name,
                              "Outdoor Air Drybulb Temperature",
