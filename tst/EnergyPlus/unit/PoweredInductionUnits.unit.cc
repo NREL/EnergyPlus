@@ -554,7 +554,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     int PIUNum = 1;
     PoweredInductionUnits::PIU(PIUNum).Name = "Series PIU";
     PoweredInductionUnits::PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
-    PoweredInductionUnits::PIU(PIUNum).HCoilType_Num = PoweredInductionUnits::HCoilType_Electric;
+    PoweredInductionUnits::PIU(PIUNum).HCoilType_Num = PoweredInductionUnits::iHCoilType::Electric;
 
     // Go into all of the autosize blocks (aside from Heating/Steam coils)
     PoweredInductionUnits::PIU(PIUNum).MaxPriAirVolFlow = AutoSize;

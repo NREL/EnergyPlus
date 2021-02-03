@@ -125,15 +125,8 @@ namespace PoweredInductionUnits {
     using namespace FluidProperties;
     using DataHeatBalFanSys::TempControlType;
 
-    // MODULE PARAMETER DEFINITIONS
-    // coil types in this module
-    int const HCoilType_Gas(1);
-    int const HCoilType_Electric(2);
-    int const HCoilType_SimpleHeating(3);
-    int const HCoilType_SteamAirHeating(4);
-
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const fluidNameWater("WATER");
+    constexpr const char *fluidNameSteam("STEAM");
+    constexpr const char *fluidNameWater("WATER");
 
     // MODULE VARIABLE DECLARATIONS:
     Array1D_bool CheckEquipName;
@@ -355,12 +348,12 @@ namespace PoweredInductionUnits {
 
             PIU(PIUNum).HCoilType = cAlphaArgs(9); // type (key) of heating coil
             if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:WATER")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_SimpleHeating;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:FUEL")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_Gas;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:STEAM")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_SteamAirHeating;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
                 if (PIU(PIUNum).HCoil_FluidIndex == 0) {
@@ -370,7 +363,7 @@ namespace PoweredInductionUnits {
                     SteamMessageNeeded = false;
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_Electric;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
             } else {
                 ShowSevereError(state, "Illegal " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + PIU(PIUNum).Name);
@@ -418,10 +411,10 @@ namespace PoweredInductionUnits {
                                                            cAlphaFieldNames(6));
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
-            if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
+            if (PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
-            if (PIU(PIUNum).HCoilType_Num == HCoilType_SteamAirHeating) {
+            if (PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
             PIU(PIUNum).MixerName = cAlphaArgs(7); // name of zone mixer object
@@ -549,12 +542,12 @@ namespace PoweredInductionUnits {
             PIU(PIUNum).FanOnFlowFrac = rNumericArgs(4);
             PIU(PIUNum).HCoilType = cAlphaArgs(9); // type (key) of heating coil
             if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:WATER")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_SimpleHeating;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::SimpleHeating;
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:FUEL")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_Gas;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::Gas;
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:STEAM")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_SteamAirHeating;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::SteamAirHeating;
                 PIU(PIUNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
                 PIU(PIUNum).HCoil_FluidIndex = FindRefrigerant(state, "Steam");
                 if (PIU(PIUNum).HCoil_FluidIndex == 0) {
@@ -564,7 +557,7 @@ namespace PoweredInductionUnits {
                     SteamMessageNeeded = false;
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
-                PIU(PIUNum).HCoilType_Num = HCoilType_Electric;
+                PIU(PIUNum).HCoilType_Num = iHCoilType::Electric;
             } else {
                 ShowSevereError(state, "Illegal " + cAlphaFieldNames(9) + " = " + cAlphaArgs(9));
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + PIU(PIUNum).Name);
@@ -628,10 +621,10 @@ namespace PoweredInductionUnits {
             //      GetOnlySingleNode(state, cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
             //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
             //  END IF
-            if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
+            if (PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
-            if (PIU(PIUNum).HCoilType_Num == HCoilType_SteamAirHeating) {
+            if (PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
             PIU(PIUNum).MixerName = cAlphaArgs(7); // name of zone mixer object
@@ -895,7 +888,7 @@ namespace PoweredInductionUnits {
                 Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxPriAirMassFlow;
             }
 
-            if (((PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) || (PIU(PIUNum).HCoilType_Num == HCoilType_SteamAirHeating)) &&
+            if (((PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) || (PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating)) &&
                 !MyPlantScanFlag(PIUNum)) {
                 InitComponentNodes(PIU(PIUNum).MinHotWaterFlow,
                                    PIU(PIUNum).MaxHotWaterFlow,
@@ -1466,7 +1459,7 @@ namespace PoweredInductionUnits {
             TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = PIU(PIUNum).MaxVolHotSteamFlow;
             TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
             TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir = PIU(PIUNum).InducesPlenumAir;
-            if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
+            if (PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
                 SetCoilDesFlow(state, PIU(PIUNum).HCoilType, PIU(PIUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
         }
@@ -1695,7 +1688,7 @@ namespace PoweredInductionUnits {
         {
             auto const SELECT_CASE_var(PIU(PIUNum).HCoilType_Num);
 
-            if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+            if (SELECT_CASE_var == iHCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                 if (!HCoilOn) {
                     // call the reheat coil with the NO FLOW condition
                     mdot = 0.0;
@@ -1732,7 +1725,7 @@ namespace PoweredInductionUnits {
                                       PIU(PIUNum).HWLoopSide,
                                       PIU(PIUNum).HWBranchNum);
                 }
-            } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
+            } else if (SELECT_CASE_var == iHCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
@@ -1740,7 +1733,7 @@ namespace PoweredInductionUnits {
                 }
                 SimulateSteamCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index, QCoilReq);
 
-            } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+            } else if (SELECT_CASE_var == iHCoilType::Electric) { // COIL:ELECTRIC:HEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
@@ -1748,7 +1741,7 @@ namespace PoweredInductionUnits {
                 }
                 SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
 
-            } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+            } else if (SELECT_CASE_var == iHCoilType::Gas) { // COIL:GAS:HEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
@@ -1988,7 +1981,7 @@ namespace PoweredInductionUnits {
         {
             auto const SELECT_CASE_var(PIU(PIUNum).HCoilType_Num);
 
-            if (SELECT_CASE_var == HCoilType_SimpleHeating) { // COIL:WATER:SIMPLEHEATING
+            if (SELECT_CASE_var == iHCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                 if (!HCoilOn) {
                     // call the reheat coil with the NO FLOW condition
                     mdot = 0.0;
@@ -2023,14 +2016,14 @@ namespace PoweredInductionUnits {
                                       PIU(PIUNum).HWLoopSide,
                                       PIU(PIUNum).HWBranchNum);
                 }
-            } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
+            } else if (SELECT_CASE_var == iHCoilType::SteamAirHeating) { // COIL:STEAM:AIRHEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
                     QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
                 }
                 SimulateSteamCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index, QCoilReq);
-            } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
+            } else if (SELECT_CASE_var == iHCoilType::Electric) { // COIL:ELECTRIC:HEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
@@ -2038,7 +2031,7 @@ namespace PoweredInductionUnits {
                 }
                 SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
 
-            } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
+            } else if (SELECT_CASE_var == iHCoilType::Gas) { // COIL:GAS:HEATING
                 if (!HCoilOn) {
                     QCoilReq = 0.0;
                 } else {
