@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -632,8 +632,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = true;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = true;
     state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
@@ -937,7 +937,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -963,8 +963,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = true;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = true;
     state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
@@ -1351,7 +1351,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on inlet side of PTHP
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -1377,8 +1377,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = true;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = true;
     state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
@@ -1764,7 +1764,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     // get input test for terminal air single duct mixer on supply side of PTHP
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -1790,8 +1790,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = true;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = true;
     state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
     state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on

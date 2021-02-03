@@ -131,25 +131,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
 
-    namespace {
-        // clear_state variables
-        bool MyOneTimeFlag(true);               // initialization flag
-        bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
-    }                                           // namespace
-
     constexpr const char *fluidNameSteam("STEAM");
-
-    bool GetPTUnitInputFlag(true); // First time, input is "gotten"
-    Real64 SaveCompressorPLR(0.0); // holds compressor PLR from active DX coil
-    Real64 SteamDensity(0.0);      // density of steam at 100C, used for steam heating coils
-    bool HeatingLoad(false);       // defines a heating load on PTUnit
-    bool CoolingLoad(false);       // defines a cooling load on PTUnit
-    Real64 MinWaterFlow(0.0);      // minimum water flow for heating [kg/s]
-    Real64 TempSteamIn(100.0);     // steam coil steam inlet temperature
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // modules for variable speed heat pump
 
     // Object Data
     Array1D<PTUnitData> PTUnit;
@@ -159,18 +141,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
     // Functions
     void clear_state()
     {
-        MyOneTimeFlag = true;
-        GetPTUnitInputFlag = true;
-        SaveCompressorPLR = 0.0;
-        SteamDensity = 0.0;
-        HeatingLoad = false;
-        CoolingLoad = false;
-        MinWaterFlow = 0.0;
-        TempSteamIn = 100.0;
         PTUnitUniqueNames.clear();
         PTUnit.deallocate();
         PTUnitUNumericFields.clear();
-        ZoneEquipmentListNotChecked = true;
     }
 
     void SimPackagedTerminalUnit(EnergyPlusData &state,
@@ -212,9 +185,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // FLOW
 
         // First time SimPackagedTerminalHeatPump is called, get the input for all the PTUnits
-        if (GetPTUnitInputFlag) {
+        if (state.dataPTHP->GetPTUnitInputFlag) {
             GetPTUnit(state);
-            GetPTUnitInputFlag = false;
+            state.dataPTHP->GetPTUnitInputFlag = false;
         }
 
         // Find the correct packaged terminal heat pump
@@ -349,7 +322,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         DXElecCoolingPower = 0.0;
         DXElecHeatingPower = 0.0;
         ElecHeatingCoilPower = 0.0;
-        SaveCompressorPLR = 0.0;
+        state.dataPTHP->SaveCompressorPLR = 0.0;
         QLatReq = 0.0;
 
         // initialize local variables
@@ -365,7 +338,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // reset operation flag if unit is off
         if (PTUnit(PTUnitNum).OpMode == CycFanCycCoil) {
             // cycling unit: only runs if there is a cooling or heating load.
-            if ((!CoolingLoad && !HeatingLoad) || AirMassFlow < SmallMassFlow) {
+            if ((!state.dataPTHP->CoolingLoad && !state.dataPTHP->HeatingLoad) || AirMassFlow < SmallMassFlow) {
                 UnitOn = false;
             }
         } else if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
@@ -432,7 +405,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 PTUnit(PTUnitNum).CompPartLoadRatio = PartLoadFrac;
             } else {
-                PTUnit(PTUnitNum).CompPartLoadRatio = SaveCompressorPLR;
+                PTUnit(PTUnitNum).CompPartLoadRatio = state.dataPTHP->SaveCompressorPLR;
             }
 
             if (PTUnit(PTUnitNum).OpMode == CycFanCycCoil) {
@@ -1030,8 +1003,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                        state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
+                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag) * state.dataPTHP->SteamDensity;
                     }
                     errFlag = false;
                     SuppHeatInletNodeNum = GetSteamCoilAirInletNode(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, PTUnit(PTUnitNum).SuppHeatCoilName, errFlag);
@@ -1776,9 +1749,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).HeatCoilFluidInletNode = GetCoilSteamInletNode(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag);
                     PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, errFlag);
                     SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                    SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
+                    state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
                     if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
-                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, errFlag) * SteamDensity;
+                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, errFlag) * state.dataPTHP->SteamDensity;
                     }
                     HeatCoilOutletNodeNum = GetCoilAirOutletNode(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag);
                     if (errFlag) {
@@ -2702,8 +2675,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag) * SteamDensity;
+                        state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineNameFull);
+                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag) * state.dataPTHP->SteamDensity;
                     }
                     errFlag = false;
                     SuppHeatInletNodeNum = GetSteamCoilAirInletNode(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, PTUnit(PTUnitNum).SuppHeatCoilName, errFlag);
@@ -3769,7 +3742,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         OutNode = PTUnit(PTUnitNum).AirOutNode;
         CtrlZoneNum = 0;
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataPTHP->MyOneTimeFlag) {
 
             MyEnvrnFlag.allocate(state.dataPTHP->NumPTUs);
             MySizeFlag.allocate(state.dataPTHP->NumPTUs);
@@ -3781,8 +3754,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             MyFanFlag = true;
             MyPlantScanFlag = true;
             MyZoneEqFlag = true;
-            MyOneTimeFlag = false;
-            ZoneEquipmentListNotChecked = true;
+            state.dataPTHP->MyOneTimeFlag = false;
+            state.dataPTHP->ZoneEquipmentListNotChecked = true;
         }
 
         if (allocated(ZoneComp)) {
@@ -3858,9 +3831,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                     if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                        state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         PTUnit(PTUnitNum).MaxHeatCoilFluidFlow =
-                            GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound) * SteamDensity;
+                            GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound) * state.dataPTHP->SteamDensity;
                     }
                 }
 
@@ -3925,9 +3898,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
                     if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                        state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
-                            GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound) * SteamDensity;
+                            GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound) * state.dataPTHP->SteamDensity;
                     }
                 }
                 // fill outlet node for coil
@@ -3944,9 +3917,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             MyPlantScanFlag(PTUnitNum) = false;
         }
 
-        if (ZoneEquipmentListNotChecked) {
+        if (state.dataPTHP->ZoneEquipmentListNotChecked) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled) {
-                ZoneEquipmentListNotChecked = false;
+                state.dataPTHP->ZoneEquipmentListNotChecked = false;
                 for (Loop = 1; Loop <= state.dataPTHP->NumPTUs; ++Loop) {
                     if (CheckZoneEquipmentList(state, PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
                         // save the ZoneEquipConfig index for this unit
@@ -4082,19 +4055,19 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Constant fan systems will further test the load including the impacts of OA
         // OA can change the load to be met by the PTUnit (this is done later in Init)
         if (QZnReq > SmallLoad) {
-            HeatingLoad = true;
-            CoolingLoad = false;
+            state.dataPTHP->HeatingLoad = true;
+            state.dataPTHP->CoolingLoad = false;
         } else if (std::abs(QZnReq) > SmallLoad) {
-            HeatingLoad = false;
-            CoolingLoad = true;
+            state.dataPTHP->HeatingLoad = false;
+            state.dataPTHP->CoolingLoad = true;
         } else {
-            HeatingLoad = false;
-            CoolingLoad = false;
+            state.dataPTHP->HeatingLoad = false;
+            state.dataPTHP->CoolingLoad = false;
         }
 
         // Initialize the operating PLR (turn coils on if needed, otherwise turn coils off)
         if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0) {
-            if (HeatingLoad || CoolingLoad) {
+            if (state.dataPTHP->HeatingLoad || state.dataPTHP->CoolingLoad) {
                 PartLoadFrac = 1.0;
             } else {
                 PartLoadFrac = 0.0;
@@ -4279,8 +4252,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                            state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * state.dataPTHP->SteamDensity;
                         }
                     }
                 }
@@ -4318,8 +4291,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                         if (CoilMaxVolFlowRate != AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                            state.dataPTHP->SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataPTHP->TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * state.dataPTHP->SteamDensity;
                         }
                     }
                 }
@@ -4350,9 +4323,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         PTUnit(PTUnitNum).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
-            if (CoolingLoad) {
+            if (state.dataPTHP->CoolingLoad) {
                 if (PTUnit(PTUnitNum).validASHRAECoolCoil) PTUnit(PTUnitNum).simASHRAEModel = true;
-            } else if (HeatingLoad) {
+            } else if (state.dataPTHP->HeatingLoad) {
                 if (PTUnit(PTUnitNum).validASHRAEHeatCoil) PTUnit(PTUnitNum).simASHRAEModel = true;
             } else if (PTUnit(PTUnitNum).validASHRAECoolCoil || PTUnit(PTUnitNum).validASHRAEHeatCoil) {
                 PTUnit(PTUnitNum).simASHRAEModel = true;
@@ -4396,12 +4369,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (NoCompOutput - QToHeatSetPt < -SmallLoad) {
                     //  If the net cooling capacity overshoots the heating setpoint, change mode
                     QZnReq = QToHeatSetPt;
-                    CoolingLoad = false;
+                    state.dataPTHP->CoolingLoad = false;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                     if (TempControlType(ZoneNum) == SingleCoolingSetPoint || TempControlType(ZoneNum) == 0) {
-                        HeatingLoad = false;
+                        state.dataPTHP->HeatingLoad = false;
                     } else {
-                        HeatingLoad = true;
+                        state.dataPTHP->HeatingLoad = true;
                     }
                     PartLoadFrac = 1.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
@@ -4428,7 +4401,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (NoCompOutput > QToHeatSetPt) {
                         //         If changing operating mode (flow rates) does not overshoot heating setpoint, turn off coil
                         QZnReq = 0.0;
-                        HeatingLoad = false;
+                        state.dataPTHP->HeatingLoad = false;
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4439,7 +4412,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 } else if (NoCompOutput < QZnReq) {
                     //       If the net cooling capacity meets the zone cooling load but does not overshoot heating set point, turn off coil
                     QZnReq = 0.0;
-                    CoolingLoad = false;
+                    state.dataPTHP->CoolingLoad = false;
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4454,11 +4427,11 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     QZnReq = QToCoolSetPt;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
                     if (TempControlType(ZoneNum) == SingleHeatingSetPoint || TempControlType(ZoneNum) == 0) {
-                        CoolingLoad = false;
+                        state.dataPTHP->CoolingLoad = false;
                     } else {
-                        CoolingLoad = true;
+                        state.dataPTHP->CoolingLoad = true;
                     }
-                    HeatingLoad = false;
+                    state.dataPTHP->HeatingLoad = false;
                     PartLoadFrac = 1.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4485,7 +4458,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     if (NoCompOutput < QToCoolSetPt) {
                         //         If changing operating mode (flow rates) does not overshoot cooling setpoint, turn off coil
                         QZnReq = 0.0;
-                        CoolingLoad = false;
+                        state.dataPTHP->CoolingLoad = false;
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4496,7 +4469,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 } else if (NoCompOutput > QZnReq) {
                     //       If the net heating capacity meets the zone heating load but does not overshoot, turn off coil
                     QZnReq = 0.0;
-                    HeatingLoad = false;
+                    state.dataPTHP->HeatingLoad = false;
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4509,9 +4482,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             // Check SZVAV model after fan operation is tested. Constant fan operating mode is required.
             PTUnit(PTUnitNum).simASHRAEModel = false; // flag used to envoke ASHRAE 90.1 model calculations
             if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
-                if (CoolingLoad) {
+                if (state.dataPTHP->CoolingLoad) {
                     if (PTUnit(PTUnitNum).validASHRAECoolCoil) PTUnit(PTUnitNum).simASHRAEModel = true;
-                } else if (HeatingLoad) {
+                } else if (state.dataPTHP->HeatingLoad) {
                     if (PTUnit(PTUnitNum).validASHRAEHeatCoil) PTUnit(PTUnitNum).simASHRAEModel = true;
                 } else if (PTUnit(PTUnitNum).validASHRAECoolCoil || PTUnit(PTUnitNum).validASHRAEHeatCoil) {
                     PTUnit(PTUnitNum).simASHRAEModel = true;
@@ -4665,12 +4638,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Set the operating air mass flow rate
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
             // constant fan mode
-            if (HeatingLoad) {
+            if (state.dataPTHP->HeatingLoad) {
                 state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
                 state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
                 state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
                 PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
-            } else if (CoolingLoad) {
+            } else if (state.dataPTHP->CoolingLoad) {
                 state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
                 state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
                 state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
@@ -4698,11 +4671,11 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         } else {
             // cycling fan mode
-            if (HeatingLoad) {
+            if (state.dataPTHP->HeatingLoad) {
                 state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
                 state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
                 state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
-            } else if (CoolingLoad) {
+            } else if (state.dataPTHP->CoolingLoad) {
                 state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
                 state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
                 state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
@@ -5543,7 +5516,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) == 0.0) return;
 
         // If no heating or cooling required the coils needs to be off
-        if (!HeatingLoad && !CoolingLoad) {
+        if (!state.dataPTHP->HeatingLoad && !state.dataPTHP->CoolingLoad) {
             return;
         }
 
@@ -5558,8 +5531,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         if (PTUnit(PTUnitNum).simASHRAEModel) {
 
-            if ((CoolingLoad && FullOutput < QZnReq) || (HeatingLoad && FullOutput > QZnReq)) {
-                if ((CoolingLoad && NoCompOutput < QZnReq) || (HeatingLoad && NoCompOutput > QZnReq)) {
+            if ((state.dataPTHP->CoolingLoad && FullOutput < QZnReq) || (state.dataPTHP->HeatingLoad && FullOutput > QZnReq)) {
+                if ((state.dataPTHP->CoolingLoad && NoCompOutput < QZnReq) || (state.dataPTHP->HeatingLoad && NoCompOutput > QZnReq)) {
                     PartLoadFrac = 0.0;
                     PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // set SZVAV model variable
                 } else {
@@ -5571,8 +5544,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                SZVAVModel,
                                                PTUnitNum,
                                                FirstHVACIteration,
-                                               CoolingLoad,
-                                               HeatingLoad,
+                                               state.dataPTHP->CoolingLoad,
+                                               state.dataPTHP->HeatingLoad,
                                                QZnReq,
                                                OnOffAirFlowRatio,
                                                HXUnitOn,
@@ -5584,7 +5557,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         } else {
 
-            if (CoolingLoad) {
+            if (state.dataPTHP->CoolingLoad) {
                 // Since we are cooling, we expect FullOutput < NoCompOutput
                 // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
                 if (FullOutput >= NoCompOutput) {
@@ -5620,7 +5593,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             // Calculate the part load fraction
 
-            if ((HeatingLoad && QZnReq < FullOutput) || (CoolingLoad && QZnReq > FullOutput)) {
+            if ((state.dataPTHP->HeatingLoad && QZnReq < FullOutput) || (state.dataPTHP->CoolingLoad && QZnReq > FullOutput)) {
 
                 Par(1) = PTUnitNum;
                 Par(2) = ZoneNum;
@@ -5646,16 +5619,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     while (ContinueIter && TempMaxPLR < 1.0) {
                         TempMaxPLR += 0.1;
                         CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMaxPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                        if (HeatingLoad && TempOutput > QZnReq) ContinueIter = false;
-                        if (CoolingLoad && TempOutput < QZnReq) ContinueIter = false;
+                        if (state.dataPTHP->HeatingLoad && TempOutput > QZnReq) ContinueIter = false;
+                        if (state.dataPTHP->CoolingLoad && TempOutput < QZnReq) ContinueIter = false;
                     }
                     TempMinPLR = TempMaxPLR;
                     ContinueIter = true;
                     while (ContinueIter && TempMinPLR > 0.0) {
                         TempMinPLR -= 0.01;
                         CalcPTUnit(state, PTUnitNum, FirstHVACIteration, TempMinPLR, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
-                        if (HeatingLoad && TempOutput < QZnReq) ContinueIter = false;
-                        if (CoolingLoad && TempOutput > QZnReq) ContinueIter = false;
+                        if (state.dataPTHP->HeatingLoad && TempOutput < QZnReq) ContinueIter = false;
+                        if (state.dataPTHP->CoolingLoad && TempOutput > QZnReq) ContinueIter = false;
                     }
                     SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, PLRResidual, TempMinPLR, TempMaxPLR, Par);
                     if (SolFla == -1) {
@@ -5703,7 +5676,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if the DX heating coil cannot meet the load, trim with supplemental heater
         // occurs with constant fan mode when compressor is on or off
         // occurs with cycling fan mode when compressor PLR is equal to 1
-        if (HeatingLoad && QZnReq > FullOutput && PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
+        if (state.dataPTHP->HeatingLoad && QZnReq > FullOutput && PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
             PartLoadFrac = 1.0;
             if (OutsideDryBulbTemp <= PTUnit(PTUnitNum).MaxOATSupHeat) {
                 SupHeaterLoad = QZnReq - FullOutput;
@@ -5861,7 +5834,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             OutsideDryBulbTemp = Node(PTUnit(PTUnitNum).CondenserNodeNum).Temp;
         }
 
-        SaveCompressorPLR = 0.0;
+        state.dataPTHP->SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
 
@@ -5899,7 +5872,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
+        if (state.dataPTHP->CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
             {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                 if ((SELECT_CASE_var == iPTHPType::PTACUnit) || (SELECT_CASE_var == iPTHPType::PTHPUnit)) {
@@ -5922,7 +5895,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
                     }
-                    SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
+                    state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                 } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
@@ -5939,7 +5912,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           PartLoadFrac,
                                           FirstHVACIteration,
                                           OnOffAirFlowRatio);
-                    SaveCompressorPLR = PartLoadFrac;
+                    state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
                 } else {
                 }
             }
@@ -5984,7 +5957,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             }
         }
-        if (HeatingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorHeating) {
+        if (state.dataPTHP->HeatingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorHeating) {
             if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
@@ -6053,7 +6026,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   PTUnit(PTUnitNum).OpMode,
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
-                        SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
+                        state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
                     } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                         SimWatertoAirHPSimple(state,
@@ -6070,7 +6043,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                               PartLoadFrac,
                                               FirstHVACIteration,
                                               OnOffAirFlowRatio);
-                        SaveCompressorPLR = PartLoadFrac;
+                        state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
                     } else {
                     }
                 }
@@ -6864,9 +6837,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PTUnitNum(0);
 
-        if (GetPTUnitInputFlag) {
+        if (state.dataPTHP->GetPTUnitInputFlag) {
             GetPTUnit(state);
-            GetPTUnitInputFlag = false;
+            state.dataPTHP->GetPTUnitInputFlag = false;
         }
 
         GetPTUnitZoneInletAirNode = 0;
@@ -6939,9 +6912,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PTUnitNum(0);
 
-        if (GetPTUnitInputFlag) {
+        if (state.dataPTHP->GetPTUnitInputFlag) {
             GetPTUnit(state);
-            GetPTUnitInputFlag = false;
+            state.dataPTHP->GetPTUnitInputFlag = false;
         }
 
         GetPTUnitOutAirNode = 0;
@@ -7016,9 +6989,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PTUnitNum(0);
 
-        if (GetPTUnitInputFlag) {
+        if (state.dataPTHP->GetPTUnitInputFlag) {
             GetPTUnit(state);
-            GetPTUnitInputFlag = false;
+            state.dataPTHP->GetPTUnitInputFlag = false;
         }
 
         // PTHP, PTAC and PTWSHP share the same data structure which was allocated to total number of all three
@@ -7096,9 +7069,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PTUnitNum(0);
 
-        if (GetPTUnitInputFlag) {
+        if (state.dataPTHP->GetPTUnitInputFlag) {
             GetPTUnit(state);
-            GetPTUnitInputFlag = false;
+            state.dataPTHP->GetPTUnitInputFlag = false;
         }
 
         // PTHP, PTAC and PTWSHP share the same data structure which was allocated to total number of all three
@@ -7198,7 +7171,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         DXElecHeatingPower = 0.0;
         DXElecCoolingPower = 0.0;
-        SaveCompressorPLR = 0.0;
+        state.dataPTHP->SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
 
         // initialize local variables
@@ -7209,7 +7182,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         AirMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
 
         // Set latent load for heating
-        if (HeatingLoad) {
+        if (state.dataPTHP->HeatingLoad) {
             TotalZoneLatentLoad = 0.0;
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
             // Set latent load for cooling and no sensible load condition
@@ -7218,9 +7191,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
         }
 
-        if (HeatingLoad) {
+        if (state.dataPTHP->HeatingLoad) {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
-        } else if (CoolingLoad) {
+        } else if (state.dataPTHP->CoolingLoad) {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
         } else {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
@@ -7259,14 +7232,14 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                           HXUnitOn);
 
         if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
-            SaveCompressorPLR = PartLoadFrac;
+            state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
         } else {
             if (SpeedNum > 1) {
-                SaveCompressorPLR = 1.0;
+                state.dataPTHP->SaveCompressorPLR = 1.0;
             }
 
-            if (PartLoadFrac == 1.0 && SaveCompressorPLR < 1.0) {
-                PartLoadFrac = SaveCompressorPLR;
+            if (PartLoadFrac == 1.0 && state.dataPTHP->SaveCompressorPLR < 1.0) {
+                PartLoadFrac = state.dataPTHP->SaveCompressorPLR;
             }
         }
 
@@ -7295,7 +7268,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Node(OutletNode).MassFlowRateMaxAvail = AirMassFlow;
 
         // report variables
-        PTUnit(PTUnitNum).CompPartLoadRatio = SaveCompressorPLR;
+        PTUnit(PTUnitNum).CompPartLoadRatio = state.dataPTHP->SaveCompressorPLR;
         if (PTUnit(PTUnitNum).OpMode == CycFanCycCoil) {
             if (SupHeaterLoad > 0.0) {
                 PTUnit(PTUnitNum).FanPartLoadRatio = 1.0;
@@ -7659,7 +7632,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // if the DX heating coil cannot meet the load, trim with supplemental heater
         // occurs with constant fan mode when compressor is on or off
         // occurs with cycling fan mode when compressor PLR is equal to 1
-        if (HeatingLoad && QZnReq > FullOutput && PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
+        if (state.dataPTHP->HeatingLoad && QZnReq > FullOutput && PTUnit(PTUnitNum).SuppHeatCoilIndex > 0) {
             PartLoadFrac = 1.0;
             SpeedRatio = 1.0;
 
@@ -8074,7 +8047,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
 
-        SaveCompressorPLR = 0.0;
+        state.dataPTHP->SaveCompressorPLR = 0.0;
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetVSHPAirFlow(state, PTUnitNum, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SpeedNum, SpeedRatio);
 
@@ -8112,7 +8085,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
+        if (state.dataPTHP->CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
 
             SimVariableSpeedCoils(state,
                                   std::string(),
@@ -8129,7 +8102,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   QLatReq,
                                   OnOffAirFlowRatio);
 
-            SaveCompressorPLR = PartLoadFrac;
+            state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
         } else { // cooling coil is off
             SimVariableSpeedCoils(state,
                                   std::string(),
@@ -8148,7 +8121,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }
 
         if (PTUnit(PTUnitNum).UnitType_Num != iPTHPType::PTACUnit) { // PTHP
-            if (HeatingLoad) {
+            if (state.dataPTHP->HeatingLoad) {
                 SimVariableSpeedCoils(state,
                                       std::string(),
                                       PTUnit(PTUnitNum).DXHeatCoilIndexNum,
@@ -8164,7 +8137,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                       QLatReq,
                                       OnOffAirFlowRatio);
 
-                SaveCompressorPLR = PartLoadFrac;
+                state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
             } else {
                 //   heating coil is off
                 SimVariableSpeedCoils(state,
@@ -8183,7 +8156,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                       OnOffAirFlowRatio);
             }
         } else { // PTAC
-            if (HeatingLoad) {
+            if (state.dataPTHP->HeatingLoad) {
                 if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                     QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
@@ -8372,7 +8345,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         if (QActual > (SupHeaterLoad + SmallLoad)) {
                             // control water flow to obtain output matching SupHeaterLoad
                             SolFlag = 0;
-                            MinWaterFlow = 0.0;
+                            state.dataPTHP->MinWaterFlow = 0.0;
                             Par(1) = double(PTUnitNum);
                             if (FirstHVACIteration) {
                                 Par(2) = 1.0;
@@ -8382,7 +8355,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                             Par(3) = SupHeaterLoad;
                             MaxHotWaterFlow = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
                             SolveRoot(
-                                state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                                state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, state.dataPTHP->MinWaterFlow, MaxHotWaterFlow, Par);
                             if (SolFlag == -1) {
                                 if (PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage(state, "RoutineName//Hot water coil control failed for " + PTUnit(PTUnitNum).UnitType + "=\"" +
@@ -8404,14 +8377,14 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                        "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state, "...Bad hot water maximum flow rate limits");
-                                    ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
+                                    ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", state.dataPTHP->MinWaterFlow));
                                     ShowContinueError(state, format("...Given maximum water flow rate={:.3R} kg/s", MaxHotWaterFlow));
                                 }
                                 ShowRecurringWarningErrorAtEnd(state, "RoutineName//Hot water coil control failed (flow limits) for " +
                                                                    PTUnit(PTUnitNum).UnitType + "=\"" + PTUnit(PTUnitNum).Name + "\"",
                                                                PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
-                                                               MinWaterFlow,
+                                                               state.dataPTHP->MinWaterFlow,
                                                                _,
                                                                "[kg/s]",
                                                                "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
@@ -8517,7 +8490,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             state.dataPTHP->CompOffFlowRatio = 0.0;
         }
 
-        if (HeatingLoad && (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit)) {
+        if (state.dataPTHP->HeatingLoad && (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit)) {
             state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
             state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(PTUnit(PTUnitNum).NumOfSpeedCooling);
             MSHPMassFlowRateLow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
@@ -8530,7 +8503,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         } else {
             if (present(SpeedNum)) {
-                if (HeatingLoad) {
+                if (state.dataPTHP->HeatingLoad) {
                     if (SpeedNum == 1) {
                         state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                         state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
@@ -8667,9 +8640,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // FLOW:
 
-        if (CoolingLoad) {
+        if (state.dataPTHP->CoolingLoad) {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
-        } else if (HeatingLoad) {
+        } else if (state.dataPTHP->HeatingLoad) {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
         } else {
             PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;

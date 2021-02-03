@@ -286,8 +286,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // turn the availability schedule on
     Schedule(1).CurrentValue = 1.0;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
@@ -343,8 +343,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     CoolingLoad = false;
     HeatingLoad = true;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
 
     // set unit inlet node conditions for heating
     DataLoopNode::Node(1).Temp = 21.0;

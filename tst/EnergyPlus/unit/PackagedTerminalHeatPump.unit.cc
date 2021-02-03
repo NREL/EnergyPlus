@@ -804,7 +804,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     //// get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataPTHP->NumPTAC);
@@ -829,8 +829,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = false;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = false;
     state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;     // supply air mass flow rate
     state->dataPTHP->CompOffMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate during comp off
     state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate;  // OA mass flow rate during comp on
@@ -896,11 +896,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PTUnit(1).LastMode = PackagedTerminalHeatPump::iCompMode::HeatingMode;
 
     // initialized to false
-    ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
+    ASSERT_FALSE(state->dataPTHP->HeatingLoad);
     // Init PTAC zoneHVAC equipment
     InitPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     // init sets heating mode to true due to cold ventilation air
-    ASSERT_TRUE(PackagedTerminalHeatPump::HeatingLoad);
+    ASSERT_TRUE(state->dataPTHP->HeatingLoad);
     // simulate PTAC zoneHVAC equipment
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // no zone heating load
@@ -1156,7 +1156,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     GetPTUnit(*state);
-    GetPTUnitInputFlag = false;
+    state->dataPTHP->GetPTUnitInputFlag = false;
 
     state->dataGlobal->BeginEnvrnFlag = true;
 
@@ -1175,8 +1175,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy =
         Psychrometrics::PsyHFnTdbW(Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Temp, Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat);
 
-    PackagedTerminalHeatPump::HeatingLoad = false;
-    PackagedTerminalHeatPump::CoolingLoad = false;
+    state->dataPTHP->HeatingLoad = false;
+    state->dataPTHP->CoolingLoad = false;
     //		PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate; // supply air mass flow rate
     //		PackagedTerminalHeatPump::CompOffMassFlow = HVACInletMassFlowRate; // supply air mass flow rate during comp off
     //		PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp on
@@ -1243,13 +1243,13 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     //		PTUnit( 1 ).LastMode = 2;
 
     // initialized to false
-    ASSERT_FALSE(PackagedTerminalHeatPump::HeatingLoad);
+    ASSERT_FALSE(state->dataPTHP->HeatingLoad);
     // Init PTAC zoneHVAC equipment
     InitPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     state->dataGlobal->BeginEnvrnFlag = false;
     InitPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     // init sets heating mode to true due to cold ventilation air
-    ASSERT_TRUE(PackagedTerminalHeatPump::HeatingLoad);
+    ASSERT_TRUE(state->dataPTHP->HeatingLoad);
     // simulate PTAC zoneHVAC equipment
     SimPTUnit(*state, PTUnitNum, ZoneNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, QZnReq, LatOutputProvided);
     // no zone heating load

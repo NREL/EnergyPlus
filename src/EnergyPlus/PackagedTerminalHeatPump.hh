@@ -105,16 +105,6 @@ namespace PackagedTerminalHeatPump {
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
     };
 
-    extern bool GetPTUnitInputFlag;  // First time, input is "gotten"
-    extern Real64 SaveCompressorPLR; // holds compressor PLR from active DX coil
-    extern Real64 SteamDensity;      // density of steam at 100C, used for steam heating coils
-    extern bool HeatingLoad;         // defines a heating load on PTUnit
-    extern bool CoolingLoad;         // defines a cooling load on PTUnit
-    extern Real64 MinWaterFlow;      // minimum water flow for heating [kg/s]
-    extern Real64 TempSteamIn;       // steam coil steam inlet temperature
-
-    // Types
-
     struct PTUnitData
     {
         // Members
@@ -577,6 +567,15 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
     Real64 CompOnFlowRatio = 0.0;   // fan flow ratio when coil on
     Real64 CompOffFlowRatio = 0.0;  // fan flow ratio when coil off
     Real64 FanSpeedRatio = 0.0;     // ratio of air flow ratio passed to fan object
+    bool GetPTUnitInputFlag = true; // First time, input is "gotten"
+    Real64 SaveCompressorPLR = 0.0; // holds compressor PLR from active DX coil
+    Real64 SteamDensity = 0.0;      // density of steam at 100C, used for steam heating coils
+    bool HeatingLoad = false;       // defines a heating load on PTUnit
+    bool CoolingLoad = false;       // defines a cooling load on PTUnit
+    Real64 MinWaterFlow = 0.0;      // minimum water flow for heating [kg/s]
+    Real64 TempSteamIn = 100.0;     // steam coil steam inlet temperature
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListNotChecked = true;
 
     void clear_state() override
     {
@@ -593,6 +592,15 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
         this->CompOnFlowRatio = 0.0;
         this->CompOffFlowRatio = 0.0;
         this->FanSpeedRatio = 0.0;
+        this->GetPTUnitInputFlag = true;
+        this->SaveCompressorPLR = 0.0;
+        this->SteamDensity = 0.0;
+        this->HeatingLoad = false;
+        this->CoolingLoad = false;
+        this->MinWaterFlow = 0.0;
+        this->TempSteamIn = 100.0;
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListNotChecked = true;
     }
 };
 
