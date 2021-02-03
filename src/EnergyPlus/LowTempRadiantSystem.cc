@@ -685,6 +685,16 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.TubeDiameterInner = Numbers(11);
             thisRadSysDesign.TubeDiameterOuter = Numbers(12);
 
+            thisRadSysDesign.schedNameChangeoverDelay = Alphas(10);
+            if (!lAlphaBlanks(11)) {
+                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(10));
+                if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
+                    ShowWarningError(state, cAlphaFields(10) + " not found for " + Alphas(10));
+                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
+                }
+            }
+
             VarFlowRadDesignNames(Item) =  Alphas(1);
         }
 
@@ -859,16 +869,6 @@ namespace LowTempRadiantSystem {
 //                    ShowContinueError(state, "Blank field not allowed for " + cNumericFields(2));
 //                    ErrorsFound = true;
 //                }
-            }
-
-            thisRadSys.schedNameChangeoverDelay = Alphas(11);
-            if (!lAlphaBlanks(11)) {
-                thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(11));
-                if (thisRadSys.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(11) + " not found for " + Alphas(11));
-                    ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
-                }
             }
 
             // To fix
