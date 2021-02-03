@@ -8435,7 +8435,9 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     // Test the regular scenario (No missing or default values) Case 1: UseoutputControlTableStyle
     std::string const idf_objects =
-        delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
+        delimited_string({"Output:SQLite,", 
+            "SimpleAndTabular, !-Option Type", 
+            "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -8445,7 +8447,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
-    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
@@ -8457,7 +8459,9 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 {
     // Test the regular scenario (No missing or default values) Case 2: InchPound
-    std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "InchPound; !-Tabular Unit Conversion"});
+    std::string const idf_objects = delimited_string({"Output:SQLite,", 
+        "SimpleAndTabular, !-Option Type", 
+        "InchPound; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -8467,7 +8471,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
-    EXPECT_EQ(unitSQLiteTable, 4);
+    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
@@ -8479,7 +8483,9 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 {
     // Test the regular scenario (No missing or default values) Case 3: None
-    std::string const idf_objects = delimited_string({"Output:SQLite,", "SimpleAndTabular, !-Option Type", "None; !-Tabular Unit Conversion"});
+    std::string const idf_objects = delimited_string({"Output:SQLite,", 
+        "SimpleAndTabular, !-Option Type", 
+        "None; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -8489,7 +8495,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
-    EXPECT_EQ(unitSQLiteTable, 0);
+    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
@@ -8515,7 +8521,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
@@ -8542,7 +8548,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
 
-    EXPECT_EQ(unitSQLiteTable, 5);
+    EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
@@ -8551,7 +8557,6 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
     DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
 }
 
-// TEST_F(EnergyPlusFixture, ORT_DualUnits_Heat_Emission)
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
 {
     EnergyPlus::sqlite->sqliteBegin();
@@ -8617,14 +8622,14 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     // Test Combination 1: None
     state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
-    energyconversion = 1.0e9;
+    energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
 
     // Now test the reporting:
     //const std::string reportName = "AnnualHeatEmissionsReport";
     // const std::string tableName = "Annual Heat Emissions Summary";
-    unitsName = "J";
+    unitsName = "GJ";
 
     // Test the row of heat emissions
     // std::vector<std::string> testRowNames = {"Heat Emissions"};
@@ -8669,7 +8674,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
         }
     }
 
-    // Test 2: 
+    // Test Combination 2: 
     state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoKWH;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::InchPound;
 

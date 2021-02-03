@@ -11487,8 +11487,8 @@ namespace EnergyPlus::OutputReportTabular {
                     rowHead(1) = "Heat Emissions [MJ]";
                     energyconversion = 1.0e3;
                 } else if (unitsStyle_cur == iUnitsStyle::None) {
-                    rowHead(1) = "Heat Emissions [J]"; 
-                    energyconversion = 1.0e9;
+                    rowHead(1) = "Heat Emissions [GJ]"; 
+                    energyconversion = 1.0;
                 } else {
                     rowHead(1) = "Heat Emissions [GJ]";
                     energyconversion = 1.0;
