@@ -105,13 +105,6 @@ namespace PackagedTerminalHeatPump {
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
     };
 
-    extern Real64 CompOnMassFlow;    // Supply air mass flow rate w/ compressor ON
-    extern Real64 OACompOnMassFlow;  // OA mass flow rate w/ compressor ON
-    extern Real64 CompOffMassFlow;   // Supply air mass flow rate w/ compressor OFF
-    extern Real64 OACompOffMassFlow; // OA mass flow rate w/ compressor OFF
-    extern Real64 CompOnFlowRatio;   // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;  // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;     // ratio of air flow ratio passed to fan object
     extern bool GetPTUnitInputFlag;  // First time, input is "gotten"
     extern Real64 SaveCompressorPLR; // holds compressor PLR from active DX coil
     extern Real64 SteamDensity;      // density of steam at 100C, used for steam heating coils
@@ -572,11 +565,18 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
 {
 
     Array1D_bool CheckEquipName;
-    Real64 SupHeaterLoad = 0.0; // load to be met by supplemental heater [W]
-    int NumPTHP = 0;            // total number of PTHP's
-    int NumPTAC = 0;            // total number of PTAC's
-    int NumPTWSHP = 0;          // total number of PTWSHP's
-    int NumPTUs = 0;            // total number of PTHP and PTAC units
+    Real64 SupHeaterLoad = 0.0;     // load to be met by supplemental heater [W]
+    int NumPTHP = 0;                // total number of PTHP's
+    int NumPTAC = 0;                // total number of PTAC's
+    int NumPTWSHP = 0;              // total number of PTWSHP's
+    int NumPTUs = 0;                // total number of PTHP and PTAC units
+    Real64 CompOnMassFlow = 0.0;    // Supply air mass flow rate w/ compressor ON
+    Real64 OACompOnMassFlow = 0.0;  // OA mass flow rate w/ compressor ON
+    Real64 CompOffMassFlow = 0.0;   // Supply air mass flow rate w/ compressor OFF
+    Real64 OACompOffMassFlow = 0.0; // OA mass flow rate w/ compressor OFF
+    Real64 CompOnFlowRatio = 0.0;   // fan flow ratio when coil on
+    Real64 CompOffFlowRatio = 0.0;  // fan flow ratio when coil off
+    Real64 FanSpeedRatio = 0.0;     // ratio of air flow ratio passed to fan object
 
     void clear_state() override
     {
@@ -586,6 +586,13 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
         this->NumPTAC = 0;
         this->NumPTWSHP = 0;
         this->NumPTUs = 0;
+        this->CompOnMassFlow = 0.0;
+        this->OACompOnMassFlow = 0.0;
+        this->CompOffMassFlow = 0.0;
+        this->OACompOffMassFlow = 0.0;
+        this->CompOnFlowRatio = 0.0;
+        this->CompOffFlowRatio = 0.0;
+        this->FanSpeedRatio = 0.0;
     }
 };
 

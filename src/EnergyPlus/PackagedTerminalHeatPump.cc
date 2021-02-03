@@ -139,13 +139,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
     constexpr const char *fluidNameSteam("STEAM");
 
-    Real64 CompOnMassFlow(0.0);    // Supply air mass flow rate w/ compressor ON
-    Real64 OACompOnMassFlow(0.0);  // OA mass flow rate w/ compressor ON
-    Real64 CompOffMassFlow(0.0);   // Supply air mass flow rate w/ compressor OFF
-    Real64 OACompOffMassFlow(0.0); // OA mass flow rate w/ compressor OFF
-    Real64 CompOnFlowRatio(0.0);   // fan flow ratio when coil on
-    Real64 CompOffFlowRatio(0.0);  // fan flow ratio when coil off
-    Real64 FanSpeedRatio(0.0);     // ratio of air flow ratio passed to fan object
     bool GetPTUnitInputFlag(true); // First time, input is "gotten"
     Real64 SaveCompressorPLR(0.0); // holds compressor PLR from active DX coil
     Real64 SteamDensity(0.0);      // density of steam at 100C, used for steam heating coils
@@ -167,13 +160,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
     void clear_state()
     {
         MyOneTimeFlag = true;
-        CompOnMassFlow = 0.0;
-        OACompOnMassFlow = 0.0;
-        CompOffMassFlow = 0.0;
-        OACompOffMassFlow = 0.0;
-        CompOnFlowRatio = 0.0;
-        CompOffFlowRatio = 0.0;
-        FanSpeedRatio = 0.0;
         GetPTUnitInputFlag = true;
         SaveCompressorPLR = 0.0;
         SteamDensity = 0.0;
@@ -4539,7 +4525,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                 //     set water-side mass flow rates
-                Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = CompOnMassFlow;
+                Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
 
@@ -4560,7 +4546,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = CompOnMassFlow;
+                Node(PTUnit(PTUnitNum).HeatCoilInletNodeNum).MassFlowRate = state.dataPTHP->CompOnMassFlow;
 
                 mdot = PTUnit(PTUnitNum).MaxHeatCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
@@ -4586,7 +4572,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
+                Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).SuppCoilFluidInletNode,
@@ -4605,7 +4591,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
 
                 //     set air-side and steam-side mass flow rates
-                Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = CompOnMassFlow;
+                Node(PTUnit(PTUnitNum).SupCoilAirInletNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 mdot = PTUnit(PTUnitNum).MaxSuppCoilFluidFlow;
                 SetComponentFlowRate(state, mdot,
                                      PTUnit(PTUnitNum).SuppCoilFluidInletNode,
@@ -4680,54 +4666,54 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
             // constant fan mode
             if (HeatingLoad) {
-                CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
-                CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
-                OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
+                state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
                 PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
             } else if (CoolingLoad) {
-                CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
-                CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
-                OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
+                state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
                 PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
             } else {
-                CompOnMassFlow = PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
-                CompOnFlowRatio = PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
-                OACompOnMassFlow = PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
+                state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
             }
 
             if (PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow) {
                 if (PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
-                    CompOffMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
-                    CompOffFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
-                    OACompOffMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
+                    state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
+                    state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
+                    state.dataPTHP->OACompOffMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
                 } else {
-                    CompOffMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
-                    CompOffFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
-                    OACompOffMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
+                    state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
+                    state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
+                    state.dataPTHP->OACompOffMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
                 }
             } else {
-                CompOffMassFlow = PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
-                CompOffFlowRatio = PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
-                OACompOffMassFlow = PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
+                state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
+                state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
+                state.dataPTHP->OACompOffMassFlow = PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
             }
         } else {
             // cycling fan mode
             if (HeatingLoad) {
-                CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
-                CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
-                OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxHeatAirMassFlow;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).HeatingSpeedRatio;
+                state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).HeatOutAirMassFlow;
             } else if (CoolingLoad) {
-                CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
-                CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
-                OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).MaxCoolAirMassFlow;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).CoolingSpeedRatio;
+                state.dataPTHP->OACompOnMassFlow = PTUnit(PTUnitNum).CoolOutAirMassFlow;
             } else {
-                CompOnMassFlow = 0.0;
-                CompOnFlowRatio = 0.0;
-                OACompOnMassFlow = 0.0;
+                state.dataPTHP->CompOnMassFlow = 0.0;
+                state.dataPTHP->CompOnFlowRatio = 0.0;
+                state.dataPTHP->OACompOnMassFlow = 0.0;
             }
-            CompOffMassFlow = 0.0;
-            CompOffFlowRatio = 0.0;
-            OACompOffMassFlow = 0.0;
+            state.dataPTHP->CompOffMassFlow = 0.0;
+            state.dataPTHP->CompOffFlowRatio = 0.0;
+            state.dataPTHP->OACompOffMassFlow = 0.0;
         }
 
         SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -5907,7 +5893,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
-                                            FanSpeedRatio,
+                                            state.dataPTHP->FanSpeedRatio,
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             }
@@ -6169,7 +6155,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
-                                            FanSpeedRatio,
+                                            state.dataPTHP->FanSpeedRatio,
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             }
@@ -6738,12 +6724,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         fanPartLoadRatio = PartLoadRatio;
         if (PTUnit(PTUnitNum).simASHRAEModel) fanPartLoadRatio = PTUnit(PTUnitNum).FanPartLoadRatio;
 
-        AverageUnitMassFlow = (fanPartLoadRatio * CompOnMassFlow) + ((1 - fanPartLoadRatio) * CompOffMassFlow);
-        AverageOAMassFlow = (fanPartLoadRatio * OACompOnMassFlow) + ((1 - fanPartLoadRatio) * OACompOffMassFlow);
-        if (CompOffFlowRatio > 0.0) {
-            FanSpeedRatio = (fanPartLoadRatio * CompOnFlowRatio) + ((1 - fanPartLoadRatio) * CompOffFlowRatio);
+        AverageUnitMassFlow = (fanPartLoadRatio * state.dataPTHP->CompOnMassFlow) + ((1 - fanPartLoadRatio) * state.dataPTHP->CompOffMassFlow);
+        AverageOAMassFlow = (fanPartLoadRatio * state.dataPTHP->OACompOnMassFlow) + ((1 - fanPartLoadRatio) * state.dataPTHP->OACompOffMassFlow);
+        if (state.dataPTHP->CompOffFlowRatio > 0.0) {
+            state.dataPTHP->FanSpeedRatio = (fanPartLoadRatio * state.dataPTHP->CompOnFlowRatio) + ((1 - fanPartLoadRatio) * state.dataPTHP->CompOffFlowRatio);
         } else {
-            FanSpeedRatio = CompOnFlowRatio;
+            state.dataPTHP->FanSpeedRatio = state.dataPTHP->CompOnFlowRatio;
         }
 
         if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).SchedPtr) > 0.0 &&
@@ -6758,7 +6744,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
             }
             if (AverageUnitMassFlow > 0.0) {
-                OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
+                OnOffAirFlowRatio = state.dataPTHP->CompOnMassFlow / AverageUnitMassFlow;
             } else {
                 OnOffAirFlowRatio = 0.0;
             }
@@ -8120,7 +8106,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
-                                            FanSpeedRatio,
+                                            state.dataPTHP->FanSpeedRatio,
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             }
@@ -8302,7 +8288,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
-                                            FanSpeedRatio,
+                                            state.dataPTHP->FanSpeedRatio,
                                             ZoneCompTurnFansOn,
                                             ZoneCompTurnFansOff);
             }
@@ -8521,53 +8507,53 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         OutsideAirNode = PTUnit(PTUnitNum).OutsideAirNode;
         AirRelNode = PTUnit(PTUnitNum).AirReliefNode;
 
-        AverageOAMassFlow = (PartLoadRatio * OACompOnMassFlow) + ((1 - PartLoadRatio) * OACompOffMassFlow);
+        AverageOAMassFlow = (PartLoadRatio * state.dataPTHP->OACompOnMassFlow) + ((1 - PartLoadRatio) * state.dataPTHP->OACompOffMassFlow);
 
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
-            CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
-            CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
+            state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
+            state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
         } else {
-            CompOffMassFlow = 0.0;
-            CompOffFlowRatio = 0.0;
+            state.dataPTHP->CompOffMassFlow = 0.0;
+            state.dataPTHP->CompOffFlowRatio = 0.0;
         }
 
         if (HeatingLoad && (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit)) {
-            CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
-            CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(PTUnit(PTUnitNum).NumOfSpeedCooling);
+            state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
+            state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(PTUnit(PTUnitNum).NumOfSpeedCooling);
             MSHPMassFlowRateLow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
             MSHPMassFlowRateHigh = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
-            AverageUnitMassFlow = (PartLoadRatio * CompOnMassFlow) + ((1 - PartLoadRatio) * CompOffMassFlow);
-            if (CompOffFlowRatio > 0.0) {
-                FanSpeedRatio = (PartLoadRatio * CompOnFlowRatio) + ((1 - PartLoadRatio) * CompOffFlowRatio);
+            AverageUnitMassFlow = (PartLoadRatio * state.dataPTHP->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffMassFlow);
+            if (state.dataPTHP->CompOffFlowRatio > 0.0) {
+                state.dataPTHP->FanSpeedRatio = (PartLoadRatio * state.dataPTHP->CompOnFlowRatio) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffFlowRatio);
             } else {
-                FanSpeedRatio = CompOnFlowRatio;
+                state.dataPTHP->FanSpeedRatio = state.dataPTHP->CompOnFlowRatio;
             }
         } else {
             if (present(SpeedNum)) {
                 if (HeatingLoad) {
                     if (SpeedNum == 1) {
-                        CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
-                        CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
+                        state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
+                        state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
                         MSHPMassFlowRateLow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                         MSHPMassFlowRateHigh = PTUnit(PTUnitNum).HeatMassFlowRate(1);
                     } else if (SpeedNum > 1) {
-                        CompOnMassFlow = SpeedRatio * PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum) +
+                        state.dataPTHP->CompOnMassFlow = SpeedRatio * PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum) +
                                          (1.0 - SpeedRatio) * PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum - 1);
-                        CompOnFlowRatio = SpeedRatio * PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum) +
+                        state.dataPTHP->CompOnFlowRatio = SpeedRatio * PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum) +
                                           (1.0 - SpeedRatio) * PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum - 1);
                         MSHPMassFlowRateLow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum - 1);
                         MSHPMassFlowRateHigh = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                     }
                 } else if (PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) {
                     if (SpeedNum == 1) {
-                        CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
-                        CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
+                        state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
+                        state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
                         MSHPMassFlowRateLow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                         MSHPMassFlowRateHigh = PTUnit(PTUnitNum).CoolMassFlowRate(1);
                     } else if (SpeedNum > 1) {
-                        CompOnMassFlow = SpeedRatio * PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum) +
+                        state.dataPTHP->CompOnMassFlow = SpeedRatio * PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum) +
                                          (1.0 - SpeedRatio) * PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum - 1);
-                        CompOnFlowRatio = SpeedRatio * PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum) +
+                        state.dataPTHP->CompOnFlowRatio = SpeedRatio * PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum) +
                                           (1.0 - SpeedRatio) * PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum - 1);
                         MSHPMassFlowRateLow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum - 1);
                         MSHPMassFlowRateHigh = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
@@ -8577,38 +8563,38 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             // Set up fan flow rate during compressor off time
             if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-                if (PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+                if (PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow && state.dataPTHP->CompOnMassFlow > 0.0) {
                     if (SpeedNum == 1) { // LOWEST SPEED USE IDLE FLOW
-                        CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
-                        CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
+                        state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
+                        state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
                     } else if (PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
-                        CompOffMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
-                        CompOffFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
+                        state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
+                        state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
                     } else {
-                        CompOffMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
-                        CompOffFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
+                        state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
+                        state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
                     }
                 }
             }
 
             if (present(SpeedNum)) {
                 if (SpeedNum > 1) {
-                    AverageUnitMassFlow = CompOnMassFlow;
-                    FanSpeedRatio = CompOnFlowRatio;
+                    AverageUnitMassFlow = state.dataPTHP->CompOnMassFlow;
+                    state.dataPTHP->FanSpeedRatio = state.dataPTHP->CompOnFlowRatio;
                 } else {
-                    AverageUnitMassFlow = (PartLoadRatio * CompOnMassFlow) + ((1 - PartLoadRatio) * CompOffMassFlow);
-                    if (CompOffFlowRatio > 0.0) {
-                        FanSpeedRatio = (PartLoadRatio * CompOnFlowRatio) + ((1 - PartLoadRatio) * CompOffFlowRatio);
+                    AverageUnitMassFlow = (PartLoadRatio * state.dataPTHP->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffMassFlow);
+                    if (state.dataPTHP->CompOffFlowRatio > 0.0) {
+                        state.dataPTHP->FanSpeedRatio = (PartLoadRatio * state.dataPTHP->CompOnFlowRatio) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffFlowRatio);
                     } else {
-                        FanSpeedRatio = CompOnFlowRatio;
+                        state.dataPTHP->FanSpeedRatio = state.dataPTHP->CompOnFlowRatio;
                     }
                 }
             } else {
-                AverageUnitMassFlow = (PartLoadRatio * CompOnMassFlow) + ((1 - PartLoadRatio) * CompOffMassFlow);
-                if (CompOffFlowRatio > 0.0) {
-                    FanSpeedRatio = (PartLoadRatio * CompOnFlowRatio) + ((1 - PartLoadRatio) * CompOffFlowRatio);
+                AverageUnitMassFlow = (PartLoadRatio * state.dataPTHP->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffMassFlow);
+                if (state.dataPTHP->CompOffFlowRatio > 0.0) {
+                    state.dataPTHP->FanSpeedRatio = (PartLoadRatio * state.dataPTHP->CompOnFlowRatio) + ((1 - PartLoadRatio) * state.dataPTHP->CompOffFlowRatio);
                 } else {
-                    FanSpeedRatio = CompOnFlowRatio;
+                    state.dataPTHP->FanSpeedRatio = state.dataPTHP->CompOnFlowRatio;
                 }
             }
         }
@@ -8625,7 +8611,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 Node(AirRelNode).MassFlowRateMaxAvail = AverageOAMassFlow;
             }
             if (AverageUnitMassFlow > 0.0) {
-                OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
+                OnOffAirFlowRatio = state.dataPTHP->CompOnMassFlow / AverageUnitMassFlow;
             } else {
                 OnOffAirFlowRatio = 0.0;
             }
@@ -8693,40 +8679,40 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
             // constant fan mode
             if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
-                CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
                 PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
             } else if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
-                CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
                 PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
             } else {
-                CompOnMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
-                CompOnFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
             }
-            CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
-            CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
+            state.dataPTHP->CompOffMassFlow = PTUnit(PTUnitNum).IdleMassFlowRate;
+            state.dataPTHP->CompOffFlowRatio = PTUnit(PTUnitNum).IdleSpeedRatio;
         } else {
             // cycling fan mode
             if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
-                CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).HeatMassFlowRate(1);
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
             } else if ((PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
-                CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
-                CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
+                state.dataPTHP->CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(1);
+                state.dataPTHP->CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
             } else {
-                CompOnMassFlow = 0.0;
-                CompOnFlowRatio = 0.0;
+                state.dataPTHP->CompOnMassFlow = 0.0;
+                state.dataPTHP->CompOnFlowRatio = 0.0;
             }
-            CompOffMassFlow = 0.0;
-            CompOffFlowRatio = 0.0;
+            state.dataPTHP->CompOffMassFlow = 0.0;
+            state.dataPTHP->CompOffFlowRatio = 0.0;
         }
 
         // Set the inlet node mass flow rate
-        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 && CompOnMassFlow != 0.0) {
+        if (GetCurrentScheduleValue(state, PTUnit(PTUnitNum).FanAvailSchedPtr) > 0.0 && state.dataPTHP->CompOnMassFlow != 0.0) {
             OnOffAirFlowRatio = 1.0;
             if (FirstHVACIteration) {
-                Node(InNode).MassFlowRate = CompOnMassFlow;
+                Node(InNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
                 PartLoadRatio = 0.0;
             } else {
                 if (PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Unassigned) {

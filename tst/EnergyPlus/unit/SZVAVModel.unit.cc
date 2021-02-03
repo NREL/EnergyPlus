@@ -231,8 +231,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     PTUnit(1).FanAvailSchedPtr = 1;
     PTUnit(1).FanPlace = BlowThru;
     PTUnit(1).OpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
-    PackagedTerminalHeatPump::CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
-    PackagedTerminalHeatPump::CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
+    state->dataPTHP->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
+    state->dataPTHP->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);

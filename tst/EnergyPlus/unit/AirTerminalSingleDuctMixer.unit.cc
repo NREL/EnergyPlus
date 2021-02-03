@@ -634,9 +634,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = true;
-    PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
+    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
+    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
     DataHVACGlobals::ZoneCompTurnFansOff = false;
     DataHVACGlobals::ZoneCompTurnFansOn = true;
 
@@ -965,9 +965,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = true;
-    PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
+    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
+    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
     DataHVACGlobals::ZoneCompTurnFansOff = false;
     DataHVACGlobals::ZoneCompTurnFansOn = true;
 
@@ -1379,9 +1379,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = true;
-    PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
+    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
+    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
     DataHVACGlobals::ZoneCompTurnFansOff = false;
     DataHVACGlobals::ZoneCompTurnFansOn = true;
 
@@ -1792,9 +1792,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = true;
-    PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
-    PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
-    PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;                     // compressor is on
+    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate
+    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate
+    state->dataPTHP->CompOnFlowRatio = 1.0;                     // compressor is on
     DataHVACGlobals::ZoneCompTurnFansOff = false;
     DataHVACGlobals::ZoneCompTurnFansOn = true;
 

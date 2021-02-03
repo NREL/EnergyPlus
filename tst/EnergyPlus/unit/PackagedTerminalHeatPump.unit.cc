@@ -831,11 +831,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 
     PackagedTerminalHeatPump::HeatingLoad = false;
     PackagedTerminalHeatPump::CoolingLoad = false;
-    PackagedTerminalHeatPump::CompOnMassFlow = HVACInletMassFlowRate;     // supply air mass flow rate
-    PackagedTerminalHeatPump::CompOffMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate during comp off
-    PackagedTerminalHeatPump::OACompOnMassFlow = PrimaryAirMassFlowRate;  // OA mass flow rate during comp on
-    PackagedTerminalHeatPump::OACompOffMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp off
-    PackagedTerminalHeatPump::CompOnFlowRatio = 1.0;
+    state->dataPTHP->CompOnMassFlow = HVACInletMassFlowRate;     // supply air mass flow rate
+    state->dataPTHP->CompOffMassFlow = HVACInletMassFlowRate;    // supply air mass flow rate during comp off
+    state->dataPTHP->OACompOnMassFlow = PrimaryAirMassFlowRate;  // OA mass flow rate during comp on
+    state->dataPTHP->OACompOffMassFlow = PrimaryAirMassFlowRate; // OA mass flow rate during comp off
+    state->dataPTHP->CompOnFlowRatio = 1.0;
     DataHVACGlobals::ZoneCompTurnFansOff = false;
     DataHVACGlobals::ZoneCompTurnFansOn = true;
 
