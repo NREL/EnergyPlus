@@ -1087,7 +1087,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
+        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
         this->OutputTableBinnedCount = 0;
         this->BinResultsTableCount = 0;
         this->BinResultsIntervalCount = 0;
