@@ -1044,6 +1044,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
     EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
 
+    // Part 3: Test ankle draft PPD.
     People(1).AnkleDraftASH55 = true;
     AirVel = 0.15;
     Real64 AnkleAirVel = 0.3;

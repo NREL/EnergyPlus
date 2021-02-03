@@ -735,7 +735,7 @@ namespace ThermalComfort {
 
     Real64 CalcRelativeAirVelocity(Real64 AirVel, Real64 ActMet) {
         if (ActMet > 1) {
-            return round((AirVel + 0.3 * (ActMet - 1)) * 1000) / 1000;
+            return AirVel + 0.3 * (ActMet - 1);
         } else {
             return AirVel;
         }
@@ -820,7 +820,7 @@ namespace ThermalComfort {
         Real64 ActLevel = state.dataThermalComforts->ActLevelConv * ActMet;
         state.dataThermalComforts->IntHeatProd = ActLevel - WorkEff;
 
-        // Step 2: CALCULATE VARIABLESS THAT REMAIN CONSTANT FOR AN HOUR
+        // Step 1: CALCULATE VARIABLESS THAT REMAIN CONSTANT FOR AN HOUR
         Real64 PInAtmospheres = state.dataEnvrn->OutBaroPress / 101325;
         Real64 RClo = CloUnit * 0.155; // (var RCL)
         Real64 TotCloFac = 1.0 + 0.15 * CloUnit;
@@ -854,7 +854,7 @@ namespace ThermalComfort {
         Real64 ActLevelStart = ActLevel; // ActLevel gets increased by shivering in the following
         Real64 AvgBodyTempSet = SkinMassRatSet * SkinTempSet + (1.0 - SkinMassRatSet) * CoreTempSet; // (var TempBodyNeutral)
 
-        // Step 3: BEGIN MINUTE BY MINUTE CALCULATIONS FOR ONE HOUR SIMULATION OF TEMPERATURE REGULATION.
+        // Step 2: BEGIN MINUTE BY MINUTE CALCULATIONS FOR ONE HOUR SIMULATION OF TEMPERATURE REGULATION.
         // This section simulates the temperature regulation over 1 minute.
         // Inputs are the physiological data from the previous time step and the current environmental conditions. Loop and must be increased from the start level, not perpetually increased
         for (int IterMin = 1; IterMin <= 60; ++IterMin) {
@@ -988,7 +988,7 @@ namespace ThermalComfort {
         // EvapHeatLossMax is readjusted for EvapEff
         state.dataThermalComforts->EvapHeatLossMax *= EvapEff;
 
-        // Step 4: Heat transfer indices in real environment. Computation of comfort indices.
+        // Step 3: Heat transfer indices in real environment. Computation of comfort indices.
         // Inputs to this SECTION are the physiological data from the simulation of temperature regulation loop.
         Real64 EffectSkinHeatLoss = state.dataThermalComforts->DryHeatLoss + state.dataThermalComforts->EvapHeatLoss;
         // ET*(standardization humidity/REAL(r64) CloUnit, StdAtm and Hc)

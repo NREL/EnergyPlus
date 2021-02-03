@@ -297,7 +297,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 CoreThermCap = 0.0;              // Thermal capacity of core
     Real64 DryHeatLoss = 0.0;               // Heat loss from clothing surface due to both convection and radiation
     Real64 DryHeatLossET = 0.0;             // Effective heat loss from clothing surface due to both convection and radiation
-    Real64 DryHeatLossSET = 0.0;             // Standard effective heat loss from clothing surface due to both convection and radiation
+    Real64 DryHeatLossSET = 0.0;            // Standard effective heat loss from clothing surface due to both convection and radiation
     Real64 DryRespHeatLoss = 0.0;           // Dry respiration heat loss
     Real64 EvapHeatLoss = 0.0;              // Evaporative heat loss from skin
     Real64 EvapHeatLossDiff = 0.0;          // Evaporative heat loss due to moisture diffusion through skin
@@ -311,7 +311,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 HcFor = 0.0;                     // Convective heat transfer coeffiency - Forced
     Real64 HcNat = 0.0;                     // Convective heat transfer coeffiency - Natural
     Real64 HeatFlow = 0.0;                  // Heat flow from core to skin
-    Real64 Hr = 0.0;                        // Hriency
+    Real64 Hr = 0.0;                        // Radiant heat transfer coeffiency
     Real64 IntHeatProd = 0.0;               // Internal heat production
     int IterNum = 0;                        // Number of iteration
     Real64 LatRespHeatLoss = 0.0;           // Latent respiration heat loss

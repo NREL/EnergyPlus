@@ -63,7 +63,7 @@ This equation is only applicable for v<sub>r</sub> < 0.2 m/s. And the subject’
 
 ## Approach ##
 
-We will add a new key, `ASHRAE55`, to the current `People` object, `Thermal Comfort Model N Type` field to reflect the adjusted thermal comfort calculations with considerations of the elevated air velocity cooling effect. We would also add two optional field `Relative Air Velocity Schedule Name` and `Ankle Level Air Velocity Schedule Name` to allow calculations of PPD_AD. When choosing the ASHRAE55 as the thermal comfort model, the still-air PMV/PPD and the original Pierce SET will be calculated, along with the adjusted cooling effect adjusted PMV/PPD. Both the original still-air and the adjusted thermal comfort metrics will be reported.
+We will add new keys, `CoolingEffectASH55` and `AnkleDraftASH55`, to the current `People` object, `Thermal Comfort Model N Type` field to reflect the adjusted thermal comfort calculations with considerations of the elevated air velocity cooling effect. We would also add a optional field `Ankle Level Air Velocity Schedule Name` to allow calculations of PPD_AD. When choosing the ASHRAE55 as the thermal comfort model, the still-air PMV/PPD and the original Pierce SET will be calculated, along with the adjusted cooling effect adjusted PMV/PPD. Both the original still-air and the adjusted thermal comfort metrics will be reported.
 
 ```
 People,
@@ -71,26 +71,23 @@ People,
    \memo If you use a ZoneList in the Zone or ZoneList name field then this definition applies
    \memo to all the zones in the ZoneList.
    \min-fields 10
-   A13, \field Relative Air Velocity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-       \note units in the schedule are m/s
-       \note this is the schedule of relative air velocity caused by body movement
-       \note optional (only required for runs of thermal comfort models ASHRAE55 and PPD_AD variable is declared)
-   A14, \field Ankle Level Air Velocity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-       \note units in the schedule are m/s
-       \note this is the schedule of the air speed at the 0.1 m above the floor
-       \note optional (only required for runs of thermal comfort models ASHRAE55 and PPD_AD variable is declared)
-   A15, \field Thermal Comfort Model 1 Type
+   
+   A14, \field Thermal Comfort Model 1 Type
        \type choice
        \key Fanger
        \key Pierce
        \key KSU
        \key AdaptiveASH55
        \key AdaptiveCEN15251
-       \key ASHRAE55
+       \key CoolingEffectASH55
+       \key AnkleDraftASH55
+
+   A21, \field Ankle Level Air Velocity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+       \note units in the schedule are m/s
+       \note this is the schedule of the air speed at the 0.1 m above the floor
+       \note optional (only required for runs of thermal comfort models ASHRAE55 and PPD_AD variable is declared)
 ```
 
 The following new variables will be added in the thermal comfort data structures and be set as reportable variables to be included in the output.
@@ -110,7 +107,7 @@ To be developed.
 
 ## Input Description ##
 
-The `Thermal Comfort Model N Type` field in the `People` object will be modified to take another `ASHRAE55` key as one of the choices.
+The `Thermal Comfort Model N Type` field in the `People` object will be modified to take two extra keys, `CoolingEffectASH55` and `AnkleDraftASH55`, as choices.
 
 ## Outputs Description ##
 The following new report variables will be added:
@@ -126,9 +123,9 @@ To be developed.
 
 ## Example Files and Transition Changes ##
 
-The existing DOE reference small office model will be modified to report the adjusted thermal comfort calculations.
+The existing 1ZoneUncontrolled model will be modified to report the ASH55 thermal comfort calculations.
 
-Transition change is required in People object.
+No transition change required.
 
 ## E-mail and  Conference Call Conclusions ##
 

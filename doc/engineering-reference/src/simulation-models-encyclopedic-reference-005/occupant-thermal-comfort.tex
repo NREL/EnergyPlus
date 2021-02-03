@@ -1179,6 +1179,14 @@ SET(t_{a}, t_{r}, v_{elev}, *) = SET(t_{a} - CE, t_{r} - CE, v_{still}, *)
 
 where \(t_{a}\) is the average air temperature, \(t_{r}\) is the mean radiant temperature, \(v_{elev}\) is the elevated average air speed, such that \(v_{elev} > 0.1 m/s\) , \(v_{still}\) is the elevated average air speed (\(v_{still} = 0.1 m/s\)). The other parameters (indoor air humidity, clothing, metabolic rate) that stay the same are denoted by “*”.
 
+It should be noted that v_{elev} is the relative air velocity caused by body movement and not the air speed measured by the air velocity sensor. It can be calculate using the function below.
+
+\begin{equation}
+v_{elev} = max(v_{measured}, v_{measured} + 0.3 * (met - 1))
+\end{equation}
+
+where \(met\) is the metabolic rate in [met].
+
 The Cooling Effect adjusted PMV/PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). The following are equations to calculate the adjusted PMV and PPD.
 
 \begin{equation}
