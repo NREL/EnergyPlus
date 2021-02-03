@@ -212,7 +212,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
-    PackagedTerminalHeatPump::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();

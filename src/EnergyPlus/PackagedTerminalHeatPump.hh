@@ -336,14 +336,6 @@ namespace PackagedTerminalHeatPump {
         PTUnitNumericFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<PTUnitData> PTUnit;
-    extern Array1D<PTUnitNumericFieldData> PTUnitUNumericFields; // holds PT unit numeric input fields character field name
-
-    // Functions
-
-    void clear_state();
-
     void SimPackagedTerminalUnit(EnergyPlusData &state,
                                  std::string const &CompName, // name of the packaged terminal heat pump
                                  int ZoneNum,                 // number of zone being served
@@ -405,7 +397,8 @@ namespace PackagedTerminalHeatPump {
                     bool HXUnitOn              // flag to enable heat exchanger
     );
 
-    void HeatPumpRunFrac(int PTUnitNum,      // PTAC Index Number
+    void HeatPumpRunFrac(EnergyPlusData &state,
+                         int PTUnitNum,      // PTAC Index Number
                          Real64 PLR,         // part load ratio
                          bool &errFlag,      // part load factor out of range flag
                          Real64 &RuntimeFrac // the required run time fraction to meet part load
@@ -576,6 +569,9 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
     Real64 TempSteamIn = 100.0;     // steam coil steam inlet temperature
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListNotChecked = true;
+    Array1D<PackagedTerminalHeatPump::PTUnitData> PTUnit;
+    std::unordered_map<std::string, std::string> PTUnitUniqueNames;
+    Array1D<PackagedTerminalHeatPump::PTUnitNumericFieldData> PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
     void clear_state() override
     {
@@ -601,6 +597,9 @@ struct PackagedTerminalHeatPumpData : BaseGlobalStruct
         this->TempSteamIn = 100.0;
         this->MyOneTimeFlag = true;
         this->ZoneEquipmentListNotChecked = true;
+        this->PTUnit.deallocate();
+        this->PTUnitUniqueNames.clear();
+        this->PTUnitUNumericFields.deallocate();
     }
 };
 
