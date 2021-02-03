@@ -123,12 +123,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
     // is not explicitly modeled - instead cycling inefficiencies must be included in
     // the efficiency curves of the DX coil module.
 
-    // REFERENCES: None
-
-    // OTHER NOTES: None
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
@@ -143,18 +137,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
     }                                           // namespace
 
-    // Unit type
-    int const PTHPUnit(1);   // equivalent to PackagedTerminal:HeatPump:AirToAir
-    int const PTACUnit(2);   // equivalent to PackagedTerminal:AirConditioner
-    int const PTWSHPUnit(3); // equivalent to WaterToAirHeatPump
-
-    // control type
-    int const None(1);       // no special capacity control
-    int const CCM_ASHRAE(2); // capacity control based on ASHRAE Standard 90.1
-
     constexpr const char *fluidNameSteam("STEAM");
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
     Array1D_bool CheckEquipName;
@@ -474,7 +457,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         if (!PTUnit(PTUnitNum).useVSCoilModel) {
             // report variables
-            if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 PTUnit(PTUnitNum).CompPartLoadRatio = PartLoadFrac;
             } else {
                 PTUnit(PTUnitNum).CompPartLoadRatio = SaveCompressorPLR;
@@ -505,7 +488,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             locFanElecPower = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
 
-        if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+        if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
             {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).ACHeatCoilType_Num);
                 if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
@@ -726,7 +709,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-            PTUnit(PTUnitNum).UnitType_Num = PTHPUnit;
+            PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPAirToAir_Num;
             if (lAlphaBlanks(2)) {
                 PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -1345,25 +1328,25 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             if (NumAlphas < 19) {
-                PTUnit(PTUnitNum).ControlType = None;
+                PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                 PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else if (!lAlphaBlanks(19)) {
                 if (UtilityRoutines::SameString(Alphas(19), "SingleZoneVAV")) {
-                    PTUnit(PTUnitNum).ControlType = CCM_ASHRAE;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
                 } else if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                    PTUnit(PTUnitNum).ControlType = None;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
                 } else {
-                    PTUnit(PTUnitNum).ControlType = None;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
                 }
             } else {
-                PTUnit(PTUnitNum).ControlType = None;
+                PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                 PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
@@ -1474,7 +1457,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             // check for specific input requirements for SZVAV model
-            if (PTUnit(PTUnitNum).ControlType == CCM_ASHRAE) {
+            if (PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
 
                 // MaxNoCoolHeatAirVolFlow should be greater than 0
                 if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -1552,7 +1535,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                           CompSetSupHeatInlet,
                           CompSetSupHeatOutlet);
 
-            if (PTUnit(PTUnitNum).UnitType_Num == PTHPUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTHPUnit) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
                     TempNodeNum = GetOnlySingleNode(state, NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
@@ -1622,7 +1605,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-            PTUnit(PTUnitNum).UnitType_Num = PTACUnit;
+            PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTACUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermACAirToAir_Num;
             if (lAlphaBlanks(2)) {
                 PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -2172,25 +2155,25 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             if (NumAlphas < 17) {
-                PTUnit(PTUnitNum).ControlType = None;
+                PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                 PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else if (!lAlphaBlanks(17)) {
                 if (UtilityRoutines::SameString(Alphas(17), "SingleZoneVAV")) {
-                    PTUnit(PTUnitNum).ControlType = CCM_ASHRAE;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
                 } else if (UtilityRoutines::SameString(Alphas(17), "None")) {
-                    PTUnit(PTUnitNum).ControlType = None;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
                 } else {
-                    PTUnit(PTUnitNum).ControlType = None;
+                    PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                     PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                     PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
                 }
             } else {
-                PTUnit(PTUnitNum).ControlType = None;
+                PTUnit(PTUnitNum).ControlType = iCtrlType::None;
                 PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
@@ -2283,7 +2266,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
 
             // check for specific input requirements for ASHRAE90.1 model
-            if (PTUnit(PTUnitNum).ControlType == CCM_ASHRAE) {
+            if (PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
 
                 // MaxNoCoolHeatAirVolFlow should be greater than 0
                 if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -2352,7 +2335,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                           NodeID(HeatCoilInletNodeNum),
                           NodeID(HeatCoilOutletNodeNum));
 
-            if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
                     TempNodeNum = GetOnlySingleNode(state, NodeID(PTUnit(PTUnitNum).HeatCoilFluidInletNode),
@@ -2427,7 +2410,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             GlobalNames::VerifyUniqueInterObjectName(state, PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
             PTUnit(PTUnitNum).Name = Alphas(1);
             PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-            PTUnit(PTUnitNum).UnitType_Num = PTWSHPUnit;
+            PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTWSHPUnit;
             PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPWaterToAir_Num;
             if (lAlphaBlanks(2)) {
                 PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -2914,7 +2897,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowContinueError(state, "..heat pump unit air outlet node name = " + NodeID(PTUnit(PTUnitNum).AirOutNode));
                     ErrorsFound = true;
                 }
-                // check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
+                // check that the air terminal mixer secondary node is the supplemental heat coil air outlet node
                 if (PTUnit(PTUnitNum).AirOutNode != SuppHeatOutletNodeNum) {
                     ShowSevereError(state,
                         CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
@@ -2974,7 +2957,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     }
                 }
                 if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide) {
-                    // check that the air teminal mixer out node is the fan inlet node
+                    // check that the air terminal mixer out node is the fan inlet node
                     if (PTUnit(PTUnitNum).AirInNode != FanInletNodeNum) {
                         ShowSevereError(state, CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                                         "\". fan inlet node name must be the same as an air terminal mixer outlet node name.");
@@ -3082,7 +3065,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             SetUpCompSets(state,
                 PTUnit(PTUnitNum).UnitType, PTUnit(PTUnitNum).Name, SuppHeatCoilType, SuppHeatCoilName, CompSetSupHeatInlet, CompSetSupHeatOutlet);
 
-            if (PTUnit(PTUnitNum).UnitType_Num == PTWSHPUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTWSHPUnit) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     // Add heating coil water inlet node as actuator node for coil
                     TempNodeNum = GetOnlySingleNode(state, NodeID(PTUnit(PTUnitNum).SuppCoilFluidInletNode),
@@ -3316,7 +3299,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             PTUnit(PTUnitNum).MaxOATSupHeat = Numbers(12);
 
             // WSHP not yet included in ASHRAE90.1 model
-            PTUnit(PTUnitNum).ControlType = None;
+            PTUnit(PTUnitNum).ControlType = iCtrlType::None;
             PTUnit(PTUnitNum).simASHRAEModel = false;
             PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
@@ -5189,7 +5172,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
 
                 if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num || PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
-                    if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize && PTUnit(PTUnitNum).ControlType == CCM_ASHRAE) {
+                    if (PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize && PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = max(PTUnit(PTUnitNum).MaxCoolAirVolFlow, PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                         minNoLoadFlow = 0.6667;
@@ -5456,7 +5439,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
 
-        if (PTUnit(PTUnitNum).ControlType == CCM_ASHRAE) {
+        if (PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
 
             SizingDesRunThisZone = false;
             DataZoneUsedForSizing = PTUnit(PTUnitNum).ControlZoneNum;
@@ -5641,7 +5624,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PartLoadFrac = 1.0;
                     return;
                 }
-                if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+                if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                     ErrorToler = 0.001;
                 } else {
                     ErrorToler = PTUnit(PTUnitNum).CoolConvergenceTol; // Error tolerance for convergence from input deck
@@ -5947,7 +5930,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
             {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
-                if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
+                if ((SELECT_CASE_var == iPTHPType::PTACUnit) || (SELECT_CASE_var == iPTHPType::PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
                         SimHXAssistedCoolingCoil(state,
                                                  PTUnit(PTUnitNum).DXCoolCoilName,
@@ -5968,7 +5951,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   OnOffAirFlowRatio);
                     }
                     SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
-                } else if (SELECT_CASE_var == PTWSHPUnit) {
+                } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
                                           std::string(),
@@ -5991,7 +5974,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         } else { // cooling coil is off
             {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
-                if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
+                if ((SELECT_CASE_var == iPTHPType::PTACUnit) || (SELECT_CASE_var == iPTHPType::PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
                         SimHXAssistedCoolingCoil(state,
                                                  PTUnit(PTUnitNum).DXCoolCoilName,
@@ -6011,7 +5994,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   dZero,
                                   OnOffAirFlowRatio);
                     }
-                } else if (SELECT_CASE_var == PTWSHPUnit) {
+                } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                     SimWatertoAirHPSimple(state,
                                           std::string(),
                                           PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -6030,7 +6013,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         }
         if (HeatingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorHeating) {
-            if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -6089,7 +6072,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
-                    if (SELECT_CASE_var == PTHPUnit) {
+                    if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
                         SimDXCoil(state,
                                   PTUnit(PTUnitNum).DXHeatCoilName,
                                   On,
@@ -6099,7 +6082,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
                         SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXHeatCoilIndexNum);
-                    } else if (SELECT_CASE_var == PTWSHPUnit) {
+                    } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                         HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                         SimWatertoAirHPSimple(state,
                                               std::string(),
@@ -6122,7 +6105,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         } else {
             //   heating coil is off
-            if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 QCoilReq = 0.0;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -6161,7 +6144,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             } else {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
-                    if (SELECT_CASE_var == PTHPUnit) {
+                    if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
                         SimDXCoil(state,
                                   PTUnit(PTUnitNum).DXHeatCoilName,
                                   Off,
@@ -6170,7 +6153,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   PTUnit(PTUnitNum).OpMode,
                                   dZero,
                                   OnOffAirFlowRatio);
-                    } else if (SELECT_CASE_var == PTWSHPUnit) {
+                    } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
                         SimWatertoAirHPSimple(state,
                                               std::string(),
                                               PTUnit(PTUnitNum).DXHeatCoilIndexNum,
@@ -7303,7 +7286,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                           SupHeaterLoad,
                           HXUnitOn);
 
-        if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+        if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
             SaveCompressorPLR = PartLoadFrac;
         } else {
             if (SpeedNum > 1) {
@@ -7469,7 +7452,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         PartLoadFrac = 1.0;
         SpeedRatio = 1.0;
         if (PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) {
-            if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+            if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                 SpeedNum = PTUnit(PTUnitNum).NumOfSpeedCooling;
             } else {
                 SpeedNum = PTUnit(PTUnitNum).NumOfSpeedHeating;
@@ -8192,7 +8175,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                   OnOffAirFlowRatio);
         }
 
-        if (PTUnit(PTUnitNum).UnitType_Num != PTACUnit) { // PTHP
+        if (PTUnit(PTUnitNum).UnitType_Num != iPTHPType::PTACUnit) { // PTHP
             if (HeatingLoad) {
                 SimVariableSpeedCoils(state,
                                       std::string(),
@@ -8229,7 +8212,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             }
         } else { // PTAC
             if (HeatingLoad) {
-                if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+                if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                     QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -8284,7 +8267,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 //   heating coil is off
-                if (PTUnit(PTUnitNum).UnitType_Num == PTACUnit) {
+                if (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
                     QCoilReq = 0.0;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -8562,7 +8545,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             CompOffFlowRatio = 0.0;
         }
 
-        if (HeatingLoad && (PTUnit(PTUnitNum).UnitType_Num == PTACUnit)) {
+        if (HeatingLoad && (PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit)) {
             CompOnMassFlow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
             CompOnFlowRatio = PTUnit(PTUnitNum).MSCoolingSpeedRatio(PTUnit(PTUnitNum).NumOfSpeedCooling);
             MSHPMassFlowRateLow = PTUnit(PTUnitNum).CoolMassFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
