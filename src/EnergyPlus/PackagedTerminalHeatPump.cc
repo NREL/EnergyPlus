@@ -139,14 +139,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
     constexpr const char *fluidNameSteam("STEAM");
 
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_bool CheckEquipName;
-
-    Real64 SupHeaterLoad(0.0);     // load to be met by supplemental heater [W]
-    int NumPTHP(0);                // total number of PTHP's
-    int NumPTAC(0);                // total number of PTAC's
-    int NumPTWSHP(0);              // total number of PTWSHP's
-    int NumPTUs(0);                // total number of PTHP and PTAC units
     Real64 CompOnMassFlow(0.0);    // Supply air mass flow rate w/ compressor ON
     Real64 OACompOnMassFlow(0.0);  // OA mass flow rate w/ compressor ON
     Real64 CompOffMassFlow(0.0);   // Supply air mass flow rate w/ compressor OFF
@@ -175,12 +167,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
     void clear_state()
     {
         MyOneTimeFlag = true;
-        CheckEquipName.clear();
-        SupHeaterLoad = 0.0;
-        NumPTHP = 0;
-        NumPTAC = 0;
-        NumPTWSHP = 0;
-        NumPTUs = 0;
         CompOnMassFlow = 0.0;
         OACompOnMassFlow = 0.0;
         CompOffMassFlow = 0.0;
@@ -258,21 +244,21 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
                     PTUnitNum = CompIndex;
                 } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
-                    PTUnitNum = CompIndex + NumPTHP;
+                    PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
                 } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
-                    PTUnitNum = CompIndex + NumPTHP + NumPTAC;
+                    PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
                 } else {
                     assert(false);
                 }
             }
-            if (PTUnitNum > NumPTUs || PTUnitNum < 1) {
+            if (PTUnitNum > state.dataPTHP->NumPTUs || PTUnitNum < 1) {
                 ShowFatalError(state,
                                format("SimPackagedTerminalUnit:  Invalid CompIndex passed={}, Number of Units={}, Entered Unit name={}",
                                       PTUnitNum,
-                                      NumPTUs,
+                                      state.dataPTHP->NumPTUs,
                                       CompName));
             }
-            if (CheckEquipName(PTUnitNum)) {
+            if (state.dataPTHP->CheckEquipName(PTUnitNum)) {
                 if (CompName != PTUnit(PTUnitNum).Name) {
                     ShowFatalError(state,
                                    format("SimPackagedTerminalUnit: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
@@ -280,7 +266,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           CompName,
                                           PTUnit(PTUnitNum).Name));
                 }
-                CheckEquipName(PTUnitNum) = false;
+                state.dataPTHP->CheckEquipName(PTUnitNum) = false;
             }
         }
 
@@ -410,13 +396,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 SimVariableSpeedHP(state, PTUnitNum, ZoneNum, FirstHVACIteration, QZnReq, QLatReq, OnOffAirFlowRatio, OpMode, HXUnitOn);
             } else {
                 ControlPTUnitOutput(
-                    state, PTUnitNum, FirstHVACIteration, OpMode, QZnReq, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+                    state, PTUnitNum, FirstHVACIteration, OpMode, QZnReq, ZoneNum, PartLoadFrac, OnOffAirFlowRatio, state.dataPTHP->SupHeaterLoad, HXUnitOn);
             }
         } else {
             PartLoadFrac = 0.0;
             PTUnit(PTUnitNum).FanPartLoadRatio = 0.0; // SZVAV will operate at minimum fan speed
             OnOffAirFlowRatio = 1.0;
-            SupHeaterLoad = 0.0;
+            state.dataPTHP->SupHeaterLoad = 0.0;
             if (PTUnit(PTUnitNum).NumOfSpeedCooling > 0) {
                 CalcVarSpeedHeatPump(state,
                                      PTUnitNum,
@@ -431,7 +417,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                      0.0,
                                      0.0,
                                      OnOffAirFlowRatio,
-                                     SupHeaterLoad,
+                                     state.dataPTHP->SupHeaterLoad,
                                      HXUnitOn);
             }
         }
@@ -440,7 +426,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         AirMassFlow = Node(InletNode).MassFlowRate;
 
         if (!PTUnit(PTUnitNum).useVSCoilModel) {
-            CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
+            CalcPTUnit(state, PTUnitNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, QZnReq, OnOffAirFlowRatio, state.dataPTHP->SupHeaterLoad, HXUnitOn);
         } else {
             // calculate delivered capacity
             MinHumRat = min(Node(InletNode).HumRat, Node(OutletNode).HumRat);
@@ -636,19 +622,19 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // find the number of each type of packaged terminal unit
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
-        NumPTHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPTHP->NumPTHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
-        NumPTAC = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPTHP->NumPTAC = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
-        NumPTWSHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataPTHP->NumPTWSHP = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
@@ -659,19 +645,19 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         cNumericFields.allocate(MaxNumbers);
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNumbers, true);
-        NumPTUs = NumPTHP + NumPTAC + NumPTWSHP;
+        state.dataPTHP->NumPTUs = state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC + state.dataPTHP->NumPTWSHP;
 
         // allocate the data structures
-        if (NumPTUs > 0) {
-            PTUnit.allocate(NumPTUs);
-            PTUnitUniqueNames.reserve(static_cast<unsigned>(NumPTUs));
-            CheckEquipName.allocate(NumPTUs);
-            PTUnitUNumericFields.allocate(NumPTUs);
+        if (state.dataPTHP->NumPTUs > 0) {
+            PTUnit.allocate(state.dataPTHP->NumPTUs);
+            PTUnitUniqueNames.reserve(static_cast<unsigned>(state.dataPTHP->NumPTUs));
+            state.dataPTHP->CheckEquipName.allocate(state.dataPTHP->NumPTUs);
+            PTUnitUNumericFields.allocate(state.dataPTHP->NumPTUs);
         }
-        CheckEquipName = true;
+        state.dataPTHP->CheckEquipName = true;
 
         // loop over PTHP units; get and load the input data
-        for (PTUnitIndex = 1; PTUnitIndex <= NumPTHP; ++PTUnitIndex) {
+        for (PTUnitIndex = 1; PTUnitIndex <= state.dataPTHP->NumPTHP; ++PTUnitIndex) {
 
             FanInletNodeNum = 0;
             FanOutletNodeNum = 0;
@@ -1570,7 +1556,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }
 
         // loop over PTAC units; get and load the input data
-        for (PTUnitIndex = 1; PTUnitIndex <= NumPTAC; ++PTUnitIndex) {
+        for (PTUnitIndex = 1; PTUnitIndex <= state.dataPTHP->NumPTAC; ++PTUnitIndex) {
 
             FanInletNodeNum = 0;
             FanOutletNodeNum = 0;
@@ -1595,7 +1581,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           cAlphaFields,
                                           cNumericFields);
 
-            PTUnitNum = PTUnitIndex + NumPTHP;
+            PTUnitNum = PTUnitIndex + state.dataPTHP->NumPTHP;
             PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
 
             PTUnitUNumericFields(PTUnitNum).FieldNames.allocate(NumNumbers);
@@ -2372,7 +2358,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         //***********************************************************************************
 
-        for (PTUnitIndex = 1; PTUnitIndex <= NumPTWSHP; ++PTUnitIndex) {
+        for (PTUnitIndex = 1; PTUnitIndex <= state.dataPTHP->NumPTWSHP; ++PTUnitIndex) {
 
             FanInletNodeNum = 0;
             FanOutletNodeNum = 0;
@@ -2400,7 +2386,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           cAlphaFields,
                                           cNumericFields);
 
-            PTUnitNum = PTUnitIndex + NumPTHP + NumPTAC;
+            PTUnitNum = PTUnitIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             PTUnit(PTUnitNum).PTObjectIndex = PTUnitIndex;
 
             PTUnitUNumericFields(PTUnitNum).FieldNames.allocate(NumNumbers);
@@ -3320,7 +3306,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             ShowContinueError(state, "... Preceding condition causes termination.");
         }
 
-        for (PTUnitNum = 1; PTUnitNum <= NumPTHP; ++PTUnitNum) {
+        for (PTUnitNum = 1; PTUnitNum <= state.dataPTHP->NumPTHP; ++PTUnitNum) {
             // Setup Report variables for the Packaged Terminal Heat Psmps,   CurrentModuleObject = 'ZoneHVAC:PackagedTerminalHeatPump'
             SetupOutputVariable(state, "Zone Packaged Terminal Heat Pump Total Heating Rate",
                                 OutputProcessor::Unit::W,
@@ -3426,7 +3412,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                 PTUnit(PTUnitNum).Name);
         }
 
-        for (PTUnitNum = 1 + NumPTHP; PTUnitNum <= NumPTHP + NumPTAC; ++PTUnitNum) {
+        for (PTUnitNum = 1 + state.dataPTHP->NumPTHP; PTUnitNum <= state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC; ++PTUnitNum) {
             // Setup Report variables for the Packaged Terminal Air Conditioners,
             // CurrentModuleObject = 'ZoneHVAC:PackagedTerminalAirConditioner'
             SetupOutputVariable(state, "Zone Packaged Terminal Air Conditioner Total Heating Rate",
@@ -3533,7 +3519,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                 PTUnit(PTUnitNum).Name);
         }
 
-        for (PTUnitNum = 1 + NumPTHP + NumPTAC; PTUnitNum <= NumPTUs; ++PTUnitNum) {
+        for (PTUnitNum = 1 + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC; PTUnitNum <= state.dataPTHP->NumPTUs; ++PTUnitNum) {
             // Setup Report variables for the Zone Water Source Heat Pumps, CurrentModuleObject='ZoneHVAC:WaterToAirHeatPump'
             SetupOutputVariable(state, "Zone Water to Air Heat Pump Total Heating Rate",
                                 OutputProcessor::Unit::W,
@@ -3638,7 +3624,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                 "Average",
                                 PTUnit(PTUnitNum).Name);
         }
-        for (PTUnitNum = 1; PTUnitNum <= NumPTUs; ++PTUnitNum) {
+        for (PTUnitNum = 1; PTUnitNum <= state.dataPTHP->NumPTUs; ++PTUnitNum) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num > 0) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(state,
@@ -3799,11 +3785,11 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Do the one time initializations
         if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumPTUs);
-            MySizeFlag.allocate(NumPTUs);
-            MyFanFlag.allocate(NumPTUs);
-            MyPlantScanFlag.allocate(NumPTUs);
-            MyZoneEqFlag.allocate(NumPTUs);
+            MyEnvrnFlag.allocate(state.dataPTHP->NumPTUs);
+            MySizeFlag.allocate(state.dataPTHP->NumPTUs);
+            MyFanFlag.allocate(state.dataPTHP->NumPTUs);
+            MyPlantScanFlag.allocate(state.dataPTHP->NumPTUs);
+            MyZoneEqFlag.allocate(state.dataPTHP->NumPTUs);
             MyEnvrnFlag = true;
             MySizeFlag = true;
             MyFanFlag = true;
@@ -3975,7 +3961,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (ZoneEquipmentListNotChecked) {
             if (state.dataZoneEquip->ZoneEquipInputsFilled) {
                 ZoneEquipmentListNotChecked = false;
-                for (Loop = 1; Loop <= NumPTUs; ++Loop) {
+                for (Loop = 1; Loop <= state.dataPTHP->NumPTUs; ++Loop) {
                     if (CheckZoneEquipmentList(state, PTUnit(Loop).UnitType, PTUnit(Loop).Name, CtrlZoneNum)) {
                         // save the ZoneEquipConfig index for this unit
                         PTUnit(Loop).ControlZoneNum = CtrlZoneNum;
@@ -6911,15 +6897,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
                 PTUnitNum = PTUnitCompIndex;
             } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
             } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             } else {
                 assert(false);
             }
         }
 
-        if (PTUnitNum > 0 && PTUnitNum <= NumPTUs) {
+        if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
             GetPTUnitZoneInletAirNode = PTUnit(PTUnitNum).AirOutNode;
         }
 
@@ -6986,15 +6972,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
                 PTUnitNum = PTUnitCompIndex;
             } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
             } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             } else {
                 assert(false);
             }
         }
 
-        if (PTUnitNum > 0 && PTUnitNum <= NumPTUs) {
+        if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
 
             GetPTUnitOutAirNode = PTUnit(PTUnitNum).OutsideAirNode;
         }
@@ -7061,15 +7047,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
                 PTUnitNum = PTUnitCompIndex;
             } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
             } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             } else {
                 assert(false);
             }
         }
 
-        if (PTUnitNum > 0 && PTUnitNum <= NumPTUs) {
+        if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
             if (PTUnit(PTUnitNum).OAMixIndex > 0) {
                 GetPTUnitReturnAirNode = GetOAMixerReturnNodeNumber(state, PTUnit(PTUnitNum).OAMixIndex);
             } else {
@@ -7141,15 +7127,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
                 PTUnitNum = PTUnitCompIndex;
             } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
             } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
-                PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
+                PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             } else {
                 assert(false);
             }
         }
 
-        if (PTUnitNum > 0 && PTUnitNum <= NumPTUs) {
+        if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
             if (PTUnit(PTUnitNum).OAMixIndex > 0) {
                 GetPTUnitMixedAirNode = GetOAMixerMixedNodeNumber(state, PTUnit(PTUnitNum).OAMixIndex);
             } else {
@@ -9042,7 +9028,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             heatingPLR = PartLoadRatio;
             // PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
         }
-        CalcPTUnit(state, UnitarySystemNum, FirstHVACIteration, PartLoadRatio, QUnitOut, QZnReq, OnOffAirFlowRat, SupHeaterLoad, HXUnitOn);
+        CalcPTUnit(state, UnitarySystemNum, FirstHVACIteration, PartLoadRatio, QUnitOut, QZnReq, OnOffAirFlowRat, state.dataPTHP->SupHeaterLoad, HXUnitOn);
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {

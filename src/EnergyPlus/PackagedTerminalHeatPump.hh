@@ -105,14 +105,6 @@ namespace PackagedTerminalHeatPump {
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
     };
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    extern Real64 SupHeaterLoad;     // load to be met by supplemental heater [W]
-    extern int NumPTHP;              // total number of PTHP's
-    extern int NumPTAC;              // total number of PTAC's
-    extern int NumPTWSHP;            // total number of PTWSHP's
-    extern int NumPTUs;              // total number of PTHP and PTAC units
     extern Real64 CompOnMassFlow;    // Supply air mass flow rate w/ compressor ON
     extern Real64 OACompOnMassFlow;  // OA mass flow rate w/ compressor ON
     extern Real64 CompOffMassFlow;   // Supply air mass flow rate w/ compressor OFF
@@ -127,10 +119,6 @@ namespace PackagedTerminalHeatPump {
     extern bool CoolingLoad;         // defines a cooling load on PTUnit
     extern Real64 MinWaterFlow;      // minimum water flow for heating [kg/s]
     extern Real64 TempSteamIn;       // steam coil steam inlet temperature
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // modules for variable speed heat pump
 
     // Types
 
@@ -583,8 +571,21 @@ namespace PackagedTerminalHeatPump {
 struct PackagedTerminalHeatPumpData : BaseGlobalStruct
 {
 
+    Array1D_bool CheckEquipName;
+    Real64 SupHeaterLoad = 0.0; // load to be met by supplemental heater [W]
+    int NumPTHP = 0;            // total number of PTHP's
+    int NumPTAC = 0;            // total number of PTAC's
+    int NumPTWSHP = 0;          // total number of PTWSHP's
+    int NumPTUs = 0;            // total number of PTHP and PTAC units
+
     void clear_state() override
     {
+        this->CheckEquipName.deallocate();
+        this->SupHeaterLoad = 0.0;
+        this->NumPTHP = 0;
+        this->NumPTAC = 0;
+        this->NumPTWSHP = 0;
+        this->NumPTUs = 0;
     }
 };
 
