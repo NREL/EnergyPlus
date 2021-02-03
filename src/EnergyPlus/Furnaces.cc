@@ -298,7 +298,7 @@ namespace Furnaces {
         // This subroutine manages Furnace component simulation.
 
         // METHODOLOGY EMPLOYED:
-        // CALL the calc routine to determine an operating PLR. Resimulate child components at this PLR.
+        // Call the calc routine to determine an operating PLR. Resimulate child components at this PLR.
         // A supplemental heater augments the heating capacity for both air-to-air and water-to-air heat pump systems.
         // A reheat coil is used for the HeatCool furnace/unitarysystem to offset the sensible cooling when the
         // dehumidification control type is COOLREHEAT. Both the supplemental and reheat heating coil load is calculated
@@ -5640,8 +5640,6 @@ namespace Furnaces {
 
             Furnace(FurnaceNum).CheckFanFlow = false;
 
-            // CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-            //        AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
         } else {
             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
@@ -5698,8 +5696,6 @@ namespace Furnaces {
                         }
 
                         if (Furnace(FurnaceNum).NumOfSpeedCooling > 0) {
-                            // CALL SetOnOffMassFlowRateVSCoil(FurnaceNum, Furnace(FurnaceNum)%ControlZoneNum, FirstHVACIteration, &
-                            //         AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio)
                             SetOnOffMassFlowRate(state, FurnaceNum, AirLoopNum, OnOffAirFlowRatio, OpMode, QZnReq, MoistureLoad, PartLoadRatio);
                             CalcVarSpeedHeatPump(
                                 state, FurnaceNum, false, Off, 1, 0.0, 0.0, SensibleOutput, LatentOutput, 0.0, 0.0, OnOffAirFlowRatio, SUPHEATERLOAD);
@@ -9192,8 +9188,6 @@ namespace Furnaces {
         }
 
         // Subroutine arguments
-        // CALL CalcFurnaceOutput(FurnaceNum,FirstHVACIteration,FanOpMode,CompOp,CoolPartLoadRatio,HeatPartLoadRatio, &
-        //                    HeatCoilLoad, ReHeatCoilLoad, SensibleLoadMet, LatentLoadMet, OnOffAirFlowRatio, HXUnitOn)
         CalcFurnaceOutput(state,
                           FurnaceNum,
                           FirstHVACIteration,

@@ -6030,10 +6030,6 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
 
-        // Started to create a total row but did not fully implement
-        // CALL PreDefTableEntry(state, pdchOaoZoneVol1,'Total OA Avg', totalVolume)
-        // CALL PreDefTableEntry(state, pdchOaoZoneVol2,'Total OA Min', totalVolume)
-
         // Add footnote saying if it is a design day or other kind of environment
 
         // Field counts
@@ -6200,16 +6196,12 @@ namespace EnergyPlus::OutputReportTabular {
 
         // LEED Report
         // 1.1A-General Information
-        // CALL PreDefTableEntry(state, pdchLeedGenData,'Principal Heating Source','-')
         if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName);
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Weather File", state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
         }
 
-        // CALL PreDefTableEntry(state, pdchLeedGenData,'Climate Zone','-')
-        // CALL PreDefTableEntry(state, pdchLeedGenData,'Heating Degree Days','-')
-        // CALL PreDefTableEntry(state, pdchLeedGenData,'Cooling Degree Days','-')
         if (ort->unitsStyle == iUnitsStyle::InchPound) {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
         } else {
@@ -8548,8 +8540,6 @@ namespace EnergyPlus::OutputReportTabular {
             if (ort->displayTabularBEPS) {
                 WriteTextLine(state, "Note 1: An asterisk (*) indicates that the feature is not yet implemented.");
             }
-            // CALL WriteTextLine('Note 2: The source energy conversion factors used are: ')
-            // CALL WriteTextLine('        1.05 for all fuels, 1 for district, and 3 for electricity.')
         }
     }
 
@@ -16010,9 +16000,6 @@ namespace EnergyPlus::OutputReportTabular {
             // if no conversion just output the input string
             stringOutWithIP = stringInWithSI;
         }
-        // For debugging only
-        // CALL  ShowWarningError(state, 'LookupSItoIP in: ' // TRIM(stringInWithSI) // ' out: ' // TRIM(stringOutWithIP))
-        // IF (foundConv .NE. 0) CALL  ShowWarningError(state, '   Hint ' // TRIM(UnitConv(foundConv)%hint) // std::to_string(foundConv) )
 
         unitConvIndex = selectedConv;
 

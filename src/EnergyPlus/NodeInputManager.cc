@@ -820,8 +820,6 @@ namespace EnergyPlus::NodeInputManager {
                         ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
                         ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID(CheckNumber) + "\".");
                         ShowContinueError(state, "...Nodes must be unique across instances of this object.");
-                        //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
-                        //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
                         ErrorsFound = true;
                     } else {
                         ++state.dataNodeInputMgr->NumCheckNodes;

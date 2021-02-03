@@ -1720,31 +1720,6 @@ namespace HVACControllers {
                 //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
                 //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
             } else if (SELECT_CASE_var == iStatusErrorSlope) {
-                // CALL ShowSevereError('FindRootSimpleController: Root finder failed at '//TRIM(CreateHVACStepFullString()))
-                // CALL ShowContinueError(state,  &
-                //   'FindRootSimpleController: Controller name='//TRIM(ControllerProps(ControlNum)%ControllerName) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller action='//TRIM(ActionTypes(ControllerProps(ControlNum)%Action)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller setpoint='// &
-                //    TRIM(TrimSigDigits(ControllerProps(ControlNum)%SetPointValue,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller function is inconsistent with the specified action.' &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Min bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Max bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowFatalError(state, 'FindRootSimpleController: Preceding error causes program termination.')
                 if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");

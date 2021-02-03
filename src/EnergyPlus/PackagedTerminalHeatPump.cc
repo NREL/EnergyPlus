@@ -4264,8 +4264,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
 
-            // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
-            //               ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
         } else {
             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
         }
@@ -4452,8 +4450,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     }
                     PartLoadFrac = 1.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
-                        // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, &
-                        //      ZoneEquipConfig(ZoneNum)%AirLoopNum, OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         CalcVarSpeedHeatPump(state,
                                              PTUnitNum,
@@ -4481,8 +4477,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                            // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
-                            //       OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         } else {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         }
@@ -4494,8 +4488,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                        // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
-                        //         OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                     } else {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                     }
@@ -4515,8 +4507,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PartLoadFrac = 1.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                        // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
-                        //     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         CalcVarSpeedHeatPump(state,
                                              PTUnitNum,
                                              ZoneNum,
@@ -4544,8 +4534,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         PartLoadFrac = 0.0;
                         if (PTUnit(PTUnitNum).useVSCoilModel) {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                            // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
-                            //      OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                         } else {
                             SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                         }
@@ -4557,8 +4545,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     PartLoadFrac = 0.0;
                     if (PTUnit(PTUnitNum).useVSCoilModel) {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
-                        // CALL SetOnOffMassFlowRateVSCoil(PTUnitNum,ZoneNum, FirstHVACIteration, ZoneEquipConfig(ZoneNum)%AirLoopNum, &
-                        //     OnOffAirFlowRatio, PTUnit(PTUnitNum)%OpMode, QZnReq, 0.0d0, PartLoadFrac)
                     } else {
                         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
                     }

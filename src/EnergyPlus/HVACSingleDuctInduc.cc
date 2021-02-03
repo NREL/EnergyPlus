@@ -244,7 +244,6 @@ namespace HVACSingleDuctInduc {
         // the tasks usually done by the Update and Report routines are not required in a compound terminal unit.
 
         // Update the current unit's outlet nodes. No update needed
-        // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
         IndUnit(IUNum).ReportIndUnit(state);

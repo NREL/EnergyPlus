@@ -150,13 +150,12 @@ struct NodeInputManagerData : BaseGlobalStruct
     // The following is a module level flag because there are several possible "entries" into
     // this module that may need to get the Node Inputs.
     bool GetNodeInputFlag = true;    // Flag to Get Node Input(s)
-    Array1D_string TmpNodeID;        // Used to "reallocate" name arrays
     Array1D_int NodeRef;             // Number of times a Node is "referenced"
     std::string CurCheckContextName; // Used in Uniqueness checks
     Array1D_string UniqueNodeNames;  // used in uniqueness checks
     int NumCheckNodes = 0;           // Num of Unique nodes in check
     int MaxCheckNodes = 0;           // Current "max" unique nodes in check
-    bool NodeVarsSetup = true;       // Setup indicator of node vars for reporting (also that all nodes have been entered)
+    bool NodeVarsSetup = false;      // Setup indicator of node vars for reporting (also that all nodes have been entered)
     Array1D_bool NodeWetBulbRepReq;
     bool CalcMoreNodeInfoMyOneTimeFlag = true; // one time flag
     Array1D_int GetOnlySingleNodeNodeNums;
@@ -171,7 +170,6 @@ struct NodeInputManagerData : BaseGlobalStruct
         this->NumOfNodeLists = 0;
         this->NumOfUniqueNodeNames = 0;
         this->GetNodeInputFlag = true;
-        this->TmpNodeID.deallocate();
         this->NodeRef.deallocate();
         this->CurCheckContextName = std::string();
         this->UniqueNodeNames.deallocate();

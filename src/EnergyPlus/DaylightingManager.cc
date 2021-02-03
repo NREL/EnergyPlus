@@ -8220,11 +8220,8 @@ namespace EnergyPlus::DaylightingManager {
 
                         } else { // Blind on
 
-                            // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
-                            //         for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
-
-                            // TH 7/7/2010: This call is moved outside the loop - DO JB = 1,MaxSlatAngs
-                            // CALL ProfileAngle(IWin,SUNCOSHR(1:3,IHR),Blind(BlNum)%SlatOrientation,ProfAng)
+                            // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
+                            // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
                             TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 

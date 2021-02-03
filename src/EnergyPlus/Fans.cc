@@ -655,9 +655,6 @@ namespace Fans {
                 Fan(FanNum).BalancedFractSchedNum = 0;
             }
 
-            // Component sets not setup yet for zone equipment
-            // CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(3),cAlphaArgs(4),'Air Nodes')
-
         } // end of Zone Exhaust Fan loop
 
         for (OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {

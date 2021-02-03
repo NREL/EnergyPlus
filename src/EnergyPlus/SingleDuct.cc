@@ -5885,7 +5885,6 @@ namespace EnergyPlus::SingleDuct {
         int ATMixerIndex; // local air terminal mixer index
 
         if (state.dataSingleDuct->GetATMixerFlag) {
-            // CALL GetZoneAirLoopEquipment
             GetATMixers(state);
             state.dataSingleDuct->GetATMixerFlag = false;
         }

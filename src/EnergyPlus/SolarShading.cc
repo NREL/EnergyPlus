@@ -11624,9 +11624,7 @@ namespace SolarShading {
         }
 
         // This calculates the area stored in XVS and YVS
-        // CALL HTRANS(1,LOCHCA,NVT)
         HTRANS1(state, state.dataSolarShading->LOCHCA, NVT);
-        // HCAREA(LOCHCA) = -HCAREA(LOCHCA)
 
         // Calculation of overlap areas for each outgoing basis direction
         for (IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay) { // basis directions loop (on back surface)
@@ -11670,9 +11668,7 @@ namespace SolarShading {
                 // Transform to the homogeneous coordinate system.
 
                 NS3 = state.dataSolarShading->LOCHCA + 1;
-                // NS3      = LOCHCA
                 state.dataSolarShading->HCT(NS3) = 0.0;
-                // CALL HTRANS(1,NS3,NVT)
                 HTRANS1(state, NS3, NVT);
 
                 // Determine area of overlap of projected back surface and receiving surface.

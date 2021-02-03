@@ -13607,8 +13607,6 @@ namespace EnergyPlus::DXCoils {
             return;
         }
 
-        // CALL CheckCurveLimitsForStandardRatings(
-
         // Calculate the Indoor fan electric power consumption.  The electric power consumption is estimated
         // using either user supplied or AHRI default value for fan power per air volume flow rate
         if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
