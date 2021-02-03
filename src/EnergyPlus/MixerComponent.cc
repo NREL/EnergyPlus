@@ -340,7 +340,7 @@ namespace EnergyPlus::MixerComponent {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int NodeNum;
-        // FLOW:
+
 
         // Do the following initializations (every time step): This should be the info from
         // the previous components outlets or the node data in this section.

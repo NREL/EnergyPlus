@@ -2259,7 +2259,7 @@ namespace HVACManager {
         int GroupNum;
         int Mult;
 
-        // FLOW:
+
         // Sum ZONE LIST and ZONE GROUP report variables
         ListSNLoadHeatEnergy = 0.0;
         ListSNLoadCoolEnergy = 0.0;

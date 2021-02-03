@@ -1389,7 +1389,7 @@ namespace HVACSingleDuctInduc {
         int HWOutletNode;
         int CWOutletNode;
 
-        // FLOW
+
 
         PriNode = IndUnit(IUNum).PriAirInNode;
         OutletNode = IndUnit(IUNum).OutAirNode;

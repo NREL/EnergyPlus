@@ -293,7 +293,7 @@ namespace EnergyPlus::DXCoils {
         int DXCoilNum;      // index of fan coil unit being simulated
         int SingleModeOper; // SingleMode Operation
 
-        // FLOW
+
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (state.dataDXCoils->GetCoilsInputFlag) {
@@ -445,7 +445,7 @@ namespace EnergyPlus::DXCoils {
         //           steady-state sensible cooling capacity
         Real64 TSat;                     // calculation to avoid calling psych routines twice
         Real64 NodePress;                // Pressure at condenser inlet node (Pa)
-        // FLOW
+
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (state.dataDXCoils->GetCoilsInputFlag) {
@@ -12676,7 +12676,7 @@ namespace EnergyPlus::DXCoils {
         // Autodesk:Uninit Initialize variables used uninitialized
         FullLoadOutAirEnth = 0.0; // Autodesk:Uninit Force default initialization
 
-        // FLOW
+
         if (SpeedNum > 1) {
             SpeedNumLS = SpeedNum - 1;
             SpeedNumHS = SpeedNum;

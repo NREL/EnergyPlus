@@ -255,7 +255,7 @@ namespace ChillerGasAbsorption {
         bool Get_ErrorsFound(false);
         int NumGasAbsorbers(0); // number of Absorption Chillers specified in input
 
-        // FLOW
+
         cCurrentModuleObject = "ChillerHeater:Absorption:DirectFired";
         NumGasAbsorbers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 

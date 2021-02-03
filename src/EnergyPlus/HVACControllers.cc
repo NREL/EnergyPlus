@@ -2113,7 +2113,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PreviousSolutionIndex;
 
-        // FLOW
+
 
         // Save solution and mode for next call only if converged
         if (IsConvergedFlag) {
@@ -2328,7 +2328,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // If no controllers on this air loop then we have nothig to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
@@ -2409,7 +2409,7 @@ namespace HVACControllers {
         // Current operating mode
         int Mode;
 
-        // FLOW
+
 
         ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
@@ -2466,7 +2466,7 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // FLOW
+
 
         // Detect if statistics have been generated or not for this run
         if (!TrackAirLoopEnvFlag) {
@@ -2529,7 +2529,7 @@ namespace HVACControllers {
         Real64 AvgIterations;
         int iModeNum;
 
-        // FLOW
+
 
         print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
@@ -2736,7 +2736,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // IF no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;

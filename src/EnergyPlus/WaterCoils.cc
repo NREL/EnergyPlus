@@ -167,7 +167,7 @@ namespace WaterCoils {
         int OpMode;          // fan operating mode
         Real64 PartLoadFrac; // part-load fraction of heating coil
 
-        // FLOW:
+
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
@@ -973,7 +973,7 @@ namespace WaterCoils {
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
 
-        // FLOW:
+
 
         if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
             // initialize the environment and sizing flags

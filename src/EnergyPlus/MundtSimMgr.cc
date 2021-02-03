@@ -209,7 +209,7 @@ namespace MundtSimMgr {
         bool AirNodeFoundFlag;  // flag used for error check
         bool ErrorsFound;       // true if errors found in init
 
-        // FLOW:
+
 
         // allocate and initialize zone data
         ZoneData.allocate(state.dataGlobal->NumOfZones);
@@ -413,7 +413,7 @@ namespace MundtSimMgr {
         Real64 ZoneMult;         // total zone multiplier
         Real64 RetAirConvGain;
 
-        // FLOW:
+
 
         // determine ZoneEquipConfigNum for this zone
         ZoneEquipConfigNum = ZoneNum;
@@ -523,7 +523,7 @@ namespace MundtSimMgr {
         int NodeNum; // index for air nodes
         int SurfNum; // index for surfaces
 
-        // FLOW:
+
 
         // set up air node ID
         NumRoomNodes = 0;
@@ -607,7 +607,7 @@ namespace MundtSimMgr {
         int SurfNum;            // index for surfaces
         int SurfCounted;        // number of surfaces assciated with an air node
 
-        // FLOW:
+
 
         //   apply floor splits
         QequipConvFloor = state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) * ConvIntGain;
@@ -721,7 +721,7 @@ namespace MundtSimMgr {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         LineNode(NodeID, MundtZoneNum).Temp = TempResult;
     }

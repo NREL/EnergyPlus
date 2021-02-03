@@ -270,7 +270,7 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // FLOW:
+
         PostIPProcessing(state);
 
         InitializePsychRoutines();
@@ -1798,7 +1798,7 @@ namespace SimulationManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // FLOW:
+
         state.dataGlobal->StdOutputRecordCount = 0;
         state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
         print(state.files.eso, "Program Version,{}\n", VerString);
@@ -3080,7 +3080,7 @@ void Resimulate(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
 
-    // FLOW:
+
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 

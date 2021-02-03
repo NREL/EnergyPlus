@@ -78,19 +78,6 @@ namespace PoweredInductionUnits {
         SteamAirHeating,
     };
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
-
-    extern int NumPIUs;
-    extern int NumSeriesPIUs;
-    extern int NumParallelPIUs;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // PRIVATE UpdatePIU
-
-    // Types
-
     struct PowIndUnitData
     {
         // Members
@@ -173,13 +160,6 @@ namespace PoweredInductionUnits {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<PowIndUnitData> PIU;
-
-    // Functions
-
-    void clear_state();
-
     void SimPIU(EnergyPlusData &state,
                 std::string const &CompName, // name of the PIU
                 bool FirstHVACIteration,     // TRUE if first HVAC iteration in time step
@@ -224,8 +204,27 @@ namespace PoweredInductionUnits {
 struct PoweredInductionUnitsData : BaseGlobalStruct
 {
 
+    Array1D_bool CheckEquipName;
+    bool GetPIUInputFlag = true;
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false;
+    int NumPIUs = 0;
+    int NumSeriesPIUs = 0;
+    int NumParallelPIUs = 0;
+    Array1D<PoweredInductionUnits::PowIndUnitData> PIU;
+    std::unordered_map<std::string, std::string> PiuUniqueNames;
+
     void clear_state() override
     {
+        this->CheckEquipName.deallocate();
+        this->GetPIUInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->NumPIUs = 0;
+        this->NumSeriesPIUs = 0;
+        this->NumParallelPIUs = 0;
+        this->PIU.deallocate();
+        this->PiuUniqueNames.clear();
     }
 };
 

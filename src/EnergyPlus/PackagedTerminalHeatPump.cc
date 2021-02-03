@@ -169,7 +169,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Real64 RemainingOutputToHeatingSP; // remaining load to heating setpoint
         Real64 RemainingOutputToCoolingSP; // remaining load to cooling setpoint
 
-        // FLOW
+
 
         // First time SimPackagedTerminalHeatPump is called, get the input for all the PTUnits
         if (state.dataPTHP->GetPTUnitInputFlag) {
@@ -5808,7 +5808,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Real64 const dZero(0.0);
         Real64 const dOne(1.0);
 
-        // FLOW
+
 
         OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
         InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
@@ -6757,7 +6757,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        // FLOW
+
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergy = state.dataPTHP->PTUnit(PTUnitNum).TotCoolEnergyRate * ReportingConstant;
@@ -7347,7 +7347,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         static int ErrCountVar(0);      // Counter used to minimize the occurrence of output warnings
         Real64 mdot;                    // coil fluid mass flow rate (kg/s)
 
-        // FLOW
+
         SupHeaterLoad = 0.0;
         PartLoadFrac = 0.0;
         SpeedRatio = 0.0;
@@ -8025,7 +8025,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         int SolFlag;
         static int ATMixOutNode(0); // outlet node of ATM Mixer
 
-        // FLOW
+
 
         OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
         InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
@@ -8626,7 +8626,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         SetOnOffMassFlowRate(state, PTUnitNum, PartLoadRatio, OnOffAirFlowRatio);
         // INITIALIZE FIXED SPEED FIRST, AND OVER-WRITE USING MUL-SPEED
 
-        // FLOW:
+
 
         if (state.dataPTHP->CoolingLoad) {
             state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;

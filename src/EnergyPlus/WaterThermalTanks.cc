@@ -528,7 +528,7 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // The necessary control flags and dummy variables are set and passed into SimWaterHeater.
 
-        // FLOW:
+
         if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput(state);
             state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
@@ -594,7 +594,7 @@ namespace WaterThermalTanks {
         // Sums the tank losses from all of the water heaters in the zone to add as a gain to the zone.
         // Now used to determine tank losses during sizing.  Internal gains are summed in a centralized way now
 
-        // FLOW:
+
         if (state.dataWaterThermalTanks->numWaterThermalTank == 0) {
 
             if (!state.dataGlobal->DoingSizing) {
@@ -5154,7 +5154,7 @@ namespace WaterThermalTanks {
         // Currently can only check 0 and 1.  Need changes in CurveManager to be able to check minimums and
         // maximums.
 
-        // FLOW:
+
         IsValid = true;
 
         // Check 0 and 1
@@ -5186,7 +5186,7 @@ namespace WaterThermalTanks {
         const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
         const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
 
-        // FLOW:
+
         int NumNodes = this->Nodes;
         this->Node.allocate(NumNodes);
         Real64 rho;
@@ -6203,7 +6203,7 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("CalcWaterThermalTankMixed");
 
-        // FLOW:
+
         Real64 TimeElapsed_loc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
 
         if (this->TimeElapsed != TimeElapsed_loc) {
@@ -6859,7 +6859,7 @@ namespace WaterThermalTanks {
 
         Real64 t; // Time elapsed from Ti to Tf (s)
 
-        // FLOW:
+
         if (Tf == Ti) {
             // Already at Tf; no time is needed
             t = 0.0;
@@ -6956,7 +6956,7 @@ namespace WaterThermalTanks {
         Real64 b;  // Intermediate variable
         Real64 Tf; // Final tank temperature (C)
 
-        // FLOW:
+
         if (UA / Cp + m1 + m2 == 0.0) {
             a = Q / (m * Cp);
 
@@ -7013,7 +7013,7 @@ namespace WaterThermalTanks {
         Real64 b;     // Intermediate variable
         Real64 dTsum; // Integral of tank temperature (C s)
 
-        // FLOW:
+
         if (t == 0.0) {
             dTsum = 0.0;
 
@@ -8369,7 +8369,7 @@ namespace WaterThermalTanks {
         // References to objects used in this function
         HeatPumpWaterHeaterData &HeatPump = state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum);
 
-        // FLOW:
+
         // initialize local variables
         int AvailSchedule = ScheduleManager::GetCurrentScheduleValue(state, HeatPump.AvailSchedPtr);
         int HPAirInletNode = HeatPump.HeatPumpAirInletNode;
@@ -11388,7 +11388,7 @@ namespace WaterThermalTanks {
             return;
         }
 
-        // FLOW:
+
         bool FirstTimeFlag; // used during HPWH rating procedure
         bool bIsVSCoil = false;
         Real64 RecoveryEfficiency;

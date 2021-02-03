@@ -174,7 +174,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
         state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -2090,7 +2090,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
         state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -4022,7 +4022,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
         state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 

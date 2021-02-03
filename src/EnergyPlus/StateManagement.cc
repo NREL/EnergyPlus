@@ -112,27 +112,19 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/MicroCHPElectricGenerator.hh>
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
@@ -216,7 +208,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     PollutionModule::clear_state();
-    PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection

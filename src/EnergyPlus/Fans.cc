@@ -189,7 +189,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
 
-        // FLOW:
+
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -1025,7 +1025,7 @@ namespace Fans {
         int OutNode;
         int Loop;
 
-        // FLOW:
+
 
         if (MyOneTimeFlag) {
 
@@ -3109,7 +3109,7 @@ namespace Fans {
         Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
         Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
 
-        // FLOW
+
 
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);

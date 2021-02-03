@@ -4878,7 +4878,7 @@ namespace Furnaces {
         InNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
-        // FLOW:
+
         if (InitFurnaceMyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(NumFurnaces);
@@ -5925,7 +5925,7 @@ namespace Furnaces {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         // Check for heat only furnace
         if (Furnace(FurnaceNum).FurnaceType_Num != Furnace_HeatOnly && Furnace(FurnaceNum).FurnaceType_Num != UnitarySys_HeatOnly) {
 
@@ -10293,7 +10293,7 @@ namespace Furnaces {
         static int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
 
-        // FLOW
+
         SupHeaterLoad = 0.0;
         PartLoadFrac = 0.0;
         SpeedRatio = 0.0;
@@ -10711,7 +10711,7 @@ namespace Furnaces {
         bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
         Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
 
-        // FLOW
+
         InletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutletNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
@@ -11762,7 +11762,7 @@ namespace Furnaces {
         InNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
-        // FLOW:
+
 
         if (CoolingLoad) {
             Furnace(FurnaceNum).HeatCoolMode = Furnaces::ModeOfOperation::CoolingMode;

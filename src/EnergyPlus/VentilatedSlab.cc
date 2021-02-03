@@ -163,7 +163,7 @@ namespace VentilatedSlab {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // index of ventilated slab being simulated
 
-        // FLOW:
+
         if (state.dataVentilatedSlab->GetInputFlag) {
             GetVentilatedSlabInput(state);
             state.dataVentilatedSlab->GetInputFlag = false;
@@ -282,7 +282,7 @@ namespace VentilatedSlab {
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         bool SteamMessageNeeded;
 
-        // FLOW:
+
         // Figure out how many Ventilated Slab Systems there are in the input file
 
         SteamMessageNeeded = true;
@@ -1339,7 +1339,7 @@ namespace VentilatedSlab {
         int MixOut;
         Real64 rho;
         bool errFlag;
-        // FLOW:
+
 
         // Do the one time initializations
 
@@ -2566,7 +2566,7 @@ namespace VentilatedSlab {
             }
         }
 
-        // FLOW:
+
 
         // initialize local variables
         ControlNode = 0;
@@ -3336,7 +3336,7 @@ namespace VentilatedSlab {
         Real64 QTotUnitOut; // total unit output [watts]
         Real64 QUnitOut;    // heating or sens. cooling provided by fan coil unit [watts]
 
-        // FLOW:
+
 
         OutletNode = state.dataVentilatedSlab->VentSlab(Item).RadInNode;
         FanOutletNode = state.dataVentilatedSlab->VentSlab(Item).FanOutletNode;
@@ -4090,7 +4090,7 @@ namespace VentilatedSlab {
         int OAMixOutNode;   // outside air mixer outlet node for ventilated slab loop
         int OutsideAirNode; // outside air node number in ventilated slab loop
 
-        // FLOW:
+
         AirRelNode = state.dataVentilatedSlab->VentSlab(Item).AirReliefNode;
         InletNode = state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode;
         OAMixOutNode = state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode;
@@ -4187,7 +4187,7 @@ namespace VentilatedSlab {
         int OANode;             // Node number for the water side outlet of the radiant system
         Real64 OAFraction;      // Outside air fraction of inlet air
         int ZoneInletNode;      // Node number for the air side inlet of the ventilated slab
-        // FLOW:
+
 
         ZoneNum = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
         TotRadSurfaces = state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces;
@@ -4358,7 +4358,7 @@ namespace VentilatedSlab {
         Real64 PRactual;
         Real64 SysAirMassFlow; // Specific heat of air
 
-        // FLOW:
+
         // First find out where we are in the range of temperatures
         Index = 1;
         while (Index <= NumOfPropDivisions) {
@@ -4450,7 +4450,7 @@ namespace VentilatedSlab {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {

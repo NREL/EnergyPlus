@@ -247,7 +247,7 @@ namespace EMSManager {
         int tmpInteger;
         //  INTEGER  :: ProgramNum
 
-        // FLOW:
+
         anyProgramRan = false;
         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
@@ -516,7 +516,7 @@ namespace EMSManager {
         static int TotalArgs(0);       // argument for call to GetObjectDefMaxArgs
         bool errFlag;
 
-        // FLOW:
+
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
@@ -1260,7 +1260,7 @@ namespace EMSManager {
         Array1D_int KeyIndex;
         bool Found;
 
-        // FLOW:
+
         VarType = 0;
         VarIndex = 0;
         Found = false;
