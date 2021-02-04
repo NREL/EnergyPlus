@@ -59,15 +59,15 @@ namespace AirflowNetwork {
     )
     {
         // Dry air thermal conductivity {W/m-K}
-        // Correlated over the range -73C to 76.9C
-        // Reference doi/10.1063/1.555744
+        // Correlated over the range -20C to 70C
+        // Reference Cengel & Ghajar, Heat and Mass Transfer. 5th ed.
 
-        Real64 const LowerLimit = -73;
-        Real64 const UpperLimit = 76.9;
+        Real64 const LowerLimit = -20;
+        Real64 const UpperLimit = 70;
 
-        Real64 const a = 0.02420195316;
-        Real64 const b = 0.0000766872;
-        Real64 const c = -4.4e-08;
+        Real64 const a = 0.02364;
+        Real64 const b = 0.0000754772569209165;
+        Real64 const c = -2.40977632412045e-8;
 
         if (T < LowerLimit) {
             if (lowerLimitErrIdx == 0) {
