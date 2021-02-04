@@ -59,10 +59,10 @@ namespace AirflowNetwork {
     )
     {
         // Dry air thermal conductivity {W/m-K}
-        // Correlated over the range -73C to 76.9C
+        // Correlated over the range -73.1C to 76.9C
         // Reference doi/10.1063/1.555744
 
-        Real64 const LowerLimit = -73;
+        Real64 const LowerLimit = -73.1;
         Real64 const UpperLimit = 76.9;
 
         Real64 const a = 0.02420195316;
