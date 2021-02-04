@@ -8193,7 +8193,7 @@ namespace ConvectionCoefficients {
         if (Tilt == 0 || Tilt == 180) {             // Horizontal roof or floor
             L = std::sqrt(Surface(SurfNum).Area);
         } else {
-            L = Surface(SurfNum).Height;            // 
+            L = Surface(SurfNum).Height;
         }
 
         if (Surface(SurfNum).ExtBoundCond == 0) {

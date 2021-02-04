@@ -30,14 +30,13 @@ For radiant barriers, this can be selected as `Zone Inside Convection Algorithm`
 - Heat flow direction (up and down) can be determined the temperature difference between the surface and the air.
 - For calculating the convection heat transfer coefficient, following inputs for each surface are needed:
   - Length along the heat flow direction
-    - the square root of surface area for floors and ceilings
-    - surface height for gables and walls
-    - length of pitched roof from soffit to ridge
+    - The square root of surface area for floors and ceilings
+    - Surface height for gables and walls
+    - Length of pitched roof from soffit to ridge
   - Tilt angle
   - Velocity of the air stream
     - For interior surfaces, it is calculated from zone voulme and air changes per hour
     - For exterior surfaces, Surface Outside Face Outdoor Air Wind Speed
-
 
 ## Testing/Validation/Data Sources ##
 

@@ -1969,7 +1969,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     DataSurfaces::Surface(1).Tilt = 0;
     DataSurfaces::Surface(1).Area = 100;
     DataSurfaces::Surface(1).ExtBoundCond = 0;
-    DataSurfaces::Surface(1).WindSpeed = 3;
+    DataSurfaces::Surface(1).WindSpeed = 1;
 
     Tsurf = 18.0;
     Tair = 15.0;
@@ -1978,7 +1978,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
 
     Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(1, Tsurf, Tair, AirStreamV, Tilt);
 
-    EXPECT_NEAR(Hin, 7.465, 0.001);
+    EXPECT_NEAR(Hin, 1.977, 0.001);
 
     //Pitched Roof, heat flow up
     DataSurfaces::Surface(2).Zone = 2;
@@ -1987,7 +1987,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     DataSurfaces::Surface(2).Tilt = 20;
     DataSurfaces::Surface(2).Area = 100;
     DataSurfaces::Surface(2).ExtBoundCond = 0;
-    DataSurfaces::Surface(2).WindSpeed = 3;
+    DataSurfaces::Surface(2).WindSpeed = 1;
     DataSurfaces::Surface(2).Height = 8;
 
     Tsurf = 15.0;
@@ -1997,7 +1997,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
 
     Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(2, Tsurf, Tair, AirStreamV, Tilt);
 
-    EXPECT_NEAR(Hin, 7.424, 0.001);
+    EXPECT_NEAR(Hin, 2.666, 0.001);
     
     // Vertical Wall
     DataSurfaces::Surface(3).Zone = 3;
