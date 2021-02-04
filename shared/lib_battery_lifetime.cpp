@@ -1,6 +1,7 @@
 #include "lib_battery_lifetime.h"
 #include "lib_battery_lifetime_calendar_cycle.h"
 #include "lib_battery_lifetime_nmc.h"
+#include <cmath>
 
 lifetime_params::lifetime_params() {
     model_choice = CALCYC;

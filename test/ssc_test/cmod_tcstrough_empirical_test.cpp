@@ -1,373 +1,278 @@
 #include <gtest/gtest.h>
+#include "tcstrough_empirical_defaults.h"
+#include "csp_common_test.h"
+#include "vs_google_test_explorer_namespace.h"
 
-#include "cmod_tcstrough_empirical_test.h"
-#include "../tcs_test/tcstrough_empirical_cases.h"
-#include "../input_cases/weather_inputs.h"
+namespace csp_trough {}
+using namespace csp_trough;
 
-/// Test tcstrough_empirical with all defaults with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Default_No_Financial_cmod_tcstrough_empirical) {
-
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_default(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.44335e8, 3.44335e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 39.347, 39.347 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 4.04116e8, 4.04116e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3446.8, 3446.8 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 88.7574, 88.7574 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+//========Tests===================================================================================
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, Default_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 344049128, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 39.31, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 403814011, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3444, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 88.75, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Test tcstrough_empirical with alternative Solar Field HTF type: Hitec Solar Salt
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Solar_Field_HTF_No_Financial_cmod_tcstrough_empirical) {
+// Alternative solar field HTF type: Hitec Solar Salt
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, SolarSaltHtf_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("HTFFluid", 18);
+    empirical_trough.SetInput("PTSmax", 676.471);
+    empirical_trough.SetInput("PFSmax", 342.699);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_solar_field_HTF(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.40714e8, 3.40714e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 38.9332, 38.9332 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 3.9992e8, 3.9992e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3410.55, 3410.55 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 88.7454, 88.7454 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 340377809, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 38.89, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 399556634, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3407, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 88.74, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Passed with m_error_tolerance_hi used for:
-/// annual_W_cycle_gross & conversion_factor & kwh_per_kw
+// Alternative solar collector assembly (SCA): EuroTrough ET150
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, EuroTrough_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("Solar_Field_Area", 856740);
+    empirical_trough.SetInput("Ave_Focal_Length", 2.1);
+    empirical_trough.SetInput("ScaLen", 150);
+    empirical_trough.SetInput("SCA_aper", 5.75);
+    empirical_trough.SetInput("TrkTwstErr", 0.99);
+    empirical_trough.SetInput("MirCln", 0.97);
+    empirical_trough.SetInput("HCEdust", { 0.98, 0.98, 0.98, 0.98 });
+    empirical_trough.SetInput("RefMirrAper", { 5.75, 5.75, 5.75, 5.75 });
+    empirical_trough.SetInput("SfPar", 0.228);
+    empirical_trough.SetInput("ChtfPar", 9.013);
+    empirical_trough.SetInput("AntiFrPar", 0.9013);
 
-/// Test tcstrough_empirical with alternative Solar Collector Assembly (SCA): EuroTrough ET150
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_SCA_No_Financial_cmod_tcstrough_empirical) {
-
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_SCA(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.44114e8, 3.44114e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 39.3217, 39.3217 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 4.03352e8, 4.03352e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3444.58, 3444.58 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 88.8683, 88.8683 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 343687390, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 39.27, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 402926405, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3440, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 88.85, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Passed with m_error_tolerance_hi used for:
-/// conversion_factor
+// Alternative heat collection element (HCE): Luz Cermet Vacuum, Luz Cermet Hydrogren, and Luz Cermet Broken Glass
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, LuzCermetHce_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("Solar_Field_Area", 1015848);
+    empirical_trough.SetInput("HCEBelShad", { 0.971, 0.971, 0.971, 0 });
+    empirical_trough.SetInput("HCEEnvTrans", { 0.935, 0.935, 1, 0 });
+    empirical_trough.SetInput("HCEabs", { 0.925, 0.925, 0.8, 0 });
+    empirical_trough.SetInput("PerfFac", { 1.25, 1.25, 1.25, 0 });
+    empirical_trough.SetInput("HCE_A0", { 2.424, 7.0233, 100.05, 0 });
+    empirical_trough.SetInput("HCE_A1", { 0.214, 1.275, -0.7351, 0 });
+    empirical_trough.SetInput("HCE_A2", { -0.00047461, 0.0015105, -0.008635, 0 });
+    empirical_trough.SetInput("HCE_A3", { 6.88e-06, 5.05e-06, 2.67e-05, 0 });
+    empirical_trough.SetInput("HCE_A4", { 9.62e-08, 7.03e-08, 6.65e-07, 0 });
+    empirical_trough.SetInput("HCE_A5", { -2.2423, -4.284, -99.043, 0 });
+    empirical_trough.SetInput("HCE_A6", { 0.032325, 0.39685, 5.1672, 0 });
+    empirical_trough.SetInput("SfPar", 0.270);
+    empirical_trough.SetInput("ChtfPar", 10.687);
+    empirical_trough.SetInput("AntiFrPar", 1.069);
 
-/// Test tcstrough_empirical with alternative Heat Collection Element (HCE): Luz Cermet Vacuum, Luz Cermet Hydrogren, and Luz Cermet Broken Glass
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_HCE_No_Financial_cmod_tcstrough_empirical) {
-
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_HCE(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.11168e8, 3.11168e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 35.557, 35.557 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 3.69939e8, 3.69939e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3114.8, 3114.8 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 87.618, 87.618 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 310891768, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 35.53, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 369630914, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3112, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 87.61, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Test tcstrough_empirical with alternative Power Cycle: APS Ormat 1MWe 300C
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Power_Cycle_No_Financial_cmod_tcstrough_empirical) {
+// Alternative power cycle: APS Ormat 1MWe 300C
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, PowerCycle_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("Solar_Field_Area", 1599020);
+    empirical_trough.SetInput("TurbEffG", 0.2071);
+    empirical_trough.SetInput("TurSUE", 0.05);
+    empirical_trough.SetInput("T2EPLF0", -0.1594);
+    empirical_trough.SetInput("T2EPLF1", 0.9262);
+    empirical_trough.SetInput("T2EPLF2", 1.1349);
+    empirical_trough.SetInput("T2EPLF3", -1.3606);
+    empirical_trough.SetInput("T2EPLF4", 0.4588);
+    empirical_trough.SetInput("E2TPLF0", 0.1492);
+    empirical_trough.SetInput("E2TPLF1", 0.8522);
+    empirical_trough.SetInput("E2TPLF2", -0.3247);
+    empirical_trough.SetInput("E2TPLF3", 0.44863);
+    empirical_trough.SetInput("E2TPLF4", -0.1256);
+    empirical_trough.SetInput("TempCorrF", 0);
+    empirical_trough.SetInput("TempCorr0", 1);
+    empirical_trough.SetInput("TempCorr1", 0);
+    empirical_trough.SetInput("TempCorr2", 0);
+    empirical_trough.SetInput("TempCorr3", 0);
+    empirical_trough.SetInput("TempCorr4", 0);
+    empirical_trough.SetInput("PTSmax", 535.973);
+    empirical_trough.SetInput("PFSmax", 543.0467);
+    empirical_trough.SetInput("SfPar", 0.42534);
+    empirical_trough.SetInput("ChtfPar", 16.8217);
+    empirical_trough.SetInput("AntiFrPar", 1.6822);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_power_cycle(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.5066e8, 3.5066e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 40.0698, 40.0698 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 4.27665e8, 4.27665e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3510.11, 3510.11 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 85.4106, 85.4106 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 350313341, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 40.03, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 427283458, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3507, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 85.40, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Test tcstrough_empirical with alternative Thermal Storage Fluid Type: Therminol VP-1
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Thermal_Storage_Fluid_No_Financial_cmod_tcstrough_empirical) {
+// Alternative thermal stoage fluid type: Therminol VP-1
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, TherminolHtf_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("PTSmax", 676.4706);
+    empirical_trough.SetInput("PFSmax", 342.699);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_thermal_storage(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.4418e8, 3.4418e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 39.3292, 39.3292 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 4.03784e8, 4.03784e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3445.24, 3445.24 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 88.7901, 88.7901 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 343856219, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 39.29, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 403443026, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3444, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 88.78, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Test tcstrough_empirical with alternative Parasitic Electric Energy Use: 500C Molten Salt HTF
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Parasitic_No_Financial_cmod_tcstrough_empirical) {
+// Alternative parasitic electric energy use
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, ParasiticElectric_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    empirical_trough.SetInput("SfPar", 0.117);
+    empirical_trough.SetInput("SfParPF", 0.5);
+    empirical_trough.SetInput("ChtfPar", 3.231);
+    empirical_trough.SetInput("ChtfParPF", 0.35);
+    empirical_trough.SetInput("AntiFrPar", 0.323);
+    empirical_trough.SetInput("HhtfPar", 0.777);
+    empirical_trough.SetInput("HhtfParPF", 0.35);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_tucson_parasitic(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.58145e8, 3.58145e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 40.9251, 40.9251 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 4.04116e8, 4.04116e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3585.04, 3585.04 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 92.3171, 92.3171 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 357850265, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 40.89, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 403814011, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3582, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 92.31, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
 
-/// Test tcstrough_empirical with alternativelocation: Phoenix, AZ
-/// Rest default configurations with respect to the No Financial model
-TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Location_No_Financial_cmod_tcstrough_empirical) {
+// Alternative location: Phoenix, AZ
+NAMESPACE_TEST(csp_trough, EmpiricalTroughCmod, Phoenix_NoFinancial)
+{
+    ssc_data_t defaults = tcstrough_empirical_defaults();
+    CmodUnderTest empirical_trough = CmodUnderTest("tcstrough_empirical", defaults);
+    char solar_resource_path_phoenix[512];
+    int n = sprintf(solar_resource_path_phoenix, "%s/test/input_cases/trough_empirical_data/phoenix_az_33.450495_-111.983688_psmv3_60_tmy.csv", std::getenv("SSCDIR"));
+    empirical_trough.SetInput("file_name", solar_resource_path_phoenix);
 
-	ssc_data_t data = ssc_data_create();
-	int test_errors = tcstrough_empirical_phoenix(data);
-
-	EXPECT_FALSE(test_errors);
-	if (!test_errors)
-	{
-		ssc_number_t annual_energy;
-		ssc_data_get_number(data, "annual_energy", &annual_energy);
-		EXPECT_NEAR(annual_energy, 3.3255e8, 3.3255e8 * m_error_tolerance_hi) << "Annual Energy";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_fuel_usage;
-		ssc_data_get_number(data, "annual_fuel_usage", &annual_fuel_usage);
-		EXPECT_NEAR(annual_fuel_usage, 0, 0 * m_error_tolerance_hi) << "Annual fuel usage";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t capacity_factor;
-		ssc_data_get_number(data, "capacity_factor", &capacity_factor);
-		EXPECT_NEAR(capacity_factor, 38.0003, 38.0003 * m_error_tolerance_hi) << "Capacity Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t annual_W_cycle_gross;
-		ssc_data_get_number(data, "annual_W_cycle_gross", &annual_W_cycle_gross);
-		EXPECT_NEAR(annual_W_cycle_gross, 3.91116e8, 3.91116e8 * m_error_tolerance_hi) << "Annual W_cycle Gross";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t kwh_per_kw;
-		ssc_data_get_number(data, "kwh_per_kw", &kwh_per_kw);
-		EXPECT_NEAR(kwh_per_kw, 3328.83, 3328.83 * m_error_tolerance_hi) << "kwh per kw";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t conversion_factor;
-		ssc_data_get_number(data, "conversion_factor", &conversion_factor);
-		EXPECT_NEAR(conversion_factor, 88.5687, 88.5687 * m_error_tolerance_hi) << "Conversion Factor";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_heat_rate;
-		ssc_data_get_number(data, "system_heat_rate", &system_heat_rate);
-		EXPECT_NEAR(system_heat_rate, 3.413, 3.413 * m_error_tolerance_hi) << "System heat rate";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-		ssc_number_t system_use_lifetime_output;
-		ssc_data_get_number(data, "system_use_lifetime_output", &system_use_lifetime_output);
-		EXPECT_NEAR(system_use_lifetime_output, 0, 0 * m_error_tolerance_hi) << "Use lifetime output";  // choose either m_error_tolerance_lo or m_error_tolerance_hi
-
-	}
+    int errors = empirical_trough.RunModule();
+    EXPECT_FALSE(errors);
+    if (!errors) {
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_energy"), 332549669, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("annual_fuel_usage"), 0., kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("capacity_factor"), 38.00, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("annual_W_cycle_gross"), 391115710, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("kwh_per_kw"), 3329, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("conversion_factor"), 88.56, kErrorToleranceLo);
+        EXPECT_NEAR_FRAC(empirical_trough.GetOutput("system_heat_rate"), 3.413, kErrorToleranceLo);
+        EXPECT_NEAR(empirical_trough.GetOutput("system_use_lifetime_output"), 0., kErrorToleranceLo);
+    }
 }
+
+// Test series of Advanced Combinatorial Testing System (ACTS) runs
+// Parabolic trough (empirical)
+//int ACTS_test_empirical(ssc_data_t &data, int test_case)
+//{
+//	tcstrough_empirical_default(data);
+//
+//	// Testing level to vector index map
+//	std::unordered_map<int, int> idx =
+//	{
+//		{-1, 0},
+//		{ 0, 1},
+//		{ 1, 2}
+//	};
+//
+//	// Parameter test range values
+//	std::vector<double> Distance_SCA_vals{ 0.5, 1 , 2 };				// Distance Between SCAs in Row		// SAM SSC - "Distance_SCA"			 
+//	std::vector<double> NumScas_vals{ 1, 4, 8 };			            // Number of SCAs per Row			// SAM SSC - "NumScas"
+//	std::vector<double> DepAngle_vals{ 5, 10, 20 };						// Deploy Angle						// SAM SSC - "DepAngle"	 
+//	std::vector<double> Stow_Angle_vals{ 160, 170, 175 };			    // Stow Angle					    // SAM SSC - "Stow_Angle"
+//
+//	// ACTS transposed covering array           1   2   3   4   5  6   7   8  9             
+//	       std::vector<int> Distance_SCA_lvls{ -1, -1, -1,  0,  0, 0,  1,  1, 1 };
+//	            std::vector<int> NumScas_lvls{ -1,  0,  1, -1,  0, 1, -1,  0, 1 };
+//	           std::vector<int> DepAngle_lvls{  0,  1, -1,  1, -1, 0, -1,  0, 1 };
+//	         std::vector<int> Stow_Angle_lvls{  0,  1, -1, -1,  0, 1,  1, -1, 0 };
+//
+//	// Get test case values from index
+//	double Distance_SCA_ACTS = Distance_SCA_vals.at(idx.find(Distance_SCA_lvls.at(test_case))->second);
+//	double NumScas_ACTS = NumScas_vals.at(idx.find(NumScas_lvls.at(test_case))->second);
+//	double DepAngle_ACTS = DepAngle_vals.at(idx.find(DepAngle_lvls.at(test_case))->second);
+//	double Stow_Angle_ACTS = Stow_Angle_vals.at(idx.find(Stow_Angle_lvls.at(test_case))->second);
+//
+//	// Assigning values to variables 
+//	ssc_data_set_number(data, "Distance_SCA", Distance_SCA_ACTS);
+//	ssc_data_set_number(data, "NumScas", NumScas_ACTS);
+//	ssc_data_set_number(data, "DepAngle", DepAngle_ACTS);
+//	ssc_data_set_number(data, "Stow_Angle", Stow_Angle_ACTS);
+//
+//	int status = run_module(data, "tcstrough_empirical");
+//
+//	return status;
+//}
+
 
 /// Test series of Advanced Combinatorial Testing System (ACTS) runs 
 //TEST_F(CMTcsTroughEmpirical, ACTS_Test_Empirical) {
@@ -423,6 +328,3 @@ TEST_F(CMTcsTroughEmpirical, TroughEmpirical_Location_No_Financial_cmod_tcstroug
 //		}
 //	}
 //}
-
-
-

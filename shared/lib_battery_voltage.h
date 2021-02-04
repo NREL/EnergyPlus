@@ -188,8 +188,9 @@ public:
 
     double calculate_voltage_for_current(double I, double q, double qmax, double T_k) override;
 
-    void updateVoltage(double q, double qmax, double I, double temp, double dt) override;
-
+    
+    void updateVoltage(double q, double qmax, double I, double temp, double dt) override; //updates battery voltage based on system capacity (Ah), system maximum capacity (Ah), current (A), temperature (C), and time step (hr)
+    
 
 protected:
     double _A;

@@ -47,9 +47,9 @@ public:
     {
         // For Manual Dispatch Test
         BatteryProperties::SetUp();
-        q = 1000. / 89.;
+        n_strings = 445;
 
-        capacityModel = new capacity_lithium_ion_t(q * n_strings, SOC_init, SOC_max, SOC_min, dtHour);
+        capacityModel = new capacity_lithium_ion_t(Qfull * n_strings, SOC_init, SOC_max, SOC_min, dtHour);
         voltageModel = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
                                              C_rate, resistance, dtHour);
         lifetimeModel = new lifetime_calendar_cycle_t(cycleLifeMatrix, dtHour, calendar_q0, calendar_a, calendar_b, calendar_c);
