@@ -76,7 +76,6 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -89,7 +88,6 @@
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -165,7 +163,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
     clearFacilityElectricPowerServiceObject();
-    EarthTube::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
@@ -176,7 +173,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FluidProperties::clear_state();
     Furnaces::clear_state();
     General::clear_state();
-    GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
