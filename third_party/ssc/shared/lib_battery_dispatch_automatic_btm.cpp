@@ -140,23 +140,22 @@ void dispatch_automatic_behind_the_meter_t::setup_rate_forecast()
     {
         // Process load and pv forecasts to get _monthly_ expected gen, load, and peak
         // Do we need new member variables, or can these just be passed off to UtilityRateForecast?
-        std::vector<double> monthly_peaks;
+        std::vector<double> monthly_gross_load;
         std::vector<double> monthly_gen;
-        std::vector<double> monthly_load;
+        std::vector<double> monthly_net_load;
 
         // Load here is every step for the full analysis period. Load escalation has already been applied (TODO in compute modules)
         size_t num_recs = util::hours_per_year * _steps_per_hour * _nyears;
         size_t step = 0; size_t hour_of_year = 0;
         int curr_month = 1;
-        double load_during_month = 0.0; double gen_during_month = 0.0; double peak_during_month = 0.0;
+        double load_during_month = 0.0; double gen_during_month = 0.0; double gross_load_during_month = 0.0;
         size_t array_size = std::min(_P_pv_ac.size(), _P_load_ac.size()); // Cover smaller arrays to make testing easier
         for (size_t idx = 0; idx < num_recs && idx < array_size; idx++)
         {
             double grid_power = _P_pv_ac[idx] - _P_load_ac[idx];
-            if (grid_power < peak_during_month)
-            {
-                peak_during_month = grid_power;
-            }
+
+            gross_load_during_month += _P_load_ac[idx] * _dt_hour;
+            
 
             if (grid_power < 0)
             {
@@ -180,16 +179,16 @@ void dispatch_automatic_behind_the_meter_t::setup_rate_forecast()
             {
                 // Push back vectors
                 // Note: this is a net-billing approach. To be accurate for net metering, we'd have to invoke tou periods here, this overestimates costs for NM
-                monthly_peaks.push_back(-1.0 * peak_during_month);
-                monthly_load.push_back(-1.0 * load_during_month);
+                monthly_gross_load.push_back(gross_load_during_month / util::hours_in_month(curr_month));
+                monthly_net_load.push_back(-1.0 * load_during_month);
                 monthly_gen.push_back(gen_during_month);
 
-                peak_during_month = 0.0; load_during_month = 0.0; gen_during_month = 0.0;
+                gross_load_during_month = 0.0; load_during_month = 0.0; gen_during_month = 0.0;
                 curr_month < 12 ? curr_month++ : curr_month = 1;
             }
         }
 
-        rate_forecast = std::shared_ptr<UtilityRateForecast>(new UtilityRateForecast(rate.get(), _steps_per_hour, monthly_load, monthly_gen, monthly_peaks, _nyears));
+        rate_forecast = std::shared_ptr<UtilityRateForecast>(new UtilityRateForecast(rate.get(), _steps_per_hour, monthly_net_load, monthly_gen, monthly_gross_load, _nyears));
         rate_forecast->initializeMonth(0, 0);
         rate_forecast->copyTOUForecast();
     }
@@ -604,6 +603,7 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
         }
     }
     double remainingEnergy = E_max;
+    double powerAtMaxCost = 0;
     plan.lowestMarginalCost = sorted_grid[0].MarginalCost();
     for (i = 0; i < (plan.dispatch_hours * _steps_per_hour) && (i < sorted_grid.size()); i++)
     {
@@ -612,10 +612,17 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
         {
             double costPercent = costAtStep / costDuringDispatchHours;
             double desiredPower = remainingEnergy * costPercent / _dt_hour;
+
+            // Prevent the wierd signals from demand charges from reducing dispatch (maybe fix this upstream in the future)
+            if (desiredPower < powerAtMaxCost && sorted_grid[i].Grid() >= powerAtMaxCost) {
+                desiredPower = powerAtMaxCost;
+            }
+
             if (desiredPower > sorted_grid[i].Grid())
             {
                 desiredPower = sorted_grid[i].Grid();
             }
+            
             // Account for discharging constraints assuming voltage is constant over forecast period
             check_power_restrictions(desiredPower);
 
@@ -627,10 +634,23 @@ void dispatch_automatic_behind_the_meter_t::plan_dispatch_for_cost(dispatch_plan
             index = sorted_grid[i].Hour() * _steps_per_hour + sorted_grid[i].Step(); // Assumes we're always running this function on the hour
             plan.plannedDispatch[index] = desiredPower;
 
+            if (powerAtMaxCost == 0) {
+                powerAtMaxCost = desiredPower;
+            }
+        }
+    }
+
+    for (i = 0; i < _steps_per_hour && (i < sorted_grid.size()); i++)
+    {
+        if (sorted_grid[i].Cost() > 0)
+        {
             if (sorted_grid[i].MarginalCost() < plan.lowestMarginalCost)
             {
                 plan.lowestMarginalCost = sorted_grid[i].MarginalCost();
             }
+        }
+        else {
+            break;
         }
     }
 

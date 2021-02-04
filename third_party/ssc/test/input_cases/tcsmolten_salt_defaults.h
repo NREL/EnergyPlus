@@ -1,8 +1,7 @@
-#ifndef _TCSMOLTEN_SALT_COMMON_DATA_H_
-#define _TCSMOLTEN_SALT_COMMON_DATA_H_
+#ifndef _TCSMOLTEN_SALT_DEFAULTS_H_
+#define _TCSMOLTEN_SALT_DEFAULTS_H_
 
 #include <stdio.h>
-
 #include "../input_cases/code_generator_utilities.h"
 
 //const char * SSCDIR = std::getenv("SSCDIR");
@@ -12,18 +11,18 @@ char dispatch_factors_path[512];
 char ud_ind_od_path[512];
 char wlim_series_path[512];
 char helio_positions_path[512];
-
-
 int nmspt1 = sprintf(dispatch_factors_path, "%s/test/input_cases/moltensalt_data/dispatch_factors_ts.csv", std::getenv("SSCDIR"));
 int nmspt2 = sprintf(ud_ind_od_path, "%s/test/input_cases/moltensalt_data/ud_ind_od.csv", std::getenv("SSCDIR"));
 int nmspt3 = sprintf(wlim_series_path, "%s/test/input_cases/moltensalt_data/wlim_series.csv", std::getenv("SSCDIR"));
 int nmspt4 = sprintf(helio_positions_path, "%s/test/input_cases/moltensalt_data/helio_positions.csv", std::getenv("SSCDIR"));
 
 /**
-*  Default data for tcsmolten_salt run that can be further modified
+*  Default parameters for tcsmolten_salt technology model
 */
-void tcsmolten_salt_default(ssc_data_t &data)
+ssc_data_t tcsmolten_salt_defaults()
 {
+    ssc_data_t data = ssc_data_create();
+
 	char solar_resource_path[512];
     // This is a copy of the actual weather file used, which has been copied to the ssc repo so it can be found by Travis CI for its tests.
     //  The actual weather file used by SAM could change and thus change the UI output values (different input (i.e., weather file) -> different outputs)
@@ -312,239 +311,7 @@ void tcsmolten_salt_default(ssc_data_t &data)
     ssc_data_set_number(data, "adjust:constant", 4);
     ssc_data_set_number(data, "sf_adjust:constant", 0);
 
-}
-
-/**
-*  Default data for the PPA single owner (utility) run that can be further modified
-*/
-void single_owner_default(ssc_data_t &data)
-{
-    ssc_data_set_number(data, "analysis_period", 25);
-    ssc_number_t p_federal_tax_rate[1] = { 21 };
-    ssc_data_set_array(data, "federal_tax_rate", p_federal_tax_rate, 1);
-    ssc_number_t p_state_tax_rate[1] = { 7 };
-    ssc_data_set_array(data, "state_tax_rate", p_state_tax_rate, 1);
-    ssc_data_set_number(data, "property_tax_rate", 0);
-    ssc_data_set_number(data, "prop_tax_cost_assessed_percent", 100);
-    ssc_data_set_number(data, "prop_tax_assessed_decline", 0);
-    ssc_data_set_number(data, "real_discount_rate", 6.4);
-    ssc_data_set_number(data, "inflation_rate", 2.5);
-    ssc_data_set_number(data, "insurance_rate", 0.5);
-    ssc_data_set_number(data, "system_capacity", 103500);
-    ssc_number_t p_om_fixed[1] = { 0 };
-    ssc_data_set_array(data, "om_fixed", p_om_fixed, 1);
-    ssc_data_set_number(data, "om_fixed_escal", 0);
-    ssc_number_t p_om_production[1] = { 3.5 };
-    ssc_data_set_array(data, "om_production", p_om_production, 1);
-    ssc_data_set_number(data, "om_production_escal", 0);
-    ssc_number_t p_om_capacity[1] = { 66 };
-    ssc_data_set_array(data, "om_capacity", p_om_capacity, 1);
-    ssc_data_set_number(data, "om_capacity_escal", 0);
-    ssc_number_t p_om_fuel_cost[1] = { 0 };
-    ssc_data_set_array(data, "om_fuel_cost", p_om_fuel_cost, 1);
-    ssc_data_set_number(data, "om_fuel_cost_escal", 0);
-    ssc_data_set_number(data, "itc_fed_amount", 0);
-    ssc_data_set_number(data, "itc_fed_amount_deprbas_fed", 1);
-    ssc_data_set_number(data, "itc_fed_amount_deprbas_sta", 1);
-    ssc_data_set_number(data, "itc_sta_amount", 0);
-    ssc_data_set_number(data, "itc_sta_amount_deprbas_fed", 0);
-    ssc_data_set_number(data, "itc_sta_amount_deprbas_sta", 0);
-    ssc_data_set_number(data, "itc_fed_percent", 30);
-    ssc_data_set_number(data, "itc_fed_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "itc_fed_percent_deprbas_fed", 1);
-    ssc_data_set_number(data, "itc_fed_percent_deprbas_sta", 1);
-    ssc_data_set_number(data, "itc_sta_percent", 0);
-    ssc_data_set_number(data, "itc_sta_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "itc_sta_percent_deprbas_fed", 0);
-    ssc_data_set_number(data, "itc_sta_percent_deprbas_sta", 0);
-    ssc_number_t p_ptc_fed_amount[1] = { 0 };
-    ssc_data_set_array(data, "ptc_fed_amount", p_ptc_fed_amount, 1);
-    ssc_data_set_number(data, "ptc_fed_term", 10);
-    ssc_data_set_number(data, "ptc_fed_escal", 0);
-    ssc_number_t p_ptc_sta_amount[1] = { 0 };
-    ssc_data_set_array(data, "ptc_sta_amount", p_ptc_sta_amount, 1);
-    ssc_data_set_number(data, "ptc_sta_term", 10);
-    ssc_data_set_number(data, "ptc_sta_escal", 0);
-    ssc_data_set_number(data, "ibi_fed_amount", 0);
-    ssc_data_set_number(data, "ibi_fed_amount_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_fed_amount_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_fed_amount_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_fed_amount_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_sta_amount", 0);
-    ssc_data_set_number(data, "ibi_sta_amount_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_sta_amount_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_sta_amount_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_sta_amount_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_uti_amount", 0);
-    ssc_data_set_number(data, "ibi_uti_amount_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_uti_amount_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_uti_amount_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_uti_amount_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_oth_amount", 0);
-    ssc_data_set_number(data, "ibi_oth_amount_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_oth_amount_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_oth_amount_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_oth_amount_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_fed_percent", 0);
-    ssc_data_set_number(data, "ibi_fed_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "ibi_fed_percent_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_fed_percent_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_fed_percent_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_fed_percent_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_sta_percent", 0);
-    ssc_data_set_number(data, "ibi_sta_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "ibi_sta_percent_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_sta_percent_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_sta_percent_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_sta_percent_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_uti_percent", 0);
-    ssc_data_set_number(data, "ibi_uti_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "ibi_uti_percent_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_uti_percent_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_uti_percent_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_uti_percent_deprbas_sta", 0);
-    ssc_data_set_number(data, "ibi_oth_percent", 0);
-    ssc_data_set_number(data, "ibi_oth_percent_maxvalue", 10e+37);
-    ssc_data_set_number(data, "ibi_oth_percent_tax_fed", 1);
-    ssc_data_set_number(data, "ibi_oth_percent_tax_sta", 1);
-    ssc_data_set_number(data, "ibi_oth_percent_deprbas_fed", 0);
-    ssc_data_set_number(data, "ibi_oth_percent_deprbas_sta", 0);
-    ssc_data_set_number(data, "cbi_fed_amount", 0);
-    ssc_data_set_number(data, "cbi_fed_maxvalue", 10e+37);
-    ssc_data_set_number(data, "cbi_fed_tax_fed", 1);
-    ssc_data_set_number(data, "cbi_fed_tax_sta", 1);
-    ssc_data_set_number(data, "cbi_fed_deprbas_fed", 0);
-    ssc_data_set_number(data, "cbi_fed_deprbas_sta", 0);
-    ssc_data_set_number(data, "cbi_sta_amount", 0);
-    ssc_data_set_number(data, "cbi_sta_maxvalue", 10e+37);
-    ssc_data_set_number(data, "cbi_sta_tax_fed", 1);
-    ssc_data_set_number(data, "cbi_sta_tax_sta", 1);
-    ssc_data_set_number(data, "cbi_sta_deprbas_fed", 0);
-    ssc_data_set_number(data, "cbi_sta_deprbas_sta", 0);
-    ssc_data_set_number(data, "cbi_uti_amount", 0);
-    ssc_data_set_number(data, "cbi_uti_maxvalue", 10e+37);
-    ssc_data_set_number(data, "cbi_uti_tax_fed", 1);
-    ssc_data_set_number(data, "cbi_uti_tax_sta", 1);
-    ssc_data_set_number(data, "cbi_uti_deprbas_fed", 0);
-    ssc_data_set_number(data, "cbi_uti_deprbas_sta", 0);
-    ssc_data_set_number(data, "cbi_oth_amount", 0);
-    ssc_data_set_number(data, "cbi_oth_maxvalue", 10e+37);
-    ssc_data_set_number(data, "cbi_oth_tax_fed", 1);
-    ssc_data_set_number(data, "cbi_oth_tax_sta", 1);
-    ssc_data_set_number(data, "cbi_oth_deprbas_fed", 0);
-    ssc_data_set_number(data, "cbi_oth_deprbas_sta", 0);
-    ssc_number_t p_pbi_fed_amount[1] = { 0 };
-    ssc_data_set_array(data, "pbi_fed_amount", p_pbi_fed_amount, 1);
-    ssc_data_set_number(data, "pbi_fed_term", 0);
-    ssc_data_set_number(data, "pbi_fed_escal", 0);
-    ssc_data_set_number(data, "pbi_fed_tax_fed", 1);
-    ssc_data_set_number(data, "pbi_fed_tax_sta", 1);
-    ssc_number_t p_pbi_sta_amount[1] = { 0 };
-    ssc_data_set_array(data, "pbi_sta_amount", p_pbi_sta_amount, 1);
-    ssc_data_set_number(data, "pbi_sta_term", 0);
-    ssc_data_set_number(data, "pbi_sta_escal", 0);
-    ssc_data_set_number(data, "pbi_sta_tax_fed", 1);
-    ssc_data_set_number(data, "pbi_sta_tax_sta", 1);
-    ssc_number_t p_pbi_uti_amount[1] = { 0 };
-    ssc_data_set_array(data, "pbi_uti_amount", p_pbi_uti_amount, 1);
-    ssc_data_set_number(data, "pbi_uti_term", 0);
-    ssc_data_set_number(data, "pbi_uti_escal", 0);
-    ssc_data_set_number(data, "pbi_uti_tax_fed", 1);
-    ssc_data_set_number(data, "pbi_uti_tax_sta", 1);
-    ssc_number_t p_pbi_oth_amount[1] = { 0 };
-    ssc_data_set_array(data, "pbi_oth_amount", p_pbi_oth_amount, 1);
-    ssc_data_set_number(data, "pbi_oth_term", 0);
-    ssc_data_set_number(data, "pbi_oth_escal", 0);
-    ssc_data_set_number(data, "pbi_oth_tax_fed", 1);
-    ssc_data_set_number(data, "pbi_oth_tax_sta", 1);
-    ssc_number_t p_degradation[1] = { 0 };
-    ssc_data_set_array(data, "degradation", p_degradation, 1);
-    ssc_number_t p_roe_input[1] = { 0 };
-    ssc_data_set_array(data, "roe_input", p_roe_input, 1);
-    ssc_data_set_number(data, "loan_moratorium", 0);
-    ssc_data_set_number(data, "system_use_recapitalization", 0);
-    ssc_data_set_number(data, "system_use_lifetime_output", 0);
-    ssc_data_set_number(data, "total_installed_cost", 673465536);
-    ssc_data_set_number(data, "reserves_interest", 1.75);
-    ssc_data_set_number(data, "equip1_reserve_cost", 0);
-    ssc_data_set_number(data, "equip1_reserve_freq", 12);
-    ssc_data_set_number(data, "equip2_reserve_cost", 0);
-    ssc_data_set_number(data, "equip2_reserve_freq", 15);
-    ssc_data_set_number(data, "equip3_reserve_cost", 0);
-    ssc_data_set_number(data, "equip3_reserve_freq", 3);
-    ssc_data_set_number(data, "equip_reserve_depr_sta", 0);
-    ssc_data_set_number(data, "equip_reserve_depr_fed", 0);
-    ssc_data_set_number(data, "salvage_percentage", 0);
-    ssc_data_set_number(data, "ppa_soln_mode", 0);
-	ssc_number_t p_ppa_price_input[1] = { 0.13 };
-	ssc_data_set_array(data, "ppa_price_input", p_ppa_price_input, 1);
-	ssc_data_set_number(data, "cp_capacity_payment_esc", 0);
-	ssc_data_set_number(data, "cp_capacity_payment_type", 0);
-	ssc_data_set_number(data, "cp_system_nameplate", 0);
-	ssc_data_set_number(data, "cp_battery_nameplate", 0);
-	ssc_data_set_array(data, "cp_capacity_credit_percent", p_ppa_price_input, 1);
-	ssc_data_set_array(data, "cp_capacity_payment_amount", p_ppa_price_input, 1);
-	ssc_data_set_number(data, "ppa_escalation", 1);
-    ssc_data_set_number(data, "construction_financing_cost", 33673276);
-    ssc_data_set_number(data, "term_tenor", 18);
-    ssc_data_set_number(data, "term_int_rate", 7);
-    ssc_data_set_number(data, "dscr", 1.3);
-    ssc_data_set_number(data, "dscr_reserve_months", 6);
-    ssc_data_set_number(data, "debt_percent", 50);
-    ssc_data_set_number(data, "debt_option", 1);
-    ssc_data_set_number(data, "payment_option", 0);
-    ssc_data_set_number(data, "cost_debt_closing", 450000);
-    ssc_data_set_number(data, "cost_debt_fee", 2.75);
-    ssc_data_set_number(data, "months_working_reserve", 6);
-    ssc_data_set_number(data, "months_receivables_reserve", 0);
-    ssc_data_set_number(data, "cost_other_financing", 0);
-    ssc_data_set_number(data, "flip_target_percent", 11);
-    ssc_data_set_number(data, "flip_target_year", 20);
-    ssc_data_set_number(data, "depr_alloc_macrs_5_percent", 90);
-    ssc_data_set_number(data, "depr_alloc_macrs_15_percent", 1.5);
-    ssc_data_set_number(data, "depr_alloc_sl_5_percent", 0);
-    ssc_data_set_number(data, "depr_alloc_sl_15_percent", 2.5);
-    ssc_data_set_number(data, "depr_alloc_sl_20_percent", 3);
-    ssc_data_set_number(data, "depr_alloc_sl_39_percent", 0);
-    ssc_data_set_number(data, "depr_alloc_custom_percent", 0);
-    ssc_number_t p_depr_custom_schedule[1] = { 0 };
-    ssc_data_set_array(data, "depr_custom_schedule", p_depr_custom_schedule, 1);
-    ssc_data_set_number(data, "depr_bonus_sta", 0);
-    ssc_data_set_number(data, "depr_bonus_sta_macrs_5", 1);
-    ssc_data_set_number(data, "depr_bonus_sta_macrs_15", 1);
-    ssc_data_set_number(data, "depr_bonus_sta_sl_5", 0);
-    ssc_data_set_number(data, "depr_bonus_sta_sl_15", 0);
-    ssc_data_set_number(data, "depr_bonus_sta_sl_20", 0);
-    ssc_data_set_number(data, "depr_bonus_sta_sl_39", 0);
-    ssc_data_set_number(data, "depr_bonus_sta_custom", 0);
-    ssc_data_set_number(data, "depr_bonus_fed", 0);
-    ssc_data_set_number(data, "depr_bonus_fed_macrs_5", 1);
-    ssc_data_set_number(data, "depr_bonus_fed_macrs_15", 1);
-    ssc_data_set_number(data, "depr_bonus_fed_sl_5", 0);
-    ssc_data_set_number(data, "depr_bonus_fed_sl_15", 0);
-    ssc_data_set_number(data, "depr_bonus_fed_sl_20", 0);
-    ssc_data_set_number(data, "depr_bonus_fed_sl_39", 0);
-    ssc_data_set_number(data, "depr_bonus_fed_custom", 0);
-    ssc_data_set_number(data, "depr_itc_sta_macrs_5", 1);
-    ssc_data_set_number(data, "depr_itc_sta_macrs_15", 0);
-    ssc_data_set_number(data, "depr_itc_sta_sl_5", 0);
-    ssc_data_set_number(data, "depr_itc_sta_sl_15", 0);
-    ssc_data_set_number(data, "depr_itc_sta_sl_20", 0);
-    ssc_data_set_number(data, "depr_itc_sta_sl_39", 0);
-    ssc_data_set_number(data, "depr_itc_sta_custom", 0);
-    ssc_data_set_number(data, "depr_itc_fed_macrs_5", 1);
-    ssc_data_set_number(data, "depr_itc_fed_macrs_15", 0);
-    ssc_data_set_number(data, "depr_itc_fed_sl_5", 0);
-    ssc_data_set_number(data, "depr_itc_fed_sl_15", 0);
-    ssc_data_set_number(data, "depr_itc_fed_sl_20", 0);
-    ssc_data_set_number(data, "depr_itc_fed_sl_39", 0);
-    ssc_data_set_number(data, "depr_itc_fed_custom", 0);
-    ssc_data_set_number(data, "pbi_fed_for_ds", 0);
-    ssc_data_set_number(data, "pbi_sta_for_ds", 0);
-    ssc_data_set_number(data, "pbi_uti_for_ds", 0);
-    ssc_data_set_number(data, "pbi_oth_for_ds", 0);
-    ssc_data_set_number(data, "depr_stabas_method", 1);
-    ssc_data_set_number(data, "depr_fedbas_method", 1);
+    return data;
 }
 
 #endif

@@ -124,8 +124,6 @@ namespace {
 		ssc_number_t p_ur_ec_tou_mat[24] = { 1, 1, 200, 1, 0.21174600720405579, 0.028000000864267349, 1, 2, 400, 1, 0.057693801820278168, 0.028000000864267349, 1, 3, 600, 1, 0.052770901471376419, 0.028000000864267349, 1, 4, 10000, 1, 0.049003798514604568, 0.028000000864267349 };
 		ssc_data_set_matrix(data, "ur_ec_tou_mat", p_ur_ec_tou_mat, 4, 6);
         ssc_data_set_number(data, "batt_cycle_cost_choice", 0);
-        ssc_number_t p_batt_cycle_cost[1] = { 0.1 };
-        ssc_data_set_array(data, "batt_cycle_cost", p_batt_cycle_cost, 1);
 	}
 }
 #endif

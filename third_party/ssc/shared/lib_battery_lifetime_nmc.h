@@ -21,10 +21,10 @@ struct lifetime_nmc_state {
     // for complex cycling of battery, b1 = summagion of b1_dt * dt_day over a day
     // lifetime capacity updated after 24 hours elapse.
 
-    std::vector<double> b1_dt;
-    std::vector<double> b2_dt;
-    std::vector<double> b3_dt;
-    std::vector<double> c2_dt; 
+    double b1_dt; 
+    double b2_dt;
+    double b3_dt;
+    double c2_dt; 
 
     friend std::ostream& operator<<(std::ostream& os, const lifetime_nmc_state& p);
 };
