@@ -302,6 +302,14 @@ private:                            // methods
                                      Real64 const controlSOCMaxFracLimit,
                                      Real64 const controlSOCMinFracLimit);
 
+    void simulateLiIonNmcBatteryModel(EnergyPlusData &state,
+                                     Real64 &powerCharge,
+                                     Real64 &powerDischarge,
+                                     bool &charging,
+                                     bool &discharging,
+                                     Real64 const controlSOCMaxFracLimit,
+                                     Real64 const controlSOCMinFracLimit);
+
     void rainflow(int const numbin,           // numbin = constant value
                   Real64 const input,         // input = input value from other object (battery model)
                   std::vector<Real64> &B1,    // stores values of points, calculated here - stored for next timestep
@@ -399,8 +407,9 @@ private: // data
     Real64 lastTimeStepBound_;         // [Ah] bound charge at the previous timestep
     Real64 lastTwoTimeStepAvailable_;  // [Ah] available charge at the previous two timesteps
     Real64 lastTwoTimeStepBound_;      // [Ah] bound charge at the previous two timesteps
-    // Li-ion NMC battery object from SAM Simulation Core lib_battery
+    // Li-ion NMC battery objects from SAM Simulation Core lib_battery
     std::unique_ptr<battery_t> ssc_battery_;
+    std::unique_ptr<battery_state> ssc_lastBatteryState_;
     // battery life calculation variables
     int count0_;
     std::vector<Real64> b10_;
