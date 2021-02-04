@@ -40,7 +40,8 @@ For radiant barriers, this can be selected as `Zone Inside Convection Algorithm`
 
 ## Testing/Validation/Data Sources ##
 
-Standard unit tests will be used to verify that the convective coefficients are calculated properly.
+1. Standard unit tests were used to verify that the convective coefficients are calculated properly.
+2. The convection coefficient results of the testfile with the EMS implementation were compared to the results from the implemented algorithm. 
 
 ## Input Output Reference Documentation ##
 
