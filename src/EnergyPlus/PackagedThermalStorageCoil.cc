@@ -85,9 +85,7 @@
 #include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 
-namespace EnergyPlus {
-
-namespace PackagedThermalStorageCoil {
+namespace EnergyPlus::PackagedThermalStorageCoil {
 
     // Module containing the routines dealing with the packaged thermal storage cooling
 
@@ -100,45 +98,10 @@ namespace PackagedThermalStorageCoil {
     // PURPOSE OF THIS MODULE:
     // encapsulate the data and algorithms for modeling packaged thermals storage cooling coils
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace Psychrometrics;
     using namespace CurveManager;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // control types
-    int const ScheduledOpModes(1);   // control over TES modes is via local schedule
-    int const EMSActuatedOpModes(2); // control over TES modes is via EMS
-
-    // Control Modes
-    int const OffMode(0);
-    int const CoolingOnlyMode(1);
-    int const CoolingAndChargeMode(2);
-    int const CoolingAndDischargeMode(3);
-    int const ChargeOnlyMode(4);
-    int const DischargeOnlyMode(5);
-
-    // storage media
-    int const FluidBased(101);
-    int const IceBased(102);
-    // INTEGER, PARAMETER :: UserDefinedFluid = 103
-
-    // Water Systems
-    int const CondensateDiscarded(1001); // default mode where water is "lost"
-    int const CondensateToTank(1002);    // collect coil condensate from air and store in water storage tank
-
-    int const WaterSupplyFromMains(101);
-    int const WaterSupplyFromTank(102);
 
     // Dehumidification control modes (DehumidControlMode)
     int const DehumidControl_CoolReheat(2);
@@ -216,7 +179,7 @@ namespace PackagedThermalStorageCoil {
             }
         }
 
-        TESOpMode = 1;
+        TESOpMode = CoolingOnlyMode;
 
         InitTESCoil(state, TESCoilNum);
 
@@ -319,9 +282,9 @@ namespace PackagedThermalStorageCoil {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
                 if (SELECT_CASE_var == "SCHEDULEDMODES") {
-                    TESCoil(item).ModeControlType = ScheduledOpModes;
+                    TESCoil(item).ModeControlType = iModeCtrlType::ScheduledOpModes;
                 } else if (SELECT_CASE_var == "EMSCONTROLLED") {
-                    TESCoil(item).ModeControlType = EMSActuatedOpModes;
+                    TESCoil(item).ModeControlType = iModeCtrlType::EMSActuatedOpModes;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -330,14 +293,14 @@ namespace PackagedThermalStorageCoil {
                 }
             }
             if (lAlphaFieldBlanks(4)) {
-                if (TESCoil(item).ModeControlType == ScheduledOpModes) {
+                if (TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(state, cAlphaFieldNames(4) + " is blank but a schedule is needed");
                     ErrorsFound = true;
                 }
             } else {
                 TESCoil(item).ControlModeSchedNum = GetScheduleIndex(state, cAlphaArgs(4));
-                if (TESCoil(item).ControlModeSchedNum == 0 && TESCoil(item).ModeControlType == ScheduledOpModes) {
+                if (TESCoil(item).ControlModeSchedNum == 0 && TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                     ErrorsFound = true;
@@ -346,13 +309,13 @@ namespace PackagedThermalStorageCoil {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(5));
                 if (SELECT_CASE_var == "ICE") {
-                    TESCoil(item).StorageMedia = IceBased;
+                    TESCoil(item).StorageMedia = iMedia::IceBased;
                 } else if (SELECT_CASE_var == "WATER") {
-                    TESCoil(item).StorageMedia = FluidBased;
+                    TESCoil(item).StorageMedia = iMedia::FluidBased;
                     TESCoil(item).StorageFluidName = "WATER";
                     TESCoil(item).StorageFluidIndex = FindGlycol(state, "WATER");
                 } else if (SELECT_CASE_var == "USERDEFINEDFLUIDTYPE") {
-                    TESCoil(item).StorageMedia = FluidBased;
+                    TESCoil(item).StorageMedia = iMedia::FluidBased;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
@@ -384,22 +347,22 @@ namespace PackagedThermalStorageCoil {
                 }
             }
 
-            if ((TESCoil(item).StorageMedia == FluidBased) && (!lNumericFieldBlanks(1))) {
+            if ((TESCoil(item).StorageMedia == iMedia::FluidBased) && (!lNumericFieldBlanks(1))) {
                 TESCoil(item).FluidStorageVolume = rNumericArgs(1);
-            } else if ((TESCoil(item).StorageMedia == FluidBased) && (lNumericFieldBlanks(1))) {
+            } else if ((TESCoil(item).StorageMedia == iMedia::FluidBased) && (lNumericFieldBlanks(1))) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                 ShowContinueError(state, cNumericFieldNames(1) + " cannot be blank for Water storage type");
                 ShowContinueError(state, "Enter fluid storage tank volume in m3/s.");
                 ErrorsFound = true;
             }
 
-            if ((TESCoil(item).StorageMedia == IceBased) && (!lNumericFieldBlanks(2))) {
+            if ((TESCoil(item).StorageMedia == iMedia::IceBased) && (!lNumericFieldBlanks(2))) {
                 if (rNumericArgs(2) == DataGlobalConstants::AutoCalculate) {
                     TESCoil(item).IceStorageCapacity = rNumericArgs(2);
                 } else {
                     TESCoil(item).IceStorageCapacity = rNumericArgs(2) * 1.e+09; // input in giga joules, used as joules internally
                 }
-            } else if ((TESCoil(item).StorageMedia == IceBased) && (lNumericFieldBlanks(2))) {
+            } else if ((TESCoil(item).StorageMedia == iMedia::IceBased) && (lNumericFieldBlanks(2))) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + TESCoil(item).Name + "\", invalid");
                 ShowContinueError(state, cNumericFieldNames(2) + " cannot be blank for Ice storage type");
                 ShowContinueError(state, "Enter ice storage tank capacity in GJ.");
@@ -1465,10 +1428,10 @@ namespace PackagedThermalStorageCoil {
             }
 
             if (lAlphaFieldBlanks(60)) {
-                TESCoil(item).EvapWaterSupplyMode = WaterSupplyFromMains;
+                TESCoil(item).EvapWaterSupplyMode = iWaterSupply::WaterSupplyFromMains;
             } else {
                 TESCoil(item).EvapWaterSupplyName = cAlphaArgs(60);
-                TESCoil(item).EvapWaterSupplyMode = WaterSupplyFromTank;
+                TESCoil(item).EvapWaterSupplyMode = iWaterSupply::WaterSupplyFromTank;
                 SetupTankDemandComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).EvapWaterSupplyName,
@@ -1478,10 +1441,10 @@ namespace PackagedThermalStorageCoil {
             }
 
             if (lAlphaFieldBlanks(61)) {
-                TESCoil(item).CondensateCollectMode = CondensateDiscarded;
+                TESCoil(item).CondensateCollectMode = iWaterSys::CondensateDiscarded;
             } else {
                 TESCoil(item).CondensateCollectName = cAlphaArgs(61);
-                TESCoil(item).CondensateCollectMode = CondensateToTank;
+                TESCoil(item).CondensateCollectMode = iWaterSys::CondensateToTank;
                 SetupTankSupplyComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).CondensateCollectName,
@@ -1524,7 +1487,7 @@ namespace PackagedThermalStorageCoil {
             if (!lNumericFieldBlanks(41)) {
                 TESCoil(item).TESPlantEffectiveness = rNumericArgs(41);
             }
-            if (TESCoil(item).StorageMedia == FluidBased) {
+            if (TESCoil(item).StorageMedia == iMedia::FluidBased) {
                 if (!lNumericFieldBlanks(42)) {
                     TESCoil(item).MinimumFluidTankTempLimit = rNumericArgs(42);
                 } else {
@@ -1683,7 +1646,7 @@ namespace PackagedThermalStorageCoil {
                                     "Average",
                                     TESCoil(item).Name);
 
-                if (TESCoil(item).EvapWaterSupplyMode == WaterSupplyFromMains) {
+                if (TESCoil(item).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromMains) {
                     SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterConsump,
@@ -1706,7 +1669,7 @@ namespace PackagedThermalStorageCoil {
                                         "Cooling",
                                         _,
                                         "System");
-                } else if (TESCoil(item).EvapWaterSupplyMode == WaterSupplyFromTank) {
+                } else if (TESCoil(item).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
                     SetupOutputVariable(state, "Cooling Coil Evaporative Condenser Storage Tank Water Volume",
                                         OutputProcessor::Unit::m3,
                                         TESCoil(item).EvapWaterConsump,
@@ -1779,7 +1742,7 @@ namespace PackagedThermalStorageCoil {
                                     "System");
             }
 
-            if (TESCoil(item).StorageMedia == FluidBased) {
+            if (TESCoil(item).StorageMedia == iMedia::FluidBased) {
                 SetupOutputVariable(state, "Cooling Coil Fluid Thermal Storage End Temperature",
                                     OutputProcessor::Unit::C,
                                     TESCoil(item).FluidTankTempFinal,
@@ -1787,7 +1750,7 @@ namespace PackagedThermalStorageCoil {
                                     "Average",
                                     TESCoil(item).Name);
 
-            } else if (TESCoil(item).StorageMedia == IceBased) {
+            } else if (TESCoil(item).StorageMedia == iMedia::IceBased) {
                 SetupOutputVariable(state, "Cooling Coil Ice Thermal Storage End Fraction",
                                     OutputProcessor::Unit::None,
                                     TESCoil(item).IceFracRemain,
@@ -1819,32 +1782,10 @@ namespace PackagedThermalStorageCoil {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataPlant::TypeOf_PackagedTESCoolingCoil;
-
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyFlag;       // One time environment flag
@@ -1962,9 +1903,9 @@ namespace PackagedThermalStorageCoil {
 
         // determine control mode
         if (GetCurrentScheduleValue(state, TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
-            if (TESCoil(TESCoilNum).ModeControlType == ScheduledOpModes) {
+            if (TESCoil(TESCoilNum).ModeControlType == iModeCtrlType::ScheduledOpModes) {
                 tmpSchedValue = GetCurrentScheduleValue(state, TESCoil(TESCoilNum).ControlModeSchedNum);
-                TESCoil(TESCoilNum).CurControlMode = int(tmpSchedValue);
+                TESCoil(TESCoilNum).CurControlMode = tmpSchedValue;
                 // check if value is valid
                 {
                     auto const SELECT_CASE_var(TESCoil(TESCoilNum).CurControlMode);
@@ -1987,7 +1928,7 @@ namespace PackagedThermalStorageCoil {
                     }
                 }
 
-            } else if (TESCoil(TESCoilNum).ModeControlType == EMSActuatedOpModes) {
+            } else if (TESCoil(TESCoilNum).ModeControlType == iModeCtrlType::EMSActuatedOpModes) {
                 if (TESCoil(TESCoilNum).EMSControlModeOn) {
                     TESCoil(TESCoilNum).CurControlMode = std::floor(TESCoil(TESCoilNum).EMSControlModeValue);
                     // check if value is valid
@@ -2311,7 +2252,7 @@ namespace PackagedThermalStorageCoil {
                                          TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap);
         }
 
-        if ((TESCoil(TESCoilNum).StorageMedia == FluidBased) && (TESCoil(TESCoilNum).FluidStorageVolume == DataGlobalConstants::AutoCalculate)) {
+        if ((TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) && (TESCoil(TESCoilNum).FluidStorageVolume == DataGlobalConstants::AutoCalculate)) {
             // for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
             deltaT = min(FluidTankSizingDeltaT, (TESCoil(TESCoilNum).MaximumFluidTankTempLimit - TESCoil(TESCoilNum).MinimumFluidTankTempLimit));
 
@@ -2332,7 +2273,7 @@ namespace PackagedThermalStorageCoil {
                                          "Fluid Storage Volume [m3]",
                                          TESCoil(TESCoilNum).FluidStorageVolume);
         }
-        if ((TESCoil(TESCoilNum).StorageMedia == IceBased) && (TESCoil(TESCoilNum).IceStorageCapacity == DataGlobalConstants::AutoCalculate)) {
+        if ((TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) && (TESCoil(TESCoilNum).IceStorageCapacity == DataGlobalConstants::AutoCalculate)) {
 
             if (TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 && TESCoil(TESCoilNum).DischargeOnlyModeAvailable) {
                 TESCoil(TESCoilNum).IceStorageCapacity =
@@ -2900,7 +2841,7 @@ namespace PackagedThermalStorageCoil {
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
-        if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
+        if (TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES > TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESCanBeCharged = true;
@@ -2913,7 +2854,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCanBeCharged = false;
             }
-        } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
+        } else if (TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
             sTES = TESCoil(TESCoilNum).IceFracRemainLastTimestep;
             if (sTES < 1.0) {
                 TESCanBeCharged = true;
@@ -3334,7 +3275,7 @@ namespace PackagedThermalStorageCoil {
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
-        if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
+        if (TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES >= TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESHasSomeCharge = true;
@@ -3346,7 +3287,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESHasSomeCharge = false;
             }
-        } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
+        } else if (TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
             sTES = TESCoil(TESCoilNum).IceFracRemainLastTimestep;
             if (sTES > 0.0) {
                 TESHasSomeCharge = true;
@@ -3677,7 +3618,7 @@ namespace PackagedThermalStorageCoil {
             CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
         }
 
-        if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
+        if (TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES > TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESCanBeCharged = true;
@@ -3690,7 +3631,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCanBeCharged = false;
             }
-        } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
+        } else if (TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
             sTES = TESCoil(TESCoilNum).IceFracRemainLastTimestep;
             if (sTES < 1.0) {
                 TESCanBeCharged = true;
@@ -3861,7 +3802,7 @@ namespace PackagedThermalStorageCoil {
         EvapInletEnthalpy = Node(TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
         CoilMightBeDry = false;
 
-        if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
+        if (TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
             sTES = TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
             if ((sTES >= TESCoil(TESCoilNum).MinimumFluidTankTempLimit) && (sTES < TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
                 TESHasSomeCharge = true;
@@ -3873,7 +3814,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESHasSomeCharge = false;
             }
-        } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
+        } else if (TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
             sTES = TESCoil(TESCoilNum).IceFracRemainLastTimestep;
             if (sTES > 0.0) {
                 TESHasSomeCharge = true;
@@ -4498,9 +4439,9 @@ namespace PackagedThermalStorageCoil {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
-        if (TESCoil(TESCoilNum).StorageMedia == FluidBased) {
+        if (TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
             CalcTESWaterStorageTank(state, TESCoilNum);
-        } else if (TESCoil(TESCoilNum).StorageMedia == IceBased) {
+        } else if (TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
             CalcTESIceStorageTank(state, TESCoilNum);
         }
     }
@@ -4862,13 +4803,13 @@ namespace PackagedThermalStorageCoil {
             (HumRatAfterEvap - Node(InletNodeNum).HumRat) * Node(InletNodeNum).MassFlowRate / RhoWater * TESCoil(TESCoilNum).CondenserRuntimeFraction;
 
         // Set the demand request for supply water from water storage tank (if needed)
-        if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (TESCoil(TESCoilNum).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
             state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotRequestDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
                 TESCoil(TESCoilNum).EvapWaterConsumpRate;
         }
 
         // check if should be starved by restricted flow from tank
-        if (TESCoil(TESCoilNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (TESCoil(TESCoilNum).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
             AvailWaterRate = state.dataWaterData->WaterStorage(TESCoil(TESCoilNum).EvapWaterSupTankID).VdotAvailDemand(TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
             if (AvailWaterRate < TESCoil(TESCoilNum).EvapWaterConsumpRate) {
                 TESCoil(TESCoilNum).EvapWaterStarvMakupRate = TESCoil(TESCoilNum).EvapWaterConsumpRate - AvailWaterRate;
@@ -5079,7 +5020,5 @@ namespace PackagedThermalStorageCoil {
             CoilCoolAirFlow = TESCoil(CoilIndex).RatedEvapAirVolFlowRate;
         }
     }
-
-} // namespace PackagedThermalStorageCoil
 
 } // namespace EnergyPlus
