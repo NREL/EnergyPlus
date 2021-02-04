@@ -4465,13 +4465,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactor
     EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1, 2, 0.1), 10, tol);
 
     //// Calculate convection resistance from correlation
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2297, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4093, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4531, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 0.1, 2, 0), 0.2259, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.0, 2, 0), 0.4024, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 20, 10, 0.001, 101000, 1.5, 2, 0), 0.4455, tol);
 
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2368, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4218, tol);
-    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4670, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 0.1, 2, 0), 0.2327, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.0, 2, 0), 0.4146, tol);
+    EXPECT_NEAR(CalcDuctOutsideConvResist(*state, 10, 20, 0.001, 101000, 1.5, 2, 0), 0.4589, tol);
 
     // Calculate convection resistance given a convection coefficient
     EXPECT_NEAR(CalcDuctInsideConvResist(20, 0.1, 1, 5), 0.2, tol);
@@ -4490,14 +4490,23 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirThermConductivity)
 
     Real64 const tol = 0.00001;
 
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02212, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 0), 0.02364, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 20), 0.02514, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 40), 0.02662, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 60), 0.02808, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 70), 0.02881, tol);
-    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 80), 0.02881, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -80), 0.01836, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -70), 0.01862, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -60), 0.01944, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -50), 0.02026, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -40), 0.02106, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -30), 0.02186, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -20), 0.02265, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, -10), 0.02343, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 0), 0.02420, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 10), 0.02496, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 20), 0.02572, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 30), 0.02646, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 40), 0.02720, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 50), 0.02793, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 60), 0.02864, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 70), 0.02935, tol);
+    EXPECT_NEAR(AirflowNetwork::airThermConductivity(*state, 80), 0.02984, tol);
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirDynamicVisc)
