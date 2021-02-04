@@ -2057,7 +2057,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Check if a node is used by a stand alone ERV.
+        // Check if a node is used by a stand alone ERV
+        // and can be excluded from an airflow network.
 
         // Return value
         bool StandSloneERVAFNException;
