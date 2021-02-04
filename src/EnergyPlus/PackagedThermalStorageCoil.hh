@@ -104,11 +104,8 @@ namespace PackagedThermalStorageCoil {
         WaterSupplyFromTank,
     };
 
-    extern int NumTESCoils;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetTESInputFlag;
-
-    extern int const DehumidControl_CoolReheat;
+    // Dehumidification control modes (DehumidControlMode)
+    constexpr int DehumidControl_CoolReheat(2);
 
     struct PackagedTESCoolingCoilStruct
     {
@@ -512,8 +509,17 @@ namespace PackagedThermalStorageCoil {
 struct PackagedThermalStorageCoilData : BaseGlobalStruct
 {
 
+    int NumTESCoils = 0;
+    Array1D_bool CheckEquipName;
+    bool GetTESInputFlag = true;
+    bool MyOneTimeFlag = true;
+
     void clear_state() override
     {
+        this->NumTESCoils = 0;
+        this->CheckEquipName.deallocate();
+        this->GetTESInputFlag = true;
+        this->MyOneTimeFlag = true;
     }
 };
 

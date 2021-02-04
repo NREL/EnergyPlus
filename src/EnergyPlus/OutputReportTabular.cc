@@ -4320,7 +4320,6 @@ namespace EnergyPlus::OutputReportTabular {
         using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
-        using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
 
         static int iOACtrl(0);
@@ -4439,7 +4438,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Packaged TES
-        for (iCoil = 1; iCoil <= NumTESCoils; ++iCoil) {
+        for (iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
             if (TESCoil(iCoil).CondenserType == AirCooled) {
                 SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                               TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
