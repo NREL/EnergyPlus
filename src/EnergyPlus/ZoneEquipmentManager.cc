@@ -3852,7 +3852,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 TotInletAirMassFlowRateMaxAvail;
         Real64 TotInletAirMassFlowRateMin;
         Real64 TotInletAirMassFlowRateMinAvail;
-        Real64 TotSupplyAirMassFlowRate;
 
         Real64 ZoneMixingAirMassFlowRate;
         Real64 ZoneMixingNetAirMassFlowRate;
@@ -3967,6 +3966,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                     state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
                     CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+                    ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
+
                 }
 
                 ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
@@ -3993,7 +3994,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 Real64 FinalTotalReturnMassFlow = 0;
                 CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
-
                 MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
 
                 // Set zone infiltration flow rate
@@ -4048,9 +4048,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
-                TotSupplyAirMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate -
-                                           (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh) -
-                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 
@@ -4234,6 +4231,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         returnNodeMassFlow = inletMassFlow;
                         thisZoneEquip.FixedReturnFlow(returnNum) = true;
                     }
+                    // if zone mass balance true, set to expected return flow
+                    if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
+                        ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow);
+                        returnNodeMassFlow = ExpTotalReturnMassFlow;
+                    }
                 } else {
                     returnNodeMassFlow = 0.0;
                 }
@@ -4263,6 +4265,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                             if ((numRetNodes == 1) && !thisZoneEquip.FixedReturnFlow(returnNum)) {
                                 returnNodeMassFlow = max(0.0, (ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac));
                             }
+                        }
+                        // if zone mass balance true, set to expected return flow
+                        if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
+                            ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow);
+                            returnNodeMassFlow = ExpTotalReturnMassFlow; 
                         }
                     }
                 }
