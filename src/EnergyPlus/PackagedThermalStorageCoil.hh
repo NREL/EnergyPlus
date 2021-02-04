@@ -417,11 +417,6 @@ namespace PackagedThermalStorageCoil {
         }
     };
 
-    // Object Data
-    extern Array1D<PackagedTESCoolingCoilStruct> TESCoil;
-
-    void clear_state();
-
     void SimTESCoil(EnergyPlusData &state,
                     std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
@@ -513,6 +508,7 @@ struct PackagedThermalStorageCoilData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag = true;
     bool MyOneTimeFlag = true;
+    Array1D<PackagedThermalStorageCoil::PackagedTESCoolingCoilStruct> TESCoil;
 
     void clear_state() override
     {
@@ -520,6 +516,7 @@ struct PackagedThermalStorageCoilData : BaseGlobalStruct
         this->CheckEquipName.deallocate();
         this->GetTESInputFlag = true;
         this->MyOneTimeFlag = true;
+        this->TESCoil.deallocate();
     }
 };
 
