@@ -8176,7 +8176,6 @@ namespace ConvectionCoefficients {
                             // (the square root of surface area for floors and ceilings, average height for gables and walls, and length of pitched roof from soffit to ridge)
         Real64 v;           // The velocity of the air stream in m/s, (for interior surfaces)
                             // Surface Outside Face Outdoor Air Wind Speed (for exterior surfaces)
-        Real64 g(9.80665);  // Acceleration of gravity, m/s2
         Real64 Pr;          // Prandtl number
         Real64 beta_SI;     // Volume coefficient of expansion of air, 1/K
         Real64 rho_SI;      // Density of air, kg/m3
@@ -8188,7 +8187,8 @@ namespace ConvectionCoefficients {
         Real64 k_SI;        // Thermal conductivity of air, W/m.K
         Real64 Ra;          // Rayleigh number
         Real64 Re;          // Reynolds number
-        static constexpr Real64 OneThird((1.0 / 3.0));  // 1/3 in highest precision
+        constexpr Real64 g = DataGlobalConstants::GravityConstant;      // Acceleration of gravity, m/s2
+        constexpr Real64 OneThird((1.0 / 3.0));                         // 1/3 in highest precision
 
         if (Tilt == 0 || Tilt == 180) {             // Horizontal roof or floor
             L = std::sqrt(Surface(SurfNum).Area);
