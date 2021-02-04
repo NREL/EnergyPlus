@@ -48,11 +48,13 @@
 // EnergyPlus::VariableSpeedCoils Unit Tests
 
 // Google Test Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <gtest/gtest.h>
 
 namespace EnergyPlus {
 

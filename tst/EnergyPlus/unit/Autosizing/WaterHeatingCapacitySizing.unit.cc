@@ -130,7 +130,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     EnergyPlus::DataSizing::ZoneEqSizing(1).MaxHWVolFlow = 0.0002;
     EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 28.0;
     EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.0045;
-    EnergyPlus::DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataSizing::DataWaterLoopNum = 1;
     DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
 

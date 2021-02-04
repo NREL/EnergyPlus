@@ -77,8 +77,8 @@ namespace FanCoilUnits {
     extern std::string const cMO_FanCoil;
 
     // coil operation
-    extern int const On;  // normal coil operation
-    extern int const Off; // signal coil shouldn't run
+    constexpr int On(1);  // normal coil operation
+    constexpr int Off(0); // signal coil shouldn't run
 
     // coil type units supported in this module
     extern int const FanCoilUnit_4Pipe;

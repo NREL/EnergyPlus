@@ -134,8 +134,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).ExitTemp = 60.0;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     DataSizing::ZoneSizingRunDone = true;
 

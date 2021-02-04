@@ -51,13 +51,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-
 
 using namespace EnergyPlus;
 

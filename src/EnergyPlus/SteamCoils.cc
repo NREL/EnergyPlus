@@ -99,7 +99,6 @@ namespace SteamCoils {
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using PlantUtilities::MyPlantSizingIndex;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -474,7 +473,7 @@ namespace SteamCoils {
             state.dataSteamCoils->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
@@ -784,7 +783,7 @@ namespace SteamCoils {
                     if (DesCoilLoad >= SmallLoad) {
                         // TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
                         // TempSteamIn=PlantSizData(PltSizSteamNum)%ExitTemp
-                        TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
+                        TempSteamIn = 100.0; // Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
                         // RefrigIndex is set during GetInput for this module
                         EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                         EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
@@ -1416,7 +1415,7 @@ namespace SteamCoils {
         Node(AirOutletNode).HumRat = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat;
         Node(AirOutletNode).Enthalpy = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy;
 
-        SafeCopyPlantNode(SteamInletNode, SteamOutletNode);
+        SafeCopyPlantNode(state, SteamInletNode, SteamOutletNode);
 
         // Set the outlet Steam nodes for the Coil
         //   Node(SteamOutletNode)%MassFlowRate = SteamCoil(CoilNum)%OutletSteamMassFlowRate

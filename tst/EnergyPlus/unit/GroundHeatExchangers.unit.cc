@@ -52,16 +52,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 // Testing Headers
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -183,11 +181,11 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     // Initializations
     GLHESlinky thisGLHE;
 
-    PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     thisGLHE.loopNum = 1;
 
-    PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
-    PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
 
     thisGLHE.inletTemp = 5.0;
     thisGLHE.massFlowRate = 0.01;
@@ -1184,7 +1182,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -1666,7 +1664,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -1970,7 +1968,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -2266,7 +2264,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -2564,7 +2562,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -2862,7 +2860,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -3160,7 +3158,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -3458,7 +3456,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);
@@ -3756,7 +3754,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ScheduleInputProcessed = true;
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(verticalGLHE[0]);

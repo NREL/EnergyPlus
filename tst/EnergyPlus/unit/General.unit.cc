@@ -50,15 +50,16 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/General.hh>
+// Objexx Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/string.functions.hh>
 
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Array1D.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/General.hh>
 
 namespace EnergyPlus {
 

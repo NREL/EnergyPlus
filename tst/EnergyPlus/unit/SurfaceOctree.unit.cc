@@ -51,11 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/SurfaceOctree.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>

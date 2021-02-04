@@ -237,7 +237,7 @@ namespace WaterUse {
 
         void CalcConnectionsHeatRecovery(EnergyPlusData &state);
 
-        void UpdateWaterConnections();
+        void UpdateWaterConnections(EnergyPlusData &state);
 
         void ReportWaterUse(EnergyPlusData &state);
 

@@ -52,9 +52,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/MixerComponent.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::MixerComponent;

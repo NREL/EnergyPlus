@@ -123,15 +123,15 @@ namespace DataHVACGlobals {
     extern int const Other;
     extern int const RAB;
     // parameters describing fan types
-    extern int const NumAllFanTypes; // cpw22Aug2010 (was 4)
+    extern int const NumAllFanTypes;
 
     // fan types
     extern int const FanType_SimpleConstVolume;
     extern int const FanType_SimpleVAV;
     extern int const FanType_SimpleOnOff;
     extern int const FanType_ZoneExhaust;
-    extern int const FanType_ComponentModel;    // cpw22Aug2010 (new)
-    extern int const FanType_SystemModelObject; //
+    extern int const FanType_ComponentModel;
+    extern int const FanType_SystemModelObject;
 
     // Fan Minimum Flow Fraction Input Method
     extern int const MinFrac;
@@ -146,7 +146,7 @@ namespace DataHVACGlobals {
     extern int const BypassWhenWithinEconomizerLimits;   // heat recovery controlled by economizer limits
     extern int const BypassWhenOAFlowGreaterThanMinimum; // heat recovery ON at minimum OA in economizer mode
 
-    extern Array1D_string const cFanTypes; // cpw22Aug2010 | cpw22Aug2010 (new)
+    extern Array1D_string const cFanTypes;
 
     // parameters describing unitary systems
     extern int const NumUnitarySystemTypes;

@@ -51,11 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/Material.hh>
 #include "Fixtures/SQLiteFixture.hh"
-#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 

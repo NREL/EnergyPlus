@@ -1276,13 +1276,6 @@ namespace HeatRecovery {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DXCoils::DXCoilFullLoadOutAirHumRat;
-        using DXCoils::DXCoilFullLoadOutAirTemp;
-
         //  USE DataZoneEquipment,  ONLY: ZoneEquipInputsFilled,CheckZoneEquipmentList
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
@@ -1568,14 +1561,14 @@ namespace HeatRecovery {
 
                     if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        if (DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 || DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
+                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 || state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
                             //       DX Coil is OFF, read actual inlet conditions
                             FullLoadOutAirTemp = ExchCond(ExchNum).SecInTemp;
                             FullLoadOutAirHumRat = ExchCond(ExchNum).SecInHumRat;
                         } else {
                             //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-                            FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
-                            FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
+                            FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
+                            FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
@@ -2563,7 +2556,6 @@ namespace HeatRecovery {
 
         // Using/Aliasing
         using DataLoopNode::SensedNodeFlagValue;
-        using DXCoils::DXCoilPartLoadRatio;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2810,7 +2802,7 @@ namespace HeatRecovery {
 
                     } else if (CompanionCoilIndex > 0) {
                         // VS coil issue here?
-                        HXPartLoadRatio = DXCoilPartLoadRatio(CompanionCoilIndex);
+                        HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
                     }
 
                     if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {

@@ -47,19 +47,20 @@
 
 // EnergyPlus::HeatingCoils Unit Tests
 
-#include <exception>
-
 // Google Test Headers
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 

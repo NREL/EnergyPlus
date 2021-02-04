@@ -389,6 +389,7 @@ namespace EnergyPlus {
         this->dataHVACDuct->clear_state();
         this->dataHVACFan->clear_state();
         this->dataHVACGlobal->clear_state();
+        this->dataHVACInterfaceMgr->clear_state();
         this->dataHVACMgr->clear_state();
         this->dataHVACMultiSpdHP->clear_state();
         this->dataHVACSingleDuctInduc->clear_state();
@@ -544,7 +545,6 @@ namespace EnergyPlus {
         this->dataZoneTempPredictorCorrector->clear_state();
 
         this->files.debug.close();
-        this->files.err_stream.reset();
         this->files.err_stream.reset();
         this->files.eso.close();
         this->files.mtr.close();

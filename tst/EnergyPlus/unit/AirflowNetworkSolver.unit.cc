@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

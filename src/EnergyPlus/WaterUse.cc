@@ -177,7 +177,7 @@ namespace WaterUse {
 
             } // WHILE
 
-            state.dataWaterUse->WaterConnections(WaterConnNum).UpdateWaterConnections();
+            state.dataWaterUse->WaterConnections(WaterConnNum).UpdateWaterConnections(state);
             state.dataWaterUse->WaterConnections(WaterConnNum).ReportWaterUse(state);
 
         } // WaterConnNum
@@ -270,7 +270,7 @@ namespace WaterUse {
             }
         } // WHILE
 
-        this->UpdateWaterConnections();
+        this->UpdateWaterConnections(state);
         this->ReportWaterUse(state);
     }
 
@@ -975,7 +975,7 @@ namespace WaterUse {
             this->setupMyOutputVars = false;
         }
 
-        if (this->plantScanFlag && allocated(DataPlant::PlantLoop) && !this->StandAlone) {
+        if (this->plantScanFlag && allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -1270,7 +1270,7 @@ namespace WaterUse {
         }
     }
 
-    void WaterConnectionsType::UpdateWaterConnections()
+    void WaterConnectionsType::UpdateWaterConnections(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1284,7 +1284,7 @@ namespace WaterUse {
 
         if (this->InletNode > 0 && this->OutletNode > 0) {
             // Pass all variables from inlet to outlet node
-            PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode, this->PlantLoopNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
 
             // Set outlet node variables that are possibly changed
             DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;

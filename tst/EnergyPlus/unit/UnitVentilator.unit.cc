@@ -49,13 +49,13 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/UnitVentilator.hh>
 
 namespace EnergyPlus {
 

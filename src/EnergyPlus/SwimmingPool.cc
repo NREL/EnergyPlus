@@ -702,7 +702,7 @@ namespace SwimmingPool {
         bool errFlag;
         static std::string const RoutineName("InitSwimmingPoolPlantLoopIndex");
 
-        if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
+        if (MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
@@ -924,7 +924,7 @@ namespace SwimmingPool {
 
         int WaterInletNode = this->WaterInletNode;   // inlet node number
         int WaterOutletNode = this->WaterOutletNode; // outlet node number
-        PlantUtilities::SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
 
         Real64 WaterMassFlow = DataLoopNode::Node(WaterInletNode).MassFlowRate; // water mass flow rate
         if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = this->PoolWaterTemp;

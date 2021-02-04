@@ -49,15 +49,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;

@@ -51,15 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ConfiguredFunctions.hh>
+#include "Fixtures/InputProcessorFixture.hh"
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
-#include "Fixtures/InputProcessorFixture.hh"
-
-#include <fstream>
 #include <map>
 #include <sstream>
 #include <string>

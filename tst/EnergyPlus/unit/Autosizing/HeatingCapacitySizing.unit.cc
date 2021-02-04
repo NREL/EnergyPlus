@@ -164,7 +164,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 20.0;
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.007;
 
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop.allocate(1);
     DataSizing::DataWaterLoopNum = 1;
     DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
 
