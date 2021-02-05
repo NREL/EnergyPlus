@@ -1829,6 +1829,41 @@ namespace CondenserLoopTowers {
         }
     }
 
+    void CoolingTower::oneTimeInit(EnergyPlusData &state) {
+        // Locate the tower on the plant loops for later usage
+        bool ErrorsFound = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+        if (ErrorsFound) {
+            ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
+        }
+
+        // check if setpoint on outlet node
+        this->SetpointIsOnOutlet = !((DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                                     (DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
+
+    }
+
+    void CoolingTower::initEachEnvironment(EnergyPlusData &state) {
+        static std::string const RoutineName("CoolingTower::initEachEnvironment");
+        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                             DataGlobalConstants::InitConvTemp,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                             RoutineName);
+        this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
+        this->DesWaterMassFlowRatePerCell = this->DesWaterMassFlowRate / this->NumCell;
+        PlantUtilities::InitComponentNodes(0.0,
+                                           this->DesWaterMassFlowRate,
+                                           this->WaterInletNodeNum,
+                                           this->WaterOutletNodeNum,
+                                           this->LoopNum,
+                                           this->LoopSideNum,
+                                           this->BranchNum,
+                                           this->CompNum);
+
+    }
+
     void CoolingTower::initialize(EnergyPlusData &state)
     {
 
@@ -1848,48 +1883,15 @@ namespace CondenserLoopTowers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("initialize");
-
         if (this->oneTimeFlag) {
-
             this->setupOutputVariables(state);
-
-            // Locate the tower on the plant loops for later usage
-            bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
-            if (ErrorsFound) {
-                ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
-            }
-
-            // check if setpoint on outlet node
-            this->SetpointIsOnOutlet = !((DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                                         (DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
-
+            this->oneTimeInit(state);
             this->oneTimeFlag = false;
         }
 
         // Begin environment initializations
         if (this->envrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
-
-            Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::InitConvTemp,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                 RoutineName);
-
-            this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-            this->DesWaterMassFlowRatePerCell = this->DesWaterMassFlowRate / this->NumCell;
-            PlantUtilities::InitComponentNodes(0.0,
-                                               this->DesWaterMassFlowRate,
-                                               this->WaterInletNodeNum,
-                                               this->WaterOutletNodeNum,
-                                               this->LoopNum,
-                                               this->LoopSideNum,
-                                               this->BranchNum,
-                                               this->CompNum);
-
+            this->initEachEnvironment(state);
             this->envrnFlag = false;
         }
 
