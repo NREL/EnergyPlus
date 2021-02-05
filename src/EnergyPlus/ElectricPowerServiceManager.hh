@@ -368,8 +368,7 @@ private: // data
     int cycleBinNum_;                              // [ ] number of cycle bins
     Real64 startingSOC_;                           // [ ] initial fractional state of charge
     Real64 maxAhCapacity_;                         // [Ah]maximum capacity
-    Real64 maxSOC_;                                // [ ] maximum fraction of available charge capacity
-    Real64 minSOC_;                                // [ ] minimum fraction of available charge capacity
+    Real64 availableFrac_;                         // [ ] maximum fraction of available charge capacity
     Real64 chargeConversionRate_;                  // [1/h]change rate from bound charge energy to available charge
     Real64 chargedOCV_;                            // [V] fully charged open circuit voltage
     Real64 dischargedOCV_;                         // [V] fully discharged open circuit voltage

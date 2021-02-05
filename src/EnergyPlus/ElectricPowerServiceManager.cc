@@ -2946,8 +2946,8 @@ ElectricStorage::ElectricStorage( // main constructor
       maxRainflowArrayInc_(100), myWarmUpFlag_(false), storageModelMode_(StorageModelType::storageTypeNotSet), availSchedPtr_(0),
       heatLossesDestination_(ThermalLossDestination::heatLossNotDetermined), zoneNum_(0), zoneRadFract_(0.0), startingEnergyStored_(0.0),
       energeticEfficCharge_(0.0), energeticEfficDischarge_(0.0), maxPowerDraw_(0.0), maxPowerStore_(0.0), maxEnergyCapacity_(0.0), parallelNum_(0),
-      seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0), maxSOC_(0.0),
-      chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
+      seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0),
+      availableFrac_(0.0), chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
       maxChargeRate_(0.0), lifeCalculation_(BatteyDegredationModelType::degredationNotSet), lifeCurveNum_(0), thisTimeStepStateOfCharge_(0.0),
       lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0),
       timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0), lastTimeStepBound_(0.0),
@@ -3133,7 +3133,7 @@ ElectricStorage::ElectricStorage( // main constructor
             numBattery_ = parallelNum_ * seriesNum_;
             maxAhCapacity_ = DataIPShortCuts::rNumericArgs(4);
             startingSOC_ = DataIPShortCuts::rNumericArgs(5);
-            maxSOC_ = DataIPShortCuts::rNumericArgs(6);
+            availableFrac_ = DataIPShortCuts::rNumericArgs(6);
             chargeConversionRate_ = DataIPShortCuts::rNumericArgs(7);
             chargedOCV_ = DataIPShortCuts::rNumericArgs(8);
             dischargedOCV_ = DataIPShortCuts::rNumericArgs(9);
@@ -3152,44 +3152,21 @@ ElectricStorage::ElectricStorage( // main constructor
             }
             seriesNum_ = DataIPShortCuts::lNumericFieldBlanks(2) ? 3 : static_cast<int>(DataIPShortCuts::rNumericArgs(2));
             parallelNum_ = DataIPShortCuts::lNumericFieldBlanks(3) ? 1 : static_cast<int>(DataIPShortCuts::rNumericArgs(3));
-            minSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.15 : DataIPShortCuts::rNumericArgs(4);
-            maxSOC_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
-            if (minSOC_ >= maxSOC_) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(4) + " should be less than " + DataIPShortCuts::cNumericFieldNames(5));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
-                errorsFound = true;
-            }
-            startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(6) ? 0.5 : DataIPShortCuts::rNumericArgs(6);
-            if (startingSOC_ > maxSOC_) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(6) + " should be less than or equal to " + DataIPShortCuts::cNumericFieldNames(5));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(5), DataIPShortCuts::rNumericArgs(5)));
-                errorsFound = true;
-            }
-            if (startingSOC_ < minSOC_) {
-                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
-                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(6) + " should be greater than or equal to " + DataIPShortCuts::cNumericFieldNames(4));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(6), DataIPShortCuts::rNumericArgs(6)));
-                ShowContinueError(state, format("{} = {:.3R}.", DataIPShortCuts::cNumericFieldNames(4), DataIPShortCuts::rNumericArgs(4)));
-                errorsFound = true;
-            }
-            liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(7) ? 0.95 : DataIPShortCuts::rNumericArgs(7);
-            liIon_mass_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 95.1255 : DataIPShortCuts::rNumericArgs(8);
-            liIon_surfaceArea_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 0.5 : DataIPShortCuts::rNumericArgs(9);
-            liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 1500.0 : DataIPShortCuts::rNumericArgs(10);
-            liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 7.5 : DataIPShortCuts::rNumericArgs(11);
-            liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 4.2 : DataIPShortCuts::rNumericArgs(12);
-            liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.53 : DataIPShortCuts::rNumericArgs(13);
-            liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.342 : DataIPShortCuts::rNumericArgs(14);
-            liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 3.342 : DataIPShortCuts::rNumericArgs(15);
-            liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 1.0 : DataIPShortCuts::rNumericArgs(16);
-            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 0.1925 : DataIPShortCuts::rNumericArgs(17);
-            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.0231 : DataIPShortCuts::rNumericArgs(18);
-            liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(19) ? 1.0 : DataIPShortCuts::rNumericArgs(19);
-            internalR_ = DataIPShortCuts::lNumericFieldBlanks(20) ? 0.09 : DataIPShortCuts::rNumericArgs(20);
+            startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.5 : DataIPShortCuts::rNumericArgs(4);
+            liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
+            liIon_mass_ = DataIPShortCuts::lNumericFieldBlanks(6) ? 95.1255 : DataIPShortCuts::rNumericArgs(6);
+            liIon_surfaceArea_ = DataIPShortCuts::lNumericFieldBlanks(7) ? 0.5 : DataIPShortCuts::rNumericArgs(7);
+            liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 1500.0 : DataIPShortCuts::rNumericArgs(8);
+            liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 7.5 : DataIPShortCuts::rNumericArgs(9);
+            liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 4.2 : DataIPShortCuts::rNumericArgs(10);
+            liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 3.53 : DataIPShortCuts::rNumericArgs(11);
+            liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 3.342 : DataIPShortCuts::rNumericArgs(12);
+            liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.342 : DataIPShortCuts::rNumericArgs(13);
+            liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 1.0 : DataIPShortCuts::rNumericArgs(14);
+            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.1925 : DataIPShortCuts::rNumericArgs(15);
+            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.0231 : DataIPShortCuts::rNumericArgs(16);
+            liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
+            internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
 
             maxAhCapacity_ = liIon_Qfull_ * seriesNum_ * parallelNum_;
 
@@ -3202,8 +3179,8 @@ ElectricStorage::ElectricStorage( // main constructor
                     new capacity_lithium_ion_t(
                         maxAhCapacity_,  // Capacity of the whole battery
                         startingSOC_,
-                        maxSOC_,
-                        minSOC_,
+                        0.0,  // Reset later
+                        1.0,  // Reset later
                         DataHVACGlobals::TimeStepSys
                         ),
                     new voltage_dynamic_t(
@@ -3368,12 +3345,12 @@ void ElectricStorage::reinitAtBeginEnvironment()
 
     if (storageModelMode_ == StorageModelType::kiBaMBattery) {
         Real64 initialCharge = maxAhCapacity_ * startingSOC_;
-        lastTwoTimeStepAvailable_ = initialCharge * maxSOC_;
-        lastTwoTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
-        lastTimeStepAvailable_ = initialCharge * maxSOC_;
-        lastTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
-        thisTimeStepAvailable_ = initialCharge * maxSOC_;
-        thisTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        lastTwoTimeStepAvailable_ = initialCharge * availableFrac_;
+        lastTwoTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        lastTimeStepAvailable_ = initialCharge * availableFrac_;
+        lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        thisTimeStepAvailable_ = initialCharge * availableFrac_;
+        thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3408,12 +3385,12 @@ void ElectricStorage::reinitAtEndWarmup()
     thisTimeStepStateOfCharge_ = startingEnergyStored_;
     if (storageModelMode_ == StorageModelType::kiBaMBattery) {
         Real64 initialCharge = maxAhCapacity_ * startingSOC_;
-        lastTwoTimeStepAvailable_ = initialCharge * maxSOC_;
-        lastTwoTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
-        lastTimeStepAvailable_ = initialCharge * maxSOC_;
-        lastTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
-        thisTimeStepAvailable_ = initialCharge * maxSOC_;
-        thisTimeStepBound_ = initialCharge * (1.0 - maxSOC_);
+        lastTwoTimeStepAvailable_ = initialCharge * availableFrac_;
+        lastTwoTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        lastTimeStepAvailable_ = initialCharge * availableFrac_;
+        lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        thisTimeStepAvailable_ = initialCharge * availableFrac_;
+        thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3638,7 +3615,7 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     E0c = chargedOCV_;
     E0d = dischargedOCV_;
     k = chargeConversionRate_;
-    c = maxSOC_;
+    c = availableFrac_;
 
     if (charging) {
 
@@ -3853,6 +3830,9 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     }
     ssc_battery_->set_state(battState);
 
+    // Set the SOC limits
+    ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
+
     // Set the current timestep length
     ssc_battery_->ChangeTimestep(DataHVACGlobals::TimeStepSys);
 
@@ -3867,7 +3847,6 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     }
     power *= 0.001;  // Convert to kW
     ssc_battery_->runPower(power);
-    // FIXME: Track down these controlSOCMax/MinFracLimit and figure out what to do with them.
     // FIXME: Check other class members that store simulation state that are retrieved from getters and set accordingly.
 
     // Store outputs
