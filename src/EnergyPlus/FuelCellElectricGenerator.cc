@@ -1331,6 +1331,20 @@ namespace FuelCellElectricGenerator {
                                 "System",
                                 "Sum",
                                 this->Name);
+
+            SetupOutputVariable(state, "Generator Number of Cycles",
+                                OutputProcessor::Unit::None,
+                                this->Report.NumCycles,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(state, "Generator Power Module Skin Heat Loss Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.FCPMSkinLoss,
+                                "System",
+                                "Average",
+                                this->Name);
         }
     }
 
@@ -3488,6 +3502,8 @@ namespace FuelCellElectricGenerator {
 
         this->Report.SeqSubstIterations = this->FCPM.SeqSubstitIter;     // number of iterations in FuelCell loop
         this->Report.RegulaFalsiIterations = this->FCPM.RegulaFalsiIter; // number of iterations in Tproduct gas solving
+        this->Report.NumCycles = this->FCPM.NumCycles;                   // number of start-stop cycles
+        this->Report.FCPMSkinLoss = this->FCPM.QdotSkin;                 // Skin loss of power module
 
         this->Report.ACancillariesPower = this->FCPM.PelancillariesAC;
         this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;

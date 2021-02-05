@@ -438,6 +438,8 @@ namespace FuelCellElectricGenerator {
         Real64 ThermalEfficiency;
         Real64 OverallEfficiency;
         Real64 ExergyEfficiency;
+        int NumCycles;               // Number of start-stop cycles
+        Real64 FCPMSkinLoss;         // Power module skin losses [W]
 
         // Default Constructor
         FCReportDataStruct()
@@ -451,7 +453,8 @@ namespace FuelCellElectricGenerator {
               WaterVaporFractExh(0.0), CondensateRate(0.0), SeqSubstIterations(0), RegulaFalsiIterations(0), ACancillariesPower(0.0),
               ACancillariesEnergy(0.0), PCUlosses(0.0), DCPowerGen(0.0), DCPowerEff(0.0), ElectEnergyinStorage(0.0), StoredPower(0.0),
               StoredEnergy(0.0), DrawnPower(0.0), DrawnEnergy(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0),
-              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0)
+              SkinLossRadiat(0.0), ElectEfficiency(0.0), ThermalEfficiency(0.0), OverallEfficiency(0.0), ExergyEfficiency(0.0), NumCycles(0),
+              FCPMSkinLoss(0.0)
         {
         }
     };
