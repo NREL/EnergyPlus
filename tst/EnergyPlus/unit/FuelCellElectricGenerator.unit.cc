@@ -838,12 +838,11 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
     EXPECT_EQ(1.0, fCPM.NomEff);
     EXPECT_EQ(3400.0, fCPM.NomPel);
-    // At beggining of simulation, 10. But then it was simulated, so it should be greater
-    EXPECT_GT(fCPM.NumCycles, 10);
+    // At beggining of simulation, 10. Then it's ALWAYS ON (baseload), so it doesn't cycle, so still should be 10
+    EXPECT_EQ(10, fCPM.NumCycles);
     EXPECT_EQ(0.0, fCPM.CyclingDegradRat);
     EXPECT_EQ(1.0, fCPM.NomEff);
     EXPECT_EQ(3400.0, fCPM.NomPel);
-    EXPECT_EQ(0.0, fCPM.NumCycles);
     EXPECT_EQ(0.0, fCPM.CyclingDegradRat);
     EXPECT_EQ(0.0, fCPM.NumRunHours);
     EXPECT_EQ(0.0, fCPM.OperateDegradRat);
