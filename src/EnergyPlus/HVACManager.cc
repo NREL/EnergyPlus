@@ -227,7 +227,6 @@ namespace HVACManager {
         using DemandManager::ManageDemand;
         using DemandManager::UpdateDemandManagers;
         using EMSManager::ManageEMS;
-        using IceThermalStorage::UpdateIceFractions;
         using InternalHeatGains::UpdateInternalGainValues;
         using NodeInputManager::CalcMoreNodeInfo;
         using OutAirNodeManager::SetOutAirNodes;
@@ -452,7 +451,7 @@ namespace HVACManager {
 
             DetectOscillatingZoneTemp(state);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
-            UpdateIceFractions(state);          // Update fraction of ice stored in TES
+            IceThermalStorage::UpdateIceFractions(state);          // Update fraction of ice stored in TES
             ManageWater(state);
             // update electricity data for net, purchased, sold etc.
             DummyLogical = false;

@@ -64,17 +64,6 @@ struct EnergyPlusData;
 
 namespace IceThermalStorage {
 
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cIceStorageSimple;
-    extern std::string const cIceStorageDetailed;
-    extern std::string const cPcmStorageSimple;
-
-    // ITS numbers and FoundOrNot
-    extern int NumSimpleIceStorage;
-    extern int NumDetailedIceStorage;
-    extern int NumSimplePcmStorage;
-    extern int TotalNumIceStorage;
-
     enum class IceStorageType
     {
         Simple,
@@ -364,14 +353,6 @@ namespace IceThermalStorage {
 
     };
 
-    // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
-    extern Array1D<SimplePcmStorageData> SimplePcmStorage; 
-
-    // Static Functions
-    void clear_state();
-
     void GetIceStorageInput(EnergyPlusData &state);
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
@@ -429,9 +410,25 @@ namespace IceThermalStorage {
 
 struct IceThermalStorageData : BaseGlobalStruct {
 
+    bool getITSInput = true;
+    int NumSimpleIceStorage = 0;
+    int NumSimplePcmStorage = 0;
+    int NumDetailedIceStorage = 0;
+    int TotalNumIceStorage = 0;
+    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    Array1D<IceThermalStorage::SimplePcmStorageData> SimplePcmStorage;
+    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+
     void clear_state() override
     {
-
+        this->getITSInput = true;
+        this->NumSimpleIceStorage = 0;
+        this->NumDetailedIceStorage = 0;
+        this->NumSimplePcmStorage = 0; 
+        this->TotalNumIceStorage = 0;
+        this->SimpleIceStorage.deallocate();
+        this->SimplePcmStorage.deallocate();
+        this->DetailedIceStorage.deallocate();
     }
 };
 
