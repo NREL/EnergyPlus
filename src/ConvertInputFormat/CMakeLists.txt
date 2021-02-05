@@ -42,7 +42,7 @@ endif()
 # See https://en.cppreference.com/w/cpp/filesystem#Notes
 if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
     ( ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
-  target_link_libraries( energyplusparser PRIVATE stdc++fs )
+  target_link_libraries( ConvertInputFormat stdc++fs )
 endif()
 
 set_target_properties(ConvertInputFormat PROPERTIES VERSION ${ENERGYPLUS_VERSION})
