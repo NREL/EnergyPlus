@@ -26,22 +26,22 @@ Table 1 shows the correlations for convection coefficients from ASTM C1340 Stand
 
 ASTM C1340 Convection algorithm will be implemented for SurfaceConvectionAlgorithm:Inside. 
 For radiant barriers, this can be selected as `Zone Inside Convection Algorithm` of attic zone in `Zone` object.
-- Energyplus has a range of 0 to 180 degree of tilt angle of a surface. Flat roofs are tilted 0 degree, walls are tilted 90 degrees, and flat floors are tilted 180 degrees. Each case (horizontal surface, tilted surface, and vertical surface) can be classfied by this tilt angle. 
-- Heat flow direction (up and down) can be determined the temperature difference between the surface and the air.
-- For calculating the convection heat transfer coefficient, following inputs for each surface are needed:
+- Energyplus has a range of 0 to 180 degrees of tilt angle of a surface. Flat roofs are tilted 0 degree, walls are tilted 90 degrees, and flat floors are tilted 180 degrees. Each case (horizontal surface, tilted surface, and vertical surface) can be classified by this tilt angle. 
+- Heat flow direction (up and down) can be determined by the temperature difference between the surface and the air.
+- For calculating the convection heat transfer coefficient, the following inputs for each surface are needed:
   - Length along the heat flow direction
     - The square root of surface area for floors and ceilings
     - Surface height for gables and walls
     - Length of pitched roof from soffit to ridge
   - Tilt angle
   - Velocity of the air stream
-    - For interior surfaces, it is calculated from zone voulme and air changes per hour
+    - For interior surfaces, it is calculated from zone volume and air changes per hour
     - For exterior surfaces, Surface Outside Face Outdoor Air Wind Speed
 
 ## Testing/Validation/Data Sources ##
 
 1. Standard unit tests were used to verify that the convective coefficients are calculated properly.
-2. The convection coefficient results of the testfile with the EMS implementation were compared to the results from the implemented algorithm. 
+2. The convection coefficient results from the testfile with the EMS implementation were compared to the results from the implemented algorithm. 
 
 ## Input Output Reference Documentation ##
 

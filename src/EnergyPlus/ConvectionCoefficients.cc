@@ -8162,6 +8162,21 @@ namespace ConvectionCoefficients {
 
     Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt)
     {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Dareum Nam
+        //       DATE WRITTEN   Feb 2021
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Calculate the inside convection coefficient for attic zones containing radiant barriers
+
+        // REFERENCES:
+        // 1. ASTM C1340: Standard Practice for Estimation of Heat Gain or Loss Through Ceilings Under Attics 
+        // Containing Radiant Barriers by Use of a Computer Program
+        // 2. Fontanini, A. D., Aguilar, J. L. C., Mitchell, M. S., Kosny, J., Merket, N., DeGraw, J. W., & Lee, E. (2018).
+        // Predicting the performance of radiant technologies in attics: Reducing the discrepancies between attic specific 
+        // and whole-building energy models. Energy and Buildings, 169, 69-83.
 
         // Return Value
         Real64 h;           // Combined convection coefficient
