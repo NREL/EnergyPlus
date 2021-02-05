@@ -76,7 +76,6 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -173,7 +172,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
     clearFacilityElectricPowerServiceObject();
-    EarthTube::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
