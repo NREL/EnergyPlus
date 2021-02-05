@@ -452,8 +452,6 @@ SET( SRC
   OutsideEnergySources.hh
   PVWatts.cc
   PVWatts.hh
-  PVWattsSSC.cc
-  PVWattsSSC.hh
   PackagedTerminalHeatPump.cc
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
@@ -796,7 +794,9 @@ target_link_libraries( energypluslib
          libkiva
          btwxt
          Windows-CalcEngine
-         airflownetworklib)
+         airflownetworklib
+         ssc
+)
 
 if (OPENGL_FOUND)
   target_link_libraries( energypluslib PUBLIC penumbra )

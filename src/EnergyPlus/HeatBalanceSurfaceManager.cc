@@ -443,6 +443,9 @@ namespace HeatBalanceSurfaceManager {
                 if (Surface(SurfNum).WindDirEMSOverrideOn) {
                     Surface(SurfNum).WindDir = Surface(SurfNum).WindDirEMSOverrideValue;
                 }
+                if (Surface(SurfNum).ViewFactorGroundEMSOverrideOn) {
+                    Surface(SurfNum).ViewFactorGround = Surface(SurfNum).ViewFactorGroundEMSOverrideValue;
+                }
             }
         }
 
