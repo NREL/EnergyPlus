@@ -1270,11 +1270,6 @@ namespace HybridEvapCoolingModel {
         Real64 PreviousMaxiumConditioningOutput = 0;
         Real64 PreviousMaxiumHumidOrDehumidOutput = 0;
         std::string ObjectID = Name.c_str();
-        int size = CurrentOperatingSettings.size();
-        CSetting empty_setting;
-        for (int i = 0; i < size; i++) {
-            CurrentOperatingSettings[i] = empty_setting;
-        }
         if (StepIns.RHosa > 1) {
             ShowSevereError(state, "Unitary hybrid system error, required relative humidity value 0-1, called in object" + ObjectID + ".Check inputs");
             assert(true);
@@ -1853,6 +1848,14 @@ namespace HybridEvapCoolingModel {
             UnitOn = 0;
             ForceOff = true;
         }
+
+        // Initialize all settings for all operating modes
+        int size = CurrentOperatingSettings.size();
+        CSetting empty_setting;
+        for (int i = 1; i < size; i++) {
+            CurrentOperatingSettings[i] = empty_setting;
+        }
+
         // Go into standby if unit is off or not needed
         if ((!CoolingRequested && !HeatingRequested && !VentilationRequested && !HumidificationRequested && !DehumidificationRequested) ||
             ForceOff)
