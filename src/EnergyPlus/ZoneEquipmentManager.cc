@@ -4046,7 +4046,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (ZoneMassBalanceFlag(ZoneNum)) {
                     MassConservation(ZoneNum).InMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                     MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
-                    ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
