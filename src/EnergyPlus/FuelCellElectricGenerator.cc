@@ -3340,7 +3340,10 @@ namespace FuelCellElectricGenerator {
                 cell.AirSup.QskinLoss = 0.0;
                 cell.WaterSup.QskinLoss = 0.0;
                 cell.AuxilHeat.QskinLoss = 0.0;
-                cell.FCPM.QdotSkin = 0.0;
+                if (cell.FCPM.SkinLossMode != DataGenerators::SkinLoss::ConstantRate) {
+                    // If Constant Skin Loss Rate, then do not zero out
+                    cell.FCPM.QdotSkin = 0.0;
+                }
                 cell.Report.SkinLossConvect = 0.0;
                 cell.Report.SkinLossRadiat = 0.0;
                 cell.AuxilHeat.QairIntake = 0.0;

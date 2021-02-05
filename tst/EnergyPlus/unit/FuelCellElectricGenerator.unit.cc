@@ -794,68 +794,15 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     SimulationManager::ManageSimulation(*state);
     EXPECT_TRUE(has_err_output(true));
 
-/**
-    // OutputProcessor::TimeValue.allocate(2);
-    state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
-    state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
-    ScheduleManager::ProcessScheduleInput(*state); // read schedules
-
-    bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    ASSERT_FALSE(ErrorsFound);
-
-    InternalHeatGains::GetInternalHeatGainsInput(*state);
-    EXPECT_FALSE(InternalHeatGains::ErrorsFound);
-
-    state->dataGlobal->BeginSimFlag = true;
-    OutputReportPredefined::SetPredefinedTables(*state);
-
-    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, "HVAC", DataHVACGlobals::TimeStepSys);
-
-    createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(*state);
-    PlantManager::CheckIfAnyPlant(*state);
-
-    BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
-    // Get plant loop data
-    PlantManager::GetPlantLoopData(*state);
-    PlantManager::GetPlantInput(*state);
-    SizingManager::GetPlantSizingInput(*state);
-    PlantManager::InitOneTimePlantSizingInfo(*state, 1);
-    EXPECT_TRUE(compare_err_stream(""));
-    PlantManager::SizePlantLoop(*state, 1, true);
-    // SizePlantLoop throws a "   ** Warning ** Water heater = WATER HEATER MIXED 1:  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings\n   **   ~~~   ** Setpoint was never recovered and/or heater never turned on\n"
-    EXPECT_TRUE(has_err_output(true));
-
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
-
-    state->dataGlobal->MetersHaveBeenInitialized = true;
-
-    UpdateMeterReporting(*state);
-
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-
-    bool SimElecCircuitsFlag = false;
-    // GetInput and other code will be executed and SimElectricCircuits will be true
-    facilityElectricServiceObj->manageElectricPowerService(*state, true, SimElecCircuitsFlag, false);
-    EXPECT_TRUE(SimElecCircuitsFlag);
-
-
-    ASSERT_EQ(1u, facilityElectricServiceObj->elecLoadCenterObjs.size());
-    EXPECT_EQ(facilityElectricServiceObj->elecLoadCenterObjs[0]->numGenerators,
-              1);
-*/
-
     auto &generatorController = facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
     EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
     EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
 
     EXPECT_EQ(DataPlant::TypeOf_Generator_FCExhaust, generatorController->compPlantTypeOf_Num);
-    // Hum, so plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
+
+    // Note: plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
+    // Here it's 'Baseload'
     // EXPECT_TRUE(generatorController->plantInfoFound);
     // EXPECT_EQ("PLANT LOOP 1", state->dataPlnt->PlantLoop(generatorController->cogenLocation.loopNum).Name);
 
@@ -920,10 +867,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 
     EXPECT_EQ(0.6392, fCPM.RadiativeFract);
 
-    // TODO: this is an actual bug. It is being overriden in FigureFuelCellZoneGains, while here the SkinLossMode is ConstantRate, so it should be
-    // unaffected throughout
     EXPECT_EQ(729, fCPM.QdotSkin);
-
 
     EXPECT_EQ(0.0, fCPM.UAskin);
     EXPECT_GT(fCPM.SkinLossCurveID, 0);
@@ -946,7 +890,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
     EXPECT_EQ(DataGenerators::AirSupRateMode::ConstantStoicsAirRat, airSup.AirSupRateMode);
 
-    // TODO: Interestingly, Stoics ratio is the input + 1.0
+    // Note: as mentionned in the IO/ref, Stoics ratio is the input + 1.0
     EXPECT_EQ(2.0, airSup.Stoics);
 
     ASSERT_GT(airSup.AirFuncPelCurveID, 0);
