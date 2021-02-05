@@ -266,7 +266,8 @@ namespace FuelCellElectricGenerator {
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NomEff = NumArray(1);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NomPel = NumArray(2);
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCycles = NumArray(3);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCyclesAtStart = NumArray(3);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCycles = state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCyclesAtStart;
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.CyclingDegradRat = NumArray(4);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumRunHours = NumArray(5);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.OperateDegradRat = NumArray(6);
@@ -3194,7 +3195,7 @@ namespace FuelCellElectricGenerator {
             this->AirSup.TairIntoBlower = 0.0;
             this->AirSup.QskinLoss = 0.0;
             this->AirSup.QintakeRecovery = 0.0;
-            this->FCPM.NumCycles = 0;
+            this->FCPM.NumCycles = this->FCPM.NumCyclesAtStart;
             this->FCPM.Pel = 0.0;
             this->FCPM.PelLastTimeStep = 0.0;
             this->FCPM.Eel = 0.0;

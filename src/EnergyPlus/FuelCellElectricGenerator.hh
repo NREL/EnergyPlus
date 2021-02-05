@@ -68,6 +68,7 @@ namespace FuelCellElectricGenerator {
         int EffCurveID;             // pointer to curve for efficiency
         Real64 NomEff;              // nominal efficiency
         Real64 NomPel;              // nominal power rate at rating point
+        int NumCyclesAtStart;       // number of start stop cycles at beggining of simulation (user input)
         int NumCycles;              // number of start stop cycles
         Real64 CyclingDegradRat;    // rate of degradation from cycles
         Real64 NumRunHours;         // number of hours of operation
