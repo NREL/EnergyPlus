@@ -2553,7 +2553,7 @@ namespace WindowComplexManager {
         //                 0 - ISO15099
         //                 1 - Scaled Cavity Width (SCW)
         //                 2 - Convective Scalar Model (CSM)
-        static int Debug_mode(0); // Switch for debug output files:
+        static TARCOGParams::DebugMode Debug_mode(TARCOGParams::DebugMode::); // Switch for debug output files:
         //                 0 - don't create debug output files
         //                 1 - append results to existing debug output file (where applicable)
         //                 2 - store results in a new debug output file

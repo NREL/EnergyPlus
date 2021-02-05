@@ -333,11 +333,6 @@ namespace TARCOGMain {
     // REFERENCES:
     // ISO 15099/ASHRAE SPC142, ISO10292, EN673, Tarcog technical documentation
 
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGOutput;
     using namespace TARCOGGassesParams;
@@ -659,13 +654,6 @@ namespace TARCOGMain {
         hinTemp = 0.0;
         houtTemp = 0.0;
         ErrorMessage = "Normal Termination";
-
-        // sol = 0.0d0
-        // if (dir.ne.0) then
-        //  do i= 1, nlayer
-        //    sol(i) = dir * asol(i)
-        //  end do
-        // end if
 
         for (i = 1; i <= nlayer - 1; ++i) {
             CurGap(i) = gap(i);

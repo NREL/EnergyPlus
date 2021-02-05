@@ -52,12 +52,9 @@
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
-#include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGArgs {
+namespace EnergyPlus::TARCOGArgs {
 
     // MODULE INFORMATION:
     //       AUTHOR         Simon Vidanovic
@@ -71,24 +68,11 @@ namespace TARCOGArgs {
     // A module which contains common functions for error checking and
     //    preparation of arguments and intermediate variables
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGOutput;
     using namespace TARCOGParams;
-
-    // Functions
 
     int ArgCheck(Files &files,
                  int const nlayer,
@@ -212,25 +196,6 @@ namespace TARCOGArgs {
         EP_SIZE_CHECK(LaminateB, maxlay);
         EP_SIZE_CHECK(sumsol, maxlay);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-        /// Venetians:
-
-        /// Laminates:
-
-        /// Gaps:
-
-        // Deflection
-
-        // Support Pillars
-        //   0 - does not have support pillar
-        //   1 - have support pillar
-
-        //// INPUTS/OUTPUTS:
-
-
         // bi...Write debug output files - if debug flag = 1:
 
         if (files.WriteDebugOutput) {
@@ -296,6 +261,7 @@ namespace TARCOGArgs {
                                 xgcp,
                                 xwght);
 
+            std::string const VersionNumber(" 7.0.15.00 ");
             WriteTARCOGInputFile(files,
                                  VersionNumber,
                                  tout,
@@ -383,6 +349,8 @@ namespace TARCOGArgs {
             return ArgCheck;
         }
 
+        int constexpr MinThermalMode(0);
+        int constexpr MaxThermalMode(2);
         if ((ThermalMod < MinThermalMode) || (ThermalMod > MaxThermalMode)) {
             ArgCheck = 29;
             ErrorMessage = "Invalid code for thermal mode.";
@@ -766,19 +734,7 @@ namespace TARCOGArgs {
 
     bool GoAhead(int const nperr)
     {
-
-        // Return value
-        bool GoAhead;
-
-        if (((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000))) {
-            GoAhead = false; // error
-        } else {
-            GoAhead = true; // all OK, or a warning
-        }
-
-        return GoAhead;
+        return !(((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000)));
     }
-
-} // namespace TARCOGArgs
 
 } // namespace EnergyPlus
