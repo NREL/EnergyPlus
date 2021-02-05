@@ -3170,8 +3170,23 @@ ElectricStorage::ElectricStorage( // main constructor
 
             maxAhCapacity_ = liIon_Qfull_ * seriesNum_ * parallelNum_;
 
-            // FIXME: Disable lifetime model when requested.
+            // Set the Lifetime model in SSC
+            // I'm using a raw pointer here because the the battery_t constructor expects it.
+            // The pointer is then passed into the battery_t where it is converted into a unique_ptr and persists along with that object.
+            // Therefore I am not deleting this pointer here because that will be handled by the battery_t class.
+            lifetime_t* battLifetime;
+            if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+                battLifetime = new lifetime_nmc_t(DataHVACGlobals::TimeStepSys);
+            } else {
+                // This sets a lifetime model where the capacity is always 100%.
+                std::vector<double> tblVals{{20, 0, 100, 20, 5000, 100, 20, 10000, 100, 80, 0, 100, 80, 1000, 100, 80, 2000, 100}};
+                util::matrix_t<double> battLifetimeMatrix(6, 3, &tblVals);
+                battLifetime = new lifetime_calendar_cycle_t(battLifetimeMatrix, DataHVACGlobals::TimeStepSys);
+            }
+
             std::vector<double> batt_losses{0};  // using double because SSC expects a double
+
+            // Create the SSC battery object
             ssc_battery_ = std::unique_ptr<battery_t>(
                 new battery_t(
                     DataHVACGlobals::TimeStepSys,
@@ -3197,9 +3212,7 @@ ElectricStorage::ElectricStorage( // main constructor
                         internalR_,
                         DataHVACGlobals::TimeStepSys
                         ),
-                    new lifetime_nmc_t(
-                        DataHVACGlobals::TimeStepSys
-                        ),
+                        battLifetime,
                     new thermal_t(
                         DataHVACGlobals::TimeStepSys,
                         liIon_mass_,
@@ -3847,7 +3860,6 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     }
     power *= 0.001;  // Convert to kW
     ssc_battery_->runPower(power);
-    // FIXME: Check other class members that store simulation state that are retrieved from getters and set accordingly.
 
     // Store outputs
     const battery_state& battState2{ssc_battery_->get_state()};
@@ -3876,8 +3888,9 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     batteryVoltage_ = ssc_battery_->V();
     batteryDamage_ = 1.0 - (ssc_battery_->charge_maximum_lifetime() / maxAhCapacity_);
     storedPower_ = powerCharge;
-    drawnPower_ = powerDischarge;
     storedEnergy_ = storedPower_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    drawnPower_ = powerDischarge;
+    drawnEnergy_ = drawnPower_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     decrementedEnergyStored_ = - storedEnergy_;
     thermLossRate_ = battState2.thermal->heat_dissipated * 1000.0;  // kW -> W
     thermLossEnergy_ = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
