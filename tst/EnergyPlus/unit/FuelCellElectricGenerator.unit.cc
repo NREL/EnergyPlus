@@ -55,12 +55,16 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include "EnergyPlus/CurveManager.hh"
+#include "EnergyPlus/DataGenerators.hh"
+#include "EnergyPlus/Plant/Loop.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -77,9 +81,131 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 
     std::string const idf_objects = delimited_string({
 
-       // "Zone,Thermal Zone 1;",
+        "Material,",
+        "  8 in.Concrete Block Basement Wall,      !- Name",
+        "  MediumRough,                            !- Roughness",
+        "  0.2032,                                 !- Thickness{ m }",
+        "  1.326,                                  !- Conductivity{ W / m - K }",
+        "  1841.99999999999,                       !- Density{ kg / m3 }",
+        "  911.999999999999,                       !- Specific Heat{ J / kg - K }",
+        "  0.9,                                    !- Thermal Absorptance",
+        "  0.7,                                    !- Solar Absorptance",
+        "  0.7;                                    !- Visible Absorptance",
 
-        "Zone,Thermal Zone 1;",
+        "Construction,",
+        "   Typical,   !- Name",
+        "   8 in.Concrete Block Basement Wall;     !- Layer 1",
+
+        "Zone,",
+        "  Thermal Zone 1,                         !- Name",
+        "  0,                                      !- Direction of Relative North {deg}",
+        "  0,                                      !- X Origin {m}",
+        "  0,                                      !- Y Origin {m}",
+        "  0,                                      !- Z Origin {m}",
+        "  ,                                       !- Type",
+        "  1,                                      !- Multiplier",
+        "  ,                                       !- Ceiling Height {m}",
+        "  ,                                       !- Volume {m3}",
+        "  ,                                       !- Floor Area {m2}",
+        "  ,                                       !- Zone Inside Convection Algorithm",
+        "  ,                                       !- Zone Outside Convection Algorithm",
+        "  Yes;                                    !- Part of Total Floor Area",
+
+        "BuildingSurface:Detailed,",
+        "  Floor,                                  !- Name",
+        "  Floor,                                  !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Ground,                                 !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  NoSun,                                  !- Sun Exposure",
+        "  NoWind,                                 !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 1 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 0, 0;                               !- X,Y,Z Vertex 4 {m}",
+
+         "BuildingSurface:Detailed,",
+        "  Wall 1,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 10, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 3 {m}",
+        "  0, 0, 3;                                !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Wall 2,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 10, 3,                              !- X,Y,Z Vertex 1 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 2 {m}",
+        "  0, 10, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  0, 10, 3;                               !- X,Y,Z Vertex 4 {m}",
+
+         "BuildingSurface:Detailed,",
+        "  Wall 3,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 0, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  10, 0, 0,                               !- X,Y,Z Vertex 2 {m}",
+        "  10, 10, 0,                              !- X,Y,Z Vertex 3 {m}",
+        "  10, 10, 3;                              !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Wall 4,                                 !- Name",
+        "  Wall,                                   !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  0, 0, 3,                                !- X,Y,Z Vertex 1 {m}",
+        "  0, 0, 0,                                !- X,Y,Z Vertex 2 {m}",
+        "  10, 0, 0,                               !- X,Y,Z Vertex 3 {m}",
+        "  10, 0, 3;                               !- X,Y,Z Vertex 4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "  Roof,                                   !- Name",
+        "  Roof,                                   !- Surface Type",
+        "  Typical,                                !- Construction Name",
+        "  Thermal Zone 1,                         !- Zone Name",
+        "  Outdoors,                               !- Outside Boundary Condition",
+        "  ,                                       !- Outside Boundary Condition Object",
+        "  SunExposed,                             !- Sun Exposure",
+        "  WindExposed,                            !- Wind Exposure",
+        "  ,                                       !- View Factor to Ground",
+        "  ,                                       !- Number of Vertices",
+        "  10, 0, 3,                               !- X,Y,Z Vertex 1 {m}",
+        "  10, 10, 3,                              !- X,Y,Z Vertex 2 {m}",
+        "  0, 10, 3,                               !- X,Y,Z Vertex 3 {m}",
+        "  0, 0, 3;                                !- X,Y,Z Vertex 4 {m}",
 
         "ScheduleTypeLimits,",
         "  OnOff,                                  !- Name",
@@ -159,7 +285,6 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "BranchList,",
         "  SHW Loop Supply Branches,               !- Name",
         "  SHW Loop Supply Inlet Branch,           !- Branch Name 1",
-        "  SHW Loop Supply Branch 1,               !- Branch Name 2",
         "  SHW Loop Supply Branch 2,               !- Branch Name 3",
         "  SHW Loop Supply Outlet Branch;          !- Branch Name 4",
 
@@ -173,13 +298,11 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "Connector:Splitter,",
         "  SHW Loop Supply Splitter,               !- Name",
         "  SHW Loop Supply Inlet Branch,           !- Inlet Branch Name",
-        "  SHW Loop Supply Branch 1,               !- Outlet Branch Name 1",
         "  SHW Loop Supply Branch 2;               !- Outlet Branch Name 2",
 
         "Connector:Mixer,",
         "  SHW Loop Supply Mixer,                  !- Name",
         "  SHW Loop Supply Outlet Branch,          !- Outlet Branch Name",
-        "  SHW Loop Supply Branch 1,               !- Inlet Branch Name 1",
         "  SHW Loop Supply Branch 2;               !- Inlet Branch Name 2",
 
         "Branch,",
@@ -209,58 +332,6 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "  PowerPerFlowPerPressure,                !- Design Power Sizing Method",
         "  348701.1,                               !- Design Electric Power per Unit Flow Rate {W/(m3/s)}",
         "  1.282051282,                            !- Design Shaft Power per Unit Flow Rate per Unit Head {W-s/m3-Pa}",
-        "  General;                                !- End-Use Subcategory",
-
-        "Branch,",
-        "  SHW Loop Supply Branch 1,           !- Name",
-        "  ,                                       !- Pressure Drop Curve Name",
-        "  WaterHeater:Mixed,                      !- Component Object Type 1",
-        "  Water Heater Mixed 1,                   !- Component Name 1",
-        "  Node 4,                                 !- Component Inlet Node Name 1",
-        "  Node 9;                                 !- Component Outlet Node Name 1",
-
-        "WaterHeater:Mixed,",
-        "  Water Heater Mixed 1,                   !- Name",
-        "  0.3785,                                 !- Tank Volume {m3}",
-        "  Hot_Water_Temperature,                  !- Setpoint Temperature Schedule Name",
-        "  2,                                      !- Deadband Temperature Difference {deltaC}",
-        "  82.22,                                  !- Maximum Temperature Limit {C}",
-        "  Cycle,                                  !- Heater Control Type",
-        "  845000,                                 !- Heater Maximum Capacity {W}",
-        "  ,                                       !- Heater Minimum Capacity {W}",
-        "  0,                                      !- Heater Ignition Minimum Flow Rate {m3/s}",
-        "  0,                                      !- Heater Ignition Delay {s}",
-        "  NaturalGas,                             !- Heater Fuel Type",
-        "  0.8,                                    !- Heater Thermal Efficiency",
-        "  ,                                       !- Part Load Factor Curve Name",
-        "  20,                                     !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,                             !- Off Cycle Parasitic Fuel Type",
-        "  0.8,                                    !- Off Cycle Parasitic Heat Fraction to Tank",
-        "  0,                                      !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,                             !- On Cycle Parasitic Fuel Type",
-        "  0,                                      !- On Cycle Parasitic Heat Fraction to Tank",
-        "  Schedule,                               !- Ambient Temperature Indicator",
-        "  Ambient Temperature 22C,                !- Ambient Temperature Schedule Name",
-        "  ,                                       !- Ambient Temperature Zone Name",
-        "  ,                                       !- Ambient Temperature Outdoor Air Node Name",
-        "  6,                                      !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
-        "  1,                                      !- Off Cycle Loss Fraction to Zone",
-        "  6,                                      !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
-        "  1,                                      !- On Cycle Loss Fraction to Zone",
-        "  ,                                       !- Peak Use Flow Rate {m3/s}",
-        "  ,                                       !- Use Flow Rate Fraction Schedule Name",
-        "  ,                                       !- Cold Water Supply Temperature Schedule Name",
-        "  Node 4,                                 !- Use Side Inlet Node Name",
-        "  Node 9,                                 !- Use Side Outlet Node Name",
-        "  1,                                      !- Use Side Effectiveness",
-        "  ,                                       !- Source Side Inlet Node Name",
-        "  ,                                       !- Source Side Outlet Node Name",
-        "  1,                                      !- Source Side Effectiveness",
-        "  Autosize,                               !- Use Side Design Flow Rate {m3/s}",
-        "  Autosize,                               !- Source Side Design Flow Rate {m3/s}",
-        "  1.5,                                    !- Indirect Water Heating Recovery Time {hr}",
-        "  IndirectHeatPrimarySetpoint,            !- Source Side Flow Control Mode",
-        "  ,                                       !- Indirect Alternate Setpoint Temperature Schedule Name",
         "  General;                                !- End-Use Subcategory",
 
         "Branch,",
@@ -314,7 +385,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "  Power Module Efficiency Curve,          !- Efficiency Curve Name",
         "  1,                                      !- Nominal Efficiency",
         "  3400,                                   !- Nominal Electrical Power {W}",
-        "  0,                                      !- Number of Stops at Start of Simulation",
+        "  10,                                     !- Number of Stops at Start of Simulation",
         "  0,                                      !- Cycling Performance Degradation Coefficient",
         "  0,                                      !- Number of Run Hours at Beginning of Simulation {hr}",
         "  0,                                      !- Accumulated Run Time Degradation Coefficient",
@@ -583,8 +654,9 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "WaterUse:Equipment,",
         "  Water Use Equipment 1,                  !- Name",
         "  General,                                !- End-Use Subcategory",
-        "  0,                                      !- Peak Flow Rate {m3/s}",
-        "  Always On Discrete;                     !- Flow Rate Fraction Schedule Name",
+        "  1.0,                                    !- Peak Flow Rate {m3/s}",
+        "  Always On Discrete,                     !- Flow Rate Fraction Schedule Name",
+        "  Hot_Water_Temperature;                  !- Target Temperature Schedule Name",
 
         "Branch,",
         "  SHW Loop Demand Bypass Branch,          !- Name",
@@ -626,10 +698,8 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
 
         "PlantEquipmentList,",
         "  SHW Loop Heating Equipment List,        !- Name",
-        "  WaterHeater:Mixed,                      !- Equipment Object Type 1",
-        "  Water Heater Mixed 1,                   !- Equipment Name 1",
-        "  Generator:FuelCell:ExhaustGasToWaterHeatExchanger, !- Equipment Object Type 2",
-        "  Generator Fuel Cell Exhaust Gas To Water Heat Exchanger 1; !- Equipment Name 2",
+        "  Generator:FuelCell:ExhaustGasToWaterHeatExchanger, !- Equipment Object Type 1",
+        "  Generator Fuel Cell Exhaust Gas To Water Heat Exchanger 1; !- Equipment Name 1",
 
         "SetpointManager:Scheduled,",
         "  SHW LWT SPM,                            !- Name",
@@ -651,13 +721,29 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "  Generator Fuel Cell 1,                  !- Generator Name 1",
         "  Generator:FuelCell,                     !- Generator Object Type 1",
         "  3400,                                   !- Generator Rated Electric Power Output 1 {W}",
-        "  ,                                       !- Generator Availability Schedule Name 1",
+        "  Always On Discrete,                     !- Generator Availability Schedule Name 1",
         "  ;                                       !- Generator Rated Thermal to Electrical Power Ratio 1",
+
+
+        // Fake a load
+        "Exterior:Lights,",
+        "  Exterior Facade Lighting,!- Name",
+        "  Always On Discrete,      !- Schedule Name",
+        "  10000.00,                 !- Design Level {W}",
+        "  ScheduleNameOnly,        !- Control Option",
+        "  Exterior Facade Lighting;!- End-Use Subcategory",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    Yes,                     !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
 
         "  Site:Location,",
         "    CHICAGO_IL_USA TMY2-94846,  !- Name",
-        "    42.00,                   !- Latitude {deg}",
-        "    -87.88,                  !- Longitude {deg}",
+        "    41.78,                   !- Latitude {deg}",
+        "    -87.75,                  !- Longitude {deg}",
         "    -6.00,                   !- Time Zone {hr}",
         "    190.00;                  !- Elevation {m}",
 
@@ -687,14 +773,33 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
         "    ,                        !- Diffuse Solar Day Schedule Name",
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
         "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.0;                     !- Sky Clearness",
+
+        "Timestep,4;",
+
+        // Obviously need to add the sqlite output since we query it...
+        "Output:SQLite,",
+        "  SimpleAndTabular;                       !- Option Type",
+
+        // Need at least one meter for the query below to succeed
+        "Output:Meter,",
+        "  NaturalGas:Facility,                    !- Key Name",
+        "  Timestep;                               !- Reporting Frequency",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
 
-    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    SimulationManager::ManageSimulation(*state);
+    EXPECT_TRUE(has_err_output(true));
+
+/**
+    // OutputProcessor::TimeValue.allocate(2);
+    state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     bool ErrorsFound(false);
@@ -725,6 +830,13 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     // SizePlantLoop throws a "   ** Warning ** Water heater = WATER HEATER MIXED 1:  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings\n   **   ~~~   ** Setpoint was never recovered and/or heater never turned on\n"
     EXPECT_TRUE(has_err_output(true));
 
+    ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
+
+    state->dataGlobal->MetersHaveBeenInitialized = true;
+
+    UpdateMeterReporting(*state);
+
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
 
     bool SimElecCircuitsFlag = false;
     // GetInput and other code will be executed and SimElectricCircuits will be true
@@ -735,6 +847,235 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     ASSERT_EQ(1u, facilityElectricServiceObj->elecLoadCenterObjs.size());
     EXPECT_EQ(facilityElectricServiceObj->elecLoadCenterObjs[0]->numGenerators,
               1);
+*/
 
-    EXPECT_TRUE(compare_err_stream(""));
+    auto &generatorController = facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
+    EXPECT_EQ(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num);
+    EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
+    EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
+
+    EXPECT_EQ(DataPlant::TypeOf_Generator_FCExhaust, generatorController->compPlantTypeOf_Num);
+    // Hum, so plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
+    // EXPECT_TRUE(generatorController->plantInfoFound);
+    // EXPECT_EQ("PLANT LOOP 1", state->dataPlnt->PlantLoop(generatorController->cogenLocation.loopNum).Name);
+
+    EXPECT_EQ("GENERATOR FUEL CELL EXHAUST GAS TO WATER HEAT EXCHANGER 1", generatorController->compPlantName);
+    EXPECT_EQ(0, generatorController->generatorIndex);
+
+    EXPECT_EQ("ALWAYS ON DISCRETE", generatorController->availSched);
+    EXPECT_GT(generatorController->availSchedPtr, 0);
+
+    EXPECT_EQ(0, generatorController->nominalThermElectRatio);
+
+    EXPECT_TRUE(generatorController->onThisTimestep);
+
+    // FC has 3400 of power per input, and operates in Baseload mode
+    EXPECT_EQ(3400.0, generatorController->maxPowerOut);
+    EXPECT_EQ(3400.0, generatorController->powerRequestThisTimestep);
+    EXPECT_EQ(3400.0, generatorController->electProdRate);
+    EXPECT_EQ(3400.0*15*60, generatorController->electricityProd); // Timestep = 4, so 15min
+    EXPECT_EQ(0, generatorController->dCElectricityProd);
+    EXPECT_EQ(0, generatorController->dCElectProdRate);
+
+
+
+    auto thisFCcompPtr = FuelCellElectricGenerator::FCDataStruct::factory(*state, generatorController->name);
+    auto thisFC = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFCcompPtr);
+    // Power Module
+    EXPECT_EQ("GENERATOR FUEL CELL POWER MODULE 1", thisFC->NameFCPM);
+    auto fCPM = thisFC->FCPM;
+    EXPECT_EQ(fCPM.Name, thisFC->NameFCPM);
+    // Annex42 = Direct
+    EXPECT_EQ(DataGenerators::CurveMode::Direct, fCPM.EffMode);
+    ASSERT_GT(fCPM.EffCurveID, 0);
+    EXPECT_EQ("POWER MODULE EFFICIENCY CURVE", state->dataCurveManager->PerfCurve(fCPM.EffCurveID).Name);
+    EXPECT_EQ(1.0, fCPM.NomEff);
+    EXPECT_EQ(3400.0, fCPM.NomPel);
+    // At beggining of simulation, 10. But then it was simulated, so it should be greater
+    EXPECT_GT(fCPM.NumCycles, 10);
+    EXPECT_EQ(0.0, fCPM.CyclingDegradRat);
+    EXPECT_EQ(1.0, fCPM.NomEff);
+    EXPECT_EQ(3400.0, fCPM.NomPel);
+    EXPECT_EQ(0.0, fCPM.NumCycles);
+    EXPECT_EQ(0.0, fCPM.CyclingDegradRat);
+    EXPECT_EQ(0.0, fCPM.NumRunHours);
+    EXPECT_EQ(0.0, fCPM.OperateDegradRat);
+    EXPECT_EQ(10000.0, fCPM.ThreshRunHours);
+    EXPECT_EQ(1.4, fCPM.UpTranLimit);
+    EXPECT_EQ(0.2, fCPM.DownTranLimit);
+    EXPECT_EQ(0.0, fCPM.StartUpTime);
+    EXPECT_EQ(0.2, fCPM.StartUpFuel);
+    EXPECT_EQ(0.0, fCPM.StartUpElectConsum);
+    EXPECT_EQ(0.0, fCPM.StartUpElectProd);
+    EXPECT_EQ(0.0, fCPM.ShutDownTime);
+    EXPECT_EQ(0.2, fCPM.ShutDownFuel);
+    EXPECT_EQ(0.0, fCPM.ShutDownElectConsum);
+    EXPECT_EQ(0.0, fCPM.ANC0);
+    EXPECT_EQ(0.0, fCPM.ANC1);
+
+    EXPECT_EQ(DataGenerators::SkinLoss::ConstantRate, fCPM.SkinLossMode);
+
+    EXPECT_EQ("THERMAL ZONE 1", fCPM.ZoneName);
+    EXPECT_EQ(1, fCPM.ZoneID);
+
+    EXPECT_EQ(0.6392, fCPM.RadiativeFract);
+
+    // TODO: this is an actual bug. It is being overriden in FigureFuelCellZoneGains, while here the SkinLossMode is ConstantRate, so it should be
+    // unaffected throughout
+    EXPECT_EQ(729, fCPM.QdotSkin);
+
+
+    EXPECT_EQ(0.0, fCPM.UAskin);
+    EXPECT_GT(fCPM.SkinLossCurveID, 0);
+    EXPECT_EQ(0.006156, fCPM.NdotDilutionAir);
+    EXPECT_EQ(2307, fCPM.StackHeatLossToDilution);
+    EXPECT_EQ("GENERATOR FUEL CELL POWER MODULE 1 OA NODE", fCPM.DilutionInletNodeName);
+    EXPECT_EQ("GENERATOR FUEL CELL POWER MODULE 1 DILUTION OUTLET AIR NODE", fCPM.DilutionExhaustNodeName);
+    EXPECT_EQ(3010, fCPM.PelMin);
+    EXPECT_EQ(3728, fCPM.PelMax);
+
+
+
+    // Air Supply
+    EXPECT_EQ("GENERATOR FUEL CELL AIR SUPPLY 1", thisFC->NameFCAirSup);
+    auto airSup = thisFC->AirSup;
+    EXPECT_EQ(airSup.Name, thisFC->NameFCAirSup);
+    EXPECT_EQ("GENERATOR FUEL CELL AIR SUPPLY 1 OA NODE", airSup.NodeName);
+    ASSERT_GT(airSup.BlowerPowerCurveID, 0);
+    EXPECT_EQ("BLOWER POWER CURVE", state->dataCurveManager->PerfCurve(airSup.BlowerPowerCurveID).Name);
+    EXPECT_EQ(1.0, airSup.BlowerHeatLossFactor);
+    EXPECT_EQ(DataGenerators::AirSupRateMode::ConstantStoicsAirRat, airSup.AirSupRateMode);
+
+    // TODO: Interestingly, Stoics ratio is the input + 1.0
+    EXPECT_EQ(2.0, airSup.Stoics);
+
+    ASSERT_GT(airSup.AirFuncPelCurveID, 0);
+    EXPECT_EQ("AIR RATE FUNCTION OF ELECTRIC POWER CURVE", state->dataCurveManager->PerfCurve(airSup.AirFuncPelCurveID).Name);
+    EXPECT_EQ(0.00283, airSup.AirTempCoeff);
+    EXPECT_EQ(0, airSup.AirFuncNdotCurveID);
+
+    EXPECT_EQ(DataGenerators::RecoverMode::NoRecoveryOnAirIntake, airSup.IntakeRecoveryMode);
+
+    EXPECT_EQ(DataGenerators::ConstituentMode::RegularAir, airSup.ConstituentMode);
+    // Regular air has 5 constituents
+    EXPECT_EQ(5, airSup.NumConstituents);
+
+    // Fuel Supply
+    EXPECT_EQ("NATURALGAS", thisFC->NameFCFuelSup);
+
+
+    // Water Supply
+    EXPECT_EQ("GENERATOR FUEL CELL WATER SUPPLY 1", thisFC->NameFCWaterSup);
+    auto waterSup = thisFC->WaterSup;
+    EXPECT_EQ(waterSup.Name, thisFC->NameFCWaterSup);
+
+    ASSERT_GT(waterSup.WaterSupRateCurveID, 0);
+    EXPECT_EQ("REFORMER WATER FLOWRATE FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.WaterSupRateCurveID).Name);
+
+    ASSERT_GT(waterSup.PmpPowerCurveID, 0);
+    EXPECT_EQ("REFORMER WATER PUMP POWER FUNCTION OF FUELRATE CURVE", state->dataCurveManager->PerfCurve(waterSup.PmpPowerCurveID).Name);
+
+    EXPECT_EQ(0.0, waterSup.PmpPowerLossFactor);
+
+    EXPECT_EQ(0, waterSup.NodeNum);
+
+    EXPECT_EQ(DataGenerators::WaterTemperatureMode::WaterInReformSchedule, waterSup.WaterTempMode);
+
+    ASSERT_GT(waterSup.SchedNum, 0);
+
+
+    // Auxiliary Heater
+    EXPECT_EQ("GENERATOR FUEL CELL AUXILIARY HEATER 1", thisFC->NameFCAuxilHeat);
+    auto auxilHeat = thisFC->AuxilHeat;
+    EXPECT_EQ(auxilHeat.Name, thisFC->NameFCAuxilHeat);
+    EXPECT_EQ(0.0, auxilHeat.ExcessAirRAT);
+    EXPECT_EQ(0.0, auxilHeat.ANC0);
+    EXPECT_EQ(0.0, auxilHeat.ANC1);
+    EXPECT_EQ(0.5, auxilHeat.UASkin);
+
+    EXPECT_EQ(DataGenerators::LossDestination::AirInletForFC, auxilHeat.SkinLossDestination);
+
+    EXPECT_EQ(0, auxilHeat.ZoneID);
+    EXPECT_TRUE(auxilHeat.ZoneName.empty());
+
+    EXPECT_EQ(0.0, auxilHeat.MaxPowerW);
+    EXPECT_EQ(0.0, auxilHeat.MinPowerW);
+    EXPECT_EQ(0.0, auxilHeat.MaxPowerkmolperSec);
+    EXPECT_EQ(0.0, auxilHeat.MinPowerkmolperSec);
+
+
+
+    // Exhaust HX
+    EXPECT_EQ("GENERATOR FUEL CELL EXHAUST GAS TO WATER HEAT EXCHANGER 1", thisFC->NameExhaustHX);
+    auto exhaustHX = thisFC->ExhaustHX;
+    EXPECT_EQ(exhaustHX.Name, thisFC->NameExhaustHX);
+
+    EXPECT_EQ("NODE 10", exhaustHX.WaterInNodeName);
+    EXPECT_GT(exhaustHX.WaterInNode, 0);
+
+    EXPECT_EQ("NODE 11", exhaustHX.WaterOutNodeName);
+    EXPECT_GT(exhaustHX.WaterOutNode, 0);
+
+    EXPECT_EQ(0.0004, exhaustHX.WaterVolumeFlowMax);
+
+    EXPECT_EQ("GENERATOR FUEL CELL EXHAUST GAS TO WATER HEAT EXCHANGER 1 EXHAUST OUTLET AIR NODE", exhaustHX.ExhaustOutNodeName);
+    EXPECT_GT(exhaustHX.ExhaustOutNode, 0);
+
+    EXPECT_EQ(DataGenerators::ExhaustGasHX::Condensing, thisFC->ExhaustHX.HXmodelMode);
+
+    EXPECT_EQ(83.1, exhaustHX.hxs0);
+    EXPECT_EQ(4798.0, exhaustHX.hxs1);
+    EXPECT_EQ(-138000.0, exhaustHX.hxs2);
+    EXPECT_EQ(-353800.0, exhaustHX.hxs3);
+    EXPECT_EQ(515000000.0, exhaustHX.hxs4);
+
+    EXPECT_EQ(0.0, exhaustHX.HXEffect);
+    EXPECT_EQ(0.0, exhaustHX.NdotGasRef);
+    EXPECT_EQ(0.0, exhaustHX.nCoeff);
+    EXPECT_EQ(0.0, exhaustHX.AreaGas);
+    EXPECT_EQ(0.0, exhaustHX.h0Water);
+    EXPECT_EQ(0.0, exhaustHX.NdotWaterRef);
+    EXPECT_EQ(0.0, exhaustHX.mCoeff);
+    EXPECT_EQ(0.0, exhaustHX.AreaWater);
+    EXPECT_EQ(0.0, exhaustHX.Fadjust);
+    EXPECT_EQ(0.0031, exhaustHX.l1Coeff);
+    EXPECT_EQ(1.0, exhaustHX.l2Coeff);
+    EXPECT_EQ(35.0, exhaustHX.CondensationThresholdTemp);
+
+
+    // Electrical Storage
+    EXPECT_EQ("GENERATOR FUEL CELL ELECTRICAL STORAGE 1", thisFC->NameElecStorage);
+    auto elecStorage = thisFC->ElecStorage;
+    EXPECT_EQ(elecStorage.Name, thisFC->NameElecStorage);
+    EXPECT_EQ(DataGenerators::ElectricalStorage::SimpleEffConstraints, elecStorage.StorageModelMode);
+    EXPECT_EQ(1.0, elecStorage.EnergeticEfficCharge);
+    EXPECT_EQ(1.0, elecStorage.EnergeticEfficDischarge);
+    EXPECT_EQ(0.0, elecStorage.NominalEnergyCapacity);
+    EXPECT_EQ(0.0, elecStorage.MaxPowerDraw);
+    EXPECT_EQ(0.0, elecStorage.MaxPowerStore);
+    EXPECT_EQ(0.0, elecStorage.StartingEnergyStored);
+
+
+
+    // Inverter
+    EXPECT_EQ("GENERATOR FUEL CELL INVERTER 1", thisFC->NameInverter);
+    auto inverter = thisFC->Inverter;
+    EXPECT_EQ(DataGenerators::InverterEfficiencyMode::Constant, inverter.EffMode);
+    EXPECT_EQ(1.0, inverter.ConstEff);
+    ASSERT_GT(inverter.EffQuadraticCurveID, 0);
+    EXPECT_EQ("EFFICIENCY FUNCTION OF DC POWER CURVE", state->dataCurveManager->PerfCurve(inverter.EffQuadraticCurveID).Name);
+
+    // StackCooler: not included
+
+    // other checks
+    EXPECT_EQ(1, thisFC->CWLoopNum);
+
+    auto report = thisFC->Report;
+    EXPECT_EQ(exhaustHX.qHX, report.qHX);
+    EXPECT_EQ(report.ACPowerGen, generatorController->electProdRate);
+    EXPECT_EQ(report.ACEnergyGen, generatorController->electricityProd);
+
+    EXPECT_TRUE(generatorController->electProdRate > 1.15 * generatorController->thermProdRate) << "Power to Heat Ratio appears too low";
+    EXPECT_DOUBLE_EQ(exhaustHX.qHX, generatorController->thermProdRate);
+    EXPECT_DOUBLE_EQ(generatorController->thermProdRate * 15 * 60, generatorController->thermalProd);
 }
