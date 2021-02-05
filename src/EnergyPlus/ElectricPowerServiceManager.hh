@@ -410,6 +410,7 @@ private: // data
     // Li-ion NMC battery objects from SAM Simulation Core lib_battery
     std::unique_ptr<battery_t> ssc_battery_;
     std::unique_ptr<battery_state> ssc_lastBatteryState_;
+    std::unique_ptr<battery_state> ssc_initBatteryState_;
     // battery life calculation variables
     int count0_;
     std::vector<Real64> b10_;

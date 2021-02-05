@@ -3193,6 +3193,7 @@ ElectricStorage::ElectricStorage( // main constructor
 
             maxAhCapacity_ = liIon_Qfull_ * seriesNum_ * parallelNum_;
 
+            // FIXME: Disable lifetime model when requested.
             std::vector<double> batt_losses{0};  // using double because SSC expects a double
             ssc_battery_ = std::unique_ptr<battery_t>(
                 new battery_t(
@@ -3235,6 +3236,7 @@ ElectricStorage::ElectricStorage( // main constructor
                     )
                 );
             *ssc_lastBatteryState_ = ssc_battery_->get_state();
+            *ssc_initBatteryState_ = ssc_battery_->get_state();
             break;
         }
         case StorageModelType::storageTypeNotSet: {
@@ -3386,6 +3388,9 @@ void ElectricStorage::reinitAtBeginEnvironment()
             }
             batteryDamage_ = 0.0;
         }
+    } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        // Copy the initial battery state to the last battery state
+        *ssc_lastBatteryState_ = *ssc_initBatteryState_;
     }
     myWarmUpFlag_ = true;
 }
@@ -3399,7 +3404,6 @@ void ElectricStorage::reinitZoneGainsAtBeginEnvironment()
 void ElectricStorage::reinitAtEndWarmup()
 {
     // need to reset initial state of charge at beginning of environment but after warm up is complete
-    // FIXME: get this reset for li-ion batteries
     lastTimeStepStateOfCharge_ = startingEnergyStored_;
     thisTimeStepStateOfCharge_ = startingEnergyStored_;
     if (storageModelMode_ == StorageModelType::kiBaMBattery) {
@@ -3424,6 +3428,9 @@ void ElectricStorage::reinitAtEndWarmup()
             }
             batteryDamage_ = 0.0;
         }
+    } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        // Copy the initial battery state to the last battery state
+        *ssc_lastBatteryState_ = *ssc_initBatteryState_;
     }
     myWarmUpFlag_ = false;
 }
@@ -3851,6 +3858,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
 
     // Run the battery
     // SAM uses negative values for charging, positive for discharging
+    // E+ power/energy outputs are positive
     double power{0.0};  // Using double instead of Real64 because SSC is expecting a double
     if (charging) {
         power = - powerCharge;
@@ -3859,28 +3867,37 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     }
     power *= 0.001;  // Convert to kW
     ssc_battery_->runPower(power);
+    // FIXME: Track down these controlSOCMax/MinFracLimit and figure out what to do with them.
+    // FIXME: Check other class members that store simulation state that are retrieved from getters and set accordingly.
 
     // Store outputs
-    const battery_state battState2 = ssc_battery_->get_state();
+    const battery_state& battState2{ssc_battery_->get_state()};
     if (battState2.P < 0.0) { // negative for charging
         storageMode_ = 2;
+        powerCharge = fabs(battState2.P) * 1000.0;  // kW -> W
+        powerDischarge = 0.0;
+        charging = true;
+        discharging = false;
     } else if (battState2.P > 0.0) { // positive for discharging
         storageMode_ = 1;
+        powerCharge = 0.0;
+        powerDischarge = fabs(battState2.P) * 1000.0;  // kW -> W
+        charging = false;
+        discharging = true;
     } else {
         storageMode_ = 0;
+        powerCharge = 0.0;
+        powerDischarge = 0.0;
+        charging = false;
+        discharging = false;
     }
     absoluteSOC_ = ssc_battery_->charge_total();
     fractionSOC_ = ssc_battery_->SOC() * 0.01;  // % -> fraction
     batteryCurrent_ = ssc_battery_->I();
     batteryVoltage_ = ssc_battery_->V();
     batteryDamage_ = 1.0 - (ssc_battery_->charge_maximum_lifetime() / maxAhCapacity_);
-    if (battState2.P < 0.0) {  // negative for charging
-        storedPower_ = - battState2.P * 1000.0;  // kW -> W
-        drawnPower_ = 0.0;
-    } else {  // positive for discharging
-        storedPower_ = 0.0;
-        drawnPower_ = battState2.P * 1000.0;  // kW -> W
-    }
+    storedPower_ = powerCharge;
+    drawnPower_ = powerDischarge;
     storedEnergy_ = storedPower_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     decrementedEnergyStored_ = - storedEnergy_;
     thermLossRate_ = battState2.thermal->heat_dissipated * 1000.0;  // kW -> W
