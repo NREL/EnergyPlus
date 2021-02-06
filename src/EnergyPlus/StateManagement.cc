@@ -88,7 +88,6 @@
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -183,7 +182,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     Furnaces::clear_state();
     General::clear_state();
     GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
-    GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
