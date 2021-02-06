@@ -74,7 +74,7 @@ namespace EnergyPlus::TARCOGArgs {
     using namespace TARCOGOutput;
     using namespace TARCOGParams;
 
-    int ArgCheck(Files &files,
+    int ArgCheck(EnergyPlusData &state, Files &files,
                  int const nlayer,
                  int const iwd,
                  Real64 const tout,
@@ -147,10 +147,6 @@ namespace EnergyPlus::TARCOGArgs {
                  std::string &ErrorMessage)
     {
 
-        /// INPUTS:
-
-        /// General:
-
         // Return value
         int ArgCheck;
 
@@ -200,7 +196,7 @@ namespace EnergyPlus::TARCOGArgs {
 
         if (files.WriteDebugOutput) {
 
-            WriteInputArguments(files.DebugOutputFile,
+            WriteInputArguments(state, files.DebugOutputFile,
                                 files.DBGD,
                                 tout,
                                 tind,
@@ -262,7 +258,7 @@ namespace EnergyPlus::TARCOGArgs {
                                 xwght);
 
             std::string const VersionNumber(" 7.0.15.00 ");
-            WriteTARCOGInputFile(files,
+            WriteTARCOGInputFile(state, files,
                                  VersionNumber,
                                  tout,
                                  tind,
@@ -497,15 +493,6 @@ namespace EnergyPlus::TARCOGArgs {
             }
         }
 
-        // bi...Debug output:
-        //      open(unit=18,  file='iprop.dbg',  status='unknown', position='APPEND',
-        //  2            form='formatted', iostat=nperr)
-        //    write(18,5555) 'Iprop1:', iprop(1, 1), iprop(1, 2), iprop (1, 3)
-        //    write(18,5555) 'Iprop2:', iprop(2, 1), iprop(2, 2), iprop (2, 3)
-        //    write(18,5555) 'Iprop3:', iprop(3, 1), iprop(3, 2), iprop (3, 3)
-        // 5555  format(A, I3, I3, I3)
-        //    close(18)
-
         return ArgCheck;
     }
 
@@ -581,17 +568,6 @@ namespace EnergyPlus::TARCOGArgs {
         EP_SIZE_CHECK(rir, maxlay2);
         EP_SIZE_CHECK(vfreevent, maxlay1);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-
-        /// Venetians:
-
-        //// INPUTS/OUTPUTS:
-
-        /// OUTPUTS:
-
         int k1;
         Real64 tiltr;
         Real64 Rsky;
@@ -599,8 +575,6 @@ namespace EnergyPlus::TARCOGArgs {
         Real64 Fground;
         Real64 e0;
         std::string a;
-
-        //! Initialize variables:
 
         //! Scalars:
         ShadeEmisRatioOut = 1.0;
@@ -692,15 +666,6 @@ namespace EnergyPlus::TARCOGArgs {
         } // if (isky.ne.3) then
 
         ebsky = Gout;
-
-        //     Ebsky=sigma*Tout**4.0d0
-        // As of 6/1/01 The expression for Ebsky is different in the current ISO 15099
-        // (Ebsky=sigma*Tout**4) because equations 32 and 33 specify Tout and Tind as reference
-        // outdoor and indoor temperatures, but I think that they should be Tne and Tni
-        // (environmental temps).  Therefore, Ebsky becomes the same as Gout.
-        // Inside (room) radiation
-        //     Ebroom = sigma*tind**4.0d0
-        // See comment above about Ebsky
 
         if (ibc(2) == 1) { // inside BC - fixed combined film coef.
             trmin = tind;

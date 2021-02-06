@@ -78,11 +78,7 @@ namespace TARCOGOutput {
       InputOutputFile DebugOutputFile{DebugOutputFileName};
     };
 
-    extern int winID;
-    extern int iguID;
-
-
-    void WriteInputArguments(InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 tout,
                              Real64 tind,
@@ -222,7 +218,7 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
                               std::string const &VerNum,
                               Real64 tout,
                               Real64 tind,
@@ -294,15 +290,18 @@ namespace TARCOGOutput {
     void FinishDebugOutputFiles(Files &files, int nperr);
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int Debug_mode, int win_ID, int igu_ID);
+        EnergyPlusData &state, Files &files, std::string const &Debug_dir, std::string const &Debug_file, int Debug_mode, int win_ID, int igu_ID);
 
 } // namespace TARCOGOutput
 
 struct TARCOGOutputData : BaseGlobalStruct {
+    int winID = 0;
+    int iguID = 0;
 
     void clear_state() override
     {
-
+        this->winID = 0;
+        this->iguID = 0;
     }
 };
 

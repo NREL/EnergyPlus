@@ -50,6 +50,7 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
@@ -75,10 +76,7 @@ namespace EnergyPlus::TARCOGOutput {
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
 
-    int winID;
-    int iguID;
-
-    void WriteInputArguments(InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 const tout,
                              Real64 const tind,
@@ -279,16 +277,16 @@ namespace EnergyPlus::TARCOGOutput {
         print(InArgumentsFile, Format_1001, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
         print(InArgumentsFile, "\n");
 
-        if (winID == -1) {
-            print(InArgumentsFile, Format_1002, winID);
+        if (state.dataTARCOGOutputs->winID == -1) {
+            print(InArgumentsFile, Format_1002, state.dataTARCOGOutputs->winID);
         } else {
-            print(InArgumentsFile, Format_1003, winID);
+            print(InArgumentsFile, Format_1003, state.dataTARCOGOutputs->winID);
         }
 
-        if (iguID == -1) {
-            print(InArgumentsFile, Format_1006, iguID);
+        if (state.dataTARCOGOutputs->iguID == -1) {
+            print(InArgumentsFile, Format_1006, state.dataTARCOGOutputs->iguID);
         } else {
-            print(InArgumentsFile, Format_1007, iguID);
+            print(InArgumentsFile, Format_1007, state.dataTARCOGOutputs->iguID);
         }
 
         print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
@@ -865,7 +863,7 @@ namespace EnergyPlus::TARCOGOutput {
         }
     }
 
-    void WriteTARCOGInputFile(Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
                               std::string const &VerNum,
                               Real64 const tout,
                               Real64 const tind,
@@ -1051,15 +1049,15 @@ namespace EnergyPlus::TARCOGOutput {
         print(files.WINCogFile, Format_10001, VerNum); //, VerDat
         print(files.WINCogFile, Format_111);
 
-        if (winID == -1) {
-            print(files.WINCogFile, Format_1002, winID);
+        if (state.dataTARCOGOutputs->winID == -1) {
+            print(files.WINCogFile, Format_1002, state.dataTARCOGOutputs->winID);
         } else {
-            print(files.WINCogFile, Format_1003, winID);
+            print(files.WINCogFile, Format_1003, state.dataTARCOGOutputs->winID);
         }
-        if (iguID == -1) {
-            print(files.WINCogFile, Format_1006, iguID);
+        if (state.dataTARCOGOutputs->iguID == -1) {
+            print(files.WINCogFile, Format_1006, state.dataTARCOGOutputs->iguID);
         } else {
-            print(files.WINCogFile, Format_1007, iguID);
+            print(files.WINCogFile, Format_1007, state.dataTARCOGOutputs->iguID);
         }
 
         print(files.WINCogFile, Format_1008, nlayer);
@@ -1241,7 +1239,7 @@ namespace EnergyPlus::TARCOGOutput {
     }
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, [[maybe_unused]] int const Debug_mode, int const win_ID, int const igu_ID)
+        EnergyPlusData &state, Files &files, std::string const &Debug_dir, std::string const &Debug_file, [[maybe_unused]] int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
         // Locals
@@ -1257,8 +1255,8 @@ namespace EnergyPlus::TARCOGOutput {
             if ((LastPathChar == '/') && (LastPathCharIndex == 1)) files.DBGD = "";
         }
 
-        winID = win_ID;
-        iguID = igu_ID;
+        state.dataTARCOGOutputs->winID = win_ID;
+        state.dataTARCOGOutputs->iguID = igu_ID;
 
         // setup file names if file name is provided, otherwise keep default
         if (!Debug_file.empty()) {

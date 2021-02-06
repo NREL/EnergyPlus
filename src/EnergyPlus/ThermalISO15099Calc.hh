@@ -56,14 +56,9 @@
 
 namespace EnergyPlus::ThermalISO15099Calc {
 
-    // Data
-    // private picard
-
-    // Functions
-
     void film(Real64 tex, Real64 tw, Real64 ws, int iwd, Real64 &hcout, int ibc);
 
-    void Calc_ISO15099(TARCOGOutput::Files &files,
+    void Calc_ISO15099(EnergyPlusData &state, TARCOGOutput::Files &files,
                        int nlayer,
                        int iwd,
                        Real64 &tout,

@@ -155,7 +155,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
         }
     }
 
-    void Calc_ISO15099(Files &files,
+    void Calc_ISO15099(EnergyPlusData &state, Files &files,
                        int const nlayer,
                        int const iwd,
                        Real64 &tout,
@@ -892,7 +892,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                     print(files.DebugOutputFile, "UNSHADED RUN:\n");
                     print(files.DebugOutputFile, "\n");
 
-                    WriteInputArguments(files.DebugOutputFile,
+                    WriteInputArguments(state, files.DebugOutputFile,
                                         files.DBGD,
                                         tout,
                                         tind,

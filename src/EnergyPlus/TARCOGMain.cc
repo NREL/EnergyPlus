@@ -58,9 +58,7 @@
 #include <EnergyPlus/ThermalEN673Calc.hh>
 #include <EnergyPlus/ThermalISO15099Calc.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGMain {
+namespace EnergyPlus::TARCOGMain {
     // TARCOG: Thermal Analysis Routine for Center of Glazing
 
     // MODULE INFORMATION:
@@ -344,7 +342,7 @@ namespace TARCOGMain {
 
     // Functions
 
-    void TARCOG90(int const nlayer,                     // Number of layers (glass + SD)
+    void TARCOG90(EnergyPlusData &state, int const nlayer,                     // Number of layers (glass + SD)
                   int const iwd,                        // Wind direction:
                   Real64 &tout,                         // Outdoor temperature [K]
                   Real64 &tind,                         // Indoor temperature [K]
@@ -662,10 +660,10 @@ namespace TARCOGMain {
         Files files;
 
         //  Prepare common debug variables:
-        PrepDebugFilesAndVariables(files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID);
+        PrepDebugFilesAndVariables(state, files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID);
 
         // Check input arguments:
-        nperr = ArgCheck(files,
+        nperr = ArgCheck(state, files,
                          nlayer,
                          iwd,
                          tout,
@@ -778,7 +776,7 @@ namespace TARCOGMain {
         if (GoAhead(nperr)) {
 
             if (standard == ISO15099) {
-                Calc_ISO15099(files,
+                Calc_ISO15099(state, files,
                               nlayer,
                               iwd,
                               tout,
@@ -958,7 +956,7 @@ namespace TARCOGMain {
 
                     // after performed deflection recalculate temperatures with new gap widths
                     if (standard == ISO15099) {
-                        Calc_ISO15099(files,
+                        Calc_ISO15099(state, files,
                                       nlayer,
                                       iwd,
                                       tout,
@@ -1117,7 +1115,5 @@ namespace TARCOGMain {
 
         FinishDebugOutputFiles(files, nperr);
     }
-
-} // namespace TARCOGMain
 
 } // namespace EnergyPlus
