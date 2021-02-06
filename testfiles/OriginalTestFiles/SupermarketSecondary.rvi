@@ -1,0 +1,40 @@
+eplusout.eso
+eplusout.csv
+MediumTempSystem,Refrigeration System Total Compressor Electricity Rate
+MediumTempSystem,Refrigeration System Average Compressor COP
+MediumTempSystem,Refrigeration System Total Compressor Heat Transfer Rate
+MediumTempCondenser,Refrigeration System Condenser Heat Transfer Rate
+Refrigeration Secondary Loop Load Heat Transfer Rate
+BackRoom,Zone Air Temperature
+BackRoom,Zone Air Relative Humidity
+SalesFloor,Zone Air Temperature
+SalesFloor,Zone Air Relative Humidity
+Zone Air System Sensible Heating Rate
+Zone Air System Sensible Cooling Rate
+Refrigeration Case Evaporator Total Cooling Rate
+Refrigeration Walk In Evaporator Total Cooling Rate
+MediumTempSystem,Refrigeration System Condensing Temperature
+MediumTempSystem,Refrigeration System Evaporating Temperature
+MediumTempCondenser,Refrigeration System Condenser Fan Electricity Rate
+Site Outdoor Air Drybulb Temperature
+Site Outdoor Air Relative Humidity
+Refrigeration Secondary Loop Pump Electricity Rate
+Refrigeration Secondary Loop Total Heat Transfer Rate
+Refrigeration Secondary Loop Estimated Refrigerant Inventory Mass
+Refrigeration Secondary Loop Volume Flow Rate
+Refrigeration Secondary Loop Pipe Heat Gain Rate
+MediumTempSystem,Refrigeration System Total Transferred Load Heat Transfer Rate
+MediumTempSystem,Refrigeration System Net Rejected Heat Transfer Rate
+MediumTempCondenser,Refrigeration System Condenser Total Recovered Heat Transfer Rate
+MediumTempSystem,Refrigeration System Total Suction Pipe Heat Gain Rate
+MediumTempSystem,Refrigeration System Estimated Refrigerant Inventory Mass
+MediumTempSystem,Refrigeration System Estimated Refrigerant Mass Flow Rate
+MediumTempSystem,Refrigeration System Suction Pipe Suction Temperature
+MediumTempSystem,Refrigeration System Thermostatic Expansion Valve Liquid Temperature
+MediumTempSystem,Refrigeration System Total Cases and Walk Ins Heat Transfer Rate
+SalesFloor,Zone Refrigeration Heating Rate,timestep;
+SalesFloor,Zone Refrigeration Sensible Cooling Rate,timestep;
+SalesFloor,Zone Refrigeration Total Cooling Rate,timestep;
+0
+
+

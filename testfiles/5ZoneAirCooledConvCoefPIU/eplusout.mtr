@@ -1,0 +1,58 @@
+Program Version,EnergyPlus, Version 9.4.0-eabe692fc2, YMD=2020.12.04 09:14
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Meters Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Meters Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Meters Requested
+6,1,Calendar Year of Simulation[] ! When Annual Meters Requested
+11,9,Electricity:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+23,9,Electricity:Building [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+47,9,InteriorLights:Electricity [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+852,9,Electricity:HVAC [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+972,9,Electricity:Plant [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+923,9,NaturalGas:Facility [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+935,9,NaturalGas:Plant [J] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+25,11,Electricity:Building [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+49,11,InteriorLights:Electricity [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+854,11,Electricity:HVAC [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+974,11,Electricity:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+925,11,NaturalGas:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+937,11,NaturalGas:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+End of Data Dictionary
+1,CHICAGO ANN HTG 99% CONDNS DB,  39.74,-105.18,  -7.00,1829.00
+4,1, 1
+11,191851734.1970577,1998455.5645526807,21, 1,15,1998455.5645526807,21, 1,15
+23,118800000.0,1237500.0,21, 1,15,1237500.0,21, 1,15
+47,32400000.0,337500.0,21, 1,15,337500.0,21, 1,15
+852,71572011.68670206,745541.7884031464,21, 1,15,745541.7884031464,21, 1,15
+923,1110451347.0383464,11567201.531649419,21, 1,15,11567201.531649437,21, 9,45
+935,1110451347.0383464,11567201.531649419,21, 1,15,11567201.531649437,21, 9,45
+972,1479722.5103553087,15413.77614953448,21, 1,15,15413.776149534484,21, 4,30
+5,1
+13,191851734.1970577,1998455.5645526807, 1,21, 1,15,1998455.5645526807, 1,21, 1,15
+25,118800000.0,1237500.0, 1,21, 1,15,1237500.0, 1,21, 1,15
+49,32400000.0,337500.0, 1,21, 1,15,337500.0, 1,21, 1,15
+854,71572011.68670206,745541.7884031464, 1,21, 1,15,745541.7884031464, 1,21, 1,15
+925,1110451347.0383464,11567201.531649419, 1,21, 1,15,11567201.531649437, 1,21, 9,45
+937,1110451347.0383464,11567201.531649419, 1,21, 1,15,11567201.531649437, 1,21, 9,45
+974,1479722.5103553087,15413.77614953448, 1,21, 1,15,15413.776149534484, 1,21, 4,30
+1,CHICAGO ANN CLG 1% CONDNS DB=>MWB,  39.74,-105.18,  -7.00,1829.00
+4,1, 7
+11,746825347.6236497,2407390.784665872,21, 6,45,15257423.200296473,21,15,60
+23,446670000.0,427500.0,21, 1,15,10800000.0,21,11,15
+47,298350000.0,337500.0,21, 1,15,6750000.0,21,11,15
+852,73671472.85701642,719692.8759913141,21,20,15,846698.9843879666,21,16,60
+923,0.0,0.0,21, 1,15,0.0,21, 1,15
+935,0.0,0.0,21, 1,15,0.0,21, 1,15
+972,226483874.7666335,1234348.9962627255,21, 6,45,4204366.421940387,21,16,60
+5,1
+13,746825347.6236497,2407390.784665872, 7,21, 6,45,15257423.200296473, 7,21,15,60
+25,446670000.0,427500.0, 7,21, 1,15,10800000.0, 7,21,11,15
+49,298350000.0,337500.0, 7,21, 1,15,6750000.0, 7,21,11,15
+854,73671472.85701642,719692.8759913141, 7,21,20,15,846698.9843879666, 7,21,16,60
+925,0.0,0.0, 7,21, 1,15,0.0, 7,21, 1,15
+937,0.0,0.0, 7,21, 1,15,0.0, 7,21, 1,15
+974,226483874.7666335,1234348.9962627255, 7,21, 6,45,4204366.421940387, 7,21,16,60
+End of Data
+ Number of Records Written=          28

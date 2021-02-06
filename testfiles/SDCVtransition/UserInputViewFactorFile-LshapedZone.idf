@@ -1,0 +1,1624 @@
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+!UserInputViewFactorFile-LshapedZone.idf
+!
+!
+! Basic file description:  Basic test for EnergyPlus.  Two L-shaped zones of spandrel walls
+!
+! Highlights:        The idf includes a UserViewFactor object and produces view factor information
+!                    in the .eio file. Two identical L shaped zones are included.  The first one uses
+!                    the input view factors, and the second one calculates approximate view factors.
+!                    The purpose of the run is to produce the .eio file.  It does not produce other
+!                    usable output.  The viewfactorinfo request is included in the Report Object.
+!
+!
+! Simulation Location/Run: Urbana Illinois. One design day. Purpose is not to obtain load information.
+!                          Only purpose is to produce the eio file which has the ViewFactorInfo report
+!                          information.
+!
+!
+!
+! Building: Two fictional 1 zone buildings with spandrel walls.
+!
+!
+!
+!                      ______________
+!                      |            |
+!                      |            |
+!                      |            |
+!                      |            |
+!                      |            |
+!                      |            |
+!                      |            |
+!        ______________|            |
+!        |                          |
+!        |                          |
+!        |                          |
+!        |                          |
+!        |                          |
+!        |                          |
+!        |                          |
+!        |__________________________|
+!
+!
+
+  Version,9.4;
+
+  Building,
+    Urbana             Load Calc,  !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.03,                    !- Loads Convergence Tolerance Value {W}
+    0.3,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullExterior,            !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,2;
+
+  SurfaceConvectionAlgorithm:Inside,Simple;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  Output:Diagnostics,
+    DisplayAdvancedReportVariables;  !- Key 1
+
+  Site:Location,
+    Chicago IL,              !- Name
+    41.780,                  !- Latitude {deg}
+    -87.750,                 !- Longitude {deg}
+    -6.0,                    !- Time Zone {hr}
+    200.56;                  !- Elevation {m}
+
+  SizingPeriod:DesignDay,
+    CHICAGO ILLINOIS SUMMER, !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    32.77778,                !- Maximum Dry-Bulb Temperature {C}
+    12.77778,                !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    22.77778,                !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99361.81,                !- Barometric Pressure {Pa}
+    3.879596,                !- Wind Speed {m/s}
+    215.0000,                !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.000000;                !- Sky Clearness
+
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 2%, MaxDB=29.9°C MWB=22.1°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg 2% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    29.9,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    22.1,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
+
+!========================
+
+  Material,
+    ASHRAEColumnMat,         !- Name
+    smooth,                  !- Roughness
+    0.18,                    !- Thickness {m}
+    1.33,                    !- Conductivity {W/m-K}
+    2002,                    !- Density {kg/m3}
+    920,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.6,                     !- Solar Absorptance
+    0.6;                     !- Visible Absorptance
+
+  Material,
+    Spandrel,                !- Name
+    verysmooth,              !- Roughness
+    0.009,                   !- Thickness {m}
+    0.9,                     !- Conductivity {W/m-K}
+    2600,                    !- Density {kg/m3}
+    840,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.9,                     !- Solar Absorptance
+    0.9;                     !- Visible Absorptance
+
+  Construction,
+    SpandrelSheet,           !- Name
+    Spandrel;                !- Outside Layer
+
+  Zone,
+    Lshaped Zone,            !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    3.048,                   !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+! =========================
+
+  ZoneProperty:UserViewFactors:BySurfaceName,
+    Lshaped Zone,            !- Zone or ZoneList Name
+    Lshaped Zone:South Wall, !- From Surface 1
+    Lshaped Zone:South Wall, !- To Surface 1
+    0.000000,                !- View Factor 1
+    Lshaped Zone:South Wall, !- From Surface 2
+    Lshaped Zone:East Wall,  !- To Surface 2
+    0.101310,                !- View Factor 2
+    Lshaped Zone:South Wall, !- From Surface 3
+    Lshaped Zone:North Wall-1,  !- To Surface 3
+    2.438700E-002,           !- View Factor 3
+    Lshaped Zone:South Wall, !- From Surface 4
+    Lshaped Zone:West Wall-1,!- To Surface 4
+    9.005000E-003,           !- View Factor 4
+    Lshaped Zone:South Wall, !- From Surface 5
+    Lshaped Zone:Northwall-2,!- To Surface 5
+    8.263900E-002,           !- View Factor 5
+    Lshaped Zone:South Wall, !- From Surface 6
+    Lshaped Zone:Westwall-2, !- To Surface 6
+    8.365900E-002,           !- View Factor 6
+    Lshaped Zone:South Wall, !- From Surface 7
+    Lshaped Zone:Roof-1,     !- To Surface 7
+    0.333727,                !- View Factor 7
+    Lshaped Zone:South Wall, !- From Surface 8
+    Lshaped Zone:Roof-2,     !- To Surface 8
+    1.577200E-002,           !- View Factor 8
+    Lshaped Zone:South Wall, !- From Surface 9
+    Lshaped Zone:Floor-1,    !- To Surface 9
+    0.333728,                !- View Factor 9
+    Lshaped Zone:South Wall, !- From Surface 10
+    Lshaped Zone:Floor-2,    !- To Surface 10
+    1.577200E-002,           !- View Factor 10
+    Lshaped Zone:East Wall,  !- From Surface 11
+    Lshaped Zone:South Wall, !- To Surface 11
+    0.101310,                !- View Factor 11
+    Lshaped Zone:East Wall,  !- From Surface 12
+    Lshaped Zone:East Wall,  !- To Surface 12
+    0.000000,                !- View Factor 12
+    Lshaped Zone:East Wall,  !- From Surface 13
+    Lshaped Zone:North Wall-1,  !- To Surface 13
+    8.366000E-002,           !- View Factor 13
+    Lshaped Zone:East Wall,  !- From Surface 14
+    Lshaped Zone:West Wall-1,!- To Surface 14
+    8.263300E-002,           !- View Factor 14
+    Lshaped Zone:East Wall,  !- From Surface 15
+    Lshaped Zone:Northwall-2,!- To Surface 15
+    9.005000E-003,           !- View Factor 15
+    Lshaped Zone:East Wall,  !- From Surface 16
+    Lshaped Zone:Westwall-2, !- To Surface 16
+    2.438300E-002,           !- View Factor 16
+    Lshaped Zone:East Wall,  !- From Surface 17
+    Lshaped Zone:Roof-1,     !- To Surface 17
+    0.182649,                !- View Factor 17
+    Lshaped Zone:East Wall,  !- From Surface 18
+    Lshaped Zone:Roof-2,     !- To Surface 18
+    0.166856,                !- View Factor 18
+    Lshaped Zone:East Wall,  !- From Surface 19
+    Lshaped Zone:Floor-1,    !- To Surface 19
+    0.182648,                !- View Factor 19
+    Lshaped Zone:East Wall,  !- From Surface 20
+    Lshaped Zone:Floor-2,    !- To Surface 20
+    0.166856,                !- View Factor 20
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    4.877300E-002,           !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    0.167320,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.149307,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    2.490300E-002,           !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.292397,                !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    2.490300E-002,           !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.292397,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:South Wall, !- <none>
+    1.801000E-002,           !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    0.165266,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.149307,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    4.133800E-002,           !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.292370,                !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    4.133800E-002,           !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.292370,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:South Wall, !- <none>
+    0.165278,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    1.800900E-002,           !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    0.149298,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.333708,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.333707,                !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    0.167318,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    4.876700E-002,           !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.149298,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.314598,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    2.711000E-003,           !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.314598,                !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    2.711000E-003,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    0.166864,                !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    9.132500E-002,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    6.226000E-003,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    1.033500E-002,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    8.342700E-002,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    7.865000E-002,           !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.508989,                !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    5.418500E-002,           !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    1.577200E-002,           !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    0.166856,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.146198,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.146185,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    1.355000E-003,           !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.108370,                !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.415263,                !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    0.166865,                !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    9.132400E-002,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    6.226000E-003,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    1.033500E-002,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    8.342700E-002,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    7.865000E-002,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.508989,                !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    5.418500E-002,           !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:South Wall, !- <none>
+    1.577200E-002,           !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:East Wall,  !- <none>
+    0.166856,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:North Wall-1,  !- <none>
+    0.146198,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:West Wall-1,!- <none>
+    0.146185,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Northwall-2,!- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Westwall-2, !- <none>
+    1.355000E-003,           !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Roof-1,     !- <none>
+    0.108370,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Roof-2,     !- <none>
+    0.415263,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Floor-1,    !- <none>
+    0.000000,                !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    Lshaped Zone:Floor-2,    !- <none>
+    0.000000;                !- <none>
+
+!  ZoneProperty:UserViewFactors,
+!    Lshaped zone,            !- Zone Name
+!    1,                       !- i 1
+!    1,                       !- j 1
+!    0,                       !- Fij 1
+!    1,                       !- i 2
+!    2,                       !- j 2
+!    0.10131,                 !- Fij 2
+!    1,                       !- i 3
+!    3,                       !- j 3
+!    0.024387,                !- Fij 3
+!    1,                       !- i 4
+!    4,                       !- j 4
+!    0.009005,                !- Fij 4
+!    1,                       !- i 5
+!    5,                       !- j 5
+!    0.082639,                !- Fij 5
+!    1,                       !- i 6
+!    6,                       !- j 6
+!    0.083659,                !- Fij 6
+!    1,                       !- i 7
+!    7,                       !- j 7
+!    0.333727,                !- Fij 7
+!    1,                       !- i 8
+!    8,                       !- j 8
+!    0.015772,                !- Fij 8
+!    1,                       !- i 9
+!    9,                       !- j 9
+!    0.333728,                !- Fij 9
+!    1,                       !- i 10
+!    10,                      !- j 10
+!    0.015772,                !- Fij 10
+!    2,                       !- i 11
+!    1,                       !- j 11
+!    0.10131,                 !- Fij 11
+!    2,                       !- i 12
+!    2,                       !- j 12
+!    0,                       !- Fij 12
+!    2,                       !- i 13
+!    3,                       !- j 13
+!    0.08366,                 !- Fij 13
+!    2,                       !- i 14
+!    4,                       !- j 14
+!    0.082633,                !- Fij 14
+!    2,                       !- i 15
+!    5,                       !- j 15
+!    0.009005,                !- Fij 15
+!    2,                       !- i 16
+!    6,                       !- j 16
+!    0.024383,                !- Fij 16
+!    2,                       !- i 17
+!    7,                       !- j 17
+!    0.182649,                !- Fij 17
+!    2,                       !- i 18
+!    8,                       !- j 18
+!    0.166856,                !- Fij 18
+!    2,                       !- i 19
+!    9,                       !- j 19
+!    0.182648,                !- Fij 19
+!    2,                       !- i 20
+!    10,                      !- j 20
+!    0.166856,                !- Fij 20
+!    3,                       !- i 21
+!    1,                       !- j 21
+!    0.048773,                !- Fij 21
+!    3,                       !- i 22
+!    2,                       !- j 22
+!    0.16732,                 !- Fij 22
+!    3,                       !- i 23
+!    3,                       !- j 23
+!    0,                       !- Fij 23
+!    3,                       !- i 24
+!    4,                       !- j 24
+!    0.149307,                !- Fij 24
+!    3,                       !- <none>
+!    5,                       !- <none>
+!    0,                       !- <none>
+!    3,                       !- <none>
+!    6,                       !- <none>
+!    0,                       !- <none>
+!    3,                       !- <none>
+!    7,                       !- <none>
+!    0.024903,                !- <none>
+!    3,                       !- <none>
+!    8,                       !- <none>
+!    0.292397,                !- <none>
+!    3,                       !- <none>
+!    9,                       !- <none>
+!    0.024903,                !- <none>
+!    3,                       !- <none>
+!    10,                      !- <none>
+!    0.292397,                !- <none>
+!    4,                       !- <none>
+!    1,                       !- <none>
+!    0.01801,                 !- <none>
+!    4,                       !- <none>
+!    2,                       !- <none>
+!    0.165266,                !- <none>
+!    4,                       !- <none>
+!    3,                       !- <none>
+!    0.149307,                !- <none>
+!    4,                       !- <none>
+!    4,                       !- <none>
+!    0,                       !- <none>
+!    4,                       !- <none>
+!    5,                       !- <none>
+!    0,                       !- <none>
+!    4,                       !- <none>
+!    6,                       !- <none>
+!    0,                       !- <none>
+!    4,                       !- <none>
+!    7,                       !- <none>
+!    0.041338,                !- <none>
+!    4,                       !- <none>
+!    8,                       !- <none>
+!    0.29237,                 !- <none>
+!    4,                       !- <none>
+!    9,                       !- <none>
+!    0.041338,                !- <none>
+!    4,                       !- <none>
+!    10,                      !- <none>
+!    0.29237,                 !- <none>
+!    5,                       !- <none>
+!    1,                       !- <none>
+!    0.165278,                !- <none>
+!    5,                       !- <none>
+!    2,                       !- <none>
+!    0.018009,                !- <none>
+!    5,                       !- <none>
+!    3,                       !- <none>
+!    0,                       !- <none>
+!    5,                       !- <none>
+!    4,                       !- <none>
+!    0,                       !- <none>
+!    5,                       !- <none>
+!    5,                       !- <none>
+!    0,                       !- <none>
+!    5,                       !- <none>
+!    6,                       !- <none>
+!    0.149298,                !- <none>
+!    5,                       !- <none>
+!    7,                       !- <none>
+!    0.333708,                !- <none>
+!    5,                       !- <none>
+!    8,                       !- <none>
+!    0,                       !- <none>
+!    5,                       !- <none>
+!    9,                       !- <none>
+!    0.333707,                !- <none>
+!    5,                       !- <none>
+!    10,                      !- <none>
+!    0,                       !- <none>
+!    6,                       !- <none>
+!    1,                       !- <none>
+!    0.167318,                !- <none>
+!    6,                       !- <none>
+!    2,                       !- <none>
+!    0.048767,                !- <none>
+!    6,                       !- <none>
+!    3,                       !- <none>
+!    0,                       !- <none>
+!    6,                       !- <none>
+!    4,                       !- <none>
+!    0,                       !- <none>
+!    6,                       !- <none>
+!    5,                       !- <none>
+!    0.149298,                !- <none>
+!    6,                       !- <none>
+!    6,                       !- <none>
+!    0,                       !- <none>
+!    6,                       !- <none>
+!    7,                       !- <none>
+!    0.314598,                !- <none>
+!    6,                       !- <none>
+!    8,                       !- <none>
+!    0.002711,                !- <none>
+!    6,                       !- <none>
+!    9,                       !- <none>
+!    0.314598,                !- <none>
+!    6,                       !- <none>
+!    10,                      !- <none>
+!    0.002711,                !- <none>
+!    7,                       !- <none>
+!    1,                       !- <none>
+!    0.166864,                !- <none>
+!    7,                       !- <none>
+!    2,                       !- <none>
+!    0.091325,                !- <none>
+!    7,                       !- <none>
+!    3,                       !- <none>
+!    0.006226,                !- <none>
+!    7,                       !- <none>
+!    4,                       !- <none>
+!    0.010335,                !- <none>
+!    7,                       !- <none>
+!    5,                       !- <none>
+!    0.083427,                !- <none>
+!    7,                       !- <none>
+!    6,                       !- <none>
+!    0.07865,                 !- <none>
+!    7,                       !- <none>
+!    7,                       !- <none>
+!    0,                       !- <none>
+!    7,                       !- <none>
+!    8,                       !- <none>
+!    0,                       !- <none>
+!    7,                       !- <none>
+!    9,                       !- <none>
+!    0.508989,                !- <none>
+!    7,                       !- <none>
+!    10,                      !- <none>
+!    0.054185,                !- <none>
+!    8,                       !- <none>
+!    1,                       !- <none>
+!    0.015772,                !- <none>
+!    8,                       !- <none>
+!    2,                       !- <none>
+!    0.166856,                !- <none>
+!    8,                       !- <none>
+!    3,                       !- <none>
+!    0.146198,                !- <none>
+!    8,                       !- <none>
+!    4,                       !- <none>
+!    0.146185,                !- <none>
+!    8,                       !- <none>
+!    5,                       !- <none>
+!    0,                       !- <none>
+!    8,                       !- <none>
+!    6,                       !- <none>
+!    0.001355,                !- <none>
+!    8,                       !- <none>
+!    7,                       !- <none>
+!    0,                       !- <none>
+!    8,                       !- <none>
+!    8,                       !- <none>
+!    0,                       !- <none>
+!    8,                       !- <none>
+!    9,                       !- <none>
+!    0.10837,                 !- <none>
+!    8,                       !- <none>
+!    10,                      !- <none>
+!    0.415263,                !- <none>
+!    9,                       !- <none>
+!    1,                       !- <none>
+!    0.166865,                !- <none>
+!    9,                       !- <none>
+!    2,                       !- <none>
+!    0.091324,                !- <none>
+!    9,                       !- <none>
+!    3,                       !- <none>
+!    0.006226,                !- <none>
+!    9,                       !- <none>
+!    4,                       !- <none>
+!    0.010335,                !- <none>
+!    9,                       !- <none>
+!    5,                       !- <none>
+!    0.083427,                !- <none>
+!    9,                       !- <none>
+!    6,                       !- <none>
+!    0.07865,                 !- <none>
+!    9,                       !- <none>
+!    7,                       !- <none>
+!    0.508989,                !- <none>
+!    9,                       !- <none>
+!    8,                       !- <none>
+!    0.054185,                !- <none>
+!    9,                       !- <none>
+!    9,                       !- <none>
+!    0,                       !- <none>
+!    9,                       !- <none>
+!    10,                      !- <none>
+!    0,                       !- <none>
+!    10,                      !- <none>
+!    1,                       !- <none>
+!    0.015772,                !- <none>
+!    10,                      !- <none>
+!    2,                       !- <none>
+!    0.166856,                !- <none>
+!    10,                      !- <none>
+!    3,                       !- <none>
+!    0.146198,                !- <none>
+!    10,                      !- <none>
+!    4,                       !- <none>
+!    0.146185,                !- <none>
+!    10,                      !- <none>
+!    5,                       !- <none>
+!    0,                       !- <none>
+!    10,                      !- <none>
+!    6,                       !- <none>
+!    0.001355,                !- <none>
+!    10,                      !- <none>
+!    7,                       !- <none>
+!    0.10837,                 !- <none>
+!    10,                      !- <none>
+!    8,                       !- <none>
+!    0.415263,                !- <none>
+!    10,                      !- <none>
+!    9,                       !- <none>
+!    0,                       !- <none>
+!    10,                      !- <none>
+!    10,                      !- <none>
+!    0;                       !- <none>
+! =========================
+
+  Zone,
+    LshapedZoneBase,         !- Name
+    0,                       !- Direction of Relative North {deg}
+    30.48,                   !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    3.048,                   !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+  GlobalGeometryRules,
+    LowerLeftCorner,         !- Starting Vertex Position
+    CounterClockwise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Lshaped zone:South Wall, !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:South Wall, !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,3.359875E-05,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.192,3.782572E-05,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:East Wall,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:East Wall,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.192,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19198,12.192,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,12.192,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    12.192,0,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:North Wall-1,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:North Wall-1,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.192,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,12.192,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    12.192,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:West Wall-1,!- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:West Wall-1,!- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096025,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.09603,6.096,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096004,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:NorthWall-2,!- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:NorthWall-2,!- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096017,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.192,6.096021,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,6.096004,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:WestWall-2, !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:WestWall-2, !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:Roof-1,     !- Name
+    Roof,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:Roof-1,     !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,3.359875E-05,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,6.096034,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:Roof-2,     !- Name
+    Roof,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:Roof-2,     !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,6.096,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096017,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,12.19202,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.095983,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:Floor-1,    !- Name
+    Floor,                   !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:Floor-1,    !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096034,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19202,3.371887E-05,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    Lshaped zone:Floor-2,    !- Name
+    Floor,                   !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    Lshaped zone,            !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Lshaped zone:Floor-2,    !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,12.19202,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19202,6.096016,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096017,6.096,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+!========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:South Wall,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:South Wall,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,3.359875E-05,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.192,3.782572E-05,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:East Wall,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:East Wall,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.192,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.19198,12.192,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,12.192,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    12.192,0,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:North Wall-1,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:North Wall-1,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    12.192,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,12.192,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    12.192,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:West Wall-1,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:West Wall-1,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096025,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.09603,6.096,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096004,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:NorthWall-2,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:NorthWall-2,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096017,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.192,6.096021,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,6.096004,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:WestWall-2,  !- Name
+    Wall,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:WestWall-2,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:Roof-1,  !- Name
+    Roof,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:Roof-1,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,3.359875E-05,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,6.096034,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:Roof-2,  !- Name
+    Roof,                    !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:Roof-2,  !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,6.096,3.048,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096017,3.048,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19198,12.19202,3.048,  !- X,Y,Z ==> Vertex 3 {m}
+    6.095983,12.192,3.048;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:Floor-1, !- Name
+    Floor,                   !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:Floor-1, !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,6.096,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,6.096034,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19202,3.371887E-05,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+! =========================
+
+  BuildingSurface:Detailed,
+    LshapedZoneBase:Floor-2, !- Name
+    Floor,                   !- Surface Type
+    SpandrelSheet,           !- Construction Name
+    LshapedZoneBase,         !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    LshapedZoneBase:Floor-2, !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,12.192,0,  !- X,Y,Z ==> Vertex 1 {m}
+    12.192,12.19202,0,  !- X,Y,Z ==> Vertex 2 {m}
+    12.19202,6.096016,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096017,6.096,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+! =========================
+
+  ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+! =========================
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+! =========================
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Schedule:Compact,
+    LSHAPED ZONE-EQUIPSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-PEOPLESCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-PEOPLEACTIVITY,  !- Name
+    ANY NUMBER,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,132.00;     !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-LIGHTSSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-INFILTRATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-VENTILATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPED ZONE-CONTROL SCHED,  !- Name
+    CONTROL TYPE,            !- Schedule Type Limits Name
+    Through: 4/30,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1,          !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,2,          !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,1;          !- Field 11
+
+  Schedule:Compact,
+    LSHAPED ZONE-SETPOINTS,  !- Name
+    TEMPERATURE,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,23.88889;   !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-EQUIPSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-PEOPLESCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-PEOPLEACTIVITY,  !- Name
+    ANY NUMBER,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,132.00;     !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-LIGHTSSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-INFILTRATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-VENTILATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-CONTROL SCHED,  !- Name
+    CONTROL TYPE,            !- Schedule Type Limits Name
+    Through: 4/30,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1,          !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,2,          !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,1;          !- Field 11
+
+  Schedule:Compact,
+    LSHAPEDZONEBASE-SETPOINTS,  !- Name
+    TEMPERATURE,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,23.88889;   !- Field 3
+
+  People,
+    Lshaped zonePeople,      !- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-PeopleSchedule,  !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    1,                       !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.6,                     !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    Lshaped zone-PeopleActivity;  !- Activity Level Schedule Name
+
+! =========================
+
+  People,
+    LshapedZoneBasePeople,   !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-PeopleSchedule,  !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    1,                       !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.6,                     !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    LshapedZoneBase-PeopleActivity;  !- Activity Level Schedule Name
+
+  Lights,
+    Lshaped zoneLights,      !- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-LightsSchedule,  !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    0,                       !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.4,                     !- Fraction Radiant
+    0.0,                     !- Fraction Visible
+    0.0,                     !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  Lights,
+    LshapedZoneBaseLights,   !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-LightsSchedule,  !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    0,                       !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.4,                     !- Fraction Radiant
+    0.0,                     !- Fraction Visible
+    0.0,                     !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  ElectricEquipment,
+    Lshaped zoneEEquip,      !- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-EquipSchedule,  !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    0,                       !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.5,                     !- Fraction Radiant
+    0.0;                     !- Fraction Lost
+
+  ElectricEquipment,
+    LshapedZoneBaseEEquip,   !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-EquipSchedule,  !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    0,                       !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.5,                     !- Fraction Radiant
+    0.0;                     !- Fraction Lost
+
+  ZoneInfiltration:DesignFlowRate,
+    Lshaped zoneInfiltration,!- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-InfiltrationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    0,                       !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0;                     !- Velocity Squared Term Coefficient
+
+  ZoneInfiltration:DesignFlowRate,
+    LshapedZoneBaseInfiltration,  !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-InfiltrationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    0,                       !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0;                     !- Velocity Squared Term Coefficient
+
+  ZoneVentilation:DesignFlowRate,
+    Lshaped zoneVentilation, !- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-VentilationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    4.716667E-04,            !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Person {m3/s-person}
+    ,                        !- Air Changes per Hour {1/hr}
+    Exhaust,                 !- Ventilation Type
+    10,                      !- Fan Pressure Rise {Pa}
+    1.0,                     !- Fan Total Efficiency
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0,                     !- Velocity Squared Term Coefficient
+    -20.,                    !- Minimum Indoor Temperature {C}
+    ,                        !- Minimum Indoor Temperature Schedule Name
+    ,                        !- Maximum Indoor Temperature {C}
+    ,                        !- Maximum Indoor Temperature Schedule Name
+    1.;                      !- Delta Temperature {deltaC}
+
+! =========================
+
+  ZoneVentilation:DesignFlowRate,
+    LshapedZoneBaseVentilation,  !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-VentilationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    4.716667E-04,            !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Person {m3/s-person}
+    ,                        !- Air Changes per Hour {1/hr}
+    Exhaust,                 !- Ventilation Type
+    10,                      !- Fan Pressure Rise {Pa}
+    1.0,                     !- Fan Total Efficiency
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0,                     !- Velocity Squared Term Coefficient
+    -20.,                    !- Minimum Indoor Temperature {C}
+    ,                        !- Minimum Indoor Temperature Schedule Name
+    ,                        !- Maximum Indoor Temperature {C}
+    ,                        !- Maximum Indoor Temperature Schedule Name
+    1.;                      !- Delta Temperature {deltaC}
+
+  NodeList,
+    Lshaped zone-Inlets,     !- Name
+    Lshaped zone-Inlet;      !- Node 1 Name
+
+! =========================
+
+  NodeList,
+    LshapedZoneBase-Inlets,  !- Name
+    LshapedZoneBase-Inlet;   !- Node 1 Name
+
+  ZoneHVAC:EquipmentConnections,
+    Lshaped zone,            !- Zone Name
+    Equipment-Lshaped zone,  !- Zone Conditioning Equipment List Name
+    Lshaped zone-Inlets,     !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    Lshaped zone-ZoneAirNode,!- Zone Air Node Name
+    Lshaped zone-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentConnections,
+    LshapedZoneBase,         !- Zone Name
+    Equipment-LshapedZoneBase,  !- Zone Conditioning Equipment List Name
+    LshapedZoneBase-Inlets,  !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    LshapedZoneBase-ZoneAirNode,  !- Zone Air Node Name
+    LshapedZoneBase-ReturnAirNode;  !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentList,
+    Equipment-Lshaped zone,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    Lshaped zone-Air,        !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  ZoneHVAC:EquipmentList,
+    Equipment-LshapedZoneBase,  !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    LshapedZoneBase-Air,     !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  ZoneHVAC:IdealLoadsAirSystem,
+    Lshaped zone-Air,        !- Name
+    ,                        !- Availability Schedule Name
+    Lshaped zone-Inlet,      !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    12.77778,                !- Minimum Cooling Supply Air Temperature {C}
+    8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    8.263639E-03,            !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    0,                       !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    0,                       !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
+    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    ,                        !- Demand Controlled Ventilation Type
+    ,                        !- Outdoor Air Economizer Type
+    ,                        !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+
+  ZoneHVAC:IdealLoadsAirSystem,
+    LshapedZoneBase-Air,     !- Name
+    ,                        !- Availability Schedule Name
+    LshapedZoneBase-Inlet,   !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    12.77778,                !- Minimum Cooling Supply Air Temperature {C}
+    8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    8.263639E-03,            !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    0,                       !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    0,                       !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
+    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    ,                        !- Demand Controlled Ventilation Type
+    ,                        !- Outdoor Air Economizer Type
+    ,                        !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+
+  ZoneControl:Thermostat,
+    Lshaped zone-Thermostat, !- Name
+    Lshaped zone,            !- Zone or ZoneList Name
+    Lshaped zone-Control Sched,  !- Control Type Schedule Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    Lshaped zone-Cooling Setpoint with SB,  !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    Lshaped zone-Heating Setpoint with SB;  !- Control 2 Name
+
+  ZoneControl:Thermostat,
+    LshapedZoneBase-Thermostat,  !- Name
+    LshapedZoneBase,         !- Zone or ZoneList Name
+    LshapedZoneBase-Control Sched,  !- Control Type Schedule Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    LshapedZoneBase-Cooling Setpoint with SB,  !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    LshapedZoneBase-Heating Setpoint with SB;  !- Control 2 Name
+
+  ThermostatSetpoint:SingleHeating,
+    Lshaped zone-Heating Setpoint with SB,  !- Name
+    Lshaped zone-Setpoints;  !- Setpoint Temperature Schedule Name
+
+  ThermostatSetpoint:SingleHeating,
+    LshapedZoneBase-Heating Setpoint with SB,  !- Name
+    LshapedZoneBase-Setpoints;  !- Setpoint Temperature Schedule Name
+
+  ThermostatSetpoint:SingleCooling,
+    Lshaped zone-Cooling Setpoint with SB,  !- Name
+    Lshaped zone-Setpoints;  !- Setpoint Temperature Schedule Name
+
+  ThermostatSetpoint:SingleCooling,
+    LshapedZoneBase-Cooling Setpoint with SB,  !- Name
+    LshapedZoneBase-Setpoints;  !- Setpoint Temperature Schedule Name
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Total Cooling Rate,Hourly;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Cooling Rate,Hourly;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
+
+  Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+  Output:Variable,*,Surface Outside Face Temperature,Hourly;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Surfaces:Drawing,dxf;
+
+  Output:Surfaces:List,detailswithvertices;
+
+  Output:Surfaces:List,ViewFactorInfo;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

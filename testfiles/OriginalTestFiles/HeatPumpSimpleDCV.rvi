@@ -1,0 +1,25 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Zone Air Relative Humidity
+Zone Air Humidity Ratio
+Zone Air System Sensible Heating Energy
+Zone Air System Sensible Cooling Energy
+Unitary System Fan Part Load Ratio
+Unitary System Compressor Part Load Ratio
+Fan Electricity Rate
+Cooling Coil Total Cooling Energy
+Cooling Coil Sensible Cooling Rate
+Cooling Coil Sensible Cooling Energy
+Cooling Coil Electricity Rate
+Heating Coil Heating Rate
+Heating Coil Heating Energy
+Heating Coil Electricity Rate
+Heating Coil Defrost Electricity Rate
+Heating Coil Defrost Electricity Energy
+Heating Coil NaturalGas Rate
+Heating Coil NaturalGas Energy
+System Node Mass Flow Rate
+System Node Temperature
+Zone People Occupant Count
+0

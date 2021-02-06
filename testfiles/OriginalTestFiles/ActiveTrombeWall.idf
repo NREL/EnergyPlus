@@ -1,0 +1,782 @@
+! ActiveTrombeWall.idf
+! Basic file description: Based on PassiveTrombeWall.idf but treats the Trombe zone as
+! a zone supply plenum.  A simple fan system circulates air between the Trombe zone and
+! the main zone.
+! Run:      2 design days.
+! Building: The Trombe wall is modeled using an additional zone on the southern face
+!           coupled to the main zone with an interzone partition.  All floors use
+!           interzone partitions to disconnect them from the ground.
+! Internal: None.
+! System:   The system is not controlled but there is an air loop with a simple fan
+!           scheduled to run during winter daylight hours.  To make the zone
+!           connections, the Direct Air component is used.
+! Plant:    None.
+!
+
+  Version,9.4;
+
+  Timestep,4;
+
+  Building,
+    BUILDING #1,             !- Name
+    0.0000000E+00,           !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
+    0.2500000,               !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  Site:Location,
+    CEDAR_CITY_UT_USA_WMO_724755,  !- Name
+    37.70,                   !- Latitude {deg}
+    -113.08,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1712.00;                 !- Elevation {m}
+
+ ! CEDAR_CITY_UT_USA Annual Heating 99%, MaxDB=-12.8°C
+
+  SizingPeriod:DesignDay,
+    CEDAR_CITY Ann Htg 99% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -12.8,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -12.8,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    82379.,                  !- Barometric Pressure {Pa}
+    1.2,                     !- Wind Speed {m/s}
+    130,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! CEDAR_CITY_UT_USA Annual Cooling (DB=>MWB) 1%, MaxDB=32.9°C MWB=14.8°C
+
+  SizingPeriod:DesignDay,
+    CEDAR_CITY Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    32.9,                    !- Maximum Dry-Bulb Temperature {C}
+    16.3,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    14.8,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    82379.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    200,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    NO,                      !- Do Zone Sizing Calculation
+    NO,                      !- Do System Sizing Calculation
+    NO,                      !- Do Plant Sizing Calculation
+    YES,                     !- Run Simulation for Sizing Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  Material,
+    A1 - 1 IN STUCCO,        !- Name
+    Smooth,                  !- Roughness
+    2.5389841E-02,           !- Thickness {m}
+    0.6918309,               !- Conductivity {W/m-K}
+    1858.142,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    B12 - 3 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    7.6200001E-02,           !- Thickness {m}
+    4.3239430E-02,           !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C7 - 8 IN LW CONCRETE BLOCK,  !- Name
+    Rough,                   !- Roughness
+    0.2033016,               !- Thickness {m}
+    0.5707605,               !- Conductivity {W/m-K}
+    608.7016,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E8 - 5 / 8 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.5880080E-02,           !- Thickness {m}
+    0.1601589,               !- Conductivity {W/m-K}
+    784.9047,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    B3 - 2 IN INSULATION,    !- Name
+    VeryRough,               !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    4.3239430E-02,           !- Conductivity {W/m-K}
+    32.03693,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C2 - 4 IN LW CONCRETE BLOCK,  !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    0.3805070,               !- Conductivity {W/m-K}
+    608.7016,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  WindowMaterial:Glazing,
+    GLASS - CLEAR SHEET 1 / 8 IN,  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    3.0000000E-03,           !- Thickness {m}
+    0.8370000,               !- Solar Transmittance at Normal Incidence
+    7.5000003E-02,           !- Front Side Solar Reflectance at Normal Incidence
+    7.5000003E-02,           !- Back Side Solar Reflectance at Normal Incidence
+    0.8980000,               !- Visible Transmittance at Normal Incidence
+    8.1000000E-02,           !- Front Side Visible Reflectance at Normal Incidence
+    8.1000000E-02,           !- Back Side Visible Reflectance at Normal Incidence
+    0.0000000E+00,           !- Infrared Transmittance at Normal Incidence
+    0.8400000,               !- Front Side Infrared Hemispherical Emissivity
+    0.8400000,               !- Back Side Infrared Hemispherical Emissivity
+    0.9000000;               !- Conductivity {W/m-K}
+
+  WindowMaterial:Gas,
+    WinAirB1 - AIRSPACE RESISTANCE,  !- Name
+    AIR,                     !- Gas Type
+    1.3000000E-02;           !- Thickness {m}
+
+  Material,
+    TABOR SOLAR ABSORBER,    !- Name
+    MediumRough,             !- Roughness
+    1.6000000E-03,           !- Thickness {m}
+    392.6100,                !- Conductivity {W/m-K}
+    8906.260,                !- Density {kg/m3}
+    370.0000,                !- Specific Heat {J/kg-K}
+    0.0500000,               !- Thermal Absorptance
+    0.8500000,               !- Solar Absorptance
+    0.8500000;               !- Visible Absorptance
+
+  Material,
+    CONCRETE - SAND AND GRAVEL 4 IN,  !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6000000,               !- Solar Absorptance
+    0.6000000;               !- Visible Absorptance
+
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    ROOFING - WOOD SHINGLES, !- Name
+    VeryRough,               !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.1141521,               !- Conductivity {W/m-K}
+    720.8308,                !- Density {kg/m3}
+    1255.200,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7800000,               !- Solar Absorptance
+    0.7800000;               !- Visible Absorptance
+
+  Material,
+    BLBD - SHEATHING NAIL BASE 1 / 2 IN,  !- Name
+    MediumRough,             !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    6.3475482E-02,           !- Conductivity {W/m-K}
+    400.4616,                !- Density {kg/m3}
+    1297.040,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7000000,               !- Solar Absorptance
+    0.7000000;               !- Visible Absorptance
+
+  Material,
+    E6 - 1 / 2 IN GYP SHEATHING BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    0.1601589,               !- Conductivity {W/m-K}
+    784.9047,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  WindowMaterial:Glazing,
+    GLASS - LOW IRON 3 MM,   !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.0030000E+00,           !- Thickness {m}
+    0.8990000,               !- Solar Transmittance at Normal Incidence
+    0.0790000,               !- Front Side Solar Reflectance at Normal Incidence
+    0.0790000,               !- Back Side Solar Reflectance at Normal Incidence
+    0.9130000,               !- Visible Transmittance at Normal Incidence
+    0.0820000,               !- Front Side Visible Reflectance at Normal Incidence
+    0.0820000,               !- Back Side Visible Reflectance at Normal Incidence
+    0.0000000E+00,           !- Infrared Transmittance at Normal Incidence
+    0.8400000,               !- Front Side Infrared Hemispherical Emissivity
+    0.8400000,               !- Back Side Infrared Hemispherical Emissivity
+    0.9000000E+00;           !- Conductivity {W/m-K}
+
+  Construction,
+    EXTERIOR,                !- Name
+    A1 - 1 IN STUCCO,        !- Outside Layer
+    B12 - 3 IN DENSE INSULATION,  !- Layer 2
+    B12 - 3 IN DENSE INSULATION,  !- Layer 3
+    C7 - 8 IN LW CONCRETE BLOCK,  !- Layer 4
+    E8 - 5 / 8 IN PLASTER OR GYP BOARD;  !- Layer 5
+
+  Construction,
+    DOUBLE PANE WINDOW,      !- Name
+    GLASS - CLEAR SHEET 1 / 8 IN,  !- Outside Layer
+    WinAirB1 - AIRSPACE RESISTANCE,  !- Layer 2
+    GLASS - CLEAR SHEET 1 / 8 IN;  !- Layer 3
+
+  Construction,
+    TROMBE WALL IN,          !- Name
+    TABOR SOLAR ABSORBER,    !- Outside Layer
+    C10 - 8 IN HW CONCRETE,  !- Layer 2
+    C10 - 8 IN HW CONCRETE;  !- Layer 3
+
+  Construction,
+    SLAB FLOOR,              !- Name
+    CONCRETE - SAND AND GRAVEL 4 IN;  !- Outside Layer
+
+  Construction,
+    ROOF31,                  !- Name
+    ROOFING - WOOD SHINGLES, !- Outside Layer
+    BLBD - SHEATHING NAIL BASE 1 / 2 IN,  !- Layer 2
+    B12 - 3 IN DENSE INSULATION,  !- Layer 3
+    B12 - 3 IN DENSE INSULATION,  !- Layer 4
+    B3 - 2 IN INSULATION,    !- Layer 5
+    B3 - 2 IN INSULATION,    !- Layer 6
+    E6 - 1 / 2 IN GYP SHEATHING BOARD;  !- Layer 7
+
+  Construction,
+    SGL CLR LOW IRON 3 MM,   !- Name
+    GLASS - LOW IRON 3 MM;   !- Outside Layer
+
+  Construction,
+    TROMBE WALL OUT,         !- Name
+    C10 - 8 IN HW CONCRETE,  !- Outside Layer
+    C10 - 8 IN HW CONCRETE,  !- Layer 2
+    TABOR SOLAR ABSORBER;    !- Layer 3
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  Site:GroundTemperature:BuildingSurface,19.77,19.81,19.91,19.89,19.85,19.60,19.38,19.56,19.66,19.74,19.82,19.76;
+
+! original origin (10,15,0)
+
+  Zone,
+    ZONE 1,                  !- Name
+    0.0000000E+00,           !- Direction of Relative North {deg}
+    0.0000000E+00,           !- X Origin {m}
+    0.0000000E+00,           !- Y Origin {m}
+    0.0000000E+00,           !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+ ! original origin (10,14.9,0)
+
+  Zone,
+    ZONE 2,                  !- Name
+    0.0000000E+00,           !- Direction of Relative North {deg}
+    0.0000000E+00,           !- X Origin {m}
+    0.0000000E+00,           !- Y Origin {m}
+    0.0000000E+00,           !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    30.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,25.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,25.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,25.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    30.00000,25.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,25.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,25.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall002:Win001,    !- Name
+    Window,                  !- Surface Type
+    DOUBLE PANE WINDOW,      !- Construction Name
+    Zn001:Wall002,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.000000,                !- Multiplier
+    4,                       !- Number of Vertices
+    24.00000,25.00000,2.500000,  !- X,Y,Z ==> Vertex 1 {m}
+    24.00000,25.00000,0.5000000,  !- X,Y,Z ==> Vertex 2 {m}
+    16.00000,25.00000,0.5000000,  !- X,Y,Z ==> Vertex 3 {m}
+    16.00000,25.00000,2.500000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,25.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,25.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,15.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    TROMBE WALL IN,          !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn002:Wall004,           !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,15.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    SLAB FLOOR,              !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,25.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,25.00000,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,25.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,25.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,14.90000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn002:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    SGL CLR LOW IRON 3 MM,   !- Construction Name
+    Zn002:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.000000,                !- Multiplier
+    4,                       !- Number of Vertices
+    10.10000,14.90000,2.900000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.10000,14.90000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}
+    29.90000,14.90000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}
+    29.90000,14.90000,2.900000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Shading:Zone:Detailed,
+    Zn002:Wall001:Shade001,  !- Name
+    Zn002:Wall001,           !- Base Surface Name
+    ShadingTransmittance:0001,  !- Transmittance Schedule Name
+    4,                       !- Number of Vertices
+    10.00000,13.90000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,13.90000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    30.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,15.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,14.90000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    TROMBE WALL OUT,         !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Wall004,           !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    30.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    10.00000,15.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    SLAB FLOOR,              !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Zn002:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    30.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,14.90000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    10.00000,15.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,15.00000,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn002:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE 2,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    4,                       !- Number of Vertices
+    10.00000,15.00000,3.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    10.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 2 {m}
+    30.00000,14.90000,3.000000,  !- X,Y,Z ==> Vertex 3 {m}
+    30.00000,15.00000,3.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Schedule:Compact,
+    ShadingTransmittance:0001,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
+
+  Schedule:Compact,
+    FanSchedule,             !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: AllDays,            !- Field 2
+    Until:  9:00,0.0,        !- Field 3
+    Until: 19:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    Through: 9/30,           !- Field 9
+    For: AllDays,            !- Field 10
+    Until: 24:00,0.0,        !- Field 11
+    Through: 12/31,          !- Field 13
+    For: AllDays,            !- Field 14
+    Until:  9:00,0.0,        !- Field 15
+    Until: 19:00,1.0,        !- Field 17
+    Until: 24:00,0.0;        !- Field 19
+
+  AirLoopHVAC,
+    Fan Loop,                !- Name
+    ,                        !- Controller List Name
+    ,                        !- Availability Manager List Name
+    0.1,                     !- Design Supply Air Flow Rate {m3/s}
+    Air Loop Branches,       !- Branch List Name
+    ,                        !- Connector List Name
+    Air Loop Inlet Node,     !- Supply Side Inlet Node Name
+    Return Air Mixer Outlet Node,  !- Demand Side Outlet Node Name
+    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
+    Air Loop Outlet Node;    !- Supply Side Outlet Node Names
+
+  BranchList,
+    Air Loop Branches,       !- Name
+    Air Loop Main Branch;    !- Branch 1 Name
+
+  Branch,
+    Air Loop Main Branch,    !- Name
+    ,                        !- Pressure Drop Curve Name
+    Fan:ConstantVolume,      !- Component 1 Object Type
+    Supply Fan 1,            !- Component 1 Name
+    Air Loop Inlet Node,     !- Component 1 Inlet Node Name
+    Air Loop Outlet Node;    !- Component 1 Outlet Node Name
+
+  AirLoopHVAC:SupplyPath,
+    TrombeSupplyPath,        !- Name
+    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:SupplyPlenum,!- Component 1 Object Type
+    Trombe Plenum,           !- Component 1 Name
+    AirLoopHVAC:ZoneSplitter,!- Component 2 Object Type
+    Zone Supply Air Splitter;!- Component 2 Name
+
+  AirLoopHVAC:SupplyPlenum,
+    Trombe Plenum,           !- Name
+    Zone 2,                  !- Zone Name
+    Trombe Plenum Zone Node, !- Zone Node Name
+    Zone Equipment Inlet Node,  !- Inlet Node Name
+    Trombe Plenum Outlet Node;  !- Outlet 1 Node Name
+
+  AirLoopHVAC:ZoneSplitter,
+    Zone Supply Air Splitter,!- Name
+    Trombe Plenum Outlet Node,  !- Inlet Node Name
+    Zone 1 Inlet Node ATInlet;  !- Outlet 1 Node Name
+
+  AirLoopHVAC:ReturnPath,
+    TrombeReturnPath,        !- Name
+    Return Air Mixer Outlet Node,  !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Zone Return Air Mixer;   !- Component 1 Name
+
+  AirLoopHVAC:ZoneMixer,
+    Zone Return Air Mixer,   !- Name
+    Return Air Mixer Outlet Node,  !- Outlet Node Name
+    Zone 1 Outlet Node;      !- Inlet 1 Node Name
+
+  ZoneHVAC:EquipmentConnections,
+    Zone 1,                  !- Zone Name
+    Zone 1 Equipment,        !- Zone Conditioning Equipment List Name
+    Zone 1 Inlets,           !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    Zone 1 Node,             !- Zone Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
+
+  NodeList,
+    Zone 1 Inlets,           !- Name
+    Zone 1 Inlet Node;       !- Node 1 Name
+
+  ZoneHVAC:EquipmentList,
+    Zone 1 Equipment,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone 1 Direct Air ADU,   !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    Zone 1 Direct Air,       !- Name
+    FanSchedule,             !- Availability Schedule Name
+    Zone 1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 Inlet Node,       !- Air Outlet Node Name
+    0.1,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone 1 Direct Air ADU,   !- Name
+    Zone 1 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone 1 Direct Air,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  Fan:ConstantVolume,
+    Supply Fan 1,            !- Name
+    FanSchedule,             !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    600.0,                   !- Pressure Rise {Pa}
+    0.1,                     !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    Air Loop Inlet Node,     !- Air Inlet Node Name
+    Air Loop Outlet Node;    !- Air Outlet Node Name
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+
+  Output:Variable,*,Zone Air Temperature,hourly;
+
+  Output:Variable,Zn001:Wall004,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,Zn002:Wall004,Surface Inside Face Temperature,hourly;
+
+  Output:Variable,Zone Equipment Inlet Node,System Node Mass Flow Rate,hourly;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Surfaces:Drawing,DXF;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

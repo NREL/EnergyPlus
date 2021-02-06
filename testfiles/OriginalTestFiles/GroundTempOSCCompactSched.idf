@@ -1,0 +1,712 @@
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+
+  Version,9.4;
+
+  Building,
+    anyplace Load Calc,      !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.03,                    !- Loads Convergence Tolerance Value {W}
+    0.3,                     !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,        !- Solar Distribution
+    ,                        !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,4;
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
+    ,                        !- Use Weather File Holidays and Special Days
+    ,                        !- Use Weather File Daylight Saving Period
+    ,                        !- Apply Weekend Holiday Rule
+    ,                        !- Use Weather File Rain Indicators
+    ;                        !- Use Weather File Snow Indicators
+
+  Site:Location,
+    USA IL-CHICAGO-OHARE,    !- Name
+    41.77,                   !- Latitude {deg}
+    -87.75,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190;                     !- Elevation {m}
+
+! CHICAGO_IL_USA Annual Heating 99.6%, MaxDB=-20.6°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -20.6,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -20.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+! CHICAGO_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg .4% Condns WB=>MDB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.2,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    25.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
+
+  Material,
+    B7 - 1 IN WOOD,          !- Name
+    MediumSmooth,            !- Roughness
+    2.0000000E-02,           !- Thickness {m}
+    0.1200000,               !- Conductivity {W/m-K}
+    592.6800,                !- Density {kg/m3}
+    2510.000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7800000,               !- Solar Absorptance
+    0.7800000;               !- Visible Absorptance
+
+  Material,
+    B12 - 3 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    7.0000000E-02,           !- Thickness {m}
+    3.9999999E-02,           !- Conductivity {W/m-K}
+    91.30000,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+!! Or use WindowGlassMaterial -- CLEAR 3MM
+! (R=.0236,TRANS=.87,VERY SMOOTH,GLASS), from 3mm clear
+
+  WindowMaterial:Glazing,
+    GLASS - CLEAR SHEET 1 / 8 IN,  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    3.0000000E-03,           !- Thickness {m}
+    0.8370000,               !- Solar Transmittance at Normal Incidence
+    7.5000003E-02,           !- Front Side Solar Reflectance at Normal Incidence
+    7.5000003E-02,           !- Back Side Solar Reflectance at Normal Incidence
+    0.8980000,               !- Visible Transmittance at Normal Incidence
+    8.1000000E-02,           !- Front Side Visible Reflectance at Normal Incidence
+    8.1000000E-02,           !- Back Side Visible Reflectance at Normal Incidence
+    0,                       !- Infrared Transmittance at Normal Incidence
+    0.8400000,               !- Front Side Infrared Hemispherical Emissivity
+    0.8400000,               !- Back Side Infrared Hemispherical Emissivity
+    0.9000000;               !- Conductivity {W/m-K}
+
+  Material,
+    BLBD - GYPSUM PLASTER 1 / 2 IN,  !- Name
+    MediumSmooth,            !- Roughness
+    9.9999998E-03,           !- Thickness {m}
+    0.1600000,               !- Conductivity {W/m-K}
+    800.9200,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    C7 - 8 IN LW CONCRETE BLOCK,  !- Name
+    Rough,                   !- Roughness
+    0.2000000,               !- Thickness {m}
+    0.5700000,               !- Conductivity {W/m-K}
+    608.7000,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    CB61 - 4 IN LW HOLLOW CBLK,  !- Name
+    MediumRough,             !- Roughness
+    0.1000000,               !- Thickness {m}
+    0.3800000,               !- Conductivity {W/m-K}
+    1041.200,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.2000000,               !- Solar Absorptance
+    0.2000000;               !- Visible Absorptance
+
+  Material,
+    CONCRETE - 120 LB / CU FT 4 IN,  !- Name
+    MediumRough,             !- Roughness
+    0.1000000,               !- Thickness {m}
+    0.7400000,               !- Conductivity {W/m-K}
+    1922.210,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    CONCRETE - 60 LB / CU FT 4 IN,  !- Name
+    MediumRough,             !- Roughness
+    0.1000000,               !- Thickness {m}
+    0.2400000,               !- Conductivity {W/m-K}
+    961.1000,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    9.9999998E-03,           !- Thickness {m}
+    0.7200000,               !- Conductivity {W/m-K}
+    1601.840,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    E5 - ACOUSTIC TILE,      !- Name
+    MediumSmooth,            !- Roughness
+    9.9999998E-03,           !- Thickness {m}
+    5.9999999E-02,           !- Conductivity {W/m-K}
+    480.5500,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.3200000,               !- Solar Absorptance
+    0.3200000;               !- Visible Absorptance
+
+  Material,
+    E8 - 5 / 8 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    9.9999998E-03,           !- Thickness {m}
+    0.1600000,               !- Conductivity {W/m-K}
+    784.9000,                !- Density {kg/m3}
+    830.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    E11 - 1 / 2 IN FIBERBOARD SHEATHING,  !- Name
+    Smooth,                  !- Roughness
+    9.9999998E-03,           !- Thickness {m}
+    5.0000001E-02,           !- Conductivity {W/m-K}
+    832.9600,                !- Density {kg/m3}
+    920.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.8900000,               !- Solar Absorptance
+    0.8900000;               !- Visible Absorptance
+
+  Material,
+    INS - GLASS FIBER BONDED 3 IN,  !- Name
+    VeryRough,               !- Roughness
+    7.0000000E-02,           !- Thickness {m}
+    2.9999999E-02,           !- Conductivity {W/m-K}
+    96.11000,                !- Density {kg/m3}
+    790.0000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material:AirGap,
+    E4 - CEILING AIRSPACE,   !- Name
+    0.1700000;               !- Thermal Resistance {m2-K/W}
+
+  Construction,
+    Exterior,                !- Name
+    C7 - 8 IN LW CONCRETE BLOCK,  !- Outside Layer
+    B12 - 3 IN DENSE INSULATION,  !- Layer 2
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+
+  Construction,
+    InteriorWall,            !- Name
+    BLBD - GYPSUM PLASTER 1 / 2 IN,  !- Outside Layer
+    CB61 - 4 IN LW HOLLOW CBLK,  !- Layer 2
+    BLBD - GYPSUM PLASTER 1 / 2 IN;  !- Layer 3
+
+  Construction,
+    CeilingTile,             !- Name
+    E5 - ACOUSTIC TILE;      !- Outside Layer
+
+  Construction,
+    SlabFloor,               !- Name
+    CONCRETE - 60 LB / CU FT 4 IN;  !- Outside Layer
+
+  Zone,
+    OSCTest,                 !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    4.572,                   !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockwise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  BuildingSurface:Detailed,
+    OSCTest:South Wall,      !- Name
+    Wall,                    !- Surface Type
+    Exterior,                !- Construction Name
+    OSCTest,                 !- Zone Name
+    OtherSideCoefficients,   !- Outside Boundary Condition
+    ExampleOSC,              !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    OSCTest:East Wall,       !- Name
+    Wall,                    !- Surface Type
+    Exterior,                !- Construction Name
+    OSCTest,                 !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    OSCTest:East Wall,       !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,6.096,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    0,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    OSCTest:North Wall,      !- Name
+    Wall,                    !- Surface Type
+    Exterior,                !- Construction Name
+    OSCTest,                 !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    OSCTest:North Wall,      !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,6.096,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,6.096,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    OSCTest:West Wall,       !- Name
+    Wall,                    !- Surface Type
+    Exterior,                !- Construction Name
+    OSCTest,                 !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    OSCTest:West Wall,       !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    6.096,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.096,6.096,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,6.096,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    OSCTest:Ceiling,         !- Name
+    Ceiling,                 !- Surface Type
+    CeilingTile,             !- Construction Name
+    OSCTest,                 !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    OSCTest:Ceiling,         !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.572,  !- X,Y,Z ==> Vertex 1 {m}
+    6.096,0,4.572,  !- X,Y,Z ==> Vertex 2 {m}
+    6.095983,6.096017,4.572,  !- X,Y,Z ==> Vertex 3 {m}
+    0,6.096,4.572;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    OSCTest:Floor,           !- Name
+    Floor,                   !- Surface Type
+    SlabFloor,               !- Construction Name
+    OSCTest,                 !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    OSCTest:Floor,           !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,6.096,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6.095992,6.096008,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6.096,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  InternalMass,
+    OSCTest:PartitionIntMass,!- Name
+    InteriorWall,            !- Construction Name
+    OSCTest,                 !- Zone or ZoneList Name
+    92.9;                    !- Surface Area {m2}
+
+  SurfaceProperty:OtherSideCoefficients,
+    ExampleOSC,              !- Name
+    0,                       !- Combined Convective/Radiative Film Coefficient {W/m2-K}
+    1,                       !- Constant Temperature {C}
+    1,                       !- Constant Temperature Coefficient
+    0,                       !- External Dry-Bulb Temperature Coefficient
+    0,                       !- Ground Temperature Coefficient
+    0,                       !- Wind Speed Coefficient
+    0,                       !- Zone Air Temperature Coefficient
+    GroundTempCompactSched;  !- Constant Temperature Schedule Name
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+  ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    Discrete;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    Continuous;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Schedule:Compact,
+    OSCTEST-EQUIPSCHEDULE,   !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 4:00,0.00,        !- Field 3
+    Until: 15:00,1.00,       !- Field 5
+    Until: 24:00,0.00;       !- Field 7
+
+  Schedule:Compact,
+    OSCTEST-PEOPLESCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 3:00,0.00,        !- Field 3
+    Until: 24:00,1.00;       !- Field 5
+
+  Schedule:Compact,
+    OSCTEST-PEOPLEACTIVITY,  !- Name
+    ANY NUMBER,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,132.00;     !- Field 3
+
+  Schedule:Compact,
+    OSCTEST-LIGHTSSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    OSCTEST-INFILTRATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    OSCTEST-VENTILATIONSCHEDULE,  !- Name
+    FRACTION,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    OSCTEST-CONTROL SCHED,   !- Name
+    CONTROL TYPE,            !- Schedule Type Limits Name
+    Through: 4/30,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1,          !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,2,          !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,1;          !- Field 11
+
+  Schedule:Compact,
+    OSCTEST-SETPOINTS,       !- Name
+    TEMPERATURE,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,23.88889;   !- Field 3
+
+  Schedule:Compact,
+    GroundTempCompactSched,  !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 1/31,           !- Field 1
+    For:AllDays,             !- Field 2
+    Until: 24:00,16,         !- Field 3
+    Through: 2/28,           !- Field 5
+    For:AllDays,             !- Field 6
+    Until: 24:00,17,         !- Field 7
+    Through: 3/31,           !- Field 9
+    For:AllDays,             !- Field 10
+    Until: 24:00,18,         !- Field 11
+    Through: 4/30,           !- Field 13
+    For:AllDays,             !- Field 14
+    Until: 24:00,19,         !- Field 15
+    Through: 5/31,           !- Field 17
+    For:AllDays,             !- Field 18
+    Until: 24:00,20,         !- Field 19
+    Through: 6/30,           !- Field 21
+    For:AllDays,             !- Field 22
+    Until: 24:00,20,         !- Field 23
+    Through: 7/31,           !- Field 25
+    For:AllDays,             !- Field 26
+    Until: 24:00,20,         !- Field 27
+    Through: 8/31,           !- Field 29
+    For:AllDays,             !- Field 30
+    Until: 24:00,19,         !- Field 31
+    Through: 9/30,           !- Field 33
+    For:AllDays,             !- Field 34
+    Until: 24:00,18,         !- Field 35
+    Through: 10/31,          !- Field 37
+    For:AllDays,             !- Field 38
+    Until: 24:00,17,         !- Field 39
+    Through: 11/30,          !- Field 41
+    For:AllDays,             !- Field 42
+    Until: 24:00,16,         !- Field 43
+    Through: 12/31,          !- Field 45
+    For:AllDays,             !- Field 46
+    Until: 24:00,16;         !- Field 47
+
+  People,
+    OSCTest People 1,        !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-PeopleSchedule,  !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    6,                       !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.6,                     !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    OSCTest-PeopleActivity;  !- Activity Level Schedule Name
+
+  Lights,
+    OSCTest Lights 1,        !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-LightsSchedule,  !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    400,                     !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.4,                     !- Fraction Radiant
+    0.0,                     !- Fraction Visible
+    0.0,                     !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  ElectricEquipment,
+    OSCTest ElecEq 1,        !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-EquipSchedule,   !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    800,                     !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.5,                     !- Fraction Radiant
+    0.0;                     !- Fraction Lost
+
+  ZoneInfiltration:DesignFlowRate,
+    OSCTest Infil 1,         !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-InfiltrationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    4.716666E-02,            !- Design Flow Rate {m3/s}
+    ,                        !- Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow per Exterior Surface Area {m3/s-m2}
+    ,                        !- Air Changes per Hour {1/hr}
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0;                     !- Velocity Squared Term Coefficient
+
+  ZoneVentilation:DesignFlowRate,
+    OSCTest Ventl 1,         !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-VentilationSchedule,  !- Schedule Name
+    flow/zone,               !- Design Flow Rate Calculation Method
+    4.716667E-04,            !- Design Flow Rate {m3/s}
+    ,                        !- Flow Rate per Zone Floor Area {m3/s-m2}
+    ,                        !- Flow Rate per Person {m3/s-person}
+    ,                        !- Air Changes per Hour {1/hr}
+    Exhaust,                 !- Ventilation Type
+    10,                      !- Fan Pressure Rise {Pa}
+    1.0,                     !- Fan Total Efficiency
+    1.0,                     !- Constant Term Coefficient
+    0.0,                     !- Temperature Term Coefficient
+    0.0,                     !- Velocity Term Coefficient
+    0.0,                     !- Velocity Squared Term Coefficient
+    -20.,                    !- Minimum Indoor Temperature {C}
+    ,                        !- Minimum Indoor Temperature Schedule Name
+    ,                        !- Maximum Indoor Temperature {C}
+    ,                        !- Maximum Indoor Temperature Schedule Name
+    1.;                      !- Delta Temperature {deltaC}
+
+  NodeList,
+    OSCTest-Inlets,          !- Name
+    OSCTest-Inlet;           !- Node 1 Name
+
+  ZoneHVAC:EquipmentConnections,
+    OSCTest,                 !- Zone Name
+    Equipment-OSCTest,       !- Zone Conditioning Equipment List Name
+    OSCTest-Inlets,          !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    OSCTest-ZoneAirNode,     !- Zone Air Node Name
+    OSCTest-ReturnAirNode;   !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentList,
+    Equipment-OSCTest,       !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    OSCTest-Air,             !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  ZoneHVAC:IdealLoadsAirSystem,
+    OSCTest-Air,             !- Name
+    ,                        !- Availability Schedule Name
+    OSCTest-Inlet,           !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    12.77778,                !- Minimum Cooling Supply Air Temperature {C}
+    8.263639E-03,            !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    8.263639E-03,            !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    ,                        !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
+    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    ,                        !- Demand Controlled Ventilation Type
+    ,                        !- Outdoor Air Economizer Type
+    ,                        !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+
+  ZoneControl:Thermostat,
+    OSCTest-Thermostat,      !- Name
+    OSCTest,                 !- Zone or ZoneList Name
+    OSCTest-Control Sched,   !- Control Type Schedule Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    OSCTest-Cooling Setpoint with SB,  !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    OSCTest-Heating Setpoint with SB;  !- Control 2 Name
+
+  ThermostatSetpoint:SingleHeating,
+    OSCTest-Heating Setpoint with SB,  !- Name
+    OSCTest-Setpoints;       !- Setpoint Temperature Schedule Name
+
+  ThermostatSetpoint:SingleCooling,
+    OSCTest-Cooling Setpoint with SB,  !- Name
+    OSCTest-Setpoints;       !- Setpoint Temperature Schedule Name
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Total Cooling Rate,Daily;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Cooling Rate,Daily;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Daily;
+
+  Output:Variable,*,Zone Mean Air Temperature,Daily;
+
+  Output:Variable,*,Surface Outside Face Temperature,Daily;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

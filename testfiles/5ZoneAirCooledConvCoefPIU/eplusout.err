@@ -1,0 +1,35 @@
+Program Version,EnergyPlus, Version 9.4.0-eabe692fc2, YMD=2020.12.04 09:14,
+   ************* Beginning Zone Sizing Calculations
+   ** Warning ** Weather file location will be used rather than entered (IDF) Location object.
+   **   ~~~   ** ..Location object=CHICAGO_IL_USA_WMO_725300
+   **   ~~~   ** ..Weather File Location=Denver Centennial  Golden   Nr CO USA TMY3 WMO#=724666
+   **   ~~~   ** ..due to location differences, Latitude difference=[2.26] degrees, Longitude difference=[17.30] degrees.
+   **   ~~~   ** ..Time Zone difference=[1.0] hour(s), Elevation difference=[862.63] percent, [1639.00] meters.
+   ** Warning ** SetUpDesignDay: Entered DesignDay Barometric Pressure=99063 differs by more than 10% from Standard Barometric Pressure=81198.
+   **   ~~~   ** ...occurs in DesignDay=CHICAGO ANN HTG 99% CONDNS DB, Standard Pressure (based on elevation) will be used.
+   ** Warning ** SetUpDesignDay: Entered DesignDay Barometric Pressure=99063 differs by more than 10% from Standard Barometric Pressure=81198.
+   **   ~~~   ** ...occurs in DesignDay=CHICAGO ANN CLG 1% CONDNS DB=>MWB, Standard Pressure (based on elevation) will be used.
+   ************* Beginning System Sizing Calculations
+   ************* Beginning Plant Sizing Calculations
+   ** Warning ** In calculating the design coil UA for Coil:Cooling:Water MAIN COOLING COIL 1
+   **   ~~~   ** no apparatus dew-point can be found for the initial entering and leaving conditions;
+   **   ~~~   ** the coil outlet design conditions will be changed to correct the problem.
+   **   ~~~   ** The initial design conditions are: Tair,in = 26.7846
+   **   ~~~   **                                    Wair,in = 1.264830E-002
+   **   ~~~   **                                    Twater,in = 7.2200
+   **   ~~~   **                                    Tair,out = 11.9363
+   **   ~~~   **                                    Wair,out = 8.000000E-003
+   **   ~~~   ** The revised design conditions are: Tair,out = 10.2023
+   **   ~~~   **                                    Wair,out = 8.701682E-003
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ************* Simulation Error Summary *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 3 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 4 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  9.14sec

@@ -1,0 +1,30 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Zone Air Relative Humidity
+Zone Air Humidity Ratio
+Zone Air System Sensible Heating Energy
+Unitary System Fan Part Load Ratio
+Heating Coil Air Heating Rate
+Heating Coil NaturalGas Rate
+Heating Coil NaturalGas Energy
+System Node Mass Flow Rate
+AIR LOOP INLET NODE,System Node Temperature
+HEATING COIL AIR INLET NODE,System Node Temperature
+HX ASSISTED DX COIL AIR INLET NODE,System Node Temperature
+DX COOLING COIL AIR INLET NODE,System Node Temperature
+DX COOLING COIL AIR OUTLET NODE,System Node Temperature
+AIR LOOP OUTLET NODE,System Node Temperature
+Cooling Coil Total Cooling Rate
+Cooling Coil Sensible Cooling Rate
+Cooling Coil Latent Cooling Rate
+Cooling Coil Electricity Rate
+Cooling Coil Runtime Fraction
+Heat Exchanger Sensible Heating Rate
+Heat Exchanger Latent Gain Rate
+Heat Exchanger Total Heating Rate
+Heat Exchanger Sensible Cooling Rate
+Heat Exchanger Latent Cooling Rate
+Heat Exchanger Total Cooling Rate
+Heat Exchanger Electricity Rate
+0

@@ -1,0 +1,19 @@
+eplusout.eso
+eplusout.csv
+Zone Air Temperature
+Cooling Coil Total Cooling Rate
+Heating Coil Heating Rate
+Plant Supply Side Cooling Demand Rate
+Plant Supply Side Heating Demand Rate
+BIG CHILLER,Chiller Drive Shaft Power
+BIG CHILLER,Chiller Evaporator Cooling Rate
+BIG CHILLER,Chiller Evaporator Outlet Temperature
+BIG CHILLER,Chiller Evaporator Mass Flow Rate
+BIG CHILLER,Chiller Condenser Heat Transfer Rate
+BIG CHILLER,Chiller Condenser Inlet Temperature
+BIG CHILLER,Chiller Condenser Outlet Temperature
+BIG CHILLER,Chiller Condenser Mass Flow Rate
+BIG CHILLER,Chiller NaturalGas Rate
+BIG CHILLER,Chiller NaturalGas Energy
+BIG CHILLER,Chiller NaturalGas Mass Flow Rate
+0

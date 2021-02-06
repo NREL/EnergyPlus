@@ -1,0 +1,740 @@
+! Flr_Rf_8Sides.idf
+! Basic file description:  Simple 1 zone, 1 story
+!
+! Highlights:              Polygonal floor roof.  With window.
+!
+! Simulation Location/Run: DENVER_STAPLETON_CO_USA_WMO_724690, 2 design days, 1 run period,
+!                          Run Control executes two design days (see RUN PERIOD object)
+!
+! Location:                Denver, CO
+!
+! Design Days:             Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20°C
+!                          Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.9°C
+!
+! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
+!
+! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
+!
+! Building: Single floor odd shaped building.  1 zone.  Window in South side.
+!
+!           The building is oriented due north.
+!
+! Floor Area:        660 m2
+! Number of Stories: 1
+!
+! Zone Description Details:
+!
+!                     ---------------------
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!                     |                   |
+!     ----------------|                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   |
+!     |                                   ----------------------
+!     |                                                        |
+!     |                                                        |
+!     |                                                        |
+!     |                                                        |
+!     |                                                        |
+!     |                                                        |
+!     |                                                        |
+!     -------[=============Window========================]------
+!
+!
+! Internal gains description:     None
+!
+! Interzone Surfaces:             None
+! Internal Mass:                  None
+! People:                         None
+! Lights:                         None
+! Windows:                        Clear Plate Glass
+!
+! Doors:                          None
+!
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              Yes (some illustration for Weekschedule:Compact)
+! Solar Distribution:             FullExterior
+!
+! HVAC:                           Purchased Air
+!
+! Zonal Equipment:                None
+! Central Air Handling Equipment: None
+! System Equipment Autosize:      None
+! Purchased Cooling:              None
+! Purchased Heating:              None
+! Coils:                          None
+! Pumps:                          None
+! Boilers:                        None
+! Chillers:                       None
+!
+! Results:
+! Standard Reports:               None
+! Timestep or Hourly Variables:   Hourly and RunPeriod
+! Time bins Report:               None
+! HTML Report:                    None
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+
+  Version,9.4;
+
+  Timestep,4;
+
+  Building,
+    BUILDING #1,             !- Name
+    0.0000000E+00,           !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    FullExterior,            !- Solar Distribution
+    ,                        !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  SurfaceConvectionAlgorithm:Inside,Simple;
+
+  SurfaceConvectionAlgorithm:Outside,SimpleCombined;
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    No,                      !- Run Simulation for Sizing Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  Site:Location,
+    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name
+    39.77,                   !- Latitude {deg}
+    -104.87,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1611.00;                 !- Elevation {m}
+
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
+ ! Coldest Month=December
+ ! Denver Stapleton Intl Arpt CO USA Annual Heating 99.6%, MaxDB=-20°C
+
+  SizingPeriod:DesignDay,
+    Denver Stapleton Intl Arpt Ann Htg 99.6% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -20,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -20,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    83411.,                  !- Barometric Pressure {Pa}
+    2.3,                     !- Wind Speed {m/s}
+    180,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! Denver Stapleton Intl Arpt Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
+ ! Hottest Month=July
+ ! Denver Stapleton Intl Arpt CO USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.9°C
+
+  SizingPeriod:DesignDay,
+    Denver Stapleton Intl Arpt Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    34.1,                    !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.9,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    83411.,                  !- Barometric Pressure {Pa}
+    4,                       !- Wind Speed {m/s}
+    120,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  Material,
+    A2 - 4 IN DENSE FACE BRICK,  !- Name
+    Rough,                   !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.245296,                !- Conductivity {W/m-K}
+    2082.400,                !- Density {kg/m3}
+    920.4800,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9300000,               !- Solar Absorptance
+    0.9300000;               !- Visible Absorptance
+
+  Material,
+    B3 - 2 IN INSULATION,    !- Name
+    VeryRough,               !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    4.3239430E-02,           !- Conductivity {W/m-K}
+    32.03693,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C2 - 4 IN LW CONCRETE BLOCK,  !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    0.3805070,               !- Conductivity {W/m-K}
+    608.7016,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+   ! (R=.0472,TRANS=.80,VERY SMOOTH,GLASS), from 6mm clear
+
+  WindowMaterial:Glazing,
+    GLASS - CLEAR PLATE 1 / 4 IN,  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    6.0000001E-03,           !- Thickness {m}
+    0.7750000,               !- Solar Transmittance at Normal Incidence
+    7.1000002E-02,           !- Front Side Solar Reflectance at Normal Incidence
+    7.1000002E-02,           !- Back Side Solar Reflectance at Normal Incidence
+    0.8810000,               !- Visible Transmittance at Normal Incidence
+    7.9999998E-02,           !- Front Side Visible Reflectance at Normal Incidence
+    7.9999998E-02,           !- Back Side Visible Reflectance at Normal Incidence
+    0.0000000E+00,           !- Infrared Transmittance at Normal Incidence
+    0.8400000,               !- Front Side Infrared Hemispherical Emissivity
+    0.8400000,               !- Back Side Infrared Hemispherical Emissivity
+    0.9000000;               !- Conductivity {W/m-K}
+
+  Material,
+    DIRT 12 IN,              !- Name
+    Rough,                   !- Roughness
+    0.3048000,               !- Thickness {m}
+    0.1729577,               !- Conductivity {W/m-K}
+    1041.200,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7000000,               !- Solar Absorptance
+    0.7000000;               !- Visible Absorptance
+
+  Material,
+    CONCRETE - SAND AND GRAVEL 4 IN,  !- Name
+    MediumRough,             !- Roughness
+    0.1014984,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6000000,               !- Solar Absorptance
+    0.6000000;               !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5500000,               !- Solar Absorptance
+    0.5500000;               !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    9.5402403E-03,           !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    B6 - 2 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    4.3239430E-02,           !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C12 - 2 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Construction,
+    EXTERIOR,                !- Name
+    A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer
+    B3 - 2 IN INSULATION,    !- Layer 2
+    C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 3
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
+
+  Construction,
+    SINGLE PANE HW WINDOW,   !- Name
+    GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer
+
+  Construction,
+    SLAB FLOOR,              !- Name
+    DIRT 12 IN,              !- Outside Layer
+    CONCRETE - SAND AND GRAVEL 4 IN;  !- Layer 2
+
+  Construction,
+    ROOF31,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B6 - 2 IN DENSE INSULATION,  !- Layer 3
+    C12 - 2 IN HW CONCRETE;  !- Layer 4
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  Site:GroundTemperature:BuildingSurface,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01,1.50000000E+01;
+
+  Zone,
+    ZONE 1,                  !- Name
+    0.0,                     !- Direction of Relative North {deg}
+    0.0,                     !- X Origin {m}
+    0.0,                     !- Y Origin {m}
+    0.0,                     !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    autocalculate,           !- Ceiling Height {m}
+    autocalculate;           !- Volume {m3}
+
+ ! BLAST Translator units, UpperLeftCorner, Counter Clock-Wise, World Coordinate System
+ ! Note original Building and Zone Origins are retained
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    6.000000,6.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    6.000000,6.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    42.90000,6.000001,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    42.90000,6.000001,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    SINGLE PANE HW WINDOW,   !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.000000,                !- Multiplier
+    autocalculate,           !- Number of Vertices
+    9.200000,6.000000,8.000000,  !- X,Y,Z ==> Vertex 1 {m}
+    9.200000,6.000000,3.000000,  !- X,Y,Z ==> Vertex 2 {m}
+    35.60000,6.000001,3.000000,  !- X,Y,Z ==> Vertex 3 {m}
+    35.60000,6.000001,8.000000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    42.90000,6.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    42.90000,6.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    42.90000,16.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    42.90000,16.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    42.90000,16.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    42.90000,16.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    26.00000,16.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    26.00000,16.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    26.00000,16.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    26.00000,16.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    26.00000,35.10000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    26.00000,35.10000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall005,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    26.00000,35.10000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    26.00000,35.10000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    16.00000,35.10000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    16.00000,35.10000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall006,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    16.00000,35.10000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    16.00000,35.10000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    16.00000,26.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    16.00000,26.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall007,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    16.00000,26.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    16.00000,26.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    6.000000,26.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    6.000000,26.00000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall008,           !- Name
+    Wall,                    !- Surface Type
+    EXTERIOR,                !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    6.000000,26.00000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}
+    6.000000,26.00000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
+    6.000001,6.000000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
+    6.000001,6.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    SLAB FLOOR,              !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    42.9,16,0,  !- X,Y,Z ==> Vertex 1 {m}
+    42.9,6,0,  !- X,Y,Z ==> Vertex 2 {m}
+    6,6,0,  !- X,Y,Z ==> Vertex 3 {m}
+    6,26,0,  !- X,Y,Z ==> Vertex 4 {m}
+    16,26,0,  !- X,Y,Z ==> Vertex 5 {m}
+    16,35.1,0,  !- X,Y,Z ==> Vertex 6 {m}
+    26,35.1,0,  !- X,Y,Z ==> Vertex 7 {m}
+    26,16,0;  !- X,Y,Z ==> Vertex 8 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE 1,                  !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.0000000E+00,           !- View Factor to Ground
+    autocalculate,           !- Number of Vertices
+    26,35.1,10,  !- X,Y,Z ==> Vertex 1 {m}
+    16,35.1,10,  !- X,Y,Z ==> Vertex 2 {m}
+    16,26,10,  !- X,Y,Z ==> Vertex 3 {m}
+    6,26,10,  !- X,Y,Z ==> Vertex 4 {m}
+    6,6,10,  !- X,Y,Z ==> Vertex 5 {m}
+    42.9,6,10,  !- X,Y,Z ==> Vertex 6 {m}
+    42.9,16,10,  !- X,Y,Z ==> Vertex 7 {m}
+    26,16,10;  !- X,Y,Z ==> Vertex 8 {m}
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -100,                    !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    ControlType,             !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Day:Interval,
+    CT Day Schedule,         !- Name
+    ControlType,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    Until: 24:00,            !- Time 1
+    4;                       !- Value Until Time 1
+
+  Schedule:Week:Compact,
+    CT WeekSchedule,         !- Name
+    For: Alldays,            !- DayType List 1
+    CT Day Schedule;         !- Schedule:Day Name 1
+
+  Schedule:Year,
+    Zone Control Type Schedule,  !- Name
+    ControlType,             !- Schedule Type Limits Name
+    CT WeekSchedule,         !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+
+  Schedule:Compact,
+    ZONE 1 Heating Setpoints,!- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays WinterDesignDay, !- Field 2
+    Until: 7:00,15.6,        !- Field 3
+    Until: 17:00,22.8,       !- Field 5
+    Until: 24:00,15.6,       !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 24:00,15.6;       !- Field 10
+
+  Schedule:Compact,
+    ZONE 1 Cooling Setpoints,!- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 7:00,100.0,       !- Field 3
+    Until: 17:00,25.0,       !- Field 5
+    Until: 24:00,100.0,      !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 24:00,100.0;      !- Field 10
+
+  ZoneControl:Thermostat,
+    ZONE 1 CONTROLS,         !- Name
+    ZONE 1,                  !- Zone or ZoneList Name
+    Zone Control Type Schedule,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    ZONE 1 SETPOINTS;        !- Control 1 Name
+
+  ThermostatSetpoint:DualSetpoint,
+    ZONE 1 SETPOINTS,        !- Name
+    ZONE 1 Heating Setpoints,!- Heating Setpoint Temperature Schedule Name
+    ZONE 1 Cooling Setpoints;!- Cooling Setpoint Temperature Schedule Name
+
+  ZoneHVAC:EquipmentConnections,
+    ZONE 1,                  !- Zone Name
+    ZONE 1 EQUIPMENT,        !- Zone Conditioning Equipment List Name
+    ZONE 1 INLETS,           !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    ZONE 1 NODE,             !- Zone Air Node Name
+    ZONE 1 OUTLET;           !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentList,
+    ZONE 1 EQUIPMENT,        !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    ZONE 1 PURCHASED AIR,    !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  ZoneHVAC:IdealLoadsAirSystem,
+    ZONE 1 PURCHASED AIR,    !- Name
+    ,                        !- Availability Schedule Name
+    ZONE 1 INLETS,           !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    ,                        !- Heating Limit
+    ,                        !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    ,                        !- Cooling Limit
+    ,                        !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
+    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    ,                        !- Demand Controlled Ventilation Type
+    ,                        !- Outdoor Air Economizer Type
+    ,                        !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+
+  NodeList,
+    ZONE 1 INLETS,           !- Name
+    ZONE 1 INLET;            !- Node 1 Name
+
+  Output:VariableDictionary,Regular;
+
+  Output:Surfaces:Drawing,DXF,Triangulate3DFace;
+
+  Output:Surfaces:List,DetailsWithVertices;
+
+  Output:Meter,DistrictHeating:Facility,runperiod;
+
+  Output:Meter,DistrictCooling:Facility,runperiod;
+
+  Output:Variable,*,Zone Air Temperature,runperiod;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,runperiod;
+
+  Output:Variable,*,Zone Air System Sensible Heating Energy,runperiod;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Heating Energy,runperiod;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Sensible Cooling Energy,runperiod;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+
+  Output:Variable,*,Zone Air Temperature,hourly;
+
+  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+
+  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,hourly;
+
+  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,hourly;
+
+  Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,hourly;
+
+  Output:Schedules,Hourly;
+
+  Output:Surfaces:Drawing,VRML,Triangulate3DFace;
+
+  OutputControl:Table:Style,
+    Tab;                     !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

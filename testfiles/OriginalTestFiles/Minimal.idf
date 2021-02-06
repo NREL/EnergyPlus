@@ -1,0 +1,151 @@
+! Minimal.idf
+! Basic file description: This is a minimal configuration necessary to run.
+! Highlights: Illustrates minimal items necessary to perform run.
+! BUILDING, SURFACEGEOMETRY, LOCATION and DESIGNDAY (or RUNPERIOD) are the absolute minimal required input objects.
+! TIME STEP IN HOUR is included so as to not get warning error.
+! Including two design days, Run Control object and RunPeriod to facilitate use.
+! Although not incredibly useful, this could be used as a weather/solar calculator.
+! Simulation Location/Run: Denver is included.  Any could be used.
+! Building: None.
+!
+! Internal gains description: None.
+!
+! HVAC: None.
+!
+
+  Version,9.4;
+
+  Timestep,4;
+
+  Building,
+    None,                    !- Name
+    0.0000000E+00,           !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.40,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  Site:Location,
+    DENVER_STAPLETON_CO_USA_WMO_724690,  !- Name
+    39.77,                   !- Latitude {deg}
+    -104.87,                 !- Longitude {deg}
+    -7.00,                   !- Time Zone {hr}
+    1611.00;                 !- Elevation {m}
+
+ ! DENVER_STAPLETON_CO_USA Annual Heating Design Conditions Wind Speed=2.3m/s Wind Dir=180
+ ! Coldest Month=December
+ ! DENVER_STAPLETON_CO_USA Annual Heating 99.6%, MaxDB=-20°C
+
+  SizingPeriod:DesignDay,
+    DENVER_STAPLETON Ann Htg 99.6% Condns DB,  !- Name
+    12,                      !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -20,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -20,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    83411.,                  !- Barometric Pressure {Pa}
+    2.3,                     !- Wind Speed {m/s}
+    180,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! DENVER_STAPLETON Annual Cooling Design Conditions Wind Speed=4m/s Wind Dir=120
+ ! Hottest Month=July
+ ! DENVER_STAPLETON_CO_USA Annual Cooling (DB=>MWB) .4%, MaxDB=34.1°C MWB=15.8°C
+
+  SizingPeriod:DesignDay,
+    DENVER_STAPLETON Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    34.1,                    !- Maximum Dry-Bulb Temperature {C}
+    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    15.8,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    83411.,                  !- Barometric Pressure {Pa}
+    4,                       !- Wind Speed {m/s}
+    120,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  Output:VariableDictionary,Regular;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Wetbulb Temperature,Timestep;
+
+  Output:Variable,*,Site Outdoor Air Dewpoint Temperature,Timestep;
+
+  Output:Variable,*,Site Solar Azimuth Angle,Timestep;
+
+  Output:Variable,*,Site Solar Altitude Angle,Timestep;
+
+  Output:Variable,*,Site Direct Solar Radiation Rate per Area,Timestep;
+
+  Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,Timestep;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

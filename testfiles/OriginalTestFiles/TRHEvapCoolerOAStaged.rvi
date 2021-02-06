@@ -1,0 +1,29 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Site Outdoor Air Wetbulb Temperature
+Zone Air Temperature
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate
+Evaporative Cooler Electricity Rate
+Evaporative Cooler Water Volume
+Evaporative Cooler Wet Bulb Effectiveness
+Evaporative Cooler Wetbulb Effectiveness
+Evaporative Cooler Total Stage Effectiveness
+Air Loop Inlet Node,System Node Mass Flow Rate
+Air Loop Inlet Node,System Node Temperature
+Air Loop Inlet Node,System Node Humidity Ratio
+Outside Air Inlet Node,System Node Mass Flow Rate
+Outside Air Inlet Node,System Node Temperature
+Mixed Air Node,System Node Mass Flow Rate
+Mixed Air Node,System Node Temperature
+EvapCoolerIndirectInletAirNode,System Node Mass Flow Rate
+EvapCoolerIndirectInletAirNode,System Node Temperature
+EvapCoolerIndirectInletAirNode,System Node Humidity Ratio
+EvapCoolerDirectInletAirNode,System Node Mass Flow Rate
+EvapCoolerDirectInletAirNode,System Node Temperature
+EvapCoolerDirectInletAirNode,System Node Humidity Ratio
+Air Loop Outlet Node,System Node Mass Flow Rate
+Air Loop Outlet Node,System Node Temperature
+Air Loop Outlet Node,System Node Humidity Ratio
+0

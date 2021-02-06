@@ -1,0 +1,243 @@
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+! WeatherTimeBins.idf
+! Basic file description:  No Building. Minimal Configuration.
+!
+! Highlights:              Example of time bins report using weather data for illustration.
+!
+! Simulation Location/Run: 1 run period,
+!                          Run Control executes weather file.
+!                          Applicable to any location.
+!
+! Location:                Any
+!
+! Design Days:             N/A
+!
+! Run Period (Weather File): Full Annual Simulation
+!
+! Run Control:             No zone or system sizing, run control does weather file simulation
+!
+! Building: No building.
+!
+! Internal gains description:     None
+!
+! Interzone Surfaces:             None
+! Internal Mass:                  None
+! People:                         None
+! Lights:                         None
+! Exterior Equipment              None
+! Windows:                        None
+!
+! Doors:                          None
+!
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              Yes
+! Solar Distribution:             NA (MinimalShadowing)
+!
+! HVAC:                           None
+!
+! Zonal Equipment:                None
+! Central Air Handling Equipment: None
+! System Equipment Autosize:      None
+! Purchased Cooling:              None
+! Purchased Heating:              None
+! Coils:                          None
+! Pumps:                          None
+! Boilers:                        None
+! Chillers:                       None
+!
+! Results:
+! Standard Reports:               None
+! Timestep or Hourly Variables:   RunPeriod
+! Time bins Report:               Yes
+! HTML Report:                    Yes (time bins)
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+!
+! BUILDING, SURFACEGEOMETRY, LOCATION and DESIGNDAY (or RUNPERIOD) are the absolute minimal required input objects.
+! This file illustrates using EnergyPlus to create a "bin" report for weather data.
+
+  Version,9.4;
+
+  Building,
+    None,                    !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.40,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,4;
+
+  SimulationControl,
+    No,                      !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    No,                      !- Run Simulation for Sizing Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  SizingPeriod:DesignDay,
+    CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.0;                     !- Sky Clearness
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    ,                        !- Day of Week for Start Day
+    ,                        !- Use Weather File Holidays and Special Days
+    ,                        !- Use Weather File Daylight Saving Period
+    ,                        !- Apply Weekend Holiday Rule
+    ,                        !- Use Weather File Rain Indicators
+    ;                        !- Use Weather File Snow Indicators
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;
+
+  Output:Variable,*,Site Outdoor Air Wetbulb Temperature,runperiod;
+
+  Output:Variable,*,Site Outdoor Air Dewpoint Temperature,runperiod;
+
+  Output:Variable,*,Site Outdoor Air Relative Humidity,runperiod;
+
+  Output:Variable,*,Site Outdoor Air Enthalpy,runperiod;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,runperiod;
+
+  Output:Variable,*,Site Wind Direction,runperiod;
+
+  Output:Variable,*,Site Wind Speed,runperiod;
+
+  Output:Variable,*,Site Solar Azimuth Angle,runperiod;
+
+  Output:Variable,*,Site Solar Altitude Angle,runperiod;
+
+  Output:Variable,*,Site Direct Solar Radiation Rate per Area,runperiod;
+
+  Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,runperiod;
+
+  Output:VariableDictionary,Regular;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Compact,
+    Constant,                !- Name
+    On/Off,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Outdoor Air Drybulb Temperature,  !- Variable Name
+    -30,                     !- Interval Start
+    5,                       !- Interval Size
+    15,                      !- Interval Count
+    constant;                !- Schedule Name
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Outdoor Air Dewpoint Temperature,  !- Variable Name
+    -30,                     !- Interval Start
+    5,                       !- Interval Size
+    15;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Outdoor Air Relative Humidity,  !- Variable Name
+    0,                       !- Interval Start
+    5,                       !- Interval Size
+    20;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Outdoor Air Humidity Ratio,  !- Variable Name
+    0,                       !- Interval Start
+    0.001,                   !- Interval Size
+    20;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Outdoor Air Enthalpy,  !- Variable Name
+    0,                       !- Interval Start
+    5000,                    !- Interval Size
+    15;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Wind Speed,         !- Variable Name
+    0,                       !- Interval Start
+    1,                       !- Interval Size
+    20;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Wind Direction,     !- Variable Name
+    0,                       !- Interval Start
+    20,                      !- Interval Size
+    18;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Direct Solar Radiation Rate per Area,  !- Variable Name
+    0,                       !- Interval Start
+    100,                     !- Interval Size
+    10;                      !- Interval Count
+
+  Output:Table:TimeBins,
+    *,                       !- Key Value
+    Site Diffuse Solar Radiation Rate per Area,  !- Variable Name
+    0,                       !- Interval Start
+    100,                     !- Interval Size
+    10;                      !- Interval Count
+

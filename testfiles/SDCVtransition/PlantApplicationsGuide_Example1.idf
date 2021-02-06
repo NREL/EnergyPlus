@@ -1,0 +1,964 @@
+! This file serves as a template to model Example 1: Simple cooling system
+! Standard plant configurations with standard controls
+! Standard condenser loop configurations wiTh standard controls
+!*********************************************************************************************
+! 1.STANDARD PLANT LOOP WITH CHILLER(WATER LOOP)
+! A PlantLoop model is be used can be used with pumps, connectors and the main components
+! to model the system
+! Load profile for the system will be simulated by using pre modelled cooling load for a
+! generic building situated in Chicago, USA
+! RECOGNITION OF THE LOOP SYSTEM AND IT'S SYNTAX
+! The loop that is being simulated corresponds to a supply side loop in the plant loop system
+! This loop provides Chilled water to the demand side of the plant loop by using
+! an electic chiller.
+! Controllers will be used to operate the chiller to satisfy the load profile.
+! Both the supply and the demand side will be modelled in this section of the template
+! ******************************VERSION IDENTIFIER********************************************
+
+  Version,9.4;
+
+! ********************************DEFINE THE CHILLED WATER(CW) LOOP***************************
+
+  PlantLoop,
+    Chilled Water Loop,      !- Name
+    Water,                   !- Fluid Type
+    ,                        !- User Defined Fluid Type
+    CW Loop Operation,       !- Plant Equipment Operation Scheme Name
+    CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name
+    100,                     !- Maximum Loop Temperature {C}
+    3,                       !- Minimum Loop Temperature {C}
+    0.001,                   !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    autocalculate,           !- Plant Loop Volume {m3}
+    CW Supply Inlet Node,    !- Plant Side Inlet Node Name
+    CW Supply Outlet Node,   !- Plant Side Outlet Node Name
+    Cooling Supply Side Branches,  !- Plant Side Branch List Name
+    Cooling Supply Side Connectors,  !- Plant Side Connector List Name
+    CW Demand Inlet Node,    !- Demand Side Inlet Node Name
+    CW Demand Outlet Node,   !- Demand Side Outlet Node Name
+    Cooling Demand Side Branches,  !- Demand Side Branch List Name
+    Cooling Demand Side Connectors,  !- Demand Side Connector List Name
+    Optimal;                 !- Load Distribution Scheme
+
+! =======================INPUTTING THE SUPPLY SIDE OF CHILLED WATER LOOP======================
+! ----------Listing and Modeling all the branches on the supply side of the CW loop----------
+
+  BranchList,
+    Cooling Supply Side Branches,  !- Name
+    CW Supply Pump Branch,   !- Branch 1 Name
+    CW Supply Chiller Branch,!- Branch 2 Name
+    CW Supply Bypass Branch, !- Branch 3 Name
+    CW Supply Outlet Branch; !- Branch 4 Name
+
+! Modeling the CW Pump Branch
+
+  Branch,
+    CW Supply Pump Branch,   !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    CW Circ Pump,            !- Component 1 Name
+    CW Supply Inlet Node,    !- Component 1 Inlet Node Name
+    CW Pump Outlet Node;     !- Component 1 Outlet Node Name
+
+! Modeling the CW Supply Chiller Branch
+
+  Branch,
+    CW Supply Chiller Branch,!- Name
+    ,                        !- Pressure Drop Curve Name
+    Chiller:Electric,        !- Component 1 Object Type
+    Chiller,                 !- Component 1 Name
+    Chiller Inlet Node,      !- Component 1 Inlet Node Name
+    Chiller Outlet Node;     !- Component 1 Outlet Node Name
+
+!Modeling the CW Supply Bypass Branch
+
+  Branch,
+    CW Supply Bypass Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    CW Supply Side Bypass Pipe,  !- Component 1 Name
+    CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    CW Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the CW Supply Outlet Branch
+
+  Branch,
+    CW Supply Outlet Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    CW Supply Side Outlet Pipe,  !- Component 1 Name
+    CW Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    CW Supply Outlet Node;   !- Component 1 Outlet Node Name
+
+! ----------Listing and Modeling all the connectors on the supply side of the CW loop----------
+
+  ConnectorList,
+    Cooling Supply Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    CW Loop Supply Splitter, !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    CW Loop Supply Mixer;    !- Connector 2 Name
+
+! Modeling the splitter
+
+  Connector:Splitter,
+    CW Loop Supply Splitter, !- Name
+    CW Supply Pump Branch,   !- Inlet Branch Name
+    CW Supply Chiller Branch,!- Outlet Branch 1 Name
+    CW Supply Bypass Branch; !- Outlet Branch 2 Name
+
+! Modeling the mixer
+
+  Connector:Mixer,
+    CW Loop Supply Mixer,    !- Name
+    CW Supply Outlet Branch, !- Outlet Branch Name
+    CW Supply Chiller Branch,!- Inlet Branch 1 Name
+    CW Supply Bypass Branch; !- Inlet Branch 2 Name
+
+! =======================INPUTTING THE DEMAND SIDE OF CHILLED WATER LOOP======================
+! ----------Listing and Modeling all the branches on the demand side of the CW loop----------
+! Listing the cooling demand side branches
+
+  BranchList,
+    Cooling Demand Side Branches,  !- Name
+    CW Demand Inlet Branch,  !- Branch 1 Name
+    CW Demand Load Profile Branch,  !- Branch 2 Name
+    CW Demand Bypass Branch, !- Branch 3 Name
+    CW Demand Outlet Branch; !- Branch 4 Name
+
+! Modeling the CW Demand Inlet Branch
+
+  Branch,
+    CW Demand Inlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    CW Demand Side Inlet Pipe,  !- Component 1 Name
+    CW Demand Inlet Node,    !- Component 1 Inlet Node Name
+    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the CW Demand Load Profile Branch
+
+  Branch,
+    CW Demand Load Profile Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    LoadProfile:Plant,       !- Component 1 Object Type
+    Load Profile,            !- Component 1 Name
+    Cooling Demand Load Profile Inlet Node,  !- Component 1 Inlet Node Name
+    Cooling Demand Load Profile Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the CW Demand Side Bypass branch
+
+  Branch,
+    CW Demand Bypass Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    CW Demand Side Bypass Pipe,  !- Component 1 Name
+    CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the CW demand outlet branch
+
+  Branch,
+    CW Demand Outlet Branch, !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    CW Demand Side Outlet Pipe,  !- Component 1 Name
+    CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    CW Demand Outlet Node;   !- Component 1 Outlet Node Name
+
+! ----------Listing and Modeling all the connectors on the demand side of the CW loop----------
+
+  ConnectorList,
+    Cooling Demand Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    CW Loop Demand Splitter, !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    CW Loop Demand Mixer;    !- Connector 2 Name
+
+! Modeling the CW Loop Demand Splitter
+
+  Connector:Splitter,
+    CW Loop Demand Splitter, !- Name
+    CW Demand Inlet Branch,  !- Inlet Branch Name
+    CW Demand Load Profile Branch,  !- Outlet Branch 1 Name
+    CW Demand Bypass Branch; !- Outlet Branch 2 Name
+
+! Modeling the CW Loop Demand Mixer
+
+  Connector:Mixer,
+    CW Loop Demand Mixer,    !- Name
+    CW Demand Outlet Branch, !- Outlet Branch Name
+    CW Demand Load Profile Branch,  !- Inlet Branch 1 Name
+    CW Demand Bypass Branch; !- Inlet Branch 2 Name
+
+!---------------------------------------------------------------------------------------------
+!************************INPUTTING THE MAIN COMPONENTS IN THE  CW LOOP************************
+!=========================================ELECTRIC CHILLER====================================
+! Input the chiller, Most chillers need a condenser loop to operate, the inlet and outlet nodes
+! for the condesnser loop must be included in the input.
+
+  Chiller:Electric,
+    Chiller,                 !- Name
+    WaterCooled,             !- Condenser Type
+    200000,                  !- Nominal Capacity {W}
+    2.75,                    !- Nominal COP {W/W}
+    Chiller Inlet Node,      !- Chilled Water Inlet Node Name
+    Chiller Outlet Node,     !- Chilled Water Outlet Node Name
+    Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+    0.15,                    !- Minimum Part Load Ratio
+    1.0,                     !- Maximum Part Load Ratio
+    0.65,                    !- Optimum Part Load Ratio
+    29.44,                   !- Design Condenser Inlet Temperature {C}
+    2.682759,                !- Temperature Rise Coefficient
+    6.667,                   !- Design Chilled Water Outlet Temperature {C}
+    0.01,                    !- Design Chilled Water Flow Rate {m3/s}
+    0.01,                    !- Design Condenser Fluid Flow Rate {m3/s}
+    0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
+    -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
+    -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
+    1.907846,                !- Coefficient 1 of Power Ratio Curve
+    -1.20498700,             !- Coefficient 2 of Power Ratio Curve
+    0.26346230,              !- Coefficient 3 of Power Ratio Curve
+    0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+    0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+    0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+    5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+    NotModulated;            !- Chiller Flow Mode
+
+!=============================================================================================
+!===========================Setpoint Manager for the electic chiller==========================
+! Please refer to Group-SetpointManagers in the Input-Output Reference for more details.
+
+  SetpointManager:Scheduled,
+    Chilled Water Loop Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    CW Loop Temp Schedule,   !- Schedule Name
+    CW Supply Outlet Node;   !- Setpoint Node or NodeList Name
+
+!Listing the node that is being used by the CW loop setpoint manager
+  !NodeList,
+    !Chilled Water Loop Setpoint Node List,  !- Name
+    !CW Supply Outlet Node;       !- Node 1 Name
+!=============================================================================================
+!=====================================CW loop Circulation pump================================
+! Modeling the circulation pump for the CW loop
+
+  Pump:VariableSpeed,
+    CW Circ Pump,            !- Name
+    CW Supply Inlet Node,    !- Inlet Node Name
+    CW Pump Outlet Node,     !- Outlet Node Name
+    0.005,                   !- Design Maximum Flow Rate {m3/s}
+    160000,                  !- Design Pump Head {Pa}
+    1000,                    !- Design Power Consumption {W}
+    0.87,                    !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+!=============================================================================================
+!====================Modeling the various pipes used in the transport branches===============
+ ! Supply side bypass branch pipe
+
+  Pipe:Adiabatic,
+    CW Supply Side Bypass Pipe,  !- Name
+    CW Supply Bypass Inlet Node,  !- Inlet Node Name
+    CW Supply Bypass Outlet Node;  !- Outlet Node Name
+
+! Supply side outlet pipe
+
+  Pipe:Adiabatic,
+    CW Supply Side Outlet Pipe,  !- Name
+    CW Supply Side Exit Pipe Inlet Node,  !- Inlet Node Name
+    CW Supply Outlet Node;   !- Outlet Node Name
+
+!Cooling Demand Side Inlet Pipe
+
+  Pipe:Adiabatic,
+    CW Demand Side Inlet Pipe,  !- Name
+    CW Demand Inlet Node,    !- Inlet Node Name
+    CW Demand Entrance Pipe Outlet Node;  !- Outlet Node Name
+
+!Demand side bypass pipe
+
+  Pipe:Adiabatic,
+    CW Demand Side Bypass Pipe,  !- Name
+    CW Demand Bypass Inlet Node,  !- Inlet Node Name
+    CW Demand Bypass Outlet Node;  !- Outlet Node Name
+
+!Demand side outlet pipe
+
+  Pipe:Adiabatic,
+    CW Demand Side Outlet Pipe,  !- Name
+    CW Demand Exit Pipe Inlet Node,  !- Inlet Node Name
+    CW Demand Outlet Node;   !- Outlet Node Name
+
+!=============================================================================================
+! =====================Defining and Attaching the load profile to the system==================
+! Using a preconstructed Load Profile to simulate the cooling needs of a building, this previously used
+! an external .csv file to import the cooling load data.  To better meet testing purposes, this is
+! changed to use a sample of 3 days, one each repeated from 1/1 to 4/30, 5/1 to 9/30, and 10/1 to 12/31.
+
+  Schedule:Compact,
+    Load Profile Load Schedule,  !- Name
+    CW Loop Any Number,      !- Schedule Type Limits Name
+    Through: 04/30,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 01:00,-21652.9723,!- Field 3
+    Until: 02:00,-18598.11837, !- Field 5
+    Until: 03:00,-16177.62277, !- Field 7
+    Until: 04:00,-15197.61381, !- Field 9
+    Until: 05:00,-16624.78126, !- Field 11
+    Until: 06:00,-31699.6101,!- Field 13
+    Until: 07:00,-44452.50237, !- Field 15
+    Until: 08:00,-38124.24401, !- Field 17
+    Until: 09:00,-47241.8608,!- Field 19
+    Until: 10:00,-43946.29524, !- Field 21
+    Until: 11:00,-46386.16618, !- Field 23
+    Until: 12:00,-48550.0582,!- Field 25
+    Until: 13:00,-51507.49486, !- Field 27
+    Until: 14:00,-52831.65247, !- Field 29
+    Until: 15:00,-52675.34672, !- Field 31
+    Until: 16:00,-49358.45631, !- Field 33
+    Until: 17:00,-47538.37037, !- Field 35
+    Until: 18:00,-48931.3786,!- Field 37
+    Until: 19:00,-51601.12227, !- Field 39
+    Until: 20:00,-56680.15228, !- Field 41
+    Until: 21:00,-56703.57127, !- Field 43
+    Until: 22:00,-43909.99069, !- Field 45
+    Until: 23:00,-31856.94046, !- Field 47
+    Until: 24:00,-26217.40723, !- Field 49
+    Through: 09/30,          !- Field 51
+    For: AllDays,            !- Field 52
+    Until: 01:00,-37815.65528, !- Field 53
+    Until: 02:00,-34222.88759, !- Field 55
+    Until: 03:00,-31791.60136, !- Field 57
+    Until: 04:00,-30085.09174, !- Field 59
+    Until: 05:00,-31018.79267, !- Field 61
+    Until: 06:00,-47315.075, !- Field 63
+    Until: 07:00,-60809.0483,!- Field 65
+    Until: 08:00,-58353.28712, !- Field 67
+    Until: 09:00,-73057.32391, !- Field 69
+    Until: 10:00,-73595.01927, !- Field 71
+    Until: 11:00,-75811.38809, !- Field 73
+    Until: 12:00,-79872.01249, !- Field 75
+    Until: 13:00,-83892.87593, !- Field 77
+    Until: 14:00,-86869.36757, !- Field 79
+    Until: 15:00,-89138.49598, !- Field 81
+    Until: 16:00,-86282.98713, !- Field 83
+    Until: 17:00,-83215.03028, !- Field 85
+    Until: 18:00,-82178.11665, !- Field 87
+    Until: 19:00,-85325.87149, !- Field 89
+    Until: 20:00,-86953.77696, !- Field 91
+    Until: 21:00,-85795.67382, !- Field 93
+    Until: 22:00,-70176.77639, !- Field 95
+    Until: 23:00,-55495.79516, !- Field 97
+    Until: 24:00,-47851.942, !- Field 99
+    Through: 12/31,          !- Field 101
+    For: AllDays,            !- Field 102
+    Until: 01:00,-22352.35101, !- Field 103
+    Until: 02:00,-19202.04594, !- Field 105
+    Until: 03:00,-17113.77564, !- Field 107
+    Until: 04:00,-15593.56201, !- Field 109
+    Until: 05:00,-15482.2666,!- Field 111
+    Until: 06:00,-20749.41583, !- Field 113
+    Until: 07:00,-32413.96668, !- Field 115
+    Until: 08:00,-53607.28306, !- Field 117
+    Until: 09:00,-56220.09392, !- Field 119
+    Until: 10:00,-48395.82376, !- Field 121
+    Until: 11:00,-44829.77071, !- Field 123
+    Until: 12:00,-46547.56608, !- Field 125
+    Until: 13:00,-51398.25863, !- Field 127
+    Until: 14:00,-53608.45398, !- Field 129
+    Until: 15:00,-53486.89645, !- Field 131
+    Until: 16:00,-48168.90142, !- Field 133
+    Until: 17:00,-43408.52746, !- Field 135
+    Until: 18:00,-48978.48307, !- Field 137
+    Until: 19:00,-53400.35772, !- Field 139
+    Until: 20:00,-57996.78659, !- Field 141
+    Until: 21:00,-56053.17856, !- Field 143
+    Until: 22:00,-43900.3144,!- Field 145
+    Until: 23:00,-32686.46507, !- Field 147
+    Until: 24:00,-27794.9808;!- Field 149
+
+  LoadProfile:Plant,
+    Load Profile,            !- Name
+    Cooling Demand Load Profile Inlet Node,  !- Inlet Node Name
+    Cooling Demand Load Profile Outlet Node,  !- Outlet Node Name
+    Load Profile Load Schedule,  !- Load Schedule Name
+    1.0,                     !- Peak Flow Rate {m3/s}
+    Load Profile Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+
+!============================================================================================
+!-----------------------Plant Equipment Operation Schemes for the CW Loop--------------------
+
+  PlantEquipmentOperationSchemes,
+    CW Loop Operation,       !- Name
+    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
+    CW Loop Cooling Load,    !- Control Scheme 1 Name
+    Chiller AlwaysOnSchedule;!- Control Scheme 1 Schedule Name
+
+! Cooling load limits
+
+  PlantEquipmentOperation:CoolingLoad,
+    CW Loop Cooling Load,    !- Name
+    0,                       !- Load Range 1 Lower Limit {W}
+    1000000000,              !- Load Range 1 Upper Limit {W}
+    Chiller Plant;           !- Range 1 Equipment List Name
+
+!Plant equipment list for the CW loop
+
+  PlantEquipmentList,
+    Chiller Plant,           !- Name
+    Chiller:Electric,        !- Equipment 1 Object Type
+    Chiller;                 !- Equipment 1 Name
+
+!---------------------------------------------------------------------------------------------
+!--------------------------------CW loop schedules--------------------------------------------
+
+  ScheduleTypeLimits,
+    CW Loop Any Number;      !- Name
+
+  ScheduleTypeLimits,
+    CW Loop On/Off,          !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Compact,
+    CW Loop Temp Schedule,   !- Name
+    CW Loop Any Number,      !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,7.0;        !- Field 3
+
+  Schedule:Compact,
+    Chiller AlwaysOnSchedule,!- Name
+    CW Loop On/Off,          !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1;          !- Field 3
+
+  Schedule:Compact,
+    Load Profile Flow Frac Schedule,  !- Name
+    CW Loop Any Number,      !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1;          !- Field 3
+
+!Sizing:Plant,
+    !Chilled Water Loop,               !- Plant or Condenser Loop Name
+    !Cooling,                  !- Loop Type
+    !7.0,                         !- Design Loop Exit Temperature {C}
+    !5.0;                         !- Loop Design Temperature Difference {deltaC}
+!---------------------------------------------------------------------------------------------
+!*********************************************************************************************
+! 2. STANDARD CONDENSER LOOP CONFIGURATIONS WITH STANDARD CONTROLS
+! A PlantLoop object type is be used with pumps, connectors and a cooling tower to
+! model the system.
+! Load profile for the system will be simulated by using the outputs of the CW loop, i.e.
+! the CW loop will serve as the demand side for the condenser loop.
+! RECOGNITION OF THE LOOP SYSTEM AND IT'S SYNTAX
+! The loop that is being simulated corresponds to the supply side for the watercooled
+! chiller that is being used in the CW loop.
+! This loop provides Cooling water to the CW Loop chiller.
+! Controls will be used to regulate the rate of cooling in the cooling tower.
+!***********************************Define the Condenser loop*********************************
+
+  PlantLoop,
+    Condenser Loop,          !- Name
+    Water,                   !- Fluid Type
+    ,                        !- User Defined Fluid Type
+    Tower Loop Operation,    !- Plant Equipment Operation Scheme Name
+    Condenser Supply Outlet Node,  !- Loop Temperature Setpoint Node Name
+    100,                     !- Maximum Loop Temperature {C}
+    3,                       !- Minimum Loop Temperature {C}
+    1.0,                     !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    autocalculate,           !- Plant Loop Volume {m3}
+    Condenser Supply Inlet Node,  !- Plant Side Inlet Node Name
+    Condenser Supply Outlet Node,  !- Plant Side Outlet Node Name
+    Condenser Supply Side Branches,  !- Plant Side Branch List Name
+    Condenser Supply Side Connectors,  !- Plant Side Connector List Name
+    Condenser Demand Inlet Node,  !- Demand Side Inlet Node Name
+    Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
+    Condenser Demand Side Branches,  !- Demand Side Branch List Name
+    Condenser Demand Side Connectors,  !- Demand Side Connector List Name
+    Optimal;                 !- Load Distribution Scheme
+
+! ------------Listing and Modeling the supply side branches of the condenser loop------------
+! Condenser supply side branches
+
+  BranchList,
+    Condenser Supply Side Branches,  !- Name
+    Condenser Supply Pump Branch,  !- Branch 1 Name
+    Condenser Supply Tower Branch,  !- Branch 2 Name
+    Condenser Supply Bypass Branch,  !- Branch 3 Name
+    Condenser Supply Outlet Branch;  !- Branch 4 Name
+
+! Supply inlet branch
+
+  Branch,
+    Condenser Supply Pump Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    Cond Circ Pump,          !- Component 1 Name
+    Condenser Supply Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Pump Outlet Node;  !- Component 1 Outlet Node Name
+
+! Supply tower branch
+
+  Branch,
+    Condenser Supply Tower Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    CoolingTower:VariableSpeed,  !- Component 1 Object Type
+    Cooling Tower,           !- Component 1 Name
+    Condenser Tower Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Tower Outlet Node;  !- Component 1 Outlet Node Name
+
+! Supply Bypass branch
+
+  Branch,
+    Condenser Supply Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Supply Bypass Pipe,  !- Component 1 Name
+    Cond Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    Cond Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+! Condenser supply outlet branch
+
+  Branch,
+    Condenser Supply Outlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Supply Outlet Pipe,  !- Component 1 Name
+    Condenser Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Supply Outlet Node;  !- Component 1 Outlet Node Name
+
+! -----------Listing and Modeling the supply side connectors of the condenser loop-----------
+
+  ConnectorList,
+    Condenser Supply Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Condenser Supply Splitter,  !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Condenser Supply Mixer;  !- Connector 2 Name
+
+! Modeling the Condenser Supply Side Splitter
+
+  Connector:Splitter,
+    Condenser Supply Splitter,  !- Name
+    Condenser Supply Pump Branch,  !- Inlet Branch Name
+    Condenser Supply Tower Branch,  !- Outlet Branch 1 Name
+    Condenser Supply Bypass Branch;  !- Outlet Branch 2 Name
+
+! Modeling the Condenser Supply Side Mixer
+
+  Connector:Mixer,
+    Condenser Supply Mixer,  !- Name
+    Condenser Supply Outlet Branch,  !- Outlet Branch Name
+    Condenser Supply Tower Branch,  !- Inlet Branch 1 Name
+    Condenser Supply Bypass Branch;  !- Inlet Branch 2 Name
+
+! ------------Listing and Modeling the demand side branches of the condenser loop------------
+
+  BranchList,
+    Condenser Demand Side Branches,  !- Name
+    Condenser Demand Inlet Branch,  !- Branch 1 Name
+    Condenser Demand Bypass Branch,  !- Branch 2 Name
+    Condenser Demand Chiller Branch,  !- Branch 3 Name
+    Condenser Demand Outlet Branch;  !- Branch 4 Name
+
+! Modeling the Condenser Demand Inlet Branch
+
+  Branch,
+    Condenser Demand Inlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Inlet Pipe,  !- Component 1 Name
+    Condenser Demand Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the Condenser Demand Chiller Branch
+
+  Branch,
+    Condenser Demand Chiller Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Chiller:Electric,        !- Component 1 Object Type
+    Chiller,                 !- Component 1 Name
+    Chiller Condenser Inlet Node,  !- Component 1 Inlet Node Name
+    Chiller Condenser Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the Demand Bypass Branch
+
+  Branch,
+    Condenser Demand Bypass Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Bypass Pipe,  !- Component 1 Name
+    Cond Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name
+    Cond Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name
+
+! Modeling the Condenser Demand Outlet Branch
+
+  Branch,
+    Condenser Demand Outlet Branch,  !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Condenser Demand Outlet Pipe,  !- Component 1 Name
+    Condenser Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name
+    Condenser Demand Outlet Node;  !- Component 1 Outlet Node Name
+
+! -----------Listing and Modeling the demand side connectors of the condenser loop-----------
+
+  ConnectorList,
+    Condenser Demand Side Connectors,  !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Condenser Demand Splitter,  !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Condenser Demand Mixer;  !- Connector 2 Name
+
+! Modeling the Condenser Demand side splitter
+
+  Connector:Splitter,
+    Condenser Demand Splitter,  !- Name
+    Condenser Demand Inlet Branch,  !- Inlet Branch Name
+    Condenser Demand Chiller Branch,  !- Outlet Branch 1 Name
+    Condenser Demand Bypass Branch;  !- Outlet Branch 2 Name
+
+! Modeling the Condenser Demand Mixer
+
+  Connector:Mixer,
+    Condenser Demand Mixer,  !- Name
+    Condenser Demand Outlet Branch,  !- Outlet Branch Name
+    Condenser Demand Chiller Branch,  !- Inlet Branch 1 Name
+    Condenser Demand Bypass Branch;  !- Inlet Branch 2 Name
+
+!---------------------------------------------------------------------------------------------
+! ==================================Modeling THE COOLING TOWER===============================
+
+  CoolingTower:VariableSpeed,
+    Cooling Tower,           !- Name
+    Condenser Tower Inlet Node,  !- Water Inlet Node Name
+    Condenser Tower Outlet Node,  !- Water Outlet Node Name
+    YorkCalcUserDefined,     !- Model Type
+    YorkCalc Default Tower Model,  !- Model Coefficient Name
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    autosize,                !- Design Water Flow Rate {m3/s}
+    autosize,                !- Design Air Flow Rate {m3/s}
+    autosize,                !- Design Fan Power {W}
+    CoolingTowerFanRatioCurve,  !- Fan Power Ratio Function of Air Flow Rate Ratio Curve Name
+    0.2,                     !- Minimum Air Flow Rate Ratio
+    0.125,                   !- Fraction of Tower Capacity in Free Convection Regime
+    450.0,                   !- Basin Heater Capacity {W/K}
+    4.5,                     !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    SaturatedExit,           !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    0.05,                    !- Drift Loss Percent {percent}
+    ConcentrationRatio,      !- Blowdown Calculation Mode
+    4.0;                     !- Blowdown Concentration Ratio
+
+! Fan power ratio varies nearly as the cube of air flow ratio
+
+  Curve:Cubic,
+    CoolingTowerFanRatioCurve,  !- Name
+    -0.00931516301535329,    !- Coefficient1 Constant
+    0.0512333965844443,      !- Coefficient2 x
+    -0.0838364671381841,     !- Coefficient3 x**2
+    1.04191823356909,        !- Coefficient4 x**3
+    0.15,                    !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+  CoolingTowerPerformance:YorkCalc,
+    YorkCalc Default Tower Model,  !- Name
+    -34.4,                   !- Minimum Inlet Air Wet-Bulb Temperature {C}
+    26.6667,                 !- Maximum Inlet Air Wet-Bulb Temperature {C}
+    1.1111,                  !- Minimum Range Temperature {deltaC}
+    22.2222,                 !- Maximum Range Temperature {deltaC}
+    1.1111,                  !- Minimum Approach Temperature {deltaC}
+    40.0,                    !- Maximum Approach Temperature {deltaC}
+    0.5,                     !- Minimum Water Flow Rate Ratio
+    4.0,                     !- Maximum Water Flow Rate Ratio
+    8.0,                     !- Maximum Liquid to Gas Ratio
+    -0.359741205,            !- Coefficient 1
+    -0.055053608,            !- Coefficient 2
+    0.0023850432,            !- Coefficient 3
+    0.173926877,             !- Coefficient 4
+    -0.0248473764,           !- Coefficient 5
+    0.00048430224,           !- Coefficient 6
+    -0.005589849456,         !- Coefficient 7
+    0.0005770079712,         !- Coefficient 8
+    -0.00001342427256,       !- Coefficient 9
+    2.84765801111111,        !- Coefficient 10
+    -0.121765149,            !- Coefficient 11
+    0.0014599242,            !- Coefficient 12
+    1.680428651,             !- Coefficient 13
+    -0.0166920786,           !- Coefficient 14
+    -0.0007190532,           !- Coefficient 15
+    -0.025485194448,         !- Coefficient 16
+    0.0000487491696,         !- Coefficient 17
+    0.00002719234152,        !- Coefficient 18
+    -0.0653766255555556,     !- Coefficient 19
+    -0.002278167,            !- Coefficient 20
+    0.0002500254,            !- Coefficient 21
+    -0.0910565458,           !- Coefficient 22
+    0.00318176316,           !- Coefficient 23
+    0.000038621772,          !- Coefficient 24
+    -0.0034285382352,        !- Coefficient 25
+    0.00000856589904,        !- Coefficient 26
+    -0.000001516821552;      !- Coefficient 27
+
+!===========================Setpoint Manager for the Cooling tower============================
+! Please refer to Group-SetpointManagers in the Input-Output Reference for more details.
+
+  SetpointManager:FollowOutdoorAirTemperature,
+    CondenserControl SetpointManager,  !- Name
+    Temperature,             !- Control Variable
+    OutdoorAirWetBulb,       !- Reference Temperature Type
+    0,                       !- Offset Temperature Difference {deltaC}
+    80,                      !- Maximum Setpoint Temperature {C}
+    10,                      !- Minimum Setpoint Temperature {C}
+    Condenser Supply Outlet Node;  !- Setpoint Node or NodeList Name
+
+!=============================================================================================
+!===========================Circulation pump for the condenser loop===========================
+
+  Pump:VariableSpeed,
+    Cond Circ Pump,          !- Name
+    Condenser Supply Inlet Node,  !- Inlet Node Name
+    Condenser Pump Outlet Node,  !- Outlet Node Name
+    autosize,                !- Design Maximum Flow Rate {m3/s}
+    140000,                  !- Design Pump Head {Pa}
+    autosize,                !- Design Power Consumption {W}
+    0.9,                     !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+!=============================================================================================
+!=======================Modeling all the major pipes in the system===========================
+! Condenser Supply Bypass Pipe
+
+  Pipe:Adiabatic,
+    Condenser Supply Bypass Pipe,  !- Name
+    Cond Supply Bypass Inlet Node,  !- Inlet Node Name
+    Cond Supply Bypass Outlet Node;  !- Outlet Node Name
+
+! Condenser supply outlet pipe
+
+  Pipe:Adiabatic,
+    Condenser Supply Outlet Pipe,  !- Name
+    Condenser Supply Exit Pipe Inlet Node,  !- Inlet Node Name
+    Condenser Supply Outlet Node;  !- Outlet Node Name
+
+! Condenser demand inlet pipe
+
+  Pipe:Adiabatic,
+    Condenser Demand Inlet Pipe,  !- Name
+    Condenser Demand Inlet Node,  !- Inlet Node Name
+    Condenser Demand Entrance Pipe Outlet Node;  !- Outlet Node Name
+
+! Condenser Demand Bypass Pipe
+
+  Pipe:Adiabatic,
+    Condenser Demand Bypass Pipe,  !- Name
+    Cond Demand Bypass Inlet Node,  !- Inlet Node Name
+    Cond Demand Bypass Outlet Node;  !- Outlet Node Name
+
+! Condenser demand outlet pipe
+
+  Pipe:Adiabatic,
+    Condenser Demand Outlet Pipe,  !- Name
+    Condenser Demand Exit Pipe Inlet Node,  !- Inlet Node Name
+    Condenser Demand Outlet Node;  !- Outlet Node Name
+
+!--------------------Plant Equipment Operation Schemes for the Condenser Loop---------
+
+  PlantEquipmentOperationSchemes,
+    Tower Loop Operation,    !- Name
+    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
+    Tower Load,              !- Control Scheme 1 Name
+    Tower AlwaysOnSchedule;  !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:CoolingLoad,
+    Tower Load,              !- Name
+    0,                       !- Load Range 1 Lower Limit {W}
+    1000000000,              !- Load Range 1 Upper Limit {W}
+    Tower Plant;             !- Range 1 Equipment List Name
+
+  PlantEquipmentList,
+    Tower Plant,             !- Name
+    CoolingTower:VariableSpeed,  !- Equipment 1 Object Type
+    Cooling Tower;           !- Equipment 1 Name
+
+! ------------------------------- Condenser loop schedules-----------------------------
+
+  ScheduleTypeLimits,
+    Tower On/Off,            !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Compact,
+    Tower AlwaysOnSchedule,  !- Name
+    Tower On/Off,            !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1;          !- Field 3
+
+  Sizing:Plant,
+    Condenser Loop,          !- Plant or Condenser Loop Name
+    Condenser,               !- Loop Type
+    20.0,                    !- Design Loop Exit Temperature {C}
+    5.0;                     !- Loop Design Temperature Difference {deltaC}
+
+!****************************Simulation control*****************************
+! Please refer to all of the following object types in the Input-Output reference guide for
+! more information and variations.
+
+  SimulationControl,
+    NO,                      !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    Yes,                     !- Do Plant Sizing Calculation
+    No,                      !- Run Simulation for Sizing Periods
+    YES,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  Building,
+    Plant Load Profile Example,  !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Site:Location,
+    CHICAGO_IL_USA_WMO_725300,  !- Name
+    42.00,                   !- Latitude {deg}
+    -87.88,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190.00;                  !- Elevation {m}
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.5,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Htg 99% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+! This simulation is run for 1 year
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Monday,                  !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+! 1 timestep per hour, suggested timestep is 6
+
+  Timestep,1;
+
+! **************************************OUTPUTS******************************
+! The main outputs are the chiller Electricity Rate, CT inlet temp, CT outlet temp, CT Heat
+! transfer rate
+
+  Output:VariableDictionary,Regular;
+
+  Output:Variable,*,Chiller Electricity Rate,timestep;
+
+  Output:Variable,*,Cooling Tower Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Tower Outlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Plant Load Profile Mass Flow Rate,timestep;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

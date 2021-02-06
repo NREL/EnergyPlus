@@ -1,0 +1,499 @@
+! _BranchPumpsWithCommonPipe.idf
+! Basic file description: This input file is a plant-only simulation using a load profile object on the demand side.
+!   The supply side uses branch pumps and the plant loop contains a common pipe simulation
+! Highlights: Branch pumps with a common pipe
+! Simulation Location/Run:
+! Location: Chicago
+! Design Days: SummerDesignDay and WinterDesignDay
+! Run Period (Weather File): Annual
+! Run Control (should include this): No sizing, Run Design days, Don't run run period
+!
+! Building: No building
+! Floor Area: N/A
+! Number of Stories: N/A
+!
+! Zone Description Details: N/A
+! Internal gains description:  N/A
+! Interzone Surfaces: N/A
+! Internal Mass: N/A
+! People: N/A
+! Lights: N/A
+! Windows: N/A
+! Detached Shading: N/A
+! Daylight: N/A
+! Natural Ventilation: N/A
+! Compact Schedules (preferred): N/A
+! Solar Distribution: N/A
+!
+! HVAC: Plant only - with common pipe
+! Purchased Air: N/A
+! Zonal Equipment: N/A
+! Central Air Handling Equipment: N/A
+! System Equipment Autosize: N/A
+! Purchased Cooling: N/A
+! Purchased Heating: N/A
+! Coils: N/A
+! Pumps: Branch Pump
+! Boilers: None
+! Chillers: Constant COP
+! Towers: None
+!
+! Results: Standard
+! Standard Reports: AllSummary Table
+! Timestep or Hourly Variables: Hourly
+! Time bins Report: No
+! HTML Report: Yes
+! Environmental Emissions: No
+! Utility Tariffs: No
+
+  Version,9.4;
+
+  Building,
+    Branch Pumps With Common Pipe,  !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,6;
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  Site:Location,
+    CHICAGO_IL_USA_WMO_725300,  !- Name
+    42.00,                   !- Latitude {deg}
+    -87.88,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190.00;                  !- Elevation {m}
+
+ ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.5,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+ ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Htg 99% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063.,                  !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    NO,                      !- Do Zone Sizing Calculation
+    NO,                      !- Do System Sizing Calculation
+    NO,                      !- Do Plant Sizing Calculation
+    YES,                     !- Run Simulation for Sizing Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  PlantLoop,
+    Main Loop,               !- Name
+    WATER,                   !- Fluid Type
+    ,                        !- User Defined Fluid Type
+    Main Loop Operation,     !- Plant Equipment Operation Scheme Name
+    Supply Outlet Node,      !- Loop Temperature Setpoint Node Name
+    100,                     !- Maximum Loop Temperature {C}
+    3,                       !- Minimum Loop Temperature {C}
+    0.003,                   !- Maximum Loop Flow Rate {m3/s}
+    0,                       !- Minimum Loop Flow Rate {m3/s}
+    autocalculate,           !- Plant Loop Volume {m3}
+    Supply Inlet Node,       !- Plant Side Inlet Node Name
+    Supply Outlet Node,      !- Plant Side Outlet Node Name
+    Supply Branches,         !- Plant Side Branch List Name
+    Supply Connectors,       !- Plant Side Connector List Name
+    Demand Inlet Node,       !- Demand Side Inlet Node Name
+    Demand Outlet Node,      !- Demand Side Outlet Node Name
+    Demand Branches,         !- Demand Side Branch List Name
+    Demand Connectors,       !- Demand Side Connector List Name
+    OPTIMAL,                 !- Load Distribution Scheme
+    ,                        !- Availability Manager List Name
+    ,                        !- Plant Loop Demand Calculation Scheme
+    TwoWayCommonPipe;        !- Common Pipe Simulation
+
+  SetpointManager:Scheduled,
+    Main Loop Setpoint Manager 1,  !- Name
+    Temperature,             !- Control Variable
+    Main Loop Temp Sch 1,    !- Schedule Name
+    Main Loop Setpoint Node List 1;  !- Setpoint Node or NodeList Name
+
+  NodeList,
+    Main Loop Setpoint Node List 1,  !- Name
+    Supply Outlet Node;      !- Node 1 Name
+
+  SetpointManager:Scheduled,
+    Main Loop Setpoint Manager 2,  !- Name
+    Temperature,             !- Control Variable
+    Main Loop Temp Sch 2,    !- Schedule Name
+    Main Loop Setpoint Node List 2;  !- Setpoint Node or NodeList Name
+
+  NodeList,
+    Main Loop Setpoint Node List 2,  !- Name
+    Supply Inlet Node;       !- Node 1 Name
+
+  PlantEquipmentOperationSchemes,
+    Main Loop Operation,     !- Name
+    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
+    Purchased Only,          !- Control Scheme 1 Name
+    AlwaysOnSchedule;        !- Control Scheme 1 Schedule Name
+
+  PlantEquipmentOperation:HeatingLoad,
+    Purchased Only,          !- Name
+    0,                       !- Load Range 1 Lower Limit {W}
+    10000000,                !- Load Range 1 Upper Limit {W}
+    Heating Plant;           !- Range 1 Equipment List Name
+
+  PlantEquipmentList,
+    Heating Plant,           !- Name
+    DistrictHeating,         !- Equipment 1 Object Type
+    Purchased Heating 1,     !- Equipment 1 Name
+    DistrictHeating,         !- Equipment 2 Object Type
+    Purchased Heating 2;     !- Equipment 2 Name
+
+  BranchList,
+    Supply Branches,         !- Name
+    Supply Inlet Branch,     !- Branch 1 Name
+    Heating Branch 1,        !- Branch 2 Name
+    Heating Branch 2,        !- Branch 3 Name
+    Supply Outlet Branch;    !- Branch 4 Name
+
+  ConnectorList,
+    Supply Connectors,       !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Supply Splitter,         !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Supply Mixer;            !- Connector 2 Name
+
+  Connector:Splitter,
+    Supply Splitter,         !- Name
+    Supply Inlet Branch,     !- Inlet Branch Name
+    Heating Branch 1,        !- Outlet Branch 1 Name
+    Heating Branch 2;        !- Outlet Branch 2 Name
+
+  Connector:Mixer,
+    Supply Mixer,            !- Name
+    Supply Outlet Branch,    !- Outlet Branch Name
+    Heating Branch 1,        !- Inlet Branch 1 Name
+    Heating Branch 2;        !- Inlet Branch 2 Name
+
+  Branch,
+    Supply Inlet Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Supply Inlet Pipe,       !- Component 1 Name
+    Supply Inlet Node,       !- Component 1 Inlet Node Name
+    Supply Inlet Pipe Outlet Node;  !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Supply Inlet Pipe,       !- Name
+    Supply Inlet Node,       !- Inlet Node Name
+    Supply Inlet Pipe Outlet Node;  !- Outlet Node Name
+
+  Branch,
+    Heating Branch 1,        !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:ConstantSpeed,      !- Component 1 Object Type
+    Branch Pump 1,           !- Component 1 Name
+    Branch Pump 1 Inlet Node,!- Component 1 Inlet Node Name
+    Supply Heating 1 Inlet Node,  !- Component 1 Outlet Node Name
+    DistrictHeating,         !- Component 2 Object Type
+    Purchased Heating 1,     !- Component 2 Name
+    Supply Heating 1 Inlet Node,  !- Component 2 Inlet Node Name
+    Supply Heating 1 Outlet Node;  !- Component 2 Outlet Node Name
+
+  Pump:ConstantSpeed,
+    Branch Pump 1,           !- Name
+    Branch Pump 1 Inlet Node,!- Inlet Node Name
+    Supply Heating 1 Inlet Node,  !- Outlet Node Name
+    0.002,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1000,                    !- Design Power Consumption {W}
+    0.87,                    !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    INTERMITTENT;            !- Pump Control Type
+
+  DistrictHeating,
+    Purchased Heating 1,     !- Name
+    Supply Heating 1 Inlet Node,  !- Hot Water Inlet Node Name
+    Supply Heating 1 Outlet Node,  !- Hot Water Outlet Node Name
+    1000000;                 !- Nominal Capacity {W}
+
+  Branch,
+    Heating Branch 2,        !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:ConstantSpeed,      !- Component 1 Object Type
+    Branch Pump 2,           !- Component 1 Name
+    Branch Pump 2 Inlet Node,!- Component 1 Inlet Node Name
+    Supply Heating 2 Inlet Node,  !- Component 1 Outlet Node Name
+    DistrictHeating,         !- Component 2 Object Type
+    Purchased Heating 2,     !- Component 2 Name
+    Supply Heating 2 Inlet Node,  !- Component 2 Inlet Node Name
+    Supply Heating 2 Outlet Node;  !- Component 2 Outlet Node Name
+
+  Pump:ConstantSpeed,
+    Branch Pump 2,           !- Name
+    Branch Pump 2 Inlet Node,!- Inlet Node Name
+    Supply Heating 2 Inlet Node,  !- Outlet Node Name
+    0.003,                   !- Design Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1200,                    !- Design Power Consumption {W}
+    0.87,                    !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    INTERMITTENT;            !- Pump Control Type
+
+  DistrictHeating,
+    Purchased Heating 2,     !- Name
+    Supply Heating 2 Inlet Node,  !- Hot Water Inlet Node Name
+    Supply Heating 2 Outlet Node,  !- Hot Water Outlet Node Name
+    1000000;                 !- Nominal Capacity {W}
+
+  Branch,
+    Supply Outlet Branch,    !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Supply Outlet Pipe,      !- Component 1 Name
+    Supply Heating-Pipe Node,!- Component 1 Inlet Node Name
+    Supply Outlet Node;      !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Supply Outlet Pipe,      !- Name
+    Supply Heating-Pipe Node,!- Inlet Node Name
+    Supply Outlet Node;      !- Outlet Node Name
+
+  BranchList,
+    Demand Branches,         !- Name
+    Demand Inlet Branch,     !- Branch 1 Name
+    Load Profile Branch 1,   !- Branch 2 Name
+    Demand Outlet Branch;    !- Branch 3 Name
+
+  ConnectorList,
+    Demand Connectors,       !- Name
+    Connector:Splitter,      !- Connector 1 Object Type
+    Demand Splitter,         !- Connector 1 Name
+    Connector:Mixer,         !- Connector 2 Object Type
+    Demand Mixer;            !- Connector 2 Name
+
+  Connector:Splitter,
+    Demand Splitter,         !- Name
+    Demand Inlet Branch,     !- Inlet Branch Name
+    Load Profile Branch 1;   !- Outlet Branch 1 Name
+
+  Connector:Mixer,
+    Demand Mixer,            !- Name
+    Demand Outlet Branch,    !- Outlet Branch Name
+    Load Profile Branch 1;   !- Inlet Branch 1 Name
+
+  Branch,
+    Demand Inlet Branch,     !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pump:VariableSpeed,      !- Component 1 Object Type
+    Demand Pump 1,           !- Component 1 Name
+    Demand Inlet Node,       !- Component 1 Inlet Node Name
+    Demand Pipe-Load Profile Node;  !- Component 1 Outlet Node Name
+
+  Pump:VariableSpeed,
+    Demand Pump 1,           !- Name
+    Demand Inlet Node,       !- Inlet Node Name
+    Demand Pipe-Load Profile Node,  !- Outlet Node Name
+    0.002,                   !- Design Maximum Flow Rate {m3/s}
+    300000,                  !- Design Pump Head {Pa}
+    1250,                    !- Design Power Consumption {W}
+    0.87,                    !- Motor Efficiency
+    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
+    0,                       !- Coefficient 1 of the Part Load Performance Curve
+    1,                       !- Coefficient 2 of the Part Load Performance Curve
+    0,                       !- Coefficient 3 of the Part Load Performance Curve
+    0,                       !- Coefficient 4 of the Part Load Performance Curve
+    0,                       !- Design Minimum Flow Rate {m3/s}
+    INTERMITTENT;            !- Pump Control Type
+
+  Branch,
+    Load Profile Branch 1,   !- Name
+    ,                        !- Pressure Drop Curve Name
+    LoadProfile:Plant,       !- Component 1 Object Type
+    Load Profile 1,          !- Component 1 Name
+    Demand Load Profile 1 Inlet Node,  !- Component 1 Inlet Node Name
+    Demand Load Profile 1 Outlet Node;  !- Component 1 Outlet Node Name
+
+  LoadProfile:Plant,
+    Load Profile 1,          !- Name
+    Demand Load Profile 1 Inlet Node,  !- Inlet Node Name
+    Demand Load Profile 1 Outlet Node,  !- Outlet Node Name
+    Load Profile 1 Load Schedule,  !- Load Schedule Name
+    0.003,                   !- Peak Flow Rate {m3/s}
+    Load Profile 1 Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+
+  Branch,
+    Demand Outlet Branch,    !- Name
+    ,                        !- Pressure Drop Curve Name
+    Pipe:Adiabatic,          !- Component 1 Object Type
+    Demand Outlet Pipe,      !- Component 1 Name
+    Demand Load Profile-Pipe Node,  !- Component 1 Inlet Node Name
+    Demand Outlet Node;      !- Component 1 Outlet Node Name
+
+  Pipe:Adiabatic,
+    Demand Outlet Pipe,      !- Name
+    Demand Load Profile-Pipe Node,  !- Inlet Node Name
+    Demand Outlet Node;      !- Outlet Node Name
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Compact,
+    Main Loop Temp Sch 1,    !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,60.0;       !- Field 3
+
+  Schedule:Compact,
+    Main Loop Temp Sch 2,    !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,58.0;       !- Field 3
+
+  Schedule:Compact,
+    AlwaysOnSchedule,        !- Name
+    On/Off,                  !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1;          !- Field 3
+
+  Schedule:Compact,
+    Load Profile 1 Load Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 4:00,20000,       !- Field 3
+    UNTIL: 8:00,30000,       !- Field 5
+    UNTIL: 9:00,20000,       !- Field 7
+    UNTIL: 12:00,26000,      !- Field 9
+    UNTIL: 24:00,24000;      !- Field 11
+
+  Schedule:Compact,
+    Load Profile 1 Flow Frac Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,1.0;        !- Field 3
+
+  Output:VariableDictionary,idf;
+
+  Output:Variable,*,Plant Common Pipe Primary Mass Flow Rate,hourly;
+
+  Output:Variable,*,Plant Common Pipe Secondary Mass Flow Rate,hourly;
+
+  Output:Variable,*,Plant Common Pipe Primary to Secondary Mass Flow Rate,hourly;
+
+  Output:Variable,*,Plant Common Pipe Secondary to Primary Mass Flow Rate,hourly;
+
+  Output:Variable,*,System Node Temperature,Hourly;
+
+  Output:Variable,*,System Node Mass Flow Rate,Hourly;
+
+  Output:Variable,*,Plant Load Profile Mass Flow Rate,Hourly;
+
+  Output:Variable,*,Plant Load Profile Heat Transfer Rate,Hourly;
+
+  Output:Variable,*,Plant Load Profile Heat Transfer Energy,Hourly;
+
+  Output:Variable,*,District Heating Hot Water Rate,Hourly;
+
+  Output:Variable,*,District Heating Hot Water Energy,Hourly;
+
+  Output:Meter,Heating:DistrictHeating,Daily;
+
+  Output:Meter:MeterFileOnly,Heating:DistrictHeating,monthly;
+
+  Output:Meter:MeterFileOnly,Heating:DistrictHeating,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
+
+  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

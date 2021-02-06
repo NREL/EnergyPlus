@@ -2201,60 +2201,6 @@
     Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name
     Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER ===========
-
-  ZoneHVAC:Baseboard:RadiantConvective:Water:Design,
-     SPACE2-1 Baseboard Design,      !- Name
-     HeatingDesignCapacity,   !- Heating Design Capacity Method
-     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-     ,                        !- Fraction of Autosized Heating Design Capacity
-     0.001,                   !- Convergence Tolerance
-     0.3,                     !- Fraction Radiant
-     0.3;                     !- Fraction of Radiant Energy Incident on People
-
-  ZoneHVAC:Baseboard:RadiantConvective:Water:Design,
-     SPACE4-1 Baseboard Design,      !- Name
-     HeatingDesignCapacity,   !- Heating Design Capacity Method
-     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-     ,                        !- Fraction of Autosized Heating Design Capacity
-     0.001,                   !- Convergence Tolerance
-     0.3,                     !- Fraction Radiant
-     0.3;                     !- Fraction of Radiant Energy Incident on People
-
-  ZoneHVAC:Baseboard:RadiantConvective:Water,
-    SPACE2-1 Baseboard,      !- Name
-    SPACE2-1 Baseboard Design,      !- Design Object Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
-    SPACE2-1 Zone Coil Water In Node,  !- Inlet Node Name
-    SPACE2-1 Zone Coil Water Out Node,  !- Outlet Node Name
-    87.78,                   !- Rated Average Water Temperature {C}
-    0.063,                   !- Rated Water Mass Flow Rate {kg/s}
-    autosize,                !- Heating Design Capacity {W}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
-    RIGHT-1,                 !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
-    C2-1,                    !- Surface 2 Name
-    0.2,                     !- Fraction of Radiant Energy to Surface 2
-    SB25,                    !- Surface 3 Name
-    0.1;                     !- Fraction of Radiant Energy to Surface 3
-
-  ZoneHVAC:Baseboard:RadiantConvective:Water,
-    SPACE4-1 Baseboard,      !- Name
-    SPACE4-1 Baseboard Design,      !- Design Object Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
-    SPACE4-1 Zone Coil Water In Node,  !- Inlet Node Name
-    SPACE4-1 Zone Coil Water Out Node,  !- Outlet Node Name
-    82.22,                   !- Rated Average Water Temperature {C}
-    0.063,                   !- Rated Water Mass Flow Rate {kg/s}
-    autosize,                !- Heating Design Capacity {W}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
-    LEFT-1,                  !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
-    C4-1,                    !- Surface 2 Name
-    0.2,                     !- Fraction of Radiant Energy to Surface 2
-    SB45,                    !- Surface 3 Name
-    0.1;                     !- Fraction of Radiant Energy to Surface 3
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 
   AirTerminal:SingleDuct:VAV:NoReheat,
@@ -3753,3 +3699,55 @@
 
   Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
+
+  ZoneHVAC:Baseboard:RadiantConvective:Water, 
+    SPACE2-1 Baseboard, !- Name 
+    SPACE2-1 Baseboard Design, !- Design_Object_Name 
+    ReheatCoilAvailSched, !- Availability_Schedule_Name 
+    SPACE2-1 Zone Coil Water In Node, !- Inlet_Node_Name 
+    SPACE2-1 Zone Coil Water Out Node, !- Outlet_Node_Name 
+    87.78, !- Rated_Average_Water_Temperature 
+    0.063, !- Rated_Water_Mass_Flow_Rate 
+    autosize, !- Heating_Design_Capacity 
+    autosize, !- Maximum_Water_Flow_Rate 
+    RIGHT-1, !- Surface_1_Name 
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1 
+    C2-1, !- Surface_2_Name 
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2 
+    SB25, !- Surface_3_Name 
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3 
+
+  ZoneHVAC:Baseboard:RadiantConvective:Water:Design, 
+    SPACE2-1 Baseboard Design, !- Design_Object_Name 
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method 
+    , !- Heating_Design_Capacity_Per_Floor_Area 
+    , !- Fraction_of_Autosized_Heating_Design_Capacity 
+    0.001, !- Convergence_Tolerance 
+    0.3, !- Fraction_Radiant 
+    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People 
+
+  ZoneHVAC:Baseboard:RadiantConvective:Water, 
+    SPACE4-1 Baseboard, !- Name 
+    SPACE4-1 Baseboard Design, !- Design_Object_Name 
+    ReheatCoilAvailSched, !- Availability_Schedule_Name 
+    SPACE4-1 Zone Coil Water In Node, !- Inlet_Node_Name 
+    SPACE4-1 Zone Coil Water Out Node, !- Outlet_Node_Name 
+    82.22, !- Rated_Average_Water_Temperature 
+    0.063, !- Rated_Water_Mass_Flow_Rate 
+    autosize, !- Heating_Design_Capacity 
+    autosize, !- Maximum_Water_Flow_Rate 
+    LEFT-1, !- Surface_1_Name 
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1 
+    C4-1, !- Surface_2_Name 
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2 
+    SB45, !- Surface_3_Name 
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3 
+
+  ZoneHVAC:Baseboard:RadiantConvective:Water:Design, 
+    SPACE4-1 Baseboard Design, !- Design_Object_Name 
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method 
+    , !- Heating_Design_Capacity_Per_Floor_Area 
+    , !- Fraction_of_Autosized_Heating_Design_Capacity 
+    0.001, !- Convergence_Tolerance 
+    0.3, !- Fraction_Radiant 
+    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People 

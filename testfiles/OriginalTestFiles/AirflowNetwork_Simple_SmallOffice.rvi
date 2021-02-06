@@ -1,0 +1,25 @@
+eplusout.eso
+eplusout.csv
+AFN Distribution Sensible Heat Loss Rate
+AFN Distribution Sensible Heat Gain Rate
+AFN Distribution Sensible Heat Loss Energy
+AFN Distribution Sensible Heat Gain Energy
+AFN Zone Infiltration Sensible Heat Loss Energy
+AFN Zone Infiltration Sensible Heat Gain Energy
+Zone Infiltration Sensible Heat Loss Energy
+Zone Infiltration Sensible Heat Gain Energy
+Zone Ventilation Sensible Heat Loss Energy
+Zone Ventilation Sensible Heat Gain Energy
+AFN Linkage Node 1 to Node 2 Mass Flow Rate
+Heating Coil NaturalGas Rate
+Cooling Coil Electricity Rate
+Zone Air Temperature
+Zone Air System Sensible Heating Energy
+Zone Air System Sensible Cooling Energy
+Zone Air Heat Balance Internal Convective Heat Gain Rate
+Zone Air Heat Balance Surface Convection Rate
+Zone Air Heat Balance Interzone Air Transfer Rate
+Zone Air Heat Balance Outdoor Air Transfer Rate
+Zone Air Heat Balance System Air Transfer Rate
+Zone Air Heat Balance Air Energy Storage Rate
+0

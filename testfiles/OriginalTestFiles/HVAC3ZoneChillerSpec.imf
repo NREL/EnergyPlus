@@ -1,0 +1,78 @@
+!  Version,
+!    8.9;                    !- Version Identifier
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  DistrictCooling,
+    Purchased Cooling,       !- Name
+    Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name
+    Purchased Cooling Outlet Node,  !- Chilled Water Outlet Node Name
+    680000;                  !- Nominal Capacity {W}
+
+  Chiller:Electric,
+    Little Chiller,          !- Name
+    WaterCooled,             !- Condenser Type
+    20000,                   !- Nominal Capacity {W}
+    2.75,                    !- Nominal COP {W/W}
+    Little Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+    Little Chiller Outlet Node,  !- Chilled Water Outlet Node Name
+    Little Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Little Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+    .15,                     !- Minimum Part Load Ratio
+    1.0,                     !- Maximum Part Load Ratio
+    .65,                     !- Optimum Part Load Ratio
+    29.44,                   !- Design Condenser Inlet Temperature {C}
+    2.682759,                !- Temperature Rise Coefficient
+    6.667,                   !- Design Chilled Water Outlet Temperature {C}
+    0.0011,                  !- Design Chilled Water Flow Rate {m3/s}
+    0.0011,                  !- Design Condenser Fluid Flow Rate {m3/s}
+    0.94483600,              !- Coefficient 1 of Capacity Ratio Curve
+    -.05700880,              !- Coefficient 2 of Capacity Ratio Curve
+    -.00185486,              !- Coefficient 3 of Capacity Ratio Curve
+    1.907846,                !- Coefficient 1 of Power Ratio Curve
+    -1.20498700,             !- Coefficient 2 of Power Ratio Curve
+    0.26346230,              !- Coefficient 3 of Power Ratio Curve
+    0.03303,                 !- Coefficient 1 of Full Load Ratio Curve
+    0.6852,                  !- Coefficient 2 of Full Load Ratio Curve
+    0.2818,                  !- Coefficient 3 of Full Load Ratio Curve
+    5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+    LeavingSetpointModulated;!- Chiller Flow Mode
+
+  SetpointManager:Scheduled,
+    Little Chiller Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    CW Loop Temp Schedule,   !- Schedule Name
+    Little Chiller Outlet Node;  !- Setpoint Node or NodeList Name
+
+  Chiller:Absorption,
+    Big Chiller,             !- Name
+    100000,                  !- Nominal Capacity {W}
+    250,                     !- Nominal Pumping Power {W}
+    Big Chiller Inlet Node,  !- Chilled Water Inlet Node Name
+    Big Chiller Outlet Node, !- Chilled Water Outlet Node Name
+    Big Chiller Condenser Inlet Node,  !- Condenser Inlet Node Name
+    Big Chiller Condenser Outlet Node,  !- Condenser Outlet Node Name
+    .15,                     !- Minimum Part Load Ratio
+    1.0,                     !- Maximum Part Load Ratio
+    .65,                     !- Optimum Part Load Ratio
+    35.0,                    !- Design Condenser Inlet Temperature {C}
+    .0011,                   !- Design Chilled Water Flow Rate {m3/s}
+    .0011,                   !- Design Condenser Water Flow Rate {m3/s}
+    0.03303,                 !- Coefficient 1 of the Hot Water or Steam Use Part Load Ratio Curve
+    0.6852,                  !- Coefficient 2 of the Hot Water or Steam Use Part Load Ratio Curve
+    0.2818,                  !- Coefficient 3 of the Hot Water or Steam Use Part Load Ratio Curve
+    1.0,                     !- Coefficient 1 of the Pump Electric Use Part Load Ratio Curve
+    0,                       !- Coefficient 2 of the Pump Electric Use Part Load Ratio Curve
+    0,                       !- Coefficient 3 of the Pump Electric Use Part Load Ratio Curve
+    5,                       !- Chilled Water Outlet Temperature Lower Limit {C}
+    ,                        !- Generator Inlet Node Name
+    ,                        !- Generator Outlet Node Name
+    LeavingSetpointModulated;!- Chiller Flow Mode
+
+  SetpointManager:Scheduled,
+    Big Chiller Setpoint Manager,  !- Name
+    Temperature,             !- Control Variable
+    CW Loop Temp Schedule,   !- Schedule Name
+    Big Chiller Outlet Node; !- Setpoint Node or NodeList Name
+

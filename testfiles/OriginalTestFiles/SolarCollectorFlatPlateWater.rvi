@@ -1,0 +1,24 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Pump Mass Flow Rate
+Domestic Hot Water Inlet Node,System Node Temperature
+Domestic Hot Water Outlet Node,System Node Temperature
+Storage Tank Source Loop Inlet Node,System Node Temperature
+Storage Tank Source Loop Outlet Node,System Node Temperature
+Storage Tank,Water Heater Tank Temperature
+Storage Tank,Water Heater Heat Loss Rate
+Storage Tank,Water Heater Use Side Heat Transfer Rate
+Storage Tank,Water Heater Source Side Heat Transfer Rate
+Instantaneous Water Heater,Water Heater Tank Temperature
+Instantaneous Water Heater,Water Heater Electricity Rate
+Tempering Valve Flow Fraction
+Water Use Equipment Hot Water Mass Flow Rate
+Water Use Equipment Total Mass Flow Rate
+Water Use Connections Hot Water Mass Flow Rate
+Water Use Connections Total Mass Flow Rate
+Collector Surface 1,Surface Outside Face Incident Solar Radiation Rate per Area
+Collector 1,Solar Collector Heat Transfer Rate
+WaterSystems:Electricity
+WaterSystems:Water
+0

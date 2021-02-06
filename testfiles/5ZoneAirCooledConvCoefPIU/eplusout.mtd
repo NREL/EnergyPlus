@@ -1,0 +1,778 @@
+
+ Meters for 7,SPACE1-1 LIGHTS 1:Lights Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE1-1 [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE1-1 [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 80,SPACE2-1 LIGHTS 1:Lights Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE2-1 [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE2-1 [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 105,SPACE3-1 LIGHTS 1:Lights Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE3-1 [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE3-1 [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 130,SPACE4-1 LIGHTS 1:Lights Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE4-1 [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE4-1 [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 155,SPACE5-1 LIGHTS 1:Lights Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE5-1 [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:SPACE5-1 [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 180,SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE1-1 [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:SPACE1-1 [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 217,SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE2-1 [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:SPACE2-1 [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 230,SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE3-1 [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:SPACE3-1 [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 243,SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE4-1 [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:SPACE4-1 [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 256,SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:SPACE5-1 [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:SPACE5-1 [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 269,PLENUM-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:PLENUM-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:PLENUM-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 342,PLENUM-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:PLENUM-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:PLENUM-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 380,SPACE1-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE1-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:SPACE1-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 405,SPACE1-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE1-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:SPACE1-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 419,SPACE2-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE2-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:SPACE2-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 444,SPACE2-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE2-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:SPACE2-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 460,SPACE3-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE3-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:SPACE3-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 485,SPACE3-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE3-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:SPACE3-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 499,SPACE4-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE4-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:SPACE4-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 524,SPACE4-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE4-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:SPACE4-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 538,SPACE5-1:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE5-1 [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:SPACE5-1 [J]
+  OnMeter=General:Heating:EnergyTransfer [J]
+
+ Meters for 563,SPACE5-1:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:SPACE5-1 [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:SPACE5-1 [J]
+  OnMeter=General:Cooling:EnergyTransfer [J]
+
+ Meters for 577,Whole Building:Facility Total Purchased Electricity Energy [J]
+  OnMeter=ElectricityPurchased:Facility [J]
+  OnMeter=ElectricityPurchased:Plant [J]
+  OnMeter=Cogeneration:ElectricityPurchased [J]
+  OnMeter=General:Cogeneration:ElectricityPurchased [J]
+
+ Meters for 626,Whole Building:Facility Total Surplus Electricity Energy [J]
+  OnMeter=ElectricitySurplusSold:Facility [J]
+  OnMeter=ElectricitySurplusSold:Plant [J]
+  OnMeter=Cogeneration:ElectricitySurplusSold [J]
+  OnMeter=General:Cogeneration:ElectricitySurplusSold [J]
+
+ Meters for 675,Whole Building:Facility Net Purchased Electricity Energy [J]
+  OnMeter=ElectricityNet:Facility [J]
+  OnMeter=ElectricityNet:Plant [J]
+  OnMeter=Cogeneration:ElectricityNet [J]
+  OnMeter=General:Cogeneration:ElectricityNet [J]
+
+ Meters for 724,SPACE1-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 749,SPACE1-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 786,SPACE2-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 787,SPACE2-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 789,SPACE3-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 790,SPACE3-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 791,SPACE4-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 792,SPACE4-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 793,SPACE5-1 ZONE COIL:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 794,SPACE5-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 795,MAIN HEATING COIL 1:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 796,MAIN HEATING COIL 1:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 797,MAIN COOLING COIL 1:Cooling Coil Total Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=CoolingCoils:EnergyTransfer [J]
+
+ Meters for 810,MAIN COOLING COIL 1:Cooling Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopCoolingDemand:Facility [J]
+  OnMeter=PlantLoopCoolingDemand:HVAC [J]
+  OnMeter=CoolingCoils:PlantLoopCoolingDemand [J]
+
+ Meters for 848,SPACE1-1 PIU FAN:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 885,SPACE2-1 PIU FAN:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 886,SPACE3-1 PIU FAN:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 887,SPACE4-1 PIU FAN:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 888,SUPPLY FAN 1:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 889,RELIEF FAN 1:Fan Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 894,CENTRAL BOILER:Boiler Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=Boilers:EnergyTransfer [J]
+
+ Meters for 919,CENTRAL BOILER:Boiler NaturalGas Energy [J]
+  OnMeter=NaturalGas:Facility [J]
+  OnMeter=NaturalGas:Plant [J]
+  OnMeter=Heating:NaturalGas [J]
+  OnMeter=Boiler:Heating:NaturalGas [J]
+
+ Meters for 968,CENTRAL BOILER:Boiler Ancillary Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Heating:Electricity [J]
+  OnMeter=Boiler Parasitic:Heating:Electricity [J]
+
+ Meters for 1005,CENTRAL CHILLER:Chiller Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Cooling:Electricity [J]
+  OnMeter=General:Cooling:Electricity [J]
+
+ Meters for 1030,CENTRAL CHILLER:Chiller Evaporator Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=Chillers:EnergyTransfer [J]
+
+ Meters for 1043,CENTRAL CHILLER:Chiller Condenser Heat Transfer Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=HeatRejection:EnergyTransfer [J]
+  OnMeter=General:HeatRejection:EnergyTransfer [J]
+
+ Meters for 1068,HW CIRC PUMP:Pump Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Pumps:Electricity [J]
+  OnMeter=General:Pumps:Electricity [J]
+
+ Meters for 1093,CW CIRC PUMP:Pump Electricity Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Pumps:Electricity [J]
+  OnMeter=General:Pumps:Electricity [J]
+
+ Meters for 1116,Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ Meters for 1141,Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ Meters for 1142,Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ For Meter=Electricity:Facility [J], ResourceType=Electricity, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE1-1 PIU FAN:Fan Electricity Energy
+  SPACE2-1 PIU FAN:Fan Electricity Energy
+  SPACE3-1 PIU FAN:Fan Electricity Energy
+  SPACE4-1 PIU FAN:Fan Electricity Energy
+  SUPPLY FAN 1:Fan Electricity Energy
+  RELIEF FAN 1:Fan Electricity Energy
+  CENTRAL BOILER:Boiler Ancillary Electricity Energy
+  CENTRAL CHILLER:Chiller Electricity Energy
+  HW CIRC PUMP:Pump Electricity Energy
+  CW CIRC PUMP:Pump Electricity Energy
+
+ For Meter=Electricity:Building [J], ResourceType=Electricity, Group=Building, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=Electricity:Zone:SPACE1-1 [J], ResourceType=Electricity, Group=Zone, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorLights:Electricity [J], ResourceType=Electricity, EndUse=InteriorLights, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=InteriorLights:Electricity:Zone:SPACE1-1 [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=GeneralLights:InteriorLights:Electricity [J], ResourceType=Electricity, EndUse=InteriorLights, contents are:
+  SPACE1-1 LIGHTS 1:Lights Electricity Energy
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=Electricity:Zone:SPACE2-1 [J], ResourceType=Electricity, Group=Zone, contents are:
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorLights:Electricity:Zone:SPACE2-1 [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  SPACE2-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=Electricity:Zone:SPACE3-1 [J], ResourceType=Electricity, Group=Zone, contents are:
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorLights:Electricity:Zone:SPACE3-1 [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  SPACE3-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=Electricity:Zone:SPACE4-1 [J], ResourceType=Electricity, Group=Zone, contents are:
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorLights:Electricity:Zone:SPACE4-1 [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  SPACE4-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=Electricity:Zone:SPACE5-1 [J], ResourceType=Electricity, Group=Zone, contents are:
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorLights:Electricity:Zone:SPACE5-1 [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  SPACE5-1 LIGHTS 1:Lights Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity [J], ResourceType=Electricity, EndUse=InteriorEquipment, contents are:
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:SPACE1-1 [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=General:InteriorEquipment:Electricity [J], ResourceType=Electricity, EndUse=InteriorEquipment, contents are:
+  SPACE1-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:SPACE2-1 [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  SPACE2-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:SPACE3-1 [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  SPACE3-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:SPACE4-1 [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  SPACE4-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:SPACE5-1 [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  SPACE5-1 ELECEQ 1:Electric Equipment Electricity Energy
+
+ For Meter=EnergyTransfer:Facility [J], ResourceType=EnergyTransfer, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Heating Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+  SPACE2-1:Zone Air System Sensible Heating Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+  SPACE3-1:Zone Air System Sensible Heating Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+  SPACE4-1:Zone Air System Sensible Heating Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+  SPACE5-1:Zone Air System Sensible Heating Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE2-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE3-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE4-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE5-1 ZONE COIL:Heating Coil Heating Energy
+  MAIN HEATING COIL 1:Heating Coil Heating Energy
+  MAIN COOLING COIL 1:Cooling Coil Total Cooling Energy
+  CENTRAL BOILER:Boiler Heating Energy
+  CENTRAL CHILLER:Chiller Evaporator Cooling Energy
+  CENTRAL CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=EnergyTransfer:Building [J], ResourceType=EnergyTransfer, Group=Building, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Heating Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+  SPACE2-1:Zone Air System Sensible Heating Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+  SPACE3-1:Zone Air System Sensible Heating Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+  SPACE4-1:Zone Air System Sensible Heating Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+  SPACE5-1:Zone Air System Sensible Heating Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:PLENUM-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Heating, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+  SPACE1-1:Zone Air System Sensible Heating Energy
+  SPACE2-1:Zone Air System Sensible Heating Energy
+  SPACE3-1:Zone Air System Sensible Heating Energy
+  SPACE4-1:Zone Air System Sensible Heating Energy
+  SPACE5-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:PLENUM-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+
+ For Meter=General:Heating:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Heating, contents are:
+  PLENUM-1:Zone Air System Sensible Heating Energy
+  SPACE1-1:Zone Air System Sensible Heating Energy
+  SPACE2-1:Zone Air System Sensible Heating Energy
+  SPACE3-1:Zone Air System Sensible Heating Energy
+  SPACE4-1:Zone Air System Sensible Heating Energy
+  SPACE5-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Cooling, contents are:
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:PLENUM-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=General:Cooling:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Cooling, contents are:
+  PLENUM-1:Zone Air System Sensible Cooling Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:SPACE1-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  SPACE1-1:Zone Air System Sensible Heating Energy
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:SPACE1-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  SPACE1-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:SPACE1-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  SPACE1-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:SPACE2-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  SPACE2-1:Zone Air System Sensible Heating Energy
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:SPACE2-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  SPACE2-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:SPACE2-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  SPACE2-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:SPACE3-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  SPACE3-1:Zone Air System Sensible Heating Energy
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:SPACE3-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  SPACE3-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:SPACE3-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  SPACE3-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:SPACE4-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  SPACE4-1:Zone Air System Sensible Heating Energy
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:SPACE4-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  SPACE4-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:SPACE4-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  SPACE4-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:SPACE5-1 [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  SPACE5-1:Zone Air System Sensible Heating Energy
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:SPACE5-1 [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  SPACE5-1:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:SPACE5-1 [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  SPACE5-1:Zone Air System Sensible Cooling Energy
+
+ For Meter=ElectricityPurchased:Facility [J], ResourceType=ElectricityPurchased, contents are:
+  Whole Building:Facility Total Purchased Electricity Energy
+
+ For Meter=ElectricityPurchased:Plant [J], ResourceType=ElectricityPurchased, Group=Plant, contents are:
+  Whole Building:Facility Total Purchased Electricity Energy
+
+ For Meter=Cogeneration:ElectricityPurchased [J], ResourceType=ElectricityPurchased, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Purchased Electricity Energy
+
+ For Meter=General:Cogeneration:ElectricityPurchased [J], ResourceType=ElectricityPurchased, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Purchased Electricity Energy
+
+ For Meter=ElectricitySurplusSold:Facility [J], ResourceType=ElectricitySurplusSold, contents are:
+  Whole Building:Facility Total Surplus Electricity Energy
+
+ For Meter=ElectricitySurplusSold:Plant [J], ResourceType=ElectricitySurplusSold, Group=Plant, contents are:
+  Whole Building:Facility Total Surplus Electricity Energy
+
+ For Meter=Cogeneration:ElectricitySurplusSold [J], ResourceType=ElectricitySurplusSold, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Surplus Electricity Energy
+
+ For Meter=General:Cogeneration:ElectricitySurplusSold [J], ResourceType=ElectricitySurplusSold, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Surplus Electricity Energy
+
+ For Meter=ElectricityNet:Facility [J], ResourceType=ElectricityNet, contents are:
+  Whole Building:Facility Net Purchased Electricity Energy
+
+ For Meter=ElectricityNet:Plant [J], ResourceType=ElectricityNet, Group=Plant, contents are:
+  Whole Building:Facility Net Purchased Electricity Energy
+
+ For Meter=Cogeneration:ElectricityNet [J], ResourceType=ElectricityNet, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Net Purchased Electricity Energy
+
+ For Meter=General:Cogeneration:ElectricityNet [J], ResourceType=ElectricityNet, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Net Purchased Electricity Energy
+
+ For Meter=EnergyTransfer:HVAC [J], ResourceType=EnergyTransfer, Group=HVAC, contents are:
+  SPACE1-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE2-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE3-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE4-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE5-1 ZONE COIL:Heating Coil Heating Energy
+  MAIN HEATING COIL 1:Heating Coil Heating Energy
+  MAIN COOLING COIL 1:Cooling Coil Total Cooling Energy
+
+ For Meter=HeatingCoils:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=HeatingCoils, contents are:
+  SPACE1-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE2-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE3-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE4-1 ZONE COIL:Heating Coil Heating Energy
+  SPACE5-1 ZONE COIL:Heating Coil Heating Energy
+  MAIN HEATING COIL 1:Heating Coil Heating Energy
+
+ For Meter=PlantLoopHeatingDemand:Facility [J], ResourceType=PlantLoopHeatingDemand, contents are:
+  SPACE1-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE2-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE3-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE4-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE5-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  MAIN HEATING COIL 1:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=PlantLoopHeatingDemand:HVAC [J], ResourceType=PlantLoopHeatingDemand, Group=HVAC, contents are:
+  SPACE1-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE2-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE3-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE4-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE5-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  MAIN HEATING COIL 1:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=HeatingCoils:PlantLoopHeatingDemand [J], ResourceType=PlantLoopHeatingDemand, EndUse=HeatingCoils, contents are:
+  SPACE1-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE2-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE3-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE4-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  SPACE5-1 ZONE COIL:Heating Coil Source Side Heat Transfer Energy
+  MAIN HEATING COIL 1:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=CoolingCoils:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=CoolingCoils, contents are:
+  MAIN COOLING COIL 1:Cooling Coil Total Cooling Energy
+
+ For Meter=PlantLoopCoolingDemand:Facility [J], ResourceType=PlantLoopCoolingDemand, contents are:
+  MAIN COOLING COIL 1:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=PlantLoopCoolingDemand:HVAC [J], ResourceType=PlantLoopCoolingDemand, Group=HVAC, contents are:
+  MAIN COOLING COIL 1:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=CoolingCoils:PlantLoopCoolingDemand [J], ResourceType=PlantLoopCoolingDemand, EndUse=CoolingCoils, contents are:
+  MAIN COOLING COIL 1:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=Electricity:HVAC [J], ResourceType=Electricity, Group=HVAC, contents are:
+  SPACE1-1 PIU FAN:Fan Electricity Energy
+  SPACE2-1 PIU FAN:Fan Electricity Energy
+  SPACE3-1 PIU FAN:Fan Electricity Energy
+  SPACE4-1 PIU FAN:Fan Electricity Energy
+  SUPPLY FAN 1:Fan Electricity Energy
+  RELIEF FAN 1:Fan Electricity Energy
+
+ For Meter=Fans:Electricity [J], ResourceType=Electricity, EndUse=Fans, contents are:
+  SPACE1-1 PIU FAN:Fan Electricity Energy
+  SPACE2-1 PIU FAN:Fan Electricity Energy
+  SPACE3-1 PIU FAN:Fan Electricity Energy
+  SPACE4-1 PIU FAN:Fan Electricity Energy
+  SUPPLY FAN 1:Fan Electricity Energy
+  RELIEF FAN 1:Fan Electricity Energy
+
+ For Meter=General:Fans:Electricity [J], ResourceType=Electricity, EndUse=Fans, contents are:
+  SPACE1-1 PIU FAN:Fan Electricity Energy
+  SPACE2-1 PIU FAN:Fan Electricity Energy
+  SPACE3-1 PIU FAN:Fan Electricity Energy
+  SPACE4-1 PIU FAN:Fan Electricity Energy
+  SUPPLY FAN 1:Fan Electricity Energy
+  RELIEF FAN 1:Fan Electricity Energy
+
+ For Meter=EnergyTransfer:Plant [J], ResourceType=EnergyTransfer, Group=Plant, contents are:
+  CENTRAL BOILER:Boiler Heating Energy
+  CENTRAL CHILLER:Chiller Evaporator Cooling Energy
+  CENTRAL CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=Boilers:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Boilers, contents are:
+  CENTRAL BOILER:Boiler Heating Energy
+
+ For Meter=NaturalGas:Facility [J], ResourceType=NaturalGas, contents are:
+  CENTRAL BOILER:Boiler NaturalGas Energy
+
+ For Meter=NaturalGas:Plant [J], ResourceType=NaturalGas, Group=Plant, contents are:
+  CENTRAL BOILER:Boiler NaturalGas Energy
+
+ For Meter=Heating:NaturalGas [J], ResourceType=NaturalGas, EndUse=Heating, contents are:
+  CENTRAL BOILER:Boiler NaturalGas Energy
+
+ For Meter=Boiler:Heating:NaturalGas [J], ResourceType=NaturalGas, EndUse=Heating, contents are:
+  CENTRAL BOILER:Boiler NaturalGas Energy
+
+ For Meter=Electricity:Plant [J], ResourceType=Electricity, Group=Plant, contents are:
+  CENTRAL BOILER:Boiler Ancillary Electricity Energy
+  CENTRAL CHILLER:Chiller Electricity Energy
+  HW CIRC PUMP:Pump Electricity Energy
+  CW CIRC PUMP:Pump Electricity Energy
+
+ For Meter=Heating:Electricity [J], ResourceType=Electricity, EndUse=Heating, contents are:
+  CENTRAL BOILER:Boiler Ancillary Electricity Energy
+
+ For Meter=Boiler Parasitic:Heating:Electricity [J], ResourceType=Electricity, EndUse=Heating, contents are:
+  CENTRAL BOILER:Boiler Ancillary Electricity Energy
+
+ For Meter=Cooling:Electricity [J], ResourceType=Electricity, EndUse=Cooling, contents are:
+  CENTRAL CHILLER:Chiller Electricity Energy
+
+ For Meter=General:Cooling:Electricity [J], ResourceType=Electricity, EndUse=Cooling, contents are:
+  CENTRAL CHILLER:Chiller Electricity Energy
+
+ For Meter=Chillers:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Chillers, contents are:
+  CENTRAL CHILLER:Chiller Evaporator Cooling Energy
+
+ For Meter=HeatRejection:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=HeatRejection, contents are:
+  CENTRAL CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=General:HeatRejection:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=HeatRejection, contents are:
+  CENTRAL CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=Pumps:Electricity [J], ResourceType=Electricity, EndUse=Pumps, contents are:
+  HW CIRC PUMP:Pump Electricity Energy
+  CW CIRC PUMP:Pump Electricity Energy
+
+ For Meter=General:Pumps:Electricity [J], ResourceType=Electricity, EndUse=Pumps, contents are:
+  HW CIRC PUMP:Pump Electricity Energy
+  CW CIRC PUMP:Pump Electricity Energy
+
+ For Meter=Carbon Equivalent:Facility [kg], ResourceType=Carbon Equivalent, contents are:
+  Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass
+
+ For Meter=CarbonEquivalentEmissions:Carbon Equivalent [kg], ResourceType=Carbon Equivalent, EndUse=CarbonEquivalentEmissions, contents are:
+  Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass

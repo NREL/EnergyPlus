@@ -1,0 +1,20 @@
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Zone Air Temperature
+Zone Mean Air Temperature
+Zone Air Humidity Ratio
+Zone Air System Sensible Cooling Energy
+Zone Air System Sensible Cooling Rate
+Earth Tube Zone Sensible Cooling Energy
+Earth Tube Zone Sensible Heating Energy
+Earth Tube Air Flow Volume
+Earth Tube Air Flow Mass
+Earth Tube Air Flow Mass Rate
+Earth Tube Water Flow Mass Rate
+Earth Tube Fan Electricity Energy
+Earth Tube Zone Inlet Air Temperature
+Earth Tube Zone Inlet Wet Bulb Temperature
+Earth Tube Zone Inlet Humidity Ratio
+Electricity:Facility
+0

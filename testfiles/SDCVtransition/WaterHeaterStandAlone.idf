@@ -1,0 +1,492 @@
+! WaterHeaterStandAlone.idf
+!
+! Basic file description:
+! This input file illustrates the use of the WATER HEATER:MIXED and WATER HEATER:STRATIFIED objects in stand-alone
+! mode for domestic hot water usage only.  Stand-alone mode is specified by not entering any plant node connections
+! in the WATER HEATER object.
+! The use of the WATER MAINS TEMPERATURES object is also demonstrated using outdoor air temperature inputs calculated
+! for Chicago-O'Hare TMY2 weather file.
+! Run:      2 design days.
+! Building: None.
+! System:   None.
+! Plant:    None.
+! Non-zone equipment: Four stand-alone, hot water heaters:
+!                     1.      Standard natural gas water heater (WATER HEATER:MIXED) with typical ratings.
+!                     2.      Standard electric water heater (WATER HEATER:MIXED) with typical ratings, ambient
+!                             temperature exposed to outdoor air, and cold water supply temperature calculated by
+!                             WATER MAINS TEMPERATURES object.
+!                     3.      Instantaneous/tankless gas water heater (WATER HEATER:MIXED) with standing pilot light
+!                             as off-cycle parasitic load and cold water supply temperature calculated by WATER MAINS
+!                             TEMPERATURES object.
+!                     4.      Standard electric water heater (WATER HEATER:STRATIFIED) with typical ratings and two
+!                             electric heating elements in a master-slave configuration.
+
+  Version,9.4;
+
+  Building,
+    Water Heater Stand-Alone Example,  !- Name
+    0.0,                     !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.04,                    !- Temperature Convergence Tolerance Value {deltaC}
+    FullInteriorAndExterior, !- Solar Distribution
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  Timestep,6;
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    Relative;                !- Coordinate System
+
+  Site:Location,
+    CHICAGO_IL_USA_WMO_725300,  !- Name
+    42.00,                   !- Latitude {deg}
+    -87.88,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190.00;                  !- Elevation {m}
+
+  ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Htg 99% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -17.3,                   !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063,                   !- Barometric Pressure {Pa}
+    4.9,                     !- Wind Speed {m/s}
+    270,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.0;                     !- Sky Clearness
+
+  ! CHICAGO_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.5°C MWB=23°C
+
+  SizingPeriod:DesignDay,
+    CHICAGO Ann Clg 1% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    31.5,                    !- Maximum Dry-Bulb Temperature {C}
+    10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    99063,                   !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    230,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.0;                     !- Sky Clearness
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  SimulationControl,
+    NO,                      !- Do Zone Sizing Calculation
+    NO,                      !- Do System Sizing Calculation
+    NO,                      !- Do Plant Sizing Calculation
+    YES,                     !- Run Simulation for Sizing Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  Site:WaterMainsTemperature,
+    CORRELATION,             !- Calculation Method
+    ,                        !- Temperature Schedule Name
+    9.69,                    !- Annual Average Outdoor Air Temperature {C}
+    28.1;                    !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
+
+  WaterHeater:Mixed,
+    Mixed Gas Tank,          !- Name
+    0.151,                   !- Tank Volume {m3}
+    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
+    ,                        !- Deadband Temperature Difference {deltaC}
+    82.2222,                 !- Maximum Temperature Limit {C}
+    MODULATE,                !- Heater Control Type
+    11712,                   !- Heater Maximum Capacity {W}
+    0,                       !- Heater Minimum Capacity {W}
+    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
+    ,                        !- Heater Ignition Delay {s}
+    NATURALGAS,              !- Heater Fuel Type
+    0.80,                    !- Heater Thermal Efficiency
+    ,                        !- Part Load Factor Curve Name
+    ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    NATURALGAS,              !- Off Cycle Parasitic Fuel Type
+    0.80,                    !- Off Cycle Parasitic Heat Fraction to Tank
+    ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}
+    ,                        !- On Cycle Parasitic Fuel Type
+    ,                        !- On Cycle Parasitic Heat Fraction to Tank
+    SCHEDULE,                !- Ambient Temperature Indicator
+    Ambient Temp Schedule,   !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    6.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- Off Cycle Loss Fraction to Zone
+    6.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- On Cycle Loss Fraction to Zone
+    0.000379,                !- Peak Use Flow Rate {m3/s}
+    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
+    Constant Mains Temp Schedule;  !- Cold Water Supply Temperature Schedule Name
+
+  WaterHeater:Mixed,
+    Outdoor Electric Tank,   !- Name
+    0.151,                   !- Tank Volume {m3}
+    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
+    2.0,                     !- Deadband Temperature Difference {deltaC}
+    82.2222,                 !- Maximum Temperature Limit {C}
+    CYCLE,                   !- Heater Control Type
+    11712,                   !- Heater Maximum Capacity {W}
+    ,                        !- Heater Minimum Capacity {W}
+    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
+    ,                        !- Heater Ignition Delay {s}
+    ELECTRICITY,             !- Heater Fuel Type
+    0.95,                    !- Heater Thermal Efficiency
+    ,                        !- Part Load Factor Curve Name
+    15,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    15,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    Outdoors,                !- Ambient Temperature Indicator
+    ,                        !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    Outdoor Electric Tank OA Node,  !- Ambient Temperature Outdoor Air Node Name
+    2.36,                    !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- Off Cycle Loss Fraction to Zone
+    2.36,                    !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- On Cycle Loss Fraction to Zone
+    0.000379,                !- Peak Use Flow Rate {m3/s}
+    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
+    Constant Mains Temp Schedule;  !- Cold Water Supply Temperature Schedule Name
+
+  OutdoorAir:Node,
+    Outdoor Electric Tank OA Node;  !- Name
+
+  WaterHeater:Mixed,
+    Tankless,                !- Name
+    0.003785,                !- Tank Volume {m3}
+    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
+    ,                        !- Deadband Temperature Difference {deltaC}
+    82.2222,                 !- Maximum Temperature Limit {C}
+    MODULATE,                !- Heater Control Type
+    11712,                   !- Heater Maximum Capacity {W}
+    0,                       !- Heater Minimum Capacity {W}
+    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
+    ,                        !- Heater Ignition Delay {s}
+    ELECTRICITY,             !- Heater Fuel Type
+    0.95,                    !- Heater Thermal Efficiency
+    ,                        !- Part Load Factor Curve Name
+    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
+    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
+    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
+    0,                       !- On Cycle Parasitic Heat Fraction to Tank
+    SCHEDULE,                !- Ambient Temperature Indicator
+    Ambient Temp Schedule,   !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    ,                        !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- Off Cycle Loss Fraction to Zone
+    ,                        !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- On Cycle Loss Fraction to Zone
+    0.000379,                !- Peak Use Flow Rate {m3/s}
+    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
+    ;                        !- Cold Water Supply Temperature Schedule Name
+
+  WaterHeater:Stratified,
+    Stratified Tank,         !- Name
+    ,                        !- End-Use Subcategory
+    0.17,                    !- Tank Volume {m3}
+    1.4,                     !- Tank Height {m}
+    VerticalCylinder,        !- Tank Shape
+    ,                        !- Tank Perimeter {m}
+    82.2222,                 !- Maximum Temperature Limit {C}
+    MasterSlave,             !- Heater Priority Control
+    Hot Water Setpoint Temp Schedule,  !- Heater 1 Setpoint Temperature Schedule Name
+    2.0,                     !- Heater 1 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 1 Capacity {W}
+    1.0,                     !- Heater 1 Height {m}
+    Hot Water Setpoint Temp Schedule,  !- Heater 2 Setpoint Temperature Schedule Name
+    5.0,                     !- Heater 2 Deadband Temperature Difference {deltaC}
+    4500,                    !- Heater 2 Capacity {W}
+    0.0,                     !- Heater 2 Height {m}
+    ELECTRICITY,             !- Heater Fuel Type
+    0.98,                    !- Heater Thermal Efficiency
+    ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
+    ,                        !- Off Cycle Parasitic Heat Fraction to Tank
+    ,                        !- Off Cycle Parasitic Height {m}
+    ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}
+    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
+    ,                        !- On Cycle Parasitic Heat Fraction to Tank
+    ,                        !- On Cycle Parasitic Height {m}
+    SCHEDULE,                !- Ambient Temperature Indicator
+    Ambient Temp Schedule,   !- Ambient Temperature Schedule Name
+    ,                        !- Ambient Temperature Zone Name
+    ,                        !- Ambient Temperature Outdoor Air Node Name
+    0.846,                   !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}
+    ,                        !- Skin Loss Fraction to Zone
+    ,                        !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}
+    ,                        !- Off Cycle Flue Loss Fraction to Zone
+    0.000189,                !- Peak Use Flow Rate {m3/s}
+    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
+    ,                        !- Cold Water Supply Temperature Schedule Name
+    ,                        !- Use Side Inlet Node Name
+    ,                        !- Use Side Outlet Node Name
+    ,                        !- Use Side Effectiveness
+    ,                        !- Use Side Inlet Height {m}
+    ,                        !- Use Side Outlet Height {m}
+    ,                        !- Source Side Inlet Node Name
+    ,                        !- Source Side Outlet Node Name
+    ,                        !- Source Side Effectiveness
+    ,                        !- Source Side Inlet Height {m}
+    ,                        !- Source Side Outlet Height {m}
+    FIXED,                   !- Inlet Mode
+    ,                        !- Use Side Design Flow Rate {m3/s}
+    ,                        !- Source Side Design Flow Rate {m3/s}
+    ,                        !- Indirect Water Heating Recovery Time {hr}
+    10,                      !- Number of Nodes
+    0.1,                     !- Additional Destratification Conductivity {W/m-K}
+    0.15,                    !- Node 1 Additional Loss Coefficient {W/K}
+    ,                        !- Node 2 Additional Loss Coefficient {W/K}
+    ,                        !- Node 3 Additional Loss Coefficient {W/K}
+    ,                        !- Node 4 Additional Loss Coefficient {W/K}
+    ,                        !- Node 5 Additional Loss Coefficient {W/K}
+    ,                        !- Node 6 Additional Loss Coefficient {W/K}
+    ,                        !- Node 7 Additional Loss Coefficient {W/K}
+    ,                        !- Node 8 Additional Loss Coefficient {W/K}
+    ,                        !- Node 9 Additional Loss Coefficient {W/K}
+    0.1;                     !- Node 10 Additional Loss Coefficient {W/K}
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  Schedule:Compact,
+    Hot Water Demand Schedule,  !- Name
+    Fraction,                !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 3:00,0,           !- Field 3
+    UNTIL: 5:00,0.2,         !- Field 5
+    UNTIL: 7:00,0,           !- Field 7
+    UNTIL: 7:10,1.0,         !- Field 9
+    UNTIL: 10:00,0,          !- Field 11
+    UNTIL: 10:30,0.3,        !- Field 13
+    UNTIL: 13:00,0,          !- Field 15
+    UNTIL: 13:10,0.5,        !- Field 17
+    UNTIL: 16:00,0,          !- Field 19
+    UNTIL: 22:00,0.1,        !- Field 21
+    UNTIL: 24:00,0;          !- Field 23
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+  Schedule:Compact,
+    Hot Water Setpoint Temp Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,60.0;       !- Field 3
+
+  Schedule:Compact,
+    Ambient Temp Schedule,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,22.0;       !- Field 3
+
+  Schedule:Compact,
+    Constant Mains Temp Schedule,  !- Name
+    Any Number,              !- Schedule Type Limits Name
+    THROUGH: 12/31,          !- Field 1
+    FOR: AllDays,            !- Field 2
+    UNTIL: 24:00,12.0;       !- Field 3
+
+  Output:VariableDictionary,Regular;
+
+  Output:Variable,*,Site Mains Water Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Tank Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Heat Loss Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Heat Loss Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Use Side Mass Flow Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Use Side Inlet Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Use Side Outlet Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Use Side Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Use Side Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Source Side Mass Flow Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Source Side Inlet Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Source Side Outlet Temperature,DETAILED;
+
+  Output:Variable,*,Water Heater Source Side Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Source Side Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic Tank Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic Tank Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic Tank Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic Tank Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Total Demand Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Total Demand Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Heating Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Heating Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Unmet Demand Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Unmet Demand Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Venting Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Venting Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Net Heat Transfer Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Net Heat Transfer Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Cycle On Count,DETAILED;
+
+  Output:Variable,*,Water Heater Runtime Fraction,DETAILED;
+
+  Output:Variable,*,Water Heater Part Load Ratio,DETAILED;
+
+  Output:Variable,*,Water Heater NaturalGas Rate,DETAILED;
+
+  Output:Variable,*,Water Heater NaturalGas Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Electricity Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Electricity Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic NaturalGas Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic NaturalGas Energy,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic NaturalGas Rate,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic NaturalGas Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Energy,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,DETAILED;
+
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Energy,DETAILED;
+
+  Output:Variable,*,Water Heater Water Volume Flow Rate,DETAILED;
+
+  Output:Variable,*,Water Heater Water Volume,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 1,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 2,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 3,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 4,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 5,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 6,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 7,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 8,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 9,DETAILED;
+
+  Output:Variable,*,Water Heater Temperature Node 10,DETAILED;
+
+  Output:Variable,*,Water Heater Heater 1 Runtime Fraction,DETAILED;
+
+  Output:Variable,*,Water Heater Heater 2 Runtime Fraction,DETAILED;
+
+  Output:Meter,WaterSystems:NaturalGas,Daily;
+
+  Output:Meter,WaterSystems:Water,Daily;
+
+  Output:Meter,WaterSystems:NaturalGas,Monthly;
+
+  Output:Meter,WaterSystems:Water,Monthly;
+
+  Output:Meter,WaterSystems:NaturalGas,RunPeriod;
+
+  Output:Meter,WaterSystems:Water,RunPeriod;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,RunPeriod;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,RunPeriod;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+

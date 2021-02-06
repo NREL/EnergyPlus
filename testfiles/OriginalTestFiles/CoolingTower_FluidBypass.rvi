@@ -1,0 +1,28 @@
+eplusout.eso
+eplusout.csv
+Cooling Tower Make Up Water Volume Flow Rate
+Cooling Tower Make Up Water Volume
+Cooling Tower Make Up Mains Water Volume
+Cooling Tower Water Evaporation Volume Flow Rate
+Cooling Tower Water Evaporation Volume
+Cooling Tower Water Drift Volume Flow Rate
+Cooling Tower Water Drift Volume
+Cooling Tower Water Blowdown Volume Flow Rate
+Cooling Tower Water Blowdown Volume
+Cooling Tower Bypass Fraction
+Cooling Tower Inlet Temperature
+Cooling Tower Outlet Temperature
+Cooling Tower Mass Flow Rate
+Cooling Tower Heat Transfer Rate
+Cooling Tower Fan Electricity Rate
+Cooling Tower Fan Electricity Energy
+CoolSys1,Plant Supply Side Cooling Demand Rate
+CoolSys1,Plant Supply Side Heating Demand Rate
+CoolSys1,Plant Supply Side Inlet Mass Flow Rate
+CoolSys1,Plant Supply Side Inlet Temperature
+CoolSys1,Plant Supply Side Outlet Temperature
+TowerWaterSys,Plant Supply Side Cooling Demand Rate
+TowerWaterSys,Plant Supply Side Heating Demand Rate
+TowerWaterSys,Plant Supply Side Inlet Temperature
+TowerWaterSys,Plant Supply Side Outlet Temperature
+0

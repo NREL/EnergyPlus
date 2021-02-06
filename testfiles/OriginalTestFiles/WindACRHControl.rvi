@@ -1,0 +1,29 @@
+! test commment at start of file
+eplusout.eso
+eplusout.csv
+Site Outdoor Air Drybulb Temperature
+Site Outdoor Air Humidity Ratio
+Zone Air Temperature
+Zone Air System Sensible Cooling Rate
+Zone Air System Sensible Heating Rate     ! test comment on output variable line
+Zone Total Internal Latent Gain Energy
+Zone Air Humidity Ratio
+Zone Air Relative Humidity
+Zone Predicted Moisture Load Moisture Transfer Rate
+System Node Mass Flow Rate
+System Node Temperature
+System Node Humidity Ratio
+Zone Window Air Conditioner Total Cooling Rate
+Zone Window Air Conditioner Sensible Cooling Rate
+Zone Window Air Conditioner Electricity Rate
+Zone Window Air Conditioner Compressor Part Load Ratio
+Zone Window Air Conditioner Fan Part Load Ratio
+North Zone Dehumidifier,Zone Dehumidifier Sensible Heating Rate
+North Zone Dehumidifier,Zone Dehumidifier Removed Water Mass Flow Rate
+North Zone Dehumidifier,Zone Dehumidifier Electricity Rate
+North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Rate
+North Zone Dehumidifier,Zone Dehumidifier Part Load Ratio
+North Zone Dehumidifier,Zone Dehumidifier Runtime Fraction
+North Zone Dehumidifier,Zone Dehumidifier Outlet Air Temperature
+!Window AC Fan Part-Load Ratio
+0

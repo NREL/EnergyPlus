@@ -1,0 +1,148 @@
+!  Version,
+!    8.9;                    !- Version Identifier
+
+!  Version,
+!    9.0;                    !- Version Identifier
+
+  Material,
+    A1 - 1 IN STUCCO,        !- Name
+    Smooth,                  !- Roughness
+    2.5389841E-02,           !- Thickness {m}
+    0.6918309,               !- Conductivity {W/m-K}
+    1858.142,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    C4 - 4 IN COMMON BRICK,  !- Name
+    Rough,                   !- Roughness
+    0.1014984,               !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1922.216,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7600000,               !- Solar Absorptance
+    0.7600000;               !- Visible Absorptance
+
+  Material,
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
+    Smooth,                  !- Roughness
+    1.9050000E-02,           !- Thickness {m}
+    0.7264224,               !- Conductivity {W/m-K}
+    1601.846,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.9200000,               !- Solar Absorptance
+    0.9200000;               !- Visible Absorptance
+
+  Material,
+    C6 - 8 IN CLAY TILE,     !- Name
+    Smooth,                  !- Roughness
+    0.2033016,               !- Thickness {m}
+    0.5707605,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.8200000,               !- Solar Absorptance
+    0.8200000;               !- Visible Absorptance
+
+  Material,
+    C10 - 8 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    0.2033016,               !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Name
+    Rough,                   !- Roughness
+    1.2710161E-02,           !- Thickness {m}
+    1.435549,                !- Conductivity {W/m-K}
+    881.0155,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5500000,               !- Solar Absorptance
+    0.5500000;               !- Visible Absorptance
+
+  Material,
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
+    Rough,                   !- Roughness
+    9.5402403E-03,           !- Thickness {m}
+    0.1902535,               !- Conductivity {W/m-K}
+    1121.292,                !- Density {kg/m3}
+    1673.600,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.7500000,               !- Solar Absorptance
+    0.7500000;               !- Visible Absorptance
+
+  Material,
+    B5 - 1 IN DENSE INSULATION,  !- Name
+    VeryRough,               !- Roughness
+    2.5389841E-02,           !- Thickness {m}
+    4.3239430E-02,           !- Conductivity {W/m-K}
+    91.30524,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.5000000,               !- Solar Absorptance
+    0.5000000;               !- Visible Absorptance
+
+  Material,
+    C12 - 2 IN HW CONCRETE,  !- Name
+    MediumRough,             !- Roughness
+    5.0901599E-02,           !- Thickness {m}
+    1.729577,                !- Conductivity {W/m-K}
+    2242.585,                !- Density {kg/m3}
+    836.8000,                !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  WindowMaterial:Glazing,
+    WIN-LAY-GLASS-LIGHT,     !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.003,                   !- Thickness {m}
+    0.90,                    !- Solar Transmittance at Normal Incidence
+    0.031,                   !- Front Side Solar Reflectance at Normal Incidence
+    0.031,                   !- Back Side Solar Reflectance at Normal Incidence
+    0.90,                    !- Visible Transmittance at Normal Incidence
+    0.05,                    !- Front Side Visible Reflectance at Normal Incidence
+    0.05,                    !- Back Side Visible Reflectance at Normal Incidence
+    0.0,                     !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Front Side Infrared Hemispherical Emissivity
+    0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    0.9;                     !- Conductivity {W/m-K}
+
+  Construction,
+    EXTWALL80,               !- Name
+    A1 - 1 IN STUCCO,        !- Outside Layer
+    C4 - 4 IN COMMON BRICK,  !- Layer 2
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+
+  Construction,
+    PARTITION06,             !- Name
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Outside Layer
+    C6 - 8 IN CLAY TILE,     !- Layer 2
+    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3
+
+  Construction,
+    FLOOR SLAB 8 IN,         !- Name
+    C10 - 8 IN HW CONCRETE;  !- Outside Layer
+
+  Construction,
+    ROOF34,                  !- Name
+    E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
+    E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
+    B5 - 1 IN DENSE INSULATION,  !- Layer 3
+    C12 - 2 IN HW CONCRETE;  !- Layer 4
+
+  Construction,
+    WIN-CON-LIGHT,           !- Name
+    WIN-LAY-GLASS-LIGHT;     !- Outside Layer
+

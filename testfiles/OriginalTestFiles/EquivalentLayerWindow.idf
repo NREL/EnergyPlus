@@ -1,0 +1,947 @@
+!-Generator IDFEditor 1.34
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+! EquivalentLayerWindow.idf
+! Basic file description:  Tests three different Equivalent Layer Window types in a single zone building.
+!                          Resistive Walls.  Regular (no ground contact) floor. Regular roof.
+!                          (1) CLR AirGap CLR: Double Pane Clear Glazing
+!                          (2) Clr ShadeX Clr: Double Pane Clear Glazing with in between shade
+!                          (3) Six Layers Window: Insect Screen, four layers of different type, Interior Shade
+!
+!
+! Highlights:              Illustrates use of Equivalent Layer Windows Model (ASHWAT Model)
+!
+!
+! Simulation Location/Run: Atlanta Hartsfield Intl Ap_GA_USA WMO Station 722190, 2 design days, 1 run period,
+!                          Run Control executes two design days (see RUN PERIOD object)
+!
+! Location:                Atlanta, GA
+!
+! Design Days:             Atlanta Hartsfield Intl Ap_GA_USA Extreme Annual Wind Speeds, 1%=9.8m/s, 2.5%=8.6m/s, 5%=7.7m/s
+!                          Atlanta Hartsfield Intl Ap_GA_USA Extreme Annual Temperatures, Max Drybulb=-11.2°C Min Drybulb=35.9°C
+!
+! Run Period (Weather File): Design Days Simulation, LOCATION,Atlanta Hartsfield Intl Ap,GA,USA,TMY3,722190
+!
+! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
+!
+! Building: Fictional 1 zone building with resistive walls.
+!
+!           The building is oriented due north.
+!
+! Floor Area:        232.25 m2
+! Number of Stories: 1
+!
+! Zone Description Details:
+!
+!       (0,15.24,0)                 (15.24,15.24,0)
+!              _____________________________
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             *  W                          |
+!             *  i                          |
+!             *  n                          |
+!             *                             |
+!             *  3                          |
+!             *                             |
+!             *                             |
+!             |                             |
+!             |                             |
+!             |                             |
+!             |____[Win 1 ]_____[Win 2 ]____|
+!
+!          (0,0,0)                      (15.24,0,0)
+!
+! Internal gains description:     NA
+!
+! Interzone Surfaces:             None
+! Internal Mass:                  None
+! People:                         None
+! Lights:                         None
+! Equipment:                      None
+! Windows:                        0
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              NA (no schedules)
+! Solar Distribution:             MinimalShadowing
+!
+! HVAC:                           ZoneHVAC:IdealLoadsAirSystem
+!
+! Zonal Equipment:                NA
+! Central Air Handling Equipment: No
+! System Equipment Autosize:      No
+! Purchased Cooling:              No
+! Purchased Heating:              No
+! Purchased Chilled Water:        No
+! Purchased Hot Water:            No
+! Coils:                          None
+! Pumps:                          None
+! Boilers:                        None
+! Chillers:                       None
+! Towers:                         None
+!
+! Results:
+! Standard Reports:               Variable Dictionary, Surfaces (dxf), Meter File
+! Timestep or Hourly Variables:   Hourly and Daily
+! Time bins Report:               None
+! HTML Report:                    None
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+
+  Version,9.4;
+
+  Timestep,4;
+
+  Building,
+    Simple One Zone w Windows,  !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.004,                   !- Temperature Convergence Tolerance Value {deltaC}
+    FullExterior,            !- Solar Distribution
+    30,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+  SimulationControl,
+    YES,                     !- Do Zone Sizing Calculation
+    No,                      !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+
+  RunPeriod,
+    Run Period 1,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  Site:Location,
+    Atlanta Hartsfield Intl Ap_GA_USA Design_Conditions,  !- Name
+    33.63,                   !- Latitude {deg}
+    -84.43,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    308.00;                  !- Elevation {m}
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    -6.3,                    !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    -6.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679.,                  !- Barometric Pressure {Pa}
+    5.3,                     !- Wind Speed {m/s}
+    320,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+  SizingPeriod:DesignDay,
+    Atlanta Hartsfield Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    34.4,                    !- Maximum Dry-Bulb Temperature {C}
+    9.5,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    97679.,                  !- Barometric Pressure {Pa}
+    4,                       !- Wind Speed {m/s}
+    300,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAETau,               !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    0.556,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+
+  Construction,
+    ROOF31,                  !- Name
+    FbrGlsBatt,              !- Outside Layer
+    Framed,                  !- Layer 2
+    GypBoard;                !- Layer 3
+
+  Material,
+    FbrGlsBatt,              !- Name
+    MediumRough,             !- Roughness
+    0.110,                   !- Thickness {m}
+    0.039,                   !- Conductivity {W/m-K}
+    19.0,                    !- Density {kg/m3}
+    960.0,                   !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.8000000,               !- Solar Absorptance
+    0.8000000;               !- Visible Absorptance
+
+  Material,
+    Framed,                  !- Name
+    MediumRough,             !- Roughness
+    0.089,                   !- Thickness {m}
+    0.043,                   !- Conductivity {W/m-K}
+    67.1,                    !- Density {kg/m3}
+    1437.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Construction,
+    FLOOR,                   !- Name
+    Framed 149mm,            !- Outside Layer
+    PlyWood 20mm,            !- Layer 2
+    OakFloor;                !- Layer 3
+
+  Material,
+    OakFloor,                !- Name
+    MediumRough,             !- Roughness
+    0.008,                   !- Thickness {m}
+    0.170,                   !- Conductivity {W/m-K}
+    720.0,                   !- Density {kg/m3}
+    1650.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6000000,               !- Solar Absorptance
+    0.6000000;               !- Visible Absorptance
+
+  Material,
+    PlyWood 20mm,            !- Name
+    MediumRough,             !- Roughness
+    0.020,                   !- Thickness {m}
+    0.140,                   !- Conductivity {W/m-K}
+    550.0,                   !- Density {kg/m3}
+    1500.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    Framed 149mm,            !- Name
+    MediumRough,             !- Roughness
+    0.149,                   !- Thickness {m}
+    0.047,                   !- Conductivity {W/m-K}
+    67.1,                    !- Density {kg/m3}
+    1437.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.0000100,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Construction,
+    R13WALL,                 !- Name
+    FrameWood 17mm,          !- Outside Layer
+    PlyWood 19mm,            !- Layer 2
+    Framed 89mm,             !- Layer 3
+    GypBoard;                !- Layer 4
+
+  Material,
+    GypBoard,                !- Name
+    MediumRough,             !- Roughness
+    0.013,                   !- Thickness {m}
+    0.160,                   !- Conductivity {W/m-K}
+    800.0,                   !- Density {kg/m3}
+    1090.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.4500000,               !- Solar Absorptance
+    0.4500000;               !- Visible Absorptance
+
+  Material,
+    Framed 89mm,             !- Name
+    MediumRough,             !- Roughness
+    0.089,                   !- Thickness {m}
+    0.061,                   !- Conductivity {W/m-K}
+    139.2,                   !- Density {kg/m3}
+    1535.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    PlyWood 19mm,            !- Name
+    MediumRough,             !- Roughness
+    0.019,                   !- Thickness {m}
+    0.140,                   !- Conductivity {W/m-K}
+    550.0,                   !- Density {kg/m3}
+    1500.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Material,
+    FrameWood 17mm,          !- Name
+    MediumRough,             !- Roughness
+    0.017,                   !- Thickness {m}
+    0.120,                   !- Conductivity {W/m-K}
+    500.0,                   !- Density {kg/m3}
+    1600.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.6000000,               !- Solar Absorptance
+    0.6000000;               !- Visible Absorptance
+
+  InternalMass,
+    ZONE ONE IM,             !- Name
+    InternalMass,            !- Construction Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    42.36;                   !- Surface Area {m2}
+
+  Construction,
+    InternalMass,            !- Name
+    FrameWood 12mm;          !- Outside Layer
+
+  Material,
+    FrameWood 12mm,          !- Name
+    MediumRough,             !- Roughness
+    0.012,                   !- Thickness {m}
+    0.120,                   !- Conductivity {W/m-K}
+    500.0,                   !- Density {kg/m3}
+    1600.0,                  !- Specific Heat {J/kg-K}
+    0.9000000,               !- Thermal Absorptance
+    0.4500000,               !- Solar Absorptance
+    0.6500000;               !- Visible Absorptance
+
+  Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
+
+  Zone,
+    ZONE ONE,                !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    2.4385788,               !- Ceiling Height {m}
+    Autocalculate;           !- Volume {m3}
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+  BuildingSurface:Detailed,
+    Zn001:Wall001,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,2.4385788,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    7.3157365,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    7.3157365,0,2.4385788;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win001,    !- Name
+    Window,                  !- Surface Type
+    CLR AIRGAP CLR,          !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    1.0,0,2.2000,  !- X,Y,Z ==> Vertex 1 {m}
+    1.0,0,1.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    3.0,0,1.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    3.0,0,2.2000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win002,    !- Name
+    Window,                  !- Surface Type
+    Clr ShadeX Clr,          !- Construction Name
+    Zn001:Wall001,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    3.5,0,2.2000,  !- X,Y,Z ==> Vertex 1 {m}
+    3.5,0,1.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    5.5,0,1.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    5.5,0,2.2000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall002,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,2.4385788,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,5.7902,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.7902,2.4385788;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall001:Win003,    !- Name
+    Window,                  !- Surface Type
+    Six Layers Window,       !- Construction Name
+    Zn001:Wall002,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0.0,2.5,2.2000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,2.5,1.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0,4.5,1.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0,4.5,2.2000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall003,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    7.3157365,5.7902,2.4385788,  !- X,Y,Z ==> Vertex 1 {m}
+    7.3157365,5.7902,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,5.7902,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,5.7902,2.4385788;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Wall004,           !- Name
+    Wall,                    !- Surface Type
+    R13WALL,                 !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5000000,               !- View Factor to Ground
+    4,                       !- Number of Vertices
+    7.3157365,5.7902,2.4385788,  !- X,Y,Z ==> Vertex 1 {m}
+    7.3157365,5.7902,0,  !- X,Y,Z ==> Vertex 2 {m}
+    7.3157365,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    7.3157365,0,2.4385788;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Flr001,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    Zn001:Flr001,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    1.000000,                !- View Factor to Ground
+    4,                       !- Number of Vertices
+    7.3157365,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000000,5.7902,0.0,  !- X,Y,Z ==> Vertex 3 {m}
+    7.3157365,5.7902,0.0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Zn001:Roof001,           !- Name
+    Roof,                    !- Surface Type
+    ROOF31,                  !- Construction Name
+    ZONE ONE,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0.000000,5.7902,2.4385788,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000000,0.000000,2.4385788,  !- X,Y,Z ==> Vertex 2 {m}
+    7.3157365,0.000000,2.4385788,  !- X,Y,Z ==> Vertex 3 {m}
+    7.3157365,5.7902,2.4385788;  !- X,Y,Z ==> Vertex 4 {m}
+
+  Sizing:Zone,
+    ZONE ONE,                !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    13.0,                    !- Zone Cooling Design Supply Air Temperature {C}
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    50.,                     !- Zone Heating Design Supply Air Temperature {C}
+    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
+    0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    SZ ZONE ONE,             !- Design Specification Outdoor Air Object Name
+    0.0,                     !- Zone Heating Sizing Factor
+    0.0,                     !- Zone Cooling Sizing Factor
+    DesignDayWithLimit,      !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Cooling Minimum Air Flow {m3/s}
+    ,                        !- Cooling Minimum Air Flow Fraction
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
+    ,                        !- Heating Maximum Air Flow {m3/s}
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
+
+  DesignSpecification:OutdoorAir,
+    SZ ZONE ONE,             !- Name
+    sum,                     !- Outdoor Air Method
+    0.0,                     !- Outdoor Air Flow per Person {m3/s-person}
+    0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
+    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
+
+  Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+  Output:Variable,ZN001:WALL001,Surface Outside Face Incident Solar Radiation Rate per Area,Hourly;
+
+  Output:Variable,ZN001:WALL002,Surface Outside Face Incident Solar Radiation Rate per Area,Hourly;
+
+  Output:Variable,*,Surface Outside Face Incident Solar Radiation Rate per Area,Hourly;
+
+  Output:Variable,*,Surface Outside Face Sunlit Fraction,Hourly;
+
+  Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,Hourly;
+
+  Output:Variable,*,Surface Inside Face Temperature,Hourly;
+
+  Output:Variable,*,Surface Outside Face Temperature,Hourly;
+
+  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Hourly;
+
+  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
+
+  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
+
+  Output:Variable,*,Zone Windows Total Heat Gain Rate,Hourly;
+
+  Output:Variable,*,Zone Windows Total Heat Loss Rate,Hourly;
+
+  Output:Variable,*,Surface Window Glazing Beam to Beam Solar Transmittance,Hourly;
+
+  Output:Variable,*,Surface Window Glazing Beam to Diffuse Solar Transmittance,Hourly;
+
+  Output:Variable,*,Surface Window Glazing Diffuse to Diffuse Solar Transmittance,Hourly;
+
+  Output:Variable,*,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate,Hourly;
+
+  Output:Variable,*,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate,Hourly;
+
+! Output:Diagnostics,DisplayAdvancedReportVariables;
+! Output:Variable,*,Surface Window Inside Face Other Convection Heat Gain Rate,Hourly;
+! Output:Variable,*,Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate,Hourly;
+
+  Output:VariableDictionary,Regular;
+
+  Output:Surfaces:Drawing,dxf;
+
+  Output:Surfaces:List,details;
+
+  Output:Constructions,Constructions;
+
+  Output:Meter:MeterFileOnly,EnergyTransfer:Building,hourly;
+
+  Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+  ZoneControl:Thermostat,
+    ZONE ONE CONTROLS,       !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
+    Zone Control Type Schedule,  !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    ZONE ONE SETPOINTS;      !- Control 1 Name
+
+  ScheduleTypeLimits,
+    ControlType,             !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  SCHEDULE:COMPACT,
+    ZONE CONTROL TYPE SCHEDULE,  !- Name
+    CONTROLTYPE,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  ThermostatSetpoint:DualSetpoint,
+    ZONE ONE SETPOINTS,      !- Name
+    Htg-SetP-Sch,            !- Heating Setpoint Temperature Schedule Name
+    Clg-SetP-Sch;            !- Cooling Setpoint Temperature Schedule Name
+
+  Schedule:Compact,
+    Htg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: SummerDesignDay,    !- Field 2
+    Until: 24:00,21.11,      !- Field 3
+    For: WinterDesignDay,    !- Field 5
+    Until: 24:00,21.11,      !- Field 6
+    For: AllOtherDays,       !- Field 8
+    Until: 24:00,21.11;      !- Field 9
+
+  Schedule:Compact,
+    Clg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: SummerDesignDay,    !- Field 2
+    Until: 24:00,23.89,      !- Field 3
+    For: WinterDesignDay,    !- Field 5
+    Until: 24:00,23.89,      !- Field 6
+    For: AllOtherDays,       !- Field 8
+    Until: 24:00,23.89;      !- Field 9
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+  ZoneHVAC:EquipmentConnections,
+    ZONE ONE,                !- Zone Name
+    ZONE ONE EQ,             !- Zone Conditioning Equipment List Name
+    ZONE ONE INLET,          !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    ZONE ONE NODE,           !- Zone Air Node Name
+    ZONE ONE OUTLET;         !- Zone Return Air Node or NodeList Name
+
+  ZoneHVAC:EquipmentList,
+    ZONE ONE EQ,             !- Name
+    SequentialLoad,          !- Load Distribution Scheme
+    ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
+    ZONE ONE Ideal Loads,    !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+
+  ZoneHVAC:IdealLoadsAirSystem,
+    ZONE ONE Ideal Loads,    !- Name
+    ,                        !- Availability Schedule Name
+    ZONE ONE INLET,          !- Zone Supply Air Node Name
+    ,                        !- Zone Exhaust Air Node Name
+    ,                        !- System Inlet Air Node Name
+    50,                      !- Maximum Heating Supply Air Temperature {C}
+    13,                      !- Minimum Cooling Supply Air Temperature {C}
+    0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}
+    NoLimit,                 !- Heating Limit
+    autosize,                !- Maximum Heating Air Flow Rate {m3/s}
+    ,                        !- Maximum Sensible Heating Capacity {W}
+    NoLimit,                 !- Cooling Limit
+    autosize,                !- Maximum Cooling Air Flow Rate {m3/s}
+    ,                        !- Maximum Total Cooling Capacity {W}
+    ,                        !- Heating Availability Schedule Name
+    ,                        !- Cooling Availability Schedule Name
+    ConstantSupplyHumidityRatio,  !- Dehumidification Control Type
+    ,                        !- Cooling Sensible Heat Ratio {dimensionless}
+    ConstantSupplyHumidityRatio,  !- Humidification Control Type
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Outdoor Air Inlet Node Name
+    ,                        !- Demand Controlled Ventilation Type
+    ,                        !- Outdoor Air Economizer Type
+    ,                        !- Heat Recovery Type
+    ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
+    ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
+
+! //**************************************************************************//
+!  Equivalent Layer Windows Inputs Description
+!
+! ******************************************************************************
+
+  Construction:WindowEquivalentLayer,
+    CLR AIRGAP CLR,          !- Name
+    GLZCLR,                  !- Outside Layer
+    Air GAP Sealed 12mm,     !- Layer 2
+    GLZCLR;                  !- Layer 3
+
+  WindowMaterial:Glazing:EquivalentLayer,
+    GLZCLR,                  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.77,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}
+    0.77,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}
+    0.07,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}
+    0.07,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.695,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}
+    0.16,                    !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.16,                    !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}
+    0.84,                    !- Front Side Infrared Emissivity {dimensionless}
+    0.84;                    !- Back Side Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Air GAP Sealed 12mm,     !- Name
+    Air,                     !- Gas Type
+    0.0120,                  !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+! *** Equivalent Layer Window 2
+
+  Construction:WindowEquivalentLayer,
+    Clr ShadeX Clr,          !- Name
+    GLZCLR,                  !- Outside Layer
+    Air GAP SealedOut 12.7mm,!- Layer 2
+    ShadeX,                  !- Layer 3
+    Air GAP SealedIn 12.7mm, !- Layer 4
+    GLZCLR;                  !- Layer 5
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Air GAP SealedOut 12.7mm,!- Name
+    Air,                     !- Gas Type
+    0.020,                   !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+  WindowMaterial:Shade:EquivalentLayer,
+    ShadeX,                  !- Name
+    0.017,                   !- Shade Beam-Beam Solar Transmittance {dimensionless}
+    0.180,                   !- Front Side Shade Beam-Diffuse Solar Transmittance {dimensionless}
+    0.180,                   !- Back Side Shade Beam-Diffuse Solar Transmittance {dimensionless}
+    0.499,                   !- Front Side Shade Beam-Diffuse Solar Reflectance {dimensionless}
+    0.530,                   !- Back Side Shade Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Shade Beam-Beam Visible Transmittance at Normal Incidence {dimensionless}
+    0.0,                     !- Shade Beam-Diffuse Visible Transmittance at Normal Incidence {dimensionless}
+    0.0,                     !- Shade Beam-Diffuse Visible Reflectance at Normal Incidence {dimensionless}
+    0.10,                    !- Shade Material Infrared Transmittance {dimensionless}
+    0.84,                    !- Front Side Shade Material Infrared Emissivity {dimensionless}
+    0.82;                    !- Back Side Shade Material Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Air GAP SealedIn 12.7mm, !- Name
+    ARGON,                   !- Gas Type
+    0.0127,                  !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+! *** Equivalent Layer Window 3
+
+  Construction:WindowEquivalentLayer,
+    Six Layers Window,       !- Name
+    INSCRN,                  !- Outside Layer
+    Air GAP Outdoor 12.7mm,  !- Layer 2
+    GLZGRY,                  !- Layer 3
+    Argon GAP Sealed 12.7mm, !- Layer 4
+    FEP,                     !- Layer 5
+    Xenon GAP Sealed 12.7mm, !- Layer 6
+    LOF1436,                 !- Layer 7
+    Krypton GAP Sealed 12.7mm,  !- Layer 8
+    GLZCLR,                  !- Layer 9
+    Air GAP Indoor 12.7mm,   !- Layer 10
+    ShadeTrns;               !- Layer 11
+
+  WindowMaterial:Screen:EquivalentLayer,
+    INSCRN,                  !- Name
+    0.763,                   !- Screen Beam-Beam Solar Transmittance {dimensionless}
+    0.076,                   !- Screen Beam-Diffuse Solar Transmittance {dimensionless}
+    0.052,                   !- Screen Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Screen Beam-Beam Visible Transmittance {dimensionless}
+    0.0,                     !- Screen Beam-Diffuse Visible Transmittance {dimensionless}
+    0.0,                     !- Screen Beam-Diffuse Visible Reflectance {dimensionless}
+    0.0,                     !- Screen Infrared Transmittance {dimensionless}
+    0.84,                    !- Screen Infrared Emissivity {dimensionless}
+    0.025,                   !- Screen Wire Spacing {m}
+    0.00315;                 !- Screen Wire Diameter {m}
+
+  WindowMaterial:Glazing:EquivalentLayer,
+    GLZGRY,                  !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.46,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}
+    0.46,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}
+    0.05,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}
+    0.05,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.38,                    !- Diffuse-Diffuse Solar Transmittance {dimensionless}
+    0.10,                    !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.10,                    !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}
+    0.84,                    !- Front Side Infrared Emissivity {dimensionless}
+    0.84;                    !- Back Side Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Glazing:EquivalentLayer,
+    FEP,                     !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.96,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}
+    0.96,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}
+    0.04,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}
+    0.04,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.8352,                  !- Diffuse-Diffuse Solar Transmittance {dimensionless}
+    0.1648,                  !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.1648,                  !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.634,                   !- Infrared Transmittance (applies to front and back) {dimensionless}
+    0.243,                   !- Front Side Infrared Emissivity {dimensionless}
+    0.243;                   !- Back Side Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Glazing:EquivalentLayer,
+    LOF1436,                 !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.705,                   !- Front Side Beam-Beam Solar Transmittance {dimensionless}
+    0.705,                   !- Back Side Beam-Beam Solar Transmittance {dimensionless}
+    0.123,                   !- Front Side Beam-Beam Solar Reflectance {dimensionless}
+    0.105,                   !- Back Side Beam-Beam Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}
+    0.6134,                  !- Diffuse-Diffuse Solar Transmittance {dimensionless}
+    0.2370,                  !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.2214,                  !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}
+    0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}
+    0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}
+    0.189,                   !- Front Side Infrared Emissivity {dimensionless}
+    0.838;                   !- Back Side Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Shade:EquivalentLayer,
+    ShadeTrns,               !- Name
+    0.20,                    !- Shade Beam-Beam Solar Transmittance {dimensionless}
+    0.400,                   !- Front Side Shade Beam-Diffuse Solar Transmittance {dimensionless}
+    0.400,                   !- Back Side Shade Beam-Diffuse Solar Transmittance {dimensionless}
+    0.300,                   !- Front Side Shade Beam-Diffuse Solar Reflectance {dimensionless}
+    0.300,                   !- Back Side Shade Beam-Diffuse Solar Reflectance {dimensionless}
+    0.0,                     !- Shade Beam-Beam Visible Transmittance at Normal Incidence {dimensionless}
+    0.0,                     !- Shade Beam-Diffuse Visible Transmittance at Normal Incidence {dimensionless}
+    0.0,                     !- Shade Beam-Diffuse Visible Reflectance at Normal Incidence {dimensionless}
+    0.20,                    !- Shade Material Infrared Transmittance {dimensionless}
+    0.60,                    !- Front Side Shade Material Infrared Emissivity {dimensionless}
+    0.60;                    !- Back Side Shade Material Infrared Emissivity {dimensionless}
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Air GAP Outdoor 12.7mm,  !- Name
+    Air,                     !- Gas Type
+    0.022,                   !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Argon GAP Sealed 12.7mm, !- Name
+    Argon,                   !- Gas Type
+    0.0120,                  !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Xenon GAP Sealed 12.7mm, !- Name
+    Xenon,                   !- Gas Type
+    0.0170,                  !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Krypton GAP Sealed 12.7mm,  !- Name
+    Krypton,                 !- Gas Type
+    0.009,                   !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
+  WindowMaterial:Gap:EquivalentLayer,
+    Air GAP Indoor 12.7mm,   !- Name
+    Air,                     !- Gas Type
+    0.0127,                  !- Thickness {m}
+    Sealed;                  !- Gap Vent Type
+
