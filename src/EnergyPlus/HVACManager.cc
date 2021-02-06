@@ -285,7 +285,7 @@ namespace HVACManager {
 
         ZT = MAT;
         // save for use with thermal comfort control models (Fang, Pierce, and KSU)
-        ZTAVComf = ZTAV;
+        // ZTAVComf = ZTAV;
         ZoneAirHumRatAvgComf = ZoneAirHumRatAvg;
         ZTAV = 0.0;
         ZoneThermostatSetPointHiAver = 0.0;
@@ -571,6 +571,8 @@ namespace HVACManager {
 
             FirstTimeStepSysFlag = false;
         } // system time step  loop (loops once if no downstepping)
+
+        ZTAVComf = ZTAV;
 
         ManageZoneAirUpdates(state, iPushZoneTimestepHistories, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
