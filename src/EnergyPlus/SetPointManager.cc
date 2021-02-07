@@ -8095,7 +8095,7 @@ namespace EnergyPlus::SetPointManager {
         int SetPtMgrNum; // loop counter for each set point manager
         int NumNode;     // loop counter for each node and specific control type
 
-        // FLOW:
+
 
         // First time called, get the input for all the setpoint managers
         if (state.dataSetPointManager->GetInputFlag) {

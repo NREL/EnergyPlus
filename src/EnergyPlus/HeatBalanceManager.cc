@@ -314,7 +314,7 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
 
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
@@ -427,7 +427,7 @@ namespace HeatBalanceManager {
         bool ErrorsFound(false); // If errors detected in input
         bool ValidSimulationWithNoZones;
 
-        // FLOW:
+
 
         GetProjectControlData(state, ErrorsFound);
 
@@ -1432,7 +1432,7 @@ namespace HeatBalanceManager {
         // Formats
         static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
-        // FLOW:
+
         CurrentModuleObject = "Site:HeightVariation";
         NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -4219,7 +4219,7 @@ namespace HeatBalanceManager {
         int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
 
-        // FLOW:
+
 
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound(state, "Construction");
@@ -5448,7 +5448,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
         // Allocate real Variables
@@ -5594,7 +5594,7 @@ namespace HeatBalanceManager {
         int ZoneNum;
         int SurfNum;
 
-        // FLOW:
+
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
