@@ -198,14 +198,15 @@ namespace LowTempRadiantSystem {
 
         void errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound);
 
-        Real64 setRadiantSystemControlTemperature(EnergyPlusData &state);
+        Real64 setRadiantSystemControlTemperature(EnergyPlusData &state,
+                                                  LowTempRadiantControlTypes TempControlType);
 
         Real64 calculateOperationalFraction(Real64 const offTemperature, Real64 const controlTemperature, Real64 const throttlingRange);
 
         virtual void calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet,
                                                           LowTempRadiantSystem::SystemType const& typeOfRadiantSystem) = 0;
 
-        Real64 setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, int const scheduleIndex, Real64 const throttlingRange);
+        Real64 setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, int const scheduleIndex, Real64 const throttlingRange, LowTempRadiantSetpointTypes SetpointControlType);
 
         void updateLowTemperatureRadiantSystemSurfaces(EnergyPlusData &state);
 

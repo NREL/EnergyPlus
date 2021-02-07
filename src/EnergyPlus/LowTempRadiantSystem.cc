@@ -671,10 +671,10 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.CondDewPtDeltaT    = Numbers(10);
 
             thisRadSysDesign.schedNameChangeoverDelay = Alphas(10);
-            if (!lAlphaBlanks(11)) {
-                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(10));
+            if (!lAlphaBlanks(10)) {
+                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, thisRadSysDesign.schedNameChangeoverDelay);
                 if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(10) + " not found for " + Alphas(10));
+                    ShowWarningError(state, cAlphaFields(10) + " not found for " + thisRadSysDesign.schedNameChangeoverDelay);
                     ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
@@ -877,6 +877,8 @@ namespace LowTempRadiantSystem {
                 thisRadSys.NumCircCalcMethod = OneCircuit;
             }
 
+            thisRadSys.schedPtrChangeoverDelay = variableFlowDesignDataObject.schedPtrChangeoverDelay;
+
             thisRadSys.CircLength = Numbers(6);
 
 
@@ -952,9 +954,9 @@ namespace LowTempRadiantSystem {
 
             thisRadSysDesign.schedNameChangeoverDelay = Alphas(5);
             if (!lAlphaBlanks(5)) {
-                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, Alphas(5));
+                thisRadSysDesign.schedPtrChangeoverDelay = GetScheduleIndex(state, thisRadSysDesign.schedNameChangeoverDelay);
                 if (thisRadSysDesign.schedPtrChangeoverDelay == 0) {
-                    ShowWarningError(state, cAlphaFields(5) + " not found for " + Alphas(5));
+                    ShowWarningError(state, cAlphaFields(5) + " not found for " + thisRadSysDesign.schedNameChangeoverDelay);
                     ShowContinueError(state, "This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError(state, "As a result, no changeover delay will be used for this radiant system.");
                 }
@@ -990,6 +992,7 @@ namespace LowTempRadiantSystem {
             thisCFloSys.Name = Alphas(1);
             thisCFloSys.designObjectName = Alphas(2);
             thisCFloSys.DesignObjectPtr = UtilityRoutines::FindItemInList( thisCFloSys.designObjectName, CFlowRadDesignNames);
+            ConstantFlowRadDesignData ConstantFlowRadDesignDataObject{CflowRadiantSysDesign(thisCFloSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
             thisCFloSys.SchedName = Alphas(3);
             if (lAlphaBlanks(3)) {
@@ -1167,6 +1170,8 @@ namespace LowTempRadiantSystem {
             } else {
                 thisCFloSys.NumCircCalcMethod = OneCircuit;
             }
+
+            thisCFloSys.schedPtrChangeoverDelay = ConstantFlowRadDesignDataObject.schedPtrChangeoverDelay;
 
             thisCFloSys.CircLength = Numbers(5);
 
@@ -3428,7 +3433,7 @@ namespace LowTempRadiantSystem {
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
             // sent to the radiant system
 
-            ControlTemp = this->setRadiantSystemControlTemperature(state);
+            ControlTemp = this->setRadiantSystemControlTemperature(state, variableFlowDesignDataObject.VarFlowControlType);
 
             if (variableFlowDesignDataObject.HotSetptSchedPtr > 0) {
 //                OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->HotSetptSchedPtr, this->HotThrottlRange);
@@ -3436,12 +3441,16 @@ namespace LowTempRadiantSystem {
                 a = variableFlowDesignDataObject.HotThrottlRange;
                 OffTempHeat = this->setOffTemperatureLowTemperatureRadiantSystem(state,
                                                                                  variableFlowDesignDataObject.HotSetptSchedPtr,
-                                                                                 variableFlowDesignDataObject.HotThrottlRange );
+                                                                                 variableFlowDesignDataObject.HotThrottlRange,
+                                                                                 variableFlowDesignDataObject.VarFlowSetpointType);
             } else { // This system is not capable of heating, set OffTempHeat to something really low
                 OffTempHeat = LowTempHeating;
             }
             if (variableFlowDesignDataObject.ColdSetptSchedPtr > 0) {
-                OffTempCool = this->setOffTemperatureLowTemperatureRadiantSystem(state, variableFlowDesignDataObject.ColdSetptSchedPtr, -variableFlowDesignDataObject.ColdThrottlRange);
+                OffTempCool = this->setOffTemperatureLowTemperatureRadiantSystem(state,
+                                                                                 variableFlowDesignDataObject.ColdSetptSchedPtr,
+                                                                                 -variableFlowDesignDataObject.ColdThrottlRange,
+                                                                                 variableFlowDesignDataObject.VarFlowSetpointType);
             } else { // This system is not capable of cooling, set OffTempCool to something really high
                 OffTempCool = HighTempCooling;
             }
@@ -4105,7 +4114,7 @@ namespace LowTempRadiantSystem {
 
             // Set the current setpoint temperature (same procedure for either heating or cooling)
 
-            SetPointTemp = this->setRadiantSystemControlTemperature(state);
+            SetPointTemp = this->setRadiantSystemControlTemperature(state, ConstantFlowDesignDataObject.ConstFlowControlType);
 
             // Avoid problems when there is no heating or cooling control because the system only cools or heats
             if (this->HotCtrlHiTempSchedPtr > 0) {
@@ -5154,11 +5163,11 @@ namespace LowTempRadiantSystem {
             // that the unit should be on or not
 
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
-            OffTemp = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->SetptSchedPtr, this->ThrottlRange);
+            OffTemp = this->setOffTemperatureLowTemperatureRadiantSystem(state, this->SetptSchedPtr, this->ThrottlRange, this->SetpointType);
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
 
-            ControlTemp = this->setRadiantSystemControlTemperature(state);
+            ControlTemp = this->setRadiantSystemControlTemperature(state, ControlType);
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 
@@ -5443,9 +5452,10 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature(EnergyPlusData &state)
+    Real64 RadiantSystemBaseData::setRadiantSystemControlTemperature(EnergyPlusData &state,
+                                                                     LowTempRadiantControlTypes TempControlType)
     {
-        switch (this->ControlType) {
+        switch (TempControlType) {
         case LowTempRadiantControlTypes::MATControl:
             return DataHeatBalFanSys::MAT(this->ZonePtr);
         case LowTempRadiantControlTypes::MRTControl:
@@ -5464,7 +5474,7 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::RunningMeanODBControl:
             return this->todayRunningMeanOutdoorDryBulbTemperature;
         default:
-            ShowSevereError(state, "Illegal control type in low temperature radiant system: " + this->Name);
+            ShowSevereError(state, "Illegal control type in low temperature radiant system or it's design object: " + this->Name);
             ShowFatalError(state, "Preceding condition causes termination.");
             return 0.0; // hush the compiler
         }
@@ -5484,10 +5494,10 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 RadiantSystemBaseData::setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, const int scheduleIndex, const Real64 throttlingRange)
+    Real64 RadiantSystemBaseData::setOffTemperatureLowTemperatureRadiantSystem(EnergyPlusData &state, const int scheduleIndex, const Real64 throttlingRange, LowTempRadiantSetpointTypes SetpointControlType)
     {
         Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(state, scheduleIndex);
-        switch (this->SetpointType) {
+        switch (SetpointControlType) {
         case LowTempRadiantSetpointTypes::halfFlowPower:
             return scheduleValue + 0.5 * throttlingRange;
         case LowTempRadiantSetpointTypes::zeroFlowPower:

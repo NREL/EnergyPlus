@@ -2150,7 +2150,8 @@
     0.5, !- Cooling_Control_Throttling_Range 
     Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name 
     Off, !- Condensation_Control_Type 
-    0.0; !- Condensation_Control_Dewpoint_Offset 
+    0.0, !- Condensation_Control_Dewpoint_Offset
+    ChangeoverSchedW;         !- Changeover delay schedule 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow, 
     East Zone Radiant Floor, !- Name 
@@ -2189,7 +2190,8 @@
     0.5, !- Cooling_Control_Throttling_Range 
     Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name 
     Off, !- Condensation_Control_Type 
-    0.0; !- Condensation_Control_Dewpoint_Offset 
+    0.0, !- Condensation_Control_Dewpoint_Offset
+    ChangeoverSchedE;         !- Changeover delay schedule 
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow, 
     North Zone Radiant Floor, !- Name 
@@ -2228,4 +2230,5 @@
     0.5, !- Cooling_Control_Throttling_Range 
     Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name 
     Off, !- Condensation_Control_Type 
-    0.0; !- Condensation_Control_Dewpoint_Offset 
+    0.0, !- Condensation_Control_Dewpoint_Offset
+    ChangeoverSchedN;         !- Changeover delay schedule 
