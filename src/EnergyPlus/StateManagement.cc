@@ -110,27 +110,19 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/MicroCHPElectricGenerator.hh>
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
 #include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
@@ -181,7 +173,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FluidProperties::clear_state();
     Furnaces::clear_state();
     General::clear_state();
-    GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
@@ -204,26 +195,15 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
-    HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    MicroCHPElectricGenerator::clear_state();
-    MicroturbineElectricGenerator::clear_state();
-    MixerComponent::clear_state();
-    MoistureBalanceEMPDManager::clear_state();
-    NodeInputManager::clear_state();
-    OutAirNodeManager::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
-    OutsideEnergySources::clear_state();
-    PackagedTerminalHeatPump::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
     PollutionModule::clear_state();
-    PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection

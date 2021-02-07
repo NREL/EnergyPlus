@@ -246,7 +246,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 OnOffAirFlowRatio; // Ratio of compressor ON airflow to average airflow over timestep
         Real64 QZnLoad;           // Zone load required by all zones served by this air loop system
         Real64 QSensUnitOut;      // MSHP sensible capacity output [W]
-        // FLOW
+
 
         // First time SimMSHeatPump is called, get the input
         if (GetInputFlag) {
@@ -621,7 +621,7 @@ namespace HVACMultiSpeedHeatPump {
         int SteamIndex;      // steam coil steam inlet density
         Real64 SteamDensity; // density of steam at 100C
 
-        // FLOW
+
 
         if (MSHeatPump.allocated()) return;
 
@@ -1827,7 +1827,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 QActual(0.0);            // coil actual capacity
         int CoilAvailSchPtr(0);         // DX coil availability schedule pointer
 
-        // FLOW
+
         InNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         OutNode = MSHeatPump(MSHeatPumpNum).AirOutletNodeNum;
         NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
@@ -2707,7 +2707,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         }
 
-        // FLOW
+
         NumOfSpeedCooling = MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling;
         NumOfSpeedHeating = MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating;
 
@@ -2908,7 +2908,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
         int i;                     // Speed index
 
-        // FLOW
+
         SupHeaterLoad = 0.0;
         PartLoadFrac = 0.0;
         SpeedRatio = 0.0;
@@ -3476,7 +3476,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 MinWaterFlow; // minimum water flow rate
         Real64 ErrorToler;   // supplemental heating coil convergence tollerance
 
-        // FLOW
+
         OutletNode = MSHeatPump(MSHeatPumpNum).AirOutletNodeNum;
         InletNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         if (MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0) {
