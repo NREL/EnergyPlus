@@ -1094,8 +1094,6 @@ namespace WaterThermalTanks {
 
     bool getHPWaterHeaterInput(EnergyPlusData &state)
     {
-        using IntegratedHeatPump::IntegratedHeatPumps; 
-
         bool ErrorsFound = false;
 
         int const NumPumpedCondenser =
@@ -1445,7 +1443,7 @@ namespace WaterThermalTanks {
                 HPWH.DXCoilTypeNum = 0;
                 if (HPWH.bIsIHP) {
                     if (IntegratedHeatPump::IHPStorageType::LIQUIDDESICCANT 
-                        == IntegratedHeatPumps(HPWH.DXCoilNum).StorageType) 
+                        == state.dataIntegratedHP->IntegratedHeatPumps(HPWH.DXCoilNum).StorageType) 
                         HPWH.DXCoilType = "COILSYSTEM:DESICCANTSTORAGEHEATPUMP:AIRSOURCE";
                     else 
                         HPWH.DXCoilType = "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE";

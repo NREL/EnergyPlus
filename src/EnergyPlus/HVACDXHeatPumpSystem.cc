@@ -222,7 +222,7 @@ namespace HVACDXHeatPumpSystem {
 
 
         if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) {
-            if (IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode ==
+            if (state.dataIntegratedHP->IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode ==
                 IntegratedHeatPump::IHPOperationMode::SCMode)
                 bVSHPOn = false;  
         }
@@ -427,7 +427,7 @@ namespace HVACDXHeatPumpSystem {
 
                 if (DXHeatPumpSystem(DXHeatSysNum).IHPIndex != 0)
                      DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilIndex =
-                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilIndex;
+                        state.dataIntegratedHP->IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilIndex;
 
             } else {
                 ShowSevereError(state, "Invalid entry for " + cAlphaFields(3) + " :" + Alphas(3));
@@ -439,11 +439,11 @@ namespace HVACDXHeatPumpSystem {
                 if (DXHeatPumpSystem(DXHeatSysNum).IHPIndex != 0) {
                     DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(
                         state, "Coil:Heating:DX:VariableSpeed", 
-                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName,
+                        state.dataIntegratedHP->IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName,
                         ErrorsFound);
                     DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(
                         state, "Coil:Heating:DX:VariableSpeed", 
-                        IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName, 
+                        state.dataIntegratedHP->IntegratedHeatPumps(DXHeatPumpSystem(DXHeatSysNum).IHPIndex).SHCoilName, 
                         ErrorsFound);
                 }
                 else{
@@ -871,7 +871,7 @@ namespace HVACDXHeatPumpSystem {
                         SpeedRatio = 0.0;
 
                         if (DXHeatPumpSystem(DXSystemNum).IHPIndex != 0) {
-                            IntegratedHeatPump::IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode =
+                            state.dataIntegratedHP->IntegratedHeatPumps(DXHeatPumpSystem(DXSystemNum).IHPIndex).CurMode =
                                 IntegratedHeatPump::IHPOperationMode::SHMode;
                         }
 

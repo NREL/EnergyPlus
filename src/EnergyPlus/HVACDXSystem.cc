@@ -263,7 +263,7 @@ namespace HVACDXSystem {
         HXUnitOn = false;
 
         if (DXCoolingSystem(DXSystemNum).IHPIndex != 0)
-            IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
+            state.dataIntegratedHP->IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
                 IntegratedHeatPump::IHPOperationMode::IdleMode; 
 
         DXCoolingSystem(DXSystemNum).bEnhancedDehum = false;
@@ -543,7 +543,7 @@ namespace HVACDXSystem {
 
                     if (DXCoolingSystem(DXCoolSysNum).IHPIndex != 0)
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
-                            IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXCoolSysNum).IHPIndex).SCCoilIndex;
+                            state.dataIntegratedHP->IntegratedHeatPumps(DXCoolingSystem(DXCoolSysNum).IHPIndex).SCCoilIndex;
 
                     if (ErrFound) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
@@ -2315,7 +2315,7 @@ namespace HVACDXSystem {
                             SpeedRatio = 0.0;
                         } else {
                             if (DXCoolingSystem(DXSystemNum).IHPIndex != 0) {
-                                IntegratedHeatPump::IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
+                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoolingSystem(DXSystemNum).IHPIndex).CurMode =
                                     IntegratedHeatPump::IHPOperationMode::SCMode;
                             }
 
