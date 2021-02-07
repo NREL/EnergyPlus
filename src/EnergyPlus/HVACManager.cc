@@ -2034,8 +2034,6 @@ namespace HVACManager {
                         if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
                             -DataConvergParams::HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
-                                // CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
-                                // TRIM(NodeID(SupplyNode))//  &
                                 // ', check for Node Connection Errors in the following messages.')
                                 for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                     TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
@@ -2261,7 +2259,7 @@ namespace HVACManager {
         int GroupNum;
         int Mult;
 
-        // FLOW:
+
         // Sum ZONE LIST and ZONE GROUP report variables
         ListSNLoadHeatEnergy = 0.0;
         ListSNLoadCoolEnergy = 0.0;

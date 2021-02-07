@@ -924,7 +924,6 @@ namespace Photovoltaics {
                 SetVentedModuleQdotSource(PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                // CALL SetPVTQdotSource(PVarray(PVNum)%ExtVentCavPtr,  -1 * PVarray(PVNum)%SurfaceSink )
             }
         }
     }

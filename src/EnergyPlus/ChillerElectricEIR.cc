@@ -2159,7 +2159,6 @@ namespace EnergyPlus::ChillerElectricEIR {
                 // maybe this could be handled earlier, check if this component has a load and an evap flow rate
                 // then if cond flow is zero, just make a request to the condenser,
                 // then just say it couldn't run until condenser loop wakes up.
-                // CALL ShowFatalError(state, 'Program Terminates due to previous error condition.')
             }
         } else { // Air Cooled or Evap Cooled
 

@@ -67,14 +67,14 @@ TEST_F(EnergyPlusFixture, GetZoneMixerIndex)
     int MixerIndex;
     // set some variables
     CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
-    NumMixers = 3;
+    state->dataMixerComponent->NumMixers = 3;
     errFlag = false;
     // allocate needed arrays
-    MixerCond.allocate(NumMixers);
-    MixerCond(1).MixerName = "SPACE1-1 ATU Mixer";
-    MixerCond(2).MixerName = "SPACE2-1 ATU Mixer";
-    MixerCond(3).MixerName = "SPACE3-1 ATU Mixer";
-    GetZoneMixerIndex(*state, MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
+    state->dataMixerComponent->MixerCond.allocate(state->dataMixerComponent->NumMixers);
+    state->dataMixerComponent->MixerCond(1).MixerName = "SPACE1-1 ATU Mixer";
+    state->dataMixerComponent->MixerCond(2).MixerName = "SPACE2-1 ATU Mixer";
+    state->dataMixerComponent->MixerCond(3).MixerName = "SPACE3-1 ATU Mixer";
+    GetZoneMixerIndex(*state, state->dataMixerComponent->MixerCond(2).MixerName, MixerIndex, errFlag, CurrentModuleObject);
     EXPECT_EQ(2, MixerIndex);
     EXPECT_FALSE(errFlag);
     GetZoneMixerIndex(*state, "SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject);
