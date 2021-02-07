@@ -774,7 +774,6 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
 {
-
     std::string const idf_objects = delimited_string({
         "Zone,",
         "  EAST ZONE,                      !- Name",
@@ -908,7 +907,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input
-    EMSManager::GetEMSInput(*state);
+
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     bool FirstHVACIteration(true);
@@ -921,6 +920,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideMdotOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyTempOn = true;
     state->dataPurchasedAirMgr->PurchAir(1).EMSOverrideSupplyHumRatOn = true;
+
     DataLoopNode::Node(2).Temp = 25.0;
     DataLoopNode::Node(2).HumRat = 0.001;
 
@@ -928,9 +928,19 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
     Real64 SysOutputProvided;
     Real64 MoistOutputProvided;
 
+    bool anyEMSRan;
+    ManageEMS(*state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const());
+    
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirNodeNum = 2;
+    state->dataPurchasedAirMgr->PurchAir(1).ZoneRecircAirNodeNum = 1;
+
     CalcPurchAirLoads(*state, 1, SysOutputProvided, MoistOutputProvided, 1, 1);
 
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueMassFlowRate, 0.0);
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 0.0);
-    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.0);
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyTemp, 18.0);
+    EXPECT_EQ(state->dataPurchasedAirMgr->PurchAir(1).EMSValueSupplyHumRat, 0.01);
+
+    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Enthalpy, 43431.131);
+    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).HumRat, 0.01);
+    EXPECT_EQ(EnergyPlus::DataLoopNode::Node(1).Temp, 18.0);
 }
