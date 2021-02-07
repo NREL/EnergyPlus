@@ -2238,7 +2238,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 DesiredDewPoint;
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
         Real64 OutdoorBaroPress;   // Barometric pressure at outdoor condenser
-        // FLOW
+
 
         Par(6) = 0.0;//field used for integrated heat pump index in CoilSystem:DX:Cooling/:Heating
 

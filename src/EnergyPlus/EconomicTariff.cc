@@ -3030,7 +3030,6 @@ namespace EnergyPlus::EconomicTariff {
                             // No longer pushing a zero to fix bug
                             // and push zero
                             // a = 0
-                            // CALL pushStack(a,noVar)
                         }
                     }
                 }
@@ -4077,7 +4076,6 @@ namespace EnergyPlus::EconomicTariff {
                 DisplayString(state, "Writing Tariff Reports");
                 for (auto &e : econVar)
                     e.isReported = false;
-                // CALL selectTariff moved to the end of computeTariff.
                 showWarningsBasedOnTotal(state);
                 //---------------------------------
                 // Economics Results Summary Report

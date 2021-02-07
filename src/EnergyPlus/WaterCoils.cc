@@ -171,7 +171,7 @@ namespace WaterCoils {
         int OpMode;          // fan operating mode
         Real64 PartLoadFrac; // part-load fraction of heating coil
 
-        // FLOW:
+
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
@@ -1233,7 +1233,7 @@ namespace WaterCoils {
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
 
-        // FLOW:
+
 
         if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -1763,7 +1763,6 @@ namespace WaterCoils {
                 if (SolFla == -1) {
                     ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating coil UA");
-                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
@@ -1775,7 +1774,6 @@ namespace WaterCoils {
                 } else if (SolFla == -2) {
                     ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "  Bad starting values for UA");
-                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);

@@ -4679,7 +4679,7 @@ namespace EnergyPlus::SystemReports {
         int PassBranchNum; // DO loop counter for branches
         int PassCompNum;   // DO loop counter for components
         int PassLoopNum;   // DO loop counter for loops or the top level of the hierarchy
-        // FLOW:
+
         // Initialize all of the output variables
 
         MatchFound = false;

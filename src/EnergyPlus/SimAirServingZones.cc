@@ -2289,7 +2289,7 @@ namespace EnergyPlus::SimAirServingZones {
                     for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
                         int compType = thisRetPath.ComponentType_Num(compNum);
                         if (compType == ZoneMixer_Type) {
-                            auto const &thisMixer(MixerComponent::MixerCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisMixer.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
@@ -2427,7 +2427,7 @@ namespace EnergyPlus::SimAirServingZones {
         bool SysReSim;
         DataConvergParams::iCalledFrom CalledFrom;
 
-        // FLOW:
+
 
         // Set up output variables
         if (!state.dataSimAirServingZones->OutputSetupFlag) {
@@ -2670,7 +2670,7 @@ namespace EnergyPlus::SimAirServingZones {
         // If Status>0, warm restart succeeded.
         static int WarmRestartStatus(iControllerWarmRestartNone);
 
-        // FLOW:
+
 
         // Reset air loop trackers to zero
         AirLoopIterMax = 0;
@@ -2818,7 +2818,7 @@ namespace EnergyPlus::SimAirServingZones {
         // A character string equivalent of ErrCount
         static bool BypassOAController; // logical to tell ManageControllers to sim or not sim controller in OA System (don't sim here)
 
-        // FLOW:
+
 
         // To track number of calls to SimAirLoopComponents() for each air loop
         // Represents the most computationally expensive operation in the iteration.
@@ -3058,7 +3058,7 @@ namespace EnergyPlus::SimAirServingZones {
         int static AirLoopPass;
         static bool BypassOAController;
 
-        // FLOW:
+
 
         bool AirLoopCheck = false;
         if (AirLoopNum > 0) {
@@ -3261,7 +3261,7 @@ namespace EnergyPlus::SimAirServingZones {
         bool IsUpToDateFlag;
         static bool BypassOAController; // logical to bypass HVAC controller calcs
 
-        // FLOW:
+
 
         // To track number of calls to SimAirLoopComponents() for each air loop
         // Represents the most computationally expensive operation in the iteration.
@@ -3459,7 +3459,7 @@ namespace EnergyPlus::SimAirServingZones {
         Real64 OAUCoilOutTemp = 0.0; // used only for UnitarySystem call
         bool ZoneEquipFlag = false;  // used only for UnitarySystem call
 
-        // FLOW:
+
 
         bool CoolingActive = false;
         bool HeatingActive = false;
@@ -3690,7 +3690,7 @@ namespace EnergyPlus::SimAirServingZones {
         Real64 OutletCO2; // outlet CO2 of mixer
         Real64 OutletGC;  // outlet generic contaminant of mixer
 
-        // FLOW
+
         MassFlowRateSetSum = 0.0;
         MassFlowRateOut = 0.0;
         MassFlowRateMinAvailOut = 0.0;
@@ -3860,7 +3860,7 @@ namespace EnergyPlus::SimAirServingZones {
         int InBranchNum;               // air system inlet branch number
         int InBranchIndex;             // air sys inlet branch DO loop index
 
-        // FLOW
+
 
         // Find the minimum MassFlowMaxAvail for each branch in the system and store it on the branch inlet node.
         // Check for mass flow conservation on each branch. Set SysReSim to TRUE is mass flow not conserved.

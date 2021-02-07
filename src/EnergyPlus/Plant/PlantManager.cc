@@ -316,7 +316,7 @@ namespace EnergyPlus::PlantManager {
             bool MatchedPressureString;
             int PressSimAlphaIndex;
 
-            // FLOW:
+
             CurrentModuleObject = "PlantLoop";
             NumPlantLoops = inputProcessor->getNumObjectsFound(state,
                     CurrentModuleObject); // Get the number of primary plant loops
@@ -1877,7 +1877,7 @@ namespace EnergyPlus::PlantManager {
             std::string CurrentModuleObject; // for ease in renaming.
             int FluidIndex;
 
-            // FLOW:
+
             MaxBranches = 0;
             for (auto &loop : state.dataPlnt->PlantLoop) {
                 MaxBranches = max(MaxBranches, loop.LoopSide(DemandSide).TotalBranches);
