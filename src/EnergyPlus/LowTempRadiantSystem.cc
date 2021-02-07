@@ -344,7 +344,7 @@ namespace LowTempRadiantSystem {
             }
 
             if ((SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) || (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) || (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem)) {
-                baseSystem->calculateLowTemperatureRadiantSystem(state, LoadMet, SystemType);
+                baseSystem->calculateLowTemperatureRadiantSystem(state, LoadMet);
                 baseSystem->updateLowTemperatureRadiantSystemSurfaces(state);
                 baseSystem->updateLowTemperatureRadiantSystem(state); // Nothing to update for electric systems
                 baseSystem->reportLowTemperatureRadiantSystem(state);
@@ -3351,8 +3351,7 @@ namespace LowTempRadiantSystem {
     }
 
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
-                                                                             Real64 &LoadMet,
-                                                                             LowTempRadiantSystem::SystemType const& typeOfRadiantSystem) // load met by the radiant system, in Watts
+                                                                             Real64 &LoadMet) // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3518,7 +3517,9 @@ namespace LowTempRadiantSystem {
 
             // Now simulate the system...
             if (((this->OperatingMode == HeatingMode) || (this->OperatingMode == CoolingMode)) && SysRunning)
-                this->calculateLowTemperatureRadiantSystemComponents(state, LoadMet, typeOfRadiantSystem);
+                this->calculateLowTemperatureRadiantSystemComponents(state,
+                                                                     LoadMet,
+                                                                     SystemType::HydronicSystem);
         }
     }
 
@@ -4030,8 +4031,7 @@ namespace LowTempRadiantSystem {
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
-                                                                             Real64 &LoadMet,
-                                                                             LowTempRadiantSystem::SystemType const& typeOfRadiantSystem) // load met by the radiant system, in Watts
+                                                                             Real64 &LoadMet) // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -4298,7 +4298,7 @@ namespace LowTempRadiantSystem {
                     // So, proceed assuming the RadInTemp requested by the controls and then figure out the
                     // mixing after the outlet radiant temperature is calculated.
                     this->WaterInletTemp = RadInTemp;
-                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
                     if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
@@ -4316,7 +4316,7 @@ namespace LowTempRadiantSystem {
                     // the entire flow to the component (no recirculation but potentially some bypass for the
                     // overall loop).  There is no way we can meet the control temperature so don't even try.
                     this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                     // We now have inlet and outlet temperatures--we still need to set the flow rates
                     if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect divide by zero
@@ -4338,7 +4338,7 @@ namespace LowTempRadiantSystem {
                     // have to repeat the solution for an unknown inlet temperature and a known recirculation
                     // rate.
                     this->WaterInletTemp = RadInTemp;
-                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                     // Now see if we can really get that desired into temperature (RadInTemp) by solving
                     // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -4365,7 +4365,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
                     } else {
                         this->WaterInjectionRate = InjectFlowRate;
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
@@ -4380,7 +4380,7 @@ namespace LowTempRadiantSystem {
                     this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                     this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                     Iteration = true;
-                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                    this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
                 }
 
             } else if (this->OperatingMode == CoolingMode) {
@@ -4409,7 +4409,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             this->WaterInletTemp = LoopReqTemp;
                         }
-                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
                         if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
@@ -4427,7 +4427,7 @@ namespace LowTempRadiantSystem {
                         // the entire flow to the component (no recirculation but potentially some bypass for the
                         // overall loop).  There is no way we can meet the control temperature so don't even try.
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
-                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                         // We now have inlet and outlet temperatures--we still need to set the flow rates
                         if ((SysWaterInTemp - this->WaterOutletTemp) != 0.0) { // protect div by zero
@@ -4454,7 +4454,7 @@ namespace LowTempRadiantSystem {
                         } else {
                             this->WaterInletTemp = LoopReqTemp;
                         }
-                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
 
                         // Now see if we can really get that desired into temperature (RadInTemp) by solving
                         // for the flow that is injected from the loop.  A heat balance for the mixer that relates
@@ -4481,7 +4481,7 @@ namespace LowTempRadiantSystem {
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                             this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                             Iteration = true;
-                            this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                            this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
                         } else {
                             this->WaterInjectionRate = InjectFlowRate;
                             this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
@@ -4496,7 +4496,7 @@ namespace LowTempRadiantSystem {
                         this->WaterRecircRate = this->WaterMassFlowRate - this->WaterInjectionRate;
                         this->WaterInletTemp = SysWaterInTemp + PumpTempRise;
                         Iteration = true;
-                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, typeOfRadiantSystem);
+                        this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
                     }
 
                     ++CFloCondIterNum;
@@ -5099,8 +5099,7 @@ namespace LowTempRadiantSystem {
     }
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
-                                                                         Real64 &LoadMet,
-                                                                         LowTempRadiantSystem::SystemType const& typeOfRadiantSystem) // load met by the radiant system, in Watts
+                                                                         Real64 &LoadMet) // load met by the radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
