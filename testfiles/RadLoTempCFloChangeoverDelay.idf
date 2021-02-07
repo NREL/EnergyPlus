@@ -2062,7 +2062,8 @@
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
-    1.0; !- Condensation_Control_Dewpoint_Offset 
+    1.0, !- Condensation_Control_Dewpoint_Offset
+    ChangeoverSchedW;         !- Changeover delay schedule 
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
     East Zone Radiant Floor, !- Name 
@@ -2101,7 +2102,8 @@
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
-    0.0; !- Condensation_Control_Dewpoint_Offset 
+    0.0, !- Condensation_Control_Dewpoint_Offset
+    ChangeoverSchedE;         !- Changeover delay schedule 
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
     North Zone Radiant Floor, !- Name 
@@ -2140,4 +2142,5 @@
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
-    0.0; !- Condensation_Control_Dewpoint_Offset 
+    0.0, !- Condensation_Control_Dewpoint_Offset 
+    ChangeoverSchedN;         !- Changeover delay schedule
