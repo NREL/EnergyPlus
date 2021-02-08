@@ -76,7 +76,6 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EarthTube.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
@@ -85,15 +84,10 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/GeneratorFuelSupply.hh>
-#include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
@@ -111,43 +105,24 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
-#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/MicroCHPElectricGenerator.hh>
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReportTabularAnnual.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PackagedThermalStorageCoil.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Photovoltaics.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
-#include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
-#include <EnergyPlus/PlantPressureSystem.hh>
-#include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PondGroundHeatExchanger.hh>
-#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
@@ -187,7 +162,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DisplacementVentMgr::clear_state();
     DualDuct::clear_state();
     clearFacilityElectricPowerServiceObject();
-    EarthTube::clear_state();
     ElectricBaseboardRadiator::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
@@ -195,24 +169,15 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
-    FluidCoolers::clear_state();
     FluidProperties::clear_state();
-    FuelCellElectricGenerator::clear_state();
     Furnaces::clear_state();
     General::clear_state();
-    GeneralRoutines_clear_state(); // GeneralRoutines does not have a namespace
-    GeneratorFuelSupply::clear_state();
-    GlobalNames::clear_state();
-    GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
-    HeatPumpWaterToWaterCOOLING::clear_state();
-    HeatPumpWaterToWaterHEATING::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
@@ -229,37 +194,15 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACSingleDuctInduc::clear_state();
     HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
-    HybridUnitaryAirConditioners::clear_state();
     HysteresisPhaseChange::clear_state();
-    // EnergyPlus::inputProcessor->clear_state(); this is done by the unit test fixture, other reset approaches (API) should just get an entirely new
-    // inputprocessor instance
-    IceThermalStorage::clear_state();
-    IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
-    MicroCHPElectricGenerator::clear_state();
-    MicroturbineElectricGenerator::clear_state();
-    MixerComponent::clear_state();
-    MoistureBalanceEMPDManager::clear_state();
-    NodeInputManager::clear_state();
-    OutAirNodeManager::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
-    OutsideEnergySources::clear_state();
-    PackagedTerminalHeatPump::clear_state();
     PackagedThermalStorageCoil::clear_state();
     Photovoltaics::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    PlantHeatExchangerFluidToFluid::clear_state();
-    PlantLoadProfile::clear_state();
-    PlantManager::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantPressureSystem::clear_state();
-    PlantUtilities::clear_state();
-    PlantPipingSystemsManager::clear_state();
     PollutionModule::clear_state();
-    PondGroundHeatExchanger::clear_state();
-    PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection

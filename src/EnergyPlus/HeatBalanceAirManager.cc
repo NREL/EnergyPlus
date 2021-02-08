@@ -245,7 +245,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
 
-        // FLOW:
+
 
         GetAirFlowFlag(state, ErrorsFound);
 
@@ -3964,7 +3964,7 @@ namespace HeatBalanceAirManager {
         bool ErrorsFound;
         bool IsNotOK;
 
-        // FLOW:
+
 
         // Initialize default values for air model parameters
         state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);

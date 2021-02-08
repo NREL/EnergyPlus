@@ -1229,7 +1229,7 @@ namespace SteamBaseboardRadiator {
 
         int BaseboardNum; // DO loop counter for surface index
 
-        // FLOW:
+
         SteamBaseboardSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1371,7 +1371,7 @@ namespace SteamBaseboardRadiator {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {

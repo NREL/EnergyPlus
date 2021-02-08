@@ -216,23 +216,23 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataScheduleMgr->Schedule.allocate(1);
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    PTUnit.allocate(1);
-    PTUnit(1) = thisUnit;
-    PTUnit(1).simASHRAEModel = true;
-    PTUnit(1).MinOATCompressorCooling = -10.0;
-    PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::PTHPUnit;
-    PTUnit(1).FanName = "TEST FAN";
-    PTUnit(1).FanType = "Fan:OnOff";
-    PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
-    PTUnit(1).DXHeatCoilName = "HEATINGCOIL";
-    PTUnit(1).DXCoolCoilIndexNum = 1;
-    PTUnit(1).DXHeatCoilIndexNum = 2;
-    PTUnit(1).SchedPtr = 1;
-    PTUnit(1).FanAvailSchedPtr = 1;
-    PTUnit(1).FanPlace = BlowThru;
-    PTUnit(1).OpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
-    PackagedTerminalHeatPump::CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
-    PackagedTerminalHeatPump::CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
+    state->dataPTHP->PTUnit.allocate(1);
+    state->dataPTHP->PTUnit(1) = thisUnit;
+    state->dataPTHP->PTUnit(1).simASHRAEModel = true;
+    state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -10.0;
+    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::iPTHPType::PTHPUnit;
+    state->dataPTHP->PTUnit(1).FanName = "TEST FAN";
+    state->dataPTHP->PTUnit(1).FanType = "Fan:OnOff";
+    state->dataPTHP->PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
+    state->dataPTHP->PTUnit(1).DXHeatCoilName = "HEATINGCOIL";
+    state->dataPTHP->PTUnit(1).DXCoolCoilIndexNum = 1;
+    state->dataPTHP->PTUnit(1).DXHeatCoilIndexNum = 2;
+    state->dataPTHP->PTUnit(1).SchedPtr = 1;
+    state->dataPTHP->PTUnit(1).FanAvailSchedPtr = 1;
+    state->dataPTHP->PTUnit(1).FanPlace = BlowThru;
+    state->dataPTHP->PTUnit(1).OpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
+    state->dataPTHP->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
+    state->dataPTHP->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     int AirLoopNum = 0;
     Real64 PLR = 0.0;
     int CompressorOnFlag = 0;
-    auto &SZVAVModel(PTUnit(1));
+    auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
@@ -286,8 +286,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     // turn the availability schedule on
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
@@ -343,8 +343,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     CoolingLoad = false;
     HeatingLoad = true;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
 
     // set unit inlet node conditions for heating
     DataLoopNode::Node(1).Temp = 21.0;
