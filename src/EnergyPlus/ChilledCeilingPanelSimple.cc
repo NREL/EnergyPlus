@@ -1552,7 +1552,7 @@ namespace CoolingPanelSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // DO loop counter for surface index
 
-        // FLOW:
+
         CoolingPanelSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1608,7 +1608,7 @@ namespace CoolingPanelSimple {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // FLOW:
+
         // Initialize arrays
         QCoolingPanelSurf = 0.0;
         QCoolingPanelToPerson = 0.0;
@@ -1714,7 +1714,7 @@ namespace CoolingPanelSimple {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {

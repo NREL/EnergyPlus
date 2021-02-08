@@ -2530,7 +2530,7 @@ namespace General {
 
         Real64 DY; // Linear fit result
 
-        // FLOW:
+
 
         // Check for convergence by comparing change in X
         if (Iter != 1) {

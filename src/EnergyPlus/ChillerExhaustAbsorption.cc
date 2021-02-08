@@ -256,7 +256,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
         bool Okay;
         bool Get_ErrorsFound(false);
 
-        // FLOW
+
         cCurrentModuleObject = "ChillerHeater:Absorption:DoubleEffect";
         int NumExhaustAbsorbers = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 

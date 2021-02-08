@@ -451,7 +451,7 @@ namespace HVACInterfaceManager {
         Real64 MixedOutletTemp;
         int ThisLoopSideInletNode;
 
-        // FLOW:
+
 
         auto &convergence(state.dataConvergeParams->PlantConvergence(LoopNum));
 
@@ -630,7 +630,7 @@ namespace HVACInterfaceManager {
         Real64 TankFinalTemp;
         Real64 TankAverageTemp;
 
-        // FLOW:
+
 
         // find tank inlet and outlet nodes
         TankOutletLoopSide = 3 - TankInletLoopSide;
@@ -796,7 +796,7 @@ namespace HVACInterfaceManager {
         Real64 TankFinalTemp;
         Real64 TankAverageTemp;
 
-        // FLOW:
+
 
         // find tank inlet and outlet nodes
         TankOutletLoopSide = 3 - TankInletLoopSide;

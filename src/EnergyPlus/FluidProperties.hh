@@ -632,7 +632,7 @@ namespace FluidProperties {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         if (std::abs(Thi - Tlo) > TempToler) {
             return Xhi - (((Thi - Tact) / (Thi - Tlo)) * (Xhi - Xlo));
         } else {

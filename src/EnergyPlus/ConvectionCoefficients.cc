@@ -161,7 +161,7 @@ namespace ConvectionCoefficients {
         int ZoneNum;                          // DO loop counter for zones
         int SurfNum;                          // DO loop counter for surfaces in zone
 
-        // FLOW:
+
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
             GetUserConvectionCoefficients(state);
             state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
@@ -371,7 +371,7 @@ namespace ConvectionCoefficients {
         int BaseSurf;
         int SrdSurfsNum; // Srd surface counter
 
-        // FLOW:
+
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
              GetUserConvectionCoefficients(state);
             state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
@@ -2351,7 +2351,7 @@ namespace ConvectionCoefficients {
         static Array1D<Real64> const E(6, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
         static Array1D<Real64> const F(6, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
 
-        // FLOW:
+
         CalcASHRAESimpExtConvectCoeff = D(Roughness) + E(Roughness) * SurfWindSpeed + F(Roughness) * pow_2(SurfWindSpeed);
 
         return CalcASHRAESimpExtConvectCoeff;
@@ -2591,7 +2591,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
     {
-        // FLOW:
+
         if (!allocated(Node)) {
             return 0.0;
         } else {
@@ -2800,7 +2800,7 @@ namespace ConvectionCoefficients {
         Real64 Tilt;                // Surface tilt
         Real64 ZoneMult;
 
-        // FLOW:
+
         if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
             ACH = 0.0;
         } else {

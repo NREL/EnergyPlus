@@ -412,7 +412,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 TotPower;                  // total condenser power use [W]
         bool HRHeatRequestFlag;           // flag indicating VRF TU could operate in heating mode
         bool HRCoolRequestFlag;           // flag indicating VRF TU could operate in cooling mode
-        // FLOW
+
 
         // variable initializations
         int TUListNum = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -10442,7 +10442,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
         Array1D<Real64> Par(3);                // Array for the parameters [-]
 
-        // FLOW
+
 
         // variable initializations
         TUListNum = this->ZoneTUListPtr;
@@ -11960,7 +11960,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 CondTemp;            // condensing temperature
         static int ATMixOutNode(0); // outlet node of ATM Mixer
         int ZoneNode;               // Zone node of VRFTU is serving
-        // FLOW
+
 
         VRFCond = this->VRFSysNum;
         TUListIndex = state.dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr;
@@ -12397,7 +12397,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 Te_new;       // newly calculated OU evaporating temperature
         Real64 Tfs;          // OU evaporator coil surface temperature [C]
 
-        // FLOW
+
 
         // calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational conditions
         state.dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, Te, Tdischarge, h_IU_evap_in, h_comp_in, Q_c_tot_temp, Ncomp_temp);
