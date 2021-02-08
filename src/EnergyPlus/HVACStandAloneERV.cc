@@ -2050,12 +2050,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 
     bool StandAloneERVAFNExceptions(EnergyPlusData &state, int const NodeNumber)
     {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jeremy Lerond & Yan Chen
-        //       DATE WRITTEN   January 2021
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS FUNCTION:
         // Check if a node is used by a stand alone ERV
         // and can be excluded from an airflow network.
