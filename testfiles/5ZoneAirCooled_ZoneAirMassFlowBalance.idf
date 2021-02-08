@@ -120,7 +120,7 @@
   Timestep,4;
 
   ZoneAirMassFlowConservation,
-    Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+    AdjustZoneMixingFlow,    !- Zone Air Mass Flow Balance Method
     AddInfiltrationFlow,     !- Infiltration Balancing Method
     MixingSourceZonesOnly;   !- Infiltration Balancing Zones
 
