@@ -5,7 +5,7 @@ Zone Air Mass Flow Balance Improvement
 
  - Original Date: January 19, 2021
  - Revision Date: January 22, 2021
- 
+ - Revision Date: February 4, 2021
 
 ## Justification for New Feature ##
 
@@ -15,7 +15,55 @@ This new feature provides an alternative air flow balancing method that maintain
 
 ## E-mail and Conference Call Conclusions ##
 
-NA
+### E-mail Communication ###
+Brent:
+Here is my two cents to frame this.  In the defect file, and the reference building restaurant example file there is a work-around that has been around for over a decade.  I would like to see this project finally do the zone mass balancing needed to remove that work-around.  There should be no need to add a dummy exhaust fan in the source zone, and no need to figure out a messy and confusing schedule for the balancing/unbalancing in the zone exhaust fan in the receiving zone.  The input hack, which I developed way back in the day, doesn’t even work for VAV system, nor if the zone transfer air is larger than the exhaust fan flow.  
+
+Bereket Response; 
+(1) The current zone air mass flow balance does not require dummy exhaust fan either in the source or receiving zone. What you need is specifying ZoneMixing object.
+(2) The current zone air mass flow balance does not require schedule for the balancing/unbalancing in the zone exhaust fan in the receiving zone
+(3) In general current zone air mass flow balance works better with VAV system but I have not tested the case with zone transfer air is larger than the exhaust fan flow.  
+
+Mike:
+Bereket,
+Adjusting infiltration is one option, but what's really wanted here is reduced return flow from the dining room rather than increased infiltration to the dining room.
+
+Looking at the Engineering Ref section on Zone Air Mass Flow Conservation (see attached pages),
+the last equation on the first page says that the dining return flow should be reduced to account for the mixing to the kitchen when ZoneAirmassFlowConservation is active. But it doesn't appear this is happening. mXR and mXS are the mixing flows for receiving and source.
+
+So, why isn't this happening?  Looking at line 3979 in CalcZoneMassBalance there net mixing flow is included in the equation.
+https://github.com/NREL/EnergyPlus/blob/0750c2009f67a3e05268b7ae7ab6cba8781826a7/src/EnergyPlus/ZoneEquipmentManager.cc#L3979-L3995
+
+                StdTotalReturnMassFlow = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
+                                         (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+
+So, maybe ZoneMixingNetAirMassFlowRate isn't getting set correctly?
+
+Yep, it's zero at this point, ZoneMixingNetAirMassFlowRate isn't set until line 4047 and only when
+if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) is true
+
+If that's true, it should get set and then impact the return flow on the next time through the mass balance do loop?
+
+I'll stop here, but I think this needs to be fixed and/or new options added to ZoneAirmassFlowConservation to make this part work. And maybe getting this all to work correctly is "all" that's needed for this new feature. Not saying it will be easy . . . .
+
+Mike
+
+### Conference Call Conclusions ###
+Bereket: 
+Presented the NFP.
+
+Mike:
+Currently the infiltration treament method has three choices. But what is really needed in this feature is that balancing the zone air flow by adjusting the return air flow and also make sure that the current method is also working propoerly.
+
+Brent:
+It would have been better if the zone air mass flow conservation control is applied zone by zone basis instead of global.
+
+Mike:
+For now let's address current needs and only if budget allows zone by zone basis can be considered. 
+
+Bereket:
+I will update the NFP per toda's discussion and add design documentation as well.
+ 
 
 ###Review comments and responses on Github####:
 
@@ -87,13 +135,22 @@ The requested feature will be implemented by adjusting the return air mass flow 
 Solving the zone air flow mass balance equation for zone return air mass flow:
 
 m_{ret} = [m_{sup} - m_{exh} + m_{zmreceiving} - m_{zmsource} + m_{inf}]
- 
+
 Depending on the sign of the value of return air mass flow rate calculated using the above equation two different cases that require different solution scheme are formulated:
 
 Case I:  [m_{ret} >= 0.0]
 
-         The zone is under positive pressure hence requires non-zero zone return air mass flow rate to balance the zone air flow. The return air flow rate will be adjusted within the bounds of 0 and a maximum zone return air flow rate that balance the zone air mass flow. The zone maximum return flow rate is determined by a check that the sum of zone return air flow of all the zones served does not exceed the design supply air flow rate of the air loop serving the zones.
-		 		 
+         The zone is under positive pressure hence requires non-zero zone return air mass flow rate to balance the zone air flow. The return air flow rate will be adjusted within the bounds of 0 and a maximum zone return air flow rate that balance the zone air mass flow. The zone maximum return flow rate is determined by the design supply air flow rate of the air loop serving the zones.
+		 
+		 For zone mixing objects serveing zones in a single airloop:
+         [m_{ret} <= min(m_{ret}, m_supply_design_airloop)]
+		 
+		 For zone mixing objects serveing zones in two or more airloops:
+		 [m_{ret} <= min(m_{ret}, (m_{supply_design_airloop} - m_{airloopZoneMixingNetOutFlow}))]
+		 
+		 where,
+		 [m_{airloopZoneMixingNetOutFlow}] = net outflow of zone mixing air flow from one airloop to another airloop, [kg/s]. 
+		 
 Case II: [m_{ret} < 0.0]
          The zone is under negative pressure hence requires additional supply air or infiltration air is required to balance the zone air flow. There are two possibilities that can be considered: (A) increasing zone infiltration air flow or (B) increasing the zone supply air flow.
 		 The preferred implementation approach is alternative IIA but both alternatives are presented for discussion. 
@@ -103,15 +160,15 @@ Case II: [m_{ret} < 0.0]
 		 [m_{inf} += m_{ret};]
 		 [m_{ret} = 0.0;] 
 		 
-		 Alternative IIB:
-		 In alternative IIB the supply air flow is increased proportionally and the return air mass flow rate will be reset to zero to balance zone air flow.
-		 [m_{sup} += m_{ret};]
-         [m_{ret} = 0.0;]   
+		 The zone air infiltration rate will be determined based user selection from three infiltration treatment method available.
 		 
-		 Alternative IIB may cause convergence problem that leads to exceeding maximum iteration limits or even missing the zone thermostat set-point because of fighting between the HVAC control and zone air mass balance flow adjustment. There could also be flow balancing problem when the HVAC system is scheduled off and the ZoneMixing or zone exhaust fan are active.
-
 The ZoneMixing objects air flows are always maintained at user specified values to allow user defined inter-zone air transfer. 
 
+Furthermore, first the zone return air flow is estimated without the zone air infiltration term and then zone air infiltration terms is added to balance the zone air flow if needed as a second step. This approach gives the 
+option of balancing the zone air flow with return air flow adjustment only, or with little change to the user specified zone infiltration air flows.
+
+Proposed Approach Limitation:
+For a case when a zone has exhaust fan flow, the zone has no user specified infiltration, and the HVAC system is off, then the zone air flow cannot be balanced unless the zone exhaust fan flow is less than the net zone mixing flow.
 
 ## Testing/Validation/Data Sources ##
 
@@ -191,3 +248,140 @@ IDD change is required to add new choice key to an existing input field, and ren
 ## References ##
 
 NA
+
+
+## Design Document ##
+
+This new feature revises modules: HeatBalanceManager, ZoneEquipmentManage, and HeatBalanceAirManager.
+
+
+### HeatBalanceManager ###
+ 
+The code change includes updating the GetProjectControlData() to allow new choice keys and renaming an existing input field and its choice keys.
+
+#### Current Get Control Data: ####
+{
+
+                    auto const SELECT_CASE_var(AlphaName(1));
+                    if (SELECT_CASE_var == "YES") {
+                        ZoneAirMassFlow.BalanceMixing = true;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "Yes";
+                    } else if (SELECT_CASE_var == "NO") {
+                        ZoneAirMassFlow.BalanceMixing = false;
+                        AlphaName(1) = "No";
+                    } else {
+                        ZoneAirMassFlow.BalanceMixing = false;
+                        AlphaName(1) = "No";
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No");
+                    }
+					
+}
+
+#### Proposed Get Control Data: ####
+
+ - Replace choice key "Yes" with "AdjutsZoneMixingFlow"
+ - Replace choice key "No" with "None"
+ - Add new choice key "AdjustZoneReturnFlow"
+ 
+{
+                    auto const SELECT_CASE_var(AlphaName(1));
+                    if (SELECT_CASE_var == "ADJUSTZONEMIXINGFLOW") { // AdjutsZoneMixingFlow replaced "YES" 
+                        ZoneAirMassFlow.BalanceMixing = true;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjutsZoneMixingFlow";
+                    } else if (SELECT_CASE_var == "ADJUSTZONERETURNFLOW") { // AdjustZoneReturnFlow proposed new method 
+                        ZoneAirMassFlow.BalanceMixing = false;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        ZoneAirMassFlow.AdjustReturnFlow = true;
+                        AlphaName(1) = "AdjustReturnFlow";
+                    } else if (SELECT_CASE_var == "NONE") { // AdjutsZoneMixingFlow replaced "No" 
+                        ZoneAirMassFlow.BalanceMixing = false;
+                        AlphaName(1) = "NONE";						
+                    } else {
+                        ZoneAirMassFlow.BalanceMixing = false;
+                        AlphaName(1) = "None";
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
+                    }
+}
+
+
+####DataHeatBalance###
+
+Add new member variable to ZoneAirMassFlowConservation struct.  
+
+
+### HeatBalanceAirManager ###
+ 
+The code revision includes updating the SetZoneMassConservationFlag() function to allow to reset flag variables for AdjustZoneReturnFlow method.
+
+The code revision includes updating allow zonemixing and infiltrtion flow report variables for the new method in GetSimpleAirModelInputs() function.
+
+
+### ZoneEquipmentManage ###
+
+Most of code revisions are done in this module. The module code revision includes resetting either ZoneMassBalanceFlag() or AdjustZoneMassFlowFlag variable depending on the method for use with CalcAirFlowSimple() function.
+
+Do not allow the ZoneMixing object flow adjustment for the new method as shown in the proposed code snippet:
+
+##### Current Code: #####
+                    // Set zone mixing incoming mass flow rate
+                    if ((Iteration == 0) || !ZoneAirMassFlow.BalanceMixing) {
+                        ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
+                    } else {
+                        ZoneMixingAirMassFlowRate =
+                            max(0.0,
+                                ZoneReturnAirMassFlowRate + state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate -
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
+                    }
+
+##### Proposed Code: #####
+                    // Set zone mixing incoming mass flow rate
+                    if ((Iteration == 0) || !ZoneAirMassFlow.BalanceMixing || ZoneAirMassFlow.AdjustZoneReturnFlow) {
+                        ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
+                    } else {
+                        ZoneMixingAirMassFlowRate =
+                            max(0.0,
+                                ZoneReturnAirMassFlowRate + state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate -
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
+                    }
+
+</span>
+
+##### Additional Proposed Code: #####
+                if (ZoneAirMassFlow.AdjustZoneReturnFlow) {
+
+                    Real64 AdjustedTotalReturnMassFlow = 0;
+                    // Calculate return air flow rate using mass conservation equation
+                    AdjustedTotalReturnMassFlow = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate -                                                
+                                                  MassConservation(ZoneNum).ExhMassFlowRate +
+												  MassConservation(ZoneNum).MixingSourceMassFlowRate -
+                                                  MassConservation(ZoneNum).MixingMassFlowRate;
+
+                      CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                      MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+
+                      // new function for updating zone infiltration air flows
+                      AdjustZoneInfiltrationAirFlows(state, ZoneNum, AdjustedTotalReturnMassFlow);				
+					  // requires refactoring the zone infiltration air flows treament method into a new function 
+						
+                    }
+                }
+				
+##### Refactoring Current Code: #####
+
+// this may require refactor the existing infiltration flow update code section in new function
+                // Set zone infiltration flow rate
+                if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
+                    if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
+                        if (MassConservation(ZoneNum).IsOnlySourceZone || (ZoneAirMassFlow.InfiltrationZoneType == AllZones)) {
+</span>
+                }
+		
+##### Modify CalcZoneReturnFlows() Code: #####
+		
+This function will be revised:
+ - reset the return air flow rate calculated using the air flow mass balance 
+ - add a check that the return air flow rate does not exceed the air loop supply design flow rate.
+						
+						
