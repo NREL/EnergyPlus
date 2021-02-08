@@ -124,7 +124,8 @@ namespace ZoneEquipmentManager {
 
     void CalcAirFlowSimple(EnergyPlusData &state,
                            int const SysTimestepLoop = 0,              // System time step index
-                           bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneMixingFlowFlag = false, // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
     void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum); // Zone Air Balance Outdoor index

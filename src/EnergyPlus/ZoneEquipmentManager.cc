@@ -2616,7 +2616,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Determine flow rate and temperature of supply air based on type of damper
 
-        bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
+        //bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
+
+        bool AdjustZoneMixingFlowFlag(true); // holds zone mixing air flow calc status
+        bool AdjustZoneInfiltrationFlowFlag(true); // holds zone infiltration air flow calc status
+
         FirstCall = true;
         ErrorFlag = false;
 
@@ -2665,7 +2669,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            CalcAirFlowSimple(state, 0, AdjustZoneMassFlowFlag);
+            CalcAirFlowSimple(state, 0, AdjustZoneMixingFlowFlag, AdjustZoneInfiltrationFlowFlag);
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -4507,7 +4511,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
     }
 
     void CalcAirFlowSimple(EnergyPlusData &state, int const SysTimestepLoop,        // System time step index
-                           bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
+                           bool const AdjustZoneMixingFlowFlag, // holds zone mixing air flow calc status
+                           bool const AdjustZoneInfiltrationFlowFlag // holds zone mixing air flow calc status
     )
     {
 
@@ -5025,7 +5030,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0); // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                    if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                    if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                         if (Mixing(j).MixingMassFlowRate > 0.0) {
                             Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                         }
@@ -5056,7 +5061,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                             // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                    if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                    if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                         if (Mixing(j).MixingMassFlowRate > 0.0) {
                             Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                         }
@@ -5086,7 +5091,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                                       // Use average conditions
 
                 Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                     if (Mixing(j).MixingMassFlowRate > 0.0) {
                         Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                     }
@@ -5364,7 +5369,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             // if ( Infiltration(j).MassFlowRate > 0.0 ) {
                             Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -5388,7 +5393,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MCpI_temp = IVF * AirDensity * CpAir;
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             if (Infiltration(j).MassFlowRate > 0.0) {
                                 Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -5413,7 +5418,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MCpI_temp = IVF * AirDensity * CpAir;
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             if (Infiltration(j).MassFlowRate > 0.0) {
                                 Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
