@@ -62,7 +62,7 @@
 // only
 namespace fs {
     void remove_all(const std::string& p) {
-#ifdef _wIN
+#ifdef _WIN32
         EnergyPlus::FileSystem::systemCall("rmdir /Q /S \"" + p + "\"");
 #else
         EnergyPlus::FileSystem::systemCall("rm -Rf \"" + p + "\"");
@@ -129,8 +129,15 @@ TEST(FileSystem, Others)
     EnergyPlus::FileSystem::makeNativePath(pathName);
 
     EXPECT_EQ("idf", EnergyPlus::FileSystem::getFileExtension(pathName));
-    EXPECT_EQ("folder/FileSystemTest.txt", EnergyPlus::FileSystem::removeFileExtension(pathName));
-    EXPECT_EQ("folder/", EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+
+    std::string noExt = "folder/FileSystemTest.txt";
+    EnergyPlus::FileSystem::makeNativePath(noExt);
+    EXPECT_EQ(noExt, EnergyPlus::FileSystem::removeFileExtension(pathName));
+
+    std::string folder = "folder/";
+    EnergyPlus::FileSystem::makeNativePath(folder);
+    EXPECT_EQ(folder, EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
+
     std::string root = "./";
     EnergyPlus::FileSystem::makeNativePath(root);
     EXPECT_EQ(root, EnergyPlus::FileSystem::getParentDirectoryPath("Myfile.txt.idf"));
