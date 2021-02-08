@@ -1,6 +1,6 @@
 name: Linux Build
 
-on: [push, pull]
+on: [push, pull_request]
 
 jobs:
   base_build:
