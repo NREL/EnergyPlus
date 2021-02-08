@@ -164,7 +164,7 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // This is the main driver subroutine for the internal heat gains.
 
-        // FLOW:
+
         if (GetInternalHeatGainsInputFlag) {
             GetInternalHeatGainsInput(state);
             GetInternalHeatGainsInputFlag = false;
@@ -280,7 +280,7 @@ namespace InternalHeatGains {
             }
         };
 
-        // FLOW:
+
         ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         ZnRpt.allocate(state.dataGlobal->NumOfZones);
         ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
@@ -6151,7 +6151,7 @@ namespace InternalHeatGains {
                                              IntGainTypeOf_SteamEquipment,
                                              IntGainTypeOf_OtherEquipment});
 
-        // FLOW:
+
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
             People(Loop).RadGainEnergy = People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             People(Loop).ConGainEnergy = People(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;

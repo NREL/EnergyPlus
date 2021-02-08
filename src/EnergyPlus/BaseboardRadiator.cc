@@ -816,7 +816,6 @@ namespace BaseboardRadiator {
                                                      baseboard->Baseboard(BaseboardNum).UA);
                     }
                 } else {
-                    // CALL CheckZoneSizing(cCMO_BBRadiator_Water,baseboard->Baseboard(BaseboardNum)%EquipID)
                     baseboard->Baseboard(BaseboardNum).WaterInletTemp = PlantSizData(PltSizHeatNum).ExitTemp;
                     baseboard->Baseboard(BaseboardNum).AirInletTemp = FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak;
                     baseboard->Baseboard(BaseboardNum).AirInletHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak;

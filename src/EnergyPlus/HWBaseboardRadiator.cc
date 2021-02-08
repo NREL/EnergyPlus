@@ -1542,7 +1542,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum; // DO loop counter for surface index
 
-        // FLOW:
+
         HWBaseboardSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1611,7 +1611,7 @@ namespace HWBaseboardRadiator {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // FLOW:
+
         // Initialize arrays
         QHWBaseboardSurf = 0.0;
         QHWBaseboardToPerson = 0.0;
@@ -1726,7 +1726,7 @@ namespace HWBaseboardRadiator {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
