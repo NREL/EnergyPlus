@@ -131,11 +131,11 @@ class CondFDSurfaceManager(EnergyPlusPlugin):
                 material.set_k_handle(k_handle)
 
                 # set the specific heat handle in each material layer
-                k_handle = self.api.exchange.get_actuator_handle(state,
+                cp_handle = self.api.exchange.get_actuator_handle(state,
                                                                  "CondFD Surface Material Layer",
                                                                  "Specific Heat",
                                                                  f"{surface.name}:{material.name}")
-                material.set_cp_handle(k_handle)
+                material.set_cp_handle(cp_handle)
 
         self.need_to_get_handles = False
 
