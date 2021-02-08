@@ -207,7 +207,7 @@ namespace TARCOGOutput {
                               int NumOfIter);
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
-                          std::string const &DBGD,
+                          fs::path const &DBGD,
                           int const nlayer,
                           Real64 const ufactor,
                           Real64 const hout,

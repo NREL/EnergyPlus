@@ -1242,7 +1242,6 @@ namespace EnergyPlus::TARCOGOutput {
         EnergyPlusData &state, Files &files, fs::path const &Debug_dir, fs::path const &Debug_file, [[maybe_unused]] int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
-        // Locals
         files.DBGD = Debug_dir;
 
         state.dataTARCOGOutputs->winID = win_ID;
