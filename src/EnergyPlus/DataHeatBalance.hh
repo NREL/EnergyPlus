@@ -1359,12 +1359,13 @@ namespace DataHeatBalance {
         // Members
         bool EnforceZoneMassBalance; // flag to enforce zone air mass conservation
         bool BalanceMixing;          // flag to allow mixing to be adjusted for zone mass balance
+        bool AdjustZoneReturnFlow;   // flag to allow adjusting return flow but not zone mixing flows for zone mass balance
         int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
         int InfiltrationZoneType;    // specifies which types of zones allow infiltration to be changed
                                      // Note, unique global object
 
         // Default Constructor
-        ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), BalanceMixing(false), InfiltrationTreatment(0), InfiltrationZoneType(0)
+        ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), BalanceMixing(false), AdjustZoneReturnFlow(false), InfiltrationTreatment(0), InfiltrationZoneType(0)
         {
         }
     };
