@@ -107,17 +107,22 @@ namespace ScheduleManager {
     {
         // Members
         std::string Name;                           // Day Schedule Name
-        int ScheduleTypePtr;                        // Index of Schedule Type
-        ScheduleInterpolation IntervalInterpolated; // Indicator for interval interpolation. If not "interpolated", False.  Else True
-        bool Used;                                  // Indicator for this schedule being "used".
+        int ScheduleTypePtr = 0;                        // Index of Schedule Type
+        ScheduleInterpolation IntervalInterpolated = ScheduleInterpolation::No; // Indicator for interval interpolation. If not "interpolated", False.  Else True
+        bool Used = false;                                  // Indicator for this schedule being "used".
         Array2D<Real64> TSValue;                    // Value array by simulation timestep
-        Real64 TSValMax;                            // maximum of all TSValue's
-        Real64 TSValMin;                            // minimum of all TSValue's
+        Real64 TSValMax = 0.0;                            // maximum of all TSValue's
+        Real64 TSValMin = 0.0;                            // minimum of all TSValue's
+        bool errorFoundDuringInputProcessing = false;
 
         // Default Constructor
-        DayScheduleData() : ScheduleTypePtr(0), IntervalInterpolated(ScheduleInterpolation::No), Used(false), TSValMax(0.0), TSValMin(0.0)
-        {
-        }
+        DayScheduleData() = default;
+
+        enum class DayScheduleType {Hourly, Interval};
+
+        DayScheduleData(EnergyPlusData &state, DayScheduleType d, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
+        void initializeForScheduleDayHourly(EnergyPlusData &state, std::string const &CurrentModuleObject, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
+        void initializeForScheduleDayInterval(EnergyPlusData &state, std::string const &CurrentModuleObject, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
     };
 
     struct WeekScheduleData
@@ -376,6 +381,10 @@ struct ScheduleManagerData : BaseGlobalStruct {
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
     std::vector<ScheduleManager::InterpretedScheduleFileData> interpretedFileData;
 
+    // things that could be moved to individual schedule classes, but would be duplicated in some situations
+    Array2D<Real64> MinuteValue;   // Temporary for processing interval schedules
+    Array2D_bool SetMinuteValue;   // Temporary for processing interval schedules
+
     void clear_state() override
     {
         NumScheduleTypes = 0;
@@ -394,6 +403,8 @@ struct ScheduleManagerData : BaseGlobalStruct {
         WeekSchedule.clear(); // Week Schedule Storage
         Schedule.clear();         // Schedule Storage
         interpretedFileData.clear();
+        MinuteValue.clear();
+        SetMinuteValue.clear();
     }
 };
 
