@@ -62,7 +62,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     IntegratedHeatPumpData IHP;
 
@@ -70,7 +70,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
     IHP.IHPCoilsSized = true;
     IHP.CurMode = IHPOperationMode::DWHMode;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_ANY_THROW(GetCurWorkMode(*state, 0););
 
@@ -81,7 +81,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
     bool ErrorsFound = false;
 
     IntegratedHeatPumpData IHP;
@@ -89,7 +89,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_EQ(0, GetCoilIndexIHP(*state, "", "", ErrorsFound));
     EXPECT_TRUE(ErrorsFound);
@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilInletNodeIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
     bool ErrorsFound = false;
 
     IntegratedHeatPumpData IHP;
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilInletNodeIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_EQ(0, GetCoilInletNodeIHP(*state, "", "", ErrorsFound));
     EXPECT_TRUE(ErrorsFound);
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     IntegratedHeatPumpData IHP;
     IHP.Name = "ASIHP";
@@ -136,11 +136,11 @@ TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_ANY_THROW(GetLowSpeedNumIHP(*state, 0););
 
-    auto &instance(IntegratedHeatPumps(1));
+    auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
     instance.CurMode = IHPOperationMode::IdleMode;
     EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     VariableSpeedCoils::VariableSpeedCoilData vsCoil;
     vsCoil.NumOfSpeeds = 999;
@@ -194,11 +194,11 @@ TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
     EXPECT_ANY_THROW(GetMaxSpeedNumIHP(*state, 0););
 
-    auto &instance(IntegratedHeatPumps(1));
+    auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
     instance.CurMode = IHPOperationMode::IdleMode;
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));

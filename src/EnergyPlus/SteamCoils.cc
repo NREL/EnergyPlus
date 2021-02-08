@@ -802,9 +802,6 @@ namespace SteamCoils {
                     } else {
                         state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
                         ShowWarningError(state, "The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
-                        // CALL ShowContinueError(state, 'The autosize value for max Steam flow rate is zero')
-                        // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
-                        // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
@@ -891,8 +888,6 @@ namespace SteamCoils {
                     if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == 0.0) {
                         ShowWarningError(state, "The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                         ShowContinueError(state, "The autosize value for max Steam flow rate is zero");
-                        // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
-                        // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);

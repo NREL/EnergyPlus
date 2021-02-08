@@ -165,7 +165,7 @@ namespace EnergyPlus::SizingManager {
         Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
         Real64 TStatSetPtAtPk(0.0);         // thermostat set point at peak
 
-        // FLOW:
+
 
         TimeStepInDay = 0;
         SysSizingRunDone = false;
@@ -991,37 +991,37 @@ namespace EnergyPlus::SizingManager {
                 }
 
                 // sum up heating and max flows for any PIU air terminals
-                if (allocated(PoweredInductionUnits::PIU) && PoweredInductionUnits::NumPIUs > 0) {
-                    for (int pIUATUNum = 1; pIUATUNum <= PoweredInductionUnits::NumPIUs; ++pIUATUNum) {
-                        if (AirLoopNum == PoweredInductionUnits::PIU(pIUATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(PoweredInductionUnits::PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
-                            airLoopMaxFlowRateSum += PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
-                            if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
+                if (allocated(state.dataPowerInductionUnits->PIU) && state.dataPowerInductionUnits->NumPIUs > 0) {
+                    for (int pIUATUNum = 1; pIUATUNum <= state.dataPowerInductionUnits->NumPIUs; ++pIUATUNum) {
+                        if (AirLoopNum == state.dataPowerInductionUnits->PIU(pIUATUNum).AirLoopNum) {
+                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
+                            airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
+                            if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 airLoopHeatingMinimumFlowRateSum +=
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
 
                                 // dual path for std 62.1
-                                DataSizing::VpzClgByZone(termUnitSizingIndex) = PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                DataSizing::VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum)
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxTotAirVolFlow; // min dz is the same as max because series PIU has constant discharge volume
 
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac *
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow; // runs at minimum primary for heating always
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // runs at minimum primary for heating always
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac *
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow; // runs at minimum primary for heating always
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // runs at minimum primary for heating always
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
 
                                 // store Ep for 62.1 calculations
                                 DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
@@ -1030,36 +1030,36 @@ namespace EnergyPlus::SizingManager {
                                 DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
                                     DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
 
-                            } else if (PoweredInductionUnits::PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
+                            } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 airLoopHeatingMinimumFlowRateSum +=
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
 
                                 // dual path for std 62.1
-                                DataSizing::VpzClgByZone(termUnitSizingIndex) = PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                DataSizing::VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow;
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum)
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxPriAirVolFlow; // for Parallel PIU expect Fan off durign max cooling, so discharge is all primary
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow +
-                                    PoweredInductionUnits::PIU(pIUATUNum)
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxSecAirVolFlow; // expect secondary fan to be running at min cooling, for reheat
 
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac *
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow; // primary at minimum
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // primary at minimum
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac *
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow; // primary at minimum
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // primary at minimum
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow +
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
-                                    PoweredInductionUnits::PIU(pIUATUNum).MinPriAirFlowFrac * PoweredInductionUnits::PIU(pIUATUNum).MaxPriAirVolFlow +
-                                    PoweredInductionUnits::PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
+                                    state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
 
                                 DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
                                     DataSizing::VpzMinClgByZone(termUnitSizingIndex) /

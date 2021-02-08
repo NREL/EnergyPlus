@@ -1721,31 +1721,6 @@ namespace HVACControllers {
                 //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
                 //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
             } else if (SELECT_CASE_var == iStatusErrorSlope) {
-                // CALL ShowSevereError('FindRootSimpleController: Root finder failed at '//TRIM(CreateHVACStepFullString()))
-                // CALL ShowContinueError(state,  &
-                //   'FindRootSimpleController: Controller name='//TRIM(ControllerProps(ControlNum)%ControllerName) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller action='//TRIM(ActionTypes(ControllerProps(ControlNum)%Action)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller setpoint='// &
-                //    TRIM(TrimSigDigits(ControllerProps(ControlNum)%SetPointValue,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller function is inconsistent with the specified action.' &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Min bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Max bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowFatalError(state, 'FindRootSimpleController: Preceding error causes program termination.')
                 if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
@@ -2139,7 +2114,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PreviousSolutionIndex;
 
-        // FLOW
+
 
         // Save solution and mode for next call only if converged
         if (IsConvergedFlag) {
@@ -2354,7 +2329,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // If no controllers on this air loop then we have nothig to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
@@ -2435,7 +2410,7 @@ namespace HVACControllers {
         // Current operating mode
         int Mode;
 
-        // FLOW
+
 
         ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
@@ -2492,7 +2467,7 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // FLOW
+
 
         // Detect if statistics have been generated or not for this run
         if (!TrackAirLoopEnvFlag) {
@@ -2555,7 +2530,7 @@ namespace HVACControllers {
         Real64 AvgIterations;
         int iModeNum;
 
-        // FLOW
+
 
         print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
@@ -2762,7 +2737,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // IF no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;

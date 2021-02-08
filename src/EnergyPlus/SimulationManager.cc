@@ -270,7 +270,7 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // FLOW:
+
         PostIPProcessing(state);
 
         InitializePsychRoutines();
@@ -1798,7 +1798,7 @@ namespace SimulationManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // FLOW:
+
         state.dataGlobal->StdOutputRecordCount = 0;
         state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
         print(state.files.eso, "Program Version,{}\n", VerString);
@@ -2256,8 +2256,6 @@ namespace SimulationManager {
         using namespace DataPlant;
         using namespace DataZoneEquipment;
         using DualDuct::ReportDualDuctConnections;
-        using OutAirNodeManager::NumOutsideAirNodes;
-        using OutAirNodeManager::OutsideAirNodeList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
@@ -2275,12 +2273,12 @@ namespace SimulationManager {
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
-        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
-        if (NumOutsideAirNodes > 0) {
+        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", state.dataOutAirNodeMgr->NumOutsideAirNodes);
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
             print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
-        for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            print(state.files.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
+        for (int Count = 1; Count <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++Count) {
+            print(state.files.bnd, " Outdoor Air Node,{},{}\n", state.dataOutAirNodeMgr->OutsideAirNodeList(Count), NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -3082,7 +3080,7 @@ void Resimulate(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
 
-    // FLOW:
+
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 
