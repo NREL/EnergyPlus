@@ -3852,7 +3852,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 TotInletAirMassFlowRateMaxAvail;
         Real64 TotInletAirMassFlowRateMin;
         Real64 TotInletAirMassFlowRateMinAvail;
-        Real64 TotSupplyAirMassFlowRate;
 
         Real64 ZoneMixingAirMassFlowRate;
         Real64 ZoneMixingNetAirMassFlowRate;
@@ -4047,10 +4046,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
                 //
-
-                TotSupplyAirMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate -
-                                           (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh) -
-                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 
