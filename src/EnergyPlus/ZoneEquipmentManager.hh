@@ -122,6 +122,11 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
+    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                                   int const ZoneNum,                // current zone index
+                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+    );
+
     void CalcAirFlowSimple(EnergyPlusData &state,
                            int const SysTimestepLoop = 0,              // System time step index
                            bool const AdjustZoneMixingFlowFlag = false, // flags to adjust zone mxing mass flow rate

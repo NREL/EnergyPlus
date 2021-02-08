@@ -3999,57 +3999,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
 
-                // Set zone infiltration flow rate
-                if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
-                    if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
-                        if (MassConservation(ZoneNum).IsOnlySourceZone || (ZoneAirMassFlow.InfiltrationZoneType == AllZones)) {
-                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate +
-                                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
-                                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                            if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-                                if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
-                                    ZoneInfiltrationFlag(ZoneNum) = true;
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
-                                        max(0.0, Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
-                                } else {
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate =
-                                        Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-                                }
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
-                                if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
-                                    ZoneInfiltrationFlag(ZoneNum) = true;
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate += ZoneInfiltrationMassFlowRate;
-                                } else {
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                                }
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            }
-                        } else {
-                            if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate =
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            }
-                        }
-                    } else {
-                        // Zone has no infiltration objects
-                        MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                    }
-
+                if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+                    // Set zone infiltration flow rate
+                    CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
                     MassConservation(ZoneNum).InMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                     MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
                 }
-                //
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 
@@ -4291,6 +4247,65 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
         } else {
             FinalTotalReturnMassFlow = totReturnFlow;
+        }
+    }
+
+    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                                   int const ZoneNum,                // current zone index
+                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+    )
+    {
+        Real64 const ConvergenceTolerance(0.000010);
+        Real64 ZoneInfiltrationMassFlowRate = 0.0;
+
+        // Set zone infiltration flow rate
+        if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) {
+            if (DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr > 0) {
+                if (DataHeatBalance::MassConservation(ZoneNum).IsOnlySourceZone ||
+                    (DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::AllZones)) {
+                    ZoneInfiltrationMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate +
+                                                   state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate +
+                                                   ZoneReturnAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
+                    if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                        if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
+                            DataHeatBalFanSys::ZoneInfiltrationFlag(ZoneNum) = true;
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                                ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                                max(0.0, DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
+                        } else {
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate =
+                                DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+                        }
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                        if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+                            DataHeatBalFanSys::ZoneInfiltrationFlag(ZoneNum) = true;
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate +=
+                                ZoneInfiltrationMassFlowRate;
+                        } else {
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                        }
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    }
+                } else {
+                    if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate =
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    }
+                }
+            } else {
+                // Zone has no infiltration objects
+                DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+            }
         }
     }
 
