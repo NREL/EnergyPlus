@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,9 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -69,10 +67,8 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -174,26 +170,26 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     TimeStepSys = 15.0 / 60.0; // System timestep in hours
     PriorTimeStep = TimeStepSys;
 
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    ZoneEquipConfig(1).NumInletNodes = 2;
-    ZoneEquipConfig(1).InletNode.allocate(2);
-    ZoneEquipConfig(1).InletNode(1) = 1;
-    ZoneEquipConfig(1).InletNode(2) = 2;
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(1).NumReturnNodes = 1;
-    ZoneEquipConfig(1).ReturnNode.allocate(1);
-    ZoneEquipConfig(1).ReturnNode(1) = 4;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Node.allocate(5);
 
     Zone.allocate(1);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
@@ -228,9 +224,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     Node(1).HumRat = 0.008;
     Node(2).MassFlowRate = 0.02; // Zone inlet node 2
     Node(2).HumRat = 0.008;
-    ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
     Node(3).HumRat = 0.008;
     Node(4).MassFlowRate = 0.03; // Zone return node
     Node(4).HumRat = 0.000;
@@ -331,26 +327,26 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     TimeStepSys = 15.0 / 60.0; // System timestep in hours
     PriorTimeStep = TimeStepSys;
 
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    ZoneEquipConfig(1).NumInletNodes = 2;
-    ZoneEquipConfig(1).InletNode.allocate(2);
-    ZoneEquipConfig(1).InletNode(1) = 1;
-    ZoneEquipConfig(1).InletNode(2) = 2;
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(1).NumReturnNodes = 1;
-    ZoneEquipConfig(1).ReturnNode.allocate(1);
-    ZoneEquipConfig(1).ReturnNode(1) = 4;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     Node.allocate(5);
 
     Zone.allocate(1);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
@@ -382,9 +378,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     Node(1).HumRat = 0.008;
     Node(2).MassFlowRate = 0.02; // Zone inlet node 2
     Node(2).HumRat = 0.008;
-    ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
     Node(3).HumRat = 0.008;
     Node(4).MassFlowRate = 0.03; // Zone return node
     Node(4).HumRat = 0.000;
@@ -482,50 +478,50 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     TimeStepSys = 15.0 / 60.0; // System timestep in hours
     PriorTimeStep = TimeStepSys;
 
-    ZoneEquipConfig.allocate(3);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(3);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    ZoneEquipConfig(1).NumInletNodes = 2;
-    ZoneEquipConfig(1).InletNode.allocate(2);
-    ZoneEquipConfig(1).InletNode(1) = 1;
-    ZoneEquipConfig(1).InletNode(2) = 2;
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(1).NumReturnNodes = 1;
-    ZoneEquipConfig(1).ReturnNode.allocate(1);
-    ZoneEquipConfig(1).ReturnNode(1) = 4;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    ZoneEquipConfig(2).ZoneName = "Zone 2";
-    ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
 
-    ZoneEquipConfig(2).NumInletNodes = 1;
-    ZoneEquipConfig(2).InletNode.allocate(1);
-    ZoneEquipConfig(2).InletNode(1) = 6;
-    ZoneEquipConfig(2).NumExhaustNodes = 0;
-    ZoneEquipConfig(2).NumReturnNodes = 1;
-    ZoneEquipConfig(2).ReturnNode.allocate(1);
-    ZoneEquipConfig(2).ReturnNode(1) = 7;
-    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
-    ZoneEquipConfig(3).ZoneName = "Zone 3";
-    ZoneEquipConfig(3).ActualZoneNum = 3;
+    state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
+    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
 
-    ZoneEquipConfig(3).NumInletNodes = 1;
-    ZoneEquipConfig(3).InletNode.allocate(1);
-    ZoneEquipConfig(3).InletNode(1) = 8;
-    ZoneEquipConfig(3).NumExhaustNodes = 0;
-    ZoneEquipConfig(3).NumReturnNodes = 1;
-    ZoneEquipConfig(3).ReturnNode.allocate(1);
-    ZoneEquipConfig(3).ReturnNode(1) = 9;
-    ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
     Node.allocate(10);
 
     Zone.allocate(3);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(3);
     CurZoneEqNum = 1;
@@ -533,13 +529,13 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    Zone(2).Name = ZoneEquipConfig(2).ZoneName;
+    Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
     Zone(2).ZoneEqNum = 1;
     Zone(2).Multiplier = 1.0;
     Zone(2).Volume = 1000.0;
     Zone(2).SystemZoneNodeNumber = 5;
     Zone(2).ZoneVolCapMultpMoist = 1.0;
-    Zone(3).Name = ZoneEquipConfig(3).ZoneName;
+    Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
     Zone(3).ZoneEqNum = 1;
     Zone(3).Multiplier = 1.0;
     Zone(3).Volume = 1000.0;
@@ -569,9 +565,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     Node(1).HumRat = 0.008;
     Node(2).MassFlowRate = 0.02; // Zone inlet node 2
     Node(2).HumRat = 0.008;
-    ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
     Node(3).HumRat = 0.008;
     Node(4).MassFlowRate = 0.03; // Zone return node
     Node(4).HumRat = 0.000;
@@ -690,50 +686,50 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     TimeStepSys = 15.0 / 60.0; // System timestep in hours
     PriorTimeStep = TimeStepSys;
 
-    ZoneEquipConfig.allocate(3);
-    ZoneEquipConfig(1).ZoneName = "Zone 1";
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(3);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    ZoneEquipConfig(1).NumInletNodes = 2;
-    ZoneEquipConfig(1).InletNode.allocate(2);
-    ZoneEquipConfig(1).InletNode(1) = 1;
-    ZoneEquipConfig(1).InletNode(2) = 2;
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(1).NumReturnNodes = 1;
-    ZoneEquipConfig(1).ReturnNode.allocate(1);
-    ZoneEquipConfig(1).ReturnNode(1) = 4;
-    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    ZoneEquipConfig(2).ZoneName = "Zone 2";
-    ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneName = "Zone 2";
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
 
-    ZoneEquipConfig(2).NumInletNodes = 1;
-    ZoneEquipConfig(2).InletNode.allocate(1);
-    ZoneEquipConfig(2).InletNode(1) = 6;
-    ZoneEquipConfig(2).NumExhaustNodes = 0;
-    ZoneEquipConfig(2).NumReturnNodes = 1;
-    ZoneEquipConfig(2).ReturnNode.allocate(1);
-    ZoneEquipConfig(2).ReturnNode(1) = 7;
-    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
 
-    ZoneEquipConfig(3).ZoneName = "Zone 3";
-    ZoneEquipConfig(3).ActualZoneNum = 3;
+    state->dataZoneEquip->ZoneEquipConfig(3).ZoneName = "Zone 3";
+    state->dataZoneEquip->ZoneEquipConfig(3).ActualZoneNum = 3;
 
-    ZoneEquipConfig(3).NumInletNodes = 1;
-    ZoneEquipConfig(3).InletNode.allocate(1);
-    ZoneEquipConfig(3).InletNode(1) = 8;
-    ZoneEquipConfig(3).NumExhaustNodes = 0;
-    ZoneEquipConfig(3).NumReturnNodes = 1;
-    ZoneEquipConfig(3).ReturnNode.allocate(1);
-    ZoneEquipConfig(3).ReturnNode(1) = 9;
-    ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).InletNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(3).NumReturnNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(3).ReturnNode(1) = 9;
+    state->dataZoneEquip->ZoneEquipConfig(3).FixedReturnFlow.allocate(1);
 
     Node.allocate(10);
 
     Zone.allocate(3);
-    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(3);
     CurZoneEqNum = 1;
@@ -741,13 +737,13 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Zone(1).Volume = 1000.0;
     Zone(1).SystemZoneNodeNumber = 5;
     Zone(1).ZoneVolCapMultpMoist = 1.0;
-    Zone(2).Name = ZoneEquipConfig(2).ZoneName;
+    Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
     Zone(2).ZoneEqNum = 1;
     Zone(2).Multiplier = 1.0;
     Zone(2).Volume = 1000.0;
     Zone(2).SystemZoneNodeNumber = 5;
     Zone(2).ZoneVolCapMultpMoist = 1.0;
-    Zone(3).Name = ZoneEquipConfig(3).ZoneName;
+    Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
     Zone(3).ZoneEqNum = 1;
     Zone(3).Multiplier = 1.0;
     Zone(3).Volume = 1000.0;
@@ -777,9 +773,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     Node(1).HumRat = 0.008;
     Node(2).MassFlowRate = 0.02; // Zone inlet node 2
     Node(2).HumRat = 0.008;
-    ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
     Node(3).MassFlowRate = 0.00; // Zone exhaust node 1
-    ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = Node(3).MassFlowRate;
     Node(3).HumRat = 0.008;
     Node(4).MassFlowRate = 0.03; // Zone return node
     Node(4).HumRat = 0.000;

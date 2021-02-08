@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -442,6 +442,9 @@ namespace HeatBalanceSurfaceManager {
                 }
                 if (Surface(SurfNum).WindDirEMSOverrideOn) {
                     Surface(SurfNum).WindDir = Surface(SurfNum).WindDirEMSOverrideValue;
+                }
+                if (Surface(SurfNum).ViewFactorGroundEMSOverrideOn) {
+                    Surface(SurfNum).ViewFactorGround = Surface(SurfNum).ViewFactorGroundEMSOverrideValue;
                 }
             }
         }
@@ -1384,7 +1387,7 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Use the total number of surfaces to allocate variables to avoid a surface number limit
         CTFConstInPart.dimension(TotSurfaces, 0.0);
@@ -2097,7 +2100,7 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surfaces
         int OSCMnum; // DO loop counter for Other side conditions modeled (OSCM)
-        // FLOW:
+
 
         // First do the "bulk" initializations of arrays sized to NumOfZones
         MRT = 23.0; // module level array
@@ -3432,7 +3435,7 @@ namespace HeatBalanceSurfaceManager {
         static Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
         static Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
 
-        // FLOW:
+
         if (!allocated(QS)) QS.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
         if (!allocated(QSLights)) QSLights.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
 
@@ -4010,7 +4013,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 const SmallestAreaAbsProductAllowed(0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
         static Array1D_bool FirstCalcZone; // for error message
 
-        // FLOW:
+
         if (!allocated(EnclSolVMULT)) {
             EnclSolVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
         }
@@ -4595,7 +4598,7 @@ namespace HeatBalanceSurfaceManager {
         bool CoolingPanelSysOn;   // true if a simple cooling panel is running
         bool SwimmingPoolOn;      // true if a pool is present (running)
 
-        // FLOW:
+
         UpdateRadSysSourceValAvg(LowTempRadSysOn);
         UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
         UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
@@ -4943,7 +4946,7 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
         int ZoneNum;                      // Zone number
 
-        // FLOW:
+
         if (CalculateZoneMRTfirstTime) {
             SurfaceAE.allocate(TotSurfaces);
             ZoneAESum.allocate(state.dataGlobal->NumOfZones);
@@ -5560,7 +5563,7 @@ namespace HeatBalanceSurfaceManager {
         static std::string const Outside("Outside");
         static std::string const BlankString;
 
-        // FLOW:
+
         bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
         if (AnyConstructInternalSourceInInput) {
@@ -6321,10 +6324,10 @@ namespace HeatBalanceSurfaceManager {
                     Real64 SumSysMCp = 0.0;
                     Real64 SumSysMCpT = 0.0;
                     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-                    for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        Real64 NodeTemp = DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                        Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         Real64 MassFlowRate =
-                            DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                            DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -7185,10 +7188,10 @@ namespace HeatBalanceSurfaceManager {
                         Real64 SumSysMCp = 0.0;
                         Real64 SumSysMCpT = 0.0;
                         Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(zoneNum));
-                        for (int NodeNum = 1; NodeNum <= DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            Real64 NodeTemp = DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                            Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             Real64 MassFlowRate =
-                                DataLoopNode::Node(DataZoneEquipment::ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                                DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }

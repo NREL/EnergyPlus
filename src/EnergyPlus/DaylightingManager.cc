@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -417,7 +417,7 @@ namespace EnergyPlus::DaylightingManager {
         int ISA;
         int ISlatAngle;
 
-        // FLOW:
+
         if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput(state);
             CheckTDDsAndLightShelvesInDaylitZones(state);
@@ -5643,7 +5643,7 @@ namespace EnergyPlus::DaylightingManager {
         int IS;       // Window shading index: 1=unshaded, 2=shaded
         int loop;     // Loop index
 
-        // FLOW:
+
         // Initialize glare constant
         GTOT = 0.0;
 
@@ -5712,7 +5712,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 BacLum; // Background luminance (cd/m2)
         int loop;      // Loop index
         int RefPoints; // Number of daylighting reference points in zone
-        // FLOW:
+
         // Initialize glare constant
 
         GTOT = 0.0;
@@ -5802,7 +5802,7 @@ namespace EnergyPlus::DaylightingManager {
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
 
-        // FLOW:
+
         // Integrate to obtain illuminance from sky.
         // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
@@ -6259,7 +6259,7 @@ namespace EnergyPlus::DaylightingManager {
         tmpBackLumFromWinAtRefPt = 0.0;
         tmpSourceLumFromWinAtRefPt = 0.0;
 
-        // FLOW:
+
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -7247,7 +7247,7 @@ namespace EnergyPlus::DaylightingManager {
         int ILM;
         bool ScheduledAvailable;
 
-        // FLOW:
+
 
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) return;
 
@@ -7415,7 +7415,7 @@ namespace EnergyPlus::DaylightingManager {
                                    0.008, 0.008, 0.006, 0.006, 0.0,   0.0,   0.003, 0.003, 0.003, 0.003, 0.003},
                                   {5, 7})); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
 
-        // FLOW:
+
         DayltgGlarePositionFactor = 0.0;
         if (X < 0.0 || X >= 3.0) return DayltgGlarePositionFactor;
         if (Y < 0.0 || Y >= 2.0) return DayltgGlarePositionFactor;
@@ -7656,7 +7656,7 @@ namespace EnergyPlus::DaylightingManager {
             }
         }
 
-        // FLOW:
+
         // Initialize window luminance and fluxes for split-flux calculation
         state.dataDaylightingManager->WLUMSK(IHR, _, _) = 0.0;
         state.dataDaylightingManager->WLUMSU(IHR, _) = 0.0;
@@ -8220,11 +8220,8 @@ namespace EnergyPlus::DaylightingManager {
 
                         } else { // Blind on
 
-                            // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
-                            //         for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
-
-                            // TH 7/7/2010: This call is moved outside the loop - DO JB = 1,MaxSlatAngs
-                            // CALL ProfileAngle(IWin,SUNCOSHR(1:3,IHR),Blind(BlNum)%SlatOrientation,ProfAng)
+                            // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
+                            // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
                             TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
@@ -9024,7 +9021,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Autodesk:Return ISky in {1,2,3,4} should be checked or asserted or a default case should be added to SELECT block to set return value
 
-        // FLOW:
+
         SPHSKY = max(std::sin(PHSKY), 0.01); // Prevent floating point underflows
         Z = DataGlobalConstants::PiOvr2 - state.dataDaylightingManager->PHSUN;
         if (ISky >= 1 && ISky <= 3) { // Following not needed for overcast sky
@@ -9110,7 +9107,7 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
         //  INTEGER            :: IComp             ! Vector component index
 
-        // FLOW:
+
         if (HorOrVert == Horizontal) { // Profile angle for horizontal structures
             ElevWin = DataGlobalConstants::PiOvr2 - Surface(SurfNum).Tilt * DataGlobalConstants::DegToRadians;
             AzimWin = (90.0 - Surface(SurfNum).Azimuth) * DataGlobalConstants::DegToRadians;
@@ -9181,7 +9178,7 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> HitPt; // Hit point on an obstruction (m)
         bool hit;                     // True iff obstruction is hit
 
-        // FLOW:
+
 
         NearestHitSurfNum = 0;
         Real64 NearestHitDistance_sq(
@@ -9300,7 +9297,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 CosIncAngAtHitPt;         // Cosine of angle of incidence of sun at HitPt
         Real64 DiffVisRefl;              // Diffuse visible reflectance of ReflSurfNum
 
-        // FLOW:
+
 
         LumAtReflHitPtFrSun = 0.0;
         // Skip daylighting shelves since reflection from these is separately calculated
@@ -9887,7 +9884,7 @@ namespace EnergyPlus::DaylightingManager {
         //		static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
-        // FLOW:
+
         if (state.dataDaylightingManager->ReportIllumMap_firstTime) {
             state.dataDaylightingManager->ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(state.dataDaylightingData->TotIllumMaps, true);
@@ -10662,7 +10659,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 COSB;                  // Cosine of angle between ray from ref pt to center of window
         //  and window outward normal
 
-        // FLOW:
+
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             state.dataDaylightingData->ZoneDaylight(ZoneNum).MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi;

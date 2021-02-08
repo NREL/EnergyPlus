@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -209,7 +209,7 @@ namespace MundtSimMgr {
         bool AirNodeFoundFlag;  // flag used for error check
         bool ErrorsFound;       // true if errors found in init
 
-        // FLOW:
+
 
         // allocate and initialize zone data
         ZoneData.allocate(state.dataGlobal->NumOfZones);
@@ -380,7 +380,6 @@ namespace MundtSimMgr {
         using DataHeatBalSurface::TempSurfIn;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
-        using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using Psychrometrics::PsyCpAirFnW;
@@ -414,7 +413,7 @@ namespace MundtSimMgr {
         Real64 ZoneMult;         // total zone multiplier
         Real64 RetAirConvGain;
 
-        // FLOW:
+
 
         // determine ZoneEquipConfigNum for this zone
         ZoneEquipConfigNum = ZoneNum;
@@ -441,16 +440,16 @@ namespace MundtSimMgr {
             // determine supply air conditions
             SumSysMCp = 0.0;
             SumSysMCpT = 0.0;
-            for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+            for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
             // prevent dividing by zero due to zero supply air flow rate
             if (SumSysMCp <= 0.0) {
-                SupplyAirTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
+                SupplyAirTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(1)).Temp;
             } else {
                 // a weighted average of the inlet temperatures
                 SupplyAirTemp = SumSysMCpT / SumSysMCp;
@@ -524,7 +523,7 @@ namespace MundtSimMgr {
         int NodeNum; // index for air nodes
         int SurfNum; // index for surfaces
 
-        // FLOW:
+
 
         // set up air node ID
         NumRoomNodes = 0;
@@ -608,7 +607,7 @@ namespace MundtSimMgr {
         int SurfNum;            // index for surfaces
         int SurfCounted;        // number of surfaces assciated with an air node
 
-        // FLOW:
+
 
         //   apply floor splits
         QequipConvFloor = state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) * ConvIntGain;
@@ -722,7 +721,7 @@ namespace MundtSimMgr {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         LineNode(NodeID, MundtZoneNum).Temp = TempResult;
     }
@@ -772,7 +771,6 @@ namespace MundtSimMgr {
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::Surface;
         using DataSurfaces::ZoneMeanAirTemp;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;      // index for surfaces

@@ -5,7 +5,7 @@ import os
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2019'
+_previous_year = '2020'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #

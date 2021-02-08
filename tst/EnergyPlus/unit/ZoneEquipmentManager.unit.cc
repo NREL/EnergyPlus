@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,39 +126,39 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
-    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+    for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
 
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 0;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
-    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess balanced zone exhaust from exhaust fan, still no warning
-    ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
-    ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
-    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
-    ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
-    ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
-    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
     CalcZoneMassBalance(*state, false);
     EXPECT_TRUE(has_err_output());
 
@@ -512,35 +512,35 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
     int ZoneNum = 1;
-    for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+    for (int NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(3) = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 3; // Intentionally in a different order
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(2) = 2;
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(3) = 1;
-    int inletNode1 = ZoneEquipConfig(ZoneNum).InletNode(1);
-    int inletNode2 = ZoneEquipConfig(ZoneNum).InletNode(2);
-    int inletNode3 = ZoneEquipConfig(ZoneNum).InletNode(3);
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 2; // Intentionally in a different order
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(2) = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(3) = 3;
-    int returnNode1 = ZoneEquipConfig(ZoneNum).ReturnNode(1);
-    int returnNode2 = ZoneEquipConfig(ZoneNum).ReturnNode(2);
-    int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(3) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 3; // Intentionally in a different order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(3) = 1;
+    int inletNode1 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1);
+    int inletNode2 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(2);
+    int inletNode3 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(3);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 2; // Intentionally in a different order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(2) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(3) = 3;
+    int returnNode1 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1);
+    int returnNode2 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(2);
+    int returnNode3 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
@@ -646,13 +646,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
-    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+    for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -664,29 +664,29 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->isPulseZoneSizing = false;
 
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
-    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 1;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 0.0;
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     // Set return node basis node flows to zero, return flow should be zero
-    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
-        Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
+    for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
+        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
     CalcZoneMassBalance(*state, false);
-    EXPECT_EQ(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
+    EXPECT_EQ(Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
-    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
-    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
-    Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
     CalcZoneMassBalance(*state, false);
-    EXPECT_NEAR(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
+    EXPECT_NEAR(Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
@@ -746,35 +746,35 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
     int ZoneNum = 1;
-    for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
-        Node(ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
+    for (int NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
+        Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
     }
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
-    ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(3) = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 3; // Intentionally in a different order
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(2) = 2;
-    ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(3) = 1;
-    int inletNode1 = ZoneEquipConfig(ZoneNum).InletNode(1);
-    int inletNode2 = ZoneEquipConfig(ZoneNum).InletNode(2);
-    int inletNode3 = ZoneEquipConfig(ZoneNum).InletNode(3);
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 2; // Intentionally in a different order
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(2) = 1;
-    ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(3) = 3;
-    int returnNode1 = ZoneEquipConfig(ZoneNum).ReturnNode(1);
-    int returnNode2 = ZoneEquipConfig(ZoneNum).ReturnNode(2);
-    int returnNode3 = ZoneEquipConfig(ZoneNum).ReturnNode(3);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(1) = 2; // Intentionally not in 1,2,3 order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(2) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNodeAirLoopNum(3) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(1) = 3; // Intentionally in a different order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(3) = 1;
+    int inletNode1 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(1);
+    int inletNode2 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(2);
+    int inletNode3 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(3);
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(1) = 2; // Intentionally in a different order
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(2) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInletNum(3) = 3;
+    int returnNode1 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(1);
+    int returnNode2 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(2);
+    int returnNode3 = state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(3);
 
     // Avoid zero values in volume flow balance check
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 100000.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
-    Node(ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).Temp = 20.0;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode).HumRat = 0.004;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(3);
@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     EXPECT_EQ(Node(returnNode3).MassFlowRate, 3.0);
 
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
-    Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
+    Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     state->dataAirSystemsData->PrimaryAirSystems(2).OASysExists = true;
     state->dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
     state->dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.0;
@@ -939,23 +939,23 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(3);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
@@ -1114,23 +1114,23 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformLoad)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // UniformLoad Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -1300,30 +1300,30 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
     DataSizing::FinalZoneSizing.allocate(1);
     DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
     DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
-    auto &thisZEqList(DataZoneEquipment::ZoneEquipList(ZoneNum));
+    auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
     thisZEqList.HeatingCapacity(3) = 500.0;
@@ -1354,13 +1354,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1368,7 +1368,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
@@ -1518,30 +1518,30 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(3);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(3);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
     DataSizing::FinalZoneSizing.allocate(1);
     DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
     DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
-    auto &thisZEqList(DataZoneEquipment::ZoneEquipList(ZoneNum));
+    auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
     thisZEqList.HeatingCapacity(3) = 500.0;
@@ -1572,13 +1572,13 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 3;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1586,7 +1586,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
@@ -1844,27 +1844,27 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     int NumEquip = 4;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
@@ -1889,14 +1889,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -1904,7 +1904,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2070,27 +2070,27 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
-    GetZoneEquipmentData1(*state);
-    ZoneEquipInputsFilled = true;
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
     int ZoneNum = 1;
-    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
-    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     int NumEquip = 4;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
-    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
-    auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).NumZoneEquipment = NumEquip;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequired.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToHumidSP.allocate(NumEquip);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
+    auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
@@ -2120,14 +2120,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
-    DataZoneEquipment::ZoneEquipList(1).EquipIndex(4) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(2) = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(3) = 2;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(4) = 2;
     int zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 1", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     int coolingPriority = 0;
     int heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
@@ -2135,7 +2135,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     zoneInlet = UtilityRoutines::FindItemInList("ZONE EQUIP INLET 3", DataLoopNode::NodeID, DataLoopNode::NumOfNodes);
     coolingPriority = 0;
     heatingPriority = 0;
-    DataZoneEquipment::ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
+    state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
     // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading

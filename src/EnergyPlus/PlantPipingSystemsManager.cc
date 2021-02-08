@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -114,27 +114,7 @@ namespace EnergyPlus {
         std::string const ObjName_ZoneCoupled_Slab("Site:GroundDomain:Slab");
         std::string const ObjName_ZoneCoupled_Basement("Site:GroundDomain:Basement");
 
-        // MODULE VARIABLE DECLARATIONS:
-        std::vector<Domain> domains;
-        std::vector<Circuit> circuits;
-        std::vector<Segment> segments;
-        std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
-        bool GetInputFlag(true); // First time, input is "gotten"
-        bool GetSegmentInputFlag(true);
-        bool GetCircuitInputFlag(true);
-        bool WriteEIOFlag(true); // False after EIO is written
 #pragma clang diagnostic pop
-
-        void clear_state() {
-            GetInputFlag = true;
-            GetSegmentInputFlag = true;
-            GetCircuitInputFlag = true;
-            WriteEIOFlag = true;
-            domains.clear();
-            circuits.clear();
-            segments.clear();
-            GroundDomainUniqueNames.clear();
-        }
 
         void CheckIfAnySlabs(EnergyPlusData &state) {
             // SUBROUTINE INFORMATION:
@@ -159,12 +139,12 @@ namespace EnergyPlus {
         PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
         {
             // Process the input data for circuits if it hasn't been done already
-            if (GetInputFlag) {
+            if (state.dataPlantPipingSysMgr->GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
-                GetInputFlag = false;
+                state.dataPlantPipingSysMgr->GetInputFlag = false;
             }
             // Now look for this particular pipe in the list
-            for (auto &circuit : circuits) {
+            for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
                 if (circuit.Name == objectName) {
                     return &circuit;
                 }
@@ -183,7 +163,7 @@ namespace EnergyPlus {
                                [[maybe_unused]] bool const RunFlag)
         {
             // Retrieve the parent domain index for this pipe circuit
-            auto &thisDomain(domains[this->ParentDomainIndex]);
+            auto &thisDomain(state.dataPlantPipingSysMgr->domains[this->ParentDomainIndex]);
 
             // Do any initialization here
             thisDomain.InitPipingSystems(state, this);
@@ -208,12 +188,12 @@ namespace EnergyPlus {
 
 
             // Read input if necessary
-            if (GetInputFlag) {
+            if (state.dataPlantPipingSysMgr->GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
-                GetInputFlag = false;
+                state.dataPlantPipingSysMgr->GetInputFlag = false;
             }
 
-            for (auto &thisDomain : domains) {
+            for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
 
                 // if the domain contains a pipe circuit, it shouldn't be initialized here, it has its own entry point
                 if (thisDomain.HasAPipeCircuit) continue;
@@ -390,14 +370,14 @@ namespace EnergyPlus {
                 }
             }
 
-            if (WriteEIOFlag) {
+            if (state.dataPlantPipingSysMgr->WriteEIOFlag) {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
                 print(state.files.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
-                for (auto &thisDomain : domains) {
+                for (auto &thisDomain : state.dataPlantPipingSysMgr->domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
                     print(state.files.eio,
                           DomainCellsToEIO,
@@ -406,7 +386,7 @@ namespace EnergyPlus {
                           thisDomain.NumGroundSurfCells,
                           thisDomain.NumInsulationCells);
                 }
-                WriteEIOFlag = false;
+                state.dataPlantPipingSysMgr->WriteEIOFlag = false;
             }
         }
 
@@ -429,7 +409,7 @@ namespace EnergyPlus {
             int NumZoneCoupledDomains = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Slab);
             int NumBasements = inputProcessor->getNumObjectsFound(state, ObjName_ZoneCoupled_Basement);
             int TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + NumBasements;
-            domains.resize(TotalNumDomains);
+            state.dataPlantPipingSysMgr->domains.resize(TotalNumDomains);
 
             // then circuits
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(state, ObjName_Circuit);
@@ -457,7 +437,7 @@ namespace EnergyPlus {
             for (int DomainNum = 0; DomainNum < TotalNumDomains; ++DomainNum) {
 
                 // Convenience
-                auto & thisDomain = domains[DomainNum];
+                auto & thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum];
 
                 // validate pipe domain-circuit name-to-index references
                 for (auto & thisCircuit : thisDomain.circuits) {
@@ -539,7 +519,7 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                auto &thisDomain = domains[DomainNum - 1];
+                auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum - 1];
 
                 // Get the name, validate
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
@@ -865,14 +845,14 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                auto &thisDomain = domains[DomainCtr - 1];
+                auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
                 // Get the name, validate
                 // Domain name
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
 
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                        GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
+                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Slab,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the rest of the inputs into the local type for clarity during transition
@@ -1181,12 +1161,12 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                auto &thisDomain = domains[DomainNum - 1];
+                auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainNum - 1];
 
                 // Get the name, validate
                 thisDomain.Name = DataIPShortCuts::cAlphaArgs(1);
                 GlobalNames::VerifyUniqueInterObjectName(state,
-                        GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
+                        state.dataPlantPipingSysMgr->GroundDomainUniqueNames, DataIPShortCuts::cAlphaArgs(1), ObjName_ZoneCoupled_Basement,
                         DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
 
                 // Read in the some of the inputs into the local type for clarity during transition
@@ -1631,7 +1611,7 @@ namespace EnergyPlus {
                     thisCircuit.pipeSegments.push_back(Segment::factory(state, segmentNameToFind));
                 }
 
-                circuits.push_back(thisCircuit);
+                state.dataPlantPipingSysMgr->circuits.push_back(thisCircuit);
 
             } // All pipe circuits in input
 
@@ -1695,8 +1675,6 @@ namespace EnergyPlus {
                                                                                DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.InletNodeNum == 0) {
                     CurIndex = 2;
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
                 thisCircuit.OutletNodeName = DataIPShortCuts::cAlphaArgs(3);
                 thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, thisCircuit.OutletNodeName,
@@ -1709,8 +1687,6 @@ namespace EnergyPlus {
                                                                                 DataLoopNode::ObjectIsNotParent);
                 if (thisCircuit.OutletNodeNum == 0) {
                     CurIndex = 3;
-                    // CALL IssueSevereInputFieldError( RoutineName, ObjName_Circuit, DataIPShortCuts::cAlphaArgs( 1 ), cAlphaFieldNames( CurIndex ), &
-                    //                                DataIPShortCuts::cAlphaArgs( CurIndex ), 'Bad node name.', ErrorsFound )
                 }
                 BranchNodeConnections::TestCompSet(state, ObjName_HorizTrench,
                                                    thisTrenchName,
@@ -1728,19 +1704,19 @@ namespace EnergyPlus {
                 thisCircuit.RadialMeshThickness = thisCircuit.PipeSize.InnerDia / 2.0;
 
                 // add it to the main vector, then get a reference to it here
-                circuits.push_back(thisCircuit);
+                state.dataPlantPipingSysMgr->circuits.push_back(thisCircuit);
             }
 
         }
 
         Segment *Segment::factory(EnergyPlusData &state, std::string segmentName) {
-            if (GetSegmentInputFlag) {
+            if (state.dataPlantPipingSysMgr->GetSegmentInputFlag) {
                 bool errorsFound = false;
                 ReadPipeSegmentInputs(state, errorsFound);
-                GetSegmentInputFlag = false;
+                state.dataPlantPipingSysMgr->GetSegmentInputFlag = false;
             }
             // Now look for this particular segment in the list
-            for (auto &segment : segments) {
+            for (auto &segment : state.dataPlantPipingSysMgr->segments) {
                 if (segment.Name == segmentName) {
                     return &segment;
                 }
@@ -1753,12 +1729,12 @@ namespace EnergyPlus {
         }
 
         Circuit *Circuit::factory(EnergyPlusData &state, std::string circuitName, bool & errorsFound) {
-            if (GetCircuitInputFlag) {
+            if (state.dataPlantPipingSysMgr->GetCircuitInputFlag) {
                 ReadPipeCircuitInputs(state, errorsFound);
-                GetCircuitInputFlag = false;
+                state.dataPlantPipingSysMgr->GetCircuitInputFlag = false;
             }
             // Now look for this particular segment in the list
-            for (auto &circuit : circuits) {
+            for (auto &circuit : state.dataPlantPipingSysMgr->circuits) {
                 if (circuit.Name == circuitName) {
                     return &circuit;
                 }
@@ -1836,7 +1812,7 @@ namespace EnergyPlus {
                     }
                 }
 
-                segments.push_back(thisSegment);
+                state.dataPlantPipingSysMgr->segments.push_back(thisSegment);
             }
         }
 
@@ -1889,7 +1865,7 @@ namespace EnergyPlus {
                                               DataIPShortCuts::cAlphaFieldNames,
                                               DataIPShortCuts::cNumericFieldNames);
 
-                auto &thisDomain = domains[DomainCtr - 1];
+                auto &thisDomain = state.dataPlantPipingSysMgr->domains[DomainCtr - 1];
 
                 // Get the name, validate
                 std::string thisTrenchName = DataIPShortCuts::cAlphaArgs(1);
@@ -1956,14 +1932,14 @@ namespace EnergyPlus {
                         segment.FlowDirection = SegmentFlow::DecreasingZ;
                     }
                     // add it to the main segment array so it has a place to live
-                    segments.push_back(segment);
+                    state.dataPlantPipingSysMgr->segments.push_back(segment);
                 }
 
                 // now that they are in the main vector, add them here
-                int const newSizeSegmentVector = static_cast<int>(segments.size());
+                int const newSizeSegmentVector = static_cast<int>(state.dataPlantPipingSysMgr->segments.size());
                 for (int segmentIndexToGrab = newSizeSegmentVector - NumPipeSegments;
                      segmentIndexToGrab < newSizeSegmentVector; ++segmentIndexToGrab) {
-                    thisDomain.circuits[0]->pipeSegments.push_back(&segments[segmentIndexToGrab]);
+                    thisDomain.circuits[0]->pipeSegments.push_back(&state.dataPlantPipingSysMgr->segments[segmentIndexToGrab]);
                 }
             }
         }
@@ -1976,7 +1952,7 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            for (auto &thisSegment : segments) {
+            for (auto &thisSegment : state.dataPlantPipingSysMgr->segments) {
 
                 if (!thisSegment.IsActuallyPartOfAHorizontalTrench) {
 
@@ -2002,7 +1978,7 @@ namespace EnergyPlus {
                 }
             }
 
-            for (auto &thisCircuit : circuits) {
+            for (auto &thisCircuit : state.dataPlantPipingSysMgr->circuits) {
 
                 if (!thisCircuit.IsActuallyPartOfAHorizontalTrench) {
 
@@ -2159,9 +2135,9 @@ namespace EnergyPlus {
 
                 // Once we find ourselves on the plant loop, we can do other things
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                                DataGlobalConstants::InitConvTemp,
-                                                               DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                                RoutineName);
                 thisCircuit->DesignMassFlowRate = thisCircuit->DesignVolumeFlowRate * rho;
                 thisCircuit->NeedToFindOnPlantLoop = false;
@@ -2285,7 +2261,7 @@ namespace EnergyPlus {
             ShowSevereError(
                 state,
                 format(
-                    "{}:{}=\"{}\", invalid {}=\"{:.3T}\", Condition: {}", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
+                    R"({}:{}="{}", invalid {}="{:.3T}", Condition: {})", RoutineName, ObjectName, InstanceName, FieldName, FieldEntry, Condition));
             ErrorsFound = true;
         }
 
@@ -5802,26 +5778,26 @@ namespace EnergyPlus {
             // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
             // but need to verify the value of inlet temperature during warm up, etc.
             FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                                                              thisCircuit->InletTemperature,
-                                                             DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                                                              RoutineName);
             FluidConductivity = FluidProperties::GetConductivityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
             FluidViscosity = FluidProperties::GetViscosityGlycol(
                     state,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidName,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidName,
                     thisCircuit->InletTemperature,
-                    DataPlant::PlantLoop(thisCircuit->LoopNum).FluidIndex,
+                    state.dataPlnt->PlantLoop(thisCircuit->LoopNum).FluidIndex,
                     RoutineName);
 
             // Doesn't anyone care about poor Ludwig Prandtl?

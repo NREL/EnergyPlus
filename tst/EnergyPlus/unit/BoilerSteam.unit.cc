@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,13 +52,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     bool RunFlag(true);
     Real64 MyLoad(1000000.0);
 
-    DataPlant::TotNumLoops = 2;
+    state->dataPlnt->TotNumLoops = 2;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -148,14 +148,14 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    for (int l = 1; l <= DataPlant::TotNumLoops; ++l) {
-        auto &loop(DataPlant::PlantLoop(l));
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(DataPlant::PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(DataPlant::PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -163,23 +163,23 @@ TEST_F(EnergyPlusFixture, BoilerSteam_BoilerEfficiency)
     GetBoilerInput(*state);
     auto &thisBoiler = state->dataBoilerSteam->Boiler(state->dataBoilerSteam->numBoilers);
 
-    DataPlant::PlantLoop(1).Name = "SteamLoop";
-    DataPlant::PlantLoop(1).FluidName = "Steam";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidName = "STEAM";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Steam;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
+    state->dataPlnt->PlantLoop(1).FluidName = "Steam";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisBoiler.Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Steam;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisBoiler.BoilerInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisBoiler.BoilerOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.1;
     DataSizing::PlantSizData(1).DeltaT = 10;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     thisBoiler.initialize(*state);
