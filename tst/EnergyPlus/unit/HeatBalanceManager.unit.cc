@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "Yes, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "AdjustZoneMixingFlow, !- Zone Air Mass Flow Balance Method",
         "AddInfiltrationFlow, !- Infiltration Balancing Method",
         "MixingSourceZonesOnly; !- Infiltration Balancing Zones",
     });
@@ -414,7 +414,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Zone Air Mass Flow Balance Method",
         "AdjustInfiltrationFlow, !- Infiltration Balancing Method",
         "AllZones;                !- Infiltration Balancing Zones",
         "Zone, Zone 1;",
@@ -590,7 +590,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Zone Air Mass Flow Balance Method",
         "None, !- Infiltration Balancing Method",
         ";                !- Infiltration Balancing Zones"
     });
@@ -624,7 +624,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "Yes, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "AdjustZoneMixingFlow, !- Zone Air Mass Flow Balance Method",
         "AdjustInfiltrationFlow, !- Infiltration Balancing Method",
         "AllZones;                !- Infiltration Balancing Zones",
 
@@ -1312,7 +1312,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Zone Air Mass Flow Balance Method",
         "None, !- Infiltration Balancing Method",
         ";                !- Infiltration Balancing Zones",
         " HVACSystemRootFindingAlgorithm,",
@@ -1345,7 +1345,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Zone Air Mass Flow Balance Method",
         "None, !- Infiltration Balancing Method",
         ";                !- Infiltration Balancing Zones",
 
@@ -1938,7 +1938,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
         "25, !- Maximum Number of Warmup Days",
         "6;                       !- Minimum Number of Warmup Days",
         "ZoneAirMassFlowConservation,",
-        "No, !- Adjust Zone Mixing For Zone Air Mass Flow Balance",
+        "None, !- Zone Air Mass Flow Balance Method",
         "None, !- Infiltration Balancing Method",
         ";                !- Infiltration Balancing Zones",
         " HVACSystemRootFindingAlgorithm,",

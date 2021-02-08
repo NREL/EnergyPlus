@@ -1268,7 +1268,7 @@ namespace HeatBalanceManager {
                     if (SELECT_CASE_var == "ADJUSTZONEMIXINGFLOW") {
                         ZoneAirMassFlow.BalanceMixing = true;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjutsZoneMixingFlow";
+                        AlphaName(1) = "AdjustZoneMixingFlow";
                     } else if (SELECT_CASE_var == "ADJUSTZONERETURNFLOW") {
                         ZoneAirMassFlow.BalanceMixing = false;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
@@ -1276,9 +1276,11 @@ namespace HeatBalanceManager {
                         AlphaName(1) = "AdjustZoneReturnFlow";
                     } else if (SELECT_CASE_var == "NONE") {
                         ZoneAirMassFlow.BalanceMixing = false;
+                        ZoneAirMassFlow.AdjustZoneReturnFlow = false;
                         AlphaName(1) = "None";	
                     } else {
                         ZoneAirMassFlow.BalanceMixing = false;
+                        ZoneAirMassFlow.AdjustZoneReturnFlow = false;
                         AlphaName(1) = "None";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
