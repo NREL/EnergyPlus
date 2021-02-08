@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     MicroCHP2.Name = "MICROCOGEN2";
     MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN1");
     MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN2");
-    EXPECT_EQ(MicroCHPElectricGenerator::NumMicroCHPs, 2);
+    EXPECT_EQ(state->dataCHPElectGen->NumMicroCHPs, 2);
 
     bool FirstHVACIteration = true;
     bool InitLoopEquip = true;

@@ -103,7 +103,7 @@ namespace EnergyPlus::DemandManager {
         static bool BeginDemandSim; // TRUE in the first timestep after warmup of a new environment
         static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
 
-        // FLOW:
+
         if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
             GetDemandManagerListInput(state);
@@ -213,7 +213,7 @@ namespace EnergyPlus::DemandManager {
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
@@ -331,7 +331,7 @@ namespace EnergyPlus::DemandManager {
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
 
-        // FLOW:
+
         CurrentModuleObject = "DemandManagerAssignmentList";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
@@ -604,7 +604,7 @@ namespace EnergyPlus::DemandManager {
         int Item;
         int Item1;
 
-        // FLOW:
+
         MaxAlphas = 0;
         MaxNums = 0;
         CurrentModuleObject = "DemandManager:ExteriorLights";
@@ -1335,7 +1335,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             DemandMgr(MgrNum).CanReduceDemand = false;
@@ -1388,7 +1388,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             if (DemandMgr(MgrNum).Activate) {
@@ -1489,7 +1489,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             // Check availability
@@ -1624,7 +1624,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
 
-        // FLOW:
+
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
             BillingPeriod = state.dataEnvrn->Month;
         } else {
@@ -1710,7 +1710,7 @@ namespace EnergyPlus::DemandManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LowestPower;
 
-        // FLOW:
+
         CanReduceDemand = false;
 
         {

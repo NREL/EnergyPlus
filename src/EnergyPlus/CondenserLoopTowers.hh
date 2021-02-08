@@ -398,6 +398,10 @@ namespace CondenserLoopTowers {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state);
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void initialize(EnergyPlusData &state);
 
         void setupOutputVariables(EnergyPlusData &state);

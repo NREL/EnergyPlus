@@ -62,8 +62,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-void GeneralRoutines_clear_state();
-
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -193,9 +191,11 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
 
 struct GeneralRoutinesData : BaseGlobalStruct {
 
+    bool MyICSEnvrnFlag = true;
+
     void clear_state() override
     {
-
+        this->MyICSEnvrnFlag = true;
     }
 };
 
