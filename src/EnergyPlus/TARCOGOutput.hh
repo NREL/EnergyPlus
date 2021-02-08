@@ -72,8 +72,8 @@ namespace TARCOGOutput {
       fs::path TarcogIterationsFilePath{"TarcogIterations.dbg"};
       InputOutputFile TarcogIterationsFile{TarcogIterationsFilePath};
 
-      fs::path IterationCSVName{"IterationResults.csv"};
-      InputOutputFile IterationCSVFile{IterationCSVName};
+      fs::path IterationCSVFilePath{"IterationResults.csv"};
+      InputOutputFile IterationCSVFile{IterationCSVFilePath};
 
       fs::path DebugOutputFilePath{"Tarcog.dbg"};
       InputOutputFile DebugOutputFile{DebugOutputFilePath};
