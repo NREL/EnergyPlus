@@ -700,7 +700,7 @@ namespace LowTempRadiantSystem {
                 thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(11)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(11);
-                    if (thisRadSys.CoolingCapMethod <= 0.0) {
+                    if (thisRadSys.ScaledCoolingCapacity <= 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
                         ShowContinueError(state, "Input for " + cAlphaFields(12) + " = " + Alphas(12));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(11), Numbers(11)));
