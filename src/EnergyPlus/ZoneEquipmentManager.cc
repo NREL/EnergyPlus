@@ -3830,12 +3830,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
-        using DataHeatBalance::AddInfiltrationFlow;
-        using DataHeatBalance::AdjustInfiltrationFlow;
-        using DataHeatBalance::AllZones;
-        using DataHeatBalance::Infiltration;
         using DataHeatBalance::MassConservation;
-        using DataHeatBalance::NoInfiltrationFlow;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::MixingMassFlowZone;
@@ -5566,29 +5561,29 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // This subroutine updates the receiving zone mixing flow rate to ensures the zone
         // air mass balance.
 
-        // Using/Aliasing
-        using DataHeatBalance::MassConservation;
-        using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalFanSys::MixingMassFlowZone;
-
         int Loop;
         int MixingNum;
         int NumOfReceivingZoneMixingObjects;
         Real64 MixingMassFlowRate; // current zone mixing mass flow rate, [kg/s]
 
         MixingMassFlowRate = 0.0;
-        // distribute the total zone mixing flow rate to the source zones
-        NumOfReceivingZoneMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+        NumOfReceivingZoneMixingObjects = DataHeatBalance::MassConservation(ZoneNum).NumReceivingZonesMixingObject;
         if (NumOfReceivingZoneMixingObjects > 0) {
-            for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
-                MixingNum = MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
-                Mixing(MixingNum).MixingMassFlowRate = MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
-                MixingMassFlowRate += Mixing(MixingNum).MixingMassFlowRate;
-                CalcZoneMixingFlowRateOfSourceZone(Mixing(MixingNum).FromZone);
+            if (DataHeatBalance::ZoneAirMassFlow.BalanceMixing) {
+                // distribute the total zone mixing flow rate to the source zones
+                for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
+                    MixingNum = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
+                    DataHeatBalance::Mixing(MixingNum).MixingMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
+                    MixingMassFlowRate += DataHeatBalance::Mixing(MixingNum).MixingMassFlowRate;
+                    CalcZoneMixingFlowRateOfSourceZone(DataHeatBalance::Mixing(MixingNum).FromZone);
+                }
+            } else {
+                // adjust zone return node air flow
+                // DataHeatBalance::ZoneAirMassFlow.AdjustZoneReturnFlow
+
             }
         }
-        MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
+        DataHeatBalance::MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
         ZoneMixingMassFlowRate = MixingMassFlowRate;
     }
 
@@ -5604,14 +5599,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the zone mixing flow rate such that it ensures the zone
         // air mass balance.
-
-        // Using/Aliasing
-        using DataHeatBalance::MassConservation;
-        using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MixingMassFlowZone;
-
+        ;
         int Loop;
         int MixingNum;
         int ZoneMixingNum;
@@ -5619,18 +5607,18 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 ZoneSourceMassFlowRate; // current zone as a source mass flow rate for zone mixing in other zones, [kg/s]
 
         ZoneSourceMassFlowRate = 0.0;
-        NumOfSourceZoneMixingObjects = MassConservation(ZoneNum).NumSourceZonesMixingObject;
+        NumOfSourceZoneMixingObjects = DataHeatBalance::MassConservation(ZoneNum).NumSourceZonesMixingObject;
         if (NumOfSourceZoneMixingObjects > 0) {
             for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
-                MixingNum = MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                MixingNum = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
+                for (Loop = 1; Loop <= DataHeatBalance::TotMixing; ++Loop) {
                     if (Loop == MixingNum) {
-                        ZoneSourceMassFlowRate += Mixing(Loop).MixingMassFlowRate;
+                        ZoneSourceMassFlowRate += DataHeatBalance::Mixing(Loop).MixingMassFlowRate;
                     }
                 }
             }
         }
-        MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+        DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
     void AutoCalcDOASControlStrategy(EnergyPlusData &state)
