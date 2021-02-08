@@ -34,7 +34,7 @@ jobs:
       run: |
         set -x
         echo "Using brew to install mactex and adding it to PATH"
-        brew cask install mactex
+        brew install --cask mactex
         echo "/Library/TeX/texbin" >> $GITHUB_PATH
 
     - name: Install IFW

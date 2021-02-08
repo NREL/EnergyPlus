@@ -174,7 +174,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
         state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -2090,7 +2090,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
         state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -2222,9 +2222,6 @@ namespace PlantChillers {
                                                                                     DataLoopNode::NodeConnectionType_Outlet,
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
-                // CALL
-                // TestCompSet(state, TRIM(DataIPShortCuts::cCurrentModuleObject),DataIPShortCuts::cAlphaArgs(1),DataIPShortCuts::cAlphaArgs(5),DataIPShortCuts::cAlphaArgs(6),'Condenser
-                // (Air) Nodes')
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
@@ -4025,7 +4022,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
         state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
