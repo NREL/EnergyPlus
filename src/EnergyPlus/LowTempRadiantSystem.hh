@@ -124,6 +124,7 @@ namespace LowTempRadiantSystem {
     extern int NumOfHydrLowTempRadSys;    // Number of hydronic low tempererature radiant systems
     extern int NumOfHydrLowTempRadSysDes; // Number of hydronic low tempererature radiant design systems
     extern int NumOfCFloLowTempRadSys;    // Number of constant flow (hydronic) low tempererature radiant systems
+    extern int NumOfCFloLowTempRadSysDes; // Number of constant flow (hydronic) low tempererature radiant design systems
     extern int NumOfElecLowTempRadSys;    // Number of electric low tempererature radiant systems
     extern int CFloCondIterNum;           // Number of iterations for a constant flow radiant system--controls variable cond sys ctrl
     extern int TotalNumOfRadSystems;      // Total number of low temperature radiant systems

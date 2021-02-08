@@ -790,6 +790,7 @@ namespace LowTempRadiantSystem {
 
             // Determine Low Temp Radiant heating design capacity sizing method
             if (variableFlowDesignDataObject.DesignHeatingCapMethod == HeatingDesignCapacity) {
+                thisRadSys.HeatingCapMethod = HeatingDesignCapacity;
                 if (!lNumericBlanks(2)) {
                     thisRadSys.ScaledHeatingCapacity = Numbers(2);
                     if (thisRadSys.ScaledHeatingCapacity < 0.0 && thisRadSys.ScaledHeatingCapacity != AutoSize) {
@@ -806,8 +807,10 @@ namespace LowTempRadiantSystem {
                     }
                 }
             } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == CapacityPerFloorArea) {
+                thisRadSys.HeatingCapMethod = CapacityPerFloorArea;
                 thisRadSys.ScaledHeatingCapacity = variableFlowDesignDataObject.DesignScaledHeatingCapacity;
             } else if (variableFlowDesignDataObject.DesignHeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+                thisRadSys.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 thisRadSys.ScaledHeatingCapacity = variableFlowDesignDataObject.DesignScaledHeatingCapacity;
             }
 
@@ -1879,14 +1882,14 @@ namespace LowTempRadiantSystem {
         Real64 rho;  // local fluid density
         bool errFlag;
 
-
-        if  (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
-            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems;
-        }
-
-        if  (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
-            ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
-        }
+//
+//        if  (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
+//            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems;
+//        }
+//
+//        if  (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
+//            ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
+//        }
 
         InitErrorsFound = false;
 
@@ -1948,12 +1951,15 @@ namespace LowTempRadiantSystem {
             for (RadNum = 1; RadNum <= NumOfCFloLowTempRadSys; ++RadNum) {
                 // Calculate the efficiency for each pump: The calculation
                 // is based on the PMPSIM code in the ASHRAE Secondary Toolkit
+                Real64 PEC = CFloRadSys(RadNum).PumpEffic;
                 if ((CFloRadSys(RadNum).NomPowerUse > ZeroTol) && (MotorEffic > ZeroTol) &&
                     (CFloRadSys(RadNum).WaterVolFlowMax != AutoSize)) {
                     TotalEffic = CFloRadSys(RadNum).WaterVolFlowMax * CFloRadSys(RadNum).NomPumpHead / CFloRadSys(RadNum).NomPowerUse;
                     CFloRadSys(RadNum).PumpEffic = TotalEffic / MotorEffic;
+                    PEC = CFloRadSys(RadNum).PumpEffic;
                     static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     Real64 pumpEfficiency = CFloRadSys(RadNum).PumpEffic * 100.0;
+                    PEC = CFloRadSys(RadNum).PumpEffic;
                     if (CFloRadSys(RadNum).PumpEffic < 0.50) {
                         ShowWarningError(state, format(fmt, pumpEfficiency, "which is less than 50%", CFloRadSys(RadNum).Name));
                     } else if ((CFloRadSys(RadNum).PumpEffic > 0.95) && (CFloRadSys(RadNum).PumpEffic <= 1.0)) {
@@ -5057,7 +5063,7 @@ namespace LowTempRadiantSystem {
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
     }
-
+//TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state,
                                                                                int RadSysNum)
     {
