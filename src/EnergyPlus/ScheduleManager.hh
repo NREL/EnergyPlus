@@ -99,6 +99,7 @@ namespace ScheduleManager {
         bool IsReal = true;      // True if this is a "real" schedule, false if integer
         int UnitType = 0;     // reference ScheduleTypeLimit table
         bool errorFoundDuringInputProcessing = false;
+        ScheduleTypeData() = default;
         ScheduleTypeData(EnergyPlusData &state, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
     };
 
