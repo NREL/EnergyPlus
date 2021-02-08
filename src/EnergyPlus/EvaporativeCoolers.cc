@@ -200,7 +200,7 @@ namespace EvaporativeCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapCoolNum; // The EvapCooler that you are currently loading input into
 
-        // FLOW:
+
 
         // Obtains and Allocates EvapCooler related parameters from input file
         if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
@@ -960,7 +960,7 @@ namespace EvaporativeCoolers {
         int EvapUnitNum;
         bool localSetPointCheck(false);
 
-        // FLOW:
+
         // Check that setpoint is active
         if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
             for (EvapUnitNum = 1; EvapUnitNum <= NumEvapCool; ++EvapUnitNum) {

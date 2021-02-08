@@ -1951,7 +1951,7 @@ namespace FaultsManager {
         Real64 FoulingFactor(
             1.0); // Actual Nominal Fouling Factor, ratio between the nominal capacity or efficiency at fouling case and that at fault free case
 
-        // FLOW
+
 
         // Check fault availability schedules
         if (GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
@@ -1989,7 +1989,7 @@ namespace FaultsManager {
         Real64 FaultFac(0.0);             // fault modification factor
         Real64 UAReductionFactorAct(1.0); // actual UA Reduction Factor, ratio between the UA value at fouling case and that at fault free case
 
-        // FLOW
+
 
         // Check fault availability schedules
         if (GetCurrentScheduleValue(state, this->AvaiSchedPtr) > 0.0) {
@@ -2114,7 +2114,7 @@ namespace FaultsManager {
         std::string const FanName = this->FaultyAirFilterFanName; // name of the fan
         int const FanCurvePtr = this->FaultyAirFilterFanCurvePtr; // pointer of the fan curve
 
-        // FLOW
+
 
         FanFound = false;
 

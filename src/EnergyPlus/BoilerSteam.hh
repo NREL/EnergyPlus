@@ -148,6 +148,10 @@ namespace BoilerSteam {
 
         void getSizingFactor(Real64 &sizFac) override;
 
+        void oneTimeInit(EnergyPlusData &state);
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);

@@ -162,6 +162,10 @@ namespace Boilers {
 
         void SetupOutputVars(EnergyPlusData &state);
 
+        void oneTimeInit(EnergyPlusData &state);
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
         void SizeBoiler(EnergyPlusData &state);

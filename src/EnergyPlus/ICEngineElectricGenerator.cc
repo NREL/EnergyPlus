@@ -143,7 +143,7 @@ namespace ICEngineElectricGenerator {
         Array1D<Real64> NumArray(11);   // numeric data
         static bool ErrorsFound(false); // error flag
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Generator:InternalCombustionEngine";
         NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
