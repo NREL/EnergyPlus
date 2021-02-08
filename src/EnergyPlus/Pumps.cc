@@ -2113,7 +2113,7 @@ namespace EnergyPlus::Pumps {
         int OutletNode; // pump outlet node number
         int PumpType;   // Current pump type
 
-        // FLOW:
+
         PumpType = state.dataPumps->PumpEquip(PumpNum).PumpType;
         InletNode = state.dataPumps->PumpEquip(PumpNum).InletNodeNum;
         OutletNode = state.dataPumps->PumpEquip(PumpNum).OutletNodeNum;

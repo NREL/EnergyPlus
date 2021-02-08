@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     Real64 Tsat(0.0);
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
     EXPECT_DOUBLE_EQ(0.0071762141417078054, DataMoistureBalanceEMPD::RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
@@ -270,7 +270,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     Real64 Tsat(0.0);
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
     EXPECT_DOUBLE_EQ(0.0071815819413115663, DataMoistureBalanceEMPD::RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
@@ -389,7 +389,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     // Calculate and verify it against the results determined above
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, Taver, Taver, Tsat);
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(surfNum);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(surfNum);
     EXPECT_DOUBLE_EQ(mass_flux_surf_deep_result, report_vars.mass_flux_deep);
 
 }

@@ -161,7 +161,7 @@ namespace DisplacementVentMgr {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
 
         // initialize Displacement Ventilation model
         InitUCSDDV(state, ZoneNum);

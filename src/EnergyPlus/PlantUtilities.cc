@@ -64,9 +64,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace PlantUtilities {
+namespace EnergyPlus::PlantUtilities {
 
     // Module containing the routines dealing with the <module_name>
 
@@ -75,53 +73,6 @@ namespace PlantUtilities {
     //       DATE WRITTEN   <date_written>
     //       MODIFIED       na
     //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // <use statements for access to subroutines in other modules>
-    // Using/Aliasing
-    namespace {
-        struct CriteriaData
-        {
-            // Members
-            int CallingCompLoopNum;        // for debug error handling
-            int CallingCompLoopSideNum;    // for debug error handling
-            int CallingCompBranchNum;      // for debug error handling
-            int CallingCompCompNum;        // for debug error handling
-            Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
-
-            // Default Constructor
-            CriteriaData()
-                : CallingCompLoopNum(0), CallingCompLoopSideNum(0), CallingCompBranchNum(0), CallingCompCompNum(0), ThisCriteriaCheckValue(0.0)
-            {
-            }
-        };
-
-        // Object Data
-        Array1D<CriteriaData> CriteriaChecks; // stores criteria information
-    }                                         // namespace
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Functions
-    void clear_state()
-    {
-        CriteriaChecks.deallocate();
-    }
 
     void InitComponentNodes(Real64 const MinCompMdot,
                             Real64 const MaxCompMdot,
@@ -148,24 +99,10 @@ namespace PlantUtilities {
         // set MassFlowRate variables on inlet node
         //  reset inlet node if more restrictive
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataPlant::DemandOpSchemeType;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpMinCompMdot; // local value
@@ -179,10 +116,6 @@ namespace PlantUtilities {
 
         // reset outlet node
         Node(OutletNode).MassFlowRate = 0.0;
-        //  Node(OutletNode)%MassFlowRateMin      = MinCompMdot
-        //  Node(OutletNode)%MassFlowRateMinAvail = MinCompMdot
-        //  Node(OutletNode)%MassFlowRateMax      = MaxCompMdot
-        //  Node(OutletNode)%MassFlowRateMaxAvail = MaxCompMdot
 
         Node(InletNode).MassFlowRateMin = tmpMinCompMdot;
         Node(InletNode).MassFlowRateMinAvail = tmpMinCompMdot;
@@ -191,26 +124,6 @@ namespace PlantUtilities {
         // reset inlet node, but only change from inlet setting if set and more restrictive
         Node(InletNode).MassFlowRate = 0.0;
         Node(InletNode).MassFlowRateRequest = 0.0;
-        //  IF (Node(InletNode)%MassFlowRateMax > 0.0d0) THEN !if inlet has been set, only change it if more restrictive
-        //    Node(InletNode)%MassFlowRateMax       = MIN(tmpMaxCompMdot, Node(InletNode)%MassFlowRateMax)
-        //  ELSE
-        //    Node(InletNode)%MassFlowRateMax       = tmpMaxCompMdot
-        //  ENDIF
-        //  IF (Node(InletNode)%MassFlowRateMaxAvail> 0.0d0) THEN !if inlet has been set, only change it if more restrictive
-        //    Node(InletNode)%MassFlowRateMaxAvail  = MIN(tmpMaxCompMdot, Node(InletNode)%MassFlowRateMaxAvail)
-        //  ELSE
-        //    Node(InletNode)%MassFlowRateMaxAvail  = tmpMaxCompMdot
-        //  ENDIF
-        //  IF (Node(InletNode)%MassFlowRateMin > 0.0d0) THEN
-        //    Node(InletNode)%MassFlowRateMin       = MAX(tmpMinCompMdot, Node(InletNode)%MassFlowRateMin)
-        //  ELSE
-        //    Node(InletNode)%MassFlowRateMin       = tmpMinCompMdot
-        //  ENDIF
-        //  IF (Node(InletNode)%MassFlowRateMinAvail > 0.0d0) THEN
-        //    Node(InletNode)%MassFlowRateMinAvail  = MAX(tmpMinCompMdot, Node(InletNode)%MassFlowRateMinAvail)
-        //  ELSE
-        //    Node(InletNode)%MassFlowRateMinAvail  = tmpMinCompMdot
-        //  ENDIF
     }
 
     void SetComponentFlowRate(EnergyPlusData &state, Real64 &CompFlow,      // [kg/s]
@@ -448,19 +361,7 @@ namespace PlantUtilities {
                         if (ActuatedNode == comp.NodeNumIn) {
                             //            ! found controller set to inlet of a component.  now set that component's outlet
                             int const NodeNum = comp.NodeNumOut;
-                            //            Node(ActuatedNode)%MassFlowRate = MAX( Node(ActuatedNode)%MassFlowRate , Node(NodeNum)%MassFlowRateMinAvail)
-                            //            Node(ActuatedNode)%MassFlowRate = MAX( Node(ActuatedNode)%MassFlowRate , Node(ActuatedNode)%MassFlowRateMin)
-                            //            Node(ActuatedNode)%MassFlowRate = MIN( Node(ActuatedNode)%MassFlowRate , Node(NodeNum)%MassFlowRateMaxAvail)
-                            //            Node(ActuatedNode)%MassFlowRate = MIN( Node(ActuatedNode)%MassFlowRate , Node(ActuatedNode)%MassFlowRateMax)
-
-                            // virtual 2-way valve
-                            //     Node(NodeNum)%MassFlowRateMinAvail = MAX(Node(ActuatedNode)%MassFlowRateMinAvail
-                            //     ,Node(ActuatedNode)%MassFlowRateMin) Node(NodeNum)%MassFlowRateMinAvail =
-                            //     MAX(Node(ActuatedNode)%MassFlowRateMinAvail , CompFlow)
                             DataLoopNode::Node(NodeNum).MassFlowRateMinAvail = max(a_node.MassFlowRateMinAvail, a_node.MassFlowRateMin);
-                            //      Node(NodeNum)%MassFlowRateMaxAvail =
-                            //      MIN(Node(ActuatedNode)%MassFlowRateMaxAvail,Node(ActuatedNode)%MassFlowRateMax) Node(NodeNum)%MassFlowRateMaxAvail
-                            //      = MIN(Node(ActuatedNode)%MassFlowRateMaxAvail , CompFlow)
                             DataLoopNode::Node(NodeNum).MassFlowRateMaxAvail = min(a_node.MassFlowRateMaxAvail, a_node.MassFlowRateMax);
                             DataLoopNode::Node(NodeNum).MassFlowRate = a_node.MassFlowRate;
                         }
@@ -985,14 +886,14 @@ namespace PlantUtilities {
         if (UniqueCriteriaCheckIndex <= 0) { // If we don't yet have an index, we need to initialize
 
             // We need to start by allocating, or REallocating the array
-            int const CurrentNumChecksStored(CriteriaChecks.size() + 1);
-            CriteriaChecks.redimension(CurrentNumChecksStored);
+            int const CurrentNumChecksStored(static_cast<int>(state.dataPlantUtilities->CriteriaChecks.size() + 1));
+            state.dataPlantUtilities->CriteriaChecks.redimension(CurrentNumChecksStored);
 
             // Store the unique name and location
-            CriteriaChecks(CurrentNumChecksStored).CallingCompLoopNum = LoopNum;
-            CriteriaChecks(CurrentNumChecksStored).CallingCompLoopSideNum = LoopSide;
-            CriteriaChecks(CurrentNumChecksStored).CallingCompBranchNum = BranchNum;
-            CriteriaChecks(CurrentNumChecksStored).CallingCompCompNum = CompNum;
+            state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopNum = LoopNum;
+            state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopSideNum = LoopSide;
+            state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompBranchNum = BranchNum;
+            state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompCompNum = CompNum;
 
             // Since this was the first pass, it is safe to assume something has changed!
             // Therefore we'll set the sim flag to true
@@ -1007,7 +908,7 @@ namespace PlantUtilities {
             //  sim flag status based on the criteria type
 
             // First store the current check in a single variable instead of array for readability
-            CurCriteria = CriteriaChecks(UniqueCriteriaCheckIndex);
+            CurCriteria = state.dataPlantUtilities->CriteriaChecks(UniqueCriteriaCheckIndex);
 
             // Check to make sure we didn't reuse the index in multiple components
             if (CurCriteria.CallingCompLoopNum != LoopNum || CurCriteria.CallingCompLoopSideNum != LoopSide ||
@@ -1041,7 +942,7 @@ namespace PlantUtilities {
         } // if we have an index or not
 
         // Store the value for the next pass
-        CriteriaChecks(UniqueCriteriaCheckIndex).ThisCriteriaCheckValue = CriteriaValue;
+        state.dataPlantUtilities->CriteriaChecks(UniqueCriteriaCheckIndex).ThisCriteriaCheckValue = CriteriaValue;
     }
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
@@ -1098,7 +999,7 @@ namespace PlantUtilities {
 
         if ((Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
 
-            // DSU3 TODO also send a request that condenser loop be made available, interlock message infrastructure??
+            // TODO also send a request that condenser loop be made available, interlock message infrastructure??
 
             DidAnythingChange = true;
         }
@@ -1250,22 +1151,12 @@ namespace PlantUtilities {
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
 
-//        TODO: Umm, this block seems like it doesn't do much...
-//        // check if node heat rate compares well with generator heat rate
-//        if (HeatSourceType == NodeType_Water) {
-//
-//        } else if (HeatSourceType == NodeType_Steam) {
-//
-//        } else {
-//            // throw error
-//        }
-
         // check if any conditions have changed
         if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
         if ((Node(InletNodeNum).MassFlowRate == 0.0) && (ModelGeneratorHeatRate > 0.0)) {
 
-            // DSU3 TODO also send a request that generator loop be made available, interlock message infrastructure??
+            //  TODO also send a request that generator loop be made available, interlock message infrastructure??
 
             DidAnythingChange = true;
         }
@@ -1530,10 +1421,6 @@ namespace PlantUtilities {
 
         Node(OutletNodeNum).TempMin = Node(InletNodeNum).TempMin;
         Node(OutletNodeNum).TempMax = Node(InletNodeNum).TempMax;
-        // DSU3 not don't do this, upstream components outlet might stomp on this components inlet
-        //  so don't propagate hardware limits downstream.  Node(OutletNodeNum)%MassFlowRateMin      = Node(InletNodeNum)%MassFlowRateMin
-        // DSU3 not don't do this                            Node(OutletNodeNum)%MassFlowRateMax      = Node(InletNodeNum)%MassFlowRateMax
-        // DSU3 hopefully these next two go away once changes are broadly implemented...
         Node(OutletNodeNum).MassFlowRateMinAvail = max(Node(InletNodeNum).MassFlowRateMin, Node(InletNodeNum).MassFlowRateMinAvail);
         Node(OutletNodeNum).MassFlowRateMaxAvail = min(Node(InletNodeNum).MassFlowRateMax, Node(InletNodeNum).MassFlowRateMaxAvail);
 
@@ -1940,28 +1827,9 @@ namespace PlantUtilities {
         //       RE-ENGINEERED  na
         // PURPOSE OF THIS FUNCTION:
         // This subroutine scans the plant LoopSide simflags and returns if any of them are still true
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-        // REFERENCES:
-        // na
-        // USE STATEMENTS:
-        // na
 
         // Return value
         bool AnyPlantLoopSidesNeedSim;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        // na
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int LoopCtr;
@@ -1990,14 +1858,9 @@ namespace PlantUtilities {
         //       AUTHOR         Edwin Lee
         //       DATE WRITTEN   November 2009
         //       MODIFIED       na
-        //       RE-ENGINEERED  B. Griffith Feb 2009 DSU3
+        //       RE-ENGINEERED  B. Griffith Feb 2009
         // PURPOSE OF THIS SUBROUTINE:
         // Quickly sets all sim flags of a certain type (loop type/side) to a value
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopCtr;
@@ -2078,12 +1941,9 @@ namespace PlantUtilities {
         using DataSizing::NumPltSizInput;
         using DataSizing::PlantSizData;
         using DataSizing::PlantSizingData;
-        //  USE DataPlant, ONLY: PlantLoop, ScanPlantLoopsForNodeNum
 
         // Return value
         int MyPltSizNum; // returned plant sizing index
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         int MyPltLoopNum;
         int PlantLoopNum;
@@ -2152,7 +2012,5 @@ namespace PlantUtilities {
         }
         return (matchedIndexA == matchedIndexB) && (matchedIndexA != 0); // only return true if both are equal and non-zero
     }
-
-} // namespace PlantUtilities
 
 } // namespace EnergyPlus

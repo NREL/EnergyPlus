@@ -213,6 +213,7 @@ namespace OutputProcessor {
         rad,
         J_m2,
         clo,
+        W_mK,
         W_K,
         K_W,
         kgWater_s,
