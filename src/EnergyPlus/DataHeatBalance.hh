@@ -689,6 +689,8 @@ namespace DataHeatBalance {
         int NonWindowSurfaceLast;  // Last  Non-Window Heat Transfer Surface in Zone
         int WindowSurfaceFirst;    // First Window Heat Transfer Surface in Zone
         int WindowSurfaceLast;     // Last  Window Heat Transfer Surface in Zone
+        int TDDDomeFirst;          // First TDD Dome Heat Transfer Surface in Zone
+        int TDDDomeLast;           // Last TDD Dome Window Heat Transfer Surface in Zone
         int InsideConvectionAlgo;  // Ref: appropriate values for Inside Convection solution
         int NumSurfaces;           // Number of surfaces for this zone
         int NumSubSurfaces;        // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -787,7 +789,7 @@ namespace DataHeatBalance {
               ExteriorTotalGroundSurfArea(0.0), ExtGrossGroundWallArea(0.0), ExtGrossGroundWallArea_Multiplied(0.0), SystemZoneNodeNumber(0),
               IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0), TempControlledZoneIndex(0),
               AllSurfaceFirst(0), SurfaceFirst(0), SurfaceLast(0), NonWindowSurfaceFirst(0), NonWindowSurfaceLast(0), WindowSurfaceFirst(0),
-              WindowSurfaceLast(0), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
+              WindowSurfaceLast(0), TDDDomeFirst(0), TDDDomeLast(0), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
               OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
               MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
 

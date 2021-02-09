@@ -724,6 +724,7 @@ namespace HeatBalanceSurfaceManager {
             InitHeatBalFiniteDiff(state);
         }
 
+        // TODO - not necessary
         CTFConstOutPart = 0.0;
         CTFConstInPart = 0.0;
         if (AnyConstructInternalSourceInInput) {
@@ -3328,6 +3329,7 @@ namespace HeatBalanceSurfaceManager {
                     } // Surface(SurfNum)%ExtSolar
                 } // end of surface window loop
             } // end of zone loop
+            // TODO - move this to Zone loop
             for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
                 int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
                 int ConstrNum = Surface(SurfNum).Construction;
@@ -3467,7 +3469,6 @@ namespace HeatBalanceSurfaceManager {
             int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-                if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
                 Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface solar absorptance
@@ -5536,7 +5537,6 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
-            if (firstSurfOpaque <= 0) continue;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
 
                 if (present(ZoneToResimulate)) {
