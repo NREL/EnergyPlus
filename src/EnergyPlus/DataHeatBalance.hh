@@ -276,16 +276,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-   // Flags for HeatTransfer Algorithms Used
-    extern bool AllCTF;                     // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva
-    extern bool AnyCTF;                     // CTF used
-    extern bool AnyEMPD;                    // EMPD used
-    extern bool AnyCondFD;                  // CondFD used
-    extern bool AnyHAMT;                    // HAMT used
-    extern bool AnyKiva;                    // Kiva used
-    extern bool AnyAirBoundary;             // Construction:AirBoundary used (implies grouped solar and radiant is present)
-    extern bool AnyBSDF;                    // True if any WindowModelType == WindowBSDFModel
-
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
     extern Real64 CondFDRelaxFactor;      // Relaxation factor, for looping across all the surfaces.
@@ -2223,6 +2213,15 @@ struct HeatBalanceData : BaseGlobalStruct {
     int SolarDistribution = 0;              // Solar Distribution Algorithm
     int InsideSurfIterations = 0;           // Counts inside surface iterations
     int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
+    // Flags for HeatTransfer Algorithms Used
+    bool AllCTF = true;          // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
+    bool AnyCTF = false;         // CTF used
+    bool AnyEMPD = false;        // EMPD used
+    bool AnyCondFD = false;      // CondFD used
+    bool AnyHAMT = false;        // HAMT used
+    bool AnyKiva = false;        // Kiva used
+    bool AnyAirBoundary = false; // Construction:AirBoundary used (implies grouped solar and radiant is present)
+    bool AnyBSDF = false;        // True if any WindowModelType == WindowBSDFModel
 
     void clear_state() override
     {
@@ -2240,6 +2239,14 @@ struct HeatBalanceData : BaseGlobalStruct {
         this->SolarDistribution = 0;
         this->InsideSurfIterations = 0;
         this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        this->AllCTF = true;
+        this->AnyCTF = false;
+        this->AnyEMPD = false;
+        this->AnyCondFD = false;
+        this->AnyHAMT = false;
+        this->AnyKiva = false;
+        this->AnyAirBoundary = false;
+        this->AnyBSDF = false;
     }
 };
 

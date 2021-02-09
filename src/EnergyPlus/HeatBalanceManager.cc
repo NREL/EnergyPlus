@@ -996,16 +996,16 @@ namespace HeatBalanceManager {
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
-                    DataHeatBalance::AnyCTF = true;
+                    state.dataHeatBal->AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
-                    DataHeatBalance::AnyEMPD = true;
-                    DataHeatBalance::AllCTF = false;
+                    state.dataHeatBal->AnyEMPD = true;
+                    state.dataHeatBal->AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
-                    DataHeatBalance::AnyCondFD = true;
-                    DataHeatBalance::AllCTF = false;
+                    state.dataHeatBal->AnyCondFD = true;
+                    state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(
                             state,
@@ -1019,8 +1019,8 @@ namespace HeatBalanceManager {
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
-                    DataHeatBalance::AnyHAMT = true;
-                    DataHeatBalance::AllCTF = false;
+                    state.dataHeatBal->AnyHAMT = true;
+                    state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
                         ShowSevereError(state,
                                         format("GetSolutionAlgorithm: {} {} is Combined Heat and Moisture Finite Element but Number of TimeSteps in "
@@ -1036,7 +1036,7 @@ namespace HeatBalanceManager {
 
                 } else {
                     state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
-                    DataHeatBalance::AnyCTF = true;
+                    state.dataHeatBal->AnyCTF = true;
                 }
             }
 
@@ -1059,7 +1059,7 @@ namespace HeatBalanceManager {
 
         } else {
             state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
-            DataHeatBalance::AnyCTF = true;
+            state.dataHeatBal->AnyCTF = true;
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
         }
@@ -5242,7 +5242,7 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
-            if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
+            if (state.dataHeatBal->AnyCTF || state.dataHeatBal->AnyEMPD) {
                 DisplayString(state, "Initializing Response Factors");
                 InitConductionTransferFunctions(state); // Initialize the response factors
             }

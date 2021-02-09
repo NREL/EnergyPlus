@@ -283,11 +283,11 @@ namespace HeatBalanceSurfaceManager {
         UpdateFinalSurfaceHeatBalance(state);
 
         // Before we leave the Surface Manager the thermal histories need to be updated
-        if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
+        if (state.dataHeatBal->AnyCTF || state.dataHeatBal->AnyEMPD) {
             UpdateThermalHistories(state); // Update the thermal histories
         }
 
-        if (DataHeatBalance::AnyCondFD) {
+        if (state.dataHeatBal->AnyCondFD) {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
@@ -720,7 +720,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
-        if (DataHeatBalance::AnyCondFD) {
+        if (state.dataHeatBal->AnyCondFD) {
             InitHeatBalFiniteDiff(state);
         }
 
@@ -6152,7 +6152,7 @@ namespace HeatBalanceSurfaceManager {
     {
 
         if (calcHeatBalInsideSurfFirstTime) {
-            if (DataHeatBalance::AnyEMPD) {
+            if (state.dataHeatBal->AnyEMPD) {
                 MinIterations = MinEMPDIterations;
             }
             if (state.dataGlobal->DisplayAdvancedReportVariables) {
@@ -6186,7 +6186,7 @@ namespace HeatBalanceSurfaceManager {
             calcHeatBalInsideSurEnvrnFlag = false;
 
             // Initialize Kiva instances ground temperatures
-            if (DataHeatBalance::AnyKiva) {
+            if (state.dataHeatBal->AnyKiva) {
                 state.dataSurfaceGeometry->kivaManager.initKivaInstances(state);
             }
         }
@@ -6205,7 +6205,7 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRep = 0.0;
             ZoneWinHeatLossRepEnergy = 0.0;
 
-            if (AllCTF) {
+            if (state.dataHeatBal->AllCTF) {
                 CalcHeatBalanceInsideSurf2CTFOnly(state, 1, state.dataGlobal->NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
                 CalcHeatBalanceInsideSurf2(state,
@@ -6383,7 +6383,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Calculate Kiva instances
-        if (DataHeatBalance::AnyKiva) {
+        if (state.dataHeatBal->AnyKiva) {
             if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY && state.dataGlobal->TimeStep == 1) ||
                  state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
                 !state.dataGlobal->WarmupFlag) {
@@ -6396,7 +6396,7 @@ namespace HeatBalanceSurfaceManager {
 
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
-            if (DataHeatBalance::AnyKiva) {
+            if (state.dataHeatBal->AnyKiva) {
                 for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = kivaSurf.second.results.Tavg - DataGlobalConstants::KelvinConv; // TODO: Use average radiant temp? Trad?
                 }
@@ -6405,7 +6405,7 @@ namespace HeatBalanceSurfaceManager {
             HeatBalanceIntRadExchange::CalcInteriorRadExchange(
                 state, TempSurfIn, state.dataHeatBal->InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
-            if (DataHeatBalance::AnyKiva) {
+            if (state.dataHeatBal->AnyKiva) {
                 for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
                     TempSurfIn(kivaSurf.first) = TempInsOld(kivaSurf.first);
                 }
@@ -6421,7 +6421,7 @@ namespace HeatBalanceSurfaceManager {
                 ConvectionCoefficients::InitInteriorConvectionCoeffs(state, TempSurfIn, ZoneToResimulate);
             }
 
-            if (DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
+            if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
                 for (int SurfNum : HTSurfs) {
                     auto &surface(Surface(SurfNum));
                     if (surface.Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
@@ -6923,7 +6923,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // ...end of loop to check for convergence
 
-            if (!DataHeatBalance::AnyCondFD) {
+            if (!state.dataHeatBal->AnyCondFD) {
                 if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
             } else {
                 if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTempCondFD) Converged = true;
@@ -6949,7 +6949,7 @@ namespace HeatBalanceSurfaceManager {
                 if (!state.dataGlobal->WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
-                        if (!DataHeatBalance::AnyCondFD) {
+                        if (!state.dataHeatBal->AnyCondFD) {
                             ShowWarningError(state,
                                              format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max "
                                                     "Allowed Temp Diff [C] ={:.3R}",
@@ -7027,7 +7027,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         // Update SumHmXXXX for non-window EMPD or HAMT surfaces
-        if (DataHeatBalance::AnyEMPD || DataHeatBalance::AnyHAMT) {
+        if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
             for (int SurfNum : HTNonWindowSurfs) {
                 auto const &surface(Surface(SurfNum));
                 int ZoneNum = surface.Zone;

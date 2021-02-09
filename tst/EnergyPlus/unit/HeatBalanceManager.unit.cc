@@ -1604,7 +1604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
     // Test various inputs for HeatBalanceAlgorithm
     // Default is CTF if no HeatBalanceAlgorithm object is present
 
-    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyCTF);
     bool errorsfound = false;
 
     std::string const idf_objects = delimited_string({
@@ -1615,10 +1615,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
-    EXPECT_TRUE(DataHeatBalance::AnyCTF);
-    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
-    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
-    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_TRUE(state->dataHeatBal->AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
+    EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
+    EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
 }
 
@@ -1626,7 +1626,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 {
     // Test various inputs for HeatBalanceAlgorithm
 
-    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyCTF);
     bool errorsfound = false;
 
     std::string const idf_objects = delimited_string({
@@ -1642,10 +1642,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
-    EXPECT_TRUE(DataHeatBalance::AnyCTF);
-    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
-    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
-    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_TRUE(state->dataHeatBal->AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
+    EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
+    EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
     EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
     EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
@@ -1668,10 +1668,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
-    EXPECT_FALSE(DataHeatBalance::AnyCTF);
-    EXPECT_TRUE(DataHeatBalance::AnyEMPD);
-    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
-    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_FALSE(state->dataHeatBal->AnyCTF);
+    EXPECT_TRUE(state->dataHeatBal->AnyEMPD);
+    EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
+    EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
 }
 
@@ -1691,10 +1691,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
-    EXPECT_FALSE(DataHeatBalance::AnyCTF);
-    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
-    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
-    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_FALSE(state->dataHeatBal->AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
+    EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
+    EXPECT_FALSE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
 }
 
@@ -1714,10 +1714,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     HeatBalanceManager::GetProjectControlData(*state, errorsfound);
     EXPECT_FALSE(errorsfound);
-    EXPECT_FALSE(DataHeatBalance::AnyCTF);
-    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
-    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
-    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_FALSE(state->dataHeatBal->AnyCTF);
+    EXPECT_FALSE(state->dataHeatBal->AnyEMPD);
+    EXPECT_FALSE(state->dataHeatBal->AnyCondFD);
+    EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
     EXPECT_EQ(state->dataHeatBal->OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
 }
 

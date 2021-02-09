@@ -1308,7 +1308,7 @@ namespace HeatBalFiniteDiffManager {
                   "Stability");
 
             // HT Algo issue
-            if (DataHeatBalance::AnyCondFD) {
+            if (state.dataHeatBal->AnyCondFD) {
                 print(state.files.eio,
                       "{}\n",
                       "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "

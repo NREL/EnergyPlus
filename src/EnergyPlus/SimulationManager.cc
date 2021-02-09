@@ -1934,7 +1934,7 @@ namespace SimulationManager {
             state.files.eso.del();
         }
 
-        if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
+        if (state.dataHeatBal->AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
                 state.files.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
             print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);

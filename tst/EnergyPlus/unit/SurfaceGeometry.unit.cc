@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(*state, FoundError);
     GetConstructData(*state, FoundError);
     GetZoneData(*state, FoundError); // Read Zone data from input file
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
@@ -3900,19 +3900,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
+    EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",

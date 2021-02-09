@@ -5700,7 +5700,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -6404,7 +6404,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7027,7 +7027,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7716,7 +7716,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -8350,7 +8350,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -9084,7 +9084,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
@@ -9558,7 +9558,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -13647,7 +13647,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 

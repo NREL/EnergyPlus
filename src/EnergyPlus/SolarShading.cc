@@ -6033,7 +6033,7 @@ namespace SolarShading {
             // Loop over exterior surfaces in this zone
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // delete values from previous timestep
-            if (AnyBSDF) SurfWinACFOverlap = 0.0;
+            if (state.dataHeatBal->AnyBSDF) SurfWinACFOverlap = 0.0;
 
             //-------------------------------------------------------------------------
             // EXTERIOR BEAM SOLAR RADIATION ABSORBED ON THE OUTSIDE OF OPAQUE SURFACES

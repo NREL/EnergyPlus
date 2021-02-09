@@ -4391,7 +4391,7 @@ namespace EnergyPlus::DaylightingManager {
             }
         }
 
-        if (!DataHeatBalance::AnyAirBoundary) {
+        if (!state.dataHeatBal->AnyAirBoundary) {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;

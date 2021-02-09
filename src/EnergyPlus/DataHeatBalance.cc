@@ -220,16 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    // Flags for HeatTransfer Algorithms Used
-    bool AllCTF(true);                      // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
-    bool AnyCTF(false);                     // CTF used
-    bool AnyEMPD(false);                    // EMPD used
-    bool AnyCondFD(false);                  // CondFD used
-    bool AnyHAMT(false);                    // HAMT used
-    bool AnyKiva(false);                    // Kiva used
-    bool AnyAirBoundary(false);             // Construction:AirBoundary used (implies grouped solar and radiant is present)
-    bool AnyBSDF(false);                    // True if any WindowModelType == WindowBSDFModel
-
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
@@ -574,14 +564,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        AllCTF = true;
-        AnyCTF = false;
-        AnyEMPD = false;
-        AnyCondFD = false;
-        AnyHAMT = false;
-        AnyKiva = false;
-        AnyAirBoundary = false;
-        AnyBSDF = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
