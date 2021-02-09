@@ -273,7 +273,7 @@ void read_battery_state(battery_state& state, var_table* vt) {
     vt_get_int(vt, "n_cycles", &lifetime->n_cycles);
     vt_get_number(vt, "range", &lifetime->range);
     vt_get_number(vt, "average_range", &lifetime->average_range);
-    vt_get_int(vt, "day_age_of_battery", &lifetime->day_age_of_battery);
+    vt_get_number(vt, "day_age_of_battery", &lifetime->day_age_of_battery);
 
     vt_get_int(vt, "life_model", &choice);
     if (choice == lifetime_params::CALCYC) {

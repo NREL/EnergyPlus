@@ -231,6 +231,7 @@ TEST_F(lib_battery_test, runTestCycleAt1C){
     // the SOC isn't at 5 so it means the controller is not able to calculate a current/voltage at which to discharge to 5
     s.capacity = {54.5, 1000, 960.01, 20.25, 0, 5.67, 7.79, 2};
     s.batt_voltage = 366.96;
+    s.lifetime.day_age_of_battery = 0.875;
     s.lifetime.q_relative = 100;
     s.lifetime.cycle->q_relative_cycle = 100;
     s.lifetime.calendar->q_relative_calendar = 101.976;
@@ -264,7 +265,7 @@ TEST_F(lib_battery_test, runTestCycleAt1C){
     s.lifetime.cycle->rainflow_Xlt = 88.79;
     s.lifetime.cycle->rainflow_Ylt = 89.30;
     s.lifetime.cycle->rainflow_jlt = 7;
-    s.lifetime.day_age_of_battery = 2739;
+    s.lifetime.day_age_of_battery = 2739.71;
     s.lifetime.calendar->q_relative_calendar = 98.0;
     s.lifetime.calendar->dq_relative_calendar_old = 0.039;
     s.thermal = {96.0, 20.00, 20};
@@ -304,6 +305,7 @@ TEST_F(lib_battery_test, runTestCycleAt3C){
     // the SOC isn't at 5 so it means the controller is not able to calculate a current/voltage at which to discharge to 5
     s.capacity = {48.01, 1000, 960.11, 26.74, 0, 5.00, 7.78, 2};
     s.batt_voltage = 338.91;
+    s.lifetime.day_age_of_battery = 0.29;
     s.lifetime.q_relative = 101.98;
     s.lifetime.calendar->q_relative_calendar = 101.98;
     s.last_idx = 0;
@@ -328,7 +330,7 @@ TEST_F(lib_battery_test, runTestCycleAt3C){
     s.capacity = {49.06, 920.77, 883.94, 8.89, 0, 5.55, 6.55, 2};
     s.batt_voltage = 362.25;
     s.lifetime.q_relative = 93.08;
-    s.lifetime.day_age_of_battery = 2613;
+    s.lifetime.day_age_of_battery = 2613.08;
     s.lifetime.cycle->q_relative_cycle = 92.08;
     s.lifetime.n_cycles = 397;
     s.lifetime.range = 88.51;
@@ -678,6 +680,7 @@ TEST_F(lib_battery_test, AdaptiveTimestep) {
     EXPECT_NEAR(batt_adaptive->SOC(), 88.67, 1e-2);
 }
 
+
 TEST_F(lib_battery_test, AugmentCapacity) {
     std::vector<double> augmentation_percent = {50, 40, 30};
     batteryModel->setupReplacements(augmentation_percent);
@@ -732,4 +735,19 @@ TEST_F(lib_battery_test, ReplaceByCapacityTest){
     }
     double rep = batteryModel->getNumReplacementYear();
     EXPECT_EQ(rep, 1);
+}
+
+TEST_F(lib_battery_test, NMCLifeModel) {
+    auto lifetimeModelNMC = new lifetime_nmc_t(dtHour);
+    auto thermalModelNMC = new thermal_t(1.0, mass, surface_area, resistance, Cp, h, T_room);
+    auto capacityModelNMC = new capacity_lithium_ion_t(q, SOC_init, SOC_max, SOC_min, dtHour);
+    auto voltageModelNMC = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
+                                         C_rate, resistance, dtHour);
+    auto lossModelNMC = new losses_t(monthlyLosses, monthlyLosses, monthlyLosses);
+
+    auto batteryNMC = std::unique_ptr<battery_t>(new battery_t(dtHour, chemistry, capacityModelNMC, voltageModelNMC, lifetimeModelNMC, thermalModelNMC, lossModelNMC));
+    double I = Qfull * n_strings * 2;
+
+    batteryNMC->run(0, I);
+
 }

@@ -19,7 +19,7 @@ protected:
     capacity_lithium_ion_t* capacityModel;
     voltage_dynamic_t* voltageModel;
     thermal_t* thermalModel;
-    lifetime_calendar_cycle_t* lifetimeModel;
+    lifetime_t* lifetimeModel;
     losses_t* lossModel;
     battery_t* batteryModel;
     BatteryPower* batteryPower;

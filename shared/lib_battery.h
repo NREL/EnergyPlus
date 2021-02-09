@@ -61,8 +61,9 @@ struct thermal_params {
     double Cp;                   // [J/KgK] - battery specific heat capacity
     double h;                    // [W/m2/K] - general heat transfer coefficient
     double resistance;                    // [Ohm] - internal resistance
+
     util::matrix_t<double> cap_vs_temp;
-    bool analytical_model;
+    bool analytical_model;       // if true, do not use cap_vs_temp
 
     enum OPTIONS {
         VALUE, SCHEDULE
@@ -76,13 +77,14 @@ struct thermal_params {
 
 class thermal_t {
 public:
+    // constructors for capacity as an entry from a cap_vs_temp table
     thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
               const util::matrix_t<double> &c_vs_t, std::vector<double> T_room_C);
 
     thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
               const util::matrix_t<double> &c_vs_t, double T_room_C);
 
-    // constructor for analytical model to update capacity
+    // constructors for capacity as an analytical function
     thermal_t(double dt_hour, double mass, double surface_area, double R, double Cp, double h,
         double T_room_C);
 

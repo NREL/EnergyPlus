@@ -16,7 +16,7 @@ class AutoFOM_lib_battery_dispatch : public BatteryProperties , public DispatchP
 {
 protected:
     thermal_t * thermalModel;
-    lifetime_calendar_cycle_t * lifetimeModel;
+    lifetime_t * lifetimeModel;
     BatteryPower * batteryPower;
 
     capacity_lithium_ion_t * capacityModel;
