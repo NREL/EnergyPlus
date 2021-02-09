@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2857,8 +2857,8 @@ namespace OutputProcessor {
         static int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->TSMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::TimeStep);
+        if (!state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::TimeStep);
         }
 
         PrintTimeStamp = true;
@@ -2884,8 +2884,8 @@ namespace OutputProcessor {
                                          StartMinute,
                                          state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
-                if (ResultsFramework::resultsFramework->TSMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->TSMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
+                if (state.dataResultsFramework->resultsFramework->TSMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TSMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, EndMinute);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -2924,7 +2924,7 @@ namespace OutputProcessor {
                                      rDummy2,
                                      iDummy2,
                                      op->EnergyMeters(Loop).RptTSFO);
-                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSRptNum, op->EnergyMeters(Loop).TSValue);
+                state.dataResultsFramework->resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSRptNum, op->EnergyMeters(Loop).TSValue);
             }
 
             if (op->EnergyMeters(Loop).RptAccTS) {
@@ -2933,7 +2933,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).TSAccRptNum),
                                                op->EnergyMeters(Loop).SMValue,
                                                op->EnergyMeters(Loop).RptAccTSFO);
-                ResultsFramework::resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->TSMeters.pushVariableValue(op->EnergyMeters(Loop).TSAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
 
@@ -2986,8 +2986,8 @@ namespace OutputProcessor {
         static int iDummy2(0);
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->HRMeters.rDataFrameEnabled()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Hourly);
+        if (!state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Hourly);
         }
 
         PrintTimeStamp = true;
@@ -3012,8 +3012,8 @@ namespace OutputProcessor {
                                          _,
                                          state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
-                if (ResultsFramework::resultsFramework->HRMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->HRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                if (state.dataResultsFramework->resultsFramework->HRMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->HRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3031,7 +3031,7 @@ namespace OutputProcessor {
                                      iDummy2,
                                      op->EnergyMeters(Loop).RptHRFO); // EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & |
                                                                   // EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
-                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum, op->EnergyMeters(Loop).HRValue);
+                state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRRptNum, op->EnergyMeters(Loop).HRValue);
                 op->EnergyMeters(Loop).HRValue = 0.0;
                 op->EnergyMeters(Loop).HRMinVal = MinSetValue;
                 op->EnergyMeters(Loop).HRMaxVal = MaxSetValue;
@@ -3043,7 +3043,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).HRAccRptNum),
                                                op->EnergyMeters(Loop).SMValue,
                                                op->EnergyMeters(Loop).RptAccHRFO);
-                ResultsFramework::resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->HRMeters.pushVariableValue(op->EnergyMeters(Loop).HRAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3087,8 +3087,8 @@ namespace OutputProcessor {
         int CurDayType;
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->DYMeters.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Daily);
+        if (!state.dataResultsFramework->resultsFramework->DYMeters.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Daily);
         }
 
         PrintTimeStamp = true;
@@ -3113,8 +3113,8 @@ namespace OutputProcessor {
                                          _,
                                          state.dataEnvrn->DSTIndicator,
                                          DayTypes(CurDayType));
-                if (ResultsFramework::resultsFramework->DYMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->DYMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                if (state.dataResultsFramework->resultsFramework->DYMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->DYMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3131,7 +3131,7 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).DYMaxVal,
                                      op->EnergyMeters(Loop).DYMaxValDate,
                                      op->EnergyMeters(Loop).RptDYFO);
-                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(op->EnergyMeters(Loop).DYRptNum, op->EnergyMeters(Loop).DYValue);
+                state.dataResultsFramework->resultsFramework->DYMeters.pushVariableValue(op->EnergyMeters(Loop).DYRptNum, op->EnergyMeters(Loop).DYValue);
                 op->EnergyMeters(Loop).DYValue = 0.0;
                 op->EnergyMeters(Loop).DYMinVal = MinSetValue;
                 op->EnergyMeters(Loop).DYMaxVal = MaxSetValue;
@@ -3143,7 +3143,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).DYAccRptNum),
                                                op->EnergyMeters(Loop).SMValue,
                                                op->EnergyMeters(Loop).RptAccDYFO);
-                ResultsFramework::resultsFramework->DYMeters.pushVariableValue(op->EnergyMeters(Loop).DYAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->DYMeters.pushVariableValue(op->EnergyMeters(Loop).DYAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3187,8 +3187,8 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->MNMeters.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Monthly);
+        if (!state.dataResultsFramework->resultsFramework->MNMeters.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Monthly);
         }
 
         PrintTimeStamp = true;
@@ -3203,8 +3203,8 @@ namespace OutputProcessor {
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          state.dataEnvrn->Month);
-                if (ResultsFramework::resultsFramework->MNMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->MNMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                if (state.dataResultsFramework->resultsFramework->MNMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->MNMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3221,7 +3221,7 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).MNMaxVal,
                                      op->EnergyMeters(Loop).MNMaxValDate,
                                      op->EnergyMeters(Loop).RptMNFO);
-                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(op->EnergyMeters(Loop).MNRptNum, op->EnergyMeters(Loop).MNValue);
+                state.dataResultsFramework->resultsFramework->MNMeters.pushVariableValue(op->EnergyMeters(Loop).MNRptNum, op->EnergyMeters(Loop).MNValue);
                 op->EnergyMeters(Loop).MNValue = 0.0;
                 op->EnergyMeters(Loop).MNMinVal = MinSetValue;
                 op->EnergyMeters(Loop).MNMaxVal = MaxSetValue;
@@ -3233,7 +3233,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).MNAccRptNum),
                                                op->EnergyMeters(Loop).SMValue,
                                                op->EnergyMeters(Loop).RptAccMNFO);
-                ResultsFramework::resultsFramework->MNMeters.pushVariableValue(op->EnergyMeters(Loop).MNAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->MNMeters.pushVariableValue(op->EnergyMeters(Loop).MNAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3275,8 +3275,8 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->YRMeters.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Yearly);
+        if (!state.dataResultsFramework->resultsFramework->YRMeters.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Yearly);
         }
 
         PrintTimeStamp = true;
@@ -3285,8 +3285,8 @@ namespace OutputProcessor {
             if (PrintTimeStamp) {
                 WriteYearlyTimeStamp(
                     state, state.files.mtr, op->YearlyStampReportChr, state.dataGlobal->CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
-                if (ResultsFramework::resultsFramework->YRMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->YRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                if (state.dataResultsFramework->resultsFramework->YRMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->YRMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3303,7 +3303,7 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).YRMaxVal,
                                      op->EnergyMeters(Loop).YRMaxValDate,
                                      op->EnergyMeters(Loop).RptYRFO);
-                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(op->EnergyMeters(Loop).YRRptNum, op->EnergyMeters(Loop).YRValue);
+                state.dataResultsFramework->resultsFramework->YRMeters.pushVariableValue(op->EnergyMeters(Loop).YRRptNum, op->EnergyMeters(Loop).YRValue);
                 op->EnergyMeters(Loop).YRValue = 0.0;
                 op->EnergyMeters(Loop).YRMinVal = MinSetValue;
                 op->EnergyMeters(Loop).YRMaxVal = MaxSetValue;
@@ -3315,7 +3315,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).YRAccRptNum),
                                                op->EnergyMeters(Loop).YRValue,
                                                op->EnergyMeters(Loop).RptAccYRFO);
-                ResultsFramework::resultsFramework->YRMeters.pushVariableValue(op->EnergyMeters(Loop).YRAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->YRMeters.pushVariableValue(op->EnergyMeters(Loop).YRAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
     }
@@ -3360,8 +3360,8 @@ namespace OutputProcessor {
         bool PrintTimeStamp;
         auto &op(state.dataOutputProcessor);
 
-        if (!ResultsFramework::resultsFramework->SMMeters.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Simulation);
+        if (!state.dataResultsFramework->resultsFramework->SMMeters.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeMeters(op->EnergyMeters, ReportingFrequency::Simulation);
         }
 
         PrintTimeStamp = true;
@@ -3380,8 +3380,8 @@ namespace OutputProcessor {
                                          op->RunPeriodStampReportChr,
                                          state.dataGlobal->DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
-                if (ResultsFramework::resultsFramework->SMMeters.rDataFrameEnabled()) {
-                    ResultsFramework::resultsFramework->SMMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+                if (state.dataResultsFramework->resultsFramework->SMMeters.rDataFrameEnabled()) {
+                    state.dataResultsFramework->resultsFramework->SMMeters.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
                 }
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -3398,7 +3398,7 @@ namespace OutputProcessor {
                                      op->EnergyMeters(Loop).SMMaxVal,
                                      op->EnergyMeters(Loop).SMMaxValDate,
                                      op->EnergyMeters(Loop).RptSMFO);
-                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(op->EnergyMeters(Loop).SMRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->SMMeters.pushVariableValue(op->EnergyMeters(Loop).SMRptNum, op->EnergyMeters(Loop).SMValue);
             }
 
             if (op->EnergyMeters(Loop).RptAccSM) {
@@ -3407,7 +3407,7 @@ namespace OutputProcessor {
                                                fmt::to_string(op->EnergyMeters(Loop).SMAccRptNum),
                                                op->EnergyMeters(Loop).SMValue,
                                                op->EnergyMeters(Loop).RptAccSMFO);
-                ResultsFramework::resultsFramework->SMMeters.pushVariableValue(op->EnergyMeters(Loop).SMAccRptNum, op->EnergyMeters(Loop).SMValue);
+                state.dataResultsFramework->resultsFramework->SMMeters.pushVariableValue(op->EnergyMeters(Loop).SMAccRptNum, op->EnergyMeters(Loop).SMValue);
             }
         }
 
@@ -4039,7 +4039,7 @@ namespace OutputProcessor {
                                                        ScheduleName);
         }
 
-        ResultsFramework::resultsFramework->addReportVariable(keyedValue, variableName, UnitsString, reportingInterval);
+        state.dataResultsFramework->resultsFramework->addReportVariable(keyedValue, variableName, UnitsString, reportingInterval);
 
         // add to ResultsFramework for output variable list, need to check RVI/MVI later
     }
@@ -4151,7 +4151,7 @@ namespace OutputProcessor {
                                                        true);
         }
 
-        ResultsFramework::resultsFramework->addReportMeter(meterName, UnitsString, reportingInterval);
+        state.dataResultsFramework->resultsFramework->addReportMeter(meterName, UnitsString, reportingInterval);
         // add to ResultsFramework for output variable list, need to check RVI/MVI later
     }
 
@@ -4261,23 +4261,23 @@ namespace OutputProcessor {
             NumberOut = std::string(s);
         }
 
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
             //// The others (<= hourly) are handled inline with the code
             // add to daily TS data store
             if (reportingInterval == ReportingFrequency::Daily) {
-                ResultsFramework::resultsFramework->RIDailyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIDailyTSData.pushVariableValue(reportID, repVal);
             }
             // add to monthly TS data store
             if (reportingInterval == ReportingFrequency::Monthly) {
-                ResultsFramework::resultsFramework->RIMonthlyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.pushVariableValue(reportID, repVal);
             }
             // add to run period TS data store
             if (reportingInterval == ReportingFrequency::Simulation) {
-                ResultsFramework::resultsFramework->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
             }
             // add to annual TS data store
             if (reportingInterval == ReportingFrequency::Yearly) {
-                ResultsFramework::resultsFramework->RIYearlyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIYearlyTSData.pushVariableValue(reportID, repVal);
             }
         }
 
@@ -4691,22 +4691,22 @@ namespace OutputProcessor {
         ProduceMinMaxString(MinOut, minValueDate, reportingInterval);
         ProduceMinMaxString(MaxOut, maxValueDate, reportingInterval);
 
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
             // add to daily TS data store
             if (reportingInterval == ReportingFrequency::Daily) {
-                ResultsFramework::resultsFramework->RIDailyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIDailyTSData.pushVariableValue(reportID, repVal);
             }
             // add to monthly TS data store
             if (reportingInterval == ReportingFrequency::Monthly) {
-                ResultsFramework::resultsFramework->RIMonthlyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.pushVariableValue(reportID, repVal);
             }
             // add to run period TS data store
             if (reportingInterval == ReportingFrequency::Simulation) {
-                ResultsFramework::resultsFramework->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
             }
             // add to annual TS data store
             if (reportingInterval == ReportingFrequency::Yearly) {
-                ResultsFramework::resultsFramework->RIYearlyTSData.pushVariableValue(reportID, repVal);
+                state.dataResultsFramework->resultsFramework->RIYearlyTSData.pushVariableValue(reportID, repVal);
             }
         }
 
@@ -5020,6 +5020,9 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::clo:
             return "clo";
             break;
+        case OutputProcessor::Unit::W_mK:
+            return "W/m-K";
+            break;
         case OutputProcessor::Unit::W_K:
             return "W/K";
             break;
@@ -5173,6 +5176,8 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::J_m2;
         } else if (unitUpper == "CLO") {
             return OutputProcessor::Unit::clo;
+        } else if (unitUpper == "W/M-K") {
+            return OutputProcessor::Unit::W_mK;
         } else if (unitUpper == "W/K") {
             return OutputProcessor::Unit::W_K;
         } else if (unitUpper == "K/W") {
@@ -5201,7 +5206,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
                          std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
-                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
+                         Optional_string_const ReportFreq,          // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
                          Optional_string_const EndUseKey,           // Meter End Use Key (Lights, Heating, Cooling, etc)
                          Optional_string_const EndUseSubKey,        // Meter End Use Sub Key (General Lights, Task Lights, etc)
@@ -5751,36 +5756,36 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
 
     rxTime = (MinuteNow - StartMinute) / double(state.dataGlobal->MinutesPerTimeStep);
 
-    if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+    if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
         // R and I data frames for TimeStepType::TimeStepZone
-        if (t_TimeStepTypeKey == TimeStepType::TimeStepZone && !ResultsFramework::resultsFramework->RIDetailedZoneTSData.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeRTSDataFrame(
+        if (t_TimeStepTypeKey == TimeStepType::TimeStepZone && !state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(
                 ReportingFrequency::EachCall, op->RVariableTypes, op->NumOfRVariable, TimeStepType::TimeStepZone);
         }
-        if (t_TimeStepTypeKey == TimeStepType::TimeStepZone && !ResultsFramework::resultsFramework->RIDetailedZoneTSData.iVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeITSDataFrame(
+        if (t_TimeStepTypeKey == TimeStepType::TimeStepZone && !state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeITSDataFrame(
                 ReportingFrequency::EachCall, op->IVariableTypes, op->NumOfIVariable, TimeStepType::TimeStepZone);
         }
 
         // R and I data frames for TimeStepType::TimeStepSystem
-        if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem && !ResultsFramework::resultsFramework->RIDetailedHVACTSData.rVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeRTSDataFrame(
+        if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem && !state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(
                 ReportingFrequency::EachCall, op->RVariableTypes, op->NumOfRVariable, TimeStepType::TimeStepSystem);
         }
-        if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem && !ResultsFramework::resultsFramework->RIDetailedHVACTSData.iVariablesScanned()) {
-            ResultsFramework::resultsFramework->initializeITSDataFrame(
+        if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem && !state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iVariablesScanned()) {
+            state.dataResultsFramework->resultsFramework->initializeITSDataFrame(
                 ReportingFrequency::EachCall, op->IVariableTypes, op->NumOfIVariable, TimeStepType::TimeStepSystem);
         }
     }
 
-    if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+    if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
         if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-            ResultsFramework::resultsFramework->RIDetailedZoneTSData.newRow(state,
+            state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.newRow(state,
                                                                             state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, op->TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
         if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
             // TODO this was an error probably, was using TimeValue(1)
-            ResultsFramework::resultsFramework->RIDetailedHVACTSData.newRow(state,
+            state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.newRow(state,
                                                                             state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, op->TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
         }
     }
@@ -5861,12 +5866,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             WriteNumericData(state, rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
             ++state.dataGlobal->StdOutputRecordCount;
 
-            if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::resultsFramework->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
+                    state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::resultsFramework->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
+                    state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
             }
         }
@@ -5946,12 +5951,12 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
             ++state.dataGlobal->StdOutputRecordCount;
 
-            if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::resultsFramework->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
+                    state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::resultsFramework->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
+                    state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
             }
         }
@@ -5962,14 +5967,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
     // TimeStep Block (Report on Zone TimeStep)
 
     if (EndTimeStepFlag) {
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RITimestepTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::TimeStep, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RITimestepTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::TimeStep, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RITimestepTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::TimeStep, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RITimestepTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::TimeStep, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RITimestepTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, op->TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
+            state.dataResultsFramework->resultsFramework->RITimestepTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, op->TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
@@ -6035,8 +6040,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     WriteNumericData(state, rVar.ReportID, rVar.ReportIDChr, rVar.TSValue);
                     ++state.dataGlobal->StdOutputRecordCount;
 
-                    if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-                        ResultsFramework::resultsFramework->RITimestepTSData.pushVariableValue(rVar.ReportID, rVar.TSValue);
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+                        state.dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(rVar.ReportID, rVar.TSValue);
                     }
                 }
                 rVar.TSValue = 0.0;
@@ -6091,8 +6096,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                     WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, iVar.TSValue);
                     ++state.dataGlobal->StdOutputRecordCount;
 
-                    if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-                        ResultsFramework::resultsFramework->RITimestepTSData.pushVariableValue(iVar.ReportID, iVar.TSValue);
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+                        state.dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(iVar.ReportID, iVar.TSValue);
                     }
                 }
                 iVar.TSValue = 0.0;
@@ -6130,14 +6135,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             TimePrint = false;
         }
 
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RIHourlyTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::Hourly, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RIHourlyTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::Hourly, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RIHourlyTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Hourly, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RIHourlyTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::Hourly, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIHourlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            state.dataResultsFramework->resultsFramework->RIHourlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
@@ -6159,8 +6164,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                         ++state.dataGlobal->StdOutputRecordCount;
                         rVar.Stored = false;
                         // add time series value for hourly to data store
-                        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-                            ResultsFramework::resultsFramework->RIHourlyTSData.pushVariableValue(rVar.ReportID, rVar.Value);
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+                            state.dataResultsFramework->resultsFramework->RIHourlyTSData.pushVariableValue(rVar.ReportID, rVar.Value);
                         }
                     }
                     rVar.StoreValue += rVar.Value;
@@ -6187,8 +6192,8 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                         WriteNumericData(state, iVar.ReportID, iVar.ReportIDChr, iVar.Value);
                         ++state.dataGlobal->StdOutputRecordCount;
                         iVar.Stored = false;
-                        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-                            ResultsFramework::resultsFramework->RIHourlyTSData.pushVariableValue(iVar.ReportID, iVar.Value);
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+                            state.dataResultsFramework->resultsFramework->RIHourlyTSData.pushVariableValue(iVar.ReportID, iVar.Value);
                         }
                     }
                     iVar.StoreValue += iVar.Value;
@@ -6230,14 +6235,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
                                      DayTypes(CurDayType));
             TimePrint = false;
         }
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RIDailyTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::Daily, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RIDailyTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::Daily, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RIDailyTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Daily, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RIDailyTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::Daily, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIDailyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            state.dataResultsFramework->resultsFramework->RIDailyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         op->NumHoursInMonth += 24;
@@ -6276,14 +6281,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             TimePrint = false;
         }
 
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RIMonthlyTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::Monthly, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::Monthly, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RIMonthlyTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Monthly, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::Monthly, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIMonthlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            state.dataResultsFramework->resultsFramework->RIMonthlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
 
         op->NumHoursInSim += op->NumHoursInMonth;
@@ -6320,14 +6325,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             TimePrint = false;
         }
 
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RIRunPeriodTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::Simulation, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::Simulation, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RIRunPeriodTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Simulation, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::Simulation, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIRunPeriodTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
@@ -6354,14 +6359,14 @@ void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType co
             WriteYearlyTimeStamp(state, state.files.eso, op->YearlyStampReportChr, state.dataGlobal->CalendarYearChr, true);
             TimePrint = false;
         }
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
-            if (!ResultsFramework::resultsFramework->RIYearlyTSData.rVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeRTSDataFrame(ReportingFrequency::Yearly, op->RVariableTypes, op->NumOfRVariable);
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
+            if (!state.dataResultsFramework->resultsFramework->RIYearlyTSData.rVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeRTSDataFrame(ReportingFrequency::Yearly, op->RVariableTypes, op->NumOfRVariable);
             }
-            if (!ResultsFramework::resultsFramework->RIYearlyTSData.iVariablesScanned()) {
-                ResultsFramework::resultsFramework->initializeITSDataFrame(ReportingFrequency::Yearly, op->IVariableTypes, op->NumOfIVariable);
+            if (!state.dataResultsFramework->resultsFramework->RIYearlyTSData.iVariablesScanned()) {
+                state.dataResultsFramework->resultsFramework->initializeITSDataFrame(ReportingFrequency::Yearly, op->IVariableTypes, op->NumOfIVariable);
             }
-            ResultsFramework::resultsFramework->RIYearlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
+            state.dataResultsFramework->resultsFramework->RIYearlyTSData.newRow(state, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, 0);
         }
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
@@ -8491,7 +8496,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
             ItemPtr = iVariableNames(Item);
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(state, ItemPtr), '\n');
-                ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
+                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8502,7 +8507,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                         ItemPtr = op->DDVariableTypes(ItemPtr).Next;
                     }
                     print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(state, ItemPtr), '\n');
-                    ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8512,7 +8517,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
             ItemPtr = iVariableNames(Item);
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(state, ItemPtr), '\n');
-                ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
+                state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
                 op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8523,7 +8528,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                         ItemPtr = op->DDVariableTypes(ItemPtr).Next;
                     }
                     print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(state, ItemPtr), '\n');
-                    ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
+                    state.dataResultsFramework->resultsFramework->RDD.push_back(StandardTimeStepTypeKey(op->DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(op->DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(state, ItemPtr));
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
@@ -8552,14 +8557,14 @@ void ProduceRDDMDD(EnergyPlusData &state)
         ItemPtr = iVariableNames(Item);
         if (op->ProduceReportVDD == iReportVDD::Yes) {
             print(state.files.mdd, "Zone,Meter,{}{}{}", op->EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units), '\n');
-            ResultsFramework::resultsFramework->MDD.push_back("Zone,Meter," + op->EnergyMeters(ItemPtr).Name +
+            state.dataResultsFramework->resultsFramework->MDD.push_back("Zone,Meter," + op->EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units));
         } else if (op->ProduceReportVDD == iReportVDD::IDF) {
             print(state.files.mdd, "Output:Meter,{},hourly; !-{}{}", op->EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units), '\n');
-            ResultsFramework::resultsFramework->MDD.push_back("Output:Meter," + op->EnergyMeters(ItemPtr).Name +
+            state.dataResultsFramework->resultsFramework->MDD.push_back("Output:Meter," + op->EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units));
             print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !-{}{}", op->EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units), '\n');
-            ResultsFramework::resultsFramework->MDD.push_back("Output:Meter:Cumulative," + op->EnergyMeters(ItemPtr).Name +
+            state.dataResultsFramework->resultsFramework->MDD.push_back("Output:Meter:Cumulative," + op->EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units));
         }
     }

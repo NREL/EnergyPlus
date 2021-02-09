@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,9 @@
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
-#include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGArgs {
+namespace EnergyPlus::TARCOGArgs {
 
     // MODULE INFORMATION:
     //       AUTHOR         Simon Vidanovic
@@ -71,26 +68,13 @@ namespace TARCOGArgs {
     // A module which contains common functions for error checking and
     //    preparation of arguments and intermediate variables
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGOutput;
     using namespace TARCOGParams;
 
-    // Functions
-
-    int ArgCheck(Files &files,
+    int ArgCheck(EnergyPlusData &state, Files &files,
                  int const nlayer,
                  int const iwd,
                  Real64 const tout,
@@ -163,10 +147,6 @@ namespace TARCOGArgs {
                  std::string &ErrorMessage)
     {
 
-        /// INPUTS:
-
-        /// General:
-
         // Return value
         int ArgCheck;
 
@@ -212,30 +192,11 @@ namespace TARCOGArgs {
         EP_SIZE_CHECK(LaminateB, maxlay);
         EP_SIZE_CHECK(sumsol, maxlay);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-        /// Venetians:
-
-        /// Laminates:
-
-        /// Gaps:
-
-        // Deflection
-
-        // Support Pillars
-        //   0 - does not have support pillar
-        //   1 - have support pillar
-
-        //// INPUTS/OUTPUTS:
-
-
         // bi...Write debug output files - if debug flag = 1:
 
         if (files.WriteDebugOutput) {
 
-            WriteInputArguments(files.DebugOutputFile,
+            WriteInputArguments(state, files.DebugOutputFile,
                                 files.DBGD,
                                 tout,
                                 tind,
@@ -296,7 +257,8 @@ namespace TARCOGArgs {
                                 xgcp,
                                 xwght);
 
-            WriteTARCOGInputFile(files,
+            std::string const VersionNumber(" 7.0.15.00 ");
+            WriteTARCOGInputFile(state, files,
                                  VersionNumber,
                                  tout,
                                  tind,
@@ -383,6 +345,8 @@ namespace TARCOGArgs {
             return ArgCheck;
         }
 
+        int constexpr MinThermalMode(0);
+        int constexpr MaxThermalMode(2);
         if ((ThermalMod < MinThermalMode) || (ThermalMod > MaxThermalMode)) {
             ArgCheck = 29;
             ErrorMessage = "Invalid code for thermal mode.";
@@ -529,15 +493,6 @@ namespace TARCOGArgs {
             }
         }
 
-        // bi...Debug output:
-        //      open(unit=18,  file='iprop.dbg',  status='unknown', position='APPEND',
-        //  2            form='formatted', iostat=nperr)
-        //    write(18,5555) 'Iprop1:', iprop(1, 1), iprop(1, 2), iprop (1, 3)
-        //    write(18,5555) 'Iprop2:', iprop(2, 1), iprop(2, 2), iprop (2, 3)
-        //    write(18,5555) 'Iprop3:', iprop(3, 1), iprop(3, 2), iprop (3, 3)
-        // 5555  format(A, I3, I3, I3)
-        //    close(18)
-
         return ArgCheck;
     }
 
@@ -613,17 +568,6 @@ namespace TARCOGArgs {
         EP_SIZE_CHECK(rir, maxlay2);
         EP_SIZE_CHECK(vfreevent, maxlay1);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-
-        /// Venetians:
-
-        //// INPUTS/OUTPUTS:
-
-        /// OUTPUTS:
-
         int k1;
         Real64 tiltr;
         Real64 Rsky;
@@ -631,8 +575,6 @@ namespace TARCOGArgs {
         Real64 Fground;
         Real64 e0;
         std::string a;
-
-        //! Initialize variables:
 
         //! Scalars:
         ShadeEmisRatioOut = 1.0;
@@ -725,15 +667,6 @@ namespace TARCOGArgs {
 
         ebsky = Gout;
 
-        //     Ebsky=sigma*Tout**4.0d0
-        // As of 6/1/01 The expression for Ebsky is different in the current ISO 15099
-        // (Ebsky=sigma*Tout**4) because equations 32 and 33 specify Tout and Tind as reference
-        // outdoor and indoor temperatures, but I think that they should be Tne and Tni
-        // (environmental temps).  Therefore, Ebsky becomes the same as Gout.
-        // Inside (room) radiation
-        //     Ebroom = sigma*tind**4.0d0
-        // See comment above about Ebsky
-
         if (ibc(2) == 1) { // inside BC - fixed combined film coef.
             trmin = tind;
         }
@@ -766,19 +699,7 @@ namespace TARCOGArgs {
 
     bool GoAhead(int const nperr)
     {
-
-        // Return value
-        bool GoAhead;
-
-        if (((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000))) {
-            GoAhead = false; // error
-        } else {
-            GoAhead = true; // all OK, or a warning
-        }
-
-        return GoAhead;
+        return !(((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000)));
     }
-
-} // namespace TARCOGArgs
 
 } // namespace EnergyPlus

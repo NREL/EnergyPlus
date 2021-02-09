@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1142,7 +1142,7 @@ namespace Construction {
         // the significant figure limit for REAL(r64)
         // variables reached)
 
-        // FLOW:
+
         AMat1.allocate(this->rcmax, this->rcmax);
         AMato.allocate(this->rcmax, this->rcmax);
         AMatN.allocate(this->rcmax, this->rcmax);
@@ -1368,7 +1368,7 @@ namespace Construction {
         int ir;                // Loop counter
         int irr;               // Loop counter
 
-        // FLOW:
+
 
         // Subroutine initializations ...
         AMat1.allocate(this->rcmax, this->rcmax);
@@ -1511,7 +1511,7 @@ namespace Construction {
         int j;                 // Loop counter
         int SurfNode;          // Loop counter
 
-        // FLOW:
+
 
         // Compute Gamma1 from equation (2.1.12) in Seem's dissertation which
         // states that:  Gamma1  =  [AInv] * ([AExp]-[I]) * [BMat]

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -314,7 +314,7 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
 
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
@@ -427,7 +427,7 @@ namespace HeatBalanceManager {
         bool ErrorsFound(false); // If errors detected in input
         bool ValidSimulationWithNoZones;
 
-        // FLOW:
+
 
         GetProjectControlData(state, ErrorsFound);
 
@@ -1428,7 +1428,7 @@ namespace HeatBalanceManager {
         // Formats
         static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
-        // FLOW:
+
         CurrentModuleObject = "Site:HeightVariation";
         NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -4215,7 +4215,7 @@ namespace HeatBalanceManager {
         int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
 
-        // FLOW:
+
 
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound(state, "Construction");
@@ -5391,6 +5391,19 @@ namespace HeatBalanceManager {
                 }
             }
         }
+
+        if (state.dataGlobal->BeginSimFlag) {
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
+                        DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
+                        DataSurfaces::SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                    }
+                }
+            }
+        }
     }
 
     void AllocateHeatBalArrays(EnergyPlusData &state)
@@ -5428,7 +5441,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
         // Allocate real Variables
@@ -5574,7 +5587,7 @@ namespace HeatBalanceManager {
         int ZoneNum;
         int SurfNum;
 
-        // FLOW:
+
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {

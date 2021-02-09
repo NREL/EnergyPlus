@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2420,7 +2420,6 @@ namespace WindowComplexManager {
         using DataHeatBalance::GasCoeffsAir;
         using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2554,10 +2553,6 @@ namespace WindowComplexManager {
         //                 0 - ISO15099
         //                 1 - Scaled Cavity Width (SCW)
         //                 2 - Convective Scalar Model (CSM)
-        static int Debug_mode(0); // Switch for debug output files:
-        //                 0 - don't create debug output files
-        //                 1 - append results to existing debug output file (where applicable)
-        //                 2 - store results in a new debug output file
         static std::string Debug_dir;          // Target directory for debug files (pointer to a character array)
         static std::string Debug_file("Test"); // Template file name used to create debug output files
         static std::int32_t Window_ID(-1);     // ID of the window (long integer value, passed by W6)
@@ -2771,9 +2766,9 @@ namespace WindowComplexManager {
                     // determine supply air conditions
                     SumSysMCp = 0.0;
                     SumSysMCpT = 0.0;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                        NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                        MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                        NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -2816,9 +2811,9 @@ namespace WindowComplexManager {
                         // determine supply air conditions
                         SumSysMCp = 0.0;
                         SumSysMCpT = 0.0;
-                        for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                            NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                            MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                             CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -3057,7 +3052,6 @@ namespace WindowComplexManager {
         }
 
         // ThermalMod = 0
-        Debug_mode = 0;
         CalcSHGC = 0;
 
         Window_ID = ConstrNum;
@@ -3135,7 +3129,8 @@ namespace WindowComplexManager {
             edgeGlCorrFac = 1;
 
         //  call TARCOG
-        TARCOG90(nlayer,
+        int constexpr Debug_mode = 0;
+        TARCOG90(state, nlayer,
                  iwd,
                  tout,
                  tind,

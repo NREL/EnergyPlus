@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -217,7 +217,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using namespace DataIPShortCuts;
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using ZonePlenum::GetReturnPlenumIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -551,9 +550,9 @@ namespace EnergyPlus::PurchasedAirManager {
                 PurchAir(PurchAirNum).HtRecLatEff = rNumericArgs(11);
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (PurchAir(PurchAirNum).ZoneSupplyAirNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             PurchAir(PurchAirNum).ZonePtr = CtrlZone;
                         }
                     }
@@ -1040,8 +1039,6 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataLoopNode::NodeID;
         using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using General::FindNumberInList;
 
         using ZonePlenum::GetReturnPlenumIndex;
@@ -1084,7 +1081,7 @@ namespace EnergyPlus::PurchasedAirManager {
         }
 
         // need to check all units to see if they are on Zone Equipment List or issue warning
-        if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataPurchasedAirMgr->InitPurchasedAirZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataPurchasedAirMgr->NumPurchAir; ++Loop) {
 
@@ -1115,11 +1112,11 @@ namespace EnergyPlus::PurchasedAirManager {
             SupplyNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
             if (SupplyNodeNum > 0) {
                 NodeIndex =
-                    FindNumberInList(SupplyNodeNum, ZoneEquipConfig(ControlledZoneNum).InletNode, ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
+                    FindNumberInList(SupplyNodeNum, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes);
                 if (NodeIndex == 0) {
                     ShowSevereError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "Zone Supply Air Node Name=" + NodeID(SupplyNodeNum) + " is not a zone inlet node.");
-                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     ShowFatalError(state, "Preceding condition causes termination.");
                 }
             }
@@ -1131,11 +1128,11 @@ namespace EnergyPlus::PurchasedAirManager {
             if (PurchAir(PurchAirNum).ZoneExhaustAirNodeNum > 0) {
                 ExhaustNodeNum = PurchAir(PurchAirNum).ZoneExhaustAirNodeNum;
                 NodeIndex = FindNumberInList(
-                    ExhaustNodeNum, ZoneEquipConfig(ControlledZoneNum).ExhaustNode, ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
+                    ExhaustNodeNum, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode, state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes);
                 if (NodeIndex == 0) {
                     ShowSevereError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state, "Zone Exhaust Air Node Name=" + NodeID(ExhaustNodeNum) + " is not a zone exhaust node.");
-                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                    ShowContinueError(state, "Check ZoneHVAC:EquipmentConnections for zone=" + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                     ShowContinueError(state, "Zone return air node will be used for ideal loads recirculation air.");
                     UseReturnNode = true;
                 } else {
@@ -1145,13 +1142,13 @@ namespace EnergyPlus::PurchasedAirManager {
                 UseReturnNode = true;
             }
             if (UseReturnNode) {
-                if (ZoneEquipConfig(ControlledZoneNum).NumReturnNodes == 1) {
-                    PurchAir(PurchAirNum).ZoneRecircAirNodeNum = ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
-                } else if (ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
+                if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes == 1) {
+                    PurchAir(PurchAirNum).ZoneRecircAirNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1);
+                } else if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes > 1) {
                     ShowWarningError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state,
                         "No Zone Exhaust Air Node Name has been specified for this system and the zone has more than one Return Air Node.");
-                    ShowContinueError(state, "Using the first return air node =" + NodeID(ZoneEquipConfig(ControlledZoneNum).ReturnNode(1)));
+                    ShowContinueError(state, "Using the first return air node =" + NodeID(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(1)));
                 } else {
                     ShowFatalError(state, "InitPurchasedAir: In " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name);
                     ShowContinueError(state,
@@ -1932,10 +1929,7 @@ namespace EnergyPlus::PurchasedAirManager {
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::ZoneComp;
         using DataLoopNode::Node;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using DataZoneEquipment::PurchasedAir_Num;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcPurchAirLoads");
@@ -1991,7 +1985,7 @@ namespace EnergyPlus::PurchasedAirManager {
         // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
         //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
         InNodeNum = PurchAir(PurchAirNum).ZoneSupplyAirNodeNum;
-        ZoneNodeNum = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         OANodeNum = PurchAir(PurchAirNum).OutdoorAirNodeNum;
         RecircNodeNum = PurchAir(PurchAirNum).ZoneRecircAirNodeNum;
         SupplyMassFlowRate = 0.0;
@@ -2011,8 +2005,8 @@ namespace EnergyPlus::PurchasedAirManager {
         UnitOn = true;
         EconoOn = false;
         // get current zone requirements
-        QZnHeatSP = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
-        QZnCoolSP = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+        QZnHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
         if (allocated(ZoneComp)) {
             ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ActualZoneNum;
@@ -2142,7 +2136,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 SupplyMassFlowRateForDehum = 0.0;
                 if (CoolOn) {
                     if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
-                        MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                        MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                             SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2157,7 +2151,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 if (HeatOn) {
                     if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                            MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                             DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                             if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                                 SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2240,7 +2234,7 @@ namespace EnergyPlus::PurchasedAirManager {
                             // But don't let it be higher than incoming MixedAirHumRat
                             SupplyHumRat = min(SupplyHumRat, MixedAirHumRat);
                         } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                            MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                             SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForDehum = min(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                             SupplyHumRat = min(MixedAirHumRat, SupplyHumRatForDehum);
@@ -2257,7 +2251,7 @@ namespace EnergyPlus::PurchasedAirManager {
                     if (HeatOn) {
                         if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
                             if ((PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::None)) {
-                                MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                                MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                                 SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                                 SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
                                 SupplyHumRat = max(SupplyHumRat, SupplyHumRatForHumid);
@@ -2409,7 +2403,7 @@ namespace EnergyPlus::PurchasedAirManager {
                     if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                         if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) ||
                             (OperatingMode == OpMode::DeadBand)) {
-                            MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                            MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                             DeltaHumRat = (PurchAir(PurchAirNum).MinCoolSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                             if ((DeltaHumRat < -SmallDeltaHumRat) && (MdotZnDehumidSP < 0.0)) {
                                 SupplyMassFlowRateForDehum = MdotZnDehumidSP / DeltaHumRat;
@@ -2422,7 +2416,7 @@ namespace EnergyPlus::PurchasedAirManager {
                 SupplyMassFlowRateForHumid = 0.0;
                 if (HeatOn) {
                     if (PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) {
-                        MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                        MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                         DeltaHumRat = (PurchAir(PurchAirNum).MaxHeatSuppAirHumRat - Node(ZoneNodeNum).HumRat);
                         if ((DeltaHumRat > SmallDeltaHumRat) && (MdotZnHumidSP > 0.0)) {
                             SupplyMassFlowRateForHumid = MdotZnHumidSP / DeltaHumRat;
@@ -2487,7 +2481,7 @@ namespace EnergyPlus::PurchasedAirManager {
                         if (SELECT_CASE_var == HumControl::None) {
                             SupplyHumRat = MixedAirHumRat;
                         } else if (SELECT_CASE_var == HumControl::Humidistat) {
-                            MdotZnHumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
+                            MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToHumidSP;
                             SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                             SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir(PurchAirNum).MaxHeatSuppAirHumRat);
                             SupplyHumRat = max(SupplyHumRat, SupplyHumRatForHumid);
@@ -2532,7 +2526,7 @@ namespace EnergyPlus::PurchasedAirManager {
                         if (PurchAir(PurchAirNum).DehumidCtrlType == HumControl::Humidistat) {
                             if ((PurchAir(PurchAirNum).HumidCtrlType == HumControl::Humidistat) || (PurchAir(PurchAirNum).HumidCtrlType == HumControl::None) ||
                                 (OperatingMode == OpMode::DeadBand)) {
-                                MdotZnDehumidSP = ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
+                                MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ActualZoneNum).RemainingOutputReqToDehumidSP;
                                 SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + Node(ZoneNodeNum).HumRat;
                                 SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir(PurchAirNum).MinCoolSuppAirHumRat);
                                 SupplyHumRat = min(SupplyHumRat, SupplyHumRatForDehum);

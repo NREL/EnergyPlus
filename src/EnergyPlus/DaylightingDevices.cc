@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -228,7 +228,7 @@ namespace DaylightingDevices {
         // Object Data
         Array1D<TDDPipeStoredData> TDDPipeStored;
 
-        // FLOW:
+
         // Initialize tubular daylighting devices (TDDs)
         GetTDDInput(state);
 
@@ -466,7 +466,7 @@ namespace DaylightingDevices {
         std::string TZoneName; // Transition zone name
         Real64 PipeArea;
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Tubular";
         state.dataDaylightingDevicesData->NumOfTDDPipes = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -734,7 +734,7 @@ namespace DaylightingDevices {
         int SurfNum;                    // Window, inside, or outside shelf surfaces
         int ConstrNum;                  // Outside shelf construction object number
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Shelf";
         state.dataDaylightingDevicesData->NumOfShelf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -964,7 +964,7 @@ namespace DaylightingDevices {
         Real64 c2;
         Real64 xLimit; // Limiting x value to prevent floating point underflow
 
-        // FLOW:
+
         CalcPipeTransBeam = 0.0;
 
         T = 0.0;
@@ -1187,7 +1187,7 @@ namespace DaylightingDevices {
         Real64 HorizonRad;      // Horizon sky radiation component
         Real64 AnisoSkyTDDMult; // Anisotropic sky multiplier for TDD
 
-        // FLOW:
+
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
@@ -1259,7 +1259,7 @@ namespace DaylightingDevices {
         Real64 transPipe;
         Real64 transDiff;
 
-        // FLOW:
+
         TransTDD = 0.0;
 
         // Get constructions of each TDD component
@@ -1331,7 +1331,7 @@ namespace DaylightingDevices {
         Real64 m;
         Real64 b;
 
-        // FLOW:
+
         InterpolatePipeTransBeam = 0.0;
 
         // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
@@ -1378,7 +1378,7 @@ namespace DaylightingDevices {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PipeNum; // TDD pipe object number
 
-        // FLOW:
+
         FindTDDPipe = 0;
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
@@ -1439,7 +1439,7 @@ namespace DaylightingDevices {
         Real64 QRefl;          // Diffuse radiation reflected back up the pipe
         Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
 
-        // FLOW:
+
         for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
             DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             transDiff = state.dataConstruction->Construct(Surface(DiffSurf).Construction).TransDiff;
@@ -1506,7 +1506,7 @@ namespace DaylightingDevices {
         int VShelf;
         int NumMatch; // Number of vertices matched
 
-        // FLOW:
+
         W = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
         H = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
 

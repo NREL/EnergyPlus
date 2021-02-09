@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -200,7 +200,7 @@ namespace EvaporativeCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapCoolNum; // The EvapCooler that you are currently loading input into
 
-        // FLOW:
+
 
         // Obtains and Allocates EvapCooler related parameters from input file
         if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
@@ -960,7 +960,7 @@ namespace EvaporativeCoolers {
         int EvapUnitNum;
         bool localSetPointCheck(false);
 
-        // FLOW:
+
         // Check that setpoint is active
         if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
             for (EvapUnitNum = 1; EvapUnitNum <= NumEvapCool; ++EvapUnitNum) {
@@ -3606,7 +3606,6 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using DataSizing::ZoneHVACSizing;
-        using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
@@ -3775,9 +3774,9 @@ namespace EvaporativeCoolers {
 
                 // get the zone numer served by the zoneHVAC evaporative cooler
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (ZoneEvapUnit(UnitLoop).UnitOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (ZoneEvapUnit(UnitLoop).UnitOutletNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             ZoneEvapUnit(UnitLoop).ZonePtr = CtrlZone;
                             break;
                         }
@@ -4038,37 +4037,13 @@ namespace EvaporativeCoolers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::ZoneComp;
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
         using Fans::GetFanVolFlow;
-
-        // Locals
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -4083,11 +4058,11 @@ namespace EvaporativeCoolers {
             ZoneEvapUnit(UnitNum).FanAvailStatus = ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
         }
 
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= NumZoneEvapUnits; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit(Loop).Name)) {
-                    ZoneEvapUnit(Loop).ZoneNodeNum = ZoneEquipConfig(ZoneNum).ZoneNode;
+                    ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
                 } else {
                     ShowSevereError(state, "InitZoneEvaporativeCoolerUnit: ZoneHVAC:EvaporativeCoolerUnit = " + ZoneEvapUnit(Loop).Name +
                                     ", is not on any ZoneHVAC:EquipmentList.  It will not be simulated.");
@@ -4379,30 +4354,9 @@ namespace EvaporativeCoolers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHVACGlobals::SmallLoad;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneCoolingLoad;
@@ -4439,7 +4393,7 @@ namespace EvaporativeCoolers {
                         ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
                         CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                     } else {
-                        ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                        ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                         // calculate part load ratio for cycling fan/unit first
                         ControlZoneEvapUnitOutput(state, UnitNum, ZoneCoolingLoad);
                         PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
@@ -4456,7 +4410,7 @@ namespace EvaporativeCoolers {
             } else if (SELECT_CASE_var == ZoneCoolingLoadOnOffCycling) {
 
                 // get zone loads
-                ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
 
                 if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
@@ -4481,7 +4435,7 @@ namespace EvaporativeCoolers {
 
             } else if (SELECT_CASE_var == ZoneCoolingLoadVariableSpeedFan) {
                 // get zone loads
-                ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+                ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
                 if ((ZoneCoolingLoad < CoolingLoadThreashold) && ZoneEvapUnit(UnitNum).UnitIsAvailable) {
 

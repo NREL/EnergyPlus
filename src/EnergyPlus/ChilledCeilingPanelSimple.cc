@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,7 +125,6 @@ namespace CoolingPanelSimple {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // Index of unit in baseboard array
@@ -172,7 +171,7 @@ namespace CoolingPanelSimple {
 
             InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
-            QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
+            QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -545,9 +544,9 @@ namespace CoolingPanelSimple {
 
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
+                        state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
                         ThisCP.ZonePtr = ctrlZone;
                     }
                 }
@@ -714,10 +713,7 @@ namespace CoolingPanelSimple {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -763,10 +759,10 @@ namespace CoolingPanelSimple {
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
         auto &ThisInNode(Node(ThisCP.WaterInletNode));
 
-        if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
+        if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
         // Need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataChilledCeilingPanelSimple->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++Loop) {
                 if (CheckZoneEquipmentList(state, cCMO_CoolingPanel_Simple, ThisCP.EquipID)) continue;
@@ -776,7 +772,7 @@ namespace CoolingPanelSimple {
         }
 
         if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
-            if (allocated(PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                     ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSideNum, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
@@ -796,7 +792,7 @@ namespace CoolingPanelSimple {
                 // set design mass flow rates
                 if (ThisCP.WaterInletNode > 0) {
                     rho = GetDensityGlycol(
-                        state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                        state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
                     InitComponentNodes(0.0,
                                        ThisCP.WaterMassFlowRateMax,
@@ -814,7 +810,7 @@ namespace CoolingPanelSimple {
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoolingPanelNum)) {
             // Initialize
 
-            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
@@ -829,7 +825,7 @@ namespace CoolingPanelSimple {
 
             ThisInNode.Temp = 7.0;
 
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, ThisInNode.Temp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
 
             ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
             ThisInNode.Quality = 0.0;
@@ -860,7 +856,7 @@ namespace CoolingPanelSimple {
         }
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ZoneNode;
         ThisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
         ThisCP.WaterInletTemp = ThisInNode.Temp;
         ThisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;
@@ -888,7 +884,6 @@ namespace CoolingPanelSimple {
         using DataHVACGlobals::AutoCalculateSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::SmallLoad;
-        using DataPlant::PlantLoop;
         using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CapacityPerFloorArea;
@@ -1037,8 +1032,8 @@ namespace CoolingPanelSimple {
                     PltSizCoolNum = MyPlantSizingIndex(state, CompType, ThisCP.EquipID, ThisCP.WaterInletNode, ThisCP.WaterOutletNode, ErrorsFound);
                     if (PltSizCoolNum > 0) {
                         if (DesCoilLoad >= SmallLoad) {
-                            rho = GetDensityGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5., PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            Cp = GetSpecificHeatGlycol(state, PlantLoop(ThisCP.LoopNum).FluidName, 5.0, PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5., state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
+                            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
@@ -1179,9 +1174,6 @@ namespace CoolingPanelSimple {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
-        using DataPlant::PlantLoop;
-        using DataZoneEnergyDemands::CurDeadBandOrSetback;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -1230,7 +1222,7 @@ namespace CoolingPanelSimple {
 
         ModifiedWaterInletTemp = false;
         ZoneNum = this->ZonePtr;
-        QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         waterInletTemp = this->WaterInletTemp;
         waterOutletTemp = waterInletTemp;
         waterMassFlowRateMax = this->WaterMassFlowRateMax;
@@ -1306,9 +1298,9 @@ namespace CoolingPanelSimple {
 
         if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
 
-            if (QZnReq < -SmallLoad && !CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
+            if (QZnReq < -SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-                Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 // Find the actual load: this parameter modifies what the response of the system should be.  For total load control, the system tries
                 // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
@@ -1390,7 +1382,7 @@ namespace CoolingPanelSimple {
 
         if (CoolingPanelOn) {
             // Now simulate the system...
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(this->LoopNum).FluidName, waterInletTemp, PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, waterInletTemp, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             Effectiveness = 1.0 - exp(-this->UA / (waterMassFlowRate * Cp));
             if (Effectiveness <= 0.0) {
                 Effectiveness = 0.0;
@@ -1524,7 +1516,7 @@ namespace CoolingPanelSimple {
         auto &ThisOutNode(Node(WaterOutletNode));
 
         // Set the outlet water nodes for the panel
-        SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+        SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
         ThisOutNode.Temp = ThisCP.WaterOutletTemp;
         ThisOutNode.Enthalpy = ThisCP.WaterOutletEnthalpy;
         ThisInNode.MassFlowRate = ThisCP.WaterMassFlowRate;
@@ -1560,7 +1552,7 @@ namespace CoolingPanelSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // DO loop counter for surface index
 
-        // FLOW:
+
         CoolingPanelSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1616,7 +1608,7 @@ namespace CoolingPanelSimple {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // FLOW:
+
         // Initialize arrays
         QCoolingPanelSurf = 0.0;
         QCoolingPanelToPerson = 0.0;
@@ -1722,7 +1714,7 @@ namespace CoolingPanelSimple {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {

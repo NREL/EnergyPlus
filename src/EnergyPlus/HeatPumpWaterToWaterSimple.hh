@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,15 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace HeatPumpWaterToWaterSimple {
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const HPEqFitHeating;
-    extern std::string const HPEqFitHeatingUC;
-    extern std::string const HPEqFitCooling;
-    extern std::string const HPEqFitCoolingUC;
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumGSHPs; // Number of GSHPs specified in input
 
     struct GshpSpecs : public PlantComponent
     {
@@ -198,46 +189,55 @@ namespace HeatPumpWaterToWaterSimple {
 
         static PlantComponent *factory(EnergyPlusData &state, int wwhp_type, std::string eir_wwhp_name);
 
-        static void clear_state();
-
         static void GetWatertoWaterHPInput(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
         void InitWatertoWaterHP(EnergyPlusData &state,
-                                int const GSHPTypeNum,       // Type of GSHP
+                                int GSHPTypeNum,             // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
-                                bool const FirstHVACIteration,
-                                Real64 const MyLoad // Demand Load
+                                bool FirstHVACIteration,
+                                Real64 MyLoad // Demand Load
         );
 
         void sizeCoolingWaterToWaterHP(EnergyPlusData &state);
 
         void sizeHeatingWaterToWaterHP(EnergyPlusData &state);
 
-        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
-        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const MyLoad); // Operating Load
+        void CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
 
-    // Object Data
-    extern Array1D<GshpSpecs> GSHP;
-
 } // namespace HeatPumpWaterToWaterSimple
 
-struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct {
+struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
+{
+
+    int NumGSHPs = 0;
+    bool GetInputFlag = true;
+    Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
+    std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
 
     void clear_state() override
     {
-
+        this->NumGSHPs = 0;
+        this->GetInputFlag = true;
+        this->GSHP.deallocate();
+        this->HeatPumpWaterUniqueNames.clear();
     }
 };
 

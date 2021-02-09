@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,28 +51,22 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
-#include <cmath>
 #include <string>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -781,7 +775,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -800,8 +794,8 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, both ADUs should be connected airloop 1 which is the only one here
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 1);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
@@ -1013,7 +1007,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1032,8 +1026,8 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, each ADUs should be connected to a different airloop
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
@@ -1278,7 +1272,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1297,9 +1291,9 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     ASSERT_FALSE(ErrorsFound);
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, each ADU 1-1 and 2-2 should be connected to airloop 1, and ADU 2-1 to airloop 1
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(2), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(2), 1);
 }
 
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
@@ -1544,7 +1538,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream(""));
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1564,9 +1558,9 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     // And finally, all of this gymnastics just to check if the airloopnums get set correctly
     // For this test, ADU 1-1 should be connected to airloop 1, and ADU 2-1 and ADU 2-2 to airloop 2
     // This test should fail before the fix for 7518 is added
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
-    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(2), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(2), 2);
 }
 
 TEST_F(EnergyPlusFixture, AirLoop_ReturnFan_MinFlow)
