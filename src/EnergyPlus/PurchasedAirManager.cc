@@ -2239,7 +2239,7 @@ namespace EnergyPlus::PurchasedAirManager {
                     // Check sensible load vs max total cooling capacity, if specified, and adjust supply temp before applying humidity controls
                     // Will check again later, too
                     if ((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitCapacity) || (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) {
-                        CpAir = PsyCpAirFnW(MixedAirHumRat);
+                        CpAir = PsyCpAirFnW(PurchAir(PurchAirNum).MixedAirHumRat);
                         CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);
                         if (CoolSensOutput >= PurchAir(PurchAirNum).MaxCoolTotCap) {
                             CoolSensOutput = PurchAir(PurchAirNum).MaxCoolTotCap;
