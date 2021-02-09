@@ -5182,13 +5182,13 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine sets the order and flags for tabular data and sqlite writing for a Dual-Unit reporting. 
         // It will set the unit styles to used, a flag for tabular data writing, and a flag for sqlite writing.
-        // The function will return a false flag if only one round of writing is needed 
-        // and will return a true flag if a second round sqlite writing is not needed.
+        // The function will return a false flag if only a second round of (SQLite) writing is needed 
+        // and will return a true flag if a second round SQLite writing is not needed.
 
         bool brkflag(false);
 
         if (iUnit_Sys == 0) {
-            unitsStyle_Cur = unitsStyle_Tab; 
+            unitsStyle_Cur = unitsStyle_Tab;
             produce_Tab = true;
             if (unitsStyle_Sql == unitsStyle_Tab) {
                 produce_Sql = true;
@@ -5200,14 +5200,14 @@ namespace EnergyPlus::OutputReportTabular {
             produce_Tab = false;
             produce_Sql = true;
             if (unitsStyle_Sql == unitsStyle_Tab) {
-                //true if a separate sqlite round is needed
+                //flag true if a separate SQLite round writing is not needed
                 brkflag = true;
                 produce_Sql = false;
             }
         }
 
-        // True if a separate sqlite round is needed;
-        // false if not
+        // False if a separate sqlite round is needed;
+        // true if not
         return brkflag;
     }
 
@@ -13359,16 +13359,9 @@ namespace EnergyPlus::OutputReportTabular {
                     CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
                     CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
 
-                    // LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
-                    // Jan 2021: Use the overloaded version instead for dual units adaption
                     LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
-                    //LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
-                    // Jan 2021: Use the overloaded version instead for dual units adaption
                     LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
 
-                    // OutputCompLoadSummary(
-                       // state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
-                    // Jan 2021: Use the new version with additional parameters for dual units
                     OutputCompLoadSummary(
                         state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
                 }
@@ -13472,15 +13465,9 @@ namespace EnergyPlus::OutputReportTabular {
                 ComputePeakDifference(FacilityCoolCompLoadTables);
                 ComputePeakDifference(FacilityHeatCompLoadTables);
 
-                // LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
-                // Jan 2021: Use the overloaded version instead for dual units adaption
                 LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables, unitsStyle_cur);
-                // LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
-                // Jan 2021: Use the overloaded version instead for dual units adaption
                 LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_cur);
 
-                // OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
-                // Jan 2021: Use the new version for dual units
                 OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0, unitsStyle_cur, produceTabular, produceSQLite);
             }
 
@@ -13489,15 +13476,9 @@ namespace EnergyPlus::OutputReportTabular {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                     if (allocated(CalcFinalZoneSizing)) {
-                        // LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
-                        // Jan 2021: Use the overloaded version instead for dual units adaption
                         LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_cur);
-                        // LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
-                        // Jan 2021: Use the overloaded version instead for dual units adaption
                         LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
 
-                        // OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
-                        // Jan 2021: Use the new version version for dual units
                         OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone, unitsStyle_cur, produceTabular, produceSQLite);
                     }
                 }
