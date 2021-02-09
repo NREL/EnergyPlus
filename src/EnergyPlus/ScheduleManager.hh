@@ -117,12 +117,14 @@ namespace ScheduleManager {
 
         // Default Constructor
         DayScheduleData() = default;
+        explicit DayScheduleData(EnergyPlusData &state);
 
-        enum class DayScheduleType {Hourly, Interval};
+        enum class DayScheduleType {Hourly, Interval, List};
 
         DayScheduleData(EnergyPlusData &state, DayScheduleType d, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
         void initializeForScheduleDayHourly(EnergyPlusData &state, std::string const &CurrentModuleObject, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
         void initializeForScheduleDayInterval(EnergyPlusData &state, std::string const &CurrentModuleObject, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
+        void initializeForScheduleDayList(EnergyPlusData &state, std::string const &CurrentModuleObject, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields);
     };
 
     struct WeekScheduleData

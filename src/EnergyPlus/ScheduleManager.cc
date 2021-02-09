@@ -173,7 +173,22 @@ namespace EnergyPlus::ScheduleManager {
         }
     }
 
+    DayScheduleData::DayScheduleData(EnergyPlusData &state) {
+        this->TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+        for (int Count = 1; Count <= 24; ++Count) {
+            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                this->TSValue(TS, Count) = 0.0;
+            }
+        }
+    }
+
     DayScheduleData::DayScheduleData(EnergyPlusData &state, DayScheduleType d, int NumAlphas, Array1D<std::string> Alphas, Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields, int NumNumbers, Array1D<Real64> Numbers, Array1D<bool> lNumericBlanks, Array1D<std::string> cNumericFields) {
+        this->TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
+        for (int Count = 1; Count <= 24; ++Count) {
+            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                this->TSValue(TS, Count) = 0.0;
+            }
+        }
         switch (d) {
             case DayScheduleType::Hourly:
                 this->initializeForScheduleDayHourly(state, "Schedule:Day:Hourly", NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
@@ -181,6 +196,8 @@ namespace EnergyPlus::ScheduleManager {
             case DayScheduleType::Interval:
                 this->initializeForScheduleDayInterval(state, "Schedule:Day:Interval", NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
                 break;
+            case DayScheduleType::List:
+                this->initializeForScheduleDayList(state, "Schedule:Day:List", NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
         }
     }
 
@@ -294,6 +311,137 @@ namespace EnergyPlus::ScheduleManager {
         } else {
             for (int Hr = 1; Hr <= 24; ++Hr) {
                 int CurMinute = state.dataGlobal->MinutesPerTimeStep;
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                    this->TSValue(TS, Hr) = state.dataScheduleMgr->MinuteValue(CurMinute, Hr);
+                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
+                }
+            }
+        }
+
+        if (state.dataScheduleMgr->ScheduleType(this->ScheduleTypePtr).Limited) {
+            if (any_lt(this->TSValue, state.dataScheduleMgr->ScheduleType(this->ScheduleTypePtr).Minimum) ||
+                any_gt(this->TSValue, state.dataScheduleMgr->ScheduleType(this->ScheduleTypePtr).Maximum)) {
+                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
+                                        cAlphaFields(2) + '=' + Alphas(2));
+            }
+        }
+        if (!state.dataScheduleMgr->ScheduleType(this->ScheduleTypePtr).IsReal) {
+            // Make sure each is integer
+            bool NumErrorFlag = false; // only show error message once
+            for (int Hr = 1; Hr <= 24; ++Hr) {
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                    if (this->TSValue(TS, Hr) != int(this->TSValue(TS, Hr))) {
+                        if (!NumErrorFlag) {
+                            ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
+                                                    "\", , One or more values are not integer as required by " + cAlphaFields(2) + '=' + Alphas(2));
+                            NumErrorFlag = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    void DayScheduleData::initializeForScheduleDayList(EnergyPlusData &state, const std::string &CurrentModuleObject,
+                                                       int NumAlphas, Array1D<std::string> Alphas,
+                                                       Array1D<bool> lAlphaBlanks, Array1D<std::string> cAlphaFields,
+                                                       int NumNumbers, Array1D<Real64> Numbers,
+                                                       Array1D<bool> lNumericBlanks,
+                                                       Array1D<std::string> cNumericFields) {
+        static constexpr auto RoutineName = "DayScheduleData::initializeForScheduleDayList";
+        GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), this->errorFoundDuringInputProcessing);
+        this->Name = Alphas(1);
+        // Validate ScheduleType
+        if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+            int CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+            if (CheckIndex == 0) {
+                if (!lAlphaBlanks(2)) {
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
+                                            "\" not found -- will not be validated");
+                } else {
+                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
+                                            " input -- will not be validated.");
+                }
+            } else {
+                this->ScheduleTypePtr = CheckIndex;
+            }
+        }
+
+        // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
+        if (UtilityRoutines::SameString(Alphas(3), "NO")) {
+            this->IntervalInterpolated = ScheduleInterpolation::No;
+        } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
+            this->IntervalInterpolated = ScheduleInterpolation::Average;
+        } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
+            this->IntervalInterpolated = ScheduleInterpolation::Linear;
+        } else {
+            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
+                                   Alphas(3) + "\"");
+            this->errorFoundDuringInputProcessing = true;
+        }
+
+        // check to see if there are any fields
+        if (Numbers(1) <= 0.0) {
+            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
+            ShowContinueError(state, format("...Minutes per Item field = [{}].", Numbers(1)));
+            this->errorFoundDuringInputProcessing = true;
+            return;
+        }
+        if (NumNumbers < 25) {
+            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
+            ShowContinueError(state,
+                              format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
+            this->errorFoundDuringInputProcessing = true;
+            return;
+        }
+        int MinutesPerItem = int(Numbers(1));
+        int NumExpectedItems = 1440 / MinutesPerItem;
+        if ((NumNumbers - 1) != NumExpectedItems) {
+            ShowSevereError(state,
+                            RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", Number of Entered Items=" +
+                            format("{} not equal number of expected items={}", NumNumbers - 1, NumExpectedItems));
+            ShowContinueError(state, format("based on {} field value={}", cNumericFields(1), MinutesPerItem));
+            this->errorFoundDuringInputProcessing = true;
+            return;
+        }
+
+        if (mod(60, MinutesPerItem) != 0) {
+            ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
+            ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(1), MinutesPerItem));
+            this->errorFoundDuringInputProcessing = true;
+            return;
+        }
+
+        // Number of numbers in the Numbers list okay to process
+        int Hr = 1;
+        int CurMinute = MinutesPerItem;
+        int SCount = 1;
+        for (int NumFields = 2; NumFields <= NumNumbers; ++NumFields) {
+            state.dataScheduleMgr->MinuteValue({SCount, CurMinute}, Hr) = Numbers(NumFields);
+            SCount = CurMinute + 1;
+            CurMinute += MinutesPerItem;
+            if (CurMinute > 60) {
+                CurMinute = MinutesPerItem;
+                SCount = 1;
+                ++Hr;
+            }
+        }
+
+        // Now parcel into TS Value....
+
+        if (this->IntervalInterpolated == ScheduleInterpolation::Average) {
+            for (int Hr = 1; Hr <= 24; ++Hr) {
+                int SCount = 1;
+                CurMinute = state.dataGlobal->MinutesPerTimeStep;
+                for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                    this->TSValue(TS, Hr) = sum(state.dataScheduleMgr->MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
+                    SCount = CurMinute + 1;
+                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
+                }
+            }
+        } else {
+            for (int Hr = 1; Hr <= 24; ++Hr) {
+                CurMinute = state.dataGlobal->MinutesPerTimeStep;
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     this->TSValue(TS, Hr) = state.dataScheduleMgr->MinuteValue(CurMinute, Hr);
                     CurMinute += state.dataGlobal->MinutesPerTimeStep;
@@ -779,18 +927,8 @@ namespace EnergyPlus::ScheduleManager {
         //!  the definitions (see above)
 
         state.dataScheduleMgr->ScheduleType.allocate({0, 0});
-        state.dataScheduleMgr->DaySchedule.allocate({0, 0});
 
         state.dataScheduleMgr->UniqueDayScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumDaySchedules));
-        //    Initialize
-        for (LoopIndex = 0; LoopIndex <= state.dataScheduleMgr->NumDaySchedules; ++LoopIndex) {
-            state.dataScheduleMgr->DaySchedule(LoopIndex).TSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
-            for (Count = 1; Count <= 24; ++Count) {
-                for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    state.dataScheduleMgr->DaySchedule(LoopIndex).TSValue(TS, Count) = 0.0;
-                }
-            }
-        }
 
         state.dataScheduleMgr->WeekSchedule.allocate({0, state.dataScheduleMgr->NumWeekSchedules});
         state.dataScheduleMgr->UniqueWeekScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumWeekSchedules));
@@ -805,7 +943,7 @@ namespace EnergyPlus::ScheduleManager {
 
         print(state.files.audit.ensure_open(state, "ProcessScheduleInput", state.files.outputControl.audit), "{}\n", "  Processing Schedule Input -- Start");
 
-        //!! Get Schedule Types
+        //!! Get Schedule Typesa
 
         CurrentModuleObject = "ScheduleTypeLimits";
         for (LoopIndex = 1; LoopIndex <= state.dataScheduleMgr->NumScheduleTypes; ++LoopIndex) {
@@ -829,6 +967,14 @@ namespace EnergyPlus::ScheduleManager {
         //!! Get Day Schedules (all types)
 
         //!!=> Get "DAYSCHEDULE" (Hourly)
+
+        // default allocate a single value at the zeroth index
+        state.dataScheduleMgr->DaySchedule.allocate({0, 0});
+
+        // add "empty" day schedules for each of the other schedule types
+        for (LoopIndex = 1; LoopIndex <= AddDaySch; ++LoopIndex) {
+            state.dataScheduleMgr->DaySchedule.emplace_back(state);
+        }
 
         Count = 0;
         for (LoopIndex = 1; LoopIndex <= NumHrDaySchedules; ++LoopIndex) {
@@ -866,7 +1012,8 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            
+            state.dataScheduleMgr->DaySchedule.emplace_back(state, DayScheduleData::DayScheduleType::Interval, NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
+            ErrorsFound |= state.dataScheduleMgr->DaySchedule.back().errorFoundDuringInputProcessing;
         }
 
         //!! Get "DaySchedule:List"
@@ -885,130 +1032,8 @@ namespace EnergyPlus::ScheduleManager {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(state, state.dataScheduleMgr->UniqueDayScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            ++Count;
-            state.dataScheduleMgr->DaySchedule(Count).Name = Alphas(1);
-            // Validate ScheduleType
-            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex = UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
-                if (CheckIndex == 0) {
-                    if (!lAlphaBlanks(2)) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                         "\" not found -- will not be validated");
-                    } else {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
-                                         " input -- will not be validated.");
-                    }
-                } else {
-                    state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr = CheckIndex;
-                }
-            }
-
-            // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-            if (UtilityRoutines::SameString(Alphas(3), "NO")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
-            } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
-            } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
-                state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
-            } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
-                                Alphas(3) + "\"");
-                ErrorsFound = true;
-            }
-
-            // check to see if there are any fields
-            if (Numbers(1) <= 0.0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state, format("...Minutes per Item field = [{}].", Numbers(1)));
-                ErrorsFound = true;
-                continue;
-            }
-            if (NumNumbers < 25) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
-                ShowContinueError(state,
-                                  format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
-                ErrorsFound = true;
-                continue;
-            }
-            MinutesPerItem = int(Numbers(1));
-            NumExpectedItems = 1440 / MinutesPerItem;
-            if ((NumNumbers - 1) != NumExpectedItems) {
-                ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", Number of Entered Items=" +
-                                    format("{} not equal number of expected items={}", NumNumbers - 1, NumExpectedItems));
-                ShowContinueError(state, format("based on {} field value={}", cNumericFields(1), MinutesPerItem));
-                ErrorsFound = true;
-                continue;
-            }
-
-            if (mod(60, MinutesPerItem) != 0) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
-                ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(1), MinutesPerItem));
-                ErrorsFound = true;
-                continue;
-            }
-
-            // Number of numbers in the Numbers list okay to process
-            Hr = 1;
-            CurMinute = MinutesPerItem;
-            SCount = 1;
-            for (NumFields = 2; NumFields <= NumNumbers; ++NumFields) {
-                state.dataScheduleMgr->MinuteValue({SCount, CurMinute}, Hr) = Numbers(NumFields);
-                SCount = CurMinute + 1;
-                CurMinute += MinutesPerItem;
-                if (CurMinute > 60) {
-                    CurMinute = MinutesPerItem;
-                    SCount = 1;
-                    ++Hr;
-                }
-            }
-
-            // Now parcel into TS Value....
-
-            if (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Average) {
-                for (Hr = 1; Hr <= 24; ++Hr) {
-                    SCount = 1;
-                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = sum(state.dataScheduleMgr->MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
-                        SCount = CurMinute + 1;
-                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
-                    }
-                }
-            } else {
-                for (Hr = 1; Hr <= 24; ++Hr) {
-                    CurMinute = state.dataGlobal->MinutesPerTimeStep;
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) = state.dataScheduleMgr->MinuteValue(CurMinute, Hr);
-                        CurMinute += state.dataGlobal->MinutesPerTimeStep;
-                    }
-                }
-            }
-
-            SchedTypePtr = state.dataScheduleMgr->DaySchedule(Count).ScheduleTypePtr;
-            if (state.dataScheduleMgr->ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(state.dataScheduleMgr->DaySchedule(Count).TSValue, state.dataScheduleMgr->ScheduleType(SchedTypePtr).Maximum)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
-                                     cAlphaFields(2) + '=' + Alphas(2));
-                }
-            }
-            if (!state.dataScheduleMgr->ScheduleType(SchedTypePtr).IsReal) {
-                // Make sure each is integer
-                NumErrorFlag = false; // only show error message once
-                for (Hr = 1; Hr <= 24; ++Hr) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        if (state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr) != int(state.dataScheduleMgr->DaySchedule(Count).TSValue(TS, Hr))) {
-                            if (!NumErrorFlag) {
-                                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                                 "\", , One or more values are not integer as required by " + cAlphaFields(2) + '=' + Alphas(2));
-                                NumErrorFlag = true;
-                            }
-                        }
-                    }
-                }
-            }
+            state.dataScheduleMgr->DaySchedule.emplace_back(state, DayScheduleData::DayScheduleType::List, NumAlphas, Alphas, lAlphaBlanks, cAlphaFields, NumNumbers, Numbers, lNumericBlanks, cNumericFields);
+            ErrorsFound |= state.dataScheduleMgr->DaySchedule.back().errorFoundDuringInputProcessing;
         }
 
         //!! Get Week Schedules - regular
