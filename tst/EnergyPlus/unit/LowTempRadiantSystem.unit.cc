@@ -1978,7 +1978,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", Zone(1).Name);
 
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     GetMaterialData(*state, ErrorsFound);
@@ -1990,7 +1990,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     GetPlantSizingInput(*state);
     GetPlantLoopData(*state);
     GetPlantInput(*state);
-    SetupInitialPlantCallingOrder();
+    SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
     DataSurfaces::WorldCoordSystem = true;
     GetSurfaceListsInputs(*state);
@@ -1999,7 +1999,14 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     EXPECT_FALSE(ErrorsFound);
 
     std::string const error_string =
-            delimited_string({format("   ** Severe  ** ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR\n   **   ~~~   ** Input for Cooling Design Capacity Method = CAPACITYPERFLOORAREA\n   **   ~~~   ** Illegal Cooling Design Capacity Per Floor Area = 0.0000000\n   **  Fatal  ** GetLowTempRadiantSystem: Errors found in input. Preceding conditions cause termination.\n   ...Summary of Errors that led to program termination:\n   ..... Reference severe error count=1\n   ..... Last severe error=ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR")});
+            delimited_string({
+                     "   ** Severe  ** ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR",
+                     "   **   ~~~   ** Input for Cooling Design Capacity Method = CAPACITYPERFLOORAREA",
+                     "   **   ~~~   ** Illegal Cooling Design Capacity Per Floor Area = 0.0000000",
+                     "   **  Fatal  ** GetLowTempRadiantSystem: Errors found in input. Preceding conditions cause termination.",
+                     "   ...Summary of Errors that led to program termination:",
+                     "   ..... Reference severe error count=1",
+                     "   ..... Last severe error=ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR"});
     EXPECT_ANY_THROW(GetLowTempRadiantSystem(*state));
 
     compare_err_stream(error_string, true);
