@@ -15752,7 +15752,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ScheduleInterpolationTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataZoneEquipment::ZoneEquipInputsFilled = true; // indicate zone data is available
+    state->dataZoneEquip->ZoneEquipInputsFilled = true; // indicate zone data is available
 
     try {
         thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
