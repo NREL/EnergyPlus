@@ -1327,7 +1327,7 @@ namespace ConvectionCoefficients {
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                             IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                            if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM") || (equationName == "ASTMC1340)")) {
+                            if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM") || (equationName == "ASTMC1340")) {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
                                 ++TotIntConvCoeff;
@@ -1547,7 +1547,8 @@ namespace ConvectionCoefficients {
                         std::string equationName = Alphas(Ptr + 1);
                         if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()){
                             IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                            if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
+                            if ((equationName == "SIMPLE") || (equationName == "TARP") ||
+                                (equationName == "ADAPTIVECONVECTIONALGORITHM" || (equationName == "ASTMC1340"))) {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
