@@ -710,24 +710,24 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             // Building Name (remove certain characters)
-            BuildingName = AlphaName(1);
-            TMP = index(BuildingName, char(1));
+            state.dataHeatBal->BuildingName = AlphaName(1);
+            TMP = index(state.dataHeatBal->BuildingName, char(1));
             while (TMP != std::string::npos) {
-                BuildingName[TMP] = ',';
-                TMP = index(BuildingName, char(1));
+                state.dataHeatBal->BuildingName[TMP] = ',';
+                TMP = index(state.dataHeatBal->BuildingName, char(1));
             }
-            TMP = index(BuildingName, char(2));
+            TMP = index(state.dataHeatBal->BuildingName, char(2));
             while (TMP != std::string::npos) {
-                BuildingName[TMP] = '!';
-                TMP = index(BuildingName, char(2));
+                state.dataHeatBal->BuildingName[TMP] = '!';
+                TMP = index(state.dataHeatBal->BuildingName, char(2));
             }
-            TMP = index(BuildingName, char(3));
+            TMP = index(state.dataHeatBal->BuildingName, char(3));
             while (TMP != std::string::npos) {
-                BuildingName[TMP] = '\\';
-                TMP = index(BuildingName, char(3));
+                state.dataHeatBal->BuildingName[TMP] = '\\';
+                TMP = index(state.dataHeatBal->BuildingName, char(3));
             }
             // Building Azimuth (no validation)
-            BuildingAzimuth = mod(BuildingNumbers(1), 360.0);
+            state.dataHeatBal->BuildingAzimuth = mod(BuildingNumbers(1), 360.0);
             // Terrain
             if (AlphaName(2) == "COUNTRY" || AlphaName(2) == "1") {
                 state.dataEnvrn->SiteWindExp = 0.14;
@@ -757,38 +757,38 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
             // Loads Convergence Tolerance Value
-            LoadsConvergTol = BuildingNumbers(2);
-            if (LoadsConvergTol <= 0.0) {
+            state.dataHeatBal->LoadsConvergTol = BuildingNumbers(2);
+            if (state.dataHeatBal->LoadsConvergTol <= 0.0) {
                 ShowSevereError(state,
-                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, CurrentModuleObject, cNumericFieldNames(2), LoadsConvergTol));
+                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, CurrentModuleObject, cNumericFieldNames(2), state.dataHeatBal->LoadsConvergTol));
                 ErrorsFound = true;
             }
             // Temperature Convergence Tolerance Value
-            TempConvergTol = BuildingNumbers(3);
-            if (TempConvergTol <= 0.0) {
+            state.dataHeatBal->TempConvergTol = BuildingNumbers(3);
+            if (state.dataHeatBal->TempConvergTol <= 0.0) {
                 ShowSevereError(state,
-                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, CurrentModuleObject, cNumericFieldNames(2), TempConvergTol));
+                                format("{}{}: {} value invalid, [{:.3R}]", RoutineName, CurrentModuleObject, cNumericFieldNames(2), state.dataHeatBal->TempConvergTol));
                 ErrorsFound = true;
             }
             // Solar Distribution
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || lMinimalShadowing) {
-                SolarDistribution = MinimalShadowing;
+                state.dataHeatBal->SolarDistribution = MinimalShadowing;
                 AlphaName(3) = "MinimalShadowing";
                 CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
-                SolarDistribution = FullExterior;
+                state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExterior";
                 CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIOR" || AlphaName(3) == "1") {
-                SolarDistribution = FullInteriorExterior;
+                state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExterior";
                 CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIORWITHREFLECTIONS") {
-                SolarDistribution = FullExterior;
+                state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExteriorWithReflectionsFromExteriorSurfaces";
                 CalcSolRefl = true;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIORWITHREFLECTIONS") {
-                SolarDistribution = FullInteriorExterior;
+                state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
                 CalcSolRefl = true;
             } else {
@@ -844,7 +844,7 @@ namespace HeatBalanceManager {
         } else {
             ShowSevereError(state, RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
             ErrorsFound = true;
-            BuildingName = "NOT ENTERED";
+            state.dataHeatBal->BuildingName = "NOT ENTERED";
             AlphaName(2) = "NOT ENTERED";
             AlphaName(3) = "NOT ENTERED";
             MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
@@ -859,8 +859,8 @@ namespace HeatBalanceManager {
         // Write Building Information to the initialization output file
         print(state.files.eio, Format_721);
         print(state.files.eio, Format_720,
-            BuildingName , BuildingAzimuth , AlphaName(2) , LoadsConvergTol
-            , TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
+            state.dataHeatBal->BuildingName , state.dataHeatBal->BuildingAzimuth , AlphaName(2) , state.dataHeatBal->LoadsConvergTol
+            , state.dataHeatBal->TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -883,37 +883,37 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
 
                 if (SELECT_CASE_var == "SIMPLE") {
-                    DefaultInsideConvectionAlgo = ASHRAESimple;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAESimple;
                     AlphaName(1) = "Simple";
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    DefaultInsideConvectionAlgo = ASHRAETARP;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAETARP;
                     AlphaName(1) = "TARP";
 
                 } else if (SELECT_CASE_var == "CEILINGDIFFUSER") {
-                    DefaultInsideConvectionAlgo = CeilingDiffuser;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = CeilingDiffuser;
                     AlphaName(1) = "CeilingDiffuser";
 
                 } else if (SELECT_CASE_var == "TROMBEWALL") {
-                    DefaultInsideConvectionAlgo = TrombeWall;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = TrombeWall;
                     ShowSevereError(state, "GetInsideConvectionAlgorithm: TrombeWall has been used as a global definition. This is a zone oriented value.  "
                                     "Will be illegal in the future.");
                     AlphaName(1) = "TrombeWall";
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    DefaultInsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = AdaptiveConvectionAlgorithm;
                     AlphaName(1) = "AdaptiveConvectionAlgorithm";
 
                 } else {
                     ShowWarningError(state, "GetInsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject +
                                      ", defaulting to TARP, invalid value=" + AlphaName(1));
-                    DefaultInsideConvectionAlgo = ASHRAETARP;
+                    state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAETARP;
                     AlphaName(1) = "TARP";
                 }
             }
         } else {
             // default value, if not specified
-            DefaultInsideConvectionAlgo = ASHRAETARP;
+            state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
         static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
@@ -940,35 +940,35 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
-                    DefaultOutsideConvectionAlgo = ASHRAESimple;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ASHRAESimple;
                     AlphaName(1) = "SimpleCombined";
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    DefaultOutsideConvectionAlgo = ASHRAETARP;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = ASHRAETARP;
                     AlphaName(1) = "TARP";
 
                 } else if (SELECT_CASE_var == "MOWITT") {
-                    DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = MoWiTTHcOutside;
                     AlphaName(1) = "MoWitt";
 
                 } else if ((SELECT_CASE_var == "DOE-2")) {
-                    DefaultOutsideConvectionAlgo = DOE2HcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = DOE2HcOutside;
                     AlphaName(1) = "DOE-2";
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    DefaultOutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
                     AlphaName(1) = "AdaptiveConvectionAlgorithm";
 
                 } else {
                     ShowWarningError(state, "GetOutsideConvectionAlgorithm: Invalid value for " + CurrentModuleObject +
                                      ", defaulting to DOE-2, invalid value=" + AlphaName(1));
-                    DefaultOutsideConvectionAlgo = DOE2HcOutside;
+                    state.dataHeatBal->DefaultOutsideConvectionAlgo = DOE2HcOutside;
                     AlphaName(1) = "DOE-2";
                 }
             }
         } else {
             // default value, if not specified
-            DefaultOutsideConvectionAlgo = DOE2HcOutside;
+            state.dataHeatBal->DefaultOutsideConvectionAlgo = DOE2HcOutside;
             AlphaName(1) = "DOE-2";
         }
 
@@ -995,15 +995,15 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
                     DataHeatBalance::AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
                     DataHeatBalance::AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
                     DataHeatBalance::AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -1018,7 +1018,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
                     DataHeatBalance::AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -1035,7 +1035,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
                     DataHeatBalance::AnyCTF = true;
                 }
             }
@@ -1058,7 +1058,7 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
             DataHeatBalance::AnyCTF = true;
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
@@ -5139,7 +5139,7 @@ namespace HeatBalanceManager {
             }
         } else {
             // No zone specific algorithm specified, use default Inside Convection Algorithm
-            Zone(ZoneLoop).InsideConvectionAlgo = DefaultInsideConvectionAlgo;
+            Zone(ZoneLoop).InsideConvectionAlgo = state.dataHeatBal->DefaultInsideConvectionAlgo;
         }
 
         if (NumAlphas > 2 && !lAlphaFieldBlanks(3)) {
@@ -5170,7 +5170,7 @@ namespace HeatBalanceManager {
             }
         } else {
             // No zone specific algorithm specified, use default Outside Convection Algorithm
-            Zone(ZoneLoop).OutsideConvectionAlgo = DefaultOutsideConvectionAlgo;
+            Zone(ZoneLoop).OutsideConvectionAlgo = state.dataHeatBal->DefaultOutsideConvectionAlgo;
         }
 
         // Process the input field:    Part of Total Floor Area
@@ -5704,14 +5704,14 @@ namespace HeatBalanceManager {
 
                 WarmupConvergenceValues(ZoneNum).TestMaxTempValue = std::abs(MaxTempPrevDay(ZoneNum) - MaxTempZone(ZoneNum));
                 WarmupConvergenceValues(ZoneNum).TestMinTempValue = std::abs(MinTempPrevDay(ZoneNum) - MinTempZone(ZoneNum));
-                if (WarmupConvergenceValues(ZoneNum).TestMaxTempValue <= TempConvergTol) {
+                if (WarmupConvergenceValues(ZoneNum).TestMaxTempValue <= state.dataHeatBal->TempConvergTol) {
                     WarmupConvergenceValues(ZoneNum).PassFlag(1) = 2;
                 } else {
                     ConvergenceChecksFailed = true;
                     WarmupConvergenceValues(ZoneNum).PassFlag(1) = 1;
                 }
 
-                if (WarmupConvergenceValues(ZoneNum).TestMinTempValue <= TempConvergTol) {
+                if (WarmupConvergenceValues(ZoneNum).TestMinTempValue <= state.dataHeatBal->TempConvergTol) {
                     WarmupConvergenceValues(ZoneNum).PassFlag(2) = 2;
                 } else {
                     ConvergenceChecksFailed = true;
@@ -5723,7 +5723,7 @@ namespace HeatBalanceManager {
                     MaxHeatLoadPrevDay(ZoneNum) = std::abs(max(MaxHeatLoadPrevDay(ZoneNum), MinLoad));
                     WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue =
                         std::abs((MaxHeatLoadZone(ZoneNum) - MaxHeatLoadPrevDay(ZoneNum)) / MaxHeatLoadZone(ZoneNum));
-                    if (WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue <= LoadsConvergTol) {
+                    if (WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue <= state.dataHeatBal->LoadsConvergTol) {
                         WarmupConvergenceValues(ZoneNum).PassFlag(3) = 2;
                     } else {
                         ConvergenceChecksFailed = true;
@@ -5738,7 +5738,7 @@ namespace HeatBalanceManager {
                     MaxCoolLoadPrevDay(ZoneNum) = std::abs(max(MaxCoolLoadPrevDay(ZoneNum), MinLoad));
                     WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue =
                         std::abs((MaxCoolLoadZone(ZoneNum) - MaxCoolLoadPrevDay(ZoneNum)) / MaxCoolLoadZone(ZoneNum));
-                    if (WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue <= LoadsConvergTol) {
+                    if (WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue <= state.dataHeatBal->LoadsConvergTol) {
                         WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                     } else {
                         ConvergenceChecksFailed = true;
@@ -5771,22 +5771,22 @@ namespace HeatBalanceManager {
                         ShowContinueError(state,
                                           format("..Max Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
                                                  WarmupConvergenceValues(ZoneNum).TestMaxTempValue,
-                                                 TempConvergTol,
+                                                 state.dataHeatBal->TempConvergTol,
                                                  PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1))));
                         ShowContinueError(state,
                                           format("..Min Temp Comparison = {:.2R} vs Temperature Convergence Tolerance={:.2R} - {} Convergence",
                                                  WarmupConvergenceValues(ZoneNum).TestMinTempValue,
-                                                 TempConvergTol,
+                                                 state.dataHeatBal->TempConvergTol,
                                                  PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2))));
                         ShowContinueError(state,
                                           format("..Max Heat Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
                                                  WarmupConvergenceValues(ZoneNum).TestMaxHeatLoadValue,
-                                                 LoadsConvergTol,
+                                                 state.dataHeatBal->LoadsConvergTol,
                                                  PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3))));
                         ShowContinueError(state,
                                           format("..Max Cool Load Comparison = {:.4R} vs Loads Convergence Tolerance={:.2R} - {} Convergence",
                                                  WarmupConvergenceValues(ZoneNum).TestMaxCoolLoadValue,
-                                                 LoadsConvergTol,
+                                                 state.dataHeatBal->LoadsConvergTol,
                                                  PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4))));
                     }
                 }

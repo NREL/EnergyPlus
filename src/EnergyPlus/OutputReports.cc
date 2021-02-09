@@ -308,7 +308,6 @@ static std::string normalizeName(std::string name)
 
 static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std::string &ColorScheme)
 {
-    using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
@@ -381,7 +380,7 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
     print(of, Format_800, DXFcolorno(ColorNo_Text), StemX(1) - 1.0, StemY(1), StemZ(1));
 
     print(of, Format_710, "Text - Building Title");
-    print(of, Format_801, DXFcolorno(ColorNo_Text), StemX(1) - 4.0, StemY(1) - 4.0, StemZ(1), "Building - " + BuildingName);
+    print(of, Format_801, DXFcolorno(ColorNo_Text), StemX(1) - 4.0, StemY(1) - 4.0, StemZ(1), "Building - " + state.dataHeatBal->BuildingName);
 
     // We want to point the north arrow to true north
     print(of, Format_710, "North Arrow Stem");
@@ -857,7 +856,6 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
@@ -1067,7 +1065,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
@@ -1806,7 +1803,6 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::BuildingName;
     using DataHeatBalance::Zone;
     using namespace DataSurfaces;
     using DataStringGlobals::VerString;
@@ -1865,9 +1861,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     print(wrlfile, Format_702);
 
     if (ColorScheme == "") {
-        print(wrlfile, Format_707, BuildingName, VerString, "Default"); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, "Default"); // World Info
     } else {
-        print(wrlfile, Format_707, BuildingName, VerString, ColorScheme); // World Info
+        print(wrlfile, Format_707, state.dataHeatBal->BuildingName, VerString, ColorScheme); // World Info
     }
 
     print(wrlfile, "# Zone Names\n");

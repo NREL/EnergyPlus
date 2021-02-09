@@ -166,7 +166,6 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-    using DataHeatBalance::SolarDistribution;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::Zone;
     using DataSurfaces::CalcSolRefl;
@@ -1190,7 +1189,7 @@ namespace DaylightingDevices {
 
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
-        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             IsoSkyRad = MultIsoSky(DomeSurf) * DifShdgRatioIsoSky(DomeSurf);
             HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHoriz(DomeSurf);
         } else {

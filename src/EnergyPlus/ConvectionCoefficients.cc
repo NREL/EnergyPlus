@@ -1661,7 +1661,7 @@ namespace ConvectionCoefficients {
             ErrorsFound = true;
         }
 
-        if (DefaultOutsideConvectionAlgo == ASHRAESimple || std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
+        if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ASHRAESimple || std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
                 return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple;
             })) {
             Count = 0;

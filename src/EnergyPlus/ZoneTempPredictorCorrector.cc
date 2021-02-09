@@ -4937,7 +4937,7 @@ namespace ZoneTempPredictorCorrector {
                     // UCSDDV: Not fully mixed - calculate factor to correct load for fully mixed assumption
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
-                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > TempConvergTol) {
+                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
                             LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - ZT(ZoneNum));
                             // constrain value to something reasonable
                             LoadCorrectionFactor(ZoneNum) = max(-3.0, LoadCorrectionFactor(ZoneNum));
@@ -4954,7 +4954,7 @@ namespace ZoneTempPredictorCorrector {
                            ((state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) || (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
-                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > TempConvergTol) {
+                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
                             LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - ZT(ZoneNum));
                             // constrain value
                             LoadCorrectionFactor(ZoneNum) = max(-3.0, LoadCorrectionFactor(ZoneNum));

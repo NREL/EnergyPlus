@@ -220,17 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    std::string BuildingName;           // Name of building
-    Real64 BuildingAzimuth(0.0);        // North Axis of Building
-    Real64 LoadsConvergTol(0.0);        // Tolerance value for Loads Convergence
-    Real64 TempConvergTol(0.0);         // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo(1); // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser;
-    // 4 = trombe wall
-    int DefaultOutsideConvectionAlgo(1);                                      // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    int SolarDistribution(0);                                                 // Solar Distribution Algorithm
-    int InsideSurfIterations(0);                                              // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
-
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF(true);                      // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF(false);                     // CTF used
@@ -585,15 +574,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        BuildingName = std::string();
-        BuildingAzimuth = 0.0;
-        LoadsConvergTol = 0.0;
-        TempConvergTol = 0.0;
-        DefaultInsideConvectionAlgo = 1;
-        DefaultOutsideConvectionAlgo = 1;
-        SolarDistribution = 0;
-        InsideSurfIterations = 0;
-        OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
         AllCTF = true;
         AnyCTF = false;
         AnyEMPD = false;

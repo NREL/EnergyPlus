@@ -909,7 +909,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -1312,7 +1312,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -2452,7 +2452,7 @@ namespace EnergyPlus::DaylightingManager {
         DWX = Surface(IWin).Width / NWX;
         DWY = Surface(IWin).Height / NWY;
 
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
 
         // Perform necessary calculations for window coordinates and vectors.  This will be used to calculate centroids for
         // each window element
@@ -3462,7 +3462,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (Surface(NearestHitSurfNum).ShadowingSurf) {
                     if (dot(Ray, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                 }
-                if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+                if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                     SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 } else {
                     SkyReflVisLum =
@@ -4574,8 +4574,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 NewAspectRatio;
         Array1D_bool ZoneMsgDone;
 
-        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         // these are only for Building Rotation for Appendix G when using world coordinate system
         CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
         SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
@@ -5211,8 +5211,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 rLightLevel;
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         // these are only for Building Rotation for Appendix G when using world coordinate system
         CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
         SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
@@ -7852,7 +7852,7 @@ namespace EnergyPlus::DaylightingManager {
                         if (Surface(NearestHitSurfNum).ShadowingSurf) {
                             if (dot(U, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                         }
-                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                             SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         } else {
                             SkyReflVisLum =

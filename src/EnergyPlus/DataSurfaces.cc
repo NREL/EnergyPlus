@@ -163,19 +163,6 @@ namespace DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    // Parameters to indicate heat transfer model to use for surface
-    int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces
-    int const HeatTransferModel_CTF(1);
-    int const HeatTransferModel_EMPD(2);
-    int const HeatTransferModel_CondFD(5);
-    int const HeatTransferModel_HAMT(6);
-    int const HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
-    int const HeatTransferModel_ComplexFenestration(8); // BSDF
-    int const HeatTransferModel_TDD(9);                 // tubular daylighting device
-    int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
-    int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
-
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
     int const OutConvClass_LeewardVertWall(102);

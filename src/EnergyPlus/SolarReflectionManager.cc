@@ -1133,7 +1133,7 @@ namespace SolarReflectionManager {
                             }
                         }
 
-                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                             SkyReflSolRadiance = Surface(HitPtSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(HitPtSurfNumX) *
                                                  state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum);
                         } else {

@@ -220,12 +220,12 @@ namespace DElightManagerF {
 
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
-        cNameWOBlanks = ReplaceBlanksWithUnderscores(BuildingName);
-        print(delightInFile, Format_902, cNameWOBlanks, state.dataEnvrn->Latitude, state.dataEnvrn->Longitude, state.dataEnvrn->Elevation * M2FT, BuildingAzimuth, state.dataEnvrn->TimeZoneNumber);
+        cNameWOBlanks = ReplaceBlanksWithUnderscores(state.dataHeatBal->BuildingName);
+        print(delightInFile, Format_902, cNameWOBlanks, state.dataEnvrn->Latitude, state.dataEnvrn->Longitude, state.dataEnvrn->Elevation * M2FT, state.dataHeatBal->BuildingAzimuth, state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {

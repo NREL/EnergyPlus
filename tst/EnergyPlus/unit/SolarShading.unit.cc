@@ -662,7 +662,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     DataSurfaces::ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
-    SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(*state);
@@ -1059,7 +1059,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     DataSurfaces::ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
-    SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(*state);
@@ -1839,7 +1839,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     DataSurfaces::ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
-    SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = FullExterior;
     DataSystemVariables::SlaterBarsky = true;
 
     state->dataSolarShading->CalcSkyDifShading = true;

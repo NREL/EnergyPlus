@@ -276,17 +276,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern std::string BuildingName;        // Name of building
-    extern Real64 BuildingAzimuth;          // North Axis of Building
-    extern Real64 LoadsConvergTol;          // Tolerance value for Loads Convergence
-    extern Real64 TempConvergTol;           // Tolerance value for Temperature Convergence
-    extern int DefaultInsideConvectionAlgo; // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser;
-    // 4 = trombe wall
-    extern int DefaultOutsideConvectionAlgo;    // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    extern int SolarDistribution;               // Solar Distribution Algorithm
-    extern int InsideSurfIterations;            // Counts inside surface iterations
-    extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-
    // Flags for HeatTransfer Algorithms Used
     extern bool AllCTF;                     // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva
     extern bool AnyCTF;                     // CTF used
@@ -2201,7 +2190,7 @@ namespace DataHeatBalance {
 
 struct HeatBalanceData : BaseGlobalStruct {
 
-    int MaxSolidWinLayers = 0;                // Maximum number of solid layers in a window construction
+    int MaxSolidWinLayers = 0; // Maximum number of solid layers in a window construction
 
     // SiteData aka building data
     Real64 LowHConvLimit = 0.1; // Lowest allowed convection coefficient for detailed model
@@ -2222,9 +2211,18 @@ struct HeatBalanceData : BaseGlobalStruct {
     //                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
     //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
     //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-    Real64 HighHConvLimit = 1000.0;         // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
+    Real64 HighHConvLimit = 1000.0;         // upper limit for HConv, mostly used for user input limits in practice. !W/m2-K
     Real64 MaxAllowedDelTemp = 0.002;       // Convergence criteria for inside surface temperatures
     Real64 MaxAllowedDelTempCondFD = 0.002; // Convergence criteria for inside surface temperatures for CondFD
+    std::string BuildingName;               // Name of building
+    Real64 BuildingAzimuth = 0.0;           // North Axis of Building
+    Real64 LoadsConvergTol = 0.0;           // Tolerance value for Loads Convergence
+    Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
+    int DefaultInsideConvectionAlgo = 1;    // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser; 4 = trombe wall
+    int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
+    int SolarDistribution = 0;              // Solar Distribution Algorithm
+    int InsideSurfIterations = 0;           // Counts inside surface iterations
+    int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
 
     void clear_state() override
     {
@@ -2233,6 +2231,15 @@ struct HeatBalanceData : BaseGlobalStruct {
         this-> HighHConvLimit = 1000.0;
         this-> MaxAllowedDelTemp = 0.002;
         this-> MaxAllowedDelTempCondFD = 0.002;
+        this->BuildingName.clear();
+        this->BuildingAzimuth = 0.0;
+        this->LoadsConvergTol = 0.0;
+        this->TempConvergTol = 0.0;
+        this->DefaultInsideConvectionAlgo = 1;
+        this->DefaultOutsideConvectionAlgo = 1;
+        this->SolarDistribution = 0;
+        this->InsideSurfIterations = 0;
+        this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
     }
 };
 

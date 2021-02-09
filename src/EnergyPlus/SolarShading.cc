@@ -194,7 +194,7 @@ namespace SolarShading {
             if (state.dataSolarShading->firstTime) DisplayString(state, "Allocate Solar Module Arrays");
             AllocateModuleArrays(state);
 
-            if (SolarDistribution != FullInteriorExterior) {
+            if (state.dataHeatBal->SolarDistribution != FullInteriorExterior) {
                 if (state.dataSolarShading->firstTime) DisplayString(state, "Computing Interior Solar Absorption Factors");
                 ComputeIntSolarAbsorpFactors(state);
             }
@@ -697,7 +697,7 @@ namespace SolarShading {
             }
         }
 
-        if (!DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+        if (!DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
             ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
                              "DetailedSkyDiffuseModeling in the " +
                              cCurrentModuleObject + " object to remove this warning.");
@@ -709,7 +709,7 @@ namespace SolarShading {
                                   " object.");
             }
         } else if (DetailedSkyDiffuseAlgorithm) {
-            if (!ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+            if (!ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                 ShowWarningError(state, "GetShadowingInput: DetailedSkyDiffuseModeling is chosen but not needed as either the shading transmittance for "
                                  "shading devices does not change throughout the year");
                 ShowContinueError(state, " or MinimalShadowing has been chosen.");
@@ -2356,7 +2356,7 @@ namespace SolarShading {
             MultCircumSolar(SurfNum) = F1 * CircumSolarFac;
             MultHorizonZenith(SurfNum) = F2 * Surface(SurfNum).SinTilt;
 
-            if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+            if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                 AnisoSkyMult(SurfNum) = MultIsoSky(SurfNum) * DifShdgRatioIsoSky(SurfNum) +
                                         MultCircumSolar(SurfNum) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) +
                                         MultHorizonZenith(SurfNum) * DifShdgRatioHoriz(SurfNum);
@@ -4685,7 +4685,7 @@ namespace SolarShading {
             }
         }
         //   Note -- if not the below, values are set in SkyDifSolarShading routine (constant for simulation)
-        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
             WithShdgIsoSky = 0.;
             WoShdgIsoSky = 0.;
             WithShdgHoriz = 0.;
@@ -4975,7 +4975,7 @@ namespace SolarShading {
 
             // Check every surface as a possible shadow casting surface ("SS" = shadow sending)
             NGSS = 0;
-            if (SolarDistribution != MinimalShadowing) { // Except when doing simplified exterior shadowing.
+            if (state.dataHeatBal->SolarDistribution != MinimalShadowing) { // Except when doing simplified exterior shadowing.
 
                 for (GSSNR = 1; GSSNR <= TotSurfaces; ++GSSNR) { // Loop through all surfaces, looking for ones that could shade GRSNR
 
@@ -5058,7 +5058,7 @@ namespace SolarShading {
             NBKS = 0;
             //                                        Except for simplified
             //                                        interior solar distribution,
-            if ((SolarDistribution == FullInteriorExterior) &&
+            if ((state.dataHeatBal->SolarDistribution == FullInteriorExterior) &&
                 (HasWindow)) { // For full interior solar distribution | and a window present on base surface (GRSNR)
 
                 for (BackSurfaceNumber = 1; BackSurfaceNumber <= TotSurfaces;
@@ -5121,15 +5121,15 @@ namespace SolarShading {
         if (!state.dataSolarShading->penumbra) {
             if (shd_stream) {
                 *shd_stream << "Shadowing Combinations\n";
-                if (SolarDistribution == MinimalShadowing) {
+                if (state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                     *shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
-                } else if (SolarDistribution == FullExterior) {
+                } else if (state.dataHeatBal->SolarDistribution == FullExterior) {
                     if (CalcSolRefl) {
                         *shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
                     } else {
                         *shd_stream << "..Solar Distribution=FullExterior\n";
                     }
-                } else if (SolarDistribution == FullInteriorExterior) {
+                } else if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) {
                     if (CalcSolRefl) {
                         *shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
                     } else {
@@ -6838,7 +6838,7 @@ namespace SolarShading {
                         continue;
                     }
 
-                    if (SolarDistribution == FullInteriorExterior) { // Full interior solar distribution
+                    if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) { // Full interior solar distribution
                         if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
                             // Loop over back surfaces irradiated by beam from this exterior window
                             for (int IBack = 1; IBack <= state.dataBSDFWindow->MaxBkSurf; ++IBack) {
@@ -7538,7 +7538,7 @@ namespace SolarShading {
 
             // Variables for reporting
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                if (SolarDistribution == FullInteriorExterior) {
+                if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) {
                     SurfBmIncInsSurfAmountRep(SurfNum) *= state.dataEnvrn->BeamSolarRad;
                     SurfBmIncInsSurfAmountRepEnergy(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     SurfBmIncInsSurfIntensRep(SurfNum) = SurfBmIncInsSurfAmountRep(SurfNum) / (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
@@ -7887,7 +7887,7 @@ namespace SolarShading {
 
                 int NumOfBackSurf = ShadowComb(BaseSurfNum).NumBackSurf;
 
-                if (SolarDistribution == FullInteriorExterior) {
+                if (state.dataHeatBal->SolarDistribution == FullInteriorExterior) {
                     for (int IBack = 1; IBack <= NumOfBackSurf; ++IBack) {
 
                         int const BackSurfNum = BackSurfaces(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, IBack, SurfNum);
@@ -9302,12 +9302,12 @@ namespace SolarShading {
         // initialized as no shading
         DifShdgRatioIsoSky = 1.0;
         DifShdgRatioHoriz = 1.0;
-        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
             curDifShdgRatioIsoSky.dimension(TotSurfaces, 1.0);
         }
 
         // only for detailed.
-        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
             DifShdgRatioIsoSkyHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces);
             DifShdgRatioIsoSkyHRTS = 1.0;
             DifShdgRatioHorizHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces);
@@ -9318,7 +9318,7 @@ namespace SolarShading {
             if (!Surface(SurfNum).ExtSolar) continue;
 
             // CurrentModuleObject='Surfaces'
-            if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+            if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
                 SetupOutputVariable(state, "Debug Surface Solar Shading Model DifShdgRatioIsoSky",
                                     OutputProcessor::Unit::None,
                                     curDifShdgRatioIsoSky(SurfNum),
@@ -9427,7 +9427,7 @@ namespace SolarShading {
         // sky or ground.
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
+            if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                 Surface(SurfNum).ViewFactorSkyIR *= DifShdgRatioIsoSky(SurfNum);
             } else {
                 Surface(SurfNum).ViewFactorSkyIR *= DifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
@@ -9450,7 +9450,7 @@ namespace SolarShading {
         //  DEALLOCATE(WithShdgHoriz)
         //  DEALLOCATE(WoShdgHoriz)
 
-        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing) {
+        if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 DifShdgRatioIsoSkyHRTS({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}, SurfNum) = DifShdgRatioIsoSky(SurfNum);
                 DifShdgRatioHorizHRTS({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}, SurfNum) = DifShdgRatioHoriz(SurfNum);

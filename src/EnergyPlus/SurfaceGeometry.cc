@@ -312,8 +312,8 @@ namespace SurfaceGeometry {
         // as setting up DaylightingCoords
 
         // these include building north axis and Building Rotation for Appendix G
-        state.dataSurfaceGeometry->CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        state.dataSurfaceGeometry->SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
 
         // these are only for Building Rotation for Appendix G when using world coordinate system
         state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
@@ -1021,7 +1021,7 @@ namespace SurfaceGeometry {
         GetGeometryParameters(state, ErrorsFound);
 
         if (WorldCoordSystem) {
-            if (BuildingAzimuth != 0.0) RelWarning = true;
+            if (state.dataHeatBal->BuildingAzimuth != 0.0) RelWarning = true;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
             }
@@ -2686,7 +2686,7 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if ((TotDetachedFixed + TotDetachedBldg) > 0 && SolarDistribution == MinimalShadowing) {
+        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -2848,7 +2848,7 @@ namespace SurfaceGeometry {
         int ItemsToGet;
         SurfaceClass ClassItem;
 
-        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && SolarDistribution == MinimalShadowing) {
+        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -2898,7 +2898,7 @@ namespace SurfaceGeometry {
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = rNumericArgs(1);
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B && !WorldCoordSystem) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += BuildingAzimuth;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingAzimuth;
                 }
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += BuildingRotationAppendixG;
@@ -3764,7 +3764,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = rNumericArgs(2);
                 if (!WorldCoordSystem) {
                     if (ZoneNum != 0) {
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += BuildingAzimuth + Zone(ZoneNum).RelNorth;
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingAzimuth + Zone(ZoneNum).RelNorth;
                     }
                 }
                 if (ZoneNum != 0) {
@@ -5035,7 +5035,7 @@ namespace SurfaceGeometry {
         // Warning if window has multiplier > 1 and SolarDistribution = FullExterior or FullInteriorExterior
 
         if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window || state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) &&
-            SolarDistribution > MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
+            state.dataHeatBal->SolarDistribution > MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, cRoutineName + ": A Multiplier > 1.0 for window/glass door " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
                 ShowContinueError(state, "in conjunction with SolarDistribution = FullExterior or FullInteriorExterior");
@@ -5361,7 +5361,7 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (TotShdSubs > 0 && SolarDistribution == MinimalShadowing) {
+        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -5556,7 +5556,7 @@ namespace SurfaceGeometry {
         Real64 TiltAngle;
         bool MakeFin;
 
-        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 && SolarDistribution == MinimalShadowing) {
+        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -7080,7 +7080,7 @@ namespace SurfaceGeometry {
 
         // first initialize each heat transfer surface with the overall model type, array assignment
         for (auto &e : Surface)
-            e.HeatTransferAlgorithm = OverallHeatTransferSolutionAlgo;
+            e.HeatTransferAlgorithm = state.dataHeatBal->OverallHeatTransferSolutionAlgo;
 
         cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
         CountHTAlgoObjectsSingleSurf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -13434,7 +13434,7 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (SolarDistribution != MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
+                if (state.dataHeatBal->SolarDistribution != MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, "CheckConvexity: Zone=\"" + Zone(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone).Name + "\", Surface=\"" +
                                          state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\" is non-convex.");

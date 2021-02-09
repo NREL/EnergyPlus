@@ -6158,7 +6158,7 @@ namespace HeatBalanceSurfaceManager {
             if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Surface Inside Face Heat Balance Calculation Iteration Count",
                                     OutputProcessor::Unit::None,
-                                    InsideSurfIterations,
+                                    state.dataHeatBal->InsideSurfIterations,
                                     "ZONE",
                                     "Sum",
                                     "Simulation");
@@ -6370,7 +6370,7 @@ namespace HeatBalanceSurfaceManager {
             SurfWinDividerQRadInAbs(surfNum) = 0.0;
         }
 
-        InsideSurfIterations = 0;
+        state.dataHeatBal->InsideSurfIterations = 0;
 
         // Calculate heat extract due to additional heat flux source term as the surface boundary condition
         if (DataSurfaces::AnyHeatBalanceInsideSourceTerm) {
@@ -6403,7 +6403,7 @@ namespace HeatBalanceSurfaceManager {
             }
 
             HeatBalanceIntRadExchange::CalcInteriorRadExchange(
-                state, TempSurfIn, InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
+                state, TempSurfIn, state.dataHeatBal->InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             if (DataHeatBalance::AnyKiva) {
                 for (auto &kivaSurf : state.dataSurfaceGeometry->kivaManager.surfaceMap) {
@@ -6417,7 +6417,7 @@ namespace HeatBalanceSurfaceManager {
             // heat balance is in error (potentially) once HConvIn is re-evaluated.
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
-            if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
+            if ((state.dataHeatBal->InsideSurfIterations > 0) && (mod(state.dataHeatBal->InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
                 ConvectionCoefficients::InitInteriorConvectionCoeffs(state, TempSurfIn, ZoneToResimulate);
             }
 
@@ -6779,7 +6779,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfWinLossSWZoneToOutWinRep(SurfNum) =
                         QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                             // Regular window
-                    if (InsideSurfIterations == 0) { // Do windows only once
+                    if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                         if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = surface.StormWinConstruction;
                         // Get outside convection coeff for exterior window here to avoid calling
                         // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
@@ -6911,7 +6911,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfTempOut(SurfNum) = TH[SurfNum - 1] = TH[l211 + surfExtBoundCond];
             }
 
-            ++InsideSurfIterations;
+            ++state.dataHeatBal->InsideSurfIterations;
 
             // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
             Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
@@ -6929,10 +6929,10 @@ namespace HeatBalanceSurfaceManager {
                 if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTempCondFD) Converged = true;
 
                 // resets relaxation factor to speed up iterations when under-relaxation is not needed.
-                if (InsideSurfIterations <= 1) {
+                if (state.dataHeatBal->InsideSurfIterations <= 1) {
                     CondFDRelaxFactor = CondFDRelaxFactorInput;
                 }
-                if ((InsideSurfIterations > IterationsForCondFDRelaxChange) && !Converged) {
+                if ((state.dataHeatBal->InsideSurfIterations > IterationsForCondFDRelaxChange) && !Converged) {
                     // adjust relaxation factor down, assume large number of iterations is result of instability
                     CondFDRelaxFactor *= 0.9;
                     if (CondFDRelaxFactor < 0.1) CondFDRelaxFactor = 0.1;
@@ -6940,12 +6940,12 @@ namespace HeatBalanceSurfaceManager {
             }
 
 #ifdef EP_Count_Calls
-            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, InsideSurfIterations);
+            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
 #endif
 
-            if (InsideSurfIterations < MinIterations) Converged = false;
+            if (state.dataHeatBal->InsideSurfIterations < MinIterations) Converged = false;
 
-            if (InsideSurfIterations > MaxIterations) {
+            if (state.dataHeatBal->InsideSurfIterations > MaxIterations) {
                 if (!state.dataGlobal->WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {
@@ -7264,14 +7264,14 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        InsideSurfIterations = 0;
+        state.dataHeatBal->InsideSurfIterations = 0;
         bool Converged = false; // .TRUE. if inside heat balance has converged
         while (!Converged) {    // Start of main inside heat balance iteration loop...
 
             TempInsOld = TempSurfIn; // Keep track of last iteration's temperature values
 
             HeatBalanceIntRadExchange::CalcInteriorRadExchange(
-                state, TempSurfIn, InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
+                state, TempSurfIn, state.dataHeatBal->InsideSurfIterations, SurfNetLWRadToSurf, ZoneToResimulate, Inside); // Update the radiation balance
 
             // Every 30 iterations, recalculate the inside convection coefficients in case
             // there has been a significant drift in the surface temperatures predicted.
@@ -7279,7 +7279,7 @@ namespace HeatBalanceSurfaceManager {
             // heat balance is in error (potentially) once HConvIn is re-evaluated.
             // The choice of 30 is not significant--just want to do this a couple of
             // times before the iteration limit is hit.
-            if ((InsideSurfIterations > 0) && (mod(InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
+            if ((state.dataHeatBal->InsideSurfIterations > 0) && (mod(state.dataHeatBal->InsideSurfIterations, ItersReevalConvCoeff) == 0)) {
                 ConvectionCoefficients::InitInteriorConvectionCoeffs(state, TempSurfIn, ZoneToResimulate);
                 // Since HConvIn has changed re-calculate a few terms - non-window surfaces
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
@@ -7480,7 +7480,7 @@ namespace HeatBalanceSurfaceManager {
                         SurfWinLossSWZoneToOutWinRep(surfNum) =
                             QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
                     } else {                             // Regular window
-                        if (InsideSurfIterations == 0) { // Do windows only once
+                        if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                             if (SurfWinStormWinFlag(surfNum) == 1) ConstrNum = surface.StormWinConstruction;
                             // Get outside convection coeff for exterior window here to avoid calling
                             // InitExteriorConvectionCoeff from CalcWindowHeatBalance, which avoids circular reference
@@ -7616,7 +7616,7 @@ namespace HeatBalanceSurfaceManager {
                 TH11Surf(SurfNum) = SurfTempOut(SurfNum);
             }
 
-            ++InsideSurfIterations;
+            ++state.dataHeatBal->InsideSurfIterations;
 
             // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
             Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
@@ -7633,12 +7633,12 @@ namespace HeatBalanceSurfaceManager {
             if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
 
 #ifdef EP_Count_Calls
-            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, InsideSurfIterations);
+            NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, state.dataHeatBal->InsideSurfIterations);
 #endif
 
-            if (InsideSurfIterations < MinIterations) Converged = false;
+            if (state.dataHeatBal->InsideSurfIterations < MinIterations) Converged = false;
 
-            if (InsideSurfIterations > MaxIterations) {
+            if (state.dataHeatBal->InsideSurfIterations > MaxIterations) {
                 if (!state.dataGlobal->WarmupFlag) {
                     ++calcHeatBalInsideSurfErrCount;
                     if (calcHeatBalInsideSurfErrCount < 16) {

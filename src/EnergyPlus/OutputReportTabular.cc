@@ -2991,27 +2991,8 @@ namespace EnergyPlus::OutputReportTabular {
         //   the output is in a CSV file if it is comma delimited otherwise
         //   it is in a TXT file.
 
-        // METHODOLOGY EMPLOYED:
-        //   Uses get input structure similar to other objects
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int iStyle;
@@ -3031,7 +3012,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "Program Version:" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
+                    tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -3044,7 +3025,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "Program Version" << curDel << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
+                    tbl_stream << "Building:" << curDel << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -3058,9 +3039,9 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<html>\n";
                     tbl_stream << "<head>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
+                        tbl_stream << "<title> " << state.dataHeatBal->BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
+                        tbl_stream << "<title> " << state.dataHeatBal->BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
                     }
                     tbl_stream << "  " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2) << ort->td(3)
                                << '\n';
@@ -3074,7 +3055,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<a name=top></a>\n";
                     tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
-                    tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
+                    tbl_stream << "<p>Building: <b>" << state.dataHeatBal->BuildingName << "</b></p>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
                     } else {
@@ -3089,7 +3070,7 @@ namespace EnergyPlus::OutputReportTabular {
                     std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, DataStringGlobals::outputTblXmlFileName, state.files.outputControl.tabular);
                     tbl_stream << "<?xml version=\"1.0\"?>\n";
                     tbl_stream << "<EnergyPlusTabularReports>\n";
-                    tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
+                    tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
                     tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                     tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                     tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
@@ -3110,7 +3091,7 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "Program Version: " << VerString << '\n';
                     tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                     tbl_stream << '\n';
-                    tbl_stream << "Building:        " << BuildingName << '\n';
+                    tbl_stream << "Building:        " << state.dataHeatBal->BuildingName << '\n';
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
                         tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << '\n';
                     } else {
@@ -9644,11 +9625,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   This report actually consists of many sub-tables each with
         //   its own call to WriteTable.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::BuildingAzimuth;
         using DataHeatBalance::BuildingRotationAppendixG;
         using DataHeatBalance::Lights;
         using DataHeatBalance::People;
@@ -9872,7 +9849,7 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
             tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
             tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
-            tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
+            tableBody(1, 8) = RealToStr(state.dataHeatBal->BuildingAzimuth, 2);           // north axis angle
             tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);    // hours simulated
             //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
@@ -13806,21 +13783,7 @@ namespace EnergyPlus::OutputReportTabular {
         //   Write the first few lines of each report with headers to the output
         //   file for tabular reports.
         // Using/Aliasing
-        using DataHeatBalance::BuildingName;
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         std::string const modifiedReportName(reportName + (averageOrSum == OutputProcessor::StoreType::Summed ? " per second" : ""));
         auto &ort(state.dataOutRptTab);

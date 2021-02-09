@@ -1010,7 +1010,7 @@ namespace SolarCollectors {
         // Heat gain or loss to collector fluid (W)
         Real64 Q = 0.0;
 
-        while (std::abs(outletTemp - OutletTempPrev) > DataHeatBalance::TempConvergTol) { // Check for temperature convergence
+        while (std::abs(outletTemp - OutletTempPrev) > state.dataHeatBal->TempConvergTol) { // Check for temperature convergence
 
             OutletTempPrev = outletTemp; // Save previous outlet temperature
 
