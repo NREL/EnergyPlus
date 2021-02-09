@@ -70,6 +70,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/SizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -518,6 +519,142 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+}
+
+TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+     "Zone,",
+     "  EAST ZONE,                      !- Name",
+     "  0,                              !- Direction of Relative North{ deg }",
+     "  0,                              !- X Origin{ m }",
+     "  0,                              !- Y Origin{ m }",
+     "  0,                              !- Z Origin{ m }",
+     "  1,                              !- Type",
+     "  1,                              !- Multiplier",
+     "  autocalculate,                  !- Ceiling Height{ m }",
+     "  autocalculate;                  !- Volume{ m3 }",
+
+     "ZoneHVAC:IdealLoadsAirSystem,",
+     "  ZONE 1 IDEAL LOADS,             !- Name",
+     "  ,                               !- Availability Schedule Name",
+     "  Zone Inlet Node,                !- Zone Supply Air Node Name",
+     "  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+     "  ,                               !- System Inlet Air Node Name",
+     "  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+     "  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+     "  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+     "  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+     "  NoLimit,                        !- Heating Limit",
+     "  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+     "  ,                               !- Maximum Sensible Heating Capacity{ W }",
+     "  NoLimit,                        !- Cooling Limit",
+     "  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+     "  ,                               !- Maximum Total Cooling Capacity{ W }",
+     "  ,                               !- Heating Availability Schedule Name",
+     "  ,                               !- Cooling Availability Schedule Name",
+     "  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+     "  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+     "  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+     "  Office Outdoor Air Spec,        !- Design Specification Outdoor Air Object Name",
+     "  ,                               !- Outdoor Air Inlet Node Name",
+     "  ,                               !- Demand Controlled Ventilation Type",
+     "  NoEconomizer,                   !- Outdoor Air Economizer Type",
+     "  Enthalpy,                       !- Heat Recovery Type",
+     "  0.7,                            !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+     "  0.65;                           !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+     "DesignSpecification:OutdoorAir,",
+     "  Office Outdoor Air Spec,        !- Name",
+     "  Flow/Zone,                      !- Outdoor Air Method",
+     "  0.0,                            !- Outdoor Air Flow per Person {m3/s-person}",
+     "  0.00305,                        !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+     "  0.0,                            !- Outdoor Air Flow per Zone {m3/s}",
+     "  0.0,                            !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+     "  Min OA Sched;                   !- Outdoor Air Schedule Name",
+
+     "Schedule:Compact,",
+     "  Min OA Sched,                   !- Name",
+     "  Fraction,                       !- Schedule Type Limits Name",
+     "  Through: 12/31,                 !- Field 1",
+     "  For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+     "  Until: 8:00,0.0,                !- Field 3",
+     "  Until: 21:00,1.0,               !- Field 5",
+     "  Until: 24:00,0.0,               !- Field 7",
+     "  For: Weekends Holiday,          !- Field 9",
+     "  Until: 24:00,0.0,               !- Field 10",
+     "  For: SummerDesignDay,           !- Field 12",
+     "  Until: 24:00,1.0,               !- Field 13",
+     "  For: WinterDesignDay,           !- Field 15",
+     "  Until: 24:00,1.0;               !- Field 16",
+
+     "ZoneHVAC:EquipmentConnections,",
+     "  EAST ZONE,                      !- Zone Name",
+     "  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+     "  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+     "  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+     "  Zone Node,                      !- Zone Air Node Name",
+     "  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+     "ZoneHVAC:EquipmentList,",
+     "  ZoneEquipment,                  !- Name",
+     "  SequentialLoad,                 !- Load Distribution Scheme",
+     "  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+     "  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+     "  1,                              !- Zone Equipment 1 Cooling Sequence",
+     "  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+     "AirLoopHVAC:ReturnPlenum,",
+     "  DOAS Zone Return Plenum,        !- Name",
+     "  PLENUM ZONE,                    !- Zone Name",
+     "  Plenum Node,                    !- Zone Node Name", // illegal use of non-unique zone node name
+     "  Plenum Outlet Node,             !- Outlet Node Name",
+     "  ,                               !- Induced Air Outlet Node or NodeList Name",
+     "  Zone Exhaust Node;              !- Inlet 1 Node Name",
+
+     });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataGlobal->DoWeathSim = true;
+
+    bool ErrorsFound = false;
+    GetZoneData(*state, ErrorsFound);
+    Zone(1).SurfaceFirst = 1;
+    Zone(1).SurfaceLast = 1;
+    ScheduleManager::Schedule.allocate(1);
+    AllocateHeatBalArrays(*state);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
+
+
+    bool FirstHVACIteration(true);
+    bool SimZone(true);
+    bool SimAir(false);
+
+    EnergyPlus::SizingManager::GetOARequirements(*state);
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
+                        SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
+
+
+    EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
+    // Ideal loads air system found the plenum it is attached to
+    EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp); //
+    EXPECT_EQ(PurchAir(1).SupplyHumRat, Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
+
+    Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp = 35;
+    Node(PurchAir(1).OutdoorAirNodeNum).Temp = 10;
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
+                        SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
+    EXPECT_EQ(0, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
+    EXPECT_EQ(0, Node(PurchAir(1).OutdoorAirNodeNum).Temp);
+    EXPECT_EQ(PurchAir(1).MixedAirTemp, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
