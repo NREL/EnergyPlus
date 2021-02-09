@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -590,7 +590,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        void CalcUpdateHeatRecovery(bool FirstHVACIteration);
+        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration);
 
         void ManageElectStorInteractions(EnergyPlusData &state,
                                          Real64 Pdemand,
@@ -608,24 +608,25 @@ namespace FuelCellElectricGenerator {
         void UpdateFuelCellGeneratorRecords(EnergyPlusData &state);
     };
 
-    void clear_state();
-
     void getFuelCellInput(EnergyPlusData &state);
 
     void FigureFuelCellZoneGains(EnergyPlusData &state);
-
-    extern bool getFuelCellInputFlag;
-    extern int NumFuelCellGenerators;
-    extern Array1D_bool CheckEquipName;
-    extern Array1D<FCDataStruct> FuelCell;
 
 } // namespace FuelCellElectricGenerator
 
 struct FuelCellElectricGeneratorData : BaseGlobalStruct {
 
+    int NumFuelCellGenerators = 0;
+    bool getFuelCellInputFlag = true;
+    bool MyEnvrnFlag = true;
+    Array1D<FuelCellElectricGenerator::FCDataStruct> FuelCell;
+
     void clear_state() override
     {
-
+        this->NumFuelCellGenerators = 0;
+        this->getFuelCellInputFlag = true;
+        this->MyEnvrnFlag = true;
+        this->FuelCell.deallocate();
     }
 };
 

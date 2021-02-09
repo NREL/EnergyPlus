@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -257,7 +257,7 @@ namespace SimulationManager {
 
 
         state.files.outputControl.getInput(state);
-        ResultsFramework::resultsFramework->setupOutputOptions(state);
+        state.dataResultsFramework->resultsFramework->setupOutputOptions(state);
 
         state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
@@ -270,7 +270,7 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // FLOW:
+
         PostIPProcessing(state);
 
         InitializePsychRoutines();
@@ -1650,113 +1650,113 @@ namespace SimulationManager {
     {
 
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
-            if (ResultsFramework::resultsFramework->JSONEnabled()) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                 jsonOutputStreams.json_stream = OpenStreamFile(state, jsonOutputStreams.outputJsonFileName);
             }
-            if (ResultsFramework::resultsFramework->CBOREnabled()) {
+            if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                 jsonOutputStreams.cbor_stream = OpenStreamFile(state, jsonOutputStreams.outputCborFileName);
             }
-            if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                 jsonOutputStreams.msgpack_stream = OpenStreamFile(state, jsonOutputStreams.outputMsgPackFileName);
             }
         }
         //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
+        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
             // Output detailed Zone time series file
-            if (ResultsFramework::resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneMsgPackFileName);
                 }
             }
 
             // Output detailed HVAC time series file
-            if (ResultsFramework::resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacMsgPackFileName);
                 }
             }
 
             // Output timestep time series file
-            if (ResultsFramework::resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSMsgPackFileName);
                 }
             }
 
             // Output hourly time series file
-            if (ResultsFramework::resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRMsgPackFileName);
                 }
             }
 
             // Output daily time series file
-            if (ResultsFramework::resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYMsgPackFileName);
                 }
             }
 
             // Output monthly time series file
-            if (ResultsFramework::resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNMsgPackFileName);
                 }
             }
 
             // Output run period time series file
-            if (ResultsFramework::resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
-                ResultsFramework::resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+            if (state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
+                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMJsonFileName);
                 }
-                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMCborFileName);
                 }
-                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMMsgPackFileName);
                 }
             }
@@ -1798,7 +1798,7 @@ namespace SimulationManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // FLOW:
+
         state.dataGlobal->StdOutputRecordCount = 0;
         state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
         print(state.files.eso, "Program Version,{}\n", VerString);
@@ -2256,8 +2256,6 @@ namespace SimulationManager {
         using namespace DataPlant;
         using namespace DataZoneEquipment;
         using DualDuct::ReportDualDuctConnections;
-        using OutAirNodeManager::NumOutsideAirNodes;
-        using OutAirNodeManager::OutsideAirNodeList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
@@ -2275,12 +2273,12 @@ namespace SimulationManager {
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
-        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
-        if (NumOutsideAirNodes > 0) {
+        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", state.dataOutAirNodeMgr->NumOutsideAirNodes);
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
             print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
-        for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            print(state.files.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
+        for (int Count = 1; Count <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++Count) {
+            print(state.files.bnd, " Outdoor Air Node,{},{}\n", state.dataOutAirNodeMgr->OutsideAirNodeList(Count), NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2389,110 +2387,110 @@ namespace SimulationManager {
 
                 print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",
-                      PlantLoop(Count).Name,
+                      state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
-                      PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
-                      PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
-                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                          PlantLoop(Count).Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
 
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
                             print(state.files.bnd, "{},\n", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
-                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
+                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
 
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  PlantLoop(Count)
+                                  state.dataPlnt->PlantLoop(Count)
                                       .LoopSide(LoopSideNum)
-                                      .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
                                       .Name,
-                                  PlantLoop(Count).Name,
+                                  state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
 
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
-                              PlantLoop(Count).Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
-                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
-                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                          PlantLoop(Count).Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
 
-                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(
                                 state.files.bnd,
                                 "{},",
-                                PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
+                                state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            print(state.files.bnd, "{},{},Supply\n", errstring, PlantLoop(Count).Name);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            print(state.files.bnd, "{},{},Supply\n", errstring, state.dataPlnt->PlantLoop(Count).Name);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
-                                  PlantLoop(Count).Name,
+                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
-                              PlantLoop(Count).Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
             }
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
-                  PlantLoop(Count).Name,
-                  PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).Name,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
-                  PlantLoop(Count).Name,
-                  PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).Name,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
@@ -2521,7 +2519,7 @@ namespace SimulationManager {
               "{}\n",
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
-        for (int Count = NumPlantLoops + 1; Count <= TotNumLoops; ++Count) {
+        for (int Count = NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
             for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // Demandside and supplyside is parametrized in DataPlant
@@ -2537,65 +2535,65 @@ namespace SimulationManager {
 
                 print(state.files.bnd,
                       " Plant Loop,{},{},{},{},{},{}\n",
-                      PlantLoop(Count).Name,
+                      state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
-                      PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
-                      PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
-                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                          PlantLoop(Count).Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
 
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
-                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
+                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                            print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
 
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  PlantLoop(Count)
+                                  state.dataPlnt->PlantLoop(Count)
                                       .LoopSide(LoopSideNum)
-                                      .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
                                       .Name,
-                                  PlantLoop(Count).Name,
+                                  state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
 
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
-                              PlantLoop(Count).Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
-                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    const auto totalInletNodes = PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
+                    const auto totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
-                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                          PlantLoop(Count).Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
                           totalInletNodes); //',Supply,'//  &
 
@@ -2603,54 +2601,54 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
 
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(
                                 state.files.bnd,
                                 "{},",
-                                PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
+                                state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
-                        if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            print(state.files.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                            print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
-                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
-                                  PlantLoop(Count).Name,
+                                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
                         }
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
-                              PlantLoop(Count).Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
             }
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
-                  PlantLoop(Count).Name,
-                  PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).Name,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
-                  PlantLoop(Count).Name,
-                  PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).Name,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
         print(state.files.bnd, "{}\n", "! ===============================================================");
         int NumOfControlledZones = 0;
         for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
-            if (!allocated(ZoneEquipConfig)) continue;
-            if (ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
+            if (!allocated(state.dataZoneEquip->ZoneEquipConfig)) continue;
+            if (state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
         }
 
         if (NumOfControlledZones > 0) {
@@ -2667,41 +2665,41 @@ namespace SimulationManager {
             print(state.files.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
 
             for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
-                if (!ZoneEquipConfig(Count).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) continue;
 
                 print(state.files.bnd,
                       " Controlled Zone,{},{},{},{},{},{},{}\n",
-                      ZoneEquipConfig(Count).ZoneName,
-                      ZoneEquipConfig(Count).EquipListName,
-                      ZoneEquipConfig(Count).ControlListName,
-                      NodeID(ZoneEquipConfig(Count).ZoneNode),
-                      ZoneEquipConfig(Count).NumInletNodes,
-                      ZoneEquipConfig(Count).NumExhaustNodes,
-                      ZoneEquipConfig(Count).NumReturnNodes);
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    auto ChrName = NodeID(ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).EquipListName,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ControlListName,
+                      NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ZoneNode),
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes);
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
+                    auto ChrName = NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
                     print(state.files.bnd,
                           "   Controlled Zone Inlet,{},{},{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).InletNode(Count1)),
-                          NodeID(ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).InletNode(Count1)),
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
                           ChrName);
                 }
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Exhaust,{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).ExhaustNode(Count1)));
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ExhaustNode(Count1)));
                 }
-                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
                     print(state.files.bnd,
                           "   Controlled Zone Return,{},{},{}\n",
                           Count1,
-                          ZoneEquipConfig(Count).ZoneName,
-                          NodeID(ZoneEquipConfig(Count).ReturnNode(Count1)));
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          NodeID(state.dataZoneEquip->ZoneEquipConfig(Count).ReturnNode(Count1)));
                 }
             }
 
@@ -2715,24 +2713,24 @@ namespace SimulationManager {
             for (int Count = 1; Count <= state.dataGlobal->NumOfZones; ++Count) {
                 // Zone equipment list array parallels controlled zone equipment array, so
                 // same index finds corresponding data from both arrays
-                if (!ZoneEquipConfig(Count).IsControlled) continue;
+                if (!state.dataZoneEquip->ZoneEquipConfig(Count).IsControlled) continue;
 
                 print(state.files.bnd,
                       " Zone Equipment List,{},{},{},{}\n",
                       Count,
-                      ZoneEquipList(Count).Name,
-                      ZoneEquipConfig(Count).ZoneName,
-                      ZoneEquipList(Count).NumOfEquipTypes);
+                      state.dataZoneEquip->ZoneEquipList(Count).Name,
+                      state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                      state.dataZoneEquip->ZoneEquipList(Count).NumOfEquipTypes);
 
-                for (int Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
+                for (int Count1 = 1; Count1 <= state.dataZoneEquip->ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
                     print(state.files.bnd,
                           "   Zone Equipment Component,{},{},{},{},{},{}\n",
                           Count1,
-                          ZoneEquipList(Count).EquipType(Count1),
-                          ZoneEquipList(Count).EquipName(Count1),
-                          ZoneEquipConfig(Count).ZoneName,
-                          ZoneEquipList(Count).CoolingPriority(Count1),
-                          ZoneEquipList(Count).HeatingPriority(Count1));
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipType(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipName(Count1),
+                          state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
+                          state.dataZoneEquip->ZoneEquipList(Count).CoolingPriority(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).HeatingPriority(Count1));
                 }
             }
         }
@@ -3082,7 +3080,7 @@ void Resimulate(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
 
-    // FLOW:
+
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 

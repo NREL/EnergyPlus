@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,9 +50,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -68,10 +68,8 @@
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -112,11 +110,11 @@ protected:
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
         ZoneSizingRunDone = true;
 
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).TotalOutputRequired = 1000.0;
-        ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
-        ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
-        ZoneSysMoistureDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
+        state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
         NonAirSystemResponse.allocate(1);
         SysDepZoneLoads.allocate(1);
         MassConservation.allocate(1);
@@ -127,14 +125,14 @@ protected:
 
         TempControlType.allocate(1);
         TempControlType(1) = DataHVACGlobals::SingleHeatingSetPoint;
-        CurDeadBandOrSetback.allocate(1);
-        DeadBandOrSetback.allocate(1);
-        DeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
         ZoneAirHumRat.allocate(1);
         ZoneAirHumRat(1) = 0.07;
 
-        DataZoneEquipment::ZoneEquipInputsFilled = false;
+        state->dataZoneEquip->ZoneEquipInputsFilled = false;
     }
 
     virtual void TearDown()
@@ -411,11 +409,11 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     // The ideal loads air system inlet air node is equal to the zone return plenum outlet node
     EXPECT_EQ(PurchAir(1).PlenumExhaustAirNodeNum, state->dataZonePlenum->ZoneRetPlenCond(1).OutletNode);
     // The ideal loads air system ZoneSupplyAirNodeNum is equal to the zone air inlet node
-    EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, ZoneEquipConfig(1).InletNode(1));
+    EXPECT_EQ(PurchAir(1).ZoneSupplyAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1));
     // The ideal loads air system ZoneExhaustAirNodeNum is equal to the zone exhaust air node num
-    EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, ZoneEquipConfig(1).ExhaustNode(1));
+    EXPECT_EQ(PurchAir(1).ZoneExhaustAirNodeNum, state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1));
     // The zone exhaust air node is equal to the zone return plenum inlet air node
-    EXPECT_EQ(ZoneEquipConfig(1).ExhaustNode(1), state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(1));
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1), state->dataZonePlenum->ZoneRetPlenCond(1).InletNode(1));
     // The ideal loads air system has a non-zero mass flow rate
     EXPECT_GT(PurchAir(1).SupplyAirMassFlowRate, 0.0);
     // The ideal loads air system mass flow rate is equal to all nodes attached to this system
@@ -637,16 +635,16 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
-    ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
-    ZoneEquipConfig(1).IsControlled = true;
-    ZoneEquipConfig(1).NumInletNodes = 1;
-    ZoneEquipConfig(1).InletNode.allocate(1);
-    ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
 
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).ExhaustNode(1) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 2;
     state->dataGlobal->TimeStepZone = 0.25;
 
     EMSManager::CheckIfAnyEMS(*state); // get EMS input

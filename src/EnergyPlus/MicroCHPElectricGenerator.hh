@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -62,9 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace MicroCHPElectricGenerator {
-
-    extern int NumMicroCHPs;
-    extern int NumMicroCHPParams; // number of parameter sets for micro chp
 
     struct MicroCHPParamsNonNormalized
     {
@@ -164,7 +162,6 @@ namespace MicroCHPElectricGenerator {
         std::string Name;                     // name of this Micro CHP Generator
         std::string ParamObjName;             // name of parameter object
         MicroCHPParamsNonNormalized A42Model; // Nested parameter data structure
-        bool ModelTypeAnnex42;                // normalized =  non-normalized?
         Real64 NomEff;                        // nominal efficiency
         std::string ZoneName;
         int ZoneID;
@@ -194,10 +191,10 @@ namespace MicroCHPElectricGenerator {
 
         // Default Constructor
         MicroCHPDataStruct()
-            : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
-              PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
-              DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true),
-              MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
+            : NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0), PlantMassFlowRateMax(0.0),
+              PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0), DynamicsControlID(0),
+              AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true), MySizeFlag(true),
+              MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }
 
@@ -211,7 +208,7 @@ namespace MicroCHPElectricGenerator {
 
         void InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state);
 
-        void CalcUpdateHeatRecovery(EnergyPlusData &state);
+        void CalcUpdateHeatRecovery(EnergyPlusData &state) const;
 
         void CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &state,
                                                    bool RunFlagElectCenter, // TRUE when Generator operating
@@ -261,18 +258,27 @@ namespace MicroCHPElectricGenerator {
 
     void FigureMicroCHPZoneGains(EnergyPlusData &state);
 
-    void clear_state();
-
-    extern Array1D<MicroCHPDataStruct> MicroCHP;
-    extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
-
 } // namespace MicroCHPElectricGenerator
 
 struct MicroCHPElectricGeneratorData : BaseGlobalStruct {
 
+    int NumMicroCHPs = 0;
+    int NumMicroCHPParams = 0;
+    Array1D<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
+    Array1D<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
+    bool getMicroCHPInputFlag = true;
+    bool MyOneTimeFlag = true;
+    bool MyEnvrnFlag = true;
+
     void clear_state() override
     {
-
+        this->NumMicroCHPs = 0;
+        this->NumMicroCHPParams = 0;
+        this->getMicroCHPInputFlag = true;
+        this->MicroCHP.deallocate();
+        this->MicroCHPParamInput.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MyEnvrnFlag = true;
     }
 };
 

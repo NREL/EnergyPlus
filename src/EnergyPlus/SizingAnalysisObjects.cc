@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -502,7 +502,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
         sizingFac = GlobalCoolSizingFactor;
     } else if (PlantSizData(plantSizingIndex).SizingFactorOption == LoopComponentSizingFactorMode) {
         // multiplier used for pumps, often 1.0, from component level sizing fractions
-        sizingFac = PlantLoop(plantLoopIndex).LoopSide(SupplySide).Branch(1).PumpSizFac;
+        sizingFac = state.dataPlnt->PlantLoop(plantLoopIndex).LoopSide(SupplySide).Branch(1).PumpSizFac;
     }
 
     newAdjustedMassFlowRate = newFoundMassFlowRate * sizingFac; // apply overall heating or cooling sizing factor
@@ -527,14 +527,14 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
         // set new size values for rest of simulation
         PlantSizData(plantSizingIndex).DesVolFlowRate = newVolDesignFlowRate;
 
-        if (PlantLoop(plantLoopIndex).MaxVolFlowRateWasAutoSized) {
-            PlantLoop(plantLoopIndex).MaxVolFlowRate = newVolDesignFlowRate;
-            PlantLoop(plantLoopIndex).MaxMassFlowRate = newAdjustedMassFlowRate;
+        if (state.dataPlnt->PlantLoop(plantLoopIndex).MaxVolFlowRateWasAutoSized) {
+            state.dataPlnt->PlantLoop(plantLoopIndex).MaxVolFlowRate = newVolDesignFlowRate;
+            state.dataPlnt->PlantLoop(plantLoopIndex).MaxMassFlowRate = newAdjustedMassFlowRate;
         }
-        if (PlantLoop(plantLoopIndex).VolumeWasAutoSized) {
+        if (state.dataPlnt->PlantLoop(plantLoopIndex).VolumeWasAutoSized) {
             // Note this calculation also appears in PlantManager::SizePlantLoop and PlantManager::ResizePlantLoopLevelSizes
-            PlantLoop(plantLoopIndex).Volume = PlantLoop(plantLoopIndex).MaxVolFlowRate * PlantLoop(plantLoopIndex).CirculationTime * 60.0;
-            PlantLoop(plantLoopIndex).Mass = PlantLoop(plantLoopIndex).Volume * densityForSizing;
+            state.dataPlnt->PlantLoop(plantLoopIndex).Volume = state.dataPlnt->PlantLoop(plantLoopIndex).MaxVolFlowRate * state.dataPlnt->PlantLoop(plantLoopIndex).CirculationTime * 60.0;
+            state.dataPlnt->PlantLoop(plantLoopIndex).Mass = state.dataPlnt->PlantLoop(plantLoopIndex).Volume * densityForSizing;
         }
     }
 
@@ -576,43 +576,43 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
 
     // report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPrevVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizMeasVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
-    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCalcVdot, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPrevVdot, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, previousVolDesignFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizMeasVdot, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundVolFlowRate, 6);
+    PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCalcVdot, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newVolDesignFlowRate, 6);
 
     if (setNewSizes) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "Yes");
     } else {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizCoincYesNo, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, "No");
     }
 
     if (!nullStampProblem) {
         if (!changedByDemand && !CheckTimeStampForNull(newFoundMassFlowRateTimeStamp)) { // bug fix #5665
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
-                                 PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                                 state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
+                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
+                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.hourOfDay - 1);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizPkTimeMin,
-                             PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                             state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                              newFoundMassFlowRateTimeStamp.stepStartMinute,
                              0);
         } else if (changedByDemand && !CheckTimeStampForNull(NewFoundMaxDemandTimeStamp)) { // bug fix #5665
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchPlantSizDesDay,
-                                 PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
+                                 state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
                                  state.dataWeatherManager->Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
+                state.dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
+                state.dataOutRptPredefined->pdchPlantSizPkTimeHour, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.hourOfDay - 1);
             PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchPlantSizPkTimeMin, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
+                state.dataOutRptPredefined->pdchPlantSizPkTimeMin, state.dataPlnt->PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.stepStartMinute, 0);
         }
     }
 }

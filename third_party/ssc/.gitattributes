@@ -1,0 +1,30 @@
+
+doc/* linguist-documentation=true
+tcsdata/docs/* linguist-documentation=true
+
+*.c linguist-vendored
+lpsolve/* linguist-vendored=true
+nlopt/* linguist-vendored=true
+examples/* linguist-vendored=true
+
+build_*/* linguist_generated=true
+
+# Autodetect text files
+* text=auto
+
+# ...Unless the name matches the following
+# overriding patterns
+*.vcxproj text eol=crlf
+*.sln text eol=crlf
+
+# Definitively text files 
+*.txt text
+*.c text
+*.cpp text
+*.h text
+*.csv text
+*.lk text
+
+# Ensure those won't be messed up with
+*.jpg binary
+*.data binary
