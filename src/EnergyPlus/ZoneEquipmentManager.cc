@@ -3965,7 +3965,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                 ZoneReturnAirMassFlowRate + state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate -
                                     state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
-                    CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+                    CalcZoneMixingFlowRateOfReceivingZone(state, ZoneNum, ZoneMixingAirMassFlowRate);
                 }
 
                 ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
@@ -4628,11 +4628,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         if (!allocated(state.dataZoneEquip->ZMAT)) state.dataZoneEquip->ZMAT.allocate(state.dataGlobal->NumOfZones);
         if (!allocated(state.dataZoneEquip->ZHumRat)) state.dataZoneEquip->ZHumRat.allocate(state.dataGlobal->NumOfZones);
-        if (!allocated(state.dataZoneEquip->VentMCP)) state.dataZoneEquip->VentMCP.allocate(TotVentilation);
+        if (!allocated(state.dataZoneEquip->VentMCP)) state.dataZoneEquip->VentMCP.allocate(state.dataHeatBal->TotVentilation);
 
         // Allocate module level logical arrays for MIXING and CROSS MIXING reporting
-        if (!allocated(state.dataZoneEquip->CrossMixingReportFlag)) state.dataZoneEquip->CrossMixingReportFlag.allocate(TotCrossMixing);
-        if (!allocated(state.dataZoneEquip->MixingReportFlag)) state.dataZoneEquip->MixingReportFlag.allocate(TotMixing);
+        if (!allocated(state.dataZoneEquip->CrossMixingReportFlag)) state.dataZoneEquip->CrossMixingReportFlag.allocate(state.dataHeatBal->TotCrossMixing);
+        if (!allocated(state.dataZoneEquip->MixingReportFlag)) state.dataZoneEquip->MixingReportFlag.allocate(state.dataHeatBal->TotMixing);
 
         if (!allocated(MCPTThermChim)) MCPTThermChim.allocate(state.dataGlobal->NumOfZones);
         if (!allocated(MCPThermChim)) MCPThermChim.allocate(state.dataGlobal->NumOfZones);
@@ -4645,8 +4645,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         MixingMassFlowXHumRat = 0.0;
         state.dataZoneEquip->CrossMixingReportFlag = false;
         state.dataZoneEquip->MixingReportFlag = false;
-        if (state.dataContaminantBalance->Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
-        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowGC = 0.0;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation && state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowCO2 = 0.0;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation && state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotRefDoorMixing > 0) state.dataContaminantBalance->MixingMassFlowGC = 0.0;
 
         IVF = 0.0;
         MCPTI = 0.0;
@@ -4687,7 +4687,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
 
         // Process the scheduled Ventilation for air heat balance
-        if (TotVentilation > 0) {
+        if (state.dataHeatBal->TotVentilation > 0) {
             for (auto &e : ZnAirRpt) {
                 e.VentilFanElec = 0.0;
             }
@@ -4705,7 +4705,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
         }
 
-        for (j = 1; j <= TotVentilation; ++j) {
+        for (j = 1; j <= state.dataHeatBal->TotVentilation; ++j) {
             // Use air node information linked to the zone if defined
             NZ = Ventilation(j).ZonePtr;
             Ventilation(j).FanPower = 0.0;
@@ -4908,7 +4908,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
 
         // Process Mixing
-        for (j = 1; j <= TotMixing; ++j) {
+        for (j = 1; j <= state.dataHeatBal->TotMixing; ++j) {
             n = Mixing(j).ZonePtr;
             m = Mixing(j).FromZone;
             TD = Mixing(j).DeltaTemperature;
@@ -5115,7 +5115,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         //                              COMPUTE CROSS ZONE
         //                              AIR MIXING
-        for (j = 1; j <= TotCrossMixing; ++j) {
+        for (j = 1; j <= state.dataHeatBal->TotCrossMixing; ++j) {
             n = CrossMixing(j).ZonePtr;
             m = CrossMixing(j).FromZone;
             TD = CrossMixing(j).DeltaTemperature;
@@ -5251,7 +5251,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         //                              COMPUTE REFRIGERATION DOOR
         //                              AIR MIXING
-        if (TotRefDoorMixing > 0) {
+        if (state.dataHeatBal->TotRefDoorMixing > 0) {
             // Zone loops structured in getinput so only do each pair of zones bounding door once, even if multiple doors in one zone
             for (ZoneA = 1; ZoneA <= (state.dataGlobal->NumOfZones - 1); ++ZoneA) {
                 if (!RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
@@ -5333,7 +5333,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }         //(TotRefrigerationDoorMixing > 0) THEN
 
         // Process the scheduled Infiltration for air heat balance depending on model type
-        for (j = 1; j <= TotInfiltration; ++j) {
+        for (j = 1; j <= state.dataHeatBal->TotInfiltration; ++j) {
 
             NZ = Infiltration(j).ZonePtr;
 
@@ -5537,7 +5537,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
     }
 
-    void CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 &ZoneMixingMassFlowRate)
+    void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int const ZoneNum, Real64 &ZoneMixingMassFlowRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5553,7 +5553,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
         using DataHeatBalFanSys::MixingMassFlowZone;
 
         int Loop;
@@ -5569,14 +5568,14 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 MixingNum = MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
                 Mixing(MixingNum).MixingMassFlowRate = MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
                 MixingMassFlowRate += Mixing(MixingNum).MixingMassFlowRate;
-                CalcZoneMixingFlowRateOfSourceZone(Mixing(MixingNum).FromZone);
+                CalcZoneMixingFlowRateOfSourceZone(state, Mixing(MixingNum).FromZone);
             }
         }
         MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
         ZoneMixingMassFlowRate = MixingMassFlowRate;
     }
 
-    void CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum)
+    void CalcZoneMixingFlowRateOfSourceZone(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5592,7 +5591,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MixingMassFlowZone;
 
@@ -5607,7 +5605,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         if (NumOfSourceZoneMixingObjects > 0) {
             for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
                 MixingNum = MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                     if (Loop == MixingNum) {
                         ZoneSourceMassFlowRate += Mixing(Loop).MixingMassFlowRate;
                     }

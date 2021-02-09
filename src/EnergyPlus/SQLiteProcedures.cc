@@ -149,10 +149,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             auto const &surface = DataSurfaces::Surface(surfaceNumber);
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
-        for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
+        for (int materialNum = 1; materialNum <= state.dataHeatBal->TotMaterials; ++materialNum) {
             sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
-        for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
+        for (int constructNum = 1; constructNum <= state.dataHeatBal->TotConstructs; ++constructNum) {
             auto const &construction = state.dataConstruction->Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
@@ -181,13 +181,13 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int otherEquipNum = 1; otherEquipNum <= state.dataHeatBal->TotOthEquip; ++otherEquipNum) {
             sqlite->addNominalOtherEquipmentData(otherEquipNum, DataHeatBalance::ZoneOtherEq(otherEquipNum));
         }
-        for (int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {
+        for (int bBHeatNum = 1; bBHeatNum <= state.dataHeatBal->TotBBHeat; ++bBHeatNum) {
             sqlite->addNominalBaseboardData(bBHeatNum, DataHeatBalance::ZoneBBHeat(bBHeatNum));
         }
-        for (int infilNum = 1; infilNum <= DataHeatBalance::TotInfiltration; ++infilNum) {
+        for (int infilNum = 1; infilNum <= state.dataHeatBal->TotInfiltration; ++infilNum) {
             sqlite->addInfiltrationData(infilNum, DataHeatBalance::Infiltration(infilNum));
         }
-        for (int ventNum = 1; ventNum <= DataHeatBalance::TotVentilation; ++ventNum) {
+        for (int ventNum = 1; ventNum <= state.dataHeatBal->TotVentilation; ++ventNum) {
             sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {

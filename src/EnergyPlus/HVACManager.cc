@@ -2302,10 +2302,6 @@ namespace HVACManager {
         using DataHeatBalance::CrossMixing;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::RefDoorMixing;
-        using DataHeatBalance::TotCrossMixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalance::TotRefDoorMixing;
-        using DataHeatBalance::TotVentilation;
         using DataHeatBalance::TotZoneAirBalance;
         using DataHeatBalance::Ventilation;
         using DataHeatBalance::ZnAirRpt;
@@ -2479,7 +2475,7 @@ namespace HVACManager {
             VentZoneMassflow = 0.0;
             VentZoneAirTemp = 0.0;
 
-            for (VentNum = 1; VentNum <= TotVentilation; ++VentNum) {
+            for (VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
                 if (Ventilation(VentNum).ZonePtr == ZoneLoop) {
                     // moved into CalcAirFlowSimple
                     //        ZnAirRpt(ZoneLoop)%VentilFanElec  = ZnAirRpt(ZoneLoop)%VentilFanElec+Ventilation(VentNum)%FanPower*TimeStepSys*DataGlobalConstants::SecInHour()
@@ -2546,7 +2542,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).MixMdot = 0.0;           // ! zero reported mass flow rate prior to summations below
             //    MixingLoad = 0.0d0
 
-            for (MixNum = 1; MixNum <= TotMixing; ++MixNum) {
+            for (MixNum = 1; MixNum <= state.dataHeatBal->TotMixing; ++MixNum) {
                 if ((Mixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->MixingReportFlag(MixNum)) {
                     //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(Mixing(MixNum)%FromZone)
                     //        H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop))
@@ -2572,7 +2568,7 @@ namespace HVACManager {
                 }
             }
 
-            for (MixNum = 1; MixNum <= TotCrossMixing; ++MixNum) {
+            for (MixNum = 1; MixNum <= state.dataHeatBal->TotCrossMixing; ++MixNum) {
                 if ((CrossMixing(MixNum).ZonePtr == ZoneLoop) && state.dataZoneEquip->CrossMixingReportFlag(MixNum)) {
                     //        MixSenLoad(ZoneLoop) = MixSenLoad(ZoneLoop)+MCPM(ZoneLoop)*MAT(CrossMixing(MixNum)%FromZone)
                     //        Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
@@ -2616,7 +2612,7 @@ namespace HVACManager {
                 }
             }
 
-            if (TotRefDoorMixing > 0) {
+            if (state.dataHeatBal->TotRefDoorMixing > 0) {
                 // IF(ZoneLoop .NE. NumOfZones)THEN  !Refrigeration Door Mixing
                 // Note - do each Pair a Single time, so must do increment reports for both zones
                 //       Can't have a pair that has ZoneA zone number = NumOfZones because organized

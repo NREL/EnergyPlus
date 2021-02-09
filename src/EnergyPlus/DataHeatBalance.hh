@@ -276,27 +276,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern int TotInfiltration;            // Total Infiltration Statements in input and extrapolated from global assignments
-    extern int TotDesignFlowInfiltration;  // number of Design Flow rate ZoneInfiltration in input
-    extern int TotShermGrimsInfiltration;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
-    extern int TotAIM2Infiltration;        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
-    extern int TotVentilation;             // Total Ventilation Statements in input
-    extern int TotDesignFlowVentilation;   // number of Design Flow rate ZoneVentilation in input
-    extern int TotWindAndStackVentilation; // number of wind and stack open area ZoneVentilation in input
-    extern int TotMixing;                  // Total Mixing Statements in input
-    extern int TotCrossMixing;             // Total Cross Mixing Statements in input
-    extern int TotRefDoorMixing;           // Total RefrigerationDoor Mixing Statements in input
-    extern int TotBBHeat;                  // Total BBHeat Statements in input
-    extern int TotMaterials;               // Total number of unique materials (layers) in this simulation
-    extern int TotConstructs;              // Total number of unique constructions in this simulation
-    extern int TotSpectralData;            // Total window glass spectral data sets
-    extern int W5GlsMat;                   // Window5 Glass Materials, specified by transmittance and front and back reflectance
-    extern int W5GlsMatAlt;                // Window5 Glass Materials, specified by index of refraction and extinction coeff
-    extern int W5GasMat;                   // Window5 Single-Gas Materials
-    extern int W5GasMatMixture;            // Window5 Gas Mixtures
-    extern int W7SupportPillars;           // Complex fenestration support pillars
-    extern int W7DeflectionStates;         // Complex fenestration deflection states
-    extern int W7MaterialGaps;             // Complex fenestration material gaps
     extern int TotBlinds;                  // Total number of blind materials
     extern int TotScreens;                 // Total number of exterior window screen materials
     extern int TotTCGlazings;              // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
@@ -2201,25 +2180,46 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 SysTotalHVACReliefHeatLoss = 0.0;                // Building total heat emission through HVAC system relief air;
     Real64 SysTotalHVACRejectHeatLoss = 0.0;                // Building total heat emission through HVAC system heat rejection;
     // END SiteData
-    int NumOfZoneLists = 0;            // Total number of zone lists
-    int NumOfZoneGroups = 0;           // Total number of zone groups
-    int NumPeopleStatements = 0;       // Number of People objects in input - possibly global assignments
-    int NumLightsStatements = 0;       // Number of Lights objects in input - possibly global assignments
-    int NumZoneElectricStatements = 0; // Number of ZoneElectric objects in input - possibly global assignments
-    int NumZoneGasStatements = 0;      // Number of ZoneGas objects in input - possibly global assignments
-    int NumInfiltrationStatements = 0; // Number of Design Flow Infiltration objects in input - possibly global assignments
-    int NumVentilationStatements = 0;  // Number of Design Flow Ventilation objects in input - possibly global assignments
-    int NumHotWaterEqStatements = 0;   // number of Hot Water Equipment objects in input. - possibly global assignments
-    int NumSteamEqStatements = 0;      // number of Steam Equipment objects in input. - possibly global assignments
-    int NumOtherEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneITEqStatements = 0;     // number of Other Equipment objects in input. - possibly global assignments
-    int TotPeople = 0;                 // Total People Statements in input and extrapolated from global assignments
-    int TotLights = 0;                 // Total Lights Statements in input and extrapolated from global assignments
-    int TotElecEquip = 0;              // Total Electric Equipment Statements in input and extrapolated from global assignments
-    int TotGasEquip = 0;               // Total Gas Equipment Statements in input
-    int TotOthEquip = 0;               // Total Other Equipment Statements in input
-    int TotHWEquip = 0;                // Total Hot Water Equipment Statements in input
-    int TotStmEquip = 0;               // Total Steam Equipment Statements in input
+    int NumOfZoneLists = 0;             // Total number of zone lists
+    int NumOfZoneGroups = 0;            // Total number of zone groups
+    int NumPeopleStatements = 0;        // Number of People objects in input - possibly global assignments
+    int NumLightsStatements = 0;        // Number of Lights objects in input - possibly global assignments
+    int NumZoneElectricStatements = 0;  // Number of ZoneElectric objects in input - possibly global assignments
+    int NumZoneGasStatements = 0;       // Number of ZoneGas objects in input - possibly global assignments
+    int NumInfiltrationStatements = 0;  // Number of Design Flow Infiltration objects in input - possibly global assignments
+    int NumVentilationStatements = 0;   // Number of Design Flow Ventilation objects in input - possibly global assignments
+    int NumHotWaterEqStatements = 0;    // number of Hot Water Equipment objects in input. - possibly global assignments
+    int NumSteamEqStatements = 0;       // number of Steam Equipment objects in input. - possibly global assignments
+    int NumOtherEqStatements = 0;       // number of Other Equipment objects in input. - possibly global assignments
+    int NumZoneITEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
+    int TotPeople = 0;                  // Total People Statements in input and extrapolated from global assignments
+    int TotLights = 0;                  // Total Lights Statements in input and extrapolated from global assignments
+    int TotElecEquip = 0;               // Total Electric Equipment Statements in input and extrapolated from global assignments
+    int TotGasEquip = 0;                // Total Gas Equipment Statements in input
+    int TotOthEquip = 0;                // Total Other Equipment Statements in input
+    int TotHWEquip = 0;                 // Total Hot Water Equipment Statements in input
+    int TotStmEquip = 0;                // Total Steam Equipment Statements in input
+    int TotInfiltration = 0;            // Total Infiltration Statements in input and extrapolated from global assignments
+    int TotDesignFlowInfiltration = 0;  // number of Design Flow rate ZoneInfiltration in input
+    int TotShermGrimsInfiltration = 0;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
+    int TotAIM2Infiltration = 0;        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
+    int TotVentilation = 0;             // Total Ventilation Statements in input
+    int TotDesignFlowVentilation = 0;   // number of Design Flow rate ZoneVentilation in input
+    int TotWindAndStackVentilation = 0; // number of wind and stack open area ZoneVentilation in input
+    int TotMixing = 0;                  // Total Mixing Statements in input
+    int TotCrossMixing = 0;             // Total Cross Mixing Statements in input
+    int TotRefDoorMixing = 0;           // Total RefrigerationDoor Mixing Statements in input
+    int TotBBHeat = 0;                  // Total BBHeat Statements in input
+    int TotMaterials = 0;               // Total number of unique materials (layers) in this simulation
+    int TotConstructs = 0;              // Total number of unique constructions in this simulation
+    int TotSpectralData = 0;            // Total window glass spectral data sets
+    int W5GlsMat = 0;                   // Window5 Glass Materials, specified by transmittance and front and back reflectance
+    int W5GlsMatAlt = 0;                // Window5 Glass Materials, specified by index of refraction and extinction coeff
+    int W5GasMat = 0;                   // Window5 Single-Gas Materials
+    int W5GasMatMixture = 0;            // Window5 Gas Mixtures
+    int W7SupportPillars = 0;           // Complex fenestration support pillars
+    int W7DeflectionStates = 0;         // Complex fenestration deflection states
+    int W7MaterialGaps = 0;             // Complex fenestration material gaps
 
     void clear_state() override
     {
@@ -2275,6 +2275,27 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TotOthEquip = 0;
         this->TotHWEquip = 0;
         this->TotStmEquip = 0;
+        this->TotInfiltration = 0;
+        this->TotDesignFlowInfiltration = 0;
+        this->TotShermGrimsInfiltration = 0;
+        this->TotAIM2Infiltration = 0;
+        this->TotVentilation = 0;
+        this->TotDesignFlowVentilation = 0;
+        this->TotWindAndStackVentilation = 0;
+        this->TotMixing = 0;
+        this->TotCrossMixing = 0;
+        this->TotRefDoorMixing = 0;
+        this->TotBBHeat = 0;
+        this->TotMaterials = 0;
+        this->TotConstructs = 0;
+        this->TotSpectralData = 0;
+        this->W5GlsMat = 0;
+        this->W5GlsMatAlt = 0;
+        this->W5GasMat = 0;
+        this->W5GasMatMixture = 0;
+        this->W7SupportPillars = 0;
+        this->W7DeflectionStates = 0;
+        this->W7MaterialGaps = 0;
     }
 };
 

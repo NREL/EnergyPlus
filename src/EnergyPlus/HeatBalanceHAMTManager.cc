@@ -432,7 +432,7 @@ namespace HeatBalanceHAMTManager {
         }
 
         // check the isotherm
-        for (matid = 1; matid <= TotMaterials; ++matid) {
+        for (matid = 1; matid <= state.dataHeatBal->TotMaterials; ++matid) {
             if (state.dataMaterial->Material(matid).niso > 0) {
                 // - First sort
                 for (jj = 1; jj <= state.dataMaterial->Material(matid).niso - 1; ++jj) {
@@ -1065,7 +1065,7 @@ namespace HeatBalanceHAMTManager {
             static constexpr auto Format_108("! <Material Nominal Resistance>, Material Name,  Nominal R\n");
             print(state.files.eio, Format_108);
 
-            for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+            for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
                 static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
                 print(state.files.eio, Format_111, state.dataMaterial->Material(MaterNum).Name, NominalR(MaterNum));

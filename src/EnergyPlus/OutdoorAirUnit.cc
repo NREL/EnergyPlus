@@ -2454,7 +2454,6 @@ namespace OutdoorAirUnit {
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
 
-        // Flow
         CoilIndex = 0;
         OAUnitNum = CompNum;
         CompoNum = EquipIndex;

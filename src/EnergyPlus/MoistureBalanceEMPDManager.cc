@@ -705,7 +705,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
               "Coating Thickness {m}\n");
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
             if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {

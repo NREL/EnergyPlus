@@ -1319,7 +1319,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotBBHeat, 1);
+    EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 

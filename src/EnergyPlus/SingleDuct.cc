@@ -297,7 +297,6 @@ namespace EnergyPlus::SingleDuct {
         std::string AirTermSysInletNodeName;  // air terminal single duct system inlet node name
         std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
-        // Flow
         NumVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
         NumNoRHVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
         state.dataSingleDuct->NumConstVolSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat");

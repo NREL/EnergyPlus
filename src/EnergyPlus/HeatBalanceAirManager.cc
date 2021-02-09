@@ -249,7 +249,7 @@ namespace HeatBalanceAirManager {
 
         GetAirFlowFlag(state, ErrorsFound);
 
-        SetZoneMassConservationFlag();
+        SetZoneMassConservationFlag(state);
 
         // get input parameters for modeling of room air flow
         GetRoomAirModelParameters(state, ErrorsFound);
@@ -285,13 +285,13 @@ namespace HeatBalanceAirManager {
         AirFlowFlag = UseSimpleAirFlow;
 
         GetSimpleAirModelInputs(state, ErrorsFound);
-        if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
+        if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotRefDoorMixing > 0) {
             static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
             print(state.files.eio, Format_720, "Simple");
         }
     }
 
-    void SetZoneMassConservationFlag()
+    void SetZoneMassConservationFlag(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION :
@@ -299,14 +299,11 @@ namespace HeatBalanceAirManager {
         // DATE WRITTEN   February 2014
         // MODIFIED
 
-        // RE - ENGINEERED  na
-
         // PURPOSE OF THIS SUBROUTINE :
         // This subroutine sets the zone mass conservation flag to true.
 
         // Using/Aliasing
         using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::MixingMassFlowZone;
         using DataHeatBalFanSys::ZoneMassBalanceFlag;
@@ -314,10 +311,8 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS :
         int Loop;
 
-        // flow
-
         if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
-            for (Loop = 1; Loop <= TotMixing; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                 ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
                 ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
             }
@@ -779,17 +774,17 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotShermGrimsInfiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        TotAIM2Infiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotAIM2Infiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
         state.dataHeatBal->NumInfiltrationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         InfiltrationObjects.allocate(state.dataHeatBal->NumInfiltrationStatements);
 
-        TotDesignFlowInfiltration = 0;
+        state.dataHeatBal->TotDesignFlowInfiltration = 0;
         errFlag = false;
         for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
             inputProcessor->getObjectItem(state,
@@ -811,14 +806,14 @@ namespace HeatBalanceAirManager {
             ZLItem = 0;
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                InfiltrationObjects(Item).StartPtr = TotDesignFlowInfiltration + 1;
-                ++TotDesignFlowInfiltration;
+                InfiltrationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowInfiltration + 1;
+                ++state.dataHeatBal->TotDesignFlowInfiltration;
                 InfiltrationObjects(Item).NumOfZones = 1;
                 InfiltrationObjects(Item).ZoneListActive = false;
                 InfiltrationObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                InfiltrationObjects(Item).StartPtr = TotDesignFlowInfiltration + 1;
-                TotDesignFlowInfiltration += ZoneList(ZLItem).NumOfZones;
+                InfiltrationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowInfiltration + 1;
+                state.dataHeatBal->TotDesignFlowInfiltration += ZoneList(ZLItem).NumOfZones;
                 InfiltrationObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 InfiltrationObjects(Item).ZoneListActive = true;
                 InfiltrationObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -833,15 +828,15 @@ namespace HeatBalanceAirManager {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotDesignFlowInfiltration = 0;
+            state.dataHeatBal->TotDesignFlowInfiltration = 0;
         }
 
-        TotInfiltration = TotDesignFlowInfiltration + TotShermGrimsInfiltration + TotAIM2Infiltration;
+        state.dataHeatBal->TotInfiltration = state.dataHeatBal->TotDesignFlowInfiltration + state.dataHeatBal->TotShermGrimsInfiltration + state.dataHeatBal->TotAIM2Infiltration;
 
-        Infiltration.allocate(TotInfiltration);
-        UniqueInfiltrationNames.reserve(static_cast<unsigned>(TotInfiltration));
+        Infiltration.allocate(state.dataHeatBal->TotInfiltration);
+        UniqueInfiltrationNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotInfiltration));
 
-        if (TotDesignFlowInfiltration > 0) {
+        if (state.dataHeatBal->TotDesignFlowInfiltration > 0) {
             Loop = 0;
             cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
             for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
@@ -1055,8 +1050,8 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneInfiltration:EffectiveLeakageArea";
-        InfiltCount = TotDesignFlowInfiltration;
-        for (Loop = 1; Loop <= TotShermGrimsInfiltration; ++Loop) {
+        InfiltCount = state.dataHeatBal->TotDesignFlowInfiltration;
+        for (Loop = 1; Loop <= state.dataHeatBal->TotShermGrimsInfiltration; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -1119,7 +1114,7 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneInfiltration:FlowCoefficient";
-        for (Loop = 1; Loop <= TotAIM2Infiltration; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotAIM2Infiltration; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -1184,7 +1179,7 @@ namespace HeatBalanceAirManager {
         }
 
         // setup zone-level infiltration reports
-        for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
             if (Infiltration(Loop).ZonePtr > 0 && !Infiltration(Loop).QuadratureSum) {
                 if (RepVarSet(Infiltration(Loop).ZonePtr)) {
                     RepVarSet(Infiltration(Loop).ZonePtr) = false;
@@ -1286,11 +1281,11 @@ namespace HeatBalanceAirManager {
         state.dataHeatBal->NumVentilationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         VentilationObjects.allocate(state.dataHeatBal->NumVentilationStatements);
 
-        TotDesignFlowVentilation = 0;
+        state.dataHeatBal->TotDesignFlowVentilation = 0;
         errFlag = false;
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
         for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
@@ -1315,14 +1310,14 @@ namespace HeatBalanceAirManager {
             ZLItem = 0;
             if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                VentilationObjects(Item).StartPtr = TotDesignFlowVentilation + 1;
-                ++TotDesignFlowVentilation;
+                VentilationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowVentilation + 1;
+                ++state.dataHeatBal->TotDesignFlowVentilation;
                 VentilationObjects(Item).NumOfZones = 1;
                 VentilationObjects(Item).ZoneListActive = false;
                 VentilationObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                VentilationObjects(Item).StartPtr = TotDesignFlowVentilation + 1;
-                TotDesignFlowVentilation += ZoneList(ZLItem).NumOfZones;
+                VentilationObjects(Item).StartPtr = state.dataHeatBal->TotDesignFlowVentilation + 1;
+                state.dataHeatBal->TotDesignFlowVentilation += ZoneList(ZLItem).NumOfZones;
                 VentilationObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 VentilationObjects(Item).ZoneListActive = true;
                 VentilationObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -1337,13 +1332,13 @@ namespace HeatBalanceAirManager {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotDesignFlowVentilation = 0;
+            state.dataHeatBal->TotDesignFlowVentilation = 0;
         }
 
-        TotVentilation = TotDesignFlowVentilation + TotWindAndStackVentilation;
-        Ventilation.allocate(TotVentilation);
+        state.dataHeatBal->TotVentilation = state.dataHeatBal->TotDesignFlowVentilation + state.dataHeatBal->TotWindAndStackVentilation;
+        Ventilation.allocate(state.dataHeatBal->TotVentilation);
 
-        if (TotDesignFlowVentilation > 0) {
+        if (state.dataHeatBal->TotDesignFlowVentilation > 0) {
             Loop = 0;
             cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
             for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
@@ -1966,8 +1961,8 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
-        VentiCount = TotDesignFlowVentilation;
-        for (Loop = 1; Loop <= TotWindAndStackVentilation; ++Loop) {
+        VentiCount = state.dataHeatBal->TotDesignFlowVentilation;
+        for (Loop = 1; Loop <= state.dataHeatBal->TotWindAndStackVentilation; ++Loop) {
 
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -1982,7 +1977,7 @@ namespace HeatBalanceAirManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            VentiCount = TotDesignFlowVentilation + Loop;
+            VentiCount = state.dataHeatBal->TotDesignFlowVentilation + Loop;
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             Ventilation(VentiCount).Name = cAlphaArgs(1);
@@ -2399,10 +2394,10 @@ namespace HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneMixing";
-        TotMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        Mixing.allocate(TotMixing);
+        state.dataHeatBal->TotMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        Mixing.allocate(state.dataHeatBal->TotMixing);
 
-        for (Loop = 1; Loop <= TotMixing; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -2768,12 +2763,12 @@ namespace HeatBalanceAirManager {
         MassConservation.allocate(state.dataGlobal->NumOfZones);
 
         // added by BAN, 02/14
-        if (TotMixing > 0) {
-            ZoneMixingNum.allocate(TotMixing);
+        if (state.dataHeatBal->TotMixing > 0) {
+            ZoneMixingNum.allocate(state.dataHeatBal->TotMixing);
             // get source zones mixing objects index
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 SourceCount = 0;
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                     if (ZoneNum == Mixing(Loop).FromZone) {
                         SourceCount += 1;
                         ZoneMixingNum(SourceCount) = Loop;
@@ -2792,10 +2787,10 @@ namespace HeatBalanceAirManager {
             // check zones which are used only as a source zones
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 IsSourceZone = false;
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                     if (ZoneNum != Mixing(Loop).FromZone) continue;
                     MassConservation(ZoneNum).IsOnlySourceZone = true;
-                    for (Loop1 = 1; Loop1 <= TotMixing; ++Loop1) {
+                    for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotMixing; ++Loop1) {
                         if (ZoneNum == Mixing(Loop1).ZonePtr) {
                             MassConservation(ZoneNum).IsOnlySourceZone = false;
                             break;
@@ -2807,7 +2802,7 @@ namespace HeatBalanceAirManager {
             ZoneMixingNum = 0;
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ReceivingCount = 0;
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                     if (ZoneNum == Mixing(Loop).ZonePtr) {
                         ReceivingCount += 1;
                         ZoneMixingNum(ReceivingCount) = Loop;
@@ -2844,10 +2839,10 @@ namespace HeatBalanceAirManager {
 
         cCurrentModuleObject = "ZoneCrossMixing";
         int inputCrossMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        TotCrossMixing = inputCrossMixing + DataHeatBalance::NumAirBoundaryMixing;
-        CrossMixing.allocate(TotCrossMixing);
+        state.dataHeatBal->TotCrossMixing = inputCrossMixing + DataHeatBalance::NumAirBoundaryMixing;
+        CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
-        for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
 
             if (Loop > inputCrossMixing) {
                 // Create CrossMixing object from air boundary info
@@ -3301,13 +3296,13 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
-        TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (TotRefDoorMixing > 0) {
+        state.dataHeatBal->TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataHeatBal->TotRefDoorMixing > 0) {
             RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : RefDoorMixing)
                 e.NumRefDoorConnections = 0;
 
-            for (Loop = 1; Loop <= TotRefDoorMixing; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
 
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -3659,7 +3654,7 @@ namespace HeatBalanceAirManager {
             }
         };
 
-        for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
             if (Loop == 1)
                 print(state.files.eio, Format_721,
                     "ZoneInfiltration",
@@ -3688,13 +3683,13 @@ namespace HeatBalanceAirManager {
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
                 ZoneNum = Infiltration(Loop).ZonePtr;
                 MassConservation(ZoneNum).InfiltrationPtr = Loop;
             }
         }
 
-        for (Loop = 1; Loop <= TotVentilation; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotVentilation; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio, Format_721,
                     "ZoneVentilation",
@@ -3764,7 +3759,7 @@ namespace HeatBalanceAirManager {
         }
 
         TotMixingFlow.dimension(state.dataGlobal->NumOfZones, 0.0);
-        for (Loop = 1; Loop <= TotMixing; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
             if (Loop == 1)
                 print(state.files.eio, Format_721, "Mixing",
                     "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
@@ -3793,7 +3788,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
         }
 
-        for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_721,
@@ -3827,7 +3822,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
         }
 
-        if (TotRefDoorMixing > 0) {
+        if (state.dataHeatBal->TotRefDoorMixing > 0) {
             static constexpr auto Format_724("! <{} Airflow Stats Nominal>, {}\n");
             print(state.files.eio, Format_724,
                 "RefrigerationDoorMixing ",
@@ -4231,7 +4226,7 @@ namespace HeatBalanceAirManager {
 
             if (SELECT_CASE_var == UseSimpleAirFlow) { // Simplified airflow calculation
                 // Process the scheduled Mixing for air heat balance
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
                     NZ = Mixing(Loop).ZonePtr;
                     Mixing(Loop).DesiredAirFlowRate = Mixing(Loop).DesignLevel * GetCurrentScheduleValue(state, Mixing(Loop).SchedPtr);
                     if (Mixing(Loop).EMSSimpleMixingOn) Mixing(Loop).DesiredAirFlowRate = Mixing(Loop).EMSimpleMixingFlowRate;
@@ -4256,7 +4251,7 @@ namespace HeatBalanceAirManager {
                 }
 
                 // Process the scheduled CrossMixing for air heat balance
-                for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
                     NZ = CrossMixing(Loop).ZonePtr;
                     CrossMixing(Loop).DesiredAirFlowRate = CrossMixing(Loop).DesignLevel * GetCurrentScheduleValue(state, CrossMixing(Loop).SchedPtr);
                     if (CrossMixing(Loop).EMSSimpleMixingOn) CrossMixing(Loop).DesiredAirFlowRate = CrossMixing(Loop).EMSimpleMixingFlowRate;
@@ -4267,7 +4262,7 @@ namespace HeatBalanceAirManager {
                 //       in input with lowest zone # first no matter how input in idf
 
                 // Process the scheduled Refrigeration Door mixing for air heat balance
-                if (TotRefDoorMixing > 0) {
+                if (state.dataHeatBal->TotRefDoorMixing > 0) {
                     for (NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
                          ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
                         if (!RefDoorMixing(NZ).RefDoorMixFlag) continue;

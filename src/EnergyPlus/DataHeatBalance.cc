@@ -220,27 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    int TotInfiltration(0);            // Total Infiltration Statements in input and extrapolated from global assignments
-    int TotDesignFlowInfiltration(0);  // number of Design Flow rate ZoneInfiltration in input
-    int TotShermGrimsInfiltration(0);  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
-    int TotAIM2Infiltration(0);        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
-    int TotVentilation(0);             // Total Ventilation Statements in input
-    int TotDesignFlowVentilation(0);   // number of Design Flow rate ZoneVentilation in input
-    int TotWindAndStackVentilation(0); // number of wind and stack open area ZoneVentilation in input
-    int TotMixing(0);                  // Total Mixing Statements in input
-    int TotCrossMixing(0);             // Total Cross Mixing Statements in input
-    int TotRefDoorMixing(0);           // Total RefrigerationDoor Mixing Statements in input
-    int TotBBHeat(0);                  // Total BBHeat Statements in input
-    int TotMaterials(0);               // Total number of unique materials (layers) in this simulation
-    int TotConstructs(0);              // Total number of unique constructions in this simulation
-    int TotSpectralData(0);            // Total window glass spectral data sets
-    int W5GlsMat(0);                   // Window5 Glass Materials, specified by transmittance and front and back reflectance
-    int W5GlsMatAlt(0);                // Window5 Glass Materials, specified by index of refraction and extinction coeff
-    int W5GasMat(0);                   // Window5 Single-Gas Materials
-    int W5GasMatMixture(0);            // Window5 Gas Mixtures
-    int W7SupportPillars(0);           // Complex fenestration support pillars
-    int W7DeflectionStates(0);         // Complex fenestration deflection states
-    int W7MaterialGaps(0);             // Complex fenestration material gaps
     int TotBlinds(0);                  // Total number of blind materials
     int TotScreens(0);                 // Total number of exterior window screen materials
     int TotTCGlazings(0);              // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
@@ -530,27 +509,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TotInfiltration = 0;
-        TotDesignFlowInfiltration = 0;
-        TotShermGrimsInfiltration = 0;
-        TotAIM2Infiltration = 0;
-        TotVentilation = 0;
-        TotDesignFlowVentilation = 0;
-        TotWindAndStackVentilation = 0;
-        TotMixing = 0;
-        TotCrossMixing = 0;
-        TotRefDoorMixing = 0;
-        TotBBHeat = 0;
-        TotMaterials = 0;
-        TotConstructs = 0;
-        TotSpectralData = 0;
-        W5GlsMat = 0;
-        W5GlsMatAlt = 0;
-        W5GasMat = 0;
-        W5GasMatMixture = 0;
-        W7SupportPillars = 0;
-        W7DeflectionStates = 0;
-        W7MaterialGaps = 0;
         TotBlinds = 0;
         TotScreens = 0;
         TotTCGlazings = 0;
@@ -1335,7 +1293,7 @@ namespace EnergyPlus::DataHeatBalance {
 
         // now, got thru and see if there is a match already....
         NewConstrNum = 0;
-        for (Loop = 1; Loop <= TotConstructs; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             Found = true;
             for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
                 if (state.dataConstruction->Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
@@ -1351,33 +1309,33 @@ namespace EnergyPlus::DataHeatBalance {
 
         // if need new one, bunch o stuff
         if (NewConstrNum == 0) {
-            ++TotConstructs;
-            state.dataConstruction->Construct.redimension(TotConstructs);
-            NominalRforNominalUCalculation.redimension(TotConstructs);
-            NominalRforNominalUCalculation(TotConstructs) = 0.0;
-            NominalU.redimension(TotConstructs);
-            NominalU(TotConstructs) = 0.0;
+            ++state.dataHeatBal->TotConstructs;
+            state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
+            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
+            NominalU.redimension(state.dataHeatBal->TotConstructs);
+            NominalU(state.dataHeatBal->TotConstructs) = 0.0;
             //  Put in new attributes
-            NewConstrNum = TotConstructs;
+            NewConstrNum = state.dataHeatBal->TotConstructs;
             state.dataConstruction->Construct(NewConstrNum).IsUsed = true;
-            state.dataConstruction->Construct(TotConstructs) = state.dataConstruction->Construct(ConstrNum); // preserve some of the attributes.
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs) = state.dataConstruction->Construct(ConstrNum); // preserve some of the attributes.
             // replace others...
-            state.dataConstruction->Construct(TotConstructs).Name = "iz-" + state.dataConstruction->Construct(ConstrNum).Name;
-            state.dataConstruction->Construct(TotConstructs).TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = "iz-" + state.dataConstruction->Construct(ConstrNum).Name;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
             for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
-                state.dataConstruction->Construct(TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
+                state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
                 if (LayerPoint(nLayer) != 0) {
-                    NominalRforNominalUCalculation(TotConstructs) += NominalR(LayerPoint(nLayer));
+                    NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += NominalR(LayerPoint(nLayer));
                 }
             }
 
             // no error if zero -- that will have been caught with earlier construction
             // the following line was changed to fix CR7601
-            if (NominalRforNominalUCalculation(TotConstructs) != 0.0) {
-                NominalU(TotConstructs) = 1.0 / NominalRforNominalUCalculation(TotConstructs);
+            if (NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) != 0.0) {
+                NominalU(state.dataHeatBal->TotConstructs) = 1.0 / NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs);
             }
 
-            CheckAndSetConstructionProperties(state, TotConstructs, ErrorsFound);
+            CheckAndSetConstructionProperties(state, state.dataHeatBal->TotConstructs, ErrorsFound);
         }
 
         return NewConstrNum;

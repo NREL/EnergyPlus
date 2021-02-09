@@ -1314,7 +1314,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
 
-        // Flow
         GetVRFInputData(state, ErrorsFound);
 
         if (ErrorsFound) {
@@ -1429,7 +1428,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 MaxCurvePLR; // used for testing PLF curve output
         Real64 CurveInput;  // index used for testing PLF curve output
 
-        // Flow
         MaxAlphas = 0;
         MaxNumbers = 0;
 

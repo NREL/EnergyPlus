@@ -972,7 +972,6 @@ namespace Furnaces {
         std::string IHPCoilName;        // IHP cooling coil name
         int IHPCoilIndex(0);            // IHP cooling coil id
 
-        // Flow
         GetFurnaceInputFlag = false;
         MaxNumbers = 0;
         MaxAlphas = 0;

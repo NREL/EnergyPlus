@@ -4461,10 +4461,10 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneBaseboard:OutdoorTemperatureControlled";
-        TotBBHeat = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ZoneBBHeat.allocate(TotBBHeat);
+        state.dataHeatBal->TotBBHeat = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ZoneBBHeat.allocate(state.dataHeatBal->TotBBHeat);
 
-        for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
             inputProcessor->getObjectItem(state,
@@ -4798,7 +4798,7 @@ namespace InternalHeatGains {
                 if (ZoneHWEq(Loop1).ZonePtr != Loop) continue;
                 HWETot += ZoneHWEq(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= TotBBHeat; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotBBHeat; ++Loop1) {
                 if (ZoneBBHeat(Loop1).ZonePtr != Loop) continue;
                 BBHeatInd = "Yes";
             }
@@ -5204,7 +5204,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.10R}\n", ZoneITEq(Loop).DesignAirVolFlowRate);
         }
 
-        for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5591,7 +5591,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QSELost += ZoneSteamEq(Loop).LostRate;
         }
 
-        for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
             int NZ = ZoneBBHeat(Loop).ZonePtr;
             if (Zone(NZ).OutDryBulbTemp >= ZoneBBHeat(Loop).HighTemperature) {
                 Q = 0.0;
@@ -6225,7 +6225,7 @@ namespace InternalHeatGains {
             ZoneSteamEq(Loop).TotGainEnergy = ZoneSteamEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
             ZoneBBHeat(Loop).Consumption = ZoneBBHeat(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneBBHeat(Loop).RadGainEnergy = ZoneBBHeat(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneBBHeat(Loop).ConGainEnergy = ZoneBBHeat(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;

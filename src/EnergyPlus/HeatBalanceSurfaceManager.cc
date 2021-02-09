@@ -4320,7 +4320,7 @@ namespace HeatBalanceSurfaceManager {
         if (!SurfPropOverridesPresent) return; // quick return if nothing has ever needed to be done
 
         // first, loop over materials
-        for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+        for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
             if (state.dataMaterial->Material(MaterNum).AbsorpSolarEMSOverrideOn) {
                 state.dataMaterial->Material(MaterNum).AbsorpSolar = max(min(state.dataMaterial->Material(MaterNum).AbsorpSolarEMSOverride, 0.9999), 0.0001);
             } else {
@@ -4339,7 +4339,7 @@ namespace HeatBalanceSurfaceManager {
         } // loop over materials
 
         // second, loop over constructions
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; // only override opaque constructions
             TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
             if (TotLayers == 0) continue; // error condition

@@ -331,8 +331,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    TotMaterials = 3;
-    state->dataMaterial->Material.allocate(TotMaterials);
+    state->dataHeatBal->TotMaterials = 3;
+    state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
     state->dataMaterial->Material(1).Name = "GLASS";
     state->dataMaterial->Material(2).Name = "AIRGAP";
     state->dataMaterial->Material(3).Name = "GLASS";
@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
 
     NominalRforNominalUCalculation.allocate(1);
     NominalRforNominalUCalculation(1) = 0.0;
-    NominalR.allocate(TotMaterials);
+    NominalR.allocate(state->dataHeatBal->TotMaterials);
     NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at
                        // end of GetConstructData
     NominalR(2) = 0.4;
@@ -471,7 +471,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ErrorsFound = false;
     GetSimpleAirModelInputs(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SetZoneMassConservationFlag();
+    SetZoneMassConservationFlag(*state);
     // setup zone equipment configuration
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
@@ -1797,7 +1797,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(DataHeatBalance::TotConstructs, 2);
+    EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
 
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
@@ -1843,7 +1843,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;
-    EXPECT_EQ(DataHeatBalance::TotMaterials, 0);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 0);
 
     // get constructions
     ErrorsFound = false;
@@ -1858,7 +1858,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    EXPECT_EQ(DataHeatBalance::TotConstructs, 1);
+    EXPECT_EQ(state->dataHeatBal->TotConstructs, 1);
 
     int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
@@ -1877,8 +1877,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataHeatBalance::TotConstructs = 3;
-    state->dataConstruction->Construct.allocate( DataHeatBalance::TotConstructs);
+    state->dataHeatBal->TotConstructs = 3;
+    state->dataConstruction->Construct.allocate( state->dataHeatBal->TotConstructs);
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;

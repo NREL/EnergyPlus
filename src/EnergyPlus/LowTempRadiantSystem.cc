@@ -138,8 +138,6 @@ namespace LowTempRadiantSystem {
     // Using/Aliasing
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalance::TotConstructs;
-    using DataHeatBalance::TotMaterials;
     using DataHeatBalFanSys::QRadSysSource; // Heat source/sink value & temperature for CondFD algo.
     using DataHeatBalFanSys::TCondFDSourceNode;
     using DataHVACGlobals::SmallLoad;

@@ -529,7 +529,7 @@ namespace HeatBalanceManager {
             }
         }
         Unused =
-            TotConstructs - std::count_if(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.IsUsed; });
+            state.dataHeatBal->TotConstructs - std::count_if(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.IsUsed; });
         if (Unused > 0) {
             if (!state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, format("CheckUsedConstructions: There are {} nominally unused constructions in input.", Unused));
@@ -537,7 +537,7 @@ namespace HeatBalanceManager {
             } else {
                 ShowWarningError(state, format("CheckUsedConstructions: There are {} nominally unused constructions in input.", Unused));
                 ShowContinueError(state, "Each Unused construction is shown.");
-                for (Loop = 1; Loop <= TotConstructs; ++Loop) {
+                for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
                     if (state.dataConstruction->Construct(Loop).IsUsed) continue;
                     ShowMessage(state, "Construction=" + state.dataConstruction->Construct(Loop).Name);
                 }
@@ -1554,10 +1554,10 @@ namespace HeatBalanceManager {
         RegRMat = inputProcessor->getNumObjectsFound(state, "Material:NoMass");
         IRTMat = inputProcessor->getNumObjectsFound(state, "Material:InfraredTransparent");
         AirMat = inputProcessor->getNumObjectsFound(state, "Material:AirGap");
-        W5GlsMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing");
-        W5GlsMatAlt = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
-        W5GasMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
-        W5GasMatMixture = inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
+        state.dataHeatBal->W5GlsMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing");
+        state.dataHeatBal->W5GlsMatAlt = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
+        state.dataHeatBal->W5GasMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
+        state.dataHeatBal->W5GasMatMixture = inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
         TotShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
         TotComplexShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
         TotComplexGaps = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
@@ -1573,7 +1573,7 @@ namespace HeatBalanceManager {
         TotScreensEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
         W5GapMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
 
-        TotMaterials = RegMat + RegRMat + AirMat + W5GlsMat + W5GlsMatAlt + W5GasMat + W5GasMatMixture + TotShades + TotScreens + TotBlinds +
+        state.dataHeatBal->TotMaterials = RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat + state.dataHeatBal->W5GasMatMixture + TotShades + TotScreens + TotBlinds +
                        EcoRoofMat + IRTMat + TotSimpleWindow + TotComplexShades + TotComplexGaps + W5GlsMatEQL + TotShadesEQL + TotDrapesEQL +
                        TotBlindsEQL + TotScreensEQL + W5GapMatEQL;
 
@@ -1590,13 +1590,13 @@ namespace HeatBalanceManager {
 
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             // Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
-            TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
+            state.dataHeatBal->TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
-        state.dataMaterial->Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
-        UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
+        state.dataMaterial->Material.allocate(state.dataHeatBal->TotMaterials); // Allocate the array Size to the number of materials
+        UniqueMaterialNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotMaterials));
 
-        NominalR.dimension(TotMaterials, 0.0);
+        NominalR.dimension(state.dataHeatBal->TotMaterials, 0.0);
 
         MaterNum = 0;
 
@@ -1836,7 +1836,7 @@ namespace HeatBalanceManager {
         // Glass materials, regular input: transmittance and front/back reflectance
 
         CurrentModuleObject = "WindowMaterial:Glazing";
-        for (Loop = 1; Loop <= W5GlsMat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -1893,7 +1893,7 @@ namespace HeatBalanceManager {
             }
 
             state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
-            if (TotSpectralData > 0 && !lAlphaFieldBlanks(3)) {
+            if (state.dataHeatBal->TotSpectralData > 0 && !lAlphaFieldBlanks(3)) {
                 state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), SpectralData);
             }
             if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
@@ -2228,7 +2228,7 @@ namespace HeatBalanceManager {
         // Glass materials, alternative input: index of refraction and extinction coefficient
 
         CurrentModuleObject = "WindowMaterial:Glazing:RefractionExtinctionMethod";
-        for (Loop = 1; Loop <= W5GlsMatAlt; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatAlt; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -2398,7 +2398,7 @@ namespace HeatBalanceManager {
         // Window gas materials (for gaps with a single gas)
 
         CurrentModuleObject = "WindowMaterial:Gas";
-        for (Loop = 1; Loop <= W5GasMat; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GasMat; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -2631,7 +2631,7 @@ namespace HeatBalanceManager {
         // Window gas mixtures (for gaps with two or more gases)
 
         CurrentModuleObject = "WindowMaterial:GasMixture";
-        for (Loop = 1; Loop <= W5GasMatMixture; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GasMatMixture; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -3885,7 +3885,7 @@ namespace HeatBalanceManager {
             static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
             static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
 
-            for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+            for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
                 {
                     auto const SELECT_CASE_var(state.dataMaterial->Material(MaterNum).Group);
@@ -3913,7 +3913,7 @@ namespace HeatBalanceManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
-            for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+            for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
                 if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) continue;
                 SetupEMSActuator(state, "Material",
                                  state.dataMaterial->Material(MaterNum).Name,
@@ -3991,11 +3991,11 @@ namespace HeatBalanceManager {
         Real64 RhoB;
 
         CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
-        TotSpectralData = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        SpectralData.allocate(TotSpectralData);
-        if (TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
+        state.dataHeatBal->TotSpectralData = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        SpectralData.allocate(state.dataHeatBal->TotSpectralData);
+        if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
 
-        for (Loop = 1; Loop <= TotSpectralData; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotSpectralData; ++Loop) {
 
             // Call Input Get routine to retrieve spectral data
             // Name is followed by up to 450 sets of normal-incidence measured values of
@@ -4104,7 +4104,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (TotSpectralData > 0) SpecDataProps.deallocate();
+        if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.deallocate();
     }
 
     void ValidateMaterialRoughness(EnergyPlusData &state,
@@ -4239,15 +4239,15 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+        state.dataHeatBal->TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
                         state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
 
-        NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
-        NominalU.dimension(TotConstructs, 0.0);
+        NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
-        state.dataConstruction->Construct.allocate(TotConstructs);
-        UniqueConstructNames.reserve(TotConstructs);
+        state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);
+        UniqueConstructNames.reserve(state.dataHeatBal->TotConstructs);
         // Note: If TotWindow5Constructs > 0, additional constructions are created in
         // subr. SearchWindow5DataFile corresponding to those found on the data file.
         for (auto &e : state.dataConstruction->Construct) {
@@ -4487,9 +4487,9 @@ namespace HeatBalanceManager {
 
         TotSourceConstructs = ConstrNum;
         TotRegConstructs += TotSourceConstructs;
-        TotConstructs = TotRegConstructs;
+        state.dataHeatBal->TotConstructs = TotRegConstructs;
 
-        if (TotConstructs > 0 && (NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed)) {
+        if (state.dataHeatBal->TotConstructs > 0 && (NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed)) {
             ShowWarningError(state, "This building has no thermal mass which can cause an unstable solution.");
             ShowContinueError(state, "Use Material object for all opaque material definitions except very light insulation layers.");
         }
@@ -4566,7 +4566,7 @@ namespace HeatBalanceManager {
 
         TotWinEquivLayerConstructs = ConstrNum;
         TotRegConstructs += TotWinEquivLayerConstructs;
-        TotConstructs = TotRegConstructs;
+        state.dataHeatBal->TotConstructs = TotRegConstructs;
         //-------------------------------------------------------------------------------
         ConstrNum = 0;
 
@@ -4631,7 +4631,7 @@ namespace HeatBalanceManager {
         WConstructNames.deallocate();
 
         // set some (default) properties of the Construction Derived Type
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
 
             // For air boundaries, skip TypeIsAirBoundary
             if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
@@ -6627,21 +6627,21 @@ namespace HeatBalanceManager {
                 ShowFatalError(state, "HeatBalanceManager: SearchWindow5DataFile: Construction=" + DesiredConstructionName +
                                " from the Window5 data file cannot be used because of above errors");
 
-            TotMaterialsPrev = TotMaterials;
+            TotMaterialsPrev = state.dataHeatBal->TotMaterials;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 NGaps(IGlSys) = NGlass(IGlSys) - 1;
-                TotMaterials += NGlass(IGlSys) + NGaps(IGlSys);
+                state.dataHeatBal->TotMaterials += NGlass(IGlSys) + NGaps(IGlSys);
             }
 
             // Create Material objects
 
             // reallocate Material type
 
-            state.dataMaterial->Material.redimension(TotMaterials);
-            NominalR.redimension(TotMaterials, 0.0);
+            state.dataMaterial->Material.redimension(state.dataHeatBal->TotMaterials);
+            NominalR.redimension(state.dataHeatBal->TotMaterials, 0.0);
 
             // Initialize new materials
-            for (loop = TotMaterialsPrev + 1; loop <= TotMaterials; ++loop) {
+            for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop).Name = "";
                 state.dataMaterial->Material(loop).Group = -1;
                 state.dataMaterial->Material(loop).Roughness = 0;
@@ -6801,10 +6801,10 @@ namespace HeatBalanceManager {
             // Construction objects
 
             // reallocate Construct types
-            TotConstructs += NGlSys;
-            state.dataConstruction->Construct.redimension(TotConstructs);
-            NominalRforNominalUCalculation.redimension(TotConstructs);
-            NominalU.redimension(TotConstructs);
+            state.dataHeatBal->TotConstructs += NGlSys;
+            state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
+            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            NominalU.redimension(state.dataHeatBal->TotConstructs);
 
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
@@ -6823,7 +6823,7 @@ namespace HeatBalanceManager {
             }
 
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
-                ConstrNum = TotConstructs - NGlSys + IGlSys;
+                ConstrNum = state.dataHeatBal->TotConstructs - NGlSys + IGlSys;
                 if (IGlSys == 1) {
                     state.dataConstruction->Construct(ConstrNum).Name = DesiredConstructionName;
                 } else {
@@ -7048,7 +7048,7 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
                     ++TotFrameDivider;
-                    state.dataConstruction->Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider = TotFrameDivider;
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs - NGlSys + IGlSys).W5FrameDivider = TotFrameDivider;
                 }
             }
 
@@ -7058,7 +7058,7 @@ namespace HeatBalanceManager {
 
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
-                    FrDivNum = state.dataConstruction->Construct(TotConstructs - NGlSys + IGlSys).W5FrameDivider;
+                    FrDivNum = state.dataConstruction->Construct(state.dataHeatBal->TotConstructs - NGlSys + IGlSys).W5FrameDivider;
                     FrameDivider(FrDivNum).FrameWidth = FrameWidth;
                     FrameDivider(FrDivNum).FrameProjectionOut = FrameProjectionOut;
                     FrameDivider(FrDivNum).FrameProjectionIn = FrameProjectionIn;
@@ -7512,7 +7512,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::TotConstructs;
         using DataSurfaces::FenLayAbsSSG;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfIncSolSSG;
@@ -7865,7 +7864,7 @@ namespace HeatBalanceManager {
         static int iTCG(0);
 
         NumNewConst = 0;
-        for (Loop = 1; Loop <= TotConstructs; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
@@ -7879,12 +7878,12 @@ namespace HeatBalanceManager {
         if (NumNewConst == 0) return; // no need to go further
 
         // Increase Construct() and copy the extra constructions
-        state.dataConstruction->Construct.redimension(TotConstructs + NumNewConst);
-        NominalRforNominalUCalculation.redimension(TotConstructs + NumNewConst);
-        NominalU.redimension(TotConstructs + NumNewConst);
+        state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
 
-        NumNewConst = TotConstructs;
-        for (Loop = 1; Loop <= TotConstructs; ++Loop) {
+        NumNewConst = state.dataHeatBal->TotConstructs;
+        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
@@ -7904,7 +7903,7 @@ namespace HeatBalanceManager {
                 }
             }
         }
-        TotConstructs = NumNewConst;
+        state.dataHeatBal->TotConstructs = NumNewConst;
     }
 
     void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum)
@@ -8136,9 +8135,9 @@ namespace HeatBalanceManager {
 
         // Reading WindowGap:SupportPillar
         cCurrentModuleObject = "WindowGap:SupportPillar";
-        W7SupportPillars = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        SupportPillar.allocate(W7SupportPillars);
-        for (Loop = 1; Loop <= W7SupportPillars; ++Loop) {
+        state.dataHeatBal->W7SupportPillars = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
+        for (Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -8179,9 +8178,9 @@ namespace HeatBalanceManager {
 
         // Reading WindowGap:DeflectionState
         cCurrentModuleObject = "WindowGap:DeflectionState";
-        W7DeflectionStates = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        DeflectionState.allocate(W7DeflectionStates);
-        for (Loop = 1; Loop <= W7DeflectionStates; ++Loop) {
+        state.dataHeatBal->W7DeflectionStates = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
+        for (Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -8214,9 +8213,9 @@ namespace HeatBalanceManager {
         // Reading WindowMaterial:Gap
 
         cCurrentModuleObject = "WindowMaterial:Gap";
-        W7MaterialGaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->W7MaterialGaps = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         // ALLOCATE(DeflectionState(W7DeflectionStates))
-        for (Loop = 1; Loop <= W7MaterialGaps; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W7MaterialGaps; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,

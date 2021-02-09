@@ -335,7 +335,7 @@ namespace ThermalChimney {
         // setup zone-level infiltration reports
         Array1D_bool RepVarSet;
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
-        for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
             if (Infiltration(Loop).ZonePtr > 0 && !Infiltration(Loop).QuadratureSum) {
                 RepVarSet(Infiltration(Loop).ZonePtr) = false;
             }

@@ -238,11 +238,11 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // get materials data
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(4, DataHeatBalance::TotMaterials);
+    EXPECT_EQ(4, state->dataHeatBal->TotMaterials);
     EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);

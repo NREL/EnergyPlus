@@ -166,7 +166,6 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-    using DataHeatBalance::TotConstructs;
     using DataHeatBalance::Zone;
     using DataSurfaces::CalcSolRefl;
     using DataSurfaces::ExternalEnvironment;

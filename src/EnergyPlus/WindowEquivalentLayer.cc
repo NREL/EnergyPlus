@@ -149,7 +149,7 @@ namespace WindowEquivalentLayer {
         state.dataWindowEquivalentLayer->EQLDiffPropFlag = true;
         state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             if (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
@@ -190,7 +190,6 @@ namespace WindowEquivalentLayer {
         int NumGLayers;                           // number of gap layers
         int NumSLayers;                           // number of glazing and shade layers (non-gas layers)
         Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
-        // Flow
 
         if (!allocated(CFSLayers)) CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
@@ -1118,7 +1117,6 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
-        // Flow
 
         RB_BEAM(state, THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
@@ -1257,7 +1255,6 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
-        // Flow
 
         IS_BEAM(state, THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
@@ -3691,7 +3688,6 @@ namespace WindowEquivalentLayer {
         Real64 K3;
         Real64 K4;
         Real64 DEN;
-        // flow
 
         Real64 const W_cos_PHI_2(pow_2(W * std::cos(PHI)));
         Real64 const W_sin_PHI(W * std::sin(PHI));
@@ -4480,7 +4476,6 @@ namespace WindowEquivalentLayer {
         Real64 HC_GS;                        // convection - glass to shade (one side)
         Array1D<Real64> SOURCEdv(FS.NL + 1); // indices of merit
         Real64 QGAIN;                        // total gain to conditioned space [[W/m2]
-                                             // Flow
 
         NL = FS.NL; // working copy
         if (NL < 1) return;
@@ -4957,7 +4952,6 @@ namespace WindowEquivalentLayer {
         Real64 SaveHCNLm;                    // place to save HC[NL-1] - two resistance networks differ
         Real64 SaveHCNL;                     // place to save HC[NL]   - two resistance networks differ
                                              // in their definitions of these heat transfer coefficients
-                                             // Flow
 
         ASHWAT_ThermalRatings = false; // init to failure
         NL = FS.NL;                    // working copy

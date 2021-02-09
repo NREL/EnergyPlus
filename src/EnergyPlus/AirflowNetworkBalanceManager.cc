@@ -120,10 +120,6 @@ namespace AirflowNetworkBalanceManager {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataHeatBalance::TotCrossMixing;
-    using DataHeatBalance::TotInfiltration;
-    using DataHeatBalance::TotMixing;
-    using DataHeatBalance::TotVentilation;
     using DataHeatBalance::TotZoneAirBalance;
     using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
@@ -1853,7 +1849,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotZoneAirBalance +
+            if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + TotZoneAirBalance +
                     inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") + inputProcessor->getNumObjectsFound(state, "ZoneThermalChimney") +
                     inputProcessor->getNumObjectsFound(state, "ZoneCoolTower:Shower") ==
                 0) {
@@ -1867,22 +1863,22 @@ namespace AirflowNetworkBalanceManager {
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple) return;
 
         if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
-            if (TotInfiltration > 0) {
+            if (state.dataHeatBal->TotInfiltration > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneInfiltration:* objects are present.");
                 ShowContinueError(state, "..ZoneInfiltration objects will not be simulated.");
             }
-            if (TotVentilation > 0) {
+            if (state.dataHeatBal->TotVentilation > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneVentilation:* objects are present.");
                 ShowContinueError(state, "..ZoneVentilation objects will not be simulated.");
             }
-            if (TotMixing > 0) {
+            if (state.dataHeatBal->TotMixing > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneMixing objects are present.");
                 ShowContinueError(state, "..ZoneMixing objects will not be simulated.");
             }
-            if (TotCrossMixing > 0) {
+            if (state.dataHeatBal->TotCrossMixing > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCrossMixing objects are present.");
                 ShowContinueError(state, "..ZoneCrossMixing objects will not be simulated.");

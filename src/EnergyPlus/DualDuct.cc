@@ -288,7 +288,6 @@ namespace DualDuct {
         int ADUNum;                                  // loop control to search Air Distribution Units
         static Real64 DummyOAFlow(0.0);
 
-        // Flow
         NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
         NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
         NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);

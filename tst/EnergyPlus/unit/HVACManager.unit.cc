@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
-    DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
+    state->dataHeatBal->TotCrossMixing = NumOfCrossMixing;
     state->dataZoneEquip->CrossMixingReportFlag(1) = true;
     DataHVACGlobals::TimeStepSys = 1.0;
     DataHeatBalFanSys::MCPI = 0.0;
@@ -153,8 +153,8 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::TotVentilation = 1;
-    DataHeatBalance::Ventilation.allocate(DataHeatBalance::TotVentilation);
+    state->dataHeatBal->TotVentilation = 1;
+    DataHeatBalance::Ventilation.allocate(state->dataHeatBal->TotVentilation);
     state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;

@@ -314,7 +314,7 @@ namespace WindowManager {
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
         // Loop over constructions and find those that are glazing constructions
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) continue; // Skip Complex Fenestrations, they have separate
             if (state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue;  // skip Equivalent Layer Fenestration
@@ -1518,7 +1518,7 @@ namespace WindowManager {
 
 
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).FromWindow5DataFile) continue;
             if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) continue;
             state.dataConstruction->Construct(ConstrNum).TransDiff = 0.0;
@@ -2183,7 +2183,7 @@ namespace WindowManager {
                     i = 0;
                     deltaTemp = 0.0;
                     IDConst = 0;
-                    for (k = 1; k <= TotConstructs; ++k) {
+                    for (k = 1; k <= state.dataHeatBal->TotConstructs; ++k) {
                         if (state.dataConstruction->Construct(k).TCMasterConst == state.dataConstruction->Construct(ConstrNum).TCMasterConst) {
                             dT1 = std::abs(locTCLayerTemp - state.dataMaterial->Material(state.dataConstruction->Construct(k).TCLayer).SpecTemp);
                             if (dT1 < dT0) {
@@ -6166,7 +6166,7 @@ namespace WindowManager {
         } else if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
             // Find unshaded construction that goes with this construction w/blind or screen
             ConstrNumBare = 0;
-            for (ConstrNum1 = 1; ConstrNum1 <= TotConstructs; ++ConstrNum1) {
+            for (ConstrNum1 = 1; ConstrNum1 <= state.dataHeatBal->TotConstructs; ++ConstrNum1) {
                 if (ConstrNum1 != ConstrNum && state.dataConstruction->Construct(ConstrNum1).TypeIsWindow &&
                     state.dataConstruction->Construct(ConstrNum1).TotGlassLayers == state.dataConstruction->Construct(ConstrNum1).TotSolidLayers &&
                     state.dataConstruction->Construct(ConstrNum1).TotGlassLayers == state.dataConstruction->Construct(ConstrNum).TotGlassLayers) {
@@ -6821,13 +6821,13 @@ namespace WindowManager {
 
             print(state.files.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
                                                  "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
-            if ((TotSimpleWindow > 0) || (W5GlsMat > 0) || (W5GlsMatAlt > 0))
+            if ((TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
                                                      "Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible "
                                                      "Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, "
                                                      "Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar "
                                                      "Diffusing");
-            if ((W5GasMat > 0) || (W5GasMatMixture > 0))
+            if ((state.dataHeatBal->W5GasMat > 0) || (state.dataHeatBal->W5GasMatMixture > 0))
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}");
             if (TotShades > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
@@ -6887,7 +6887,7 @@ namespace WindowManager {
             if (W5GapMatEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type");
 
-            for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
+            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
 
                 if (state.dataConstruction->Construct(ThisNum).WindowTypeBSDF) {
 
@@ -7181,7 +7181,7 @@ namespace WindowManager {
 
         } else if (state.dataWindowManager->HasWindows) {
 
-            for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
+            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
 
                 if (!state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).WindowTypeEQL) continue; // skip if equivalent layer window

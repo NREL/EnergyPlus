@@ -3641,47 +3641,47 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
-    TotMaterials = 0;
+    state->dataHeatBal->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(TotMaterials, 1);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_8MM");
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.008);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 1);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_8MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.008);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(1, 1), 2.873e-3);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(2, 1), 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    EXPECT_EQ(TotMaterials, 2);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_12MM");
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.012);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_12MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.012);
 
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(TotMaterials, 2);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
 }
 
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
 {
-    TotConstructs = 1;
-    state->dataConstruction->Construct.allocate(TotConstructs);
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
 
     state->dataMaterial->Material.allocate(60);
     state->dataMaterial->Material(47).AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    state->dataConstruction->Construct(TotConstructs).TotLayers = 3;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(1) = 11;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(2) = 22;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(3) = 33;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1) = 11;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2) = 22;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3) = 33;
 
     createConstructionWithStorm(*state, 1, "construction_A", 47, 59);
-    EXPECT_EQ(TotConstructs, 2);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).Name, "construction_A");
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(1), 47);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(2), 59);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(3), 11);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(4), 22);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(5), 33);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).OutsideAbsorpThermal, 0.11);
+    EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).Name, "construction_A");
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1), 47);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2), 59);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3), 11);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(4), 22);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(5), 33);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).OutsideAbsorpThermal, 0.11);
 }
 
 

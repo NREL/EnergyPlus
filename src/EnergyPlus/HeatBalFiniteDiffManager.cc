@@ -101,8 +101,6 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalance::Air;
     using DataHeatBalance::SurfQRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalance::TotConstructs;
-    using DataHeatBalance::TotMaterials;
     using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
@@ -298,7 +296,7 @@ namespace HeatBalFiniteDiffManager {
         pcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
         vcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
 
-        MaterialFD.allocate(TotMaterials);
+        MaterialFD.allocate(state.dataHeatBal->TotMaterials);
 
         // Load the additional CondFD Material properties
         cCurrentModuleObject = "MaterialProperty:PhaseChange"; // Phase Change Information First
@@ -468,7 +466,7 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+        for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
             if (MaterialFD(MaterNum).numTempEnth == 0) {
                 MaterialFD(MaterNum).numTempEnth = 3;
                 MaterialFD(MaterNum).TempEnth.dimension(2, 3, -100.0);
@@ -639,9 +637,9 @@ namespace HeatBalFiniteDiffManager {
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
         Real64 ThicknessThreshold; // min thickness consistent with other thermal properties, for local check
 
-        ConstructFD.allocate(TotConstructs);
-        SigmaR.allocate(TotConstructs);
-        SigmaC.allocate(TotConstructs);
+        ConstructFD.allocate(state.dataHeatBal->TotConstructs);
+        SigmaR.allocate(state.dataHeatBal->TotConstructs);
+        SigmaC.allocate(state.dataHeatBal->TotConstructs);
 
         SurfaceFD.allocate(TotSurfaces);
         QHeatInFlux.allocate(TotSurfaces);
@@ -664,7 +662,7 @@ namespace HeatBalFiniteDiffManager {
             if (Delt <= 200) break;
         }
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             // Need to skip window constructions and eventually window materials
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
 
@@ -830,7 +828,7 @@ namespace HeatBalFiniteDiffManager {
         } // End of Construction Loop.  TotNodes in each construction now set
 
         // now determine x location, or distance that nodes are from the outside face in meters
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (ConstructFD(ConstrNum).TotNodes > 0) {
                 ConstructFD(ConstrNum).NodeXlocation.allocate(ConstructFD(ConstrNum).TotNodes + 1);
                 ConstructFD(ConstrNum).NodeXlocation = 0.0; // init them all
@@ -1305,7 +1303,7 @@ namespace HeatBalFiniteDiffManager {
                       "Name (or Face), Inward Material Name (or Face)");
             }
 
-            for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
+            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;

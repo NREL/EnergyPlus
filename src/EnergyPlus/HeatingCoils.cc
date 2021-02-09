@@ -370,7 +370,6 @@ namespace HeatingCoils {
         int StageNum;
         bool DXCoilErrFlag; // Used in GetDXCoil mining functions
         bool errFlag;
-        // Flow
 
         NumElecCoil = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric");
         NumElecCoilMultiStage = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Electric:MultiStage");

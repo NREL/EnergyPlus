@@ -1440,7 +1440,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 // NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
                 // Calculate Nominal U-value with convection/film coefficients for reporting by adding on
                 // prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
-                if (Surface(surf).Construction > 0 && Surface(surf).Construction <= TotConstructs) {
+                if (Surface(surf).Construction > 0 && Surface(surf).Construction <= state.dataHeatBal->TotConstructs) {
                     cNominalUwithConvCoeffs = "";
                     ConstructionName = state.dataConstruction->Construct(Surface(surf).Construction).Name;
                     {

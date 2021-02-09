@@ -182,7 +182,7 @@ namespace WindowManager {
         if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
-        for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (auto ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
