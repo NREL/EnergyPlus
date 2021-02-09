@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,25 +45,23 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
+// C++ headers
+#include <sstream>
+#include <stdexcept>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
-#include "SQLiteProcedures.hh"
-#include "DataEnvironment.hh"
-#include "DataGlobals.hh"
-#include "DataHeatBalance.hh"
-#include "DataRoomAirModel.hh"
-#include "DataStringGlobals.hh"
-#include "General.hh"
-#include "InputProcessing/InputProcessor.hh"
-#include "ScheduleManager.hh"
-#include "UtilityRoutines.hh"
-
-#include <sstream>
-#include <stdexcept>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -152,7 +150,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-            sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
+            sqlite->addMaterialData(materialNum, state.dataMaterial->Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
             auto const &construction = state.dataConstruction->Construct(constructNum);
@@ -193,7 +191,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            sqlite->addRoomAirModelData(zoneNum, DataRoomAirModel::AirModel(zoneNum));
+            sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
         }
 
         sqlite->createZoneExtendedOutput();
@@ -335,6 +333,13 @@ void SQLite::sqliteCommit()
 {
     if (m_writeOutputToSQLite) {
         sqliteExecuteCommand("COMMIT;");
+    }
+}
+
+void SQLite::sqliteRollback()
+{
+    if (m_writeOutputToSQLite) {
+        sqliteExecuteCommand("ROLLBACK;");
     }
 }
 
@@ -2428,8 +2433,8 @@ bool SQLite::RoomAirModel::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, airModelName);
-    sqliteBindInteger(insertStmt, 3, airModelType);
-    sqliteBindInteger(insertStmt, 4, tempCoupleScheme);
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(airModelType));
+    sqliteBindInteger(insertStmt, 4, static_cast<int>(tempCoupleScheme));
     sqliteBindLogical(insertStmt, 5, simAirModel);
 
     int rc = sqliteStepCommand(insertStmt);

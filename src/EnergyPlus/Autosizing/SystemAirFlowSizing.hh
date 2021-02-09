@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,7 @@
 #ifndef SystemAirFlowSizing_hh_INCLUDED
 #define SystemAirFlowSizing_hh_INCLUDED
 
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 
@@ -67,6 +68,14 @@ struct SystemAirFlowSizer : BaseSizerWithScalableInputs
     Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
     void clearState();
+};
+
+struct SystemAirFlowSizerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
 };
 
 } // namespace EnergyPlus

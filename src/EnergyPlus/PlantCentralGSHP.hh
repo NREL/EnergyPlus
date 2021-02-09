@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -63,21 +64,11 @@ struct EnergyPlusData;
 
 namespace PlantCentralGSHP {
 
-    extern int const WaterCooled;
-    extern int const SmartMixing;
-
-    extern bool getWrapperInputFlag;    // When TRUE, calls subroutine to read input file.
-    extern int numWrappers;             // Number of Wrappers specified in input
-    extern int numChillerHeaters;       // Number of Chiller/heaters specified in input
-    extern Real64 CondenserFanPower;    // Condenser Fan Power (fan cycles with compressor) [W]
-    extern Real64 ChillerCapFT;         // Chiller/heater capacity fraction (evaluated as a function of temperature)
-    extern Real64 ChillerEIRFT;         // Chiller/heater electric input ratio (EIR = 1 / COP) as a function of temperature
-    extern Real64 ChillerEIRFPLR;       // Chiller/heater EIR as a function of part-load ratio (PLR)
-    extern Real64 ChillerPartLoadRatio; // Chiller/heater part-load ratio (PLR)
-    extern Real64 ChillerCyclingRatio;  // Chiller/heater cycling ratio
-    extern Real64 ChillerFalseLoadRate; // Chiller/heater false load over and above the water-side load [W]
-
-    extern Array1D_bool CheckEquipName;
+    enum class iCondType {
+        Unassigned,
+        WaterCooled,
+        SmartMixing,
+    };
 
     struct CGSHPNodeData
     {
@@ -187,7 +178,7 @@ namespace PlantCentralGSHP {
         bool HeatSetPointErrDone;         // true if setpoint warning issued
         bool PossibleSubcooling;          // flag to indicate chiller is doing less cooling that requested
         int ChillerHeaterNum;             // Chiller heater number
-        int CondenserType;                // Type of Condenser - only water cooled is allowed
+        iCondType CondenserType;          // Type of Condenser - only water cooled is allowed
         int ChillerCapFTCoolingIDX;       // Cooling capacity function of temperature curve index
         int ChillerEIRFTCoolingIDX;       // Elec Input to Cooling Output ratio function of temperature curve index
         int ChillerEIRFPLRCoolingIDX;     // Elec Input to cooling output ratio function of PLR curve index
@@ -261,8 +252,8 @@ namespace PlantCentralGSHP {
 
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
-              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(0), ChillerCapFTCoolingIDX(0),
-              ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
+              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(iCondType::Unassigned),
+              ChillerCapFTCoolingIDX(0), ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
               ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
               CondInletNodeNum(0), CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
               ChillerEIRFTErrorIndex(0), ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerEIRRefTempErrorIndex(0), DeltaTErrCount(0),
@@ -332,7 +323,7 @@ namespace PlantCentralGSHP {
         bool VariableFlowCH;        // True if all chiller heaters are variable flow control
         int SchedPtr;               // Schedule value for ancillary power control
         int CHSchedPtr;             // Schedule value for individual chiller heater control
-        int ControlMode;            // SmartMixing or FullyMixing
+        iCondType ControlMode;      // SmartMixing or FullyMixing
         int CHWInletNodeNum;        // Node number on the inlet side of the plant (Chilled Water side)
         int CHWOutletNodeNum;       // Node number on the outlet side of the plant (Chilled Water side)
         int HWInletNodeNum;         // Node number on the inlet side of the plant (Hot Water side)
@@ -384,15 +375,15 @@ namespace PlantCentralGSHP {
         bool mySizesReported;
 
         WrapperSpecs()
-            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(0), CHWInletNodeNum(0), CHWOutletNodeNum(0), HWInletNodeNum(0),
-              HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0), HWMassFlowRate(0.0),
-              GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0), WrapperCoolingLoad(0.0),
-              WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false), CoolSetPointSetToLoop(false),
-              HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), HWLoopNum(0),
-              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0), GLHECompNum(0),
-              CHWMassFlowIndex(0), HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0),
-              GLHEVolFlowRate(0.0), MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false),
-              setupOutputVarsFlag(true), mySizesReported(false)
+            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(iCondType::Unassigned), CHWInletNodeNum(0), CHWOutletNodeNum(0),
+              HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
+              HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
+              WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),
+              CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0),
+              CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0),
+              GLHECompNum(0), CHWMassFlowIndex(0), HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0),
+              HWVolFlowRate(0.0), GLHEVolFlowRate(0.0), MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false),
+              SimulHtgDominant(false), setupOutputVarsFlag(true), mySizesReported(false)
         {
         }
 
@@ -427,16 +418,41 @@ namespace PlantCentralGSHP {
 
     };
 
-    extern Array1D<WrapperSpecs> Wrapper;
-    extern Array1D<ChillerHeaterSpecs> ChillerHeater;
-
-    void clear_state();
-
     void GetWrapperInput(EnergyPlusData &state);
 
     void GetChillerHeaterInput(EnergyPlusData &state);
 
 } // namespace PlantCentralGSHP
+
+struct PlantCentralGSHPData : BaseGlobalStruct {
+
+    bool getWrapperInputFlag = true;   // When TRUE, calls subroutine to read input file.
+    int numWrappers = 0;               // Number of Wrappers specified in input
+    int numChillerHeaters = 0;         // Number of Chiller/heaters specified in input
+    Real64 ChillerCapFT = 0.0;         // Chiller/heater capacity fraction (evaluated as a function of temperature)
+    Real64 ChillerEIRFT = 0.0;         // Chiller/heater electric input ratio (EIR = 1 / COP) as a function of temperature
+    Real64 ChillerEIRFPLR = 0.0;       // Chiller/heater EIR as a function of part-load ratio (PLR)
+    Real64 ChillerPartLoadRatio = 0.0; // Chiller/heater part-load ratio (PLR)
+    Real64 ChillerCyclingRatio = 0.0;  // Chiller/heater cycling ratio
+    Real64 ChillerFalseLoadRate = 0.0; // Chiller/heater false load over and above the water-side load [W]
+    Array1D<PlantCentralGSHP::WrapperSpecs> Wrapper;
+    Array1D<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
+
+    void clear_state() override
+    {
+        this->getWrapperInputFlag = true;
+        this->numWrappers = 0;
+        this->numChillerHeaters = 0;
+        this->ChillerCapFT = 0.0;
+        this->ChillerEIRFT = 0.0;
+        this->ChillerEIRFPLR = 0.0;
+        this->ChillerPartLoadRatio = 0.0;
+        this->ChillerCyclingRatio = 0.0;
+        this->ChillerFalseLoadRate = 0.0;
+        this->Wrapper.deallocate();
+        this->ChillerHeater.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

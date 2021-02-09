@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,13 +51,12 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -722,13 +721,13 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     ASSERT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HPWH = state->dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
-    DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+    DXCoils::DXCoilData &Coil = state->dataDXCoils->DXCoil(HPWH.DXCoilNum);
     Tank.Node(1).SavedTemp = 51.190278176501131;
     Tank.Node(2).SavedTemp = 51.190445301209223;
     Tank.Node(3).SavedTemp = 51.190593898651336;
@@ -768,7 +767,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
-    OutputReportPredefined::pdstHeatCoil = -1;
+    state->dataOutRptPredefined->pdstHeatCoil = -1;
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
@@ -1028,7 +1027,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     bool ErrorsFound = false;
     int CompIndex = 1;
@@ -1042,7 +1041,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     DataHeatBalFanSys::MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, DXCoils::DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1392,15 +1391,15 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     SetPredefinedTables(*state);
     ScheduleManager::UpdateScheduleValues(*state);
 
@@ -1409,13 +1408,13 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HeatPump = state->dataWaterThermalTanks->HPWaterHeater(1);
     DataHVACGlobals::HPWHInletDBTemp = 30.0;
-    DataEnvironment::WaterMainsTemp = 40.0;
+    state->dataEnvrn->WaterMainsTemp = 40.0;
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-    DXCoils::HPWHHeatingCapacity = 4000.0;
+    state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
     DataLoopNode::Node(3).Temp = 30.0;
     DataLoopNode::Node(3).HumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool FirstHVACIteration(true);
     state->dataGlobal->WarmupFlag = true;
@@ -1707,13 +1706,13 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -2009,7 +2008,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
-    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour;
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2167,7 +2166,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour();
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour;
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
@@ -2177,7 +2176,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2373,13 +2371,13 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum = 1;
@@ -2410,7 +2408,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Desuperheater.SetPointTemp = 55;
     Desuperheater.Mode = 1;
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 0;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     Tank.Mode = 0;
     Tank.SetPointTemp = 50;
@@ -2457,7 +2455,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2604,15 +2601,15 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
     int CyclingScheme(1);
@@ -2636,11 +2633,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
-    PlantLoop.allocate(LoopNum);
-    PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
-    PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
-    auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
+    state->dataPlnt->PlantLoop.allocate(LoopNum);
+    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
@@ -2721,7 +2718,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2999,13 +2995,13 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     int TankNum(1);
@@ -3017,30 +3013,30 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).SourceType, "Coil:Cooling:DX:MultiSpeed");
 
     // Initiate conditions for multispeed coil calculation
-    DataEnvironment::OutDryBulbTemp = 32.0;
-    DataEnvironment::OutHumRat = 0.02;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
+    state->dataEnvrn->OutDryBulbTemp = 32.0;
+    state->dataEnvrn->OutHumRat = 0.02;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 
-    DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
-    DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
-    DXCoil(1).InletAirMassFlowRate = DXCoil(1).MSRatedAirMassFlowRate(2);
-    DataHVACGlobals::MSHPMassFlowRateLow = DXCoil(1).MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = DXCoil(1).MSRatedAirMassFlowRate(2);
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
+    state->dataDXCoils->DXCoil(1).InletAirMassFlowRate = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
+    DataHVACGlobals::MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
+    DataHVACGlobals::MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
 
-    DXCoil(1).InletAirTemp = 27.0;
-    DXCoil(1).InletAirHumRat = 0.005;
-    DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
-    DXCoil(1).SchedPtr = 1;
-    ScheduleManager::Schedule(DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
-    DXCoil(1).MSRatedCBF(1) = 0.1262;
-    DXCoil(1).MSRatedCBF(2) = 0.0408;
+    state->dataDXCoils->DXCoil(1).InletAirTemp = 27.0;
+    state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
+    state->dataDXCoils->DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
+    state->dataDXCoils->DXCoil(1).SchedPtr = 1;
+    ScheduleManager::Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, state->dataDXCoils->DXCoil(DXNum).TotalCoolingEnergyRate + state->dataDXCoils->DXCoil(DXNum).ElecCoolingPower);
 
     // Now move to the water thermal tank calculation
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
@@ -3068,7 +3064,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.FirstTimeThroughFlag = true;
     Tank.CalcDesuperheaterWaterHeater(*state, true);
 
-    EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
+    EXPECT_EQ(Desuperheater.DXSysPLR, state->dataDXCoils->DXCoil(DXNum).PartLoadRatio);
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
     // used desuperheater reclaim heat is successfully stored in HeatReclaimDXCoil data struct
@@ -3158,13 +3154,13 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
@@ -3409,7 +3405,6 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3653,13 +3648,13 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::Month = 7;
-    DataEnvironment::DayOfMonth = 21;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
 
     // Initiate tank conditions
@@ -3698,7 +3693,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     }
 
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     // first tank heat reclaim
     // Call desuperheater calculation function
@@ -4396,15 +4391,15 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::TimeStepSys = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
     SetPredefinedTables(*state);
     ScheduleManager::UpdateScheduleValues(*state);
 
@@ -4417,13 +4412,13 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         EXPECT_EQ(HPWHTank.Name, "HPWHTANK");
 
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
         state->dataGlobal->WarmupFlag = true;
@@ -4441,13 +4436,13 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         EXPECT_EQ(Tank.Name, "STANDALONE TANK");
         EXPECT_EQ(Tank.HeatPumpNum, 0);
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
-        DataEnvironment::WaterMainsTemp = 40.0;
+        state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
-        DataEnvironment::OutBaroPress = 101325.0;
+        state->dataEnvrn->OutBaroPress = 101325.0;
 
         bool FirstHVACIteration(true);
         state->dataGlobal->WarmupFlag = true;

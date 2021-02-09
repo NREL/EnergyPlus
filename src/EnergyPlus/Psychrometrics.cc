@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -820,14 +820,14 @@ namespace Psychrometrics {
 #endif
 
         // Convert temperature from Centigrade to Kelvin.
-        Real64 const Tkel(T + DataGlobalConstants::KelvinConv()); // Dry-bulb in REAL(r64) for function passing
+        Real64 const Tkel(T + DataGlobalConstants::KelvinConv); // Dry-bulb in REAL(r64) for function passing
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {
             Pascal = 0.0017;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < DataGlobalConstants::KelvinConv()) {      // Tkel >= 173.15
+        } else if (Tkel < DataGlobalConstants::KelvinConv) {      // Tkel >= 173.15
             Real64 const C1(-5674.5359);     // Coefficient for TKel < KelvinConvK
             Real64 const C2(6.3925247);      // Coefficient for TKel < KelvinConvK
             Real64 const C3(-0.9677843e-2);  // Coefficient for TKel < KelvinConvK

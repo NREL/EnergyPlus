@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -68,9 +67,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 
-namespace EnergyPlus {
-
-namespace ZonePlenum {
+namespace EnergyPlus::ZonePlenum {
     // Module containing simulation routines for both zone return and zone supply plenums
 
     // MODULE INFORMATION:
@@ -88,8 +85,6 @@ namespace ZonePlenum {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::OutBaroPress;
-    using DataEnvironment::OutHumRat;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyTdbFnHW;
 
@@ -231,7 +226,6 @@ namespace ZonePlenum {
         // Using/Aliasing
         using DataHeatBalance::Zone;
         using DataZoneEquipment::EquipConfiguration;
-        using DataZoneEquipment::ZoneEquipConfig;
         using NodeInputManager::CheckUniqueNodes;
         using NodeInputManager::EndUniqueNodeCheck;
         using NodeInputManager::GetNodeNums;
@@ -335,7 +329,7 @@ namespace ZonePlenum {
                 Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
             }
             //  Check if this zone is used as a controlled zone
-            ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), ZoneEquipConfig, &EquipConfiguration::ZoneName);
+            ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneEquipConfigLoop != 0) {
                 ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                 CurrentModuleObject);
@@ -508,8 +502,8 @@ namespace ZonePlenum {
                 Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
             }
             //  Check if this zone is used as a controlled zone
-            if (std::any_of(ZoneEquipConfig.begin(), ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
-                ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), ZoneEquipConfig, &EquipConfiguration::ZoneName);
+            if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
+                ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (ZoneEquipConfigLoop != 0) {
                     ShowSevereError(state, RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                     CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
@@ -615,9 +609,7 @@ namespace ZonePlenum {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
-        using DataZoneEquipment::ZoneEquipConfig;
+
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
@@ -648,18 +640,18 @@ namespace ZonePlenum {
                         InletNode = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).InletNode(InletNodeLoop);
                         // Loop through ZoneEquipConfig's and look for return air node value = InletNode
                         for (ZoneEquipConfigLoop = 1; ZoneEquipConfigLoop <= state.dataGlobal->NumOfZones; ++ZoneEquipConfigLoop) {
-                            if (!ZoneEquipConfig(ZoneEquipConfigLoop).IsControlled) continue;
-                            for (int retNode = 1; retNode <= ZoneEquipConfig(ZoneEquipConfigLoop).NumReturnNodes; ++retNode) {
-                                if (ZoneEquipConfig(ZoneEquipConfigLoop).ReturnNode(retNode) == InletNode) {
-                                    ZoneEquipConfig(ZoneEquipConfigLoop).ReturnNodePlenumNum = ZonePlenumLoop;
+                            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).IsControlled) continue;
+                            for (int retNode = 1; retNode <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).NumReturnNodes; ++retNode) {
+                                if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).ReturnNode(retNode) == InletNode) {
+                                    state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigLoop).ReturnNodePlenumNum = ZonePlenumLoop;
                                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ZoneEqNum(InletNodeLoop) = ZoneEquipConfigLoop;
                                 }
                             }
                         }
                         // count the ADUs that can leak to this plenum
-                        for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                            if (AirDistUnit(ADUNum).ZoneEqNum == state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ZoneEqNum(InletNodeLoop)) {
-                                AirDistUnit(ADUNum).RetPlenumNum = ZonePlenumLoop;
+                        for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                            if (state.dataDefineEquipment->AirDistUnit(ADUNum).ZoneEqNum == state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ZoneEqNum(InletNodeLoop)) {
+                                state.dataDefineEquipment->AirDistUnit(ADUNum).RetPlenumNum = ZonePlenumLoop;
                                 ++NumADUsToPlen;
                             }
                         }
@@ -669,8 +661,8 @@ namespace ZonePlenum {
                 state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).NumADUs = NumADUsToPlen;
                 // fill the list of air distribution units that can leak to this plenum
                 if (NumADUsToPlen > 0) {
-                    for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                        if (AirDistUnit(ADUNum).RetPlenumNum == ZonePlenumLoop) {
+                    for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                        if (state.dataDefineEquipment->AirDistUnit(ADUNum).RetPlenumNum == ZonePlenumLoop) {
                             ++ADUsToPlenIndex;
                             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumLoop).ADUIndex(ADUsToPlenIndex) = ADUNum;
                         }
@@ -679,12 +671,12 @@ namespace ZonePlenum {
             }
 
             // Check that all ADUs with leakage found a return plenum
-            for (ADUNum = 1; ADUNum <= NumAirDistUnits; ++ADUNum) {
-                auto &thisADU(AirDistUnit(ADUNum));
+            for (ADUNum = 1; ADUNum <= state.dataDefineEquipment->NumAirDistUnits; ++ADUNum) {
+                auto &thisADU(state.dataDefineEquipment->AirDistUnit(ADUNum));
                 // TODO: this is comparing the same thing twice
                 if ((thisADU.DownStreamLeak || thisADU.DownStreamLeak) && (thisADU.RetPlenumNum == 0)) {
                     ShowWarningError(state, "No return plenum found for simple duct leakage for ZoneHVAC:AirDistributionUnit=" + thisADU.Name +
-                                     " in Zone=" + ZoneEquipConfig(thisADU.ZoneEqNum).ZoneName);
+                                     " in Zone=" + state.dataZoneEquip->ZoneEquipConfig(thisADU.ZoneEqNum).ZoneName);
                     ShowContinueError(state, "Leakage will be ignored for this ADU.");
                     thisADU.UpStreamLeak = false;
                     thisADU.DownStreamLeak = false;
@@ -705,8 +697,8 @@ namespace ZonePlenum {
                 Node(ZoneNodeNum).Temp = 20.0;
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
-                Node(ZoneNodeNum).Press = OutBaroPress;
-                Node(ZoneNodeNum).HumRat = OutHumRat;
+                Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
+                Node(ZoneNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
 
                 state.dataZonePlenum->ZoneRetPlenCond(PlenumZoneNum).ZoneTemp = 20.0;
@@ -801,8 +793,8 @@ namespace ZonePlenum {
                 Node(ZoneNodeNum).Temp = 20.0;
                 Node(ZoneNodeNum).MassFlowRate = 0.0;
                 Node(ZoneNodeNum).Quality = 1.0;
-                Node(ZoneNodeNum).Press = OutBaroPress;
-                Node(ZoneNodeNum).HumRat = OutHumRat;
+                Node(ZoneNodeNum).Press = state.dataEnvrn->OutBaroPress;
+                Node(ZoneNodeNum).HumRat = state.dataEnvrn->OutHumRat;
                 Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
 
                 state.dataZonePlenum->ZoneSupPlenCond(PlenumZoneNum).ZoneTemp = 20.0;
@@ -902,9 +894,6 @@ namespace ZonePlenum {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataDefineEquip::AirDistUnit;
-        using DataDefineEquip::NumAirDistUnits;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNodeNum(0);            // inlet node number
         int IndNum(0);                  // induced air index
@@ -947,11 +936,11 @@ namespace ZonePlenum {
         // add in the leak flow rate, if any. Don't alter the pressure calc (it is not used anyway)
         for (ADUListIndex = 1; ADUListIndex <= state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).NumADUs; ++ADUListIndex) {
             ADUNum = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ADUIndex(ADUListIndex);
-            if (AirDistUnit(ADUNum).UpStreamLeak || AirDistUnit(ADUNum).DownStreamLeak) {
+            if (state.dataDefineEquipment->AirDistUnit(ADUNum).UpStreamLeak || state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                 state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRate +=
-                    AirDistUnit(ADUNum).MassFlowRateUpStrLk + AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail += AirDistUnit(ADUNum).MaxAvailDelta;
-                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail += AirDistUnit(ADUNum).MinAvailDelta;
+                    state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk + state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMaxAvail += state.dataDefineEquipment->AirDistUnit(ADUNum).MaxAvailDelta;
+                state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletMassFlowRateMinAvail += state.dataDefineEquipment->AirDistUnit(ADUNum).MinAvailDelta;
             }
         }
         // Sum up induced air flow rate
@@ -1255,7 +1244,5 @@ namespace ZonePlenum {
 
         return thisPlenum;
     }
-
-} // namespace ZonePlenum
 
 } // namespace EnergyPlus

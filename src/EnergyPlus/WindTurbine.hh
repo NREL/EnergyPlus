@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -175,9 +175,10 @@ namespace WindTurbine {
 
     struct WindTurbineData : BaseGlobalStruct {
 
-        int NumWindTurbines; // Total wind turbine statements in inputs
+        int NumWindTurbines;        // Total wind turbine statements in inputs
         bool GetInputFlag;
         bool MyOneTimeFlag;
+        Real64 AnnualTMYWS = 0.0;   // Annual average wind speed in stat file
         Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
 
         void clear_state() override
@@ -185,11 +186,12 @@ namespace WindTurbine {
             this->NumWindTurbines = 0;
             this->GetInputFlag = true;
             this->MyOneTimeFlag = true;
+            this->AnnualTMYWS = 0.0;
             this->WindTurbineSys.deallocate();
         }
 
         // Default Constructor
-        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true)
+        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true), AnnualTMYWS(0.0)
         {
         }
     };

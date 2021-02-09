@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -200,7 +200,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     int HourOfDay_reset = state.dataGlobal->HourOfDay;
     bool BeginEnvrnFlag_reset = state.dataGlobal->BeginEnvrnFlag;
     bool EndEnvrnFlag_reset = state.dataGlobal->EndEnvrnFlag;
-    bool EndMonthFlag_reset = EndMonthFlag;
+    bool EndMonthFlag_reset = state.dataEnvrn->EndMonthFlag;
     bool WarmupFlag_reset = state.dataGlobal->WarmupFlag;
     int DayOfSim_reset = state.dataGlobal->DayOfSim;
     std::string DayOfSimChr_reset = state.dataGlobal->DayOfSimChr;
@@ -248,7 +248,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
     state.dataGlobal->BeginEnvrnFlag = true;
     state.dataGlobal->EndEnvrnFlag = false;
-    EndMonthFlag = false;
+    state.dataEnvrn->EndMonthFlag = false;
     state.dataGlobal->WarmupFlag = false;
     state.dataGlobal->DayOfSim = 0;
     state.dataGlobal->DayOfSimChr = "0";
@@ -301,11 +301,11 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 
                 WeatherManager::ManageWeather(state);
 
-                outDryBulbTemp_num += OutDryBulbTemp;
-                airDensity_num += OutAirDensity;
-                relHum_num += OutRelHumValue;
-                windSpeed_num += WindSpeed;
-                horizSolarRad_num += BeamSolarRad + DifSolarRad;
+                outDryBulbTemp_num += state.dataEnvrn->OutDryBulbTemp;
+                airDensity_num += state.dataEnvrn->OutAirDensity;
+                relHum_num += state.dataEnvrn->OutRelHumValue;
+                windSpeed_num += state.dataEnvrn->WindSpeed;
+                horizSolarRad_num += state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
 
                 state.dataGlobal->BeginHourFlag = false;
                 state.dataGlobal->BeginDayFlag = false;
@@ -356,7 +356,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
     state.dataGlobal->HourOfDay = HourOfDay_reset;
     state.dataGlobal->BeginEnvrnFlag = BeginEnvrnFlag_reset;
     state.dataGlobal->EndEnvrnFlag = EndEnvrnFlag_reset;
-    EndMonthFlag = EndMonthFlag_reset;
+    state.dataEnvrn->EndMonthFlag = EndMonthFlag_reset;
     state.dataGlobal->WarmupFlag = WarmupFlag_reset;
     state.dataGlobal->DayOfSim = DayOfSim_reset;
     state.dataGlobal->DayOfSimChr = DayOfSimChr_reset;
@@ -468,7 +468,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    timeStepInSeconds = DataGlobalConstants::SecsInDay();
+    timeStepInSeconds = DataGlobalConstants::SecsInDay;
     bool convergedFinal = false;
 
     initDomain(state);
@@ -841,7 +841,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
-    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay();
+    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay;
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
     // Intialize temperatures and volume
@@ -1081,7 +1081,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     depth = _depth;
 
-    simTimeInDays = seconds / DataGlobalConstants::SecsInDay();
+    simTimeInDays = seconds / DataGlobalConstants::SecsInDay;
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);

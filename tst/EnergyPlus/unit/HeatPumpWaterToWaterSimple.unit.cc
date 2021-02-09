@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,7 +65,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -745,7 +745,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
         state->dataGlobal->BeginEnvrnFlag = true;
         state->dataGlobal->EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
         state->dataGlobal->WarmupFlag = true;
         state->dataGlobal->DayOfSim = 0;
         state->dataGlobal->DayOfSimChr = "0";
@@ -755,7 +755,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
             ++state->dataGlobal->DayOfSim;
 
             if (!state->dataGlobal->WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
             state->dataGlobal->BeginDayFlag = true;
             state->dataGlobal->EndDayFlag = false;
@@ -1482,27 +1482,27 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // should be sized now
 
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedCapHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedPowerHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedCapHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedPowerHeatWasAutoSized);
 
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedCapHeat, 7200.71, 0.1);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedPowerHeat, 2151.07, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedCapHeat, 7200.71, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedPowerHeat, 2151.07, 0.1);
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

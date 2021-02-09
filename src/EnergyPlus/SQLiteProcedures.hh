@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,13 @@
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <sqlite3.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
@@ -55,17 +62,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
-
-#include <sqlite3.h>
-
-#include <fstream>
-#include <iosfwd>
-#include <map>
-#include <memory>
 
 namespace EnergyPlus {
 
@@ -151,6 +152,9 @@ public:
 
     // Commit a transaction
     void sqliteCommit();
+
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
 
     // Within a current transaction
     bool sqliteWithinTransaction();
@@ -970,8 +974,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        int const &airModelType;
-        int const &tempCoupleScheme;
+        DataRoomAirModel::RoomAirModel const &airModelType;
+        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -1000,6 +1004,14 @@ extern std::unique_ptr<SQLite> sqlite;
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
+
+struct SQLiteProceduresData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

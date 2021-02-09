@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -289,7 +289,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // CompNum = AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
@@ -441,7 +441,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // CompNum = AirflowNetworkCompData(j).TypeNum;
         ed = roughness / hydraulicDiameter;
         ld = L / hydraulicDiameter;
@@ -575,7 +575,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Crack standard condition from given inputs
         if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
             Corr = 1.0;
@@ -692,7 +692,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Crack standard condition from given inputs
         //if (i > NetworkNumOfLinks - NumOfLinksIntraZone) {
         //    Corr = 1.0;
@@ -790,7 +790,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
@@ -885,7 +885,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         Real64 RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         Real64 VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
@@ -985,7 +985,7 @@ namespace AirflowNetwork {
 
         int NF(1);
 
-        // FLOW:
+
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (FanTypeNum == FanType_SimpleOnOff) {
@@ -1093,7 +1093,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,5E14.6)");
 
-        // FLOW:
+
         int NumCur = n;
 
         if (solver.AFECTL(i) <= 0.0) {
@@ -1222,7 +1222,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,5E14.6)");
 
-        // FLOW:
+
         int NumCur = n;
 
         if (control <= 0.0) {
@@ -1339,7 +1339,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
 
         C = solver.AFECTL(i);
         if (C < FlowMin) C = FlowMin;
@@ -1402,7 +1402,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
 
         C = control;
         if (C < FlowMin) C = FlowMin;
@@ -1470,7 +1470,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
 
@@ -1557,7 +1557,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         FlowCoef = ELR * FlowRate / propN.density * std::pow(RefPres, -FlowExpo);
 
@@ -1710,7 +1710,7 @@ namespace AirflowNetwork {
         int Loc;
         int iNum;
 
-        // FLOW:
+
         // Get component properties
         DifLim = 1.0e-4;
         Width = MultizoneSurfaceData(IL).Width;
@@ -1959,7 +1959,7 @@ namespace AirflowNetwork {
             DpZeroOffset = DifLim * 1e-3;
             // New definition for opening factors for LVO type 2: opening angle = 90 degrees --> opening factor = 1.0
             // should be PIOvr2 in below?
-            alpha = Fact * DataGlobalConstants::PiOvr2();
+            alpha = Fact * DataGlobalConstants::PiOvr2;
             Real64 const cos_alpha(std::cos(alpha));
             Real64 const tan_alpha(std::tan(alpha));
             h2 = Axishght * (1.0 - cos_alpha);
@@ -2115,7 +2115,7 @@ namespace AirflowNetwork {
         // static gio::Fmt Format_900("(A5,9X,4E16.7)");
         // static gio::Fmt Format_903("(A5,3I3,4E16.7)");
 
-        // FLOW:
+
         Width = MultizoneSurfaceData(i).Width;
         Height = MultizoneSurfaceData(i).Height;
         coeff = FlowCoef * 2.0 * (Width + Height);
@@ -2242,7 +2242,7 @@ namespace AirflowNetwork {
         int n = AirflowNetworkLinkageData(i).NodeNums[0];
         int m = AirflowNetworkLinkageData(i).NodeNums[1];
 
-        // FLOW:
+
         // Get component properties
         // A  = Cross section area [m2]
         // DP = Pressure difference across the element [Pa]
@@ -2306,7 +2306,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
 
@@ -2396,7 +2396,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         FlowCoef = ELA * DischCoeff * sqrt_2 * std::pow(RefDeltaP, 0.5 - FlowExpo);
 
@@ -2497,12 +2497,12 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobalConstants::Pi();
+        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2656,12 +2656,12 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         // ed = Rough / DisSysCompCoilData(CompNum).hydraulicDiameter;
         ed = Rough / hydraulicDiameter;
 
-        area = square(hydraulicDiameter) * DataGlobalConstants::Pi();
+        area = square(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2810,10 +2810,10 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi();
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -2975,10 +2975,10 @@ namespace AirflowNetwork {
         Real64 AA1;
         Real64 area;
 
-        // FLOW:
+
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi();
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -3122,10 +3122,10 @@ namespace AirflowNetwork {
         Real64 AA1;
         Real64 area;
 
-        // FLOW:
+
         // Get component properties
         ed = Rough / hydraulicDiameter;
-        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi();
+        area = pow_2(hydraulicDiameter) * DataGlobalConstants::Pi;
         ld = L / hydraulicDiameter;
         g = 1.14 - 0.868589 * std::log(ed);
         AA1 = g;
@@ -3255,7 +3255,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (PressureSetFlag == PressureCtrlExhaust) {
@@ -3383,7 +3383,7 @@ namespace AirflowNetwork {
         // Formats
         // static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
-        // FLOW:
+
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
             // Treat the component as an exhaust fan
             if (PressureSetFlag == PressureCtrlExhaust) {
@@ -3501,7 +3501,7 @@ namespace AirflowNetwork {
         Real64 Cshape;     // Shape factor [dimensionless]
         Real64 OpenArea;   // Opening area [m2]
 
-        // FLOW:
+
         // Get information on the horizontal opening
         RhozAver = (propN.density + propM.density) / 2.0;
         Width = MultizoneSurfaceData(i).Width;
@@ -3512,7 +3512,7 @@ namespace AirflowNetwork {
         // Slope = MultizoneCompHorOpeningData(CompNum).Slope;
         // DischCoeff = MultizoneCompHorOpeningData(CompNum).DischCoeff;
         Cshape = 0.942 * Width / Height;
-        OpenArea = Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi() / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi() / 180.0));
+        OpenArea = Width * Height * Fact * std::sin(Slope * DataGlobalConstants::Pi / 180.0) * (1.0 + std::cos(Slope * DataGlobalConstants::Pi / 180.0));
         DH = 4.0 * (Width * Height) / 2.0 / (Width + Height) * Fact;
 
         // Check which zone is higher
@@ -3620,7 +3620,7 @@ namespace AirflowNetwork {
         Real64 FL;
         Real64 FT;
 
-        // FLOW:
+
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (Node(InletNode).MassFlowRate > VerySmallMassFlow) {
@@ -3738,7 +3738,7 @@ namespace AirflowNetwork {
         Real64 FL;
         Real64 FT;
 
-        // FLOW:
+
         int AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
 
         if (Node(OutletNode).MassFlowRate > VerySmallMassFlow) {

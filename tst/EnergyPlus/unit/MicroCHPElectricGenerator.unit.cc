@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,14 @@
 // C++ Headers
 #include <memory>
 #include <vector>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -275,20 +276,20 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(2).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(2).Comp.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(2).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(2).Comp.allocate(1);
 
-    DataPlant::PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
 
-    auto &MicroCHP1(DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1));
-    auto &MicroCHP2(DataPlant::PlantLoop(1).LoopSide(1).Branch(2).Comp(1));
+    auto &MicroCHP1(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1));
+    auto &MicroCHP2(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(2).Comp(1));
     MicroCHP1.TypeOf = "GENERATOR:MICROCHP";
     MicroCHP1.TypeOf_Num = DataPlant::TypeOf_Generator_MicroCHP;
     MicroCHP1.Name = "MICROCOGEN1";
@@ -297,7 +298,7 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     MicroCHP2.Name = "MICROCOGEN2";
     MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN1");
     MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN2");
-    EXPECT_EQ(MicroCHPElectricGenerator::NumMicroCHPs, 2);
+    EXPECT_EQ(state->dataCHPElectGen->NumMicroCHPs, 2);
 
     bool FirstHVACIteration = true;
     bool InitLoopEquip = true;
@@ -306,6 +307,6 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
     MicroCHP1.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
     MicroCHP2.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
-    EXPECT_EQ(DataGenerators::GeneratorDynamics(1).Name, MicroCHP1.Name);
-    EXPECT_EQ(DataGenerators::GeneratorDynamics(2).Name, MicroCHP2.Name);
+    EXPECT_EQ(state->dataGenerator->GeneratorDynamics(1).Name, MicroCHP1.Name);
+    EXPECT_EQ(state->dataGenerator->GeneratorDynamics(2).Name, MicroCHP2.Name);
 }
