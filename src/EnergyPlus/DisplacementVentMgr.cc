@@ -742,10 +742,10 @@ namespace DisplacementVentMgr {
         MCp_Total = SumMCp + SumSysMCp;
         MCpT_Total = SumMCpT + SumSysMCpT;
 
-        if (TotPeople > 0) {
+        if (state.dataHeatBal->TotPeople > 0) {
             NumberOfOccupants = 0;
             NumberOfPlumes = 0.0;
-            for (Ctd = 1; Ctd <= TotPeople; ++Ctd) {
+            for (Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants += People(Ctd).NumberOfPeople; // *GetCurrentScheduleValue(state, People(Ctd)%NumberOfPeoplePtr)
                     NumberOfPlumes = NumberOfOccupants * NumPLPP;

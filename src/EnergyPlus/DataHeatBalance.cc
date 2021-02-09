@@ -220,25 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    int NumOfZoneLists(0);             // Total number of zone lists
-    int NumOfZoneGroups(0);            // Total number of zone groups
-    int NumPeopleStatements(0);        // Number of People objects in input - possibly global assignments
-    int NumLightsStatements(0);        // Number of Lights objects in input - possibly global assignments
-    int NumZoneElectricStatements(0);  // Number of ZoneElectric objects in input - possibly global assignments
-    int NumZoneGasStatements(0);       // Number of ZoneGas objects in input - possibly global assignments
-    int NumInfiltrationStatements(0);  // Number of Design Flow Infiltration objects in input - possibly global assignments
-    int NumVentilationStatements(0);   // Number of Design Flow Ventilation objects in input - possibly global assignments
-    int NumHotWaterEqStatements(0);    // number of Hot Water Equipment objects in input. - possibly global assignments
-    int NumSteamEqStatements(0);       // number of Steam Equipment objects in input. - possibly global assignments
-    int NumOtherEqStatements(0);       // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneITEqStatements(0);      // number of Other Equipment objects in input. - possibly global assignments
-    int TotPeople(0);                  // Total People Statements in input and extrapolated from global assignments
-    int TotLights(0);                  // Total Lights Statements in input and extrapolated from global assignments
-    int TotElecEquip(0);               // Total Electric Equipment Statements in input and extrapolated from global assignments
-    int TotGasEquip(0);                // Total Gas Equipment Statements in input
-    int TotOthEquip(0);                // Total Other Equipment Statements in input
-    int TotHWEquip(0);                 // Total Hot Water Equipment Statements in input
-    int TotStmEquip(0);                // Total Steam Equipment Statements in input
     int TotInfiltration(0);            // Total Infiltration Statements in input and extrapolated from global assignments
     int TotDesignFlowInfiltration(0);  // number of Design Flow rate ZoneInfiltration in input
     int TotShermGrimsInfiltration(0);  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
@@ -549,25 +530,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumOfZoneLists = 0;
-        NumOfZoneGroups = 0;
-        NumPeopleStatements = 0;
-        NumLightsStatements = 0;
-        NumZoneElectricStatements = 0;
-        NumZoneGasStatements = 0;
-        NumInfiltrationStatements = 0;
-        NumVentilationStatements = 0;
-        NumHotWaterEqStatements = 0;
-        NumSteamEqStatements = 0;
-        NumOtherEqStatements = 0;
-        NumZoneITEqStatements = 0;
-        TotPeople = 0;
-        TotLights = 0;
-        TotElecEquip = 0;
-        TotGasEquip = 0;
-        TotOthEquip = 0;
-        TotHWEquip = 0;
-        TotStmEquip = 0;
         TotInfiltration = 0;
         TotDesignFlowInfiltration = 0;
         TotShermGrimsInfiltration = 0;

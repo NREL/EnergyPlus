@@ -276,25 +276,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern int NumOfZoneLists;             // Total number of zone lists
-    extern int NumOfZoneGroups;            // Total number of zone groups
-    extern int NumPeopleStatements;        // Number of People objects in input - possibly global assignments
-    extern int NumLightsStatements;        // Number of Lights objects in input - possibly global assignments
-    extern int NumZoneElectricStatements;  // Number of ZoneElectric objects in input - possibly global assignments
-    extern int NumZoneGasStatements;       // Number of ZoneGas objects in input - possibly global assignments
-    extern int NumInfiltrationStatements;  // Number of Design Flow Infiltration objects in input - possibly global assignments
-    extern int NumVentilationStatements;   // Number of Design Flow Ventilation objects in input - possibly global assignments
-    extern int NumHotWaterEqStatements;    // number of Hot Water Equipment objects in input. - possibly global assignments
-    extern int NumSteamEqStatements;       // number of Steam Equipment objects in input. - possibly global assignments
-    extern int NumOtherEqStatements;       // number of Other Equipment objects in input. - possibly global assignments
-    extern int NumZoneITEqStatements;      // Number of ElectricEquipment:ITE:AirCooled objects in input (ZoneList not supported for this object)
-    extern int TotPeople;                  // Total People Statements in input and extrapolated from global assignments
-    extern int TotLights;                  // Total Lights Statements in input and extrapolated from global assignments
-    extern int TotElecEquip;               // Total Electric Equipment Statements in input and extrapolated from global assignments
-    extern int TotGasEquip;                // Total Gas Equipment Statements in input
-    extern int TotOthEquip;                // Total Other Equipment Statements in input
-    extern int TotHWEquip;                 // Total Hot Water Equipment Statements in input
-    extern int TotStmEquip;                // Total Steam Equipment Statements in input
     extern int TotInfiltration;            // Total Infiltration Statements in input and extrapolated from global assignments
     extern int TotDesignFlowInfiltration;  // number of Design Flow rate ZoneInfiltration in input
     extern int TotShermGrimsInfiltration;  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
@@ -2163,7 +2144,8 @@ namespace DataHeatBalance {
 
 } // namespace DataHeatBalance
 
-struct HeatBalanceData : BaseGlobalStruct {
+struct HeatBalanceData : BaseGlobalStruct
+{
 
     int MaxSolidWinLayers = 0; // Maximum number of solid layers in a window construction
 
@@ -2199,26 +2181,45 @@ struct HeatBalanceData : BaseGlobalStruct {
     int InsideSurfIterations = 0;           // Counts inside surface iterations
     int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
-    bool AllCTF = true;                         // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
-    bool AnyCTF = false;                        // CTF used
-    bool AnyEMPD = false;                       // EMPD used
-    bool AnyCondFD = false;                     // CondFD used
-    bool AnyHAMT = false;                       // HAMT used
-    bool AnyKiva = false;                       // Kiva used
-    bool AnyAirBoundary = false;                // Construction:AirBoundary used (implies grouped solar and radiant is present)
-    bool AnyBSDF = false;                       // True if any WindowModelType == WindowBSDFModel
-    int MaxNumberOfWarmupDays = 25;             // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays = 1;              // Minimum number of warmup days allowed
-    Real64 CondFDRelaxFactor = 1.0;             // Relaxation factor, for looping across all the surfaces.
-    Real64 CondFDRelaxFactorInput = 1.0;        // Relaxation factor, for looping across all the surfaces, user input value
-    int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool OverrideZoneAirSolutionAlgo = false;   // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
-    Real64 BuildingRotationAppendixG = 0.0;     // Building Rotation for Appendix G
-    Real64 ZoneTotalExfiltrationHeatLoss = 0.0; // Building total heat emission through zone exfiltration;
-    Real64 ZoneTotalExhaustHeatLoss = 0.0;      // Building total heat emission through zone air exhaust;
-    Real64 SysTotalHVACReliefHeatLoss = 0.0;    // Building total heat emission through HVAC system relief air;
-    Real64 SysTotalHVACRejectHeatLoss = 0.0;    // Building total heat emission through HVAC system heat rejection;
+    bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
+    bool AnyCTF = false;                 // CTF used
+    bool AnyEMPD = false;                // EMPD used
+    bool AnyCondFD = false;              // CondFD used
+    bool AnyHAMT = false;                // HAMT used
+    bool AnyKiva = false;                // Kiva used
+    bool AnyAirBoundary = false;         // Construction:AirBoundary used (implies grouped solar and radiant is present)
+    bool AnyBSDF = false;                // True if any WindowModelType == WindowBSDFModel
+    int MaxNumberOfWarmupDays = 25;      // Maximum number of warmup days allowed
+    int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
+    Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
+    Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
+    int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo = false;               // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
+    Real64 BuildingRotationAppendixG = 0.0;                 // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss = 0.0;             // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss = 0.0;                  // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss = 0.0;                // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss = 0.0;                // Building total heat emission through HVAC system heat rejection;
     // END SiteData
+    int NumOfZoneLists = 0;            // Total number of zone lists
+    int NumOfZoneGroups = 0;           // Total number of zone groups
+    int NumPeopleStatements = 0;       // Number of People objects in input - possibly global assignments
+    int NumLightsStatements = 0;       // Number of Lights objects in input - possibly global assignments
+    int NumZoneElectricStatements = 0; // Number of ZoneElectric objects in input - possibly global assignments
+    int NumZoneGasStatements = 0;      // Number of ZoneGas objects in input - possibly global assignments
+    int NumInfiltrationStatements = 0; // Number of Design Flow Infiltration objects in input - possibly global assignments
+    int NumVentilationStatements = 0;  // Number of Design Flow Ventilation objects in input - possibly global assignments
+    int NumHotWaterEqStatements = 0;   // number of Hot Water Equipment objects in input. - possibly global assignments
+    int NumSteamEqStatements = 0;      // number of Steam Equipment objects in input. - possibly global assignments
+    int NumOtherEqStatements = 0;      // number of Other Equipment objects in input. - possibly global assignments
+    int NumZoneITEqStatements = 0;     // number of Other Equipment objects in input. - possibly global assignments
+    int TotPeople = 0;                 // Total People Statements in input and extrapolated from global assignments
+    int TotLights = 0;                 // Total Lights Statements in input and extrapolated from global assignments
+    int TotElecEquip = 0;              // Total Electric Equipment Statements in input and extrapolated from global assignments
+    int TotGasEquip = 0;               // Total Gas Equipment Statements in input
+    int TotOthEquip = 0;               // Total Other Equipment Statements in input
+    int TotHWEquip = 0;                // Total Hot Water Equipment Statements in input
+    int TotStmEquip = 0;               // Total Steam Equipment Statements in input
 
     void clear_state() override
     {
@@ -2255,6 +2256,25 @@ struct HeatBalanceData : BaseGlobalStruct {
         this->ZoneTotalExhaustHeatLoss = 0.0;
         this->SysTotalHVACReliefHeatLoss = 0.0;
         this->SysTotalHVACRejectHeatLoss = 0.0;
+        this->NumOfZoneLists = 0;
+        this->NumOfZoneGroups = 0;
+        this->NumPeopleStatements = 0;
+        this->NumLightsStatements = 0;
+        this->NumZoneElectricStatements = 0;
+        this->NumZoneGasStatements = 0;
+        this->NumInfiltrationStatements = 0;
+        this->NumVentilationStatements = 0;
+        this->NumHotWaterEqStatements = 0;
+        this->NumSteamEqStatements = 0;
+        this->NumOtherEqStatements = 0;
+        this->NumZoneITEqStatements = 0;
+        this->TotPeople = 0;
+        this->TotLights = 0;
+        this->TotElecEquip = 0;
+        this->TotGasEquip = 0;
+        this->TotOthEquip = 0;
+        this->TotHWEquip = 0;
+        this->TotStmEquip = 0;
     }
 };
 

@@ -262,7 +262,7 @@ namespace UFADManager {
         if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFI) {
             UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
             NumberOfOccupants = 0.0;
-            for (int Ctd = 1; Ctd <= TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants += People(Ctd).NumberOfPeople;
                 }
@@ -371,30 +371,30 @@ namespace UFADManager {
                     NumberOfPlumes = 1.0;
                 }
                 ZoneElecConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
                     if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
                         ZoneElecConv += ZoneElectric(Ctd).DesignLevel * ZoneElectric(Ctd).FractionConvected;
                     }
                 }
                 ZoneGasConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
                     if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
                         ZoneGasConv += ZoneGas(Ctd).DesignLevel * ZoneGas(Ctd).FractionConvected;
                     }
                 }
                 ZoneOthEqConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
                     if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel * ZoneOtherEq(Ctd).FractionConvected;
                     }
                 }
                 ZoneHWEqConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
                     if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel * ZoneHWEq(Ctd).FractionConvected;
                     }
                 }
-                for (int Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
                     if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel * ZoneSteamEq(Ctd).FractionConvected;
@@ -438,7 +438,7 @@ namespace UFADManager {
                 ShowContinueError(state, "  The zone will be treated as a UFAD interior zone");
             }
             NumberOfOccupants = 0.0;
-            for (int Ctd = 1; Ctd <= TotPeople; ++Ctd) {
+            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
                 if (People(Ctd).ZonePtr == ZoneNum) {
                     NumberOfOccupants += People(Ctd).NumberOfPeople;
                 }
@@ -546,30 +546,30 @@ namespace UFADManager {
                     NumberOfPlumes = 1.0;
                 }
                 ZoneElecConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotElecEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
                     if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
                         ZoneElecConv += ZoneElectric(Ctd).DesignLevel;
                     }
                 }
                 ZoneGasConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotGasEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
                     if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
                         ZoneGasConv += ZoneGas(Ctd).DesignLevel;
                     }
                 }
                 ZoneOthEqConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotOthEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
                     if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel;
                     }
                 }
                 ZoneHWEqConv = 0.0;
-                for (int Ctd = 1; Ctd <= TotHWEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
                     if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel;
                     }
                 }
-                for (int Ctd = 1; Ctd <= TotStmEquip; ++Ctd) {
+                for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
                     if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
                         ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel;

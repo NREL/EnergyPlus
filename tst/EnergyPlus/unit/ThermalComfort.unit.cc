@@ -944,9 +944,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
 {
 
     // Set the data for the test
-    TotPeople = 1;
-    People.allocate(TotPeople);
-    state->dataThermalComforts->ThermalComfortData.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 1;
+    People.allocate(state->dataHeatBal->TotPeople);
+    state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     state->dataGlobal->NumOfZones = 1;
     Zone.allocate(state->dataGlobal->NumOfZones);
     ZTAVComf.allocate(state->dataGlobal->NumOfZones);

@@ -1192,7 +1192,7 @@ namespace HeatBalanceIntRadExchange {
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching ZoneList name
             int zoneListNum = UtilityRoutines::FindItemInList(
-                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), DataHeatBalance::ZoneList, DataHeatBalance::NumOfZoneLists);
+                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), DataHeatBalance::ZoneList, state.dataHeatBal->NumOfZoneLists);
             if (zoneListNum > 0) {
                 // Look for radiant enclosure with same list of zones
                 auto &thisZoneList(DataHeatBalance::ZoneList(zoneListNum));

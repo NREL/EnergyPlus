@@ -105,7 +105,6 @@ namespace ThermalComfort {
     using DataHeatBalance::People;
     using DataHeatBalance::PeopleData;
     using DataHeatBalance::SurfaceWeighted;
-    using DataHeatBalance::TotPeople;
     using DataHeatBalance::Zone;
     using DataHeatBalance::ZoneAveraged;
     using DataHeatBalFanSys::MAT;
@@ -132,7 +131,7 @@ namespace ThermalComfort {
         if (state.dataThermalComforts->FirstTimeFlag) {
             InitThermalComfort(state); // Mainly sets up output stuff
             state.dataThermalComforts->FirstTimeFlag = false;
-            if (TotPeople > 0) {
+            if (state.dataHeatBal->TotPeople > 0) {
                 if (std::any_of(People.begin(), People.end(), [](PeopleData const &e) { return e.AdaptiveASH55; })) ASH55Flag = true;
                 if (std::any_of(People.begin(), People.end(), [](PeopleData const &e) { return e.AdaptiveCEN15251; })) CEN15251Flag = true;
             }
@@ -182,9 +181,9 @@ namespace ThermalComfort {
         int Loop; // DO loop counter
         std::string CurrentGroupName;
 
-        state.dataThermalComforts->ThermalComfortData.allocate(TotPeople);
+        state.dataThermalComforts->ThermalComfortData.allocate(state.dataHeatBal->TotPeople);
 
-        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
 
             CurrentGroupName = People(Loop).Name;
 
@@ -336,7 +335,7 @@ namespace ThermalComfort {
         state.dataThermalComforts->ThermalComfortInASH55.allocate(state.dataGlobal->NumOfZones);
 
         // ASHRAE 55 Warning. If any people statement for a zone is true, set that zone to true
-        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             if (People(Loop).Show55Warning) {
                 state.dataThermalComforts->ThermalComfortInASH55(People(Loop).ZonePtr).Enable55Warning = true;
             }
@@ -478,7 +477,7 @@ namespace ThermalComfort {
         Real64 PMV; // temporary variable to store calculated Fanger PMV value
         Real64 PPD; // temporary variable to store calculated Fanger PPD value
 
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
 
             // Optional argument is used to access people object when thermal comfort control is used
             if (present(PNum)) {
@@ -787,7 +786,7 @@ namespace ThermalComfort {
         Real64 UnevapSweat;          // Unevaporated sweat; g/m2/hr
         Real64 IntermediateClothing;
 
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
 
             if (!People(state.dataThermalComforts->PeopleNum).Pierce) continue;
 
@@ -1207,7 +1206,7 @@ namespace ThermalComfort {
         TimeExpos = 1.0;
         TempDiffer = 0.5;
 
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
             // THE NEXT SIX VARIABLES WILL BE READ IN FROM INPUT DECK
             if (!People(state.dataThermalComforts->PeopleNum).KSU) continue;
 
@@ -1707,7 +1706,7 @@ namespace ThermalComfort {
             ShowFatalError(state, "GetAngleFactorList: Program terminated due to preceding errors.");
         }
 
-        for (Item = 1; Item <= TotPeople; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->TotPeople; ++Item) {
             if (People(Item).MRTCalcType != AngleFactor) continue;
             People(Item).AngleFactorListPtr = UtilityRoutines::FindItemInList(People(Item).AngleFactorListName, state.dataThermalComforts->AngleFactorList);
             WhichAFList = People(Item).AngleFactorListPtr;
@@ -1986,7 +1985,7 @@ namespace ThermalComfort {
         for (auto &e : state.dataThermalComforts->ThermalComfortInASH55)
             e.ZoneIsOccupied = false;
         // loop through the people objects and determine if the zone is currently occupied
-        for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+        for (iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
             state.dataThermalComforts->ZoneNum = People(iPeople).ZonePtr;
             NumberOccupants = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             if (NumberOccupants > 0) {
@@ -2530,7 +2529,7 @@ namespace ThermalComfort {
             avgDryBulbASH += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
             if (!People(state.dataThermalComforts->PeopleNum).AdaptiveASH55) continue;
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
             if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
@@ -2729,7 +2728,7 @@ namespace ThermalComfort {
             avgDryBulbCEN += (state.dataEnvrn->OutDryBulbTemp / 24.0);
         }
 
-        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= TotPeople; ++state.dataThermalComforts->PeopleNum) {
+        for (state.dataThermalComforts->PeopleNum = 1; state.dataThermalComforts->PeopleNum <= state.dataHeatBal->TotPeople; ++state.dataThermalComforts->PeopleNum) {
             if (!People(state.dataThermalComforts->PeopleNum).AdaptiveCEN15251) continue;
             state.dataThermalComforts->ZoneNum = People(state.dataThermalComforts->PeopleNum).ZonePtr;
             if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) || state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {

@@ -4802,13 +4802,13 @@ namespace HeatBalanceManager {
 
         // Get ZONE LIST objects
         cCurrentModuleObject = "ZoneList";
-        NumOfZoneLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumOfZoneLists = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumOfZoneLists > 0) {
+        if (state.dataHeatBal->NumOfZoneLists > 0) {
 
-            ZoneList.allocate(NumOfZoneLists);
+            ZoneList.allocate(state.dataHeatBal->NumOfZoneLists);
 
-            for (ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum) {
+            for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               ListNum,
@@ -4865,12 +4865,12 @@ namespace HeatBalanceManager {
 
         // Get ZONE GROUP objects
         cCurrentModuleObject = "ZoneGroup";
-        NumOfZoneGroups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumOfZoneGroups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumOfZoneGroups > 0) {
-            ZoneGroup.allocate(NumOfZoneGroups);
+        if (state.dataHeatBal->NumOfZoneGroups > 0) {
+            ZoneGroup.allocate(state.dataHeatBal->NumOfZoneGroups);
 
-            for (GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum) {
+            for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               GroupNum,

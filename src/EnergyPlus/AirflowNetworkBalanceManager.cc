@@ -1506,7 +1506,6 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataLoopNode::Node;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
@@ -2192,7 +2191,7 @@ namespace AirflowNetworkBalanceManager {
                 } else if (SELECT_CASE_var == "ASHRAE55ADAPTIVE") {
                     // Check that for the given zone, there is a people object for which ASHRAE 55 calculations are carried out
                     ZoneNum = MultizoneZoneData(i).ZoneNum;
-                    for (j = 1; j <= TotPeople; ++j) {
+                    for (j = 1; j <= state.dataHeatBal->TotPeople; ++j) {
                         if (ZoneNum == People(j).ZonePtr && People(j).AdaptiveASH55) {
                             MultizoneZoneData(i).ASH55PeopleInd = j;
                         }
@@ -2204,7 +2203,7 @@ namespace AirflowNetworkBalanceManager {
                 } else if (SELECT_CASE_var == "CEN15251ADAPTIVE") {
                     // Check that for the given zone, there is a people object for which CEN-15251 calculations are carried out
                     ZoneNum = MultizoneZoneData(i).ZoneNum;
-                    for (j = 1; j <= TotPeople; ++j) {
+                    for (j = 1; j <= state.dataHeatBal->TotPeople; ++j) {
                         if (ZoneNum == People(j).ZonePtr && People(j).AdaptiveCEN15251) {
                             MultizoneZoneData(i).CEN15251PeopleInd = j;
                             break;

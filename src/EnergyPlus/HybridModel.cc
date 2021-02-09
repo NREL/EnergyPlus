@@ -157,7 +157,7 @@ namespace HybridModel {
 
                 ZoneListPtr = 0;
                 ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone); // "Zone" is a 1D array, cAlphaArgs(2) is the zone name
-                if (ZonePtr == 0 && NumOfZoneLists > 0) ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+                if (ZonePtr == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZoneListPtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
                 if (ZonePtr > 0) {
                     HybridModelZone(ZonePtr).Name = cAlphaArgs(1);                          // Zone HybridModel name
                     FlagHybridModel_TM = UtilityRoutines::SameString(cAlphaArgs(3), "Yes"); // Calculate thermal mass option

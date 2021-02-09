@@ -2493,7 +2493,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -2556,7 +2556,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);

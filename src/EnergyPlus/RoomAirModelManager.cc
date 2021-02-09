@@ -988,7 +988,6 @@ namespace RoomAirModelManager {
         using namespace ScheduleManager;
         using DataSurfaces::Surface;
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;
@@ -1061,7 +1060,7 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
             }
 
-            for (Loop2 = 1; Loop2 <= TotPeople; ++Loop2) {
+            for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
                 if (People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
                 if (People(Loop2).Fanger) {
                     if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {

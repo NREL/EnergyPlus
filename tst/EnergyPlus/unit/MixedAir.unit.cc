@@ -770,7 +770,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
     Schedule(2).CurrentValue = 1.0;
-    TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
     People.allocate(1);
     People(1).Name = "WestPeople";
     People(1).ZonePtr = 1;
@@ -5634,7 +5634,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
     Schedule(2).CurrentValue = 1.0;
-    TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
     People.allocate(1);
     People(1).Name = "WestPeople";
     People(1).ZonePtr = 1;

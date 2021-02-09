@@ -2637,15 +2637,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZoneHeatIndexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneHumidexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalance::TotPeople = 1;
-    DataHeatBalance::People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 1;
+    DataHeatBalance::People.allocate(state->dataHeatBal->TotPeople);
     DataHeatBalance::People(1).ZonePtr = 1;
     DataHeatBalance::People(1).Pierce = true;
     DataHeatBalance::People(1).NumberOfPeople = 2;
     DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
     ScheduleManager::Schedule.allocate(1);
 
-    state->dataThermalComforts->ThermalComfortData.allocate(DataHeatBalance::TotPeople);
+    state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     DataHeatBalFanSys::ZoneOccPierceSET.dimension(state->dataGlobal->NumOfZones, 0);
     DataHeatBalFanSys::ZoneOccPierceSETLastStep.dimension(state->dataGlobal->NumOfZones, 0);
     DataHeatBalFanSys::ZoneLowSETHours.allocate(state->dataGlobal->NumOfZones);

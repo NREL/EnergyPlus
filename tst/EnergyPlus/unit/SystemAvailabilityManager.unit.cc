@@ -194,8 +194,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalance::NumOfZoneLists = 1;
-    DataHeatBalance::ZoneList.allocate(DataHeatBalance::NumOfZoneLists);
+    state->dataHeatBal->NumOfZoneLists = 1;
+    DataHeatBalance::ZoneList.allocate(state->dataHeatBal->NumOfZoneLists);
     DataHeatBalance::ZoneList(1).Name = "LIST_ZONES";
     DataHeatBalance::ZoneList(1).NumOfZones = 3;
     DataHeatBalance::ZoneList(1).Zone.allocate(3);

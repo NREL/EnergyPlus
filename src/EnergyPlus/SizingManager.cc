@@ -1902,7 +1902,7 @@ namespace EnergyPlus::SizingManager {
                 PsBySys(AirLoopNum) = 0.0;
                 for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
                     int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
-                    for (int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum) {
+                    for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                         if (DataHeatBalance::People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                             PzSumBySys(AirLoopNum) += (DataHeatBalance::People(PeopleNum).NumberOfPeople *
                                                        DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
@@ -1948,7 +1948,7 @@ namespace EnergyPlus::SizingManager {
                             for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
                                 int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
 
-                                for (int PeopleNum = 1; PeopleNum <= DataHeatBalance::TotPeople; ++PeopleNum) {
+                                for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                                     if (DataHeatBalance::People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                                         Real64 PeopleInZone = (DataHeatBalance::People(PeopleNum).NumberOfPeople *
                                                                DataHeatBalance::Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *

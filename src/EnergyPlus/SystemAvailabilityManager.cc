@@ -300,7 +300,6 @@ namespace SystemAvailabilityManager {
         // Uses InputProcessor "Get" routines to obtain data.
 
         // Using/Aliasing
-        using DataHeatBalance::NumOfZoneLists;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneList;
         using NodeInputManager::GetOnlySingleNode;
@@ -620,7 +619,7 @@ namespace SystemAvailabilityManager {
                         state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1) = ZoneNum;
                     } else {
                         int ZoneListNum = 0;
-                        if (NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), ZoneList);
                         if (ZoneListNum > 0) {
                             int NumZones = ZoneList(ZoneListNum).NumOfZones;
                             state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones = NumZones;
@@ -646,7 +645,7 @@ namespace SystemAvailabilityManager {
                         state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs(1) = ZoneNum;
                     } else {
                         int ZoneListNum = 0;
-                        if (NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), ZoneList);
                         if (ZoneListNum > 0) {
                             int NumZones = ZoneList(ZoneListNum).NumOfZones;
                             state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones = NumZones;
@@ -672,7 +671,7 @@ namespace SystemAvailabilityManager {
                         state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs(1) = ZoneNum;
                     } else {
                         int ZoneListNum = 0;
-                        if (NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(8), ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(8), ZoneList);
                         if (ZoneListNum > 0) {
                             int NumZones = ZoneList(ZoneListNum).NumOfZones;
                             state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones = NumZones;
@@ -698,7 +697,7 @@ namespace SystemAvailabilityManager {
                         state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs(1) = ZoneNum;
                     } else {
                         int ZoneListNum = 0;
-                        if (NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(9), ZoneList);
+                        if (state.dataHeatBal->NumOfZoneLists > 0) ZoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(9), ZoneList);
                         if (ZoneListNum > 0) {
                             int NumZones = ZoneList(ZoneListNum).NumOfZones;
                             state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones = NumZones;
@@ -792,7 +791,7 @@ namespace SystemAvailabilityManager {
 
                 if (state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZoneListName = cAlphaArgs(6);
-                    for (ZoneListNum = 1; ZoneListNum <= NumOfZoneLists; ++ZoneListNum) {
+                    for (ZoneListNum = 1; ZoneListNum <= state.dataHeatBal->NumOfZoneLists; ++ZoneListNum) {
                         if (ZoneList(ZoneListNum).Name == cAlphaArgs(6)) {
                             state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumOfZones = ZoneList(ZoneListNum).NumOfZones;
                             state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).ZonePtrs.allocate(ZoneList(ZoneListNum).NumOfZones);

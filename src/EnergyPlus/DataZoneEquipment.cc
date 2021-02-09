@@ -1295,7 +1295,6 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Using/Aliasing
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneIntGain;
         using DataSizing::OAFlow;
@@ -1396,7 +1395,7 @@ namespace EnergyPlus::DataZoneEquipment {
                         // OAPerPersonMode == PerPersonDCVByCurrentLevel (UseOccSchFlag = TRUE)
                         // for dual duct, get max people according to max schedule value when requesting MaxOAFlow
                         PeopleCount = 0.0;
-                        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+                        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
                             if (ActualZoneNum != People(Loop).ZonePtr) continue;
                             PeopleCount += People(Loop).NumberOfPeople * GetScheduleMaxValue(state, People(Loop).NumberOfPeoplePtr);
                         }
@@ -1472,7 +1471,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     CO2PeopleGeneration = 0.0;
                     if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
                         // Accumulate CO2 generation from people at design occupancy and current activity level
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (People(PeopleNum).ZonePtr != ActualZoneNum) continue;
                             CO2PeopleGeneration += People(PeopleNum).NumberOfPeople * People(PeopleNum).CO2RateFactor *
                                                    GetCurrentScheduleValue(state, People(PeopleNum).ActivityLevelPtr);

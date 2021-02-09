@@ -785,13 +785,13 @@ namespace HeatBalanceAirManager {
         TotAIM2Infiltration = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-        NumInfiltrationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumInfiltrationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        InfiltrationObjects.allocate(NumInfiltrationStatements);
+        InfiltrationObjects.allocate(state.dataHeatBal->NumInfiltrationStatements);
 
         TotDesignFlowInfiltration = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumInfiltrationStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -809,7 +809,7 @@ namespace HeatBalanceAirManager {
             InfiltrationObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
                 InfiltrationObjects(Item).StartPtr = TotDesignFlowInfiltration + 1;
                 ++TotDesignFlowInfiltration;
@@ -844,7 +844,7 @@ namespace HeatBalanceAirManager {
         if (TotDesignFlowInfiltration > 0) {
             Loop = 0;
             cCurrentModuleObject = "ZoneInfiltration:DesignFlowRate";
-            for (Item = 1; Item <= NumInfiltrationStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumInfiltrationStatements; ++Item) {
 
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -1283,17 +1283,17 @@ namespace HeatBalanceAirManager {
         RepVarSet = true;
 
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        NumVentilationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->NumVentilationStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         cCurrentModuleObject = "ZoneVentilation:WindandStackOpenArea";
         TotWindAndStackVentilation = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        VentilationObjects.allocate(NumVentilationStatements);
+        VentilationObjects.allocate(state.dataHeatBal->NumVentilationStatements);
 
         TotDesignFlowVentilation = 0;
         errFlag = false;
         cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-        for (Item = 1; Item <= NumVentilationStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -1313,7 +1313,7 @@ namespace HeatBalanceAirManager {
 
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
                 VentilationObjects(Item).StartPtr = TotDesignFlowVentilation + 1;
                 ++TotDesignFlowVentilation;
@@ -1346,7 +1346,7 @@ namespace HeatBalanceAirManager {
         if (TotDesignFlowVentilation > 0) {
             Loop = 0;
             cCurrentModuleObject = "ZoneVentilation:DesignFlowRate";
-            for (Item = 1; Item <= NumVentilationStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumVentilationStatements; ++Item) {
 
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,

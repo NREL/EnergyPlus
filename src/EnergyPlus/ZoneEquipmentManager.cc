@@ -754,7 +754,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Using/Aliasing
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using EMSManager::ManageEMS;
@@ -1258,7 +1257,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // from the outside air flow per person input
             TotPeopleInZone = 0.0;
             ZoneIndex = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
-            for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                 if (People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
                     TotPeopleInZone += (People(PeopleNum).NumberOfPeople * Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
                                         Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);

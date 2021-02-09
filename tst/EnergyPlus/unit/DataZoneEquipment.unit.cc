@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     DataHeatBalance::Zone(1).TotOccupants = 5.0;
     DataHeatBalance::Zone(1).ZoneContamControllerSchedIndex = 1;
     DataHeatBalance::People(1).ZonePtr = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
     DataHeatBalance::People(1).ActivityLevelPtr = 2;
     DataHeatBalance::People(1).CO2RateFactor = 3.82e-8;
     DataHeatBalance::People(1).NumberOfPeople = DataHeatBalance::Zone(1).TotOccupants;

@@ -5075,8 +5075,8 @@ namespace HeatBalanceSurfaceManager {
         int SETNoBins = 4; // SET report column numbers
 
         if (reportThermalResilienceFirstTime) {
-            if (TotPeople == 0) hasPierceSET = false;
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            if (state.dataHeatBal->TotPeople == 0) hasPierceSET = false;
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
                 }
@@ -5102,7 +5102,7 @@ namespace HeatBalanceSurfaceManager {
         if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
             // Trace current time step Zone Pierce SET; NaN if no occupant or SET not calculated
             // Record last time step SET to trace SET unmet duration;
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
                 ZoneOccPierceSETLastStep(ZoneNum) = ZoneOccPierceSET(ZoneNum);
@@ -5230,7 +5230,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }
@@ -5279,7 +5279,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         if (DataGlobalConstants::KindOfSim::RunPeriodWeather == state.dataGlobal->KindOfSim && !state.dataGlobal->WarmupFlag) {
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 int ZoneNum = People(iPeople).ZonePtr;
                 ZoneNumOcc(ZoneNum) = People(iPeople).NumberOfPeople * GetCurrentScheduleValue(state, People(iPeople).NumberOfPeoplePtr);
             }

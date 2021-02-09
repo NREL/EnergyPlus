@@ -2459,7 +2459,6 @@ namespace EnergyPlus::MixedAir {
 
         using namespace DataLoopNode;
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneIntGain;
         using DataHeatBalance::ZoneList;
@@ -2854,7 +2853,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     if (!FoundPeopleZone) {
                         // Loop through people objects to see if this zone has a people object and only then show a warning
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (People(PeopleNum).ZonePtr == NumZone) {
                                 if (!FoundAreaZone) {
                                     ShowWarningError(state, "PEOPLE object for zone = " + Zone(NumZone).Name + " is not accounted for by " +
@@ -2869,7 +2868,7 @@ namespace EnergyPlus::MixedAir {
                         }
                     } else { // People > 0, check to make sure there is a people statement in the zone
                         FoundAreaZone = false;
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (People(PeopleNum).ZonePtr != NumZone) continue;
                             FoundAreaZone = true;
                             break;
@@ -3654,7 +3653,6 @@ namespace EnergyPlus::MixedAir {
     )
     {
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneIntGain;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3847,7 +3845,7 @@ namespace EnergyPlus::MixedAir {
                             CO2PeopleGeneration = 0.0;
                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                 // Accumulate CO2 generation from people at design occupancy and current activity level
-                                for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                                for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                                     if (People(PeopleNum).ZonePtr != ZoneNum) continue;
                                     CO2PeopleGeneration += People(PeopleNum).NumberOfPeople * People(PeopleNum).CO2RateFactor *
                                                            GetCurrentScheduleValue(state, People(PeopleNum).ActivityLevelPtr);

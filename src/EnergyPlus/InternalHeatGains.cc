@@ -389,12 +389,12 @@ namespace InternalHeatGains {
         // PEOPLE: Includes both information related to the heat balance and thermal comfort
         // First, allocate and initialize the People derived type
         CurrentModuleObject = "People";
-        NumPeopleStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        PeopleObjects.allocate(NumPeopleStatements);
+        state.dataHeatBal->NumPeopleStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        PeopleObjects.allocate(state.dataHeatBal->NumPeopleStatements);
 
-        TotPeople = 0;
+        state.dataHeatBal->TotPeople = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumPeopleStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -414,16 +414,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                PeopleObjects(Item).StartPtr = TotPeople + 1;
-                ++TotPeople;
+                PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
+                ++state.dataHeatBal->TotPeople;
                 PeopleObjects(Item).NumOfZones = 1;
                 PeopleObjects(Item).ZoneListActive = false;
                 PeopleObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                PeopleObjects(Item).StartPtr = TotPeople + 1;
-                TotPeople += ZoneList(ZLItem).NumOfZones;
+                PeopleObjects(Item).StartPtr = state.dataHeatBal->TotPeople + 1;
+                state.dataHeatBal->TotPeople += ZoneList(ZLItem).NumOfZones;
                 PeopleObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 PeopleObjects(Item).ZoneListActive = true;
                 PeopleObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -438,14 +438,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotPeople = 0;
+            state.dataHeatBal->TotPeople = 0;
         }
 
-        People.allocate(TotPeople);
+        People.allocate(state.dataHeatBal->TotPeople);
 
-        if (TotPeople > 0) {
+        if (state.dataHeatBal->TotPeople > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumPeopleStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -1136,7 +1136,7 @@ namespace InternalHeatGains {
                                              Zone(Loop).FloorArea / Zone(Loop).TotOccupants));
                 }
                 maxOccupLoad = 0.0;
-                for (Loop1 = 1; Loop1 <= TotPeople; ++Loop1) {
+                for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotPeople; ++Loop1) {
                     if (People(Loop1).ZonePtr != Loop) continue;
                     if (maxOccupLoad < GetScheduleMaxValue(state, People(Loop1).NumberOfPeoplePtr) * People(Loop1).NumberOfPeople) {
                         maxOccupLoad = GetScheduleMaxValue(state, People(Loop1).NumberOfPeoplePtr) * People(Loop1).NumberOfPeople;
@@ -1171,12 +1171,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "Lights";
-        NumLightsStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        LightsObjects.allocate(NumLightsStatements);
+        state.dataHeatBal->NumLightsStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        LightsObjects.allocate(state.dataHeatBal->NumLightsStatements);
 
-        TotLights = 0;
+        state.dataHeatBal->TotLights = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumLightsStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -1196,16 +1196,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                LightsObjects(Item).StartPtr = TotLights + 1;
-                ++TotLights;
+                LightsObjects(Item).StartPtr = state.dataHeatBal->TotLights + 1;
+                ++state.dataHeatBal->TotLights;
                 LightsObjects(Item).NumOfZones = 1;
                 LightsObjects(Item).ZoneListActive = false;
                 LightsObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                LightsObjects(Item).StartPtr = TotLights + 1;
-                TotLights += ZoneList(ZLItem).NumOfZones;
+                LightsObjects(Item).StartPtr = state.dataHeatBal->TotLights + 1;
+                state.dataHeatBal->TotLights += ZoneList(ZLItem).NumOfZones;
                 LightsObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 LightsObjects(Item).ZoneListActive = true;
                 LightsObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -1220,14 +1220,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotLights = 0;
+            state.dataHeatBal->TotLights = 0;
         }
 
-        Lights.allocate(TotLights);
+        Lights.allocate(state.dataHeatBal->TotLights);
 
-        if (TotLights > 0) {
+        if (state.dataHeatBal->TotLights > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumLightsStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -1633,12 +1633,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";
-        NumZoneElectricStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ZoneElectricObjects.allocate(NumZoneElectricStatements);
+        state.dataHeatBal->NumZoneElectricStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ZoneElectricObjects.allocate(state.dataHeatBal->NumZoneElectricStatements);
 
-        TotElecEquip = 0;
+        state.dataHeatBal->TotElecEquip = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumZoneElectricStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -1658,16 +1658,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                ZoneElectricObjects(Item).StartPtr = TotElecEquip + 1;
-                ++TotElecEquip;
+                ZoneElectricObjects(Item).StartPtr = state.dataHeatBal->TotElecEquip + 1;
+                ++state.dataHeatBal->TotElecEquip;
                 ZoneElectricObjects(Item).NumOfZones = 1;
                 ZoneElectricObjects(Item).ZoneListActive = false;
                 ZoneElectricObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                ZoneElectricObjects(Item).StartPtr = TotElecEquip + 1;
-                TotElecEquip += ZoneList(ZLItem).NumOfZones;
+                ZoneElectricObjects(Item).StartPtr = state.dataHeatBal->TotElecEquip + 1;
+                state.dataHeatBal->TotElecEquip += ZoneList(ZLItem).NumOfZones;
                 ZoneElectricObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 ZoneElectricObjects(Item).ZoneListActive = true;
                 ZoneElectricObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -1682,14 +1682,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotElecEquip = 0;
+            state.dataHeatBal->TotElecEquip = 0;
         }
 
-        ZoneElectric.allocate(TotElecEquip);
+        ZoneElectric.allocate(state.dataHeatBal->TotElecEquip);
 
-        if (TotElecEquip > 0) {
+        if (state.dataHeatBal->TotElecEquip > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumZoneElectricStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -2038,12 +2038,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "GasEquipment";
-        NumZoneGasStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ZoneGasObjects.allocate(NumZoneGasStatements);
+        state.dataHeatBal->NumZoneGasStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ZoneGasObjects.allocate(state.dataHeatBal->NumZoneGasStatements);
 
-        TotGasEquip = 0;
+        state.dataHeatBal->TotGasEquip = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumZoneGasStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -2063,16 +2063,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                ZoneGasObjects(Item).StartPtr = TotGasEquip + 1;
-                ++TotGasEquip;
+                ZoneGasObjects(Item).StartPtr = state.dataHeatBal->TotGasEquip + 1;
+                ++state.dataHeatBal->TotGasEquip;
                 ZoneGasObjects(Item).NumOfZones = 1;
                 ZoneGasObjects(Item).ZoneListActive = false;
                 ZoneGasObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                ZoneGasObjects(Item).StartPtr = TotGasEquip + 1;
-                TotGasEquip += ZoneList(ZLItem).NumOfZones;
+                ZoneGasObjects(Item).StartPtr = state.dataHeatBal->TotGasEquip + 1;
+                state.dataHeatBal->TotGasEquip += ZoneList(ZLItem).NumOfZones;
                 ZoneGasObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 ZoneGasObjects(Item).ZoneListActive = true;
                 ZoneGasObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -2087,14 +2087,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotGasEquip = 0;
+            state.dataHeatBal->TotGasEquip = 0;
         }
 
-        ZoneGas.allocate(TotGasEquip);
+        ZoneGas.allocate(state.dataHeatBal->TotGasEquip);
 
-        if (TotGasEquip > 0) {
+        if (state.dataHeatBal->TotGasEquip > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumZoneGasStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -2457,12 +2457,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "HotWaterEquipment";
-        NumHotWaterEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        HotWaterEqObjects.allocate(NumHotWaterEqStatements);
+        state.dataHeatBal->NumHotWaterEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        HotWaterEqObjects.allocate(state.dataHeatBal->NumHotWaterEqStatements);
 
-        TotHWEquip = 0;
+        state.dataHeatBal->TotHWEquip = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumHotWaterEqStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -2482,16 +2482,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                HotWaterEqObjects(Item).StartPtr = TotHWEquip + 1;
-                ++TotHWEquip;
+                HotWaterEqObjects(Item).StartPtr = state.dataHeatBal->TotHWEquip + 1;
+                ++state.dataHeatBal->TotHWEquip;
                 HotWaterEqObjects(Item).NumOfZones = 1;
                 HotWaterEqObjects(Item).ZoneListActive = false;
                 HotWaterEqObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                HotWaterEqObjects(Item).StartPtr = TotHWEquip + 1;
-                TotHWEquip += ZoneList(ZLItem).NumOfZones;
+                HotWaterEqObjects(Item).StartPtr = state.dataHeatBal->TotHWEquip + 1;
+                state.dataHeatBal->TotHWEquip += ZoneList(ZLItem).NumOfZones;
                 HotWaterEqObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 HotWaterEqObjects(Item).ZoneListActive = true;
                 HotWaterEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -2506,14 +2506,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotHWEquip = 0;
+            state.dataHeatBal->TotHWEquip = 0;
         }
 
-        ZoneHWEq.allocate(TotHWEquip);
+        ZoneHWEq.allocate(state.dataHeatBal->TotHWEquip);
 
-        if (TotHWEquip > 0) {
+        if (state.dataHeatBal->TotHWEquip > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumHotWaterEqStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -2861,12 +2861,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "SteamEquipment";
-        NumSteamEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        SteamEqObjects.allocate(NumSteamEqStatements);
+        state.dataHeatBal->NumSteamEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        SteamEqObjects.allocate(state.dataHeatBal->NumSteamEqStatements);
 
-        TotStmEquip = 0;
+        state.dataHeatBal->TotStmEquip = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumSteamEqStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -2886,16 +2886,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(2), ZoneList);
             if (Item1 > 0) {
-                SteamEqObjects(Item).StartPtr = TotStmEquip + 1;
-                ++TotStmEquip;
+                SteamEqObjects(Item).StartPtr = state.dataHeatBal->TotStmEquip + 1;
+                ++state.dataHeatBal->TotStmEquip;
                 SteamEqObjects(Item).NumOfZones = 1;
                 SteamEqObjects(Item).ZoneListActive = false;
                 SteamEqObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                SteamEqObjects(Item).StartPtr = TotStmEquip + 1;
-                TotStmEquip += ZoneList(ZLItem).NumOfZones;
+                SteamEqObjects(Item).StartPtr = state.dataHeatBal->TotStmEquip + 1;
+                state.dataHeatBal->TotStmEquip += ZoneList(ZLItem).NumOfZones;
                 SteamEqObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 SteamEqObjects(Item).ZoneListActive = true;
                 SteamEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -2910,14 +2910,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotStmEquip = 0;
+            state.dataHeatBal->TotStmEquip = 0;
         }
 
-        ZoneSteamEq.allocate(TotStmEquip);
+        ZoneSteamEq.allocate(state.dataHeatBal->TotStmEquip);
 
-        if (TotStmEquip > 0) {
+        if (state.dataHeatBal->TotStmEquip > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumSteamEqStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -3266,12 +3266,12 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "OtherEquipment";
-        NumOtherEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        OtherEqObjects.allocate(NumOtherEqStatements);
+        state.dataHeatBal->NumOtherEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        OtherEqObjects.allocate(state.dataHeatBal->NumOtherEqStatements);
 
-        TotOthEquip = 0;
+        state.dataHeatBal->TotOthEquip = 0;
         errFlag = false;
-        for (Item = 1; Item <= NumOtherEqStatements; ++Item) {
+        for (Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
                                           Item,
@@ -3291,16 +3291,16 @@ namespace InternalHeatGains {
 
             Item1 = UtilityRoutines::FindItemInList(AlphaName(3), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(3), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(AlphaName(3), ZoneList);
             if (Item1 > 0) {
-                OtherEqObjects(Item).StartPtr = TotOthEquip + 1;
-                ++TotOthEquip;
+                OtherEqObjects(Item).StartPtr = state.dataHeatBal->TotOthEquip + 1;
+                ++state.dataHeatBal->TotOthEquip;
                 OtherEqObjects(Item).NumOfZones = 1;
                 OtherEqObjects(Item).ZoneListActive = false;
                 OtherEqObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                OtherEqObjects(Item).StartPtr = TotOthEquip + 1;
-                TotOthEquip += ZoneList(ZLItem).NumOfZones;
+                OtherEqObjects(Item).StartPtr = state.dataHeatBal->TotOthEquip + 1;
+                state.dataHeatBal->TotOthEquip += ZoneList(ZLItem).NumOfZones;
                 OtherEqObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 OtherEqObjects(Item).ZoneListActive = true;
                 OtherEqObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -3315,14 +3315,14 @@ namespace InternalHeatGains {
         if (errFlag) {
             ShowSevereError(state, RoutineName + "Errors with invalid names in " + CurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            TotOthEquip = 0;
+            state.dataHeatBal->TotOthEquip = 0;
         }
 
-        ZoneOtherEq.allocate(TotOthEquip);
+        ZoneOtherEq.allocate(state.dataHeatBal->TotOthEquip);
 
-        if (TotOthEquip > 0) {
+        if (state.dataHeatBal->TotOthEquip > 0) {
             Loop = 0;
-            for (Item = 1; Item <= NumOtherEqStatements; ++Item) {
+            for (Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -3697,15 +3697,15 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment:ITE:AirCooled";
-        NumZoneITEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataHeatBal->NumZoneITEqStatements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         errFlag = false;
 
         // Note that this object type does not support ZoneList due to node names in input fields
-        ZoneITEq.allocate(NumZoneITEqStatements);
+        ZoneITEq.allocate(state.dataHeatBal->NumZoneITEqStatements);
 
-        if (NumZoneITEqStatements > 0) {
+        if (state.dataHeatBal->NumZoneITEqStatements > 0) {
             Loop = 0;
-            for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
                 AlphaName = BlankString;
                 IHGNumbers = 0.0;
 
@@ -4449,7 +4449,7 @@ namespace InternalHeatGains {
                                           &ZoneITEq(Loop).ConGainRateToZone);
 
             } // Item - Number of ZoneITEq objects
-            for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
                 if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE && (!ZoneITEq(Loop).FlowControlWithApproachTemps)) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\": invalid calculation method " + AlphaName(3) +
                                     " for Zone: " + AlphaName(2));
@@ -4770,31 +4770,31 @@ namespace InternalHeatGains {
             HWETot = 0.0;
             StmTot = 0.0;
             BBHeatInd = "No";
-            for (Loop1 = 1; Loop1 <= TotLights; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotLights; ++Loop1) {
                 if (Lights(Loop1).ZonePtr != Loop) continue;
                 LightTot += Lights(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= TotElecEquip; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotElecEquip; ++Loop1) {
                 if (ZoneElectric(Loop1).ZonePtr != Loop) continue;
                 ElecTot += ZoneElectric(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= NumZoneITEqStatements; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->NumZoneITEqStatements; ++Loop1) {
                 if (ZoneITEq(Loop1).ZonePtr != Loop) continue;
                 ElecTot += ZoneITEq(Loop1).DesignTotalPower;
             }
-            for (Loop1 = 1; Loop1 <= TotGasEquip; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotGasEquip; ++Loop1) {
                 if (ZoneGas(Loop1).ZonePtr != Loop) continue;
                 GasTot += ZoneGas(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= TotOthEquip; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotOthEquip; ++Loop1) {
                 if (ZoneOtherEq(Loop1).ZonePtr != Loop) continue;
                 OthTot += ZoneOtherEq(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= TotStmEquip; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotStmEquip; ++Loop1) {
                 if (ZoneSteamEq(Loop1).ZonePtr != Loop) continue;
                 StmTot += ZoneSteamEq(Loop1).DesignLevel;
             }
-            for (Loop1 = 1; Loop1 <= TotHWEquip; ++Loop1) {
+            for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotHWEquip; ++Loop1) {
                 if (ZoneHWEq(Loop1).ZonePtr != Loop) continue;
                 HWETot += ZoneHWEq(Loop1).DesignLevel;
             }
@@ -4819,7 +4819,7 @@ namespace InternalHeatGains {
                 print(state.files.eio, "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,{}\n", BBHeatInd);
             }
         }
-        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -4932,7 +4932,7 @@ namespace InternalHeatGains {
                 print(state.files.eio, "{:.0R}\n", People(Loop).NomMaxNumberPeople);
             }
         }
-        for (Loop = 1; Loop <= TotLights; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -4971,7 +4971,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", Lights(Loop).NomMinDesignLevel);
             print(state.files.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
         }
-        for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotElecEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5008,7 +5008,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R},", ZoneElectric(Loop).NomMinDesignLevel);
             print(state.files.eio, "{:.3R}\n", ZoneElectric(Loop).NomMaxDesignLevel);
         }
-        for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5047,7 +5047,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R}\n", ZoneGas(Loop).NomMaxDesignLevel);
         }
 
-        for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5086,7 +5086,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R}\n", ZoneHWEq(Loop).NomMaxDesignLevel);
         }
 
-        for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5125,7 +5125,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R}\n", ZoneSteamEq(Loop).NomMaxDesignLevel);
         }
 
-        for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5163,7 +5163,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.3R}\n", ZoneOtherEq(Loop).NomMaxDesignLevel);
         }
 
-        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
             if (Loop == 1) {
                 print(state.files.eio,
                       Format_723,
@@ -5369,7 +5369,7 @@ namespace InternalHeatGains {
         //       Sensible gains of 0.0 at 96F and equal to the metabolic rate
         //       at 30F were assumed in order to give reasonable values beyond
         //       The reported temperature range.
-        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             int NZ = People(Loop).ZonePtr;
             NumberOccupants = People(Loop).NumberOfPeople * GetCurrentScheduleValue(state, People(Loop).NumberOfPeoplePtr);
             if (People(Loop).EMSPeopleOn) NumberOccupants = People(Loop).EMSNumberOfPeople;
@@ -5424,7 +5424,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QOCTOT += People(Loop).TotGainRate;
         }
 
-        for (Loop = 1; Loop <= TotLights; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             int NZ = Lights(Loop).ZonePtr;
             Q = Lights(Loop).DesignLevel * GetCurrentScheduleValue(state, Lights(Loop).SchedPtr);
 
@@ -5483,7 +5483,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QLTTOT += Lights(Loop).TotGainRate;
         }
 
-        for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotElecEquip; ++Loop) {
             Q = ZoneElectric(Loop).DesignLevel * GetCurrentScheduleValue(state, ZoneElectric(Loop).SchedPtr);
 
             // Reduce equipment power due to demand limiting
@@ -5507,7 +5507,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QEELost += ZoneElectric(Loop).LostRate;
         }
 
-        for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
             Q = ZoneGas(Loop).DesignLevel * GetCurrentScheduleValue(state, ZoneGas(Loop).SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
@@ -5529,7 +5529,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QGELost += ZoneGas(Loop).LostRate;
         }
 
-        for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
             Q = ZoneOtherEq(Loop).DesignLevel * GetCurrentScheduleValue(state, ZoneOtherEq(Loop).SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
@@ -5549,7 +5549,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QOELost += ZoneOtherEq(Loop).LostRate;
         }
 
-        for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
             Q = ZoneHWEq(Loop).DesignLevel * GetCurrentScheduleValue(state, ZoneHWEq(Loop).SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
@@ -5570,7 +5570,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QHWLost += ZoneHWEq(Loop).LostRate;
         }
 
-        for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
             Q = ZoneSteamEq(Loop).DesignLevel * GetCurrentScheduleValue(state, ZoneSteamEq(Loop).SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
@@ -5625,7 +5625,7 @@ namespace InternalHeatGains {
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;
         }
 
-        if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
+        if (state.dataHeatBal->NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain(state);
@@ -5783,7 +5783,7 @@ namespace InternalHeatGains {
 
         //  Zero out time step variables
         // Object report variables
-        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
             ZoneITEq(Loop).CPUPower = 0.0;
             ZoneITEq(Loop).FanPower = 0.0;
             ZoneITEq(Loop).UPSPower = 0.0;
@@ -5857,7 +5857,7 @@ namespace InternalHeatGains {
             ZnRpt(Loop).SumToutMinusTSup = 0.0;
         } // Zone init loop
 
-        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
             // Get schedules
             NZ = ZoneITEq(Loop).ZonePtr;
             OperSchedFrac = GetCurrentScheduleValue(state, ZoneITEq(Loop).OperSchedPtr);
@@ -6084,7 +6084,7 @@ namespace InternalHeatGains {
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
-        for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
             int ZN = ZoneITEq(Loop).ZonePtr;
             if (ZnRpt(NZ).SumToutMinusTSup != 0.0) {
                 ZnRpt(ZN).ITEqSHI = ZnRpt(NZ).SumTinMinusTSup / ZnRpt(NZ).SumToutMinusTSup;
@@ -6152,7 +6152,7 @@ namespace InternalHeatGains {
                                              IntGainTypeOf_OtherEquipment});
 
 
-        for (Loop = 1; Loop <= TotPeople; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
             People(Loop).RadGainEnergy = People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             People(Loop).ConGainEnergy = People(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
             People(Loop).SenGainEnergy = People(Loop).SenGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6160,7 +6160,7 @@ namespace InternalHeatGains {
             People(Loop).TotGainEnergy = People(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotLights; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             Lights(Loop).Consumption = Lights(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             Lights(Loop).RadGainEnergy = Lights(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             Lights(Loop).VisGainEnergy = Lights(Loop).VisGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6180,7 +6180,7 @@ namespace InternalHeatGains {
             }
         }
 
-        for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotElecEquip; ++Loop) {
             ZoneElectric(Loop).Consumption = ZoneElectric(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneElectric(Loop).RadGainEnergy = ZoneElectric(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneElectric(Loop).ConGainEnergy = ZoneElectric(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6189,7 +6189,7 @@ namespace InternalHeatGains {
             ZoneElectric(Loop).TotGainEnergy = ZoneElectric(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
             ZoneGas(Loop).Consumption = ZoneGas(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneGas(Loop).RadGainEnergy = ZoneGas(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneGas(Loop).ConGainEnergy = ZoneGas(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6198,7 +6198,7 @@ namespace InternalHeatGains {
             ZoneGas(Loop).TotGainEnergy = ZoneGas(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
             ZoneOtherEq(Loop).Consumption = ZoneOtherEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneOtherEq(Loop).RadGainEnergy = ZoneOtherEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneOtherEq(Loop).ConGainEnergy = ZoneOtherEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6207,7 +6207,7 @@ namespace InternalHeatGains {
             ZoneOtherEq(Loop).TotGainEnergy = ZoneOtherEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
             ZoneHWEq(Loop).Consumption = ZoneHWEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneHWEq(Loop).RadGainEnergy = ZoneHWEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneHWEq(Loop).ConGainEnergy = ZoneHWEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6216,7 +6216,7 @@ namespace InternalHeatGains {
             ZoneHWEq(Loop).TotGainEnergy = ZoneHWEq(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
         }
 
-        for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
             ZoneSteamEq(Loop).Consumption = ZoneSteamEq(Loop).Power * state.dataGlobal->TimeStepZoneSec;
             ZoneSteamEq(Loop).RadGainEnergy = ZoneSteamEq(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             ZoneSteamEq(Loop).ConGainEnergy = ZoneSteamEq(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6388,7 +6388,7 @@ namespace InternalHeatGains {
 
         DesignLightingLevelSum = 0.0;
 
-        for (Loop = 1; Loop <= TotLights; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             if (Lights(Loop).ZonePtr == WhichZone) {
                 DesignLightingLevelSum += Lights(Loop).DesignLevel;
             }
@@ -6444,7 +6444,7 @@ namespace InternalHeatGains {
         LightsRepMax = -99999.0;
         NumLights = 0;
 
-        for (Loop = 1; Loop <= TotLights; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
             if (Lights(Loop).ZonePtr != WhichZone) continue;
             LightsRepMin = min(LightsRepMin, Lights(Loop).FractionReplaceable);
             LightsRepMax = max(LightsRepMax, Lights(Loop).FractionReplaceable);

@@ -131,10 +131,10 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addZoneData(zoneNum, DataHeatBalance::Zone(zoneNum));
         }
-        for (int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
+        for (int listNum = 1; listNum <= state.dataHeatBal->NumOfZoneLists; ++listNum) {
             sqlite->addZoneListData(listNum, DataHeatBalance::ZoneList(listNum));
         }
-        for (int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
+        for (int groupNum = 1; groupNum <= state.dataHeatBal->NumOfZoneGroups; ++groupNum) {
             sqlite->addZoneGroupData(groupNum, DataHeatBalance::ZoneGroup(groupNum));
         }
         for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
@@ -160,25 +160,25 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
                 sqlite->addConstructionData(constructNum, construction, DataHeatBalance::NominalU(constructNum));
             }
         }
-        for (int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum) {
+        for (int lightNum = 1; lightNum <= state.dataHeatBal->TotLights; ++lightNum) {
             sqlite->addNominalLightingData(lightNum, DataHeatBalance::Lights(lightNum));
         }
-        for (int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum) {
+        for (int peopleNum = 1; peopleNum <= state.dataHeatBal->TotPeople; ++peopleNum) {
             sqlite->addNominalPeopleData(peopleNum, DataHeatBalance::People(peopleNum));
         }
-        for (int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum) {
+        for (int elecEquipNum = 1; elecEquipNum <= state.dataHeatBal->TotElecEquip; ++elecEquipNum) {
             sqlite->addNominalElectricEquipmentData(elecEquipNum, DataHeatBalance::ZoneElectric(elecEquipNum));
         }
-        for (int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum) {
+        for (int gasEquipNum = 1; gasEquipNum <= state.dataHeatBal->TotGasEquip; ++gasEquipNum) {
             sqlite->addNominalGasEquipmentData(gasEquipNum, DataHeatBalance::ZoneGas(gasEquipNum));
         }
-        for (int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum) {
+        for (int steamEquipNum = 1; steamEquipNum <= state.dataHeatBal->TotStmEquip; ++steamEquipNum) {
             sqlite->addNominalSteamEquipmentData(steamEquipNum, DataHeatBalance::ZoneSteamEq(steamEquipNum));
         }
-        for (int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum) {
+        for (int hWEquipNum = 1; hWEquipNum <= state.dataHeatBal->TotHWEquip; ++hWEquipNum) {
             sqlite->addNominalHotWaterEquipmentData(hWEquipNum, DataHeatBalance::ZoneHWEq(hWEquipNum));
         }
-        for (int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum) {
+        for (int otherEquipNum = 1; otherEquipNum <= state.dataHeatBal->TotOthEquip; ++otherEquipNum) {
             sqlite->addNominalOtherEquipmentData(otherEquipNum, DataHeatBalance::ZoneOtherEq(otherEquipNum));
         }
         for (int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {

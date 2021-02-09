@@ -1318,7 +1318,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Using/Aliasing
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
@@ -1385,7 +1384,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             }
             NumberOfPeople = 0.0;
             MaxPeopleSch = 0.0;
-            for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                 if (ActualZoneNum != People(PeopleNum).ZonePtr) continue;
                 PeopleSchPtr = People(PeopleNum).NumberOfPeoplePtr;
                 MaxPeopleSch = GetScheduleMaxValue(state, PeopleSchPtr);

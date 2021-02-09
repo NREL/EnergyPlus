@@ -5964,7 +5964,7 @@ namespace SurfaceGeometry {
             IntMassObjects(Item).ZoneOrZoneListName = cAlphaArgs(3);
             int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
             if (Item1 > 0) {
                 ++NumIntMassSurfaces;
                 IntMassObjects(Item).NumOfZones = 1;
@@ -6102,7 +6102,7 @@ namespace SurfaceGeometry {
 
             int Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone, state.dataGlobal->NumOfZones);
             int ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(3), ZoneList);
             if (Item1 > 0) {
                 ++NumIntMassSurf;
             } else if (ZLItem > 0) {

@@ -363,7 +363,7 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneCtrls->TStatObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
                 state.dataZoneCtrls->TStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneCtrls->NumTempControlledZones + 1;
                 ++state.dataZoneCtrls->NumTempControlledZones;
@@ -960,7 +960,7 @@ namespace ZoneTempPredictorCorrector {
 
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             state.dataZoneCtrls->ComfortTStatObjects(Item).Name = cAlphaArgs(1);
             if (Item1 > 0) {
                 state.dataZoneCtrls->ComfortTStatObjects(Item).ComfortControlledZoneStartPtr = state.dataZoneCtrls->NumComfortControlledZones + 1;
@@ -1040,7 +1040,7 @@ namespace ZoneTempPredictorCorrector {
 
                     // Read Fields A3 and A4 for averaging method
                     IZoneCount = 0;
-                    for (i = 1; i <= TotPeople; ++i) {
+                    for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum == People(i).ZonePtr) {
                             ++IZoneCount;
                         }
@@ -1080,13 +1080,13 @@ namespace ZoneTempPredictorCorrector {
                             }
                         }
                     } else {
-                        for (i = 1; i <= TotPeople; ++i) {
+                        for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                             if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum == People(i).ZonePtr) break;
                         }
                         state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).SpecificObjectNum = i;
                     }
                     // Check values used for thermal comfort calculation
-                    for (i = 1; i <= TotPeople; ++i) {
+                    for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                         if (state.dataZoneCtrls->ComfortControlledZone(ComfortControlledZoneNum).ActualZoneNum == People(i).ZonePtr) {
                             // Check activity level
                             if (People(i).ActivityLevelPtr > 0) {
@@ -1689,7 +1689,7 @@ namespace ZoneTempPredictorCorrector {
                     int ZoneNum = 0;
                     ZLItem = 0;
                     Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
-                    if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+                    if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
                     if (Item1 > 0) {
                         ZoneNum = Item1;
                         Zone(ZoneNum).FlagCustomizedZoneCap = true;
@@ -2194,7 +2194,7 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneCtrls->StagedTStatObjects(Item).Name = cAlphaArgs(1);
             Item1 = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             ZLItem = 0;
-            if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
+            if (Item1 == 0 && state.dataHeatBal->NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
                 state.dataZoneCtrls->StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
                 ++state.dataZoneTempPredictorCorrector->NumStageCtrZone;
@@ -2693,15 +2693,15 @@ namespace ZoneTempPredictorCorrector {
             ZoneT1.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZoneW1.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-            ListSNLoadHeatEnergy.dimension(NumOfZoneLists, 0.0);
-            ListSNLoadCoolEnergy.dimension(NumOfZoneLists, 0.0);
-            ListSNLoadHeatRate.dimension(NumOfZoneLists, 0.0);
-            ListSNLoadCoolRate.dimension(NumOfZoneLists, 0.0);
+            ListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            ListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            ListSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            ListSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
 
-            GroupSNLoadHeatEnergy.dimension(NumOfZoneGroups, 0.0);
-            GroupSNLoadCoolEnergy.dimension(NumOfZoneGroups, 0.0);
-            GroupSNLoadHeatRate.dimension(NumOfZoneGroups, 0.0);
-            GroupSNLoadCoolRate.dimension(NumOfZoneGroups, 0.0);
+            GroupSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            GroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            GroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            GroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
             AIRRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZTM1.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZTM2.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -2929,7 +2929,7 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // CurrentModuleObject='ZoneList'
-            for (Loop = 1; Loop <= NumOfZoneLists; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
                 SetupOutputVariable(state,
                     "Zone List Sensible Heating Energy", OutputProcessor::Unit::J, ListSNLoadHeatEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
                 SetupOutputVariable(state,
@@ -2941,7 +2941,7 @@ namespace ZoneTempPredictorCorrector {
             } // Loop
 
             // CurrentModuleObject='ZoneGroup'
-            for (Loop = 1; Loop <= NumOfZoneGroups; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
                 SetupOutputVariable(state, "Zone Group Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
                                     GroupSNLoadHeatEnergy(Loop),
@@ -7128,7 +7128,7 @@ namespace ZoneTempPredictorCorrector {
                     ObjectCount = 0;
                     SetPointLo = 0.0;
                     SetPointHi = 0.0;
-                    for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                    for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             ++ObjectCount;
                             GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
@@ -7145,7 +7145,7 @@ namespace ZoneTempPredictorCorrector {
                     PeopleCount = 0.0;
                     SetPointLo = 0.0;
                     SetPointHi = 0.0;
-                    for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                    for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                         if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                             NumberOccupants = People(PeopleNum).NumberOfPeople * GetCurrentScheduleValue(state, People(PeopleNum).NumberOfPeoplePtr);
                             PeopleCount += NumberOccupants;
@@ -7178,7 +7178,7 @@ namespace ZoneTempPredictorCorrector {
                         ObjectCount = 0;
                         SetPointLo = 0.0;
                         SetPointHi = 0.0;
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (ActualZoneNum == People(PeopleNum).ZonePtr) {
                                 ++ObjectCount;
                                 GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);

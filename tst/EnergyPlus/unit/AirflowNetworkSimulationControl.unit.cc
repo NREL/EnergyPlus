@@ -106,8 +106,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    People.allocate(state->dataHeatBal->TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 100.0;
     People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
@@ -200,8 +200,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
     state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    People.allocate(state->dataHeatBal->TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 100.0;
     People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value

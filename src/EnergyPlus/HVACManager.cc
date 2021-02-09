@@ -450,7 +450,7 @@ namespace HVACManager {
             }
 
             DetectOscillatingZoneTemp(state);
-            UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
+            UpdateZoneListAndGroupLoads(state); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             IceThermalStorage::UpdateIceFractions(state);          // Update fraction of ice stored in TES
             ManageWater(state);
             // update electricity data for net, purchased, sold etc.
@@ -2219,7 +2219,7 @@ namespace HVACManager {
         }
     }
 
-    void UpdateZoneListAndGroupLoads()
+    void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2266,7 +2266,7 @@ namespace HVACManager {
         ListSNLoadHeatRate = 0.0;
         ListSNLoadCoolRate = 0.0;
 
-        for (ListNum = 1; ListNum <= NumOfZoneLists; ++ListNum) {
+        for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
             for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
                 Mult = Zone(ZoneNum).Multiplier;
                 ListSNLoadHeatEnergy(ListNum) += SNLoadHeatEnergy(ZoneList(ListNum).Zone(ZoneNum)) * Mult;
@@ -2276,7 +2276,7 @@ namespace HVACManager {
             } // ZoneNum
         }     // ListNum
 
-        for (GroupNum = 1; GroupNum <= NumOfZoneGroups; ++GroupNum) {
+        for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
             Mult = ZoneGroup(GroupNum).Multiplier;
             GroupSNLoadHeatEnergy(GroupNum) = ListSNLoadHeatEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
             GroupSNLoadCoolEnergy(GroupNum) = ListSNLoadCoolEnergy(ZoneGroup(GroupNum).ZoneList) * Mult;
@@ -2815,7 +2815,6 @@ namespace HVACManager {
 
         // Using/Aliasing
         using DataHeatBalance::Lights;
-        using DataHeatBalance::TotLights;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
@@ -2897,7 +2896,7 @@ namespace HVACManager {
                                          " return air cooling by refrigerated cases will be applied to the zone air.");
                         ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");
                     }
-                    for (LightNum = 1; LightNum <= TotLights; ++LightNum) {
+                    for (LightNum = 1; LightNum <= state.dataHeatBal->TotLights; ++LightNum) {
                         if (Lights(LightNum).ZonePtr != ZoneNum) continue;
                         if (Lights(LightNum).FractionReturnAir > 0.0) {
                             ShowWarningError(state, "For zone=" + Zone(ZoneNum).Name + " return air heat gain from lights will be applied to the zone air.");

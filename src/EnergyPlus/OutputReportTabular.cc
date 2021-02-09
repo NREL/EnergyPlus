@@ -5812,7 +5812,6 @@ namespace EnergyPlus::OutputReportTabular {
         // Using/Aliasing
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::Lights;
-        using DataHeatBalance::TotLights;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
@@ -5865,7 +5864,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Interior Connected Lighting Power
         consumptionTotal = 0.0;
-        for (iLight = 1; iLight <= TotLights; ++iLight) {
+        for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
             zonePt = Lights(iLight).ZonePtr;
             mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
             if (Zone(zonePt).SystemZoneNodeNumber > 0) { // conditioned y/n
@@ -9620,12 +9619,6 @@ namespace EnergyPlus::OutputReportTabular {
         // Using/Aliasing
         using DataHeatBalance::Lights;
         using DataHeatBalance::People;
-        using DataHeatBalance::TotElecEquip;
-        using DataHeatBalance::TotGasEquip;
-        using DataHeatBalance::TotHWEquip;
-        using DataHeatBalance::TotLights;
-        using DataHeatBalance::TotOthEquip;
-        using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHeatBalance::ZoneElectric;
@@ -10311,7 +10304,7 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
                 // lighting density
                 totLightPower = 0.0;
-                for (iLight = 1; iLight <= TotLights; ++iLight) {
+                for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
                     if (iZone == Lights(iLight).ZonePtr) {
                         totLightPower += Lights(iLight).DesignLevel;
                     }
@@ -10321,7 +10314,7 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // people density
                 totNumPeople = 0.0;
-                for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                for (iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                     if (iZone == People(iPeople).ZonePtr) {
                         totNumPeople += People(iPeople).NumberOfPeople;
                     }
@@ -10331,22 +10324,22 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // plug and process density
                 totPlugProcess = 0.0;
-                for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
+                for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotElecEquip; ++iPlugProc) {
                     if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
                         totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
                     }
                 }
-                for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
+                for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotGasEquip; ++iPlugProc) {
                     if (iZone == ZoneGas(iPlugProc).ZonePtr) {
                         totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
                     }
                 }
-                for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
+                for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotOthEquip; ++iPlugProc) {
                     if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
                         totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
                     }
                 }
-                for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
+                for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotHWEquip; ++iPlugProc) {
                     if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
                         totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
                     }
@@ -10451,28 +10444,8 @@ namespace EnergyPlus::OutputReportTabular {
         // occupied hours not meeting comfort bounds for ASHRAE-55 and
         // CEN-15251 adaptive models.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
         // Using/Aliasing
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D_string columnHead(5);
         Array1D_int columnWidth;
@@ -10484,10 +10457,10 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Should deallocate after writing table. - LKL
 
-        if (ort->displayAdaptiveComfort && TotPeople > 0) {
-            peopleInd.allocate(TotPeople);
+        if (ort->displayAdaptiveComfort && state.dataHeatBal->TotPeople > 0) {
+            peopleInd.allocate(state.dataHeatBal->TotPeople);
 
-            for (i = 1; i <= TotPeople; ++i) {
+            for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                 if (People(i).AdaptiveASH55 || People(i).AdaptiveCEN15251) {
                     ++ort->numPeopleAdaptive;
                     peopleInd(ort->numPeopleAdaptive) = i;
@@ -10638,7 +10611,7 @@ namespace EnergyPlus::OutputReportTabular {
             WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHumidexOccuHourBins);
 
             bool hasPierceSET = true;
-            if (TotPeople == 0) {
+            if (state.dataHeatBal->TotPeople == 0) {
                 hasPierceSET = false;
                 if (ort->displayThermalResilienceSummaryExplicitly) {
                     ShowWarningError(state, "Writing Annual Thermal Resilience Summary - SET Hours reports: "
@@ -10646,7 +10619,7 @@ namespace EnergyPlus::OutputReportTabular {
                                      "but no People object is defined.");
                 }
             }
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 if (!People(iPeople).Pierce) {
                     hasPierceSET = false;
                     if (ort->displayThermalResilienceSummaryExplicitly) {
@@ -13007,7 +12980,6 @@ namespace EnergyPlus::OutputReportTabular {
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataSizing::CalcFinalZoneSizing;
         using DataSizing::CoolPeakDateHrMin;
         using DataSizing::FinalZoneSizing;
@@ -13157,7 +13129,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             // Number of people
             Real64 totNumPeople = 0.;
-            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+            for (int iPeople = 1; iPeople <= state.dataHeatBal->TotPeople; ++iPeople) {
                 if (zoneIndex == People(iPeople).ZonePtr) {
                     totNumPeople += People(iPeople).NumberOfPeople;
                 }
@@ -14926,7 +14898,6 @@ namespace EnergyPlus::OutputReportTabular {
         // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
         // simulations so that only last year is reported in tabular reports
         using DataHeatBalance::Lights;
-        using DataHeatBalance::TotLights;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
 
@@ -14934,7 +14905,7 @@ namespace EnergyPlus::OutputReportTabular {
         int iLight;
         int iZone;
 
-        for (iLight = 1; iLight <= TotLights; ++iLight) {
+        for (iLight = 1; iLight <= state.dataHeatBal->TotLights; ++iLight) {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
@@ -14962,11 +14933,10 @@ namespace EnergyPlus::OutputReportTabular {
         // Reset accumulation variable for adaptive comfort report to zero for multi-year simulations
         // so that only last year is reported in tabular reports
         using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         int i;
         auto &ort(state.dataOutRptTab);
-        if (ort->displayAdaptiveComfort && TotPeople > 0) {
-            for (i = 1; i <= TotPeople; ++i) {
+        if (ort->displayAdaptiveComfort && state.dataHeatBal->TotPeople > 0) {
+            for (i = 1; i <= state.dataHeatBal->TotPeople; ++i) {
                 if (People(i).AdaptiveASH55) {
                     People(i).TimeNotMetASH5590 = 0.;
                     People(i).TimeNotMetASH5580 = 0.;

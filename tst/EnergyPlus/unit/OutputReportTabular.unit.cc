@@ -6204,14 +6204,14 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     Lights(1).ZonePtr = 1;
     Lights(1).DesignLevel = 1000.0;
@@ -7674,14 +7674,14 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     Surface(4).Zone = 2;
 
     // Loads
-    DataHeatBalance::TotLights = 3;
-    Lights.allocate(DataHeatBalance::TotLights);
+    state->dataHeatBal->TotLights = 3;
+    Lights.allocate(state->dataHeatBal->TotLights);
 
-    DataHeatBalance::TotPeople = 3;
-    People.allocate(DataHeatBalance::TotPeople);
+    state->dataHeatBal->TotPeople = 3;
+    People.allocate(state->dataHeatBal->TotPeople);
 
-    DataHeatBalance::TotElecEquip = 3;
-    ZoneElectric.allocate(DataHeatBalance::TotElecEquip);
+    state->dataHeatBal->TotElecEquip = 3;
+    ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     Lights(1).ZonePtr = 1;
     Lights(1).DesignLevel = 1000.0;

@@ -1312,18 +1312,18 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_EQ(DataHeatBalance::TotPeople, 1);
-    EXPECT_EQ(DataHeatBalance::TotLights, 1);
-    EXPECT_EQ(DataHeatBalance::TotElecEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotGasEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotHWEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotStmEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotOthEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotPeople, 1);
+    EXPECT_EQ(state->dataHeatBal->TotLights, 1);
+    EXPECT_EQ(state->dataHeatBal->TotElecEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
     EXPECT_EQ(DataHeatBalance::TotBBHeat, 1);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 
-    // First time should be all good, because ZnRpt values intialize to zero
+    // First time should be all good, because ZnRpt values initialize to zero
     InternalHeatGains::InitInternalHeatGains(*state);
 
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);

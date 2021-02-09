@@ -119,8 +119,8 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     CurZoneEqNum = 1;
     DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-    TotPeople = 2; // Total number of people statements
-    People.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 2; // Total number of people statements
+    People.allocate(state->dataHeatBal->TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 100.0;
     People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
@@ -236,8 +236,8 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.0;
 
-    TotPeople = 2; // Total number of people objects
-    People.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 2; // Total number of people objects
+    People.allocate(state->dataHeatBal->TotPeople);
     People(1).ZonePtr = 1;
     People(1).NumberOfPeople = 10.0;
     People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
