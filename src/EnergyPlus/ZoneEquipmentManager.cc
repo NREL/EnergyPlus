@@ -4002,20 +4002,19 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 }
 
                 Real64 FinalTotalReturnMassFlow = 0;
-                if (!ZoneAirMassFlow.EnforceZoneMassBalance || !ZoneAirMassFlow.BalanceMixing) {
-                    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
-                    MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
-                    CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
-                } else {
+
+                CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+
+                if (ZoneAirMassFlow.EnforceZoneMassBalance) {
                     // set mass conservation variables
                     MassConservation(ZoneNum).InMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                     MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
-                    
+
                     if (ZoneAirMassFlow.BalanceMixing) {
                         CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow; // this may cause diffs with develop
-                        CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
                     } else if (ZoneAirMassFlow.AdjustZoneReturnFlow) {
                         Real64 AdjustedTotalReturnMassFlow = 0;
                         // Calculate return air flow rate using mass conservation equation
@@ -4027,10 +4026,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         // add adjust zone return node air flow calc
                         CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
-                        // Set zone infiltration air flow rate
-                        CalcZoneInfiltrationFlows(state, ZoneNum, FinalTotalReturnMassFlow);
+                        ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                     }
                 }
+                // Set zone infiltration air flow rate
+                CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
                 BuildingZoneReturnFlow += MassConservation(ZoneNum).RetMassFlowRate;
