@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -122,18 +121,18 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
     {
-        auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+        auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
         auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
         auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
-        if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+        if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
                 return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
             } else { // use plant loop overall set-point
                 return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
             }
-        } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::DualSetPointDeadBand) {
+        } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
                 return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;
@@ -180,14 +179,14 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                  this->sourceSideLocation.loopSideNum,
                                                  this->sourceSideLocation.branchNum,
                                                  this->sourceSideLocation.compNum);
-            PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->loadSideLocation.loopNum,
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
                                                         this->condMassFlowRateTriggerIndex,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->sourceSideMassFlowRate);
             // Set flows if the heat pump is running
         } else { // the heat pump must run
@@ -228,14 +227,14 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                      this->sourceSideLocation.branchNum,
                                                      this->sourceSideLocation.compNum);
             }
-            PlantUtilities::PullCompInterconnectTrigger(this->loadSideLocation.loopNum,
+            PlantUtilities::PullCompInterconnectTrigger(state, this->loadSideLocation.loopNum,
                                                         this->loadSideLocation.loopSideNum,
                                                         this->loadSideLocation.branchNum,
                                                         this->loadSideLocation.compNum,
                                                         this->condMassFlowRateTriggerIndex,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,
-                                                        DataPlant::CriteriaType_MassFlowRate,
+                                                        DataPlant::iCriteriaType::MassFlowRate,
                                                         this->sourceSideMassFlowRate);
         }
     }
@@ -283,7 +282,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
     void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     {
 
-        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
@@ -306,7 +305,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         // evaluate the actual current operating load side heat transfer rate
-        auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
+        auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
             state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
@@ -467,7 +466,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     errFlag = true;
                 } else {
 
-                    PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
+                    PlantUtilities::InterConnectTwoPlantLoopSides(state, this->loadSideLocation.loopNum,
                                                                   this->loadSideLocation.loopSideNum,
                                                                   this->sourceSideLocation.loopNum,
                                                                   this->sourceSideLocation.loopSideNum,
@@ -484,11 +483,11 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             this->oneTimeInit = false;
         } // plant setup
 
-        if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && DataPlant::PlantFirstSizesOkayToFinalize) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp(),
-                                                           DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
             PlantUtilities::InitComponentNodes(0.0,
@@ -502,9 +501,9 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
             if (this->waterSource) {
                 rho = FluidProperties::GetDensityGlycol(state,
-                                                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
-                                                        DataGlobalConstants::InitConvTemp(),
-                                                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidName,
+                                                        DataGlobalConstants::InitConvTemp,
+                                                        state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
                 PlantUtilities::InitComponentNodes(0.0,
@@ -562,23 +561,23 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp();
+        Real64 loadSideInitTemp = DataGlobalConstants::CWInitConvTemp;
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            loadSideInitTemp = DataGlobalConstants::HWInitConvTemp();
+            loadSideInitTemp = DataGlobalConstants::HWInitConvTemp;
         }
 
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                             DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                              loadSideInitTemp,
-                                                             DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                              "EIRPlantLoopHeatPump::size()");
         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                 DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                 state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                  loadSideInitTemp,
-                                                                 DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                 state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                  "EIRPlantLoopHeatPump::size()");
 
-        int pltLoadSizNum = DataPlant::PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
+        int pltLoadSizNum = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
         if (pltLoadSizNum > 0) {
             // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
             // these represent what the unit would size those to, whether it is doing auto-sizing or not
@@ -597,15 +596,15 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                 if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
             }
             // now we actually need to store and report out the values
-            if (DataPlant::PlantFirstSizesOkayToFinalize) {
+            if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 // handle the auto-sizable reference capacity
                 if (this->referenceCapacityWasAutoSized) {
                     // if auto-sized, we just need to store the sized value and then report out the capacity when plant is ready
                     this->referenceCapacity = tmpCapacity;
-                    if (DataPlant::PlantFinalSizesOkayToReport) {
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
                     }
-                    if (DataPlant::PlantFirstSizesOkayToReport) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
                     }
                 } else {
@@ -613,7 +612,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     if (this->referenceCapacity > 0.0 && tmpCapacity > 0.0) {
                         // then the capacity was hard-sized to a good value and the tmpCapacity was calculated to a good value too
                         Real64 hardSizedCapacity = this->referenceCapacity;
-                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
@@ -642,16 +641,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                 // now handle the auto-sizable load side flow rate
                 if (this->loadSideDesignVolFlowRateWasAutoSized) {
                     this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
-                    if (DataPlant::PlantFinalSizesOkayToReport) {
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
-                    if (DataPlant::PlantFirstSizesOkayToReport) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
                 } else {
                     if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
                         Real64 hardSizedLoadSideFlow = this->loadSideDesignVolFlowRate;
-                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             if (state.dataGlobal->DoPlantSizing) {
                                 BaseSizer::reportSizerOutput(state, typeName,
                                                              this->name,
@@ -686,12 +685,12 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                 if (this->companionHeatPumpCoil->loadSideDesignVolFlowRateWasAutoSized &&
                     this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
                     tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
-                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                         }
-                        if (DataPlant::PlantFirstSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                 typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                         }
@@ -699,12 +698,12 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                 }
                 if (this->companionHeatPumpCoil->referenceCapacityWasAutoSized && this->companionHeatPumpCoil->referenceCapacity > 0.0) {
                     tmpCapacity = this->companionHeatPumpCoil->referenceCapacity;
-                    if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         this->referenceCapacity = tmpCapacity;
-                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
                         }
-                        if (DataPlant::PlantFirstSizesOkayToReport) {
+                        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
                         }
                     }
@@ -712,16 +711,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             } else {
                 // no companion coil, and no plant sizing, so can't do anything
                 if ((this->loadSideDesignVolFlowRateWasAutoSized || this->referenceCapacityWasAutoSized) &&
-                    DataPlant::PlantFirstSizesOkayToFinalize) {
+                    state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     ShowSevereError(state, "EIRPlantLoopHeatPump::size(): Autosizing requires a loop Sizing:Plant object.");
                     ShowContinueError(state, "Occurs in HeatPump:PlantLoop:EquationFit:Cooling object = " + this->name);
                     errorsFound = true;
                 }
             }
-            if (!this->loadSideDesignVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+            if (!this->loadSideDesignVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, typeName, this->name, "User-Specified Load Side Flow Rate [m3/s]", this->loadSideDesignVolFlowRate);
             }
-            if (!this->referenceCapacityWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
+            if (!this->referenceCapacityWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, typeName, this->name, "User-Specified Nominal Capacity [W]", this->referenceCapacity);
             }
         }
@@ -741,20 +740,20 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 tmpSourceVolFlow;
 
         std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
-        Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp();
+        Real64 sourceSideInitTemp = DataGlobalConstants::HWInitConvTemp;
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
-            sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp();
+            sourceSideInitTemp = DataGlobalConstants::CWInitConvTemp;
         }
 
         Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
-                                                                DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                 sourceSideInitTemp,
-                                                                DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                 "EIRPlantLoopHeatPump::size()");
         Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                    state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
                                                                     sourceSideInitTemp,
-                                                                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                    state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                                     "EIRPlantLoopHeatPump::size()");
 
         // To start we need to override the calculated load side flow
@@ -762,7 +761,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (!this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
         // calculate an auto-sized value for source design flow regardless of whether it was auto-sized or not
-        int plantSourceSizingIndex = DataPlant::PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
+        int plantSourceSizingIndex = state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
         if (plantSourceSizingIndex > 0) {
             // to get the source flow, we first must calculate the required heat impact on the source side
             // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
@@ -779,17 +778,17 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
         if (this->sourceSideDesignVolFlowRateWasAutoSized) {
             this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
-            if (DataPlant::PlantFinalSizesOkayToReport) {
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
             }
-            if (DataPlant::PlantFirstSizesOkayToReport) {
+            if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
             }
         } else {
             // source design flow was hard-sized
             if (this->sourceSideDesignVolFlowRate > 0.0 && tmpSourceVolFlow > 0.0) {
                 Real64 const hardSizedSourceSideFlow = this->sourceSideDesignVolFlowRate;
-                if (DataPlant::PlantFinalSizesOkayToReport) {
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     if (state.dataGlobal->DoPlantSizing) {
                         BaseSizer::reportSizerOutput(state, typeName,
                                                      this->name,
@@ -824,11 +823,11 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         PlantUtilities::RegisterPlantCompDesignFlow(this->loadSideNodes.inlet, tmpLoadVolFlow);
         PlantUtilities::RegisterPlantCompDesignFlow(this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
 
-        if (DataPlant::PlantFinalSizesOkayToReport) {
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             // create predefined report
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->name, typeName);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->name, this->referenceCOP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->name, this->referenceCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->name, typeName);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->name, this->referenceCOP);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->name, this->referenceCapacity);
         }
 
         if (errorsFound) {

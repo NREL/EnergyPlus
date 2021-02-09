@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,15 +50,14 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGOutput {
+namespace EnergyPlus::TARCOGOutput {
 
     // MODULE INFORMATION:
     //       AUTHOR         Simon Vidanovic
@@ -72,31 +71,12 @@ namespace TARCOGOutput {
     // PURPOSE OF THIS MODULE:
     // A module which contains debug dump subroutines
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
 
-    int winID;
-    int iguID;
-
-    std::string const VersionNumber(" 7.0.15.00 ");
-    std::string const VersionCompileDateCC(" August 02, 2012");
-
-    // Functions
-
-    void WriteInputArguments(InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 const tout,
                              Real64 const tind,
@@ -202,7 +182,6 @@ namespace TARCOGOutput {
         int j;
 
         // Formats
-        // static constexpr auto Format_10001("TARCOG v.{}compiled {}\n");
         static constexpr auto Format_1000("TARCOG input arguments:\n");
         static constexpr auto Format_1001("TARCOG debug output, {:4}-{:02}-{:02}, {:02}:{:02}:{:02}\n");
         static constexpr auto Format_1002("     WindowID:{:8}  - Not specified\n");
@@ -212,11 +191,6 @@ namespace TARCOGOutput {
         static constexpr auto Format_1005("Simulation parameters:\n");
         static constexpr auto Format_1010("  Tout       =  {:10.6F} K ( {:7.3F} deg C) - Outdoor temperature\n");
         static constexpr auto Format_1015("  Tint       =  {:10.6F} K ( {:7.3F} deg C) - Indoor temperature\n");
-        // static constexpr auto Format_1016("  Trmout     =  {:10.6F} K ( {:7.3F} deg C) - Outdoor mean radiant temp.\n");
-        // static constexpr auto Format_1017("  Gout       =  {:10.6F} \n");
-        // static constexpr auto Format_1018("  Gin        =  {:10.6F} \n");
-        // static constexpr auto Format_1019("  Ebsky      =  {:10.6F} \n");
-        // static constexpr auto Format_10191("  Ebroom     =  {:10.6F} \n");
         static constexpr auto Format_1020("  Trmin      =  {:10.6F} K ( {:7.3F} deg C) - Indoor mean radiant temp.\n");
         static constexpr auto Format_1030("  wso        =  {:7.3F}    - Outdoor wind speed [m/s]\n");
         static constexpr auto Format_1032("  iwd        =    0        - Wind direction - windward\n");
@@ -300,20 +274,19 @@ namespace TARCOGOutput {
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
 
         print(InArgumentsFile, "\n");
-        //  write(InArgumentsFile, 10001) VersionNumber, VersionCompileDateCC
         print(InArgumentsFile, Format_1001, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
         print(InArgumentsFile, "\n");
 
-        if (winID == -1) {
-            print(InArgumentsFile, Format_1002, winID);
+        if (state.dataTARCOGOutputs->winID == -1) {
+            print(InArgumentsFile, Format_1002, state.dataTARCOGOutputs->winID);
         } else {
-            print(InArgumentsFile, Format_1003, winID);
+            print(InArgumentsFile, Format_1003, state.dataTARCOGOutputs->winID);
         }
 
-        if (iguID == -1) {
-            print(InArgumentsFile, Format_1006, iguID);
+        if (state.dataTARCOGOutputs->iguID == -1) {
+            print(InArgumentsFile, Format_1006, state.dataTARCOGOutputs->iguID);
         } else {
-            print(InArgumentsFile, Format_1007, iguID);
+            print(InArgumentsFile, Format_1007, state.dataTARCOGOutputs->iguID);
         }
 
         print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
@@ -322,9 +295,9 @@ namespace TARCOGOutput {
         print(InArgumentsFile, Format_1000);
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1005);
-        print(InArgumentsFile, Format_1010, tout, tout - DataGlobalConstants::KelvinConv());
-        print(InArgumentsFile, Format_1015, tind, tind - DataGlobalConstants::KelvinConv());
-        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1010, tout, tout - DataGlobalConstants::KelvinConv);
+        print(InArgumentsFile, Format_1015, tind, tind - DataGlobalConstants::KelvinConv);
+        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv);
         print(InArgumentsFile, Format_1030, wso);
         if (iwd == 0) print(InArgumentsFile, Format_1032); // windward
         if (iwd == 1) print(InArgumentsFile, Format_1033); // leeward
@@ -332,7 +305,7 @@ namespace TARCOGOutput {
         print(InArgumentsFile, Format_1040, dir);
         print(InArgumentsFile, Format_1041, outir);
         print(InArgumentsFile, Format_1045, isky);
-        print(InArgumentsFile, Format_1050, tsky, tsky - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1050, tsky, tsky - DataGlobalConstants::KelvinConv);
         print(InArgumentsFile, Format_1055, esky);
         print(InArgumentsFile, Format_1060, fclr);
         print(InArgumentsFile, Format_1061, VacuumPressure);
@@ -360,9 +333,6 @@ namespace TARCOGOutput {
             print(InArgumentsFile, Format_10733, ThermalMod);
             print(InArgumentsFile, Format_10740, SDScalar);
         }
-
-        //    if (ThermalMod.eq.THERM_MOD_CSM)
-        //        write(InArgumentsFile, 10740) SDScalar
 
         print(InArgumentsFile, "\n");
 
@@ -419,23 +389,6 @@ namespace TARCOGOutput {
                 print(InArgumentsFile, Format_11055, SlatSpacing(i));
                 print(InArgumentsFile, Format_11056, SlatCurve(i));
 
-                // bi...Input arguments correction patch:
-
-                //     if (ApplyVenetianPatch.eq..TRUE.) then
-                //      SlatThick(i) = Thick(i)
-                //      SlatWidth(i) = SlatWidth(i) / 1000.0d0
-                //      SlatCurve(i) = SlatCurve(i) / 1000.0d0
-                //      SlatSpacing(i) = SlatSpacing(i) / 1000.0d0
-                //      write(InArgumentsFile, *) 'After applying the patch:'
-                //        write(InArgumentsFile, 11051) SlatThick(i)
-                //        write(InArgumentsFile, 11052) SlatWidth(i)
-                //        write(InArgumentsFile, 11053) SlatAngle(i)
-                //        write(InArgumentsFile, 11054) SlatCond(i)
-                //        write(InArgumentsFile, 11055) SlatSpacing(i)
-                //        write(InArgumentsFile, 11056) SlatCurve(i)
-                //     end if
-
-                // bi...end Input arguments correction patch
             }
 
             if (nslice(i) > 1) { // SD layer
@@ -464,16 +417,6 @@ namespace TARCOGOutput {
             }
             print(InArgumentsFile, Format_1114, nmix(i));
 
-            // if (mgas.eq.1) then ! call gasses by names:
-            //  do  j = 1, nmix(i)
-            //    if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), 'Air,     ', 100*frct(i, j) ! Air
-            //    if (iprop(i, j).eq.2) write(InArgumentsFile, 1115) iprop(i, j), 'Argon,   ', 100*frct(i, j) ! Argon
-            //    if (iprop(i, j).eq.3) write(InArgumentsFile, 1115) iprop(i, j), 'Krypton, ', 100*frct(i, j) ! Krypton
-            //    if (iprop(i, j).eq.4) write(InArgumentsFile, 1115) iprop(i, j), 'Xenon,   ', 100*frct(i, j) ! Xenon
-            //  end do  ! j - mix loop
-            // end if
-
-            // if (mgas.eq.0) then ! show received gass properties:
             for (j = 1; j <= nmix(i); ++j) {
                 // if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), ' ' 100*frct(i, j) ! Air
                 print(InArgumentsFile, Format_1115, iprop(j, i), ' ', 100 * frct(j, i)); // gas
@@ -486,36 +429,11 @@ namespace TARCOGOutput {
                 print(InArgumentsFile, Format_1133, xgcp(1, iprop(j, i)), xgcp(2, iprop(j, i)), xgcp(3, iprop(j, i)));
                 print(InArgumentsFile, Format_1134, xwght(iprop(j, i)));
             } // - j - one mix
-              // end if  ! MGAS = 1 - "table" gasses
         }     // i - gas loop
 
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1198);
 
-        // close(InArgumentsFile)
-
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
-
-        // 1000  format('TARCOG input arguments list - {:4}-{:02}-',I2.2, ', ', I2.2,':{:02}:',I2.2)
-
-        // 1010  format('  Tout       =  ', F10.6,  ' - Outdoor temperature [K]')
-        // 1015  format('  Tin        =  ', F10.6,  ' - Indoor temperature [K]')
-
-        // 1016  format('  Trmout     =  ', F10.6,  ' - Outdoor mean radiant temperature [K]')
-
-        // 1020  format('  Trmin      =  ', F10.6,  ' - Indoor mean radiant temperature [K]')
-        // 1050  format('  tsky       =  ', F10.6,  ' - Night sky temperature [K]')
-
-        // 1115  format('      Gas ', I1, ':     Air,     ', F6.2,' %')
-        // 1116  format('      Gas ', I1, ':     Argon,   ', F6.2,' %')
-        // 1117  format('      Gas ', I1, ':     Krypron, ', F6.2,' %')
-        // 1118  format('      Gas ', I1, ':     Xenon,   ', F6.2,' %')
-
-        // 1199  format('-----  *****  -----  *****  -----  *****  -----  *****  -----  *****  -----')
     }
 
     void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
@@ -581,16 +499,12 @@ namespace TARCOGOutput {
         static constexpr auto Format_11111(" Indoor space:\n");
         static constexpr auto Format_1198("=====  =====  =====  =====  =====  =====  =====  =====  =====  =====  =====\n");
 
-        // open(unit=InArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode, &
-        //        position=FilePosition, form='formatted', iostat=nperr)
-        // if (nperr.ne.0)  open(unit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
-        //        position=FilePosition, form='formatted', iostat=nperr)
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1014);
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1055, esky);
-        print(InArgumentsFile, Format_1016, trmout, trmout - DataGlobalConstants::KelvinConv());
-        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv());
+        print(InArgumentsFile, Format_1016, trmout, trmout - DataGlobalConstants::KelvinConv);
+        print(InArgumentsFile, Format_1020, trmin, trmin - DataGlobalConstants::KelvinConv);
         print(InArgumentsFile, Format_1019, ebsky);
         print(InArgumentsFile, Format_10191, ebroom);
         print(InArgumentsFile, Format_1017, Gout);
@@ -612,7 +526,6 @@ namespace TARCOGOutput {
             if ((i > 1) && (i <= nlayer)) print(InArgumentsFile, Format_1112, gap(i - 1));
             if (i == 1) print(InArgumentsFile, Format_11110);
             if (i == nlayer + 1) print(InArgumentsFile, Format_11111);
-            //    write(InArgumentsFile, 1111) i-1
             for (j = 1; j <= nmix(i); ++j) {
                 print(InArgumentsFile, Format_1130, j, 100 * frct(j, i));
                 print(InArgumentsFile, Format_1131, xgcon(1, j), xgcon(2, j), xgcon(3, j));
@@ -623,13 +536,7 @@ namespace TARCOGOutput {
         }     // i - gaps
         print(InArgumentsFile, "\n");
         print(InArgumentsFile, Format_1198);
-        // close(InArgumentsFile)
 
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
     }
 
     void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
@@ -761,48 +668,41 @@ namespace TARCOGOutput {
         static constexpr auto Format_4190("  |                     |\n");
         static constexpr auto Format_4350("Energy balances on Layer Surfaces:\n");
 
-        // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode, &
-        //      position=FilePosition, form='formatted', iostat=nperr)
-        // if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
-        //      position=FilePosition, form='formatted', iostat=nperr)
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
         print(OutArgumentsFile, "\n");
         print(OutArgumentsFile, Format_2000, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
         print(OutArgumentsFile, "\n");
         print(OutArgumentsFile, Format_2350);
         print(OutArgumentsFile, "\n");
-        print(OutArgumentsFile, Format_2105, tamb, tamb - DataGlobalConstants::KelvinConv());
+        print(OutArgumentsFile, Format_2105, tamb, tamb - DataGlobalConstants::KelvinConv);
         print(OutArgumentsFile, Format_2180, q(1));
 
         // bi  Write out layer properties:
         for (i = 1; i <= nlayer; ++i) {
-            //        write(OutArgumentsFile, 2110) 2*i-1, theta(2*i-1), theta(2*i-1)-273.15d0
             {
                 auto const SELECT_CASE_var(LayerType(i));
                 if (SELECT_CASE_var == SPECULAR) { // Specular layer
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
                 } else if (SELECT_CASE_var == VENETBLIND_HORIZ || SELECT_CASE_var == VENETBLIND_VERT) { // Venetian blind
-                    print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2111, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                    print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2111, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
                 } else if (SELECT_CASE_var == WOVSHADE) { // Venetian blind
-                    print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2112, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2195, i, q(2 * i), i, ShadeGapKeffConv(i));
-                    print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2112, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
                 } else if (SELECT_CASE_var == DIFFSHADE) { // Venetian blind
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2190, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
                 } else {
-                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i - 1, theta(2 * i - 1), theta(2 * i - 1) - DataGlobalConstants::KelvinConv);
                     print(OutArgumentsFile, Format_2199, i, q(2 * i));
-                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv());
+                    print(OutArgumentsFile, Format_2110, 2 * i, theta(2 * i), theta(2 * i) - DataGlobalConstants::KelvinConv);
                 }
             }
-
-            //    write(OutArgumentsFile, 2110) 2*i, theta(2*i), theta(2*i)-273.15d0
 
             // bi  Write out gap properties:
             if (i != nlayer) {
@@ -817,14 +717,12 @@ namespace TARCOGOutput {
                     }
                 }
                 print(OutArgumentsFile, Format_2322, i, qcgas(i + 1), i, qrgas(i + 1));
-                //      write(OutArgumentsFile, 2323) i, Keff(i)
-                // write(OutArgumentsFile, 2310) i, qprim(2*i + 1)
             } else {
                 print(OutArgumentsFile, Format_2210, q(2 * i + 1));
             }
         } // i - layers
 
-        print(OutArgumentsFile, Format_2115, troom, troom - DataGlobalConstants::KelvinConv());
+        print(OutArgumentsFile, Format_2115, troom, troom - DataGlobalConstants::KelvinConv);
 
         print(OutArgumentsFile, "\n");
 
@@ -908,31 +806,6 @@ namespace TARCOGOutput {
         print(OutArgumentsFile, "\n");
         print(OutArgumentsFile, "  Number of Iterations = {}\n", NumOfIter);
 
-        //  write(OutArgumentsFile, *)
-        //  write(OutArgumentsFile, 3333) flux_nonsolar, qeff
-
-        // close(OutArgumentsFile)
-
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
-
-        // 2101  format(' SHGC =   ',F8.6,6x,' SHGC_OLD = ',F8.6,2x,' SC = ',F8.6)
-        // 2110  format(' Theta({:3}) = ',F12.6)
-        // 2111  format(/'Pane #:', I3/)
-        // 2112  format('Number of panes: ',I2)
-        // 2113  format('    Thetaslice({:3},',I3') = ',F12.6)
-
-        // 2105  format('                                            Tamb =',F11.6)
-        // 2110  format('  ----------------- ------------------   Theta{:2} =',F11.6)
-        // 2115  format('                                           Troom =',F11.6)
-
-        // 2190  format('  |       qpane', i2,' =',  F11.6,'       |         keffc', i2,' =',  F11.6)
-        // 2195  format('  |////   qpane', i2,' =',  F11.6,'   ////|')
-
-        // 2323  format('         keff', i2,' =',  F12.5)
     }
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
@@ -956,9 +829,6 @@ namespace TARCOGOutput {
         EP_SIZE_CHECK(hr, maxlay);
         EP_SIZE_CHECK(hs, maxlay);
 
-        // Locals
-        // character(len=*), intent (inout) :: ErrorMessage
-
         Array1D_int DATE_TIME(8);
         Array1D_string real_CLOCK(3);
 
@@ -972,10 +842,6 @@ namespace TARCOGOutput {
         static constexpr auto Format_2155("  Ra({:1}) ={:15.6F}        Nu({:1}) ={:12.6F}\n");
         static constexpr auto Format_2230("  hg{:2} ={:15.6E}      hr{:2} ={:15.6E}      hs{:2} ={:15.6E}\n");
 
-        // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', access=FileMode,  &
-        //      position=FilePosition, form='formatted', iostat=nperr)
-        // if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
-        //      position=FilePosition, form='formatted', iostat=nperr)
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
         print(OutArgumentsFile, "\n");
         print(OutArgumentsFile, Format_2000, DATE_TIME(1), DATE_TIME(2), DATE_TIME(3), DATE_TIME(5), DATE_TIME(6), DATE_TIME(7));
@@ -995,16 +861,9 @@ namespace TARCOGOutput {
         for (i = 1; i <= nlayer - 1; ++i) {
             print(OutArgumentsFile, Format_2230, i, hg(i), i, hr(i), i, hs(i));
         }
-        // close(OutArgumentsFile)
-
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
     }
 
-    void WriteTARCOGInputFile(Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
                               std::string const &VerNum,
                               Real64 const tout,
                               Real64 const tind,
@@ -1116,11 +975,6 @@ namespace TARCOGOutput {
         EP_SIZE_CHECK(xwght, maxgas);
         EP_SIZE_CHECK(gama, maxgas);
 
-        // Locals
-        // Support Pillars
-        //   0 - does not have support pillar
-        //   1 - have support pillar
-
         int i;
         int j;
         int NumOfProvGasses;
@@ -1187,21 +1041,6 @@ namespace TARCOGOutput {
         static constexpr auto Format_2033("* <gcpA, gcpB, gcpC>\n");
         static constexpr auto Format_2034("* <Gamma>\n");
 
-        // open(unit=WINCogFile,  file=TRIM(DBGD)//TRIM(WinCogFileName),  status='unknown', access=FileMode, &
-        //       position=FilePosition, form='formatted', iostat=nperr)
-        // if (nperr.ne.0) open(unit=WINCogFile,  file=TRIM(WinCogFileName),  status='unknown', access=FileMode, &
-        //                      position=FilePosition, form='formatted', iostat=nperr)
-        // else
-        //  open(unit=WINCogFile,  file=TRIM(DBGD)//TRIM(SHGCFileName),  status='unknown', access=FileMode, &
-        //         position=FilePosition, form='formatted', iostat=nperr)
-        //  if (nperr.ne.0) open(unit=WINCogFile,  file=TRIM(SHGCFileName),  status='unknown', access=FileMode, &
-        //                        position=FilePosition, form='formatted', iostat=nperr)
-        // end if
-
-        // bi...Create WINCOG input file using Tarcog's input arguments:
-
-        // bi...Write the header:
-
         date_and_time(real_CLOCK(1), real_CLOCK(2), real_CLOCK(3), DATE_TIME);
 
         print(files.WINCogFile, Format_112);
@@ -1210,22 +1049,20 @@ namespace TARCOGOutput {
         print(files.WINCogFile, Format_10001, VerNum); //, VerDat
         print(files.WINCogFile, Format_111);
 
-        if (winID == -1) {
-            print(files.WINCogFile, Format_1002, winID);
+        if (state.dataTARCOGOutputs->winID == -1) {
+            print(files.WINCogFile, Format_1002, state.dataTARCOGOutputs->winID);
         } else {
-            print(files.WINCogFile, Format_1003, winID);
+            print(files.WINCogFile, Format_1003, state.dataTARCOGOutputs->winID);
         }
-        if (iguID == -1) {
-            print(files.WINCogFile, Format_1006, iguID);
+        if (state.dataTARCOGOutputs->iguID == -1) {
+            print(files.WINCogFile, Format_1006, state.dataTARCOGOutputs->iguID);
         } else {
-            print(files.WINCogFile, Format_1007, iguID);
+            print(files.WINCogFile, Format_1007, state.dataTARCOGOutputs->iguID);
         }
 
         print(files.WINCogFile, Format_1008, nlayer);
         print(files.WINCogFile, Format_111);
         print(files.WINCogFile, Format_112);
-
-        // bi...Write main body:
 
         print(files.WINCogFile, Format_113);
         print(files.WINCogFile, Format_200);
@@ -1239,7 +1076,6 @@ namespace TARCOGOutput {
         print(files.WINCogFile, Format_310);
         print(files.WINCogFile, Format_1020, tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini);
 
-        // if (mgas.eq.0) then
         NumOfProvGasses = 0;
         while (xwght(NumOfProvGasses + 1) != 0) {
             ++NumOfProvGasses;
@@ -1253,19 +1089,16 @@ namespace TARCOGOutput {
             print(files.WINCogFile, Format_2021);
             print(files.WINCogFile, Format_2020, xwght(i));
             print(files.WINCogFile, Format_2031);
-            //            ObjexxFCL::gio::write(Format_2020) ,  xgcon(1, 1);
             for (j = 2; j <= 3; ++j) {
                 print(files.WINCogFile, Format_2030, xgcon(j, i));
             }
             print(files.WINCogFile, "\n");
             print(files.WINCogFile, Format_2032);
-            //            ObjexxFCL::gio::write(Format_2020) , xgvis(1, 1);
             for (j = 2; j <= 3; ++j) {
                 print(files.WINCogFile, Format_2030, xgvis(j, i));
             }
             print(files.WINCogFile, "\n");
             print(files.WINCogFile, Format_2033);
-            //            ObjexxFCL::gio::write(Format_2020) ,  xgcp(1, 1);
             for (j = 2; j <= 3; ++j) {
                 print(files.WINCogFile, Format_2030, xgcp(j, i));
             }
@@ -1273,26 +1106,12 @@ namespace TARCOGOutput {
             print(files.WINCogFile, Format_2034);
             print(files.WINCogFile, Format_2020, gama(i));
         } // i = 1, NumProvGasses
-        // end if
 
         print(files.WINCogFile, Format_113);
         print(files.WINCogFile, Format_400);
         print(files.WINCogFile, Format_113);
         print(files.WINCogFile, Format_410);
         print(files.WINCogFile, Format_1030, totsol, tilt, height, heightt, width);
-
-        // write(files.WINCogFile,500)
-        // write(files.WINCogFile,*) SlatLength, SlatSpacing, SlatAngle, &
-        //    CurvatureRadius, SubdivisionNumber, Rf, Rb, T, Ef_IR, Eb_IR, T_IR, &
-        //    NumThetas, SOLMethod, FIRMethod, SOLhemCalc, SOLdifCalc
-        // write(files.WINCogFile,*) '    0.016, 0.012, 45, 0.0, 5, 0, 0.70, 0.40, 0.00, 0.90, 0.90, 0.00, 1, 1, 1, 1'
-        // write(files.WINCogFile,117)
-        // write(files.WINCogFile,*) '    0.003, 0.01, 0.8, 0.6, 1, 1, 1'
-        // write(files.WINCogFile,118)
-        // write(files.WINCogFile,*) '    1'
-        // write(files.WINCogFile,*) '    0'
-        // write(files.WINCogFile,*) '    1'
-        // write(files.WINCogFile,*) '    0'
 
         print(files.WINCogFile, Format_113);
         print(files.WINCogFile, Format_600);
@@ -1371,42 +1190,19 @@ namespace TARCOGOutput {
         print(files.WINCogFile, Format_113);
         print(files.WINCogFile, Format_900);
         print(files.WINCogFile, Format_113);
-        //  write(files.WINCogFile, 1198)
         print(files.WINCogFile, "\n");
 
-        // close(files.WINCogFile)
-
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
-
-        //  General:
-
-        //  Gaps/environment:
-
-        //  Layers:
-
-        // 2020  format('    ',F12.6)
     }
 
     void FinishDebugOutputFiles(Files &files, int const nperr)
     {
 
-        // Locals
-
-        // Formats
         static constexpr auto Format_2360("TARCOG status: {:3} - Normal termination.\n");
         static constexpr auto Format_2361("TARCOG status: {:3} - Warning!\n");
         static constexpr auto Format_2362("TARCOG status: {:3} - Error!\n");
         static constexpr auto Format_1199("#####  #####  #####  #####  #####  #####  #####  #####  #####  #####  #####\n");
 
         if (files.WriteDebugOutput) {
-            // open(unit=OutArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', position='APPEND',  &
-            //      &  form='formatted', iostat=ferr)
-            // if (ferr.ne.0) open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', position='APPEND',  &
-            //      &  form='formatted', iostat=ferr)
 
             print(files.DebugOutputFile, "\n");
             if ((nperr > 0) && (nperr < 1000)) {
@@ -1421,7 +1217,6 @@ namespace TARCOGOutput {
             print(files.DebugOutputFile, Format_1199);
             print(files.DebugOutputFile, Format_1199);
 
-            // close(DebugOutputFile)
         } // debug
 
         // Close debug files
@@ -1441,15 +1236,10 @@ namespace TARCOGOutput {
             files.TarcogIterationsFile.close();
         }
 
-        //!!!!!!!!!!!!!!!!!!
-        //!!
-        //!! Formats:
-        //!!
-        //!!!!!!!!!!!!!!!!!!
     }
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID)
+        EnergyPlusData &state, Files &files, std::string const &Debug_dir, std::string const &Debug_file, [[maybe_unused]] int const Debug_mode, int const win_ID, int const igu_ID)
     {
 
         // Locals
@@ -1465,55 +1255,18 @@ namespace TARCOGOutput {
             if ((LastPathChar == '/') && (LastPathCharIndex == 1)) files.DBGD = "";
         }
 
-        // DebugDir = Debug_dir
-        files.DebugMode = Debug_mode;
-        winID = win_ID;
-        iguID = igu_ID;
+        state.dataTARCOGOutputs->winID = win_ID;
+        state.dataTARCOGOutputs->iguID = igu_ID;
 
         // setup file names if file name is provided, otherwise keep default
-        if (Debug_file != "") {
+        if (!Debug_file.empty()) {
             files.WINCogFileName = Debug_file + ".w7";
-            // SHGCFileName = TRIM(Debug_file)//'_SHGC.w7'
             files.DebugOutputFileName = Debug_file + ".dbg";
         }
 
-        // bi...Write debug output files - if debug flag > 0:
-
         files.WriteDebugOutput = false;
-        if ((Debug_mode > minDebugFlag) && (Debug_mode <= maxDebugFlag)) {
+        // there used to be a block under here but the debug flag was hardwired to not do any reporting, so it was removed
 
-            files.WriteDebugOutput = true;
-            if (Debug_mode == appendResultsToFile) {
-                files.FilePosition = "APPEND";
-                files.FileMode = "SEQUENTIAL";
-            }
-            if ((Debug_mode == resultsToNewFile) || (Debug_mode == saveIntermediateResults)) {
-                files.FilePosition = "ASIS";
-                files.FileMode = "SEQUENTIAL";
-            }
-
-            const auto open_file = [&](InputOutputFile &of, const std::string &fileName, const bool forAppend) {
-                of.fileName = files.DBGD + fileName;
-                of.open(forAppend);
-
-                if (!of.good()) {
-                    of.fileName = fileName;
-                    of.open(forAppend);
-                }
-
-                std::clog << "File: '" << of.fileName << "': " << of.good() << std::endl;
-            };
-
-            open_file(files.DebugOutputFile, files.DebugOutputFileName, files.FilePosition == "APPEND");
-            open_file(files.WINCogFile, files.WINCogFileName, files.FilePosition == "APPEND");
-
-            if (Debug_mode == saveIntermediateResults) {
-                open_file(files.TarcogIterationsFile, files.TarcogIterationsFileName, true);
-                open_file(files.IterationCSVFile, files.IterationCSVName, true);
-            }
-        }
     }
-
-} // namespace TARCOGOutput
 
 } // namespace EnergyPlus

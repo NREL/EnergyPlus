@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,8 +99,15 @@ namespace HeatBalanceKivaManager {
     class KivaInstanceMap
     {
     public:
-        KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
+        KivaInstanceMap(EnergyPlusData &state,
+                        Kiva::Foundation &foundation,
+                        int floorSurface,
+                        std::vector<int> wallSurfaces,
+                        int zoneNum,
+                        Real64 zoneAssumedTemperature,
+                        Real64 floorWeight,
+                        int constructionNum,
+                        class KivaManager *kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
@@ -200,6 +207,15 @@ namespace HeatBalanceKivaManager {
     };
 
 } // namespace HeatBalanceKivaManager
+
+struct HeatBalanceKivaMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif // HeatBalanceKivaManager_hh_INCLUDED

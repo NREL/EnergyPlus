@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -194,7 +193,7 @@ namespace CoolTower {
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr == 0) {
@@ -715,7 +714,7 @@ namespace CoolTower {
         int CoolTowerNum;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
 

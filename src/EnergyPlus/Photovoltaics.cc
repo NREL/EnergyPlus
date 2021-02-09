@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -568,14 +567,14 @@ namespace Photovoltaics {
                 tmpTNRSYSModuleParams(ModNum).ShuntResistance = rNumericArgs(5);
                 tmpTNRSYSModuleParams(ModNum).RefIsc = rNumericArgs(6);
                 tmpTNRSYSModuleParams(ModNum).RefVoc = rNumericArgs(7);
-                tmpTNRSYSModuleParams(ModNum).RefTemperature = rNumericArgs(8) + DataGlobalConstants::KelvinConv();
+                tmpTNRSYSModuleParams(ModNum).RefTemperature = rNumericArgs(8) + DataGlobalConstants::KelvinConv;
                 tmpTNRSYSModuleParams(ModNum).RefInsolation = rNumericArgs(9);
                 tmpTNRSYSModuleParams(ModNum).Imp = rNumericArgs(10);
                 tmpTNRSYSModuleParams(ModNum).Vmp = rNumericArgs(11);
                 tmpTNRSYSModuleParams(ModNum).TempCoefIsc = rNumericArgs(12);
                 tmpTNRSYSModuleParams(ModNum).TempCoefVoc = rNumericArgs(13);
-                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = rNumericArgs(14) + DataGlobalConstants::KelvinConv();
-                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = rNumericArgs(15) + DataGlobalConstants::KelvinConv();
+                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = rNumericArgs(14) + DataGlobalConstants::KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = rNumericArgs(15) + DataGlobalConstants::KelvinConv;
                 tmpTNRSYSModuleParams(ModNum).NOCTInsolation = rNumericArgs(16);
                 tmpTNRSYSModuleParams(ModNum).HeatLossCoef = rNumericArgs(17);
                 tmpTNRSYSModuleParams(ModNum).HeatCapacity = rNumericArgs(18);
@@ -870,7 +869,7 @@ namespace Photovoltaics {
             PVarray(thisPV).SurfaceSink = PVarray(thisPV).Report.DCPower;
 
             // array energy, power * timestep
-            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour());
+            PVarray(thisPV).Report.DCEnergy = PVarray(thisPV).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
             PVarray(thisPV).Report.ArrayEfficiency = Eff;
         } else { // not enough incident solar, zero things out
 
@@ -901,7 +900,7 @@ namespace Photovoltaics {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int thisZone; // working index for zones
 
-        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour());
+        PVarray(PVnum).Report.DCEnergy = PVarray(PVnum).Report.DCPower * (TimeStepSys * DataGlobalConstants::SecInHour);
 
         // add check for multiplier.  if surface is attached to a zone that is on a multiplier
         // then PV production should be multiplied out as well
@@ -925,7 +924,6 @@ namespace Photovoltaics {
                 SetVentedModuleQdotSource(PVarray(PVnum).ExtVentCavPtr, -1.0 * PVarray(PVnum).SurfaceSink);
 
             } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
-                // CALL SetPVTQdotSource(PVarray(PVNum)%ExtVentCavPtr,  -1 * PVarray(PVNum)%SurfaceSink )
             }
         }
     }
@@ -976,8 +974,8 @@ namespace Photovoltaics {
         //   get input from elsewhere in Energyplus for the current point in the simulation
         PVarray(PVnum).SNLPVinto.IcBeam = SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
         PVarray(PVnum).SNLPVinto.IcDiffuse = SurfQRadSWOutIncident(ThisSurf) - SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians();    // (deg) from dataHeatBalance
-        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians();                         //(degrees),
+        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians;    // (deg) from dataHeatBalance
+        PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
         PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                      // from DataEnvironment via USE
@@ -1229,8 +1227,8 @@ namespace Photovoltaics {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
 
-            PVarray(PVnum).TRNSYSPVcalc.CellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
-            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
+            PVarray(PVnum).TRNSYSPVcalc.CellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
             MyEnvrnFlag(PVnum) = false;
         }
 
@@ -1327,7 +1325,7 @@ namespace Photovoltaics {
         ShuntResistance = PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
-        Tambient = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv();
+        Tambient = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
 
         if ((PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 
@@ -1361,13 +1359,13 @@ namespace Photovoltaics {
                                 (1.0 -
                                  std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep));
                     } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                        CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv();
+                        CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                         GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
-                        CellTemp += DataGlobalConstants::KelvinConv();
+                        CellTemp += DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                         GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                        CellTemp += DataGlobalConstants::KelvinConv();
+                        CellTemp += DataGlobalConstants::KelvinConv;
                     } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
                         // get PVT model result for cell temp..
                     }
@@ -1434,13 +1432,13 @@ namespace Photovoltaics {
                                (PVarray(PVnum).TRNSYSPVcalc.LastCellTempK - Tambient) *
                                    std::exp(-PVarray(PVnum).TRNSYSPVModule.HeatLossCoef / PVarray(PVnum).TRNSYSPVModule.HeatCapacity * PVTimeStep);
                 } else if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                    CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv();
+                    CellTemp = SurfTempOut(PVarray(PVnum).SurfacePtr) + DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                     GetUTSCTsColl(state, PVarray(PVnum).UTSCPtr, CellTemp);
-                    CellTemp += DataGlobalConstants::KelvinConv();
+                    CellTemp += DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iExteriorVentedCavityCellIntegration) {
                     GetExtVentedCavityTsColl(PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                    CellTemp += DataGlobalConstants::KelvinConv();
+                    CellTemp += DataGlobalConstants::KelvinConv;
                 } else if (SELECT_CASE_var == iPVTSolarCollectorCellIntegration) {
                     // get PVT model result for cell temp.. //Bug CellTemp not set but used below
                 } else {
@@ -1458,7 +1456,7 @@ namespace Photovoltaics {
         }
 
         // convert cell temperature back to C
-        CellTempC = CellTemp - DataGlobalConstants::KelvinConv();
+        CellTempC = CellTemp - DataGlobalConstants::KelvinConv;
 
         // calculate array based outputs (so far, the outputs are module based
         IA = PVarray(PVnum).NumSeriesNParall * IM;
@@ -2132,7 +2130,7 @@ namespace Photovoltaics {
         // na
 
         if (SolZen < 89.9) {
-            Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians()) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
+            Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         } else {
             Real64 const AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
@@ -2531,7 +2529,7 @@ namespace Photovoltaics {
 
         if (Ee > 0.0) {
             // following is equation 8 in King et al. nov. 2003
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv())) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
 
             BVmpEe = BVmp0 + mBVmp * (1.0 - Ee);
 
@@ -2594,7 +2592,7 @@ namespace Photovoltaics {
         Real64 BVocEe; // working variable
 
         if (Ee > 0.0) {
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv())) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + DataGlobalConstants::KelvinConv)) / 1.60218e-19);
             BVocEe = BVoc0 + mBVoc * (1.0 - Ee);
 
             SandiaVoc = Voc0 + NcellSer * dTc * std::log(Ee) + BVocEe * (Tc - 25.0);

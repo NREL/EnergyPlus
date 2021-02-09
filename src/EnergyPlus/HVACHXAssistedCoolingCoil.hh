@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -68,8 +69,8 @@ namespace HVACHXAssistedCoolingCoil {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);  // normal compressor operation
+    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // DERIVED TYPE DEFINITIONS
 
@@ -168,12 +169,13 @@ namespace HVACHXAssistedCoolingCoil {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHXAssistedCoolingCoil(int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
+    void InitHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum); // index for HXAssistedCoolingCoil
 
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
+                                   int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,           // FirstHVACIteration flag
                                    int const CompOp,                        // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,              // Cooling coil part load ratio
@@ -270,6 +272,14 @@ namespace HVACHXAssistedCoolingCoil {
     // *****************************************************************************
 
 } // namespace HVACHXAssistedCoolingCoil
+
+struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

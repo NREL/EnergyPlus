@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,9 +54,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -70,13 +69,10 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -107,16 +103,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     // ZoneTempPredictorCorrector variable initialization
     Zone.allocate(1);
     HybridModelZone.allocate(1);
-    AirModel.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(1);
     ZTM1.allocate(1);
     ZTM2.allocate(1);
     ZTM3.allocate(1);
     XMAT.allocate(1);
     XM2T.allocate(1);
     XM3T.allocate(1);
-    ZTOC.allocate(1);
-    ZTMX.allocate(1);
-    ZTM1MX.allocate(1);
+    state->dataRoomAirMod->ZTOC.allocate(1);
+    state->dataRoomAirMod->ZTMX.allocate(1);
+    state->dataRoomAirMod->ZTM1MX.allocate(1);
     WZoneTimeMinus1Temp.allocate(1);
     WZoneTimeMinus2Temp.allocate(1);
     WZoneTimeMinus3Temp.allocate(1);
@@ -174,13 +170,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadHeatEnergy.allocate(1);
     SNLoadCoolEnergy.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
-    IsZoneDV.dimension(1, false);
-    IsZoneCV.dimension(1, false);
-    IsZoneUI.dimension(1, false);
-    ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneUI.dimension(1, false);
+    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
     ZnAirRpt.allocate(1);
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneIntGain.allocate(1);
     ZoneIntGain(1).NumberOfDevices = 0;
     ZoneEqSizing.allocate(1);
@@ -541,16 +537,16 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     // Deallocate everything
     HybridModel::clear_state();
     Zone.deallocate();
-    AirModel.deallocate();
+    state->dataRoomAirMod->AirModel.deallocate();
     ZTM1.deallocate();
     ZTM2.deallocate();
     ZTM3.deallocate();
     XMAT.deallocate();
     XM2T.deallocate();
     XM3T.deallocate();
-    ZTOC.deallocate();
-    ZTMX.deallocate();
-    ZTM1MX.deallocate();
+    state->dataRoomAirMod->ZTOC.deallocate();
+    state->dataRoomAirMod->ZTMX.deallocate();
+    state->dataRoomAirMod->ZTM1MX.deallocate();
     WZoneTimeMinus1Temp.deallocate();
     WZoneTimeMinus2Temp.deallocate();
     WZoneTimeMinus3Temp.deallocate();
@@ -593,12 +589,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadHeatEnergy.deallocate();
     SNLoadCoolEnergy.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
-    IsZoneDV.deallocate();
-    IsZoneCV.deallocate();
-    IsZoneUI.deallocate();
-    ZoneDVMixedFlag.deallocate();
+    state->dataRoomAirMod->IsZoneDV.deallocate();
+    state->dataRoomAirMod->IsZoneCV.deallocate();
+    state->dataRoomAirMod->IsZoneUI.deallocate();
+    state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
     ZnAirRpt.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     ZoneIntGain.deallocate();
     ZoneEqSizing.deallocate();
     ZoneLatentGain.deallocate();
@@ -628,8 +624,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // ZoneContaminantPredictorCorrector variable initialization
     Zone.allocate(1);
     HybridModelZone.allocate(1);
-    AirModel.allocate(1);
-    ZTOC.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(1);
+    state->dataRoomAirMod->ZTOC.allocate(1);
     AIRRAT.allocate(1);
     ZoneAirHumRat.allocate(1);
     NonAirSystemResponse.allocate(1);
@@ -680,13 +676,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Surface.allocate(2);
     HConvIn.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
-    IsZoneDV.dimension(1, false);
-    IsZoneCV.dimension(1, false);
-    IsZoneUI.dimension(1, false);
-    ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneUI.dimension(1, false);
+    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
     ZnAirRpt.allocate(1);
-    ZoneEquipConfig.allocate(1);
-    ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEqSizing.allocate(1);
 
     // CorrectZoneContaminants variable initialization
@@ -884,8 +880,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // Deallocate everything
     Zone.deallocate();
     HybridModelZone.deallocate();
-    AirModel.deallocate();
-    ZTOC.deallocate();
+    state->dataRoomAirMod->AirModel.deallocate();
+    state->dataRoomAirMod->ZTOC.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus1Temp.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus2Temp.deallocate();
     state->dataContaminantBalance->CO2ZoneTimeMinus3Temp.deallocate();
@@ -921,12 +917,12 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Surface.deallocate();
     HConvIn.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
-    IsZoneDV.deallocate();
-    IsZoneCV.deallocate();
-    IsZoneUI.deallocate();
-    ZoneDVMixedFlag.deallocate();
+    state->dataRoomAirMod->IsZoneDV.deallocate();
+    state->dataRoomAirMod->IsZoneCV.deallocate();
+    state->dataRoomAirMod->IsZoneUI.deallocate();
+    state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
     ZnAirRpt.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     ZoneEqSizing.deallocate();
     MixingMassFlowZone.deallocate();
     ZoneW1.deallocate();

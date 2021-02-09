@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -63,8 +64,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
-
-    extern int NumOfPondGHEs; // Number of pond ground heat exchangers
 
     struct PondGroundHeatExchangerData : PlantComponent
     {
@@ -149,14 +148,23 @@ namespace PondGroundHeatExchanger {
 
     };
 
-    // Object Data
-    extern Array1D<PondGroundHeatExchangerData> PondGHE;
-
-    void clear_state();
-
     void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
+
+struct PondGroundHeatExchangerData : BaseGlobalStruct {
+
+    bool GetInputFlag = true;
+    int NumOfPondGHEs = 0;
+    Array1D<PondGroundHeatExchanger::PondGroundHeatExchangerData> PondGHE;
+
+    void clear_state() override
+    {
+        this->GetInputFlag = true;
+        this->NumOfPondGHEs = 0;
+        this->PondGHE.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

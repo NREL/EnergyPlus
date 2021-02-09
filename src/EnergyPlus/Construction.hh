@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -323,7 +323,7 @@ namespace Construction {
 
         void reportTransferFunction(EnergyPlusData &state, int const cCounter);
 
-        bool isGlazingConstruction() const;
+        bool isGlazingConstruction(EnergyPlusData &state) const;
 
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 

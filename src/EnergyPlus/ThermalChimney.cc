@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,7 +212,7 @@ namespace ThermalChimney {
 
             state.dataThermalChimneys->ThermalChimneySys(Loop).SchedName = cAlphaArgs(3);
             if (lAlphaFieldBlanks(3)) {
-                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr == 0) {
@@ -368,7 +368,7 @@ namespace ThermalChimney {
                                 state.dataThermalChimneys->ThermalChimneySys(Loop).Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Zone Thermal Chimney",
+                SetupEMSActuator(state, "Zone Thermal Chimney",
                                  state.dataThermalChimneys->ThermalChimneySys(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
@@ -666,7 +666,7 @@ namespace ThermalChimney {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = HConvIn(SurfNum);
-                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
+                        SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }
@@ -680,7 +680,7 @@ namespace ThermalChimney {
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = HConvIn(SurfNum);
-                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv();
+                        SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }
@@ -705,7 +705,7 @@ namespace ThermalChimney {
                 TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 RoomAirTemp += state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) * MAT(TCZoneNumCounter);
             }
-            RoomAirTemp += DataGlobalConstants::KelvinConv();
+            RoomAirTemp += DataGlobalConstants::KelvinConv;
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -835,7 +835,7 @@ namespace ThermalChimney {
             if (state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow != (TCVolumeAirFlowRate * AirDensityThermalChim)) {
                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow = state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv();
+            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - DataGlobalConstants::KelvinConv;
 
             if (GetCurrentScheduleValue(state, state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
@@ -875,7 +875,7 @@ namespace ThermalChimney {
         Real64 CpAir;
         Real64 TSMult;
 
-        TSMult = TimeStepSys * DataGlobalConstants::SecInHour();
+        TSMult = TimeStepSys * DataGlobalConstants::SecInHour;
 
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) { // Start of zone loads report variable update loop ...
 

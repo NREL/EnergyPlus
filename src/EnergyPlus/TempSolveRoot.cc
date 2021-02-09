@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
@@ -96,21 +95,6 @@ namespace TempSolveRoot {
     // This module should not contain variables in the module sense as it is
     // intended strictly to provide "interfaces" to routines used by other
     // parts of the simulation.
-
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
 
     // Functions
 

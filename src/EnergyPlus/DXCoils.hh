@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -69,89 +70,43 @@ namespace DXCoils {
     using DataHVACGlobals::AirCooled;
     using DataHVACGlobals::DryBulbIndicator;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Defrost strategy (heat pump only)
-    extern int const ReverseCycle; // uses reverse cycle defrost strategy
-    extern int const Resistive;    // uses electric resistance heater for defrost
+    constexpr int ReverseCycle(1);      // uses reverse cycle defrost strategy
+    constexpr int Resistive(2);         // uses electric resistance heater for defrost
+
     // Defrost control  (heat pump only)
-    extern int const Timed;    // defrost cycle is timed
-    extern int const OnDemand; // defrost cycle occurs only when required
+    constexpr int Timed(1);             // defrost cycle is timed
+    constexpr int OnDemand(2);          // defrost cycle occurs only when required
+
     // Compressor operation
-    extern int const On;  // normal compressor operation
-    extern int const Off; // signal DXCoil that compressor shouldn't run
+    constexpr int On(1);                // normal compressor operation
+    constexpr int Off(0);               // signal DXCoil that compressor shouldn't run
 
-    extern Real64 const RatedInletAirTemp;           // 26.6667C or 80F
-    extern Real64 const RatedInletWetBulbTemp;       // 19.44 or 67F
-    extern Real64 const RatedInletAirHumRat;         // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    extern Real64 const RatedOutdoorAirTemp;         // 35 C or 95F
-    extern Real64 const RatedInletAirTempHeat;       // 21.11C or 70F
-    extern Real64 const RatedOutdoorAirTempHeat;     // 8.33 C or 47F
-    extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
-    extern Real64 const RatedInletWetBulbTempHeat;   // 15.55 or 60F
-
-    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgWater/kgDryAir
+    constexpr Real64 RatedInletAirTemp(26.6667);            // 26.6667C or 80F
+    constexpr Real64 RatedInletWetBulbTemp(19.4444);        // 19.44 or 67F
+    constexpr Real64 RatedInletAirHumRat(0.0111847);        // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    constexpr Real64 RatedOutdoorAirTemp(35.0);             // 35 C or 95F
+    constexpr Real64 RatedInletAirTempHeat(21.1111);        // 21.11C or 70F
+    constexpr Real64 RatedOutdoorAirTempHeat(8.3333);       // 8.33 C or 47F
+    constexpr Real64 RatedOutdoorWetBulbTempHeat(6.1111);   // 6.11 C or 43F
+    constexpr Real64 RatedInletWetBulbTempHeat(15.5556);    // 15.55 or 60F
+    constexpr Real64 DryCoilOutletHumRatioMin(0.00001);     // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
     // Multimode DX Coil
-    extern int const MaxCapacityStages; // Maximum number of capacity stages supported
-    extern int const MaxDehumidModes;   // Maximum number of enhanced dehumidification modes supported
-    extern int const MaxModes;          // Maximum number of performance modes
+    constexpr int MaxCapacityStages(2);                               // Maximum number of capacity stages supported
+    constexpr int MaxDehumidModes(1);                                 // Maximum number of enhanced dehumidification modes supported
+    constexpr int MaxModes(MaxCapacityStages *(MaxDehumidModes + 1)); // Maximum number of performance modes
 
     // Water Systems
-    extern int const CondensateDiscarded; // default mode where water is "lost"
-    extern int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
+    enum class iCondensate {
+        Discarded,          // default mode where water is "lost"
+        ToTank,             // collect coil condensate from air and store in water storage tank
+    };
 
-    extern int const WaterSupplyFromMains;
-    extern int const WaterSupplyFromTank;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
-    extern Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
-    extern Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
-    extern Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
-    extern Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
-    extern Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
-    extern Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
-    extern Array1D<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
-    extern Array1D<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
-    extern Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
-    extern Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
-
-    extern int CurDXCoilNum;
-
-    extern int NumDXCoils;                           // Total number of DX coils
-    extern Real64 HPWHHeatingCapacity;               // Used by Heat Pump:Water Heater object as total water heating capacity [W]
-    extern Real64 HPWHHeatingCOP;                    // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-    extern bool GetCoilsInputFlag;                   // First time, input is "gotten"
-    extern bool MyOneTimeFlag;                       // One time flag used to allocate MyEnvrnFlag and MySizeFlag
-    extern int NumVRFHeatingCoils;                   // number of VRF heat pump heating coils
-    extern int NumVRFCoolingCoils;                   // number of VRF heat pump cooling coils
-    extern int NumDXHeatingCoils;                    // number of DX heat pump heating coils
-    extern int NumDoe2DXCoils;                       // number of doe2 DX  coils
-    extern int NumDXHeatPumpWaterHeaterPumpedCoils;  // number of DX  water heater coils, pumped
-    extern int NumDXHeatPumpWaterHeaterWrappedCoils; // number of wrapped tank HPWH coils
-    extern int NumDXMulSpeedCoils;                   // number of DX coils with multi-speed compressor
-    extern int NumDXMulModeCoils;                    // number of DX coils with multi-mode performance
-
-    extern int NumDXMulSpeedCoolCoils; // number of multispeed DX cooling coils
-    extern int NumDXMulSpeedHeatCoils; // number of multispeed DX heating coils
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
-    // Common routines
-
-    // External function calls
+    enum class iWaterSupply {
+        FromMains,
+        FromTank,
+    };
 
     // Types
 
@@ -379,11 +334,11 @@ namespace DXCoils {
         std::string HighAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
         std::string HighAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
         // begin variables for Water System interactions
-        int EvapWaterSupplyMode;         // where does water come from
+        iWaterSupply EvapWaterSupplyMode;         // where does water come from
         std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
         int EvapWaterSupTankID;
         int EvapWaterTankDemandARRID;
-        int CondensateCollectMode;         // where does water come from
+        iCondensate CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
@@ -533,8 +488,8 @@ namespace DXCoils {
               RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0), ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true),
               CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false), LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0),
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
-              PrintHighAmbMessage(false), EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
+              PrintHighAmbMessage(false), EvapWaterSupplyMode(iWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
               CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0), PLRImpact(false),
               LatentImpact(false), MSFuelWasteHeat(0.0),
               MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
@@ -577,10 +532,6 @@ namespace DXCoils {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<DXCoilData> DXCoil;
-    extern Array1D<DXCoilNumericFieldData> DXCoilNumericFields;
 
     // Functions
 
@@ -695,7 +646,8 @@ namespace DXCoils {
                        std::string const &CallingRoutine // function name calling this routine
     );
 
-    Real64 CalcEffectiveSHR(int const DXCoilNum,                  // Index number for cooling coil
+    Real64 CalcEffectiveSHR(EnergyPlusData &state,
+                            int const DXCoilNum,                  // Index number for cooling coil
                             Real64 const SHRss,                   // Steady-state sensible heat ratio
                             Real64 const RTF,                     // Compressor run-time fraction
                             Real64 const QLatRated,               // Rated latent capacity
@@ -956,7 +908,8 @@ namespace DXCoils {
                           Real64 &SCact            // actual SC
     );
 
-    void CalcVRFCoilSenCap(int const OperationMode, // mode 0 for cooling, 1 for heating
+    void CalcVRFCoilSenCap(EnergyPlusData &state,
+                           int const OperationMode, // mode 0 for cooling, 1 for heating
                            int const CoilNum,       // index to VRFTU cooling or heating coil
                            Real64 const Tinlet,     // dry bulb temperature of air entering the coil
                            Real64 const TeTc,       // evaporating or condensing temperature
@@ -987,17 +940,87 @@ namespace DXCoils {
     // End of Methods for New VRF Model: Fluid Temperature Control
     // *****************************************************************************
 
-    void SetMSHPDXCoilHeatRecoveryFlag(int const DXCoilNum); // must match coil names for the coil type
+    void SetMSHPDXCoilHeatRecoveryFlag(EnergyPlusData &state, int const DXCoilNum); // must match coil names for the coil type
 
     void SetDXCoilAirLoopNumber(EnergyPlusData &state, std::string const &CoilName, int const AirLoopNum); // must match coil names for the coil type
 
-    void DisableLatentDegradation(int const DXCoilNum);
-
-    // Clears the global data in DXCoils.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void DisableLatentDegradation(EnergyPlusData &state, int const DXCoilNum);
 
 } // namespace DXCoils
+
+struct DXCoilsData : BaseGlobalStruct {
+
+    bool GetCoilsInputFlag = true; // First time, input is "gotten"
+    bool MyOneTimeFlag = true;     // One time flag used to allocate MyEnvrnFlag and MySizeFlag
+    bool CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
+    bool CrankcaseHeaterReportVarFlag = true;
+    int NumVRFHeatingCoils = 0;                   // number of VRF heat pump heating coils
+    int NumVRFCoolingCoils = 0;                   // number of VRF heat pump cooling coils
+    int NumDXCoils = 0;                           // Total number of DX coils
+    int NumVRFHeatingFluidTCtrlCoils = 0;         // number of VRF heat pump heating coils for FluidTCtrl Model
+    int NumVRFCoolingFluidTCtrlCoils = 0;         // number of VRF heat pump cooling coils for FluidTCtrl Model
+    int NumDXHeatingCoils = 0;                    // number of DX heat pump heating coils
+    int NumDoe2DXCoils = 0;                       // number of doe2 DX  coils
+    int NumDXHeatPumpWaterHeaterPumpedCoils = 0;  // number of DX  water heater coils, pumped
+    int NumDXHeatPumpWaterHeaterWrappedCoils = 0; // number of DX  water heater coils, pumped
+    int NumDXMulSpeedCoils = 0;                   // number of DX coils with multi-speed compressor
+    int NumDXMulModeCoils = 0;                    // number of DX coils with multi-mode performance
+    int NumDXMulSpeedCoolCoils = 0;               // number of multispeed DX cooling coils
+    int NumDXMulSpeedHeatCoils = 0;               // number of multispeed DX heating coils
+    Real64 HPWHHeatingCapacity = 0.0;             // Used by Heat Pump:Water Heater object as total water heating capacity [W]
+    Real64 HPWHHeatingCOP = 0.0;                  // Used by Heat Pump:Water Heater object as water heating COP [W/W]
+    Array1D_bool CheckEquipName;
+    Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
+    Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
+    Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
+    Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
+    Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
+    Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
+    Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
+    Array1D<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
+    Array1D<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
+    Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
+    Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
+    Array1D<DXCoils::DXCoilData> DXCoil;
+    Array1D<DXCoils::DXCoilNumericFieldData> DXCoilNumericFields;
+
+    void clear_state() override
+    {
+        this->GetCoilsInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
+        this->CrankcaseHeaterReportVarFlag = true;
+        this->NumVRFHeatingCoils = 0;
+        this->NumVRFCoolingCoils = 0;
+        this->NumDXCoils = 0;
+        this->NumVRFHeatingFluidTCtrlCoils = 0;
+        this->NumVRFCoolingFluidTCtrlCoils = 0;
+        this->NumDXHeatingCoils = 0;
+        this->NumDoe2DXCoils = 0;
+        this->NumDXHeatPumpWaterHeaterPumpedCoils = 0;
+        this->NumDXHeatPumpWaterHeaterWrappedCoils = 0;
+        this->NumDXMulSpeedCoils = 0;
+        this->NumDXMulModeCoils = 0;
+        this->NumDXMulSpeedCoolCoils = 0;
+        this->NumDXMulSpeedHeatCoils = 0;
+        this->HPWHHeatingCapacity = 0.0;
+        this->HPWHHeatingCOP = 0.0;
+        this->CheckEquipName.deallocate();
+        this->DXCoilOutletTemp.deallocate();
+        this->DXCoilOutletHumRat.deallocate();
+        this->DXCoilPartLoadRatio.deallocate();
+        this->DXCoilFanOpMode.deallocate();
+        this->DXCoilFullLoadOutAirTemp.deallocate();
+        this->DXCoilFullLoadOutAirHumRat.deallocate();
+        this->DXCoilTotalCooling.deallocate();
+        this->DXCoilTotalHeating.deallocate();
+        this->DXCoilCoolInletAirWBTemp.deallocate();
+        this->DXCoilHeatInletAirDBTemp.deallocate();
+        this->DXCoilHeatInletAirWBTemp.deallocate();
+        this->DXCoil.deallocate();
+        this->DXCoilNumericFields.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

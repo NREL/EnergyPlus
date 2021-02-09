@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -228,7 +228,7 @@ namespace DaylightingDevices {
         // Object Data
         Array1D<TDDPipeStoredData> TDDPipeStored;
 
-        // FLOW:
+
         // Initialize tubular daylighting devices (TDDs)
         GetTDDInput(state);
 
@@ -238,8 +238,8 @@ namespace DaylightingDevices {
             state.dataDaylightingDevices->COSAngle(1) = 0.0;
             state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
 
-            dTheta = 90.0 * DataGlobalConstants::DegToRadians() / (DataDaylightingDevices::NumOfAngles - 1.0);
-            Theta = 90.0 * DataGlobalConstants::DegToRadians();
+            dTheta = 90.0 * DataGlobalConstants::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
+            Theta = 90.0 * DataGlobalConstants::DegToRadians;
             for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
                 Theta -= dTheta;
                 state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
@@ -279,7 +279,7 @@ namespace DaylightingDevices {
                         TDDPipeStored(NumStored).TransBeam(DataDaylightingDevices::NumOfAngles) = 1.0;
 
                         // Calculate intermediate beam transmittances between 0 and 90 degrees
-                        Theta = 90.0 * DataGlobalConstants::DegToRadians();
+                        Theta = 90.0 * DataGlobalConstants::DegToRadians;
                         for (AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
                             Theta -= dTheta;
                             TDDPipeStored(NumStored).TransBeam(AngleNum) = CalcPipeTransBeam(Reflectance, state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio, Theta);
@@ -466,7 +466,7 @@ namespace DaylightingDevices {
         std::string TZoneName; // Transition zone name
         Real64 PipeArea;
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Tubular";
         state.dataDaylightingDevicesData->NumOfTDDPipes = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -635,7 +635,7 @@ namespace DaylightingDevices {
                     ErrorsFound = true;
                 }
 
-                PipeArea = 0.25 * DataGlobalConstants::Pi() * pow_2(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter);
+                PipeArea = 0.25 * DataGlobalConstants::Pi * pow_2(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diameter);
                 if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome > 0 && std::abs(PipeArea - Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) > 0.1) {
                     if (SafeDivide(std::abs(PipeArea - Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area), Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Area) >
                         0.1) { // greater than 10%
@@ -734,7 +734,7 @@ namespace DaylightingDevices {
         int SurfNum;                    // Window, inside, or outside shelf surfaces
         int ConstrNum;                  // Outside shelf construction object number
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Shelf";
         state.dataDaylightingDevicesData->NumOfShelf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -964,7 +964,7 @@ namespace DaylightingDevices {
         Real64 c2;
         Real64 xLimit; // Limiting x value to prevent floating point underflow
 
-        // FLOW:
+
         CalcPipeTransBeam = 0.0;
 
         T = 0.0;
@@ -973,7 +973,7 @@ namespace DaylightingDevices {
         xLimit = (std::log(pow_2(N) * myLocalTiny) / std::log(R)) / xTol;
 
         c1 = A * std::tan(Theta);
-        c2 = 4.0 / DataGlobalConstants::Pi();
+        c2 = 4.0 / DataGlobalConstants::Pi;
 
         s = i;
         while (s < (1.0 - i)) {
@@ -1035,13 +1035,13 @@ namespace DaylightingDevices {
         Real64 COSI;            // Cosine of incident angle
         Real64 SINI;            // Sine of incident angle
 
-        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians() / NPH; // Altitude angle of sky element
+        Real64 const dPH = 90.0 * DataGlobalConstants::DegToRadians / NPH; // Altitude angle of sky element
         Real64 PH = 0.5 * dPH;                        // Altitude angle increment
 
         // Integrate from 0 to Pi/2 altitude
         for (int N = 1; N <= NPH; ++N) {
-            COSI = std::cos(DataGlobalConstants::PiOvr2() - PH);
-            SINI = std::sin(DataGlobalConstants::PiOvr2() - PH);
+            COSI = std::cos(DataGlobalConstants::PiOvr2 - PH);
+            SINI = std::sin(DataGlobalConstants::PiOvr2 - PH);
 
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
@@ -1099,14 +1099,14 @@ namespace DaylightingDevices {
         Real64 CosPhi;          // Cosine of TDD:DOME altitude angle
         Real64 Theta;           // TDD:DOME azimuth angle
 
-        CosPhi = std::cos(DataGlobalConstants::PiOvr2() - Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt * DataGlobalConstants::DegToRadians());
-        Theta = Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians();
+        CosPhi = std::cos(DataGlobalConstants::PiOvr2 - Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Tilt * DataGlobalConstants::DegToRadians);
+        Theta = Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome).Azimuth * DataGlobalConstants::DegToRadians;
 
         if (CosPhi > 0.01) { // Dome has a view of the horizon
             // Integrate over the semicircle
-            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2(); // Minimum azimuth integration limit
+            Real64 const THMIN = Theta - DataGlobalConstants::PiOvr2; // Minimum azimuth integration limit
             // Real64 const THMAX = Theta + PiOvr2; // Maximum azimuth integration limit
-            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians() / NTH; // Azimuth angle increment
+            Real64 const dTH = 180.0 * DataGlobalConstants::DegToRadians / NTH; // Azimuth angle increment
             Real64 TH = THMIN + 0.5 * dTH;                 // Azimuth angle of sky horizon element
 
             for (int N = 1; N <= NTH; ++N) {
@@ -1187,7 +1187,7 @@ namespace DaylightingDevices {
         Real64 HorizonRad;      // Horizon sky radiation component
         Real64 AnisoSkyTDDMult; // Anisotropic sky multiplier for TDD
 
-        // FLOW:
+
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
@@ -1259,7 +1259,7 @@ namespace DaylightingDevices {
         Real64 transPipe;
         Real64 transDiff;
 
-        // FLOW:
+
         TransTDD = 0.0;
 
         // Get constructions of each TDD component
@@ -1331,7 +1331,7 @@ namespace DaylightingDevices {
         Real64 m;
         Real64 b;
 
-        // FLOW:
+
         InterpolatePipeTransBeam = 0.0;
 
         // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
@@ -1378,7 +1378,7 @@ namespace DaylightingDevices {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PipeNum; // TDD pipe object number
 
-        // FLOW:
+
         FindTDDPipe = 0;
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
@@ -1439,7 +1439,7 @@ namespace DaylightingDevices {
         Real64 QRefl;          // Diffuse radiation reflected back up the pipe
         Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
 
-        // FLOW:
+
         for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
             DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             transDiff = state.dataConstruction->Construct(Surface(DiffSurf).Construction).TransDiff;
@@ -1506,7 +1506,7 @@ namespace DaylightingDevices {
         int VShelf;
         int NumMatch; // Number of vertices matched
 
-        // FLOW:
+
         W = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
         H = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
 
@@ -1543,7 +1543,7 @@ namespace DaylightingDevices {
         E3 = std::pow(pow_2(M) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(M)) * (pow_2(M) + pow_2(N))), pow_2(M));
         E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
 
-        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi() * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+        state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
     }
 
     void FigureTDDZoneGains(EnergyPlusData &state)

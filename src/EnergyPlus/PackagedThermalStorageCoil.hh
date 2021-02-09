@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -65,55 +66,56 @@ namespace PackagedThermalStorageCoil {
     // Using/Aliasing
     using namespace DataHVACGlobals;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // control types
-    extern int const ScheduledOpModes;   // control over TES modes is via local schedule
-    extern int const EMSActuatedOpModes; // control over TES modes is via EMS
+    enum class iModeCtrlType
+    {
+        Unassigned,
+        ScheduledOpModes,   // control over TES modes is via local schedule
+        EMSActuatedOpModes, // control over TES modes is via EMS
+    };
 
     // Control Modes
-    extern int const OffMode;
-    extern int const CoolingOnlyMode;
-    extern int const CoolingAndChargeMode;
-    extern int const CoolingAndDischargeMode;
-    extern int const ChargeOnlyMode;
-    extern int const DischargeOnlyMode;
+    constexpr int OffMode = 0;
+    constexpr int CoolingOnlyMode = 1;
+    constexpr int CoolingAndChargeMode = 2;
+    constexpr int CoolingAndDischargeMode = 3;
+    constexpr int ChargeOnlyMode = 4;
+    constexpr int DischargeOnlyMode = 5;
 
     // storage media
-    extern int const FluidBased;
-    extern int const IceBased;
-    // INTEGER, PARAMETER :: UserDefinedFluid = 103
+    enum class iMedia
+    {
+        Unassigned,
+        FluidBased,
+        IceBased,
+    };
 
     // Water Systems
-    extern int const CondensateDiscarded; // default mode where water is "lost"
-    extern int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
+    enum class iWaterSys
+    {
+        Unassigned,
+        CondensateDiscarded, // default mode where water is "lost"
+        CondensateToTank,    // collect coil condensate from air and store in water storage tank
+    };
 
-    extern int const WaterSupplyFromMains;
-    extern int const WaterSupplyFromTank;
+    enum class iWaterSupply
+    {
+        WaterSupplyFromMains,
+        WaterSupplyFromTank,
+    };
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumTESCoils;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetTESInputFlag;
-
-    extern int const DehumidControl_CoolReheat;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Types
+    // Dehumidification control modes (DehumidControlMode)
+    constexpr int DehumidControl_CoolReheat(2);
 
     struct PackagedTESCoolingCoilStruct
     {
         // Members
-        std::string Name;           // Name of TES cooling package
-        int AvailSchedNum;          // pointer to availability schedule
-        int ModeControlType;        // how are operation modes controlled
-        int ControlModeSchedNum;    // pointer to control schedule if used
-        bool EMSControlModeOn;      // if true, then EMS actuator has been used
-        Real64 EMSControlModeValue; // value to use from EMS actuator for control mode
+        std::string Name;              // Name of TES cooling package
+        int AvailSchedNum;             // pointer to availability schedule
+        iModeCtrlType ModeControlType; // how are operation modes controlled
+        int ControlModeSchedNum;       // pointer to control schedule if used
+        bool EMSControlModeOn;         // if true, then EMS actuator has been used
+        Real64 EMSControlModeValue;    // value to use from EMS actuator for control mode
         int CurControlMode;
         int ControlModeErrorIndex;
         Real64 RatedEvapAirVolFlowRate;  // [m3/s]
@@ -290,16 +292,16 @@ namespace PackagedThermalStorageCoil {
         Real64 BasinHeaterPowerFTempDiff;    // Basin heater power for evaporatively cooled condensers [W/K]
         int BasinHeaterAvailSchedNum;        // basin heater availability schedule pointer num
         Real64 BasinHeaterSetpointTemp;      // evap water basin temperature setpoint [C]
-        int EvapWaterSupplyMode;             // where does evap water come from
+        iWaterSupply EvapWaterSupplyMode;    // where does evap water come from
         std::string EvapWaterSupplyName;     // name of water source e.g. water storage tank
         int EvapWaterSupTankID;              // supply tank index, if any
         int EvapWaterTankDemandARRID;        // evap water demand array index
-        int CondensateCollectMode;           // where does condensate  water go to
+        iWaterSys CondensateCollectMode;     // where does condensate  water go to
         std::string CondensateCollectName;   // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
         // TES tank
-        int StorageMedia;                   // water/fluid or ice based TES
+        iMedia StorageMedia;                // water/fluid or ice based TES
         std::string StorageFluidName;       // if user defined, name of fluid type
         int StorageFluidIndex;              // if user defined, index of fluid type
         Real64 FluidStorageVolume;          // volume of water in storage tank for water systems [m3/s]
@@ -355,7 +357,7 @@ namespace PackagedThermalStorageCoil {
 
         // Default Constructor
         PackagedTESCoolingCoilStruct()
-            : AvailSchedNum(0), ModeControlType(0), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
+            : AvailSchedNum(0), ModeControlType(iModeCtrlType::Unassigned), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
               CurControlMode(OffMode), ControlModeErrorIndex(0), RatedEvapAirVolFlowRate(0.0), RatedEvapAirMassFlowRate(0.0), EvapAirInletNodeNum(0),
               EvapAirOutletNodeNum(0), CoolingOnlyModeIsAvailable(false), CoolingOnlyRatedTotCap(0.0), CoolingOnlyRatedSHR(0.0),
               CoolingOnlyRatedCOP(0.0), CoolingOnlyCapFTempCurve(0), CoolingOnlyCapFTempObjectNum(0), CoolingOnlyCapFFlowCurve(0),
@@ -371,9 +373,9 @@ namespace PackagedThermalStorageCoil {
               CoolingAndChargeChargingCapFTempObjectNum(0), CoolingAndChargeChargingCapFEvapPLRCurve(0),
               CoolingAndChargeChargingCapFEvapPLRObjectNum(0), CoolingAndChargeChargingEIRFTempCurve(0), CoolingAndChargeChargingEIRFTempObjectNum(0),
               CoolingAndChargeChargingEIRFFLowCurve(0), CoolingAndChargeChargingEIRFFLowObjectNum(0), CoolingAndChargeChargingPLFFPLRCurve(0),
-              CoolingAndChargeChargingPLFFPLRObjectNum(0), CoolingAndChargeSHRFTempCurve(0),
-              CoolingAndChargeSHRFFlowCurve(0), CoolingAndChargeSHRFFlowObjectNum(0), CoolingAndDischargeModeAvailable(false),
-              CoolingAndDischargeRatedTotCap(0.0), CoolingAndDischargeRatedTotCapSizingFactor(0.0), CoolingAndDischargeRatedDischargeCap(0.0),
+              CoolingAndChargeChargingPLFFPLRObjectNum(0), CoolingAndChargeSHRFTempCurve(0), CoolingAndChargeSHRFFlowCurve(0),
+              CoolingAndChargeSHRFFlowObjectNum(0), CoolingAndDischargeModeAvailable(false), CoolingAndDischargeRatedTotCap(0.0),
+              CoolingAndDischargeRatedTotCapSizingFactor(0.0), CoolingAndDischargeRatedDischargeCap(0.0),
               CoolingAndDischargeRatedDischargeCapSizingFactor(0.0), CoolingAndDischargeRatedSHR(0.0), CoolingAndDischargeCoolingRatedCOP(0.0),
               CoolingAndDischargeDischargingRatedCOP(0.0), CoolingAndDischargeCoolingCapFTempCurve(0), CoolingAndDischargeCoolingCapFTempObjectNum(0),
               CoolingAndDischargeCoolingCapFFlowCurve(0), CoolingAndDischargeCoolingCapFFlowObjectNum(0), CoolingAndDischargeCoolingEIRFTempCurve(0),
@@ -397,9 +399,10 @@ namespace PackagedThermalStorageCoil {
               AncillaryControlsPower(0.0), ColdWeatherMinimumTempLimit(0.0), ColdWeatherAncillaryPower(0.0), CondAirInletNodeNum(0),
               CondAirOutletNodeNum(0), CondenserType(AirCooled), CondenserAirVolumeFlow(0.0), CondenserAirFlowSizingFactor(0.0),
               CondenserAirMassFlow(0.0), EvapCondEffect(0.0), CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0), EvapCondPumpElecEnergy(0.0),
-              BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0), EvapWaterSupplyMode(WaterSupplyFromMains),
-              EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateCollectMode(CondensateDiscarded), CondensateTankID(0),
-              CondensateTankSupplyARRID(0), StorageMedia(0), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
+              BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0),
+              EvapWaterSupplyMode(iWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              CondensateCollectMode(iWaterSys::CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0),
+              StorageMedia(iMedia::Unassigned), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
               StorageCapacitySizingFactor(0.0), MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0),
               StorageAmbientNodeNum(0), StorageUA(0.0), TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0),
               TESPlantLoopNum(0), TESPlantLoopSideNum(0), TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0),
@@ -414,12 +417,8 @@ namespace PackagedThermalStorageCoil {
         }
     };
 
-    // Object Data
-    extern Array1D<PackagedTESCoolingCoilStruct> TESCoil;
-
-    void clear_state();
-
-    void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
+    void SimTESCoil(EnergyPlusData &state,
+                    std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
@@ -450,7 +449,8 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum);
 
-    void ControlTESIceStorageTankCoil(EnergyPlusData &state, std::string const &CoilName,
+    void ControlTESIceStorageTankCoil(EnergyPlusData &state,
+                                      std::string const &CoilName,
                                       int CoilIndex,
                                       std::string SystemType,
                                       int const FanOpMode,
@@ -484,18 +484,41 @@ namespace PackagedThermalStorageCoil {
 
     void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum);
 
-    void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
+    void GetTESCoilIndex(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 
-    void GetTESCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilAirInletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetTESCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilAirOutletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void GetTESCoilCoolingCapacity(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilCoolingCapacity(
+        EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void
-    GetTESCoilCoolingAirFlowRate(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetTESCoilCoolingAirFlowRate(
+        EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace PackagedThermalStorageCoil
+
+struct PackagedThermalStorageCoilData : BaseGlobalStruct
+{
+
+    int NumTESCoils = 0;
+    Array1D_bool CheckEquipName;
+    bool GetTESInputFlag = true;
+    bool MyOneTimeFlag = true;
+    Array1D<PackagedThermalStorageCoil::PackagedTESCoolingCoilStruct> TESCoil;
+
+    void clear_state() override
+    {
+        this->NumTESCoils = 0;
+        this->CheckEquipName.deallocate();
+        this->GetTESInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->TESCoil.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

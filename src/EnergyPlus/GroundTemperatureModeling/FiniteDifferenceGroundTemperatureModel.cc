@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -468,7 +468,7 @@ void FiniteDiffGroundTempsModel::performSimulation(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    timeStepInSeconds = DataGlobalConstants::SecsInDay();
+    timeStepInSeconds = DataGlobalConstants::SecsInDay;
     bool convergedFinal = false;
 
     initDomain(state);
@@ -841,7 +841,7 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
-    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay();
+    tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay;
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
     // Intialize temperatures and volume
@@ -1081,7 +1081,7 @@ Real64 FiniteDiffGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &
 
     depth = _depth;
 
-    simTimeInDays = seconds / DataGlobalConstants::SecsInDay();
+    simTimeInDays = seconds / DataGlobalConstants::SecsInDay;
 
     if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
         simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);

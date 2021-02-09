@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -65,7 +66,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -839,9 +839,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(state->dataConstruction->Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
     EXPECT_EQ(state->dataConstruction->Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(dataMaterial.Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(dataMaterial.Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(dataMaterial.Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(state->dataMaterial->Material(4).Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(state->dataMaterial->Material(5).Name, "WINGAS");     // air gap
+    EXPECT_EQ(state->dataMaterial->Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
     EXPECT_EQ(state->dataConstruction->Construct(4).LayerPoint(1), 4); // glass, outer layer
@@ -858,7 +858,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     GetEMSInput(*state);
     // check if EMS actuator is not setup because there is no blind/shade layer
     SetupWindowShadingControlActuators(*state);
-    EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
+    EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
     state->dataConstruction->Construct(4).TotLayers = 5;
@@ -887,13 +887,13 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
-    EXPECT_EQ(numEMSActuatorsAvailable, 2);
-    EXPECT_EQ(EMSActuatorAvailable(1).ComponentTypeName, "Window Shading Control");
-    EXPECT_EQ(EMSActuatorAvailable(1).ControlTypeName, "Control Status");
-    EXPECT_EQ(EMSActuatorAvailable(1).Units, "[ShadeStatus]");
-    EXPECT_EQ(EMSActuatorAvailable(2).ComponentTypeName, "Window Shading Control");
-    EXPECT_EQ(EMSActuatorAvailable(2).ControlTypeName, "Slat Angle");
-    EXPECT_EQ(EMSActuatorAvailable(2).Units, "[degrees]");
+    EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(1).ComponentTypeName, "Window Shading Control");
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(1).ControlTypeName, "Control Status");
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(1).Units, "[ShadeStatus]");
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(2).ComponentTypeName, "Window Shading Control");
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(2).ControlTypeName, "Slat Angle");
+    EXPECT_EQ(state->dataRuntimeLang->EMSActuatorAvailable(2).Units, "[degrees]");
 }
 
 TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicular)

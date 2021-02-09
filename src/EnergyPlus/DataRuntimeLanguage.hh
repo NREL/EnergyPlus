@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -88,186 +89,137 @@ namespace DataRuntimeLanguage {
     };
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const ValueNull;       // Erl entity type, "Null" value
-    extern int const ValueNumber;     // Erl entity type,  hard numeric value
-    extern int const ValueString;     // Erl entity type,  character data
-    extern int const ValueArray;      // Erl entity type,  not used yet, for future array type
-    extern int const ValueVariable;   // Erl entity type,  Erl variable
-    extern int const ValueExpression; // Erl entity type,  Erl expression
-    extern int const ValueTrend;      // Erl entity type,  Erl trend variable
-    extern int const ValueError;      // Erl entity type, processing of an expression failed, returned error
+    int constexpr ValueNull(0);       // Erl entity type, "Null" value
+    int constexpr ValueNumber(1);     // Erl entity type,  hard numeric value
+    int constexpr ValueString(2);     // Erl entity type,  character data
+    int constexpr ValueArray(3);      // Erl entity type,  not used yet, for future array type
+    int constexpr ValueVariable(4);   // Erl entity type,  Erl variable
+    int constexpr ValueExpression(5); // Erl entity type,  Erl expression
+    int constexpr ValueTrend(6);      // Erl entity type,  Erl trend variable
+    int constexpr ValueError(7);      // Erl entity type, processing of an expression failed, returned error
 
-    extern int const PntrReal;    // data type for overloaded pointer management, double real
-    extern int const PntrInteger; // data type for overloaded pointer management, integer
-    extern int const PntrLogical; // data type for overloaded pointer management, logical
-
-    extern int const MaxWhileLoopIterations; // protect from infinite loop in WHILE loops
+    int constexpr PntrReal(301);    // data type for overloaded pointer management, double real
+    int constexpr PntrInteger(302); // data type for overloaded pointer management, integer
+    int constexpr PntrLogical(303); // data type for overloaded pointer management, logical
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
-    extern int const OperatorLiteral;        // Just stores a literal value
-    extern int const OperatorNegative;       // -  (unary) No LHS?
-    extern int const OperatorDivide;         // /
-    extern int const OperatorMultiply;       // *
-    extern int const OperatorSubtract;       // -  (binary)
-    extern int const OperatorAdd;            // +  (binary)
-    extern int const OperatorEqual;          // ==
-    extern int const OperatorNotEqual;       // <>
-    extern int const OperatorLessOrEqual;    // <=
-    extern int const OperatorGreaterOrEqual; // >=
-    extern int const OperatorLessThan;       // <
-    extern int const OperatorGreaterThan;    // >
-    extern int const OperatorRaiseToPower;   // ^
-    extern int const OperatorLogicalAND;     // &&
-    extern int const OperatorLogicalOR;     // ||
+    int constexpr OperatorLiteral(1);         // Just stores a literal value
+    int constexpr OperatorNegative(2);        // -  (unary) No LHS?
+    int constexpr OperatorDivide(3);          // /
+    int constexpr OperatorMultiply(4);        // *
+    int constexpr OperatorSubtract(5);        // -  (binary)
+    int constexpr OperatorAdd(6);             // +  (binary)
+    int constexpr OperatorEqual(7);           // ==
+    int constexpr OperatorNotEqual(8);        // <>
+    int constexpr OperatorLessOrEqual(9);     // <=
+    int constexpr OperatorGreaterOrEqual(10); // >=
+    int constexpr OperatorLessThan(11);       // <
+    int constexpr OperatorGreaterThan(12);    // >
+    int constexpr OperatorRaiseToPower(13);   // ^
+    int constexpr OperatorLogicalAND(14);     // &&
+    int constexpr OperatorLogicalOR(15);     // ||
     // note there is an important check "> 15" to distinguish operators from functions
-    //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+    //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
     // parameters for built-in Erl functions, these are processed like operators and numbering
     // must be sequential with the operators.
     // math functions
-    extern int const FuncRound;    // accessor for Fortran's DNINT()
-    extern int const FuncMod;      // accessor for Fortran's MOD()
-    extern int const FuncSin;      // accessor for Fortran's SIN()
-    extern int const FuncCos;      // accessor for Fortran's COS()
-    extern int const FuncArcSin;   // accessor for Fortran's ASIN()
-    extern int const FuncArcCos;   // accessor for Fortran's ACOS()
-    extern int const FuncDegToRad; // Multiplies degrees by DegToRad
-    extern int const FuncRadToDeg; // Divides radians by DegToRad
-    extern int const FuncExp;      // accessor for Fortran's EXP()
-    extern int const FuncLn;       // accessor for Fortran's LOG()
-    extern int const FuncMax;      // accessor for Fortran's MAX()
-    extern int const FuncMin;      // accessor for Fortran's MIN()
-    extern int const FuncABS;      // accessor for Fortran's ABS()
-    extern int const FuncRandU;    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
-    extern int const FuncRandG;    // accessor for Gaussian/normal distribution random number
-    extern int const FuncRandSeed; // accessor for Fortran's Random_Seed() intrinsic
+    int constexpr FuncRound(16);    // accessor for Fortran's DNINT()
+    int constexpr FuncMod(17);      // accessor for Fortran's MOD()
+    int constexpr FuncSin(18);      // accessor for Fortran's SIN()
+    int constexpr FuncCos(19);      // accessor for Fortran's COS()
+    int constexpr FuncArcSin(20);   // accessor for Fortran's ASIN()
+    int constexpr FuncArcCos(21);   // accessor for Fortran's ACOS()
+    int constexpr FuncDegToRad(22); // Multiplies degrees by DegToRad
+    int constexpr FuncRadToDeg(23); // Divides radians by DegToRad
+    int constexpr FuncExp(24);      // accessor for Fortran's EXP()
+    int constexpr FuncLn(25);       // accessor for Fortran's LOG()
+    int constexpr FuncMax(26);      // accessor for Fortran's MAX()
+    int constexpr FuncMin(27);      // accessor for Fortran's MIN()
+    int constexpr FuncABS(28);      // accessor for Fortran's ABS()
+    int constexpr FuncRandU(29);    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
+    int constexpr FuncRandG(30);    // accessor for Gaussian/normal distribution random number
+    int constexpr FuncRandSeed(31); // accessor for Fortran's Random_Seed() intrinsic
 
     // begin psychrometric routines
-    extern int const FuncRhoAirFnPbTdbW;    // accessor for E+ psych routine
-    extern int const FuncCpAirFnW;       // accessor for E+ psych routine
-    extern int const FuncHfgAirFnWTdb;      // accessor for E+ psych routine
-    extern int const FuncHgAirFnWTdb;       // accessor for E+ psych routine
-    extern int const FuncTdpFnTdbTwbPb;     // accessor for E+ psych routine
-    extern int const FuncTdpFnWPb;          // accessor for E+ psych routine
-    extern int const FuncHFnTdbW;           // accessor for E+ psych routine
-    extern int const FuncHFnTdbRhPb;        // accessor for E+ psych routine
-    extern int const FuncTdbFnHW;           // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbRh;       // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbRhLBnd0C; // accessor for E+ psych routine
-    extern int const FuncRhovFnTdbWPb;      // accessor for E+ psych routine
-    extern int const FuncRhFnTdbRhov;       // accessor for E+ psych routine
-    extern int const FuncRhFnTdbRhovLBnd0C; // accessor for E+ psych routine
-    extern int const FuncRhFnTdbWPb;        // accessor for E+ psych routine
-    extern int const FuncTwbFnTdbWPb;       // accessor for E+ psych routine
-    extern int const FuncVFnTdbWPb;         // accessor for E+ psych routine
-    extern int const FuncWFnTdpPb;          // accessor for E+ psych routine
-    extern int const FuncWFnTdbH;           // accessor for E+ psych routine
-    extern int const FuncWFnTdbTwbPb;       // accessor for E+ psych routine
-    extern int const FuncWFnTdbRhPb;        // accessor for E+ psych routine
-    extern int const FuncPsatFnTemp;        // accessor for E+ psych routine
-    extern int const FuncTsatFnHPb;         // accessor for E+ psych routine
-    extern int const FuncTsatFnPb;          // not public in PsychRoutines.cc so not really available in EMS.
-    extern int const FuncCpCW;              // accessor for E+ psych routine
-    extern int const FuncCpHW;              // accessor for E+ psych routine
-    extern int const FuncRhoH2O;            // accessor for E+ psych routine
+    int constexpr FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
+    int constexpr FuncCpAirFnW(33);       // accessor for E+ psych routine
+    int constexpr FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
+    int constexpr FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
+    int constexpr FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
+    int constexpr FuncTdpFnWPb(37);          // accessor for E+ psych routine
+    int constexpr FuncHFnTdbW(38);           // accessor for E+ psych routine
+    int constexpr FuncHFnTdbRhPb(39);        // accessor for E+ psych routine
+    int constexpr FuncTdbFnHW(40);           // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbRh(41);       // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbRhLBnd0C(42); // accessor for E+ psych routine
+    int constexpr FuncRhovFnTdbWPb(43);      // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbRhov(44);       // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbRhovLBnd0C(45); // accessor for E+ psych routine
+    int constexpr FuncRhFnTdbWPb(46);        // accessor for E+ psych routine
+    int constexpr FuncTwbFnTdbWPb(47);       // accessor for E+ psych routine
+    int constexpr FuncVFnTdbWPb(48);         // accessor for E+ psych routine
+    int constexpr FuncWFnTdpPb(49);          // accessor for E+ psych routine
+    int constexpr FuncWFnTdbH(50);           // accessor for E+ psych routine
+    int constexpr FuncWFnTdbTwbPb(51);       // accessor for E+ psych routine
+    int constexpr FuncWFnTdbRhPb(52);        // accessor for E+ psych routine
+    int constexpr FuncPsatFnTemp(53);        // accessor for E+ psych routine
+    int constexpr FuncTsatFnHPb(54);         // accessor for E+ psych routine
+    int constexpr FuncTsatFnPb(55);          // not public in PsychRoutines.cc so not really available in EMS.
+    int constexpr FuncCpCW(56);              // accessor for E+ psych routine
+    int constexpr FuncCpHW(57);              // accessor for E+ psych routine
+    int constexpr FuncRhoH2O(58);            // accessor for E+ psych routine
 
     // Simulation Management Functions
-    extern int const FuncFatalHaltEp;  // accessor for E+ error management, "Fatal" level
-    extern int const FuncSevereWarnEp; // accessor for E+ error management, "Severe" level
-    extern int const FuncWarnEp;       // accessor for E+ error management, "Warning" level
+    int constexpr FuncFatalHaltEp(59);  // accessor for E+ error management, "Fatal" level
+    int constexpr FuncSevereWarnEp(60); // accessor for E+ error management, "Severe" level
+    int constexpr FuncWarnEp(61);       // accessor for E+ error management, "Warning" level
 
     // Trend variable handling Functions
-    extern int const FuncTrendValue;     // accessor for Erl Trend variables, instance value
-    extern int const FuncTrendAverage;   // accessor for Erl Trend variables, average value
-    extern int const FuncTrendMax;       // accessor for Erl Trend variables, max value
-    extern int const FuncTrendMin;       // accessor for Erl Trend variables, min value
-    extern int const FuncTrendDirection; // accessor for Erl Trend variables, slope value
-    extern int const FuncTrendSum;       // accessor for Erl Trend variables, sum value
+    int constexpr FuncTrendValue(62);     // accessor for Erl Trend variables, instance value
+    int constexpr FuncTrendAverage(63);   // accessor for Erl Trend variables, average value
+    int constexpr FuncTrendMax(64);       // accessor for Erl Trend variables, max value
+    int constexpr FuncTrendMin(65);       // accessor for Erl Trend variables, min value
+    int constexpr FuncTrendDirection(66); // accessor for Erl Trend variables, slope value
+    int constexpr FuncTrendSum(67);       // accessor for Erl Trend variables, sum value
 
     // Curve and Table access function
-    extern int const FuncCurveValue;
+    int constexpr FuncCurveValue(68);
 
     // Weather data query functions
-    extern int const FuncTodayIsRain;          // Access TodayIsRain(hour, timestep)
-    extern int const FuncTodayIsSnow;          // Access TodayIsSnow(hour, timestep)
-    extern int const FuncTodayOutDryBulbTemp;  // Access TodayOutDryBulbTemp(hour, timestep)
-    extern int const FuncTodayOutDewPointTemp; // Access TodayOutDewPointTemp(hour, timestep)
-    extern int const FuncTodayOutBaroPress;    // Access TodayOutBaroPress(hour, timestep)
-    extern int const FuncTodayOutRelHum;       // Access TodayOutRelHum(hour, timestep)
-    extern int const FuncTodayWindSpeed;       // Access TodayWindSpeed(hour, timestep)
-    extern int const FuncTodayWindDir;         // Access TodayWindDir(hour, timestep)
-    extern int const FuncTodaySkyTemp;         // Access TodaySkyTemp(hour, timestep)
-    extern int const FuncTodayHorizIRSky;      // Access TodayHorizIRSky(hour, timestep)
-    extern int const FuncTodayBeamSolarRad;    // Access TodayBeamSolarRad(hour, timestep)
-    extern int const FuncTodayDifSolarRad;     // Access TodayDifSolarRad(hour, timestep)
-    extern int const FuncTodayAlbedo;          // Access TodayAlbedo(hour, timestep)
-    extern int const FuncTodayLiquidPrecip;    // Access TodayLiquidPrecip(hour, timestep)
+    int constexpr FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
+    int constexpr FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
+    int constexpr FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
+    int constexpr FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
+    int constexpr FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
+    int constexpr FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
+    int constexpr FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
+    int constexpr FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
+    int constexpr FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
+    int constexpr FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
+    int constexpr FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
+    int constexpr FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
+    int constexpr FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
+    int constexpr FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
+    int constexpr FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
+    int constexpr FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
+    int constexpr FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    int constexpr FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
+    int constexpr FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
+    int constexpr FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
+    int constexpr FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
+    int constexpr FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
+    int constexpr FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
+    int constexpr FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
+    int constexpr FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
+    int constexpr FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
+    int constexpr FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
+    int constexpr FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
 
-    extern int const FuncTomorrowIsRain;          // Access TomorrowIsRain(hour, timestep)
-    extern int const FuncTomorrowIsSnow;          // Access TomorrowIsSnow(hour, timestep)
-    extern int const FuncTomorrowOutDryBulbTemp;  // Access TomorrowOutDryBulbTemp(hour, timestep)
-    extern int const FuncTomorrowOutDewPointTemp; // Access TomorrowOutDewPointTemp(hour, timestep)
-    extern int const FuncTomorrowOutBaroPress;    // Access TomorrowOutBaroPress(hour, timestep)
-    extern int const FuncTomorrowOutRelHum;       // Access TomorrowOutRelHum(hour, timestep)
-    extern int const FuncTomorrowWindSpeed;       // Access TomorrowWindSpeed(hour, timestep)
-    extern int const FuncTomorrowWindDir;         // Access TomorrowWindDir(hour, timestep)
-    extern int const FuncTomorrowSkyTemp;         // Access TomorrowSkyTemp(hour, timestep)
-    extern int const FuncTomorrowHorizIRSky;      // Access TomorrowHorizIRSky(hour, timestep)
-    extern int const FuncTomorrowBeamSolarRad;    // Access TomorrowBeamSolarRad(hour, timestep)
-    extern int const FuncTomorrowDifSolarRad;     // Access TomorrowDifSolarRad(hour, timestep)
-    extern int const FuncTomorrowAlbedo;          // Access TodayAlbedo(hour, timestep)
-    extern int const FuncTomorrowLiquidPrecip;    // Access TomorrowLiquidPrecip(hour, timestep)
+    int constexpr NumPossibleOperators(96); // total number of operators and built-in functions
 
-    extern int const NumPossibleOperators; // total number of operators and built-in functions
-
-    extern Array1D_int EMSProgram;
-
-    extern int NumProgramCallManagers;      // count of Erl program managers with calling points
-    extern int NumSensors;                  // count of EMS sensors used in model (data from output variables)
-    extern int numActuatorsUsed;            // count of EMS actuators used in model
-    extern int numEMSActuatorsAvailable;    // count of EMS actuators available for use in such a model
-    extern int maxEMSActuatorsAvailable;    // count of EMS current maximum actuators available for use in such a model
-    extern int NumInternalVariablesUsed;    // count of EMS internal variables used in model
-    extern int numEMSInternalVarsAvailable; // count of EMS internal variables available for use in such a model
-    extern int maxEMSInternalVarsAvailable; // count of EMS current maximum internal variables available for use in such a model
-    extern int varsAvailableAllocInc;       // allocation increment for variable arrays
-
-    extern int NumErlPrograms;               // count of Erl programs in model
-    extern int NumErlSubroutines;            // count of Erl subroutines in model
-    extern int NumUserGlobalVariables;       // count of global EMS variables defined by user
-    extern int NumErlVariables;              // count of Erl variables
-    extern int NumErlStacks;                 // count of Erl program stacks in model. sum of programs and subroutines
-    extern int NumExpressions;               // count of Erl expressions
-    extern int NumEMSOutputVariables;        // count of EMS output variables, custom output variables from Erl
-    extern int NumEMSMeteredOutputVariables; // count of EMS metered output variables, custom meters from Erl
-    extern int NumErlTrendVariables;         // count of EMS trend variables in model
-    extern int NumEMSCurveIndices;           // count of EMS curve index variables in model
-    extern int NumEMSConstructionIndices;    // count of EMS construction index variables in model
-
-    //######################################################################################################################################
-    // code for ExternalInterface
-    extern int NumExternalInterfaceGlobalVariables;                           // count of ExternalInterface runtime variable
-    extern int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables; // count of ExternalInterface runtime variable for FMUImport
-    // will be updated with values from ExternalInterface
-    extern int NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables; // count of ExternalInterface runtime variable for FMUExport
-    // will be updated with values from ExternalInterface
-    extern int NumExternalInterfaceActuatorsUsed;                           // count of ExternalInterface Actuators
-    extern int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed; // count of ExternalInterface Actuators for FMUImport
-    extern int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed; // count of ExternalInterface Actuators for FMUExport
-
-    //######################################################################################################################################
-
-    extern bool OutputEDDFile;               // set to true if user requests EDD output file be written
-    extern bool OutputFullEMSTrace;          // how much to write out to trace, if true do verbose for each line
-    extern bool OutputEMSErrors;             // how much to write out to trace, if true include Erl error messages
-    extern bool OutputEMSActuatorAvailFull;  // how much to write out to EDD file, if true dump full combinatorial actuator list
-    extern bool OutputEMSActuatorAvailSmall; // how much to write out to EDD file, if true dump actuator list without key names
-    extern bool OutputEMSInternalVarsFull;   // how much to write out to EDD file, if true dump full combinatorial internal list
-    extern bool OutputEMSInternalVarsSmall;  // how much to write out to EDD file, if true dump internal list without key names
-
-    extern Array2D_bool EMSConstructActuatorChecked;
-    extern Array2D_bool EMSConstructActuatorIsOkay;
+    int constexpr MaxWhileLoopIterations(1000000); // protect from infinite loop in WHILE loops
 
     // Types
 
@@ -506,22 +458,6 @@ namespace DataRuntimeLanguage {
         }
     };
 
-    // Object Data
-    extern Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
-    extern Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
-    extern Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    extern Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    extern Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
-    extern Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
-    extern Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
-    extern Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
-    extern Array1D<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
-    extern Array1D<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
-    extern Array1D<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    extern ErlValueType Null;                                           // special "null" Erl variable value instance
-    extern ErlValueType False;                                          // special "false" Erl variable value instance
-    extern ErlValueType True;                                           // special "True" Erl variable value instance, gets reset
-
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
     struct EMSActuatorKey_hash
@@ -541,11 +477,6 @@ namespace DataRuntimeLanguage {
             return seed;
         }
     };
-    extern std::unordered_set<std::tuple<std::string, std::string, std::string>, EMSActuatorKey_hash>
-        EMSActuator_lookup; // Fast duplicate lookup structure
-
-    // Functions
-    void clear_state();
 
     void ValidateEMSVariableName(EnergyPlusData &state,
                                  std::string const &cModuleObject, // the current object name
@@ -565,6 +496,127 @@ namespace DataRuntimeLanguage {
     );
 
 } // namespace DataRuntimeLanguage
+
+struct RuntimeLanguageData : BaseGlobalStruct {
+
+    int NumProgramCallManagers = 0;                 // count of Erl program managers with calling points
+    int NumSensors = 0;                             // count of EMS sensors used in model (data from output variables)
+    int numActuatorsUsed = 0;                       // count of EMS actuators used in model
+    int numEMSActuatorsAvailable = 0;               // count of EMS actuators available for use in such a model
+    int maxEMSActuatorsAvailable = 0;               // count of EMS current maximum actuators available for use in such a model
+    int NumInternalVariablesUsed = 0;               // count of EMS internal variables used in model
+    int numEMSInternalVarsAvailable = 0;            // count of EMS internal variables available for use in such a model
+    int maxEMSInternalVarsAvailable = 0;            // count of EMS current maximum internal variables available for use in such a model
+    int varsAvailableAllocInc = 1000;               // allocation increment for variable arrays
+    int NumErlPrograms = 0;                         // count of Erl programs in model
+    int NumErlSubroutines = 0;                      // count of Erl subroutines in model
+    int NumUserGlobalVariables = 0;                 // count of global EMS variables defined by user
+    int NumErlVariables = 0;                        // count of Erl variables
+    int NumErlStacks = 0;                           // count of Erl program stacks in model. sum of programs and subroutines
+    int NumExpressions = 0;                         // count of Erl expressions
+    int NumEMSOutputVariables = 0;                  // count of EMS output variables, custom output variables from Erl
+    int NumEMSMeteredOutputVariables = 0;           // count of EMS metered output variables, custom meters from Erl
+    int NumErlTrendVariables = 0;                   // count of EMS trend variables in model
+    int NumEMSCurveIndices = 0;                     // count of EMS curve index variables in model
+    int NumEMSConstructionIndices = 0;              // count of EMS construction index variables in model
+
+    //######################################################################################################################################
+    // code for ExternalInterface
+    int NumExternalInterfaceGlobalVariables = 0;                           // count of ExternalInterface runtime variable
+    int NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0; // count of ExternalInterface runtime variable for FMUImport
+    // will be updated with values from ExternalInterface
+    int NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0; // count of ExternalInterface runtime variable for FMUExport
+    // will be updated with values from ExternalInterface
+    int NumExternalInterfaceActuatorsUsed = 0;                           // count of ExternalInterface Actuators
+    int NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUImport
+    int NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0; // count of ExternalInterface Actuators for FMUExport
+
+    //######################################################################################################################################
+
+    bool OutputEDDFile = false;                     // set to true if user requests EDD output file be written
+    bool OutputFullEMSTrace = false;                // how much to write out to trace, if true do verbose for each line
+    bool OutputEMSErrors = false;                   // how much to write out to trace, if true include Erl error messages
+    bool OutputEMSActuatorAvailFull = false;        // how much to write out to EDD file, if true dump full combinatorial actuator list
+    bool OutputEMSActuatorAvailSmall = false;       // how much to write out to EDD file, if true dump actuator list without key names
+    bool OutputEMSInternalVarsFull = false;         // how much to write out to EDD file, if true dump full combinatorial internal list
+    bool OutputEMSInternalVarsSmall = false;        // how much to write out to EDD file, if true dump internal list without key names
+
+    Array2D_bool EMSConstructActuatorChecked;
+    Array2D_bool EMSConstructActuatorIsOkay;
+
+    // Object Data
+    Array1D<DataRuntimeLanguage::ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
+    Array1D<DataRuntimeLanguage::ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
+    Array1D<DataRuntimeLanguage::ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
+    Array1D<DataRuntimeLanguage::OperatorType> PossibleOperators;                     // hard library of available operators and functions
+    Array1D<DataRuntimeLanguage::TrendVariableType> TrendVariable;                    // holds Erl trend variables in a structure array
+    Array1D<DataRuntimeLanguage::OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
+    Array1D<DataRuntimeLanguage::EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
+    Array1D<DataRuntimeLanguage::ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
+    Array1D<DataRuntimeLanguage::InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
+    Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
+    Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
+    DataRuntimeLanguage::ErlValueType Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);    // special "false" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);     // special "True" Erl variable value instance, gets reset
+
+    // EMS Actuator fast duplicate check lookup support
+    std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash> EMSActuator_lookup; // Fast duplicate lookup structure
+
+    void clear_state() override
+    {
+        this->NumProgramCallManagers = 0;
+        this->NumSensors = 0;
+        this->numActuatorsUsed = 0;
+        this->numEMSActuatorsAvailable = 0;
+        this->maxEMSActuatorsAvailable = 0;
+        this->NumInternalVariablesUsed = 0;
+        this->numEMSInternalVarsAvailable = 0;
+        this->maxEMSInternalVarsAvailable = 0;
+        this->varsAvailableAllocInc = 1000;
+        this->NumErlPrograms = 0;
+        this->NumErlSubroutines = 0;
+        this->NumUserGlobalVariables = 0;
+        this->NumErlVariables = 0;
+        this->NumErlStacks = 0;
+        this->NumExpressions = 0;
+        this->NumEMSOutputVariables = 0;
+        this->NumEMSMeteredOutputVariables = 0;
+        this->NumErlTrendVariables = 0;
+        this->NumEMSCurveIndices = 0;
+        this->NumEMSConstructionIndices = 0;
+        this->NumExternalInterfaceGlobalVariables = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables = 0;
+        this->NumExternalInterfaceActuatorsUsed = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
+        this->NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
+        this->OutputEDDFile = false;
+        this->OutputFullEMSTrace = false;
+        this->OutputEMSErrors = false;
+        this->OutputEMSActuatorAvailFull = false;
+        this->OutputEMSActuatorAvailSmall = false;
+        this->OutputEMSInternalVarsFull = false;
+        this->OutputEMSInternalVarsSmall = false;
+        this->EMSConstructActuatorChecked.deallocate();
+        this->EMSConstructActuatorIsOkay.deallocate();
+        this->ErlVariable.deallocate();
+        this->ErlStack.deallocate();
+        this->ErlExpression.deallocate();
+        this->PossibleOperators.deallocate();
+        this->TrendVariable.deallocate();
+        this->Sensor.deallocate();
+        this->EMSActuatorAvailable.deallocate();
+        this->EMSActuatorUsed.deallocate();
+        this->EMSInternalVarsAvailable.deallocate();
+        this->EMSInternalVarsUsed.deallocate();
+        this->EMSProgramCallManager.deallocate();
+        this->EMSActuator_lookup.clear();
+        this->Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+    }
+};
 
 } // namespace EnergyPlus
 

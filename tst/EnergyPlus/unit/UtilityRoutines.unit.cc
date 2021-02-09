@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,14 +54,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -84,47 +83,47 @@ TEST_F(EnergyPlusFixture, RecurringWarningTest)
     int ErrIndex1 = 0;
     ShowRecurringWarningErrorAtEnd(*state, myMessage1, ErrIndex1);
     EXPECT_EQ(ErrIndex1, 1);
-    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 1u);
-    EXPECT_EQ(" ** Warning ** " + myMessage1, DataErrorTracking::RecurringErrors(1).Message);
-    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(1).Count);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 1u);
+    EXPECT_EQ(" ** Warning ** " + myMessage1, state->dataErrTracking->RecurringErrors(1).Message);
+    EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(1).Count);
 
     std::string myMessage2 = "Test message 2";
     // improper call to ShowRecurringWarningErrorAtEnd to set up new recurring warning
     int ErrIndex2 = 6;
     ShowRecurringWarningErrorAtEnd(*state, myMessage2, ErrIndex2);
     EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
-    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 2u);
-    EXPECT_EQ(" ** Warning ** " + myMessage2, DataErrorTracking::RecurringErrors(2).Message);
-    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(2).Count);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 2u);
+    EXPECT_EQ(" ** Warning ** " + myMessage2, state->dataErrTracking->RecurringErrors(2).Message);
+    EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(2).Count);
 
     ErrIndex2 = 6;
     ShowRecurringWarningErrorAtEnd(*state, myMessage2, ErrIndex2);
     EXPECT_EQ(ErrIndex2, 2); // ShowRecurringWarningErrorAtEnd handles improper index and returns correct value
-    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 2u);
-    EXPECT_EQ(" ** Warning ** " + myMessage2, DataErrorTracking::RecurringErrors(2).Message);
-    EXPECT_EQ(2, DataErrorTracking::RecurringErrors(2).Count);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 2u);
+    EXPECT_EQ(" ** Warning ** " + myMessage2, state->dataErrTracking->RecurringErrors(2).Message);
+    EXPECT_EQ(2, state->dataErrTracking->RecurringErrors(2).Count);
 
     std::string myMessage3 = "Test message 3";
     ShowRecurringContinueErrorAtEnd(*state, myMessage3, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 3);
-    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 3u);
-    EXPECT_EQ(" **   ~~~   ** " + myMessage3, DataErrorTracking::RecurringErrors(3).Message);
-    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(3).Count);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 3u);
+    EXPECT_EQ(" **   ~~~   ** " + myMessage3, state->dataErrTracking->RecurringErrors(3).Message);
+    EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(3).Count);
 
     std::string myMessage4 = "Test message 4";
     ShowRecurringSevereErrorAtEnd(*state, myMessage4, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 4);
-    EXPECT_EQ(DataErrorTracking::RecurringErrors.size(), 4u);
-    EXPECT_EQ(" ** Severe  ** " + myMessage4, DataErrorTracking::RecurringErrors(4).Message);
-    EXPECT_EQ(1, DataErrorTracking::RecurringErrors(4).Count);
+    EXPECT_EQ(state->dataErrTracking->RecurringErrors.size(), 4u);
+    EXPECT_EQ(" ** Severe  ** " + myMessage4, state->dataErrTracking->RecurringErrors(4).Message);
+    EXPECT_EQ(1, state->dataErrTracking->RecurringErrors(4).Count);
 
     // same message for different show message type (changed severe to warning) should be valid
     ShowRecurringWarningErrorAtEnd(*state, myMessage4, ErrIndex1);
     // index gets updated with correct value
     EXPECT_EQ(ErrIndex1, 5);
-    EXPECT_EQ(" ** Warning ** " + myMessage4, DataErrorTracking::RecurringErrors(5).Message);
+    EXPECT_EQ(" ** Warning ** " + myMessage4, state->dataErrTracking->RecurringErrors(5).Message);
 }
 
 TEST_F(EnergyPlusFixture, DisplayMessageTest)

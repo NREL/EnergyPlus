@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,16 +57,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-// TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
@@ -1050,7 +1048,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1062,11 +1060,11 @@ namespace General {
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
-        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
+        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
             InterpBlind = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpBlind = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpBlind;
@@ -1099,18 +1097,18 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaAngRad(DataGlobalConstants::Pi() / 36.0); // Profile angle increment (rad)
+        Real64 const DeltaAngRad(DataGlobalConstants::Pi / 36.0); // Profile angle increment (rad)
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IAlpha;       // Profile angle index
 
         // DeltaAng = Pi/36
-        if (ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
+        if (ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
             InterpProfAng = 0.0;
         } else {
-            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2()) / DeltaAngRad);
-            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2() + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
+            IAlpha = 1 + int((ProfAng + DataGlobalConstants::PiOvr2) / DeltaAngRad);
+            InterpFac = (ProfAng - (-DataGlobalConstants::PiOvr2 + DeltaAngRad * (IAlpha - 1))) / DeltaAngRad;
             InterpProfAng = (1.0 - InterpFac) * PropArray(IAlpha) + InterpFac * PropArray(IAlpha + 1);
         }
         return InterpProfAng;
@@ -1211,19 +1209,19 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Real64 const DeltaAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
-        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi());
+        static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 InterpFac; // Interpolation factor
         int IBeta;        // Slat angle index
         Real64 SlatAng1;
 
-        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0) {
+        if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
             //  InterpSlatAng = 0.0
             //  RETURN
             // END IF
-            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
         } else {
             SlatAng1 = SlatAng;
         }
@@ -1274,8 +1272,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const DeltaProfAng(DataGlobalConstants::Pi() / 36.0);
-        Real64 const DeltaSlatAng(DataGlobalConstants::Pi() / (double(MaxSlatAngs) - 1.0));
+        Real64 const DeltaProfAng(DataGlobalConstants::Pi / 36.0);
+        Real64 const DeltaSlatAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 ProfAngRatio; // Profile angle interpolation factor
@@ -1291,21 +1289,21 @@ namespace General {
         Real64 SlatAng1;
         Real64 ProfAng1;
 
-        if (SlatAng > DataGlobalConstants::Pi() || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2() || ProfAng < -DataGlobalConstants::PiOvr2()) {
+        if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0 || ProfAng > DataGlobalConstants::PiOvr2 || ProfAng < -DataGlobalConstants::PiOvr2) {
             //  InterpProfSlatAng = 0.0
             //  RETURN
-            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi());
+            SlatAng1 = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
 
             // This is not correct, fixed 2/17/2010
             // ProfAng1 = MIN(MAX(SlatAng,-PiOvr2),PiOvr2)
-            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2()), DataGlobalConstants::PiOvr2());
+            ProfAng1 = min(max(ProfAng, -DataGlobalConstants::PiOvr2), DataGlobalConstants::PiOvr2);
         } else {
             SlatAng1 = SlatAng;
             ProfAng1 = ProfAng;
         }
 
-        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2()) / DeltaProfAng) + 1;
-        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2() - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
+        IAlpha = int((ProfAng1 + DataGlobalConstants::PiOvr2) / DeltaProfAng) + 1;
+        ProfAngRatio = (ProfAng1 + DataGlobalConstants::PiOvr2 - (IAlpha - 1) * DeltaProfAng) / DeltaProfAng;
 
         if (VarSlats) { // Variable-angle slats: interpolate in profile angle and slat angle
             IBeta = int(SlatAng1 / DeltaSlatAng) + 1;
@@ -1380,7 +1378,7 @@ namespace General {
             fEdge = 0.0;
             fEdge1 = 0.0;
             if (std::abs(std::sin(gamma)) > 0.01) {
-                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2() && ProfAng <= SlatAng) || (SlatAng > DataGlobalConstants::PiOvr2() && SlatAng <= DataGlobalConstants::Pi() && ProfAng > -(DataGlobalConstants::Pi() - SlatAng)))
+                if ((SlatAng > 0.0 && SlatAng <= DataGlobalConstants::PiOvr2 && ProfAng <= SlatAng) || (SlatAng > DataGlobalConstants::PiOvr2 && SlatAng <= DataGlobalConstants::Pi && ProfAng > -(DataGlobalConstants::Pi - SlatAng)))
                     fEdge1 =
                         SlatThickness * std::abs(std::sin(gamma)) / ((SlatSeparation + SlatThickness / std::abs(std::sin(SlatAng))) * CosProfAng);
                 fEdge = min(1.0, std::abs(fEdge1));
@@ -2532,7 +2530,7 @@ namespace General {
 
         Real64 DY; // Linear fit result
 
-        // FLOW:
+
 
         // Check for convergence by comparing change in X
         if (Iter != 1) {
@@ -2880,7 +2878,7 @@ namespace General {
         // Maybe later TimeStepZone, TimeStepSys and SysTimeElapsed could also be specified
         // as real.
         CurrentHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed + TimeStepSys;
-        GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour();
+        GetCurrentHVACTime = CurrentHVACTime * DataGlobalConstants::SecInHour;
 
         return GetCurrentHVACTime;
     }
@@ -2927,7 +2925,7 @@ namespace General {
         // This is the correct formula that does not use MinutesPerSystemTimeStep, which would
         // erronously truncate all sub-minute system time steps down to the closest full minute.
         PreviousHVACTime = (state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone) + SysTimeElapsed;
-        GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour();
+        GetPreviousHVACTime = PreviousHVACTime * DataGlobalConstants::SecInHour;
 
         return GetPreviousHVACTime;
     }
@@ -3169,12 +3167,6 @@ namespace General {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataRuntimeLanguage::OutputEMSActuatorAvailFull;
-        using DataRuntimeLanguage::OutputEMSActuatorAvailSmall;
-        using DataRuntimeLanguage::OutputEMSErrors;
-        using DataRuntimeLanguage::OutputEMSInternalVarsFull;
-        using DataRuntimeLanguage::OutputEMSInternalVarsSmall;
-        using DataRuntimeLanguage::OutputFullEMSTrace;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumReports;
@@ -3378,25 +3370,25 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(1));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                        OutputEMSActuatorAvailSmall = true;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = true;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = true;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = true;
 
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(1) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSActuatorAvailSmall = false;
-                        OutputEMSActuatorAvailFull = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailSmall = false;
+                        state.dataRuntimeLang->OutputEMSActuatorAvailFull = false;
                     }
                 }
 
@@ -3404,24 +3396,24 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "NOTBYUNIQUEKEYNAMES") {
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = true;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = true;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputEMSInternalVarsFull = true;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = true;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(2) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"NotByUniqueKeyNames\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSInternalVarsFull = false;
-                        OutputEMSInternalVarsSmall = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsFull = false;
+                        state.dataRuntimeLang->OutputEMSInternalVarsSmall = false;
                     }
                 }
 
@@ -3429,24 +3421,24 @@ namespace General {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "NONE") {
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else if (SELECT_CASE_var == "ERRORSONLY") {
-                        OutputEMSErrors = true;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = true;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else if (SELECT_CASE_var == "VERBOSE") {
-                        OutputFullEMSTrace = true;
-                        OutputEMSErrors = true;
+                        state.dataRuntimeLang->OutputFullEMSTrace = true;
+                        state.dataRuntimeLang->OutputEMSErrors = true;
                     } else if (SELECT_CASE_var == "") {
                         ShowWarningError(state, cCurrentModuleObject + ": Blank " + cAlphaFieldNames(3) + " supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     } else {
                         ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(1) + "\" supplied.");
                         ShowContinueError(state, " Legal values are: \"None\", \"ErrorsOnly\", \"Verbose\". \"None\" will be used.");
-                        OutputEMSErrors = false;
-                        OutputFullEMSTrace = false;
+                        state.dataRuntimeLang->OutputEMSErrors = false;
+                        state.dataRuntimeLang->OutputFullEMSTrace = false;
                     }
                 }
             }
@@ -3562,17 +3554,17 @@ namespace General {
         std::string::size_type const ItemLength = len(ZoneName) + ItemNameLength;
         ResultName = ZoneName + ' ' + ItemName;
         bool TooLong = false;
-        if (ItemLength > DataGlobalConstants::MaxNameLength()) {
+        if (ItemLength > DataGlobalConstants::MaxNameLength) {
             ShowWarningError(state, calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long.");
             ShowContinueError(state, "Object Name=\"" + ItemName + "\".");
             ShowContinueError(state, "ZoneList/Zone Name=\"" + ZoneName + "\".");
             ShowContinueError(state,
                               format("Item length=[{}] > Maximum Length=[{}]. You may need to shorten the names.",
                                      ItemLength,
-                                     DataGlobalConstants::MaxNameLength()));
+                                     DataGlobalConstants::MaxNameLength));
             ShowContinueError(state,
                               format("Shortening the Object Name by [{}] characters will assure uniqueness for this ZoneList.",
-                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength()));
+                                     MaxZoneNameLength + 1 + ItemNameLength - DataGlobalConstants::MaxNameLength));
             ShowContinueError(state, "name that will be used (may be needed in reporting)=\"" + ResultName + "\".");
             TooLong = true;
         }

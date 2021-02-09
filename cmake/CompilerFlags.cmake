@@ -22,6 +22,7 @@ endif()
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # COMPILER FLAGS
+    ADD_COMPILE_OPTIONS("/bigobj")
     ADD_COMPILE_OPTIONS("/nologo")
     ADD_COMPILE_OPTIONS("/EHsc")
     ADD_COMPILE_OPTIONS("/MP") # Enables multi-processor compilation of source within a single project

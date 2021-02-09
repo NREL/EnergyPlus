@@ -468,6 +468,10 @@
 
   Output:Variable,*,Generator PV Cell Temperature,Timestep;
 
+  Output:Variable,*,Plane of Array Irradiance,Timestep;
+
+  Output:Variable,*,Shaded Percent,Timestep;
+
   Output:Variable,*,Electric Load Center Produced Electricity Rate,Timestep;
 
   Output:Variable,*,Electric Load Center Produced Electricity Energy,Timestep;
