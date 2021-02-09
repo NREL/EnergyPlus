@@ -2666,6 +2666,7 @@ namespace EnergyPlus::ScheduleManager {
         // Use internal Schedule data structure to return value.  Note that missing values in
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
+
         if (ScheduleIndex == -1) {
             return 1.0;
         } else if (ScheduleIndex == 0) {
@@ -3277,8 +3278,8 @@ namespace EnergyPlus::ScheduleManager {
         // those day types (can be multiple) from field.
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
-        EP_SIZE_CHECK(AlReady, MaxDayTypes);
+//        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
+//        EP_SIZE_CHECK(AlReady, MaxDayTypes);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DayT;
