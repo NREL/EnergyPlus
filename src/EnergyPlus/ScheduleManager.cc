@@ -778,9 +778,9 @@ namespace EnergyPlus::ScheduleManager {
         //!  Most initializations in the schedule data structures are taken care of in
         //!  the definitions (see above)
 
-        state.dataScheduleMgr->ScheduleType.allocate({0, state.dataScheduleMgr->NumScheduleTypes});
+        state.dataScheduleMgr->ScheduleType.allocate({0, 0});
+        state.dataScheduleMgr->DaySchedule.allocate({0, 0});
 
-        state.dataScheduleMgr->DaySchedule.allocate({0, state.dataScheduleMgr->NumDaySchedules});
         state.dataScheduleMgr->UniqueDayScheduleNames.reserve(static_cast<unsigned>(state.dataScheduleMgr->NumDaySchedules));
         //    Initialize
         for (LoopIndex = 0; LoopIndex <= state.dataScheduleMgr->NumDaySchedules; ++LoopIndex) {
