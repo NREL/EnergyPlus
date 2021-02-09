@@ -675,7 +675,7 @@ namespace OutputReportTabularAnnual {
         Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
 
         // Compute the columns related to the binning schemes
-        computeBinColumns(state);
+        computeBinColumns(state, unitsStyle);
 
         // Use title case names of variables if available for column headers
         columnHeadersToTitleCase(state);
@@ -1189,7 +1189,7 @@ namespace OutputReportTabularAnnual {
                      << "</a>    |   \n";
     }
 
-    void AnnualTable::computeBinColumns(EnergyPlusData &state)
+    void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const& unitsStyle_para)
     {
         std::vector<AnnualFieldSet>::iterator fldStIt;
         Real64 const veryLarge = 1.0E280;
@@ -1205,7 +1205,7 @@ namespace OutputReportTabularAnnual {
                 curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev) {
                 // the size the deferred vectors should be same for all rows
                 if (allRowsSameSizeDefferedVectors(fldStIt)) {
-                    convertUnitForDeferredResults(state, fldStIt, state.dataOutRptTab->unitsStyle);
+                    convertUnitForDeferredResults(state, fldStIt, unitsStyle_para);
                     std::vector<Real64> deferredTotalForColumn;
                     Real64 minVal = veryLarge;
                     Real64 maxVal = verySmall;
