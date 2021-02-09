@@ -797,7 +797,7 @@ namespace HVACDXSystem {
         static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
-        // FLOW:
+
 
         if (MyOneTimeFlag) {
 

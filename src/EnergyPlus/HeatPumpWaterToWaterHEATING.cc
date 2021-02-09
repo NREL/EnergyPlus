@@ -324,13 +324,11 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).HighPressCutoff = NumArray(16);
             if (NumArray(16) == 0.0) {
                 state.dataHPWaterToWaterHtg->GSHP(GSHPNum).HighPressCutoff = 500000000.0;
-                // CALL ShowWarningError(ModuleCompName//': High Pressure Cut Off= 0.0 Heat Pump'//TRIM(AlphArray(1)))
             }
 
             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LowPressCutoff = NumArray(17);
             if (NumArray(17) == 0.0) {
                 state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LowPressCutoff = 0.0;
-                // CALL ShowWarningError(ModuleCompName//': Low Pressure Cut Off= 0.0 Heat Pump'//TRIM(AlphArray(1)))
             }
 
             state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(state,
