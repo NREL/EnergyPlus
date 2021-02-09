@@ -86,135 +86,133 @@ namespace DataHeatBalance {
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
 
-    extern int const RegularMaterial;
-    extern int const Air;
-    extern int const Shade;
-    extern int const WindowGlass;
-    extern int const WindowGas;
-    extern int const WindowBlind;
-    extern int const WindowGasMixture;
-    extern int const Screen;
-    extern int const EcoRoof;
-    extern int const IRTMaterial;
-    extern int const WindowSimpleGlazing;
-    extern int const ComplexWindowShade;
-    extern int const ComplexWindowGap;
+    constexpr int RegularMaterial(0);
+    constexpr int Air(1);
+    constexpr int Shade(2);
+    constexpr int WindowGlass(3);
+    constexpr int WindowGas(4);
+    constexpr int WindowBlind(5);
+    constexpr int WindowGasMixture(6);
+    constexpr int Screen(7);
+    constexpr int EcoRoof(8);
+    constexpr int IRTMaterial(9);
+    constexpr int WindowSimpleGlazing(10);
+    constexpr int ComplexWindowShade(11);
+    constexpr int ComplexWindowGap(12);
 
-    extern int const GlassEquivalentLayer;
-    extern int const ShadeEquivalentLayer;
-    extern int const DrapeEquivalentLayer;
-    extern int const BlindEquivalentLayer;
-    extern int const ScreenEquivalentLayer;
-    extern int const GapEquivalentLayer;
+    constexpr int GlassEquivalentLayer(13);
+    constexpr int ShadeEquivalentLayer(14);
+    constexpr int DrapeEquivalentLayer(15);
+    constexpr int BlindEquivalentLayer(16);
+    constexpr int ScreenEquivalentLayer(17);
+    constexpr int GapEquivalentLayer(18);
 
     extern Array1D_string const cMaterialGroupType;
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type (see below):
 
-    extern int const VeryRough;
-    extern int const Rough;
-    extern int const MediumRough;
-    extern int const MediumSmooth;
-    extern int const Smooth;
-    extern int const VerySmooth;
+    constexpr int VeryRough(1);
+    constexpr int Rough(2);
+    constexpr int MediumRough(3);
+    constexpr int MediumSmooth(4);
+    constexpr int Smooth(5);
+    constexpr int VerySmooth(6);
 
     // Parameters to indicate blind orientation for use with the Material
     // derived type (see below):
 
-    extern int const Horizontal;
-    extern int const Vertical;
-    extern int const FixedSlats;
-    extern int const VariableSlats;
+    constexpr int Horizontal(1);
+    constexpr int Vertical(2);
+    constexpr int FixedSlats(1);
+    constexpr int VariableSlats(2);
+
     // Parameters for Interior and Exterior Solar Distribution
 
-    extern int const MinimalShadowing;             // all incoming solar hits floor, no exterior shadowing except reveals
-    extern int const FullExterior;                 // all incoming solar hits floor, full exterior shadowing
-    extern int const FullInteriorExterior;         // full interior solar distribution, full exterior solar shadowing
-    extern int const FullExteriorWithRefl;         // all incoming solar hits floor, full exterior shadowing and reflections
-    extern int const FullInteriorExteriorWithRefl; // full interior solar distribution,
+    constexpr int MinimalShadowing(-1);            // all incoming solar hits floor, no exterior shadowing except reveals
+    constexpr int FullExterior(0);                 // all incoming solar hits floor, full exterior shadowing
+    constexpr int FullInteriorExterior(1);         // full interior solar distribution, full exterior solar shadowing
+    constexpr int FullExteriorWithRefl(2);         // all incoming solar hits floor, full exterior shadowing and reflections
+    constexpr int FullInteriorExteriorWithRefl(3); // full interior solar distribution,
     // full exterior shadowing and reflections
     // Parameters to indicate the zone type for use with the Zone derived
     // type (see below--Zone%OfType):
 
-    extern int const StandardZone;
-    // INTEGER, PARAMETER :: PlenumZone = 2
-    // INTEGER, PARAMETER :: SolarWallZone = 11  ! from old ZTYP, OSENV
-    // INTEGER, PARAMETER :: RoofPondZone = 12   ! from old ZTYP, OSENV
+    constexpr int StandardZone(1);
 
     // Parameters to indicate the convection correlation being used for use with
     // InsideConvectionAlgo and OutsideConvectionAlgo
 
-    extern int const ASHRAESimple;
-    extern int const ASHRAETARP;
-    extern int const CeilingDiffuser; // Only valid for inside use
-    extern int const TrombeWall;      // Only valid for inside use
-    extern int const TarpHcOutside;   // Only valid for outside use
-    extern int const MoWiTTHcOutside; // Only valid for outside use
-    extern int const DOE2HcOutside;   // Only valid for outside use
-    extern int const BLASTHcOutside;  // Only valid for outside use
-    extern int const AdaptiveConvectionAlgorithm;
+    constexpr int ASHRAESimple(1);
+    constexpr int ASHRAETARP(2);
+    constexpr int CeilingDiffuser(3); // Only valid for inside use
+    constexpr int TrombeWall(4);      // Only valid for inside use
+    constexpr int TarpHcOutside(5);   // Only valid for outside use
+    constexpr int MoWiTTHcOutside(6); // Only valid for outside use
+    constexpr int DOE2HcOutside(7);   // Only valid for outside use
+    constexpr int BLASTHcOutside(8);  // Only valid for outside use
+    constexpr int AdaptiveConvectionAlgorithm(9);
 
     // Parameters for WarmupDays
-    extern int const DefaultMaxNumberOfWarmupDays; // Default maximum number of warmup days allowed
-    extern int const DefaultMinNumberOfWarmupDays; // Default minimum number of warmup days allowed
+    constexpr int DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
+    constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
-    extern int const Isotropic;
-    extern int const Anisotropic;
+    constexpr int Isotropic(0);
+    constexpr int Anisotropic(1);
 
     // Parameters for ZoneAirSolutionAlgo
-    extern int const Use3rdOrder;
-    extern int const UseAnalyticalSolution;
-    extern int const UseEulerMethod;
+    constexpr int Use3rdOrder(0);
+    constexpr int UseAnalyticalSolution(1);
+    constexpr int UseEulerMethod(2);
 
     // Parameter for MRT calculation type
-    extern int const ZoneAveraged;
-    extern int const SurfaceWeighted;
-    extern int const AngleFactor;
+    constexpr int ZoneAveraged(1);
+    constexpr int SurfaceWeighted(2);
+    constexpr int AngleFactor(3);
 
     // Parameters for Ventilation
-    extern int const NaturalVentilation;
-    extern int const IntakeVentilation;
-    extern int const ExhaustVentilation;
-    extern int const BalancedVentilation;
+    constexpr int NaturalVentilation(0);
+    constexpr int IntakeVentilation(1);
+    constexpr int ExhaustVentilation(2);
+    constexpr int BalancedVentilation(3);
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
-    extern int const HybridControlTypeIndiv;
-    extern int const HybridControlTypeClose;
-    extern int const HybridControlTypeGlobal;
+    constexpr int HybridControlTypeIndiv(0);
+    constexpr int HybridControlTypeClose(1);
+    constexpr int HybridControlTypeGlobal(2);
 
     // System type, detailed refrigeration or refrigerated case rack
-    extern int const RefrigSystemTypeDetailed;
-    extern int const RefrigSystemTypeRack;
+    constexpr int RefrigSystemTypeDetailed(1);
+    constexpr int RefrigSystemTypeRack(2);
 
     // Refrigeration condenser type
-    extern int const RefrigCondenserTypeAir;
-    extern int const RefrigCondenserTypeEvap;
-    extern int const RefrigCondenserTypeWater;
-    extern int const RefrigCondenserTypeCascade;
+    constexpr int RefrigCondenserTypeAir(1);
+    constexpr int RefrigCondenserTypeEvap(2);
+    constexpr int RefrigCondenserTypeWater(3);
+    constexpr int RefrigCondenserTypeCascade(4);
 
     // Parameters for type of infiltration model
-    extern int const InfiltrationDesignFlowRate;
-    extern int const InfiltrationShermanGrimsrud;
-    extern int const InfiltrationAIM2;
+    constexpr int InfiltrationDesignFlowRate(1);
+    constexpr int InfiltrationShermanGrimsrud(2);
+    constexpr int InfiltrationAIM2(3);
 
     // Parameters for type of ventilation model
-    extern int const VentilationDesignFlowRate;
-    extern int const VentilationWindAndStack;
+    constexpr int VentilationDesignFlowRate(1);
+    constexpr int VentilationWindAndStack(2);
 
     // Parameters for type of zone air balance model
-    extern int const AirBalanceNone;
-    extern int const AirBalanceQuadrature;
+    constexpr int AirBalanceNone(0);
+    constexpr int AirBalanceQuadrature(1);
 
     // Parameter for source zone air flow mass balance infiltration treatment
-    extern int const NoInfiltrationFlow;
-    extern int const AddInfiltrationFlow;
-    extern int const AdjustInfiltrationFlow;
-    extern int const MixingSourceZonesOnly;
-    extern int const AllZones;
+    constexpr int NoInfiltrationFlow(0);
+    constexpr int AddInfiltrationFlow(1);
+    constexpr int AdjustInfiltrationFlow(2);
+    constexpr int MixingSourceZonesOnly(1);
+    constexpr int AllZones(2);
 
-    extern int const NumZoneIntGainDeviceTypes;
+    constexpr int NumZoneIntGainDeviceTypes(53);
 
     extern Array1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
                                                         // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
@@ -223,80 +221,64 @@ namespace DataHeatBalance {
     extern Array1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
                                                           // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
                                                           // 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
-    extern int const IntGainTypeOf_People;
-    extern int const IntGainTypeOf_Lights;
-    extern int const IntGainTypeOf_ElectricEquipment;
-    extern int const IntGainTypeOf_GasEquipment;
-    extern int const IntGainTypeOf_HotWaterEquipment;
-    extern int const IntGainTypeOf_SteamEquipment;
-    extern int const IntGainTypeOf_OtherEquipment;
-    extern int const IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled;
-    extern int const IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide;
-    extern int const IntGainTypeOf_WaterUseEquipment;
-    extern int const IntGainTypeOf_DaylightingDeviceTubular;
-    extern int const IntGainTypeOf_WaterHeaterMixed;
-    extern int const IntGainTypeOf_WaterHeaterStratified;
-    extern int const IntGainTypeOf_ThermalStorageChilledWaterMixed;
-    extern int const IntGainTypeOf_ThermalStorageChilledWaterStratified;
-    extern int const IntGainTypeOf_GeneratorFuelCell;
-    extern int const IntGainTypeOf_GeneratorMicroCHP;
-    extern int const IntGainTypeOf_ElectricLoadCenterTransformer;
-    extern int const IntGainTypeOf_ElectricLoadCenterInverterSimple;
-    extern int const IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower;
-    extern int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable;
-    extern int const IntGainTypeOf_ElectricLoadCenterStorageBattery;
-    extern int const IntGainTypeOf_ElectricLoadCenterStorageSimple;
-    extern int const IntGainTypeOf_ElectricLoadCenterConverter;
-    extern int const IntGainTypeOf_PipeIndoor;
-    extern int const IntGainTypeOf_RefrigerationCase;
-    extern int const IntGainTypeOf_RefrigerationCompressorRack;
-    extern int const IntGainTypeOf_RefrigerationSystemAirCooledCondenser;
-    extern int const IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler;
-    extern int const IntGainTypeOf_RefrigerationSystemSuctionPipe;
-    extern int const IntGainTypeOf_RefrigerationTransSysSuctionPipeMT;
-    extern int const IntGainTypeOf_RefrigerationTransSysSuctionPipeLT;
-    extern int const IntGainTypeOf_RefrigerationSecondaryReceiver;
-    extern int const IntGainTypeOf_RefrigerationSecondaryPipe;
-    extern int const IntGainTypeOf_RefrigerationWalkIn;
-    extern int const IntGainTypeOf_Pump_VarSpeed;
-    extern int const IntGainTypeOf_Pump_ConSpeed;
-    extern int const IntGainTypeOf_Pump_Cond;
-    extern int const IntGainTypeOf_PumpBank_VarSpeed;
-    extern int const IntGainTypeOf_PumpBank_ConSpeed;
-    extern int const IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam;
-    extern int const IntGainTypeOf_PlantComponentUserDefined;
-    extern int const IntGainTypeOf_CoilUserDefined;
-    extern int const IntGainTypeOf_ZoneHVACForcedAirUserDefined;
-    extern int const IntGainTypeOf_AirTerminalUserDefined;
-    extern int const IntGainTypeOf_PackagedTESCoilTank;
-    extern int const IntGainTypeOf_ElectricEquipmentITEAirCooled;
-    extern int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed;
-    extern int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
-    extern int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
-    extern int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed;
-    extern int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
-    extern int const IntGainTypeOf_FanSystemModel;
+
+    constexpr int IntGainTypeOf_People(1);
+    constexpr int IntGainTypeOf_Lights(2);
+    constexpr int IntGainTypeOf_ElectricEquipment(3);
+    constexpr int IntGainTypeOf_GasEquipment(4);
+    constexpr int IntGainTypeOf_HotWaterEquipment(5);
+    constexpr int IntGainTypeOf_SteamEquipment(6);
+    constexpr int IntGainTypeOf_OtherEquipment(7);
+    constexpr int IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled(8);
+    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide(9);
+    constexpr int IntGainTypeOf_WaterUseEquipment(10);
+    constexpr int IntGainTypeOf_DaylightingDeviceTubular(11);
+    constexpr int IntGainTypeOf_WaterHeaterMixed(12);
+    constexpr int IntGainTypeOf_WaterHeaterStratified(13);
+    constexpr int IntGainTypeOf_ThermalStorageChilledWaterMixed(14);
+    constexpr int IntGainTypeOf_ThermalStorageChilledWaterStratified(15);
+    constexpr int IntGainTypeOf_GeneratorFuelCell(16);
+    constexpr int IntGainTypeOf_GeneratorMicroCHP(17);
+    constexpr int IntGainTypeOf_ElectricLoadCenterTransformer(18);
+    constexpr int IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
+    constexpr int IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
+    constexpr int IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
+    constexpr int IntGainTypeOf_ElectricLoadCenterStorageBattery(22);
+    constexpr int IntGainTypeOf_ElectricLoadCenterStorageSimple(23);
+    constexpr int IntGainTypeOf_PipeIndoor(24);
+    constexpr int IntGainTypeOf_RefrigerationCase(25);
+    constexpr int IntGainTypeOf_RefrigerationCompressorRack(26);
+    constexpr int IntGainTypeOf_RefrigerationSystemAirCooledCondenser(27);
+    constexpr int IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(28);
+    constexpr int IntGainTypeOf_RefrigerationSystemSuctionPipe(29);
+    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(30);
+    constexpr int IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(31);
+    constexpr int IntGainTypeOf_RefrigerationSecondaryReceiver(32);
+    constexpr int IntGainTypeOf_RefrigerationSecondaryPipe(33);
+    constexpr int IntGainTypeOf_RefrigerationWalkIn(34);
+    constexpr int IntGainTypeOf_Pump_VarSpeed(35);
+    constexpr int IntGainTypeOf_Pump_ConSpeed(36);
+    constexpr int IntGainTypeOf_Pump_Cond(37);
+    constexpr int IntGainTypeOf_PumpBank_VarSpeed(38);
+    constexpr int IntGainTypeOf_PumpBank_ConSpeed(39);
+    constexpr int IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(40);
+    constexpr int IntGainTypeOf_PlantComponentUserDefined(41);
+    constexpr int IntGainTypeOf_CoilUserDefined(42);
+    constexpr int IntGainTypeOf_ZoneHVACForcedAirUserDefined(43);
+    constexpr int IntGainTypeOf_AirTerminalUserDefined(44);
+    constexpr int IntGainTypeOf_PackagedTESCoilTank(45);
+    constexpr int IntGainTypeOf_ElectricEquipmentITEAirCooled(46);
+    constexpr int IntGainTypeOf_SecCoolingDXCoilSingleSpeed(47);
+    constexpr int IntGainTypeOf_SecHeatingDXCoilSingleSpeed(48);
+    constexpr int IntGainTypeOf_SecCoolingDXCoilTwoSpeed(49);
+    constexpr int IntGainTypeOf_SecCoolingDXCoilMultiSpeed(50);
+    constexpr int IntGainTypeOf_SecHeatingDXCoilMultiSpeed(51);
+    constexpr int IntGainTypeOf_ElectricLoadCenterConverter(52);
+    constexpr int IntGainTypeOf_FanSystemModel(53);
 
     // Parameters for checking surface heat transfer models
-    extern Real64 const HighDiffusivityThreshold;   // used to check if Material properties are out of line.
-    extern Real64 const ThinMaterialLayerThreshold; // 3 mm lower limit to expected material layers
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // thermochromic windows
-
-    // For predefined tabular reporting
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // MODULE VARIABLE Type DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
+    constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
+    constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
     // SiteData aka building data
     extern Real64 LowHConvLimit; // Lowest allowed convection coefficient for detailed model

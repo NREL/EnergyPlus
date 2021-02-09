@@ -61,9 +61,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataHeatBalance {
+namespace EnergyPlus::DataHeatBalance {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
@@ -108,27 +106,6 @@ namespace DataHeatBalance {
 
     int MaxSolidWinLayers(0);                // Maximum number of solid layers in a window construction
 
-    int const RegularMaterial(0);
-    int const Air(1);
-    int const Shade(2);
-    int const WindowGlass(3);
-    int const WindowGas(4);
-    int const WindowBlind(5);
-    int const WindowGasMixture(6);
-    int const Screen(7);
-    int const EcoRoof(8);
-    int const IRTMaterial(9);
-    int const WindowSimpleGlazing(10);
-    int const ComplexWindowShade(11);
-    int const ComplexWindowGap(12);
-
-    int const GlassEquivalentLayer(13);
-    int const ShadeEquivalentLayer(14);
-    int const DrapeEquivalentLayer(15);
-    int const BlindEquivalentLayer(16);
-    int const ScreenEquivalentLayer(17);
-    int const GapEquivalentLayer(18);
-
     Array1D_string const cMaterialGroupType({-1, 18},
                                             {"invalid",
                                              "Material/Material:NoMass",
@@ -151,112 +128,6 @@ namespace DataHeatBalance {
                                              "WindowMaterial:Screen:EquivalentLayer",
                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-    // Parameters to indicate surface roughness for use with the Material
-    // derived type (see below):
-
-    int const VeryRough(1);
-    int const Rough(2);
-    int const MediumRough(3);
-    int const MediumSmooth(4);
-    int const Smooth(5);
-    int const VerySmooth(6);
-
-    // Parameters to indicate blind orientation for use with the Material
-    // derived type (see below):
-
-    int const Horizontal(1);
-    int const Vertical(2);
-    int const FixedSlats(1);
-    int const VariableSlats(2);
-    // Parameters for Interior and Exterior Solar Distribution
-
-    int const MinimalShadowing(-1);            // all incoming solar hits floor, no exterior shadowing except reveals
-    int const FullExterior(0);                 // all incoming solar hits floor, full exterior shadowing
-    int const FullInteriorExterior(1);         // full interior solar distribution, full exterior solar shadowing
-    int const FullExteriorWithRefl(2);         // all incoming solar hits floor, full exterior shadowing and reflections
-    int const FullInteriorExteriorWithRefl(3); // full interior solar distribution,
-    // full exterior shadowing and reflections
-    // Parameters to indicate the zone type for use with the Zone derived
-    // type (see below--Zone%OfType):
-
-    int const StandardZone(1);
-    // INTEGER, PARAMETER :: PlenumZone = 2
-    // INTEGER, PARAMETER :: SolarWallZone = 11  ! from old ZTYP, OSENV
-    // INTEGER, PARAMETER :: RoofPondZone = 12   ! from old ZTYP, OSENV
-
-    // Parameters to indicate the convection correlation being used for use with
-    // InsideConvectionAlgo and OutsideConvectionAlgo
-
-    int const ASHRAESimple(1);
-    int const ASHRAETARP(2);
-    int const CeilingDiffuser(3); // Only valid for inside use
-    int const TrombeWall(4);      // Only valid for inside use
-    int const TarpHcOutside(5);   // Only valid for outside use
-    int const MoWiTTHcOutside(6); // Only valid for outside use
-    int const DOE2HcOutside(7);   // Only valid for outside use
-    int const BLASTHcOutside(8);  // Only valid for outside use
-    int const AdaptiveConvectionAlgorithm(9);
-
-    // Parameters for WarmupDays
-    int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
-
-    // Parameters for Sky Radiance Distribution
-    int const Isotropic(0);
-    int const Anisotropic(1);
-
-    // Parameters for ZoneAirSolutionAlgo
-    int const Use3rdOrder(0);
-    int const UseAnalyticalSolution(1);
-    int const UseEulerMethod(2);
-
-    // Parameter for MRT calculation type
-    int const ZoneAveraged(1);
-    int const SurfaceWeighted(2);
-    int const AngleFactor(3);
-
-    // Parameters for Ventilation
-    int const NaturalVentilation(0);
-    int const IntakeVentilation(1);
-    int const ExhaustVentilation(2);
-    int const BalancedVentilation(3);
-
-    // Parameters for hybrid ventilation using Ventilation and Mixing objects
-    int const HybridControlTypeIndiv(0);
-    int const HybridControlTypeClose(1);
-    int const HybridControlTypeGlobal(2);
-
-    // System type, detailed refrigeration or refrigerated case rack
-    int const RefrigSystemTypeDetailed(1);
-    int const RefrigSystemTypeRack(2);
-
-    // Refrigeration condenser type
-    int const RefrigCondenserTypeAir(1);
-    int const RefrigCondenserTypeEvap(2);
-    int const RefrigCondenserTypeWater(3);
-    int const RefrigCondenserTypeCascade(4);
-
-    // Parameters for type of infiltration model
-    int const InfiltrationDesignFlowRate(1);
-    int const InfiltrationShermanGrimsrud(2);
-    int const InfiltrationAIM2(3);
-
-    // Parameters for type of ventilation model
-    int const VentilationDesignFlowRate(1);
-    int const VentilationWindAndStack(2);
-
-    // Parameters for type of zone air balance model
-    int const AirBalanceNone(0);
-    int const AirBalanceQuadrature(1);
-
-    // Parameter for source zone air flow mass balance infiltration treatment
-    int const NoInfiltrationFlow(0);
-    int const AddInfiltrationFlow(1);
-    int const AdjustInfiltrationFlow(2);
-    int const MixingSourceZonesOnly(1);
-    int const AllZones(2);
-
-    int const NumZoneIntGainDeviceTypes(53);
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -372,81 +243,6 @@ namespace DataHeatBalance {
                                                                         // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
-
-    int const IntGainTypeOf_People(1);
-    int const IntGainTypeOf_Lights(2);
-    int const IntGainTypeOf_ElectricEquipment(3);
-    int const IntGainTypeOf_GasEquipment(4);
-    int const IntGainTypeOf_HotWaterEquipment(5);
-    int const IntGainTypeOf_SteamEquipment(6);
-    int const IntGainTypeOf_OtherEquipment(7);
-    int const IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled(8);
-    int const IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide(9);
-    int const IntGainTypeOf_WaterUseEquipment(10);
-    int const IntGainTypeOf_DaylightingDeviceTubular(11);
-    int const IntGainTypeOf_WaterHeaterMixed(12);
-    int const IntGainTypeOf_WaterHeaterStratified(13);
-    int const IntGainTypeOf_ThermalStorageChilledWaterMixed(14);
-    int const IntGainTypeOf_ThermalStorageChilledWaterStratified(15);
-    int const IntGainTypeOf_GeneratorFuelCell(16);
-    int const IntGainTypeOf_GeneratorMicroCHP(17);
-    int const IntGainTypeOf_ElectricLoadCenterTransformer(18);
-    int const IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
-    int const IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
-    int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
-    int const IntGainTypeOf_ElectricLoadCenterStorageBattery(22);
-    int const IntGainTypeOf_ElectricLoadCenterStorageSimple(23);
-    int const IntGainTypeOf_PipeIndoor(24);
-    int const IntGainTypeOf_RefrigerationCase(25);
-    int const IntGainTypeOf_RefrigerationCompressorRack(26);
-    int const IntGainTypeOf_RefrigerationSystemAirCooledCondenser(27);
-    int const IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(28);
-    int const IntGainTypeOf_RefrigerationSystemSuctionPipe(29);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(30);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(31);
-    int const IntGainTypeOf_RefrigerationSecondaryReceiver(32);
-    int const IntGainTypeOf_RefrigerationSecondaryPipe(33);
-    int const IntGainTypeOf_RefrigerationWalkIn(34);
-    int const IntGainTypeOf_Pump_VarSpeed(35);
-    int const IntGainTypeOf_Pump_ConSpeed(36);
-    int const IntGainTypeOf_Pump_Cond(37);
-    int const IntGainTypeOf_PumpBank_VarSpeed(38);
-    int const IntGainTypeOf_PumpBank_ConSpeed(39);
-    int const IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(40);
-    int const IntGainTypeOf_PlantComponentUserDefined(41);
-    int const IntGainTypeOf_CoilUserDefined(42);
-    int const IntGainTypeOf_ZoneHVACForcedAirUserDefined(43);
-    int const IntGainTypeOf_AirTerminalUserDefined(44);
-    int const IntGainTypeOf_PackagedTESCoilTank(45);
-    int const IntGainTypeOf_ElectricEquipmentITEAirCooled(46);
-    int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed(47);
-    int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed(48);
-    int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed(49);
-    int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed(50);
-    int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed(51);
-    int const IntGainTypeOf_ElectricLoadCenterConverter(52);
-    int const IntGainTypeOf_FanSystemModel(53);
-
-    // Parameters for checking surface heat transfer models
-    Real64 const HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
-    Real64 const ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // thermochromic windows
-
-    // For predefined tabular reporting
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // MODULE VARIABLE Type DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     // SiteData aka building data
     Real64 LowHConvLimit(0.1); // Lowest allowed convection coefficient for detailed model
@@ -2409,7 +2205,5 @@ namespace DataHeatBalance {
             }
         }
     }
-
-} // namespace DataHeatBalance
 
 } // namespace EnergyPlus
