@@ -643,9 +643,15 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
     // Ideal loads air system found the plenum it is attached to
-    EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp); //
+
+    // Is this the best condition to check/test SupplyTemp and SupplyHumRat? It should be always equal to Zone Supply Node conditions, but is that a sufficient condition?
+    EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
     EXPECT_EQ(PurchAir(1).SupplyHumRat, Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
 
+    //Can't figure out what would be a good test for MixedAirTemp/MixedAirHumRat. I wanted to implement a test with outdoor
+    // air as well, since MixedAirTemp/MixedAirHumRat would be the conditions after mixing OA with the incoming stream.
+    // But I cannot seem to hold the temperature at IdealLoadsSystem inlet (same conditions as ZoneExhaustAirNodeNum) which
+    // keeps falling to zero.
     Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp = 35;
     Node(PurchAir(1).OutdoorAirNodeNum).Temp = 10;
     ManageZoneEquipment(*state,
@@ -653,8 +659,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
                         SimZone,
                         SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
     EXPECT_EQ(0, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
-    EXPECT_EQ(0, Node(PurchAir(1).OutdoorAirNodeNum).Temp);
     EXPECT_EQ(PurchAir(1).MixedAirTemp, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
+    EXPECT_EQ(PurchAir(1).MixedAirHumRat, Node(PurchAir(1).ZoneExhaustAirNodeNum).HumRat);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
