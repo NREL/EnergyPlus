@@ -1930,7 +1930,7 @@
 
   Output:Variable,*,Zone Ideal Loads Heat Recovery Active Time,hourly;
 
-  Output:Variable,*,Zone Ideal Loads Supply Air Temperature,Detailed;
+  Output:Variable,*,Zone Ideal Loads Supply Air Temperature,hourly;
 
   Output:Variable,*,Zone Ideal Loads Supply Air Humidity Ratio,hourly;
 
