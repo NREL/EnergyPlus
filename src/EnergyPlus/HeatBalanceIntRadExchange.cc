@@ -180,7 +180,7 @@ namespace HeatBalanceIntRadExchange {
         static Array1D<Real64> SurfaceEmiss;
 
 
-        // FLOW:
+
 
 #ifdef EP_Detailed_Timings
         epStartTime("CalcInteriorRadExchange=");
@@ -518,7 +518,7 @@ namespace HeatBalanceIntRadExchange {
         int NumIterations;
         std::string Option1; // view factor report option
 
-        // FLOW:
+
 
         ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
@@ -1423,7 +1423,7 @@ namespace HeatBalanceIntRadExchange {
         int j;
         Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
 
-        // FLOW:
+
         // Calculate the sum of the areas seen by all zone surfaces
         ZoneArea.dimension(N, 0.0);
         for (i = 1; i <= N; ++i) {
@@ -1554,7 +1554,7 @@ namespace HeatBalanceIntRadExchange {
         int j;
         static int LargestSurf(0);
 
-        // FLOW:
+
         OriginalCheckValue = std::abs(sum(F) - N);
 
         //  Allocate and zero arrays
@@ -1781,7 +1781,7 @@ namespace HeatBalanceIntRadExchange {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
 
 #ifdef EP_Count_Calls
         ++NumCalcScriptF_Calls;

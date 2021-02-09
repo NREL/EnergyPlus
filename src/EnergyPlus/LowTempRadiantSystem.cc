@@ -274,7 +274,7 @@ namespace LowTempRadiantSystem {
         LowTempRadiantSystem::SystemType SystemType; // Type of radiant system: hydronic, constant flow, or electric
         bool InitErrorFound(false);
 
-        // FLOW:
+
         if (GetInputFlag) {
             GetLowTempRadiantSystem(state);
             GetInputFlag = false;

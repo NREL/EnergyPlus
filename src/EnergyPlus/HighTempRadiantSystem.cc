@@ -202,7 +202,7 @@ namespace HighTempRadiantSystem {
         bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
         int RadSysNum;         // Radiant system number/index in local derived types
 
-        // FLOW:
+
         if (GetInputFlag) {
             ErrorsFoundInGet = false;
             GetHighTempRadiantSystem(state, ErrorsFoundInGet);
@@ -306,7 +306,7 @@ namespace HighTempRadiantSystem {
         int SurfNum;                     // Surface number DO loop counter
         Real64 TotalFracToSurfs;         // Sum of fractions of radiation to surfaces
 
-        // FLOW:
+
         // Initializations and allocations
         NumOfHighTempRadSys = inputProcessor->getNumObjectsFound(state, "ZoneHVAC:HighTemperatureRadiant");
 
@@ -708,7 +708,7 @@ namespace HighTempRadiantSystem {
         int ZoneNum; // Intermediate variable for keeping track of the zone number
         int Loop;
 
-        // FLOW:
+
         if (firstTime) {
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             QHTRadSource.dimension(NumOfHighTempRadSys, 0.0);
@@ -924,7 +924,7 @@ namespace HighTempRadiantSystem {
         Real64 SetPtTemp; // Setpoint temperature [C]
         int ZoneNum;      // number of zone being served
 
-        // FLOW:
+
         // initialize local variables
         ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
         HeatFrac = 0.0;
@@ -1028,7 +1028,7 @@ namespace HighTempRadiantSystem {
         int ZoneNum;          // number of zone being served
         Real64 ZoneTemp(0.0); // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
 
-        // FLOW:
+
         // initialize local variables
         ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
         QHTRadSource(RadSysNum) = 0.0;
@@ -1263,7 +1263,7 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSysNum; // DO loop counter for surface index
 
-        // FLOW:
+
         HighTempRadSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1336,7 +1336,7 @@ namespace HighTempRadiantSystem {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // FLOW:
+
         // Initialize arrays
         SumConvHTRadSys = 0.0;
         SumLatentHTRadSys = 0.0;
@@ -1429,7 +1429,7 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         if (HighTempRadSys(RadSysNum).HeaterType == Gas) {
             HighTempRadSys(RadSysNum).GasPower = QHTRadSource(RadSysNum) / HighTempRadSys(RadSysNum).CombustionEffic;
             HighTempRadSys(RadSysNum).GasEnergy = HighTempRadSys(RadSysNum).GasPower * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -1482,7 +1482,7 @@ namespace HighTempRadiantSystem {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
