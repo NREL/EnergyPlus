@@ -200,6 +200,10 @@ namespace ChillerAbsorption {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state);
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;

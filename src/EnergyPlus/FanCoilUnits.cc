@@ -234,7 +234,7 @@ namespace FanCoilUnits {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanCoilNum; // index of fan coil unit being simulated
 
-        // FLOW
+
 
         // First time SimFanCoilUnit is called, get the input for all the fan coil units
         if (GetFanCoilInputFlag) {
@@ -362,7 +362,7 @@ namespace FanCoilUnits {
         static int ATMixerOutNode(0);          // node number of the air terminal mixer secondary air inlet
         std::string ATMixerName;
 
-        // FLOW
+
 
         // find the number of each type of fan coil unit
 
@@ -3595,7 +3595,7 @@ namespace FanCoilUnits {
         Real64 OASchedValue;           // value of OASchedValue, =1 if not schedule
         Real64 ElecHeaterControl(1.0); // 1 or 0, enables or disables heating coil
         Real64 FanSpeedRatio;          // ratio of actual fan flow to max design fan flow
-        // FLOW
+
 
         // if PLR present in arguments, get its value, else default PLR = 1
         if (present(PLR)) {
@@ -4649,7 +4649,7 @@ namespace FanCoilUnits {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        // FLOW
+
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         FanCoil(FanCoilNum).HeatEnergy = FanCoil(FanCoilNum).HeatPower * ReportingConstant;
         FanCoil(FanCoilNum).SensCoolEnergy = FanCoil(FanCoilNum).SensCoolPower * ReportingConstant;
