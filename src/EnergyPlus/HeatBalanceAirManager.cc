@@ -316,7 +316,7 @@ namespace HeatBalanceAirManager {
 
         // flow
 
-        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
+        if (ZoneAirMassFlow.EnforceZoneMassBalance && (ZoneAirMassFlow.BalanceMixing || ZoneAirMassFlow.AdjustZoneReturnFlow)) {
             for (Loop = 1; Loop <= TotMixing; ++Loop) {
                 ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
                 ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -3888,7 +3888,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneNum).Name);
-                if (ZoneAirMassFlow.BalanceMixing &&
+                if ((ZoneAirMassFlow.BalanceMixing || ZoneAirMassFlow.AdjustZoneReturnFlow) &&
                     ((MassConservation(ZoneNum).NumSourceZonesMixingObject + MassConservation(ZoneNum).NumReceivingZonesMixingObject) > 0)) {
                     SetupOutputVariable(state, "Zone Air Mass Balance Mixing Receiving Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
