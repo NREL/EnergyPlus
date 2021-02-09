@@ -4246,15 +4246,11 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::BuildingPreDefRep;
-
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
         using DataHeatBalSurface::SumSurfaceHeatEmission;
-
         using DataHVACGlobals::TimeStepSys;
 
-        SysTotalHVACReliefHeatLoss = 0;
-        SysTotalHVACRejectHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
         auto &ort(state.dataOutRptTab);
 
         if (!ort->displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
@@ -4266,10 +4262,10 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         CalcHeatEmissionReport(state);
-        BuildingPreDefRep.emiZoneExfiltration += ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiZoneExhaust += ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ;
-        BuildingPreDefRep.emiHVACReject += SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ;
+        BuildingPreDefRep.emiZoneExfiltration += state.dataHeatBal->ZoneTotalExfiltrationHeatLoss * DataGlobalConstants::convertJtoGJ;
+        BuildingPreDefRep.emiZoneExhaust += state.dataHeatBal->ZoneTotalExhaustHeatLoss * DataGlobalConstants::convertJtoGJ;
+        BuildingPreDefRep.emiHVACRelief += state.dataHeatBal->SysTotalHVACReliefHeatLoss * DataGlobalConstants::convertJtoGJ;
+        BuildingPreDefRep.emiHVACReject += state.dataHeatBal->SysTotalHVACRejectHeatLoss * DataGlobalConstants::convertJtoGJ;
 
         BuildingPreDefRep.emiTotHeat = BuildingPreDefRep.emiEnvelopConv + BuildingPreDefRep.emiZoneExfiltration + BuildingPreDefRep.emiZoneExhaust +
                                        BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
@@ -4287,10 +4283,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHeatBalance::BuildingPreDefRep;
         using DataHeatBalance::NumRefrigCondensers;
         using DataHeatBalance::NumRefrigeratedRacks;
-        using DataHeatBalance::SysTotalHVACRejectHeatLoss;
-        using DataHeatBalance::SysTotalHVACReliefHeatLoss;
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
@@ -4305,67 +4297,67 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 H2OHtOfVap_HVAC = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataEnvrn->OutDryBulbTemp);
         static Real64 RhoWater = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
         Real64 TimeStepSysSec = TimeStepSys * DataGlobalConstants::SecInHour;
-        SysTotalHVACReliefHeatLoss = 0;
-        SysTotalHVACRejectHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACReliefHeatLoss = 0;
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss = 0;
 
         // HVAC relief air
         for (int iOACtrl = 1; iOACtrl <= state.dataMixedAir->NumOAControllers; ++iOACtrl) {
-            SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
+            state.dataHeatBal->SysTotalHVACReliefHeatLoss += state.dataMixedAir->OAController(iOACtrl).RelTotalLossRate * TimeStepSysSec;
         }
 
         // Condenser water loop
         for (int iCooler = 1; iCooler <= state.dataCondenserLoopTowers->NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss +=
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                 state.dataCondenserLoopTowers->towers(iCooler).Qactual * TimeStepSysSec + state.dataCondenserLoopTowers->towers(iCooler).FanEnergy + state.dataCondenserLoopTowers->towers(iCooler).BasinHeaterConsumption;
         }
         for (int iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto &cooler : state.dataFluidCoolers->SimpleFluidCooler) {
-            SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
         auto &ElectricChiller(state.dataPlantChillers->ElectricChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumElectricChillers; ++iChiller) {
             if (ElectricChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         auto &EngineDrivenChiller(state.dataPlantChillers->EngineDrivenChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumEngineDrivenChillers; ++iChiller) {
             if (EngineDrivenChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += EngineDrivenChiller(iChiller).CondenserEnergy;
             }
         }
         auto &GTChiller(state.dataPlantChillers->GTChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumGTChillers; ++iChiller) {
             if (GTChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += GTChiller(iChiller).CondenserEnergy;
             }
         }
         auto &ConstCOPChiller(state.dataPlantChillers->ConstCOPChiller);
         for (int iChiller = 1; iChiller <= state.dataPlantChillers->NumConstCOPChillers; ++iChiller) {
             if (ConstCOPChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ConstCOPChiller(iChiller).CondenserEnergy;
             }
         }
         auto &ElectricEIRChiller(state.dataChillerElectricEIR->ElectricEIRChiller);
         for (int iChiller = 1; iChiller <= state.dataChillerElectricEIR->NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         auto &ElecReformEIRChiller(state.dataChillerReformulatedEIR->ElecReformEIRChiller);
         for (int iChiller = 1; iChiller <= state.dataChillerReformulatedEIR->NumElecReformEIRChillers; ++iChiller) {
             if (ElecReformEIRChiller(iChiller).CondenserType != DataPlant::CondenserType::WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
         // Water / steam boiler
         for (int iBoiler = 1; iBoiler <= state.dataBoilers->numBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
@@ -4376,18 +4368,18 @@ namespace EnergyPlus::OutputReportTabular {
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                 DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                 if (DXCoil(iCoil).CondenserType(1) == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecCoolingConsumption + DXCoil(iCoil).DefrostConsumption +
                                                   DXCoil(iCoil).CrankcaseHeaterConsumption + DXCoil(iCoil).TotalCoolingEnergy;
                 } else if (DXCoil(iCoil).CondenserType(1) == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                   DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
                 if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                    SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
             } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                        DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += DXCoil(iCoil).ElecHeatingConsumption + DXCoil(iCoil).DefrostConsumption + DXCoil(iCoil).FuelConsumed +
                                               DXCoil(iCoil).CrankcaseHeaterConsumption - DXCoil(iCoil).TotalHeatingEnergy;
             }
         }
@@ -4396,14 +4388,14 @@ namespace EnergyPlus::OutputReportTabular {
         for (int iCoil = 1; iCoil <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++iCoil) {
             if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                 if (VarSpeedCoil(iCoil).CondenserType == AirCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                                   VarSpeedCoil(iCoil).DefrostConsumption + VarSpeedCoil(iCoil).EnergyLoadTotal;
                 } else if (VarSpeedCoil(iCoil).CondenserType == EvapCooled) {
-                    SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
+                    state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).EvapCondPumpElecConsumption + VarSpeedCoil(iCoil).BasinHeaterConsumption +
                                                   VarSpeedCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
             } else if (VarSpeedCoil(iCoil).VSCoilTypeOfNum == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
-                SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VarSpeedCoil(iCoil).Energy + VarSpeedCoil(iCoil).CrankcaseHeaterConsumption +
                                               VarSpeedCoil(iCoil).DefrostConsumption - VarSpeedCoil(iCoil).EnergyLoadTotal;
             }
         }
@@ -4412,7 +4404,7 @@ namespace EnergyPlus::OutputReportTabular {
         for (int iCoil = 1; iCoil <= NumHeatingCoils; ++iCoil) {
             if (HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
                 HeatingCoil(iCoil).HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
-                SysTotalHVACRejectHeatLoss +=
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
                     HeatingCoil(iCoil).FuelUseLoad + HeatingCoil(iCoil).ParasiticFuelLoad - HeatingCoil(iCoil).HeatingCoilLoad;
             }
         }
@@ -4421,10 +4413,10 @@ namespace EnergyPlus::OutputReportTabular {
         auto &TESCoil(state.dataPackagedThermalStorageCoil->TESCoil);
         for (int iCoil = 1; iCoil <= state.dataPackagedThermalStorageCoil->NumTESCoils; ++iCoil) {
             if (TESCoil(iCoil).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapTotCoolingEnergy + TESCoil(iCoil).ElecCoolingEnergy +
                                               TESCoil(iCoil).ElectColdWeatherEnergy - TESCoil(iCoil).Q_Ambient;
             } else if (TESCoil(iCoil).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += TESCoil(iCoil).EvapCondPumpElecConsumption + TESCoil(iCoil).ElectEvapCondBasinHeaterEnergy +
                                               TESCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC - TESCoil(iCoil).Q_Ambient;
             }
         }
@@ -4433,7 +4425,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
         for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
             if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
-                SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }
 
@@ -4441,14 +4433,14 @@ namespace EnergyPlus::OutputReportTabular {
         auto &VRF(state.dataHVACVarRefFlow->VRF);
         for (int iCoil = 1; iCoil <= state.dataHVACVarRefFlow->NumVRFCond; ++iCoil) {
             if (VRF(iCoil).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).CoolElecConsumption + VRF(iCoil).HeatElecConsumption +
                                               VRF(iCoil).CrankCaseHeaterElecConsumption + VRF(iCoil).DefrostConsumption +
                                               (VRF(iCoil).TotalCoolingCapacity - VRF(iCoil).TotalHeatingCapacity) * TimeStepSysSec;
             } else if (VRF(iCoil).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).EvapCondPumpElecConsumption + VRF(iCoil).BasinHeaterConsumption +
                                               VRF(iCoil).EvapWaterConsumpRate * TimeStepSysSec * RhoWater * H2OHtOfVap_HVAC;
             } else if (VRF(iCoil).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += VRF(iCoil).QCondEnergy;
             }
         }
 
@@ -4456,23 +4448,23 @@ namespace EnergyPlus::OutputReportTabular {
         auto &RefrigRack(state.dataRefrigCase->RefrigRack);
         for (int iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
             if (RefrigRack(iRef).CondenserType == AirCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
             } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).EvapPumpConsumption + RefrigRack(iRef).BasinHeaterConsumption +
                                               RefrigRack(iRef).EvapWaterConsumption * RhoWater * H2OHtOfVap_HVAC;
             } else if (RefrigRack(iRef).CondenserType == WaterCooled) {
-                SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
+                state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).CondEnergy;
             }
         }
 
         // Refrigerated Case - Condenser
         for (int iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
-            SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
         }
 
         // Evaporative coolers
         for (int iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
         }
     }
 
@@ -9626,7 +9618,6 @@ namespace EnergyPlus::OutputReportTabular {
         //   its own call to WriteTable.
 
         // Using/Aliasing
-        using DataHeatBalance::BuildingRotationAppendixG;
         using DataHeatBalance::Lights;
         using DataHeatBalance::People;
         using DataHeatBalance::TotElecEquip;
@@ -9850,7 +9841,7 @@ namespace EnergyPlus::OutputReportTabular {
             tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
             tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
             tableBody(1, 8) = RealToStr(state.dataHeatBal->BuildingAzimuth, 2);           // north axis angle
-            tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
+            tableBody(1, 9) = RealToStr(state.dataHeatBal->BuildingRotationAppendixG, 2); // Rotation for Appendix G
             tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);    // hours simulated
             //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
 

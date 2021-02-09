@@ -276,21 +276,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
-    extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
-    extern Real64 CondFDRelaxFactor;      // Relaxation factor, for looping across all the surfaces.
-    extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
-
-    extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    extern bool OverrideZoneAirSolutionAlgo;
-    extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
-    extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
-    extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration
-    extern Real64 ZoneTotalExhaustHeatLoss;      // Building total heat emission through zone air exhaust
-    extern Real64 SysTotalHVACReliefHeatLoss;    // Building total heat emission through HVAC system relief air
-    extern Real64 SysTotalHVACRejectHeatLoss;    // Building total heat emission through HVAC system heat rejection
-    // END SiteData
-
     extern int NumOfZoneLists;             // Total number of zone lists
     extern int NumOfZoneGroups;            // Total number of zone groups
     extern int NumPeopleStatements;        // Number of People objects in input - possibly global assignments
@@ -2214,14 +2199,26 @@ struct HeatBalanceData : BaseGlobalStruct {
     int InsideSurfIterations = 0;           // Counts inside surface iterations
     int OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
-    bool AllCTF = true;          // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
-    bool AnyCTF = false;         // CTF used
-    bool AnyEMPD = false;        // EMPD used
-    bool AnyCondFD = false;      // CondFD used
-    bool AnyHAMT = false;        // HAMT used
-    bool AnyKiva = false;        // Kiva used
-    bool AnyAirBoundary = false; // Construction:AirBoundary used (implies grouped solar and radiant is present)
-    bool AnyBSDF = false;        // True if any WindowModelType == WindowBSDFModel
+    bool AllCTF = true;                         // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
+    bool AnyCTF = false;                        // CTF used
+    bool AnyEMPD = false;                       // EMPD used
+    bool AnyCondFD = false;                     // CondFD used
+    bool AnyHAMT = false;                       // HAMT used
+    bool AnyKiva = false;                       // Kiva used
+    bool AnyAirBoundary = false;                // Construction:AirBoundary used (implies grouped solar and radiant is present)
+    bool AnyBSDF = false;                       // True if any WindowModelType == WindowBSDFModel
+    int MaxNumberOfWarmupDays = 25;             // Maximum number of warmup days allowed
+    int MinNumberOfWarmupDays = 1;              // Minimum number of warmup days allowed
+    Real64 CondFDRelaxFactor = 1.0;             // Relaxation factor, for looping across all the surfaces.
+    Real64 CondFDRelaxFactorInput = 1.0;        // Relaxation factor, for looping across all the surfaces, user input value
+    int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo = false;   // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
+    Real64 BuildingRotationAppendixG = 0.0;     // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss = 0.0; // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss = 0.0;      // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss = 0.0;    // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss = 0.0;    // Building total heat emission through HVAC system heat rejection;
+    // END SiteData
 
     void clear_state() override
     {
@@ -2247,6 +2244,17 @@ struct HeatBalanceData : BaseGlobalStruct {
         this->AnyKiva = false;
         this->AnyAirBoundary = false;
         this->AnyBSDF = false;
+        this->MaxNumberOfWarmupDays = 25;
+        this->MinNumberOfWarmupDays = 1;
+        this->CondFDRelaxFactor = 1.0;
+        this->CondFDRelaxFactorInput = 1.0;
+        this->ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;
+        this->OverrideZoneAirSolutionAlgo = false;
+        this->BuildingRotationAppendixG = 0.0;
+        this->ZoneTotalExfiltrationHeatLoss = 0.0;
+        this->ZoneTotalExhaustHeatLoss = 0.0;
+        this->SysTotalHVACReliefHeatLoss = 0.0;
+        this->SysTotalHVACRejectHeatLoss = 0.0;
     }
 };
 

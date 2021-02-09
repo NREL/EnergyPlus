@@ -265,8 +265,8 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     EXPECT_NEAR(20.0, DataHeatBalance::ZnAirRpt(2).ExfilSensiLoss, 0.0001);
     EXPECT_NEAR(23377.40, DataHeatBalance::ZnAirRpt(1).ExhTotalLoss, 0.01);
     EXPECT_NEAR(0, DataHeatBalance::ZnAirRpt(2).ExhTotalLoss, 0.01);
-    EXPECT_NEAR(35.841882 * 3600, DataHeatBalance::ZoneTotalExfiltrationHeatLoss, 0.01);
-    EXPECT_NEAR(23377.39845 * 3600, DataHeatBalance::ZoneTotalExhaustHeatLoss, 0.01);
+    EXPECT_NEAR(35.841882 * 3600, state->dataHeatBal->ZoneTotalExfiltrationHeatLoss, 0.01);
+    EXPECT_NEAR(23377.39845 * 3600, state->dataHeatBal->ZoneTotalExhaustHeatLoss, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)

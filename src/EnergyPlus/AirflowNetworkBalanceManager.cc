@@ -7925,7 +7925,6 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -7961,7 +7960,7 @@ namespace AirflowNetworkBalanceManager {
         }
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
-        ZoneTotalExfiltrationHeatLoss = 0.0;
+        state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
 
         for (auto &e : AirflowNetworkReportData) {
             e.MultiZoneInfiSenGainW = 0.0;
@@ -8538,7 +8537,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss + state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss;
 
-            ZoneTotalExfiltrationHeatLoss += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
+            state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate

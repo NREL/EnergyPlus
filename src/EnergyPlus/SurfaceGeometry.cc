@@ -312,12 +312,12 @@ namespace SurfaceGeometry {
         // as setting up DaylightingCoords
 
         // these include building north axis and Building Rotation for Appendix G
-        state.dataSurfaceGeometry->CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        state.dataSurfaceGeometry->SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
 
         // these are only for Building Rotation for Appendix G when using world coordinate system
-        state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-        state.dataSurfaceGeometry->SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        state.dataSurfaceGeometry->SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
 
         state.dataSurfaceGeometry->CosZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
         state.dataSurfaceGeometry->SinZoneRelNorth.allocate(state.dataGlobal->NumOfZones);
@@ -2901,7 +2901,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingAzimuth;
                 }
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += BuildingRotationAppendixG;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingRotationAppendixG;
                 }
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = rNumericArgs(2);
 
@@ -3768,7 +3768,7 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (ZoneNum != 0) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += BuildingRotationAppendixG;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingRotationAppendixG;
                 }
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = 4;

@@ -662,7 +662,7 @@ namespace DisplacementVentMgr {
         Real64 RetAirGain;
 
         // Exact solution or Euler method
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
                 if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     state.dataRoomAirMod->Zone1Floor(ZoneNum) = state.dataRoomAirMod->ZoneM2Floor(ZoneNum);
@@ -891,7 +891,7 @@ namespace DisplacementVentMgr {
                 TempDepCoef = HA_FLOOR + MCp_Total;
                 TempIndCoef = HAT_FLOOR + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTFloor(ZoneNum) = calculateThirdOrderFloorTemperature(
                             TempHistTerm, HAT_FLOOR, HA_FLOOR, MCpT_Total, MCp_Total, state.dataRoomAirMod->ZTOC(ZoneNum), NonAirSystemResponse(ZoneNum), ZoneMult, AirCap);
@@ -911,7 +911,7 @@ namespace DisplacementVentMgr {
                 TempDepCoef = HA_OC + MCp_Total;
                 TempIndCoef = ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + state.dataRoomAirMod->ZTFloor(ZoneNum) * MCp_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTOC(ZoneNum) = (TempHistTerm + ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + 1.6 * state.dataRoomAirMod->ZTFloor(ZoneNum) * MCp_Total) /
                                         ((11.0 / 6.0) * AirCap + HA_OC + 1.6 * MCp_Total);
@@ -935,7 +935,7 @@ namespace DisplacementVentMgr {
                 TempDepCoef = HA_MX + MCp_Total;
                 TempIndCoef = ConvGainsOccupiedSubzone * (1.0 - GainsFrac) + ConvGainsMixedSubzone + HAT_MX + state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTMX(ZoneNum) = (TempHistTerm + ConvGainsOccupiedSubzone * (1.0 - GainsFrac) + ConvGainsMixedSubzone + HAT_MX +
                                 state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total) /
@@ -982,7 +982,7 @@ namespace DisplacementVentMgr {
                 TempDepCoef = HA_MX + HA_OC + HA_FLOOR + MCp_Total;
                 TempIndCoef = ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total) /
                                      ((11.0 / 6.0) * AirCap + HA_MX + HA_OC + HA_FLOOR + MCp_Total);
@@ -1004,7 +1004,7 @@ namespace DisplacementVentMgr {
                 TempDepCoef = HA_MX + HA_OC + HA_FLOOR + MCp_Total;
                 TempIndCoef = ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + HAT_MX + HAT_OC + HAT_FLOOR + MCpT_Total) /
                                      ((11.0 / 6.0) * AirCap + HA_MX + HA_OC + HA_FLOOR + MCp_Total);

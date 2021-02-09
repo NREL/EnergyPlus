@@ -689,7 +689,7 @@ namespace RoomAirModelAirflowNetwork {
             NodeHumRatX3 = ThisRAFNNode.HumRatDSX3;
         }
 
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             AirTempT1 = ThisRAFNNode.AirTempT1;
             HumRatW1 = ThisRAFNNode.HumRatW1;
         }
@@ -699,13 +699,13 @@ namespace RoomAirModelAirflowNetwork {
                       ThisRAFNNode.SumSysMCpT + ThisRAFNNode.NonAirSystemResponse + ThisRAFNNode.SysDepZoneLoadsLagged;
         AirCap = ThisRAFNNode.AirVolume * Zone(ZoneNum).ZoneVolCapMultpSens * ThisRAFNNode.RhoAir * ThisRAFNNode.CpAir / (TimeStepSys * DataGlobalConstants::SecInHour);
 
-        if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
             if (TempDepCoef == 0.0) { // B=0
                 TempTmp = AirTempT1 + TempIndCoef / AirCap;
             } else {
                 TempTmp = (AirTempT1 - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) + TempIndCoef / TempDepCoef;
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
             TempTmp = (AirCap * AirTempT1 + TempIndCoef) / (AirCap + TempDepCoef);
         } else {
             TempTmp = (TempIndCoef + AirCap * (3.0 * NodeTempX1 - (3.0 / 2.0) * NodeTempX2 + (1.0 / 3.0) * NodeTempX3)) /
@@ -721,13 +721,13 @@ namespace RoomAirModelAirflowNetwork {
         C = ThisRAFNNode.RhoAir * ThisRAFNNode.AirVolume * Zone(ZoneNum).ZoneVolCapMultpMoist / (DataGlobalConstants::SecInHour * TimeStepSys);
 
         // Exact solution
-        if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
             if (A == 0.0) { // B=0
                 HumRatTmp = HumRatW1 + B / C;
             } else {
                 HumRatTmp = (HumRatW1 - B / A) * std::exp(min(700., -A / C)) + B / A;
             }
-        } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+        } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
             HumRatTmp = (C * HumRatW1 + B) / (C + A);
         } else {
             HumRatTmp = (B + C * (3.0 * NodeHumRatX1 - (3.0 / 2.0) * NodeHumRatX2 + (1.0 / 3.0) * NodeHumRatX3)) / ((11.0 / 6.0) * C + A);

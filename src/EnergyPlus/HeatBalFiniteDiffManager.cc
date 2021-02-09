@@ -229,8 +229,6 @@ namespace HeatBalFiniteDiffManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::CondFDRelaxFactor;
-        using DataHeatBalance::CondFDRelaxFactorInput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                         // IO Status when calling get input subroutine
@@ -288,8 +286,8 @@ namespace HeatBalFiniteDiffManager {
                 SpaceDescritConstant = rNumericArgs(1);
             }
             if (!lNumericFieldBlanks(2)) {
-                CondFDRelaxFactorInput = rNumericArgs(2);
-                CondFDRelaxFactor = CondFDRelaxFactorInput;
+                state.dataHeatBal->CondFDRelaxFactorInput = rNumericArgs(2);
+                state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
             }
             if (!lNumericFieldBlanks(3)) {
                 state.dataHeatBal->MaxAllowedDelTempCondFD = rNumericArgs(3);
@@ -1111,9 +1109,6 @@ namespace HeatBalFiniteDiffManager {
         //      finite difference procedures for
         //      all building surface constructs.
 
-        // Using/Aliasing
-        using DataHeatBalance::CondFDRelaxFactor;
-
         static Real64 MaxDelTemp(0.0);
 
         int const ConstrNum(Surface(Surf).Construction);
@@ -1201,10 +1196,10 @@ namespace HeatBalFiniteDiffManager {
             } // End of Gauss Seidell iteration loop
 
             GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
-            if (CondFDRelaxFactor != 1.0) {
+            if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
                 // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
                 //   to obtain the actual temperature that is going to be exported/use
-                relax_array(TDT, TDreport, 1.0 - CondFDRelaxFactor);
+                relax_array(TDT, TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
                 EnthOld = EnthNew;
             }
 
@@ -1268,12 +1263,7 @@ namespace HeatBalFiniteDiffManager {
         // the initializations for the Finite Difference calculations
         // of each construction.
 
-        // Using/Aliasing
-        using DataHeatBalance::CondFDRelaxFactorInput;
-
         using General::ScanForReports;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -1293,7 +1283,7 @@ namespace HeatBalFiniteDiffManager {
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
-              CondFDRelaxFactorInput,
+              state.dataHeatBal->CondFDRelaxFactorInput,
               state.dataHeatBal->MaxAllowedDelTempCondFD);
 
         ScanForReports(state, "Constructions", DoReport, "Constructions");

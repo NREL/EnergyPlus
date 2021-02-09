@@ -3734,9 +3734,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
-    EXPECT_EQ(condenserReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(condenserReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(condenserReject * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
 
     state->dataDXCoils->NumDXCoils = 2;
@@ -3758,9 +3758,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
     GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
-    EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
+    EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
-    EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
+    EXPECT_EQ(condenserReject + coilReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
     EXPECT_EQ(2 * condenserReject * DataGlobalConstants::convertJtoGJ + coilReject * DataGlobalConstants::convertJtoGJ, BuildingPreDefRep.emiHVACReject);
 }
 

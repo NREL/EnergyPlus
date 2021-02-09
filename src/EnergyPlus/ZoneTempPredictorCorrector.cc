@@ -3349,7 +3349,7 @@ namespace ZoneTempPredictorCorrector {
                         auto const SELECT_CASE_var(TempControlType(ZoneNum));
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
-                        if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                        if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                             Tprev = MAT(ZoneNum);
                             if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
                         } else {
@@ -3656,7 +3656,7 @@ namespace ZoneTempPredictorCorrector {
 
             // Exact solution or Euler method
             ShortenTimeStepSysRoomAir = false;
-            if (ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
                     if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                         ZoneT1(ZoneNum) = ZoneTM2(ZoneNum);
@@ -3989,10 +3989,10 @@ namespace ZoneTempPredictorCorrector {
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
                 // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
@@ -4001,7 +4001,7 @@ namespace ZoneTempPredictorCorrector {
                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                         state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
@@ -4016,9 +4016,9 @@ namespace ZoneTempPredictorCorrector {
             } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
 
                 // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
@@ -4027,7 +4027,7 @@ namespace ZoneTempPredictorCorrector {
                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
@@ -4046,11 +4046,11 @@ namespace ZoneTempPredictorCorrector {
 
                 // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 // PH 3/2/04      !LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
@@ -4063,7 +4063,7 @@ namespace ZoneTempPredictorCorrector {
                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
@@ -4127,11 +4127,11 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
 
-                if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
-                } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
@@ -4144,7 +4144,7 @@ namespace ZoneTempPredictorCorrector {
                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
-                } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                     LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
                                             state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
@@ -4223,9 +4223,9 @@ namespace ZoneTempPredictorCorrector {
                     }
                     state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).StageNum < 0) { // Cooling load
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                    if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                         LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
-                    } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                    } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                         if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                             LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         } else {
@@ -4234,7 +4234,7 @@ namespace ZoneTempPredictorCorrector {
                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         }
-                    } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                    } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
                                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
@@ -4243,10 +4243,10 @@ namespace ZoneTempPredictorCorrector {
                     LoadToHeatingSetPoint = LoadToCoolingSetPoint;
                     if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // Heating load
-                    if (ZoneAirSolutionAlgo == Use3rdOrder) {
+                    if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                         LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                         // Exact solution
-                    } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+                    } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                         if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
                             LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         } else {
@@ -4255,7 +4255,7 @@ namespace ZoneTempPredictorCorrector {
                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         }
-                    } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+                    } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                         LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
                                                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
@@ -4594,36 +4594,36 @@ namespace ZoneTempPredictorCorrector {
             // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
             WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 exp_700_A_C(0.0);
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
                                          (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
                                                    (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
                 // Exact solution
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                 if (A == 0.0) { // B=0
                     LoadToHumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) - B;
                 } else {
                     exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
                     LoadToHumidifySetPoint = A * (WZoneSetPoint - ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                 LoadToHumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
             WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
-            if (ZoneAirSolutionAlgo == Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
                                            (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
                                                      (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
                 // Exact solution
-            } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
+            } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                 if (A == 0.0) { // B=0
                     LoadToDehumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) - B;
                 } else {
                     LoadToDehumidifySetPoint = A * (WZoneSetPoint - ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
                 }
-            } else if (ZoneAirSolutionAlgo == UseEulerMethod) {
+            } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
                 LoadToDehumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
@@ -4910,7 +4910,7 @@ namespace ZoneTempPredictorCorrector {
                 //    TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef
                 // Solve for zone air temperature
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
                                       ((11.0 / 6.0) * AirCap + TempDepCoef);
@@ -5003,7 +5003,7 @@ namespace ZoneTempPredictorCorrector {
 
                 // Solve for zone air temperature
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
                                       ((11.0 / 6.0) * AirCap + TempDepCoef);
@@ -5052,7 +5052,7 @@ namespace ZoneTempPredictorCorrector {
 
             // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
             {
-                auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                 if (SELECT_CASE_var == Use3rdOrder) {
                     if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
                         if (state.dataRoomAirMod->ZoneDVMixedFlag(ZoneNum) == 0) {
@@ -5183,7 +5183,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            if (ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 ZoneTM2(ZoneNum) = ZoneTMX(ZoneNum);
                 ZoneTMX(ZoneNum) = ZTAV(ZoneNum); // using average for whole zone time step.
                 ZoneWM2(ZoneNum) = ZoneWMX(ZoneNum);
@@ -5274,7 +5274,7 @@ namespace ZoneTempPredictorCorrector {
             }
         } // zone loop
 
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ZoneTM2(ZoneNum) = ZoneTMX(ZoneNum);
                 ZoneTMX(ZoneNum) = MAT(ZoneNum); // using average for whole zone time step.
@@ -5531,7 +5531,7 @@ namespace ZoneTempPredictorCorrector {
         // Use a 3rd order derivative to predict final zone humidity ratio and
         // smooth the changes using the zone air capacitance.
         {
-            auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+            auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
                 ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
                                                        (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum))) /
@@ -6645,7 +6645,7 @@ namespace ZoneTempPredictorCorrector {
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
 
         {
-            auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+            auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
                 CzdTdt = RhoAir * CpAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - ZTM1(ZoneNum)) /
                          (TimeStepSys * DataGlobalConstants::SecInHour);

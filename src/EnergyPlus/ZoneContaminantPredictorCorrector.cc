@@ -1732,7 +1732,7 @@ namespace ZoneContaminantPredictorCorrector {
                 }
             }
 
-            if (ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
                         if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
@@ -1838,7 +1838,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // this amount of CO2 must be added to the zone to reach the setpoint.  Negative values represent
                     // the amount of CO2 that must be removed by the system.
                     {
-                        auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                        auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                         if (SELECT_CASE_var == Use3rdOrder) {
                             LoadToCO2SetPoint = ((11.0 / 6.0) * C + A) * ZoneAirCO2SetPoint -
                                                 (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
@@ -1945,7 +1945,7 @@ namespace ZoneContaminantPredictorCorrector {
                     // this amount of GC must be added to the zone to reach the setpoint.  Negative values represent
                     // the amount of GC that must be removed by the system.
                     {
-                        auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                        auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                         if (SELECT_CASE_var == Use3rdOrder) {
                             LoadToGCSetPoint = ((11.0 / 6.0) * C + A) * ZoneAirGCSetPoint -
                                                (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
@@ -2000,7 +2000,7 @@ namespace ZoneContaminantPredictorCorrector {
                 state.dataContaminantBalance->CO2ZoneTimeMinus1(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
                 state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
 
-                if (ZoneAirSolutionAlgo != Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                     state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
                     state.dataContaminantBalance->ZoneCO2MX(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
                 }
@@ -2013,7 +2013,7 @@ namespace ZoneContaminantPredictorCorrector {
                 state.dataContaminantBalance->GCZoneTimeMinus1(ZoneNum) = state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
                 state.dataContaminantBalance->ZoneAirGC(ZoneNum) = state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum);
 
-                if (ZoneAirSolutionAlgo != Use3rdOrder) {
+                if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                     state.dataContaminantBalance->ZoneGCM2(ZoneNum) = state.dataContaminantBalance->ZoneGCMX(ZoneNum);
                     state.dataContaminantBalance->ZoneGCMX(ZoneNum) = state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
                 }
@@ -2053,7 +2053,7 @@ namespace ZoneContaminantPredictorCorrector {
             }
         } // zone loop
 
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
@@ -2528,7 +2528,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Use a 3rd order derivative to predict final zone CO2 and
                 // smooth the changes using the zone air capacitance.
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                                                             (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum))) /
@@ -2592,7 +2592,7 @@ namespace ZoneContaminantPredictorCorrector {
                 // Use a 3rd order derivative to predict final zone generic contaminant and
                 // smooth the changes using the zone air capacitance.
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
                                                            (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum))) /

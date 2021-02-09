@@ -1284,12 +1284,12 @@ namespace SimulationManager {
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
-                        DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
+                        state.dataHeatBal->OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
-                        DataHeatBalance::MinNumberOfWarmupDays = 1;
+                        state.dataHeatBal->MinNumberOfWarmupDays = 1;
                     }
                     if (overrideBeginEnvResetSuppress) {
                         ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
@@ -1399,12 +1399,12 @@ namespace SimulationManager {
         }
         Alphas(3) = overrideModeValue;
         Alphas(4) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
-        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+        if (state.dataHeatBal->OverrideZoneAirSolutionAlgo) {
             Alphas(5) = "Yes";
         } else {
             Alphas(5) = "No";
         }
-        Alphas(6) = fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays);
+        Alphas(6) = fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays);
         if (state.dataEnvrn->forceBeginEnvResetSuppress) {
             Alphas(7) = "Yes";
         } else {
@@ -1467,7 +1467,7 @@ namespace SimulationManager {
         }
         UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
         UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
         UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
         UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
@@ -1839,24 +1839,12 @@ namespace SimulationManager {
         // Using/Aliasing
         using namespace DataOutputs;
         using namespace DataRuntimeLanguage;
-        using DataHeatBalance::CondFDRelaxFactor;
-        using DataHeatBalance::CondFDRelaxFactorInput;
 
         using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
         using DataSurfaces::MaxVerticesPerSurface;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvSetThreads;
@@ -1937,7 +1925,7 @@ namespace SimulationManager {
         if (state.dataHeatBal->AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
                 state.files.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
-            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
+            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", state.dataHeatBal->CondFDRelaxFactorInput, state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
         static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "

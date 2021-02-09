@@ -723,7 +723,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WarmUpConvergenceSmallLoadTest)
 
     state->dataGlobal->WarmupFlag = false;
     state->dataGlobal->DayOfSim = 7;
-    MinNumberOfWarmupDays = 25;
+    state->dataHeatBal->MinNumberOfWarmupDays = 25;
     state->dataGlobal->NumOfZones = 1;
     WarmupConvergenceValues.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TempConvergTol = 0.01;

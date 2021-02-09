@@ -220,21 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
-    Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
-    Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
-
-    int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool OverrideZoneAirSolutionAlgo(false);   // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
-    Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
-    Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
-    Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
-    Real64 SysTotalHVACReliefHeatLoss(0.0);    // Building total heat emission through HVAC system relief air;
-    Real64 SysTotalHVACRejectHeatLoss(0.0);    // Building total heat emission through HVAC system heat rejection;
-
-    // END SiteData
-
     int NumOfZoneLists(0);             // Total number of zone lists
     int NumOfZoneGroups(0);            // Total number of zone groups
     int NumPeopleStatements(0);        // Number of People objects in input - possibly global assignments
@@ -564,16 +549,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 1;
-        CondFDRelaxFactor = 1.0;
-        CondFDRelaxFactorInput = 1.0;
-        ZoneAirSolutionAlgo = Use3rdOrder;
-        BuildingRotationAppendixG = 0.0;
-        ZoneTotalExfiltrationHeatLoss = 0.0;
-        ZoneTotalExhaustHeatLoss = 0.0;
-        SysTotalHVACReliefHeatLoss = 0.0;
-        SysTotalHVACRejectHeatLoss = 0.0;
         NumOfZoneLists = 0;
         NumOfZoneGroups = 0;
         NumPeopleStatements = 0;

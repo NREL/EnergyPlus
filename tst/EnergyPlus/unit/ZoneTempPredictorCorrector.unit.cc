@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     AirflowNetwork::SimulateAirflowNetwork = 0;
     MDotOA.allocate(1);
 
-    ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
     ZoneAirHumRatTemp.allocate(1);
     ZoneW1.allocate(1);
 
@@ -1237,7 +1237,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;
@@ -1372,7 +1372,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    ZoneAirSolutionAlgo = Use3rdOrder;
+    state->dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;

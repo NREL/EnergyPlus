@@ -761,13 +761,13 @@ namespace HVACManager {
             SetupOutputVariable(state, "Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
             SetupOutputVariable(state, "Air System Relief Air Total Heat Loss Energy",
                                 OutputProcessor::Unit::J,
-                                DataHeatBalance::SysTotalHVACReliefHeatLoss,
+                                state.dataHeatBal->SysTotalHVACReliefHeatLoss,
                                 "HVAC",
                                 "Sum",
                                 "SimHVAC");
             SetupOutputVariable(state, "HVAC System Total Heat Rejection Energy",
                                 OutputProcessor::Unit::J,
-                                DataHeatBalance::SysTotalHVACRejectHeatLoss,
+                                state.dataHeatBal->SysTotalHVACRejectHeatLoss,
                                 "HVAC",
                                 "Sum",
                                 "SimHVAC");
@@ -2311,8 +2311,6 @@ namespace HVACManager {
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirBalance;
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
-        using DataHeatBalance::ZoneTotalExhaustHeatLoss;
         using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
         using DataHeatBalFanSys::MCPV;
         using DataHeatBalFanSys::MDotCPOA;
@@ -2348,8 +2346,8 @@ namespace HVACManager {
         Real64 VentZoneMassflow;           // Total mass flow rate per zone
         Real64 VentZoneAirTemp;            // Average Zone inlet temperature
 
-        ZoneTotalExfiltrationHeatLoss = 0.0;
-        ZoneTotalExhaustHeatLoss = 0.0;
+        state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
+        state.dataHeatBal->ZoneTotalExhaustHeatLoss = 0.0;
 
         // Ensure no airflownetwork and simple calculations
         if (AirflowNetwork::SimulateAirflowNetwork == 0) return;
@@ -2787,8 +2785,8 @@ namespace HVACManager {
                 ZnAirRpt(ZoneLoop).ExfilMass / (TimeStepSys * DataGlobalConstants::SecInHour) * (ZoneAirHumRat(ZoneLoop) - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
             ZnAirRpt(ZoneLoop).ExfilTotalLoss = ZnAirRpt(ZoneLoop).ExfilLatentLoss + ZnAirRpt(ZoneLoop).ExfilSensiLoss;
 
-            ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
-            ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += ZnAirRpt(ZoneLoop).ExfilTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataHeatBal->ZoneTotalExhaustHeatLoss += ZnAirRpt(ZoneLoop).ExhTotalLoss * TimeStepSys * DataGlobalConstants::SecInHour;
         }
     }
 

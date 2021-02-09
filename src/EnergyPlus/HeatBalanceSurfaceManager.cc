@@ -2214,7 +2214,7 @@ namespace HeatBalanceSurfaceManager {
             QsrcHist = 0.0;
             QsrcHistM = 0.0;
         }
-        CondFDRelaxFactor = CondFDRelaxFactorInput;
+        state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
 
         // Perform other initializations that depend on the surface characteristics
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -6930,12 +6930,12 @@ namespace HeatBalanceSurfaceManager {
 
                 // resets relaxation factor to speed up iterations when under-relaxation is not needed.
                 if (state.dataHeatBal->InsideSurfIterations <= 1) {
-                    CondFDRelaxFactor = CondFDRelaxFactorInput;
+                    state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
                 }
                 if ((state.dataHeatBal->InsideSurfIterations > IterationsForCondFDRelaxChange) && !Converged) {
                     // adjust relaxation factor down, assume large number of iterations is result of instability
-                    CondFDRelaxFactor *= 0.9;
-                    if (CondFDRelaxFactor < 0.1) CondFDRelaxFactor = 0.1;
+                    state.dataHeatBal->CondFDRelaxFactor *= 0.9;
+                    if (state.dataHeatBal->CondFDRelaxFactor < 0.1) state.dataHeatBal->CondFDRelaxFactor = 0.1;
                 }
             }
 

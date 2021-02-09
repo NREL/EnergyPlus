@@ -798,47 +798,47 @@ namespace HeatBalanceManager {
             }
             // Maximum Number of Warmup Days
             if (!lNumericFieldBlanks(4)) {
-                MaxNumberOfWarmupDays = BuildingNumbers(4);
-                if (MaxNumberOfWarmupDays <= 0) {
+                state.dataHeatBal->MaxNumberOfWarmupDays = BuildingNumbers(4);
+                if (state.dataHeatBal->MaxNumberOfWarmupDays <= 0) {
                     ShowSevereError(state,
                                     format("{}{}: {} invalid, [{}], {} will be used",
                                            RoutineName,
                                            CurrentModuleObject,
                                            cNumericFieldNames(4),
-                                           MaxNumberOfWarmupDays,
+                                           state.dataHeatBal->MaxNumberOfWarmupDays,
                                            DefaultMaxNumberOfWarmupDays));
-                    MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
+                    state.dataHeatBal->MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
                 }
             } else {
-                MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
+                state.dataHeatBal->MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
             }
             // Minimum Number of Warmup Days
             if (!lNumericFieldBlanks(5)) {
-                MinNumberOfWarmupDays = BuildingNumbers(5);
-                if (MinNumberOfWarmupDays <= 0) {
+                state.dataHeatBal->MinNumberOfWarmupDays = BuildingNumbers(5);
+                if (state.dataHeatBal->MinNumberOfWarmupDays <= 0) {
                     ShowWarningError(state,
                                      format("{}{}: {} invalid, [{}], {} will be used",
                                             RoutineName,
                                             CurrentModuleObject,
                                             cNumericFieldNames(5),
-                                            MinNumberOfWarmupDays,
+                                            state.dataHeatBal->MinNumberOfWarmupDays,
                                             DefaultMinNumberOfWarmupDays));
-                    MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
+                    state.dataHeatBal->MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
                 }
             } else {
-                MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
+                state.dataHeatBal->MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
             }
-            if (MinNumberOfWarmupDays > MaxNumberOfWarmupDays) {
+            if (state.dataHeatBal->MinNumberOfWarmupDays > state.dataHeatBal->MaxNumberOfWarmupDays) {
                 ShowWarningError(state,
                                  format("{}{}: {} [{}]  is greater than {} [{}], {} will be used.",
                                         RoutineName,
                                         CurrentModuleObject,
                                         cNumericFieldNames(5),
-                                        MinNumberOfWarmupDays,
+                                        state.dataHeatBal->MinNumberOfWarmupDays,
                                         cNumericFieldNames(4),
-                                        MaxNumberOfWarmupDays,
-                                        MinNumberOfWarmupDays));
-                MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
+                                        state.dataHeatBal->MaxNumberOfWarmupDays,
+                                        state.dataHeatBal->MinNumberOfWarmupDays));
+                state.dataHeatBal->MaxNumberOfWarmupDays = state.dataHeatBal->MinNumberOfWarmupDays;
             }
 
         } else {
@@ -847,8 +847,8 @@ namespace HeatBalanceManager {
             state.dataHeatBal->BuildingName = "NOT ENTERED";
             AlphaName(2) = "NOT ENTERED";
             AlphaName(3) = "NOT ENTERED";
-            MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
-            MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
+            state.dataHeatBal->MaxNumberOfWarmupDays = DefaultMaxNumberOfWarmupDays;
+            state.dataHeatBal->MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
         }
 
         static constexpr auto Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
@@ -860,7 +860,7 @@ namespace HeatBalanceManager {
         print(state.files.eio, Format_721);
         print(state.files.eio, Format_720,
             state.dataHeatBal->BuildingName , state.dataHeatBal->BuildingAzimuth , AlphaName(2) , state.dataHeatBal->LoadsConvergTol
-            , state.dataHeatBal->TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
+            , state.dataHeatBal->TempConvergTol , AlphaName(3) , state.dataHeatBal->MaxNumberOfWarmupDays , state.dataHeatBal->MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -1087,7 +1087,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             // Building Rotation for Appendix G
-            BuildingRotationAppendixG = mod(BuildingNumbers(1), 360.0);
+            state.dataHeatBal->BuildingRotationAppendixG = mod(BuildingNumbers(1), 360.0);
         }
 
         // A new object is added by L. Gu, 12/09
@@ -1110,16 +1110,16 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
-                        ZoneAirSolutionAlgo = Use3rdOrder;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                     } else if (SELECT_CASE_var == "ANALYTICALSOLUTION") {
-                        ZoneAirSolutionAlgo = UseAnalyticalSolution;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = UseAnalyticalSolution;
                         AlphaName(1) = "AnalyticalSolution";
                     } else if (SELECT_CASE_var == "EULERMETHOD") {
-                        ZoneAirSolutionAlgo = UseEulerMethod;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
                         AlphaName(1) = "EulerMethod";
                     } else {
-                        ZoneAirSolutionAlgo = Use3rdOrder;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) +
                                          ". The default choice is assigned = " + AlphaName(1));
@@ -1128,11 +1128,11 @@ namespace HeatBalanceManager {
                 }
             }
         } else {
-            ZoneAirSolutionAlgo = Use3rdOrder;
+            state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
-        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
-            ZoneAirSolutionAlgo = UseEulerMethod;
+        if (state.dataHeatBal->OverrideZoneAirSolutionAlgo) {
+            state.dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
             AlphaName(1) = "EulerMethod";
         }
 
@@ -5748,13 +5748,13 @@ namespace HeatBalanceManager {
                     WarmupConvergenceValues(ZoneNum).PassFlag(4) = 2;
                 }
 
-                if (state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
+                if (state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays && state.dataGlobal->WarmupFlag) {
                     // Check convergence for individual zone
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError(state,
                                         format("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",
                                                Zone(ZoneNum).Name,
-                                               MaxNumberOfWarmupDays));
+                                               state.dataHeatBal->MaxNumberOfWarmupDays));
                         if (!WarmupConvergenceWarning && !state.dataGlobal->DoingSizing) {
                             ShowContinueError(state, "See Warmup Convergence Information in .eio file for details.");
                             WarmupConvergenceWarning = true;
@@ -5809,25 +5809,25 @@ namespace HeatBalanceManager {
             // experience with the (I)BLAST program.  If too many warmup days were
             // required, notify the program user.
 
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag && ConvergenceChecksFailed) {
-                if (MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
+            if ((state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag && ConvergenceChecksFailed) {
+                if (state.dataHeatBal->MaxNumberOfWarmupDays < DefaultMaxNumberOfWarmupDays) {
                     ShowSevereError(state,
-                                    format("CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.", MaxNumberOfWarmupDays));
+                                    format("CheckWarmupConvergence: User supplied maximum warmup days={} is insufficient.", state.dataHeatBal->MaxNumberOfWarmupDays));
                     ShowContinueError(state, format("Suggest setting maximum number of warmup days to at least {}.", DefaultMaxNumberOfWarmupDays));
                 }
             }
 
             // Set warmup flag to true depending on value of ConvergenceChecksFailed (true=fail)
             // and minimum number of warmup days
-            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= MinNumberOfWarmupDays) {
+            if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim >= state.dataHeatBal->MinNumberOfWarmupDays) {
                 state.dataGlobal->WarmupFlag = false;
-            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < MinNumberOfWarmupDays) {
+            } else if (!ConvergenceChecksFailed && state.dataGlobal->DayOfSim < state.dataHeatBal->MinNumberOfWarmupDays) {
                 state.dataGlobal->WarmupFlag = true;
             }
 
             // If max warmup days reached and still WarmupFlag, then go to non-warmup state.
             // prior messages will have been displayed
-            if ((state.dataGlobal->DayOfSim >= MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
+            if ((state.dataGlobal->DayOfSim >= state.dataHeatBal->MaxNumberOfWarmupDays) && state.dataGlobal->WarmupFlag) {
                 state.dataGlobal->WarmupFlag = false;
             }
         }

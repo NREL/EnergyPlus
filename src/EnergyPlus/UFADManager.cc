@@ -1006,7 +1006,7 @@ namespace UFADManager {
         Real64 RetAirGains;
 
         // Exact solution or Euler method
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
                 if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     state.dataRoomAirMod->Zone1OC(ZoneNum) = state.dataRoomAirMod->ZoneM2OC(ZoneNum);
@@ -1172,7 +1172,7 @@ namespace UFADManager {
                 Real64 TempIndCoef =
                     GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTOC(ZoneNum) = (TempHistTerm + GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total +
                                          NonAirSystemResponse(ZoneNum) / ZoneMult) /
@@ -1193,7 +1193,7 @@ namespace UFADManager {
                 TempDepCoef = (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total;
                 TempIndCoef = (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_OC * state.dataRoomAirMod->ZTOC(ZoneNum)) + state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTMX(ZoneNum) =
                             (TempHistTerm + (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_OC * state.dataRoomAirMod->ZTOC(ZoneNum)) + state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total) /
@@ -1238,7 +1238,7 @@ namespace UFADManager {
                 // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
                 Real64 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
@@ -1259,7 +1259,7 @@ namespace UFADManager {
                 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
                 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
@@ -1480,7 +1480,7 @@ namespace UFADManager {
         Real64 RetAirGains;
 
         // Exact solution or Euler method
-        if (ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             if (ShortenTimeStepSysRoomAir && TimeStepSys < state.dataGlobal->TimeStepZone) {
                 if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                     state.dataRoomAirMod->Zone1OC(ZoneNum) = state.dataRoomAirMod->ZoneM2OC(ZoneNum);
@@ -1683,7 +1683,7 @@ namespace UFADManager {
                 TempIndCoef =
                     GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTOC(ZoneNum) = (TempHistTerm + GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total +
                                          NonAirSystemResponse(ZoneNum) / ZoneMult) /
@@ -1704,7 +1704,7 @@ namespace UFADManager {
                 TempDepCoef = (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total;
                 TempIndCoef = (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_OC * state.dataRoomAirMod->ZTOC(ZoneNum)) + state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTMX(ZoneNum) =
                             (TempHistTerm + (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_OC * state.dataRoomAirMod->ZTOC(ZoneNum)) + state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total) /
@@ -1751,7 +1751,7 @@ namespace UFADManager {
                 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
                 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
@@ -1772,7 +1772,7 @@ namespace UFADManager {
                 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
                 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
                 {
-                    auto const SELECT_CASE_var(ZoneAirSolutionAlgo);
+                    auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
