@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -158,7 +159,7 @@ namespace MundtSimMgr {
 
     // Functions
 
-    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
@@ -166,38 +167,46 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
     void SetupMundtModel(EnergyPlusData &state,
-                         int const ZoneNum, // index number for the specified zone
+                         int ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
     );
 
     //*****************************************************************************************
 
-    void CalcMundtModel(int const ZoneNum); // index number for the specified zone
+    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetNodeResult(int const NodeID,       // node ID
-                       Real64 const TempResult // temperature for the specified air node
+    void SetNodeResult(int NodeID,       // node ID
+                       Real64 TempResult // temperature for the specified air node
     );
 
     //*****************************************************************************************
 
-    void SetSurfTmeanAir(int const SurfID,    // surface ID
-                         Real64 const TeffAir // temperature of air node adjacent to the specified surface
+    void SetSurfTmeanAir(int SurfID,    // surface ID
+                         Real64 TeffAir // temperature of air node adjacent to the specified surface
     );
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(int const ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
 } // namespace MundtSimMgr
+
+struct MundtSimMgrData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

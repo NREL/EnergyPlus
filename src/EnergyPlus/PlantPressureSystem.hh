@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -61,15 +62,12 @@ struct EnergyPlusData;
 
 namespace PlantPressureSystem {
 
-    // Functions
-    void clear_state();
-
     void SimPressureDropSystem(EnergyPlusData &state,
-                               int const LoopNum,                  // Plant Loop to update pressure information
-                               bool const FirstHVACIteration,      // System flag
-                               int const CallType,                 // Enumerated call type
-                               Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
-                               Optional_int_const BranchNum = _    // Branch num for specific branch simulation
+                               int const LoopNum,                       // Plant Loop to update pressure information
+                               bool const FirstHVACIteration,           // System flag
+                               DataPlant::iPressureCall const CallType, // Enumerated call type
+                               Optional_int_const LoopSideNum = _,      // Loop side num for specific branch simulation
+                               Optional_int_const BranchNum = _         // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const FirstHVACIteration);
@@ -84,11 +82,11 @@ namespace PlantPressureSystem {
 
     void DistributePressureOnBranch(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
 
-    void PassPressureAcrossMixer(int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide);
+    void PassPressureAcrossMixer(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &MixerPressure, int const NumBranchesOnLoopSide);
 
-    void PassPressureAcrossSplitter(int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure);
+    void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, Real64 &SplitterInletPressure);
 
-    void PassPressureAcrossInterface(int const LoopNum);
+    void PassPressureAcrossInterface(EnergyPlusData &state, int const LoopNum);
 
     Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
                                      int const LoopNum,            // - Index of which plant/condenser loop is being simulated
@@ -101,6 +99,16 @@ namespace PlantPressureSystem {
     );
 
 } // namespace PlantPressureSystem
+
+struct PlantPressureSysData : BaseGlobalStruct {
+
+    bool InitPressureDropOneTimeInit = true;
+
+    void clear_state() override
+    {
+        this->InitPressureDropOneTimeInit = true;
+    }
+};
 
 } // namespace EnergyPlus
 

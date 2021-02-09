@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,11 +81,11 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlabAndBasementModelsIndexChecking)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    domains.resize(2);
+    state->dataPlantPipingSysMgr->domains.resize(2);
 
-    domains[0].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
+    state->dataPlantPipingSysMgr->domains[0].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA1");
 
-    domains[1].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
+    state->dataPlantPipingSysMgr->domains[1].groundTempModel = GetGroundTempModelAndInit(*state, "Site:GroundTemperature:Undisturbed:KusudaAchenbach", "KA2");
 
-    EXPECT_NE(domains[0].groundTempModel, domains[1].groundTempModel);
+    EXPECT_NE(state->dataPlantPipingSysMgr->domains[0].groundTempModel, state->dataPlantPipingSysMgr->domains[1].groundTempModel);
 }

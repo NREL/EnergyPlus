@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -61,7 +62,6 @@
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
     int const EvapCoolNum(1);
     EvapCond.allocate(EvapCoolNum);
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     EvapCond(EvapCoolNum).InletMassFlowRate = 1.0;
     EvapCond(EvapCoolNum).InletTemp = 24.0;
     EvapCond(EvapCoolNum).InletHumRat = 0.013;
@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp)
 {
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     EvaporativeCoolers::EvapCond.allocate(1);
     int const EvapCoolNum(1);
     EvaporativeCoolers::EvapCond(EvapCoolNum).InletMassFlowRate = 1.0;
@@ -715,7 +715,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
     DataLoopNode::Node.allocate(2);
     auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const CurveNum = 1;
     state->dataCurveManager->NumCurves = 1;
@@ -731,14 +731,14 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     // set up the flow rates for a direct RDDSpecial
     thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.EvapCoolerName = "MyDirectEvapCoolerRS";
-    thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+    thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisEvapCooler.PumpPowerModifierCurveIndex = CurveNum;
     thisEvapCooler.DirectEffectiveness = 0.75;
     thisEvapCooler.DesVolFlowRate = 1.0;
     thisEvapCooler.InletNode = 1;
     thisEvapCooler.InletTemp = 25.0;
     thisEvapCooler.InletWetBulbTemp = 21.0;
-    thisEvapCooler.InletHumRat = PsyWFnTdbTwbPb(*state, thisEvapCooler.InletTemp, thisEvapCooler.InletWetBulbTemp, OutBaroPress);
+    thisEvapCooler.InletHumRat = PsyWFnTdbTwbPb(*state, thisEvapCooler.InletTemp, thisEvapCooler.InletWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     // set full flow rate test condition
     DataLoopNode::Node(thisEvapCooler.InletNode).MassFlowRateMax = 1.0;
@@ -762,7 +762,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
 {
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     int const EvapCoolNum(1);
     EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
     auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     thisEvapCooler.WetCoilMaxEfficiency = 0.8;
     thisEvapCooler.InletTemp = 25.5;
     thisEvapCooler.InletHumRat = 0.0140;
-    thisEvapCooler.InletWetBulbTemp = PsyTwbFnTdbWPb(*state, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+    thisEvapCooler.InletWetBulbTemp = PsyTwbFnTdbWPb(*state, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat, state->dataEnvrn->OutBaroPress);
     thisEvapCooler.SecInletTemp = thisEvapCooler.InletTemp;
     thisEvapCooler.SecInletHumRat = thisEvapCooler.InletHumRat;
     thisEvapCooler.SecInletWetBulbTemp = thisEvapCooler.InletWetBulbTemp;
@@ -890,7 +890,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
     int Evap_Cooler_CompType = 18;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Air loop fan PLR
     state->dataAirLoop->AirLoopFlow.allocate(AirLoopNum);
@@ -901,7 +901,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
-    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
+    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = state->dataEnvrn->OutBaroPress;
 
     state->dataGlobal->BeginEnvrnFlag = true;
 

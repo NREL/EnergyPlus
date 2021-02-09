@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,17 +48,19 @@
 // EnergyPlus::HVACDXSystem and VariableSpeedCoils Unit Tests
 
 // Google Test Headers
+#include <gtest/gtest.h>
+
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <gtest/gtest.h>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -534,16 +536,16 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     EXPECT_EQ(2, HVACDXSystem::DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum);
 
     // set up outdoor environment
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0196;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 27.0932;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0196;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 18.0;
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
-    DataEnvironment::StdRhoAir = 1.2;
-    DataLoopNode::Node(InletNode).MassFlowRate = 5.66336932 * DataEnvironment::StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    DataLoopNode::Node(InletNode).MassFlowRate = 5.66336932 * state->dataEnvrn->StdRhoAir;
     DataLoopNode::Node(InletNode).Temp = 24.0;
     DataLoopNode::Node(InletNode).HumRat = 0.012143698;
     DataLoopNode::Node(InletNode).Enthalpy = 55029.3778; // conditions at 65 % RH
@@ -691,15 +693,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     HVACDXSystem::GetDXCoolingSystemInput(*state);
 
     // set up outdoor environment
-    DataEnvironment::OutDryBulbTemp = 35.0;
-    DataEnvironment::OutHumRat = 0.0196;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutWetBulbTemp = 27.0932;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0196;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 27.0932;
 
     // set up inputs to test coil control
     HVACDXSystem::DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 22.0;
-    DataEnvironment::StdRhoAir = 1.2;
-    DataLoopNode::Node(InletNode).MassFlowRate = 1.396964 * DataEnvironment::StdRhoAir;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    DataLoopNode::Node(InletNode).MassFlowRate = 1.396964 * state->dataEnvrn->StdRhoAir;
     DataLoopNode::Node(InletNode).Temp = 24.0;
     DataLoopNode::Node(InletNode).HumRat = 0.014; // high zone RH, about 75%
     DataLoopNode::Node(InletNode).Enthalpy =

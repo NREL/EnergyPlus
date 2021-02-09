@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,19 +51,15 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::TARCOGDeflection {
 
-namespace TARCOGDeflection {
-
-    // Functions
-
-    void PanesDeflection(int const DeflectionStandard,
-                         Real64 const W,
-                         Real64 const H,
-                         int const nlayer,
-                         Real64 const Pa,
-                         Real64 const Pini,
-                         Real64 const Tini,
+    void PanesDeflection(int DeflectionStandard,
+                         Real64 W,
+                         Real64 H,
+                         int nlayer,
+                         Real64 Pa,
+                         Real64 Pini,
+                         Real64 Tini,
                          const Array1D<Real64> &PaneThickness,
                          const Array1D<Real64> &NonDeflectedGapWidth,
                          Array1D<Real64> &DeflectedGapWidthMax,
@@ -75,12 +71,12 @@ namespace TARCOGDeflection {
                          int &nperr,
                          std::string &ErrorMessage);
 
-    void DeflectionTemperatures(int const nlayer,
-                                Real64 const W,
-                                Real64 const H,
-                                Real64 const Pa,
-                                Real64 const Pini,
-                                Real64 const Tini,
+    void DeflectionTemperatures(int nlayer,
+                                Real64 W,
+                                Real64 H,
+                                Real64 Pa,
+                                Real64 Pini,
+                                Real64 Tini,
                                 const Array1D<Real64> &NonDeflectedGapWidth,
                                 Array1D<Real64> &DeflectedGapWidthMax,
                                 Array1D<Real64> &DeflectedGapWidthMean,
@@ -90,16 +86,14 @@ namespace TARCOGDeflection {
                                 int &nperr,
                                 std::string &ErrorMessage);
 
-    void DeflectionWidths(int const nlayer,
-                          Real64 const W,
-                          Real64 const H,
+    void DeflectionWidths(int nlayer,
+                          Real64 W,
+                          Real64 H,
                           Array1D<Real64> &DCoeff,
                           const Array1D<Real64> &NonDeflectedGapWidth,
                           const Array1D<Real64> &DeflectedGapWidthMax,
                           Array1D<Real64> &DeflectedGapWidthMean,
                           Array1D<Real64> &LayerDeflection);
-
-} // namespace TARCOGDeflection
 
 } // namespace EnergyPlus
 

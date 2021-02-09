@@ -1,0 +1,14 @@
+ndiorio = Nick DiOrio <nicholas.diorio@nrel.gov>
+sjanzou = Steve Janzou <steven.janzou@nrel.gov>
+jfreeman = Janine Freeman <janine.freeman@nrel.gov>
+adobos = Aron Dobos <aron.dobos@outlook.com>
+pgilman = Paul Gilman <paulgilman@earthlink.net>
+tneises = Ty Neises <ty.neises@nrel.gov>
+mwagner = Michael Wagner <michael.wagner@nrel.gov>
+jmartine = Janna Martinek <janna.martinek@nrel.gov>
+nblair = Nate Blair <nate.blair@nrel.gov>
+mmehos = Mark Mehos <mark.mehos@nrel.gov>
+gzhu = Guangdong Zhu <guangdong.zhu@nrel.gov>
+dryberg = David Ryberg <unknown.email.com>
+tferguso = Tom Ferguson <tom.ferguson@nrel.gov>
+lkaffine = L. Kaffine <unknown.email.com>

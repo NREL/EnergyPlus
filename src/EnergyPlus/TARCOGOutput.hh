@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,9 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -61,10 +62,7 @@ namespace TARCOGOutput {
 
     struct Files {
       std::string DBGD;
-      std::string FileMode;
-      std::string FilePosition{"ASIS"};
       bool WriteDebugOutput{false};
-      int DebugMode{0};
 
       std::string WINCogFileName{"test.w7"};
       InputOutputFile WINCogFile{WINCogFileName};
@@ -76,52 +74,38 @@ namespace TARCOGOutput {
       std::string IterationCSVName{"IterationResults.csv"};
       InputOutputFile IterationCSVFile{IterationCSVName};
 
-
-      // integer, parameter :: IterationHHAT = 102
-      // character(len=1000)    :: IterationHHATName = 'IterationHHAT.csv'
-
-      // character(len=1000)    :: SHGCFileName = 'test.w7'
       std::string DebugOutputFileName{"Tarcog.dbg"};
       InputOutputFile DebugOutputFile{DebugOutputFileName};
     };
 
-    extern int winID;
-    extern int iguID;
-
-
-    extern std::string const VersionNumber;
-    extern std::string const VersionCompileDateCC;
-
-    // Functions
-
-    void WriteInputArguments(InputOutputFile &InArgumentsFile,
+    void WriteInputArguments(EnergyPlusData &state, InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
-                             Real64 const tout,
-                             Real64 const tind,
-                             Real64 const trmin,
-                             Real64 const wso,
-                             int const iwd,
-                             Real64 const wsi,
-                             Real64 const dir,
-                             Real64 const outir,
-                             int const isky,
-                             Real64 const tsky,
-                             Real64 const esky,
-                             Real64 const fclr,
-                             Real64 const VacuumPressure,
-                             Real64 const VacuumMaxGapThickness,
+                             Real64 tout,
+                             Real64 tind,
+                             Real64 trmin,
+                             Real64 wso,
+                             int iwd,
+                             Real64 wsi,
+                             Real64 dir,
+                             Real64 outir,
+                             int isky,
+                             Real64 tsky,
+                             Real64 esky,
+                             Real64 fclr,
+                             Real64 VacuumPressure,
+                             Real64 VacuumMaxGapThickness,
                              const Array1D_int &ibc,
-                             Real64 const hout,
-                             Real64 const hin,
-                             int const standard,
-                             int const ThermalMod,
-                             Real64 const SDScalar,
-                             Real64 const height,
-                             Real64 const heightt,
-                             Real64 const width,
-                             Real64 const tilt,
-                             Real64 const totsol,
-                             int const nlayer,
+                             Real64 hout,
+                             Real64 hin,
+                             int standard,
+                             int ThermalMod,
+                             Real64 SDScalar,
+                             Real64 height,
+                             Real64 heightt,
+                             Real64 width,
+                             Real64 tilt,
+                             Real64 totsol,
+                             int nlayer,
                              const Array1D_int &LayerType,
                              const Array1D<Real64> &thick,
                              const Array1D<Real64> &scon,
@@ -148,38 +132,38 @@ namespace TARCOGOutput {
                              const Array1D<Real64> &tvent,
                              const Array1D<Real64> &presure,
                              const Array1D_int &nmix,
-                             Array2A_int const iprop,
-                             Array2A<Real64> const frct,
-                             Array2A<Real64> const xgcon,
-                             Array2A<Real64> const xgvis,
-                             Array2A<Real64> const xgcp,
+                             Array2A_int iprop,
+                             Array2A<Real64> frct,
+                             Array2A<Real64> xgcon,
+                             Array2A<Real64> xgvis,
+                             Array2A<Real64> xgcp,
                              const Array1D<Real64> &xwght);
 
     void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
                                 std::string const &DBGD,
-                                Real64 const esky,
-                                Real64 const trmout,
-                                Real64 const trmin,
-                                Real64 const ebsky,
-                                Real64 const ebroom,
-                                Real64 const Gout,
-                                Real64 const Gin,
-                                int const nlayer,
+                                Real64 esky,
+                                Real64 trmout,
+                                Real64 trmin,
+                                Real64 ebsky,
+                                Real64 ebroom,
+                                Real64 Gout,
+                                Real64 Gin,
+                                int nlayer,
                                 const Array1D_int &LayerType,
                                 const Array1D_int &nmix,
-                                Array2A<Real64> const frct,
+                                Array2A<Real64> frct,
                                 const Array1D<Real64> &thick,
                                 const Array1D<Real64> &scon,
                                 const Array1D<Real64> &gap,
-                                Array2A<Real64> const xgcon,
-                                Array2A<Real64> const xgvis,
-                                Array2A<Real64> const xgcp,
+                                Array2A<Real64> xgcon,
+                                Array2A<Real64> xgvis,
+                                Array2A<Real64> xgcp,
                                 const Array1D<Real64> &xwght);
 
     void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
                               std::string const &DBGD,
-                              int const nlayer,
-                              Real64 const tamb,
+                              int nlayer,
+                              Real64 tamb,
                               const Array1D<Real64> &q,
                               const Array1D<Real64> &qv,
                               const Array1D<Real64> &qcgas,
@@ -189,16 +173,16 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &vvent,
                               const Array1D<Real64> &Keff,
                               const Array1D<Real64> &ShadeGapKeffConv,
-                              Real64 const troom,
-                              Real64 const ufactor,
-                              Real64 const shgc,
-                              Real64 const sc,
-                              Real64 const hflux,
-                              Real64 const shgct,
-                              Real64 const hcin,
-                              Real64 const hrin,
-                              Real64 const hcout,
-                              Real64 const hrout,
+                              Real64 troom,
+                              Real64 ufactor,
+                              Real64 shgc,
+                              Real64 sc,
+                              Real64 hflux,
+                              Real64 shgct,
+                              Real64 hcin,
+                              Real64 hrin,
+                              Real64 hcout,
+                              Real64 hrout,
                               const Array1D<Real64> &Ra,
                               const Array1D<Real64> &Nu,
                               const Array1D_int &LayerType,
@@ -206,27 +190,27 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &Ebb,
                               const Array1D<Real64> &Rf,
                               const Array1D<Real64> &Rb,
-                              Real64 const ebsky,
-                              Real64 const Gout,
-                              Real64 const ebroom,
-                              Real64 const Gin,
-                              Real64 const ShadeEmisRatioIn,
-                              Real64 const ShadeEmisRatioOut,
-                              Real64 const ShadeHcRatioIn,
-                              Real64 const ShadeHcRatioOut,
-                              Real64 const HcUnshadedIn,
-                              Real64 const HcUnshadedOut,
+                              Real64 ebsky,
+                              Real64 Gout,
+                              Real64 ebroom,
+                              Real64 Gin,
+                              Real64 ShadeEmisRatioIn,
+                              Real64 ShadeEmisRatioOut,
+                              Real64 ShadeHcRatioIn,
+                              Real64 ShadeHcRatioOut,
+                              Real64 HcUnshadedIn,
+                              Real64 HcUnshadedOut,
                               const Array1D<Real64> &hcgas,
                               const Array1D<Real64> &hrgas,
-                              Real64 const AchievedErrorTolerance,
-                              int const NumOfIter);
+                              Real64 AchievedErrorTolerance,
+                              int NumOfIter);
 
     void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
                           std::string const &DBGD,
-                          int const nlayer,
-                          Real64 const ufactor,
-                          Real64 const hout,
-                          Real64 const hin,
+                          int nlayer,
+                          Real64 ufactor,
+                          Real64 hout,
+                          Real64 hin,
                           const Array1D<Real64> &Ra,
                           const Array1D<Real64> &Nu,
                           const Array1D<Real64> &hg,
@@ -234,38 +218,38 @@ namespace TARCOGOutput {
                           const Array1D<Real64> &hs,
                           int &nperr);
 
-    void WriteTARCOGInputFile(Files &files,
+    void WriteTARCOGInputFile(EnergyPlusData &state, Files &files,
                               std::string const &VerNum,
-                              Real64 const tout,
-                              Real64 const tind,
-                              Real64 const trmin,
-                              Real64 const wso,
-                              int const iwd,
-                              Real64 const wsi,
-                              Real64 const dir,
-                              Real64 const outir,
-                              int const isky,
-                              Real64 const tsky,
-                              Real64 const esky,
-                              Real64 const fclr,
-                              Real64 const VacuumPressure,
-                              Real64 const VacuumMaxGapThickness,
-                              int const CalcDeflection,
-                              Real64 const Pa,
-                              Real64 const Pini,
-                              Real64 const Tini,
+                              Real64 tout,
+                              Real64 tind,
+                              Real64 trmin,
+                              Real64 wso,
+                              int iwd,
+                              Real64 wsi,
+                              Real64 dir,
+                              Real64 outir,
+                              int isky,
+                              Real64 tsky,
+                              Real64 esky,
+                              Real64 fclr,
+                              Real64 VacuumPressure,
+                              Real64 VacuumMaxGapThickness,
+                              int CalcDeflection,
+                              Real64 Pa,
+                              Real64 Pini,
+                              Real64 Tini,
                               const Array1D_int &ibc,
-                              Real64 const hout,
-                              Real64 const hin,
-                              int const standard,
-                              int const ThermalMod,
-                              Real64 const SDScalar,
-                              Real64 const height,
-                              Real64 const heightt,
-                              Real64 const width,
-                              Real64 const tilt,
-                              Real64 const totsol,
-                              int const nlayer,
+                              Real64 hout,
+                              Real64 hin,
+                              int standard,
+                              int ThermalMod,
+                              Real64 SDScalar,
+                              Real64 height,
+                              Real64 heightt,
+                              Real64 width,
+                              Real64 tilt,
+                              Real64 totsol,
+                              int nlayer,
                               const Array1D_int &LayerType,
                               const Array1D<Real64> &thick,
                               const Array1D<Real64> &scon,
@@ -295,20 +279,31 @@ namespace TARCOGOutput {
                               const Array1D<Real64> &tvent,
                               const Array1D<Real64> &presure,
                               const Array1D_int &nmix,
-                              Array2A_int const iprop,
-                              Array2A<Real64> const frct,
-                              Array2A<Real64> const xgcon,
-                              Array2A<Real64> const xgvis,
-                              Array2A<Real64> const xgcp,
+                              Array2A_int iprop,
+                              Array2A<Real64> frct,
+                              Array2A<Real64> xgcon,
+                              Array2A<Real64> xgvis,
+                              Array2A<Real64> xgcp,
                               const Array1D<Real64> &xwght,
                               const Array1D<Real64> &gama);
 
-    void FinishDebugOutputFiles(Files &files, int const nperr);
+    void FinishDebugOutputFiles(Files &files, int nperr);
 
     void PrepDebugFilesAndVariables(
-        Files &files, std::string const &Debug_dir, std::string const &Debug_file, int const Debug_mode, int const win_ID, int const igu_ID);
+        EnergyPlusData &state, Files &files, std::string const &Debug_dir, std::string const &Debug_file, int Debug_mode, int win_ID, int igu_ID);
 
 } // namespace TARCOGOutput
+
+struct TARCOGOutputData : BaseGlobalStruct {
+    int winID = 0;
+    int iguID = 0;
+
+    void clear_state() override
+    {
+        this->winID = 0;
+        this->iguID = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,18 +67,18 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
         } else {
             if (this->termUnitIU) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                   DataGlobalConstants::CWInitConvTemp(),
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                   DataGlobalConstants::CWInitConvTemp,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                               DataGlobalConstants::CWInitConvTemp(),
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                               DataGlobalConstants::CWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 Real64 DesCoilLoad = this->dataWaterFlowUsedForSizing * this->dataWaterCoilSizCoolDeltaT * Cp * rho;
                 Real64 T1Out =
-                    this->dataDesInletAirTemp - DesCoilLoad / (DataEnvironment::StdRhoAir * Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat) *
+                    this->dataDesInletAirTemp - DesCoilLoad / (state.dataEnvrn->StdRhoAir * Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat) *
                                                                this->dataAirFlowUsedForSizing);
                 Real64 T2Out = this->plantSizData(this->dataPltSizCoolNum).ExitTemp + 2.0;
                 this->autoSizedValue = max(T1Out, T2Out);
@@ -91,7 +91,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                 if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                     Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                    fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                    fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                     this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                 }
             }
@@ -135,7 +135,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                        fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                        fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                         this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }
@@ -148,7 +148,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->dataDesInletAirHumRat);
-                        fanDeltaT = FanCoolLoad / (CpAir * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing);
+                        fanDeltaT = FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * this->dataAirFlowUsedForSizing);
                         this->setDataDesAccountForFanHeat(false); // used in CoolingCapacitySizing calculations to avoid double counting fan heat
                     }
                 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -385,7 +385,7 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
         if (!cEnvValue.empty()) state.dataGlobal->CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
@@ -400,10 +400,10 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
-        if (!cEnvValue.empty()) DataEnvironment::IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataEnvrn->IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSutherlandHodgman, cEnvValue);
         if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True

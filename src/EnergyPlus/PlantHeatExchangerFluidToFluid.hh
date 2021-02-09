@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -64,11 +65,48 @@ struct EnergyPlusData;
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    extern int const CoolingDifferentialOnOff;
-    extern int const CoolingSetPointOnOffWithComponentOverride;
-    extern int const DryBulbTemperature;
+    enum class iFluidHXType
+    {
+        Unassigned,
+        CrossFlowBothUnMixed,
+        CrossFlowBothMixed,
+        CrossFlowSupplyLoopMixedDemandLoopUnMixed,
+        CrossFlowSupplyLoopUnMixedDemandLoopMixed,
+        CounterFlow,
+        ParallelFlow,
+        Ideal,
+    };
 
-    extern int NumberOfPlantFluidHXs;
+    enum class iCtrlType
+    {
+        Unassigned,
+        UncontrolledOn,
+        OperationSchemeModulated,
+        OperationSchemeOnOff,
+        HeatingSetPointModulated,
+        HeatingSetPointOnOff,
+        CoolingSetPointModulated,
+        CoolingSetPointOnOff,
+        DualDeadBandSetPointModulated,
+        DualDeadBandSetPointOnOff,
+        CoolingDifferentialOnOff,
+        CoolingSetPointOnOffWithComponentOverride,
+        TrackComponentOnOff,
+    };
+
+    enum class iCtrlTemp
+    {
+        Unassigned,
+        WetBulbTemperature,
+        DryBulbTemperature,
+        LoopTemperature,
+    };
+
+    enum class iHXAction
+    {
+        HeatingSupplySideLoop,
+        CoolingSupplySideLoop,
+    };
 
     struct PlantConnectionStruct : PlantLocation
     {
@@ -112,13 +150,13 @@ namespace PlantHeatExchangerFluidToFluid {
         // Members
         std::string Name;
         int AvailSchedNum;
-        int HeatExchangeModelType;
+        iFluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
-        int ControlMode;
+        iCtrlType ControlMode;
         int SetPointNodeNum;
         Real64 TempControlTol;
-        int ControlSignalTemp;
+        iCtrlTemp ControlSignalTemp;
         Real64 MinOperationTemp;
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
@@ -143,11 +181,11 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(0), UA(0.0), UAWasAutoSized(false), ControlMode(0), SetPointNodeNum(0), TempControlTol(0.0),
-              ControlSignalTemp(0), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0),
-              HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
-              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
-              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
+              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
+              MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
+              OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
+              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -169,7 +207,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, int HXActionMode);
+        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, iHXAction HXActionMode);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,
@@ -177,14 +215,23 @@ namespace PlantHeatExchangerFluidToFluid {
         );
     };
 
-    // Object Data
-    extern Array1D<HeatExchangerStruct> FluidHX;
-
     void GetFluidHeatExchangerInput(EnergyPlusData &state);
 
-    void clear_state();
-
 } // namespace PlantHeatExchangerFluidToFluid
+
+struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct {
+
+    int NumberOfPlantFluidHXs = 0;
+    bool GetInput = true;
+    Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
+
+    void clear_state() override
+    {
+        this->NumberOfPlantFluidHXs = 0;
+        this->GetInput = true;
+        this->FluidHX.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

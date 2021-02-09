@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define RoomAirModelManager_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -58,35 +59,18 @@ struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
     extern bool GetUCSDDVDataFlag; // UCSD
     extern bool GetAirModelData;   // Used to "get" all air model data
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Functions
 
     void clear_state();
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
-
-    //*****************************************************************************************
 
     void GetAirModelDatas(EnergyPlusData &state);
 
     void GetUserDefinedPatternData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
     void GetAirNodeData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
-
-    //*****************************************************************************************
 
     void GetMundtData(EnergyPlusData &state, bool &ErrorsFound); // True if errors found during this get input routine
 
@@ -112,9 +96,15 @@ namespace RoomAirModelManager {
                         int TotNumEquip,              // how many of this equipment type
                         int TypeNum);                 // equipment type number
 
-    //*****************************************************************************************
-
 } // namespace RoomAirModelManager
+
+struct RoomAirModelManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

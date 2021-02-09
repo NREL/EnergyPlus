@@ -25,8 +25,8 @@ compilers:
     cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
-    coverage_pass_limit: 68.0
-    coverage_warn_limit: 67.9
+    coverage_pass_limit: 67.8
+    coverage_warn_limit: 67.7
     coverage_s3_bucket: energyplus
     build_tag: IntegrationCoverage
     ctest_filter: -R "integration.*"

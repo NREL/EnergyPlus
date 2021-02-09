@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define PlantReportingMeterData_hh_INCLUDED
 
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SystemReports.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -60,7 +61,7 @@ namespace DataPlant {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        int EndUse_CompMode;
+        SystemReports::iEndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -69,7 +70,8 @@ namespace DataPlant {
 
         // Default Constructor
         MeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None), EndUse_CompMode(0), ReportVarIndex(0),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
+              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
               ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }

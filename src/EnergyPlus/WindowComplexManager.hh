@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -267,7 +267,8 @@ namespace WindowComplexManager {
 
         bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
         bool InitBSDFWindowsOnce = true;
-        bool resetAbunchOfStuff = true;
+        int NumBasis = 0; // Number of unique bases (No. in BasisList)
+        int MatrixNo = 0; // Index of Basis matrix
 
         void clear_state() //override
         {
@@ -277,14 +278,15 @@ namespace WindowComplexManager {
             this->WindowStateList.deallocate();
             this->InitComplexWindowsOnce = true;
             this->InitBSDFWindowsOnce = true;
-            this->resetAbunchOfStuff = true;
+            this->NumBasis = 0;
+            this->MatrixNo = 0;
         }
 
         // Default Constructor
         WindowComplexManagerData()
             : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
-            TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
-            Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0)
+              TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
+              Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
         {
         }
 

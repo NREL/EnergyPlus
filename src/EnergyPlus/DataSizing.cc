@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -98,7 +99,7 @@ namespace DataSizing {
                                              "Sum",
                                              "Maximum",
                                              "IndoorAirQualityProcedure",
-                                             "ProportionalControlBasedonOccupancySchedule",
+                                             "ProportionalControlBasedOnOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air
@@ -925,7 +926,7 @@ namespace DataSizing {
 
         if (CoolCapCtrl == VAV) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
-            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / DataEnvironment::StdRhoAir;
+            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
             DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
@@ -940,9 +941,9 @@ namespace DataSizing {
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
             DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
-                              AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
+                              AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
             DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
@@ -951,7 +952,7 @@ namespace DataSizing {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
-            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
+            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
             TotFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
             MixTemp = CalcSysSizing(SysNum).MixTempAtCoolPeak;
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
@@ -960,7 +961,7 @@ namespace DataSizing {
             } else {
                 DesFlow = TotFlow;
             }
-            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         }
     }
 

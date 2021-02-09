@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -159,12 +159,12 @@ namespace SurfaceGroundHeatExchanger {
               LoopSideNum(0), BranchNum(0), CompNum(0),
 
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFflux({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0),
-              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms() - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
+              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -260,7 +260,7 @@ namespace SurfaceGroundHeatExchanger {
 
 } // namespace SurfaceGroundHeatExchanger
 
-struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {     
+struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
 
     // utility variables initialized once
     bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -66,7 +66,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -85,35 +84,35 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalance::CrossMixing.allocate(NumOfCrossMixing);
     DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::CrossMixingReportFlag.allocate(NumOfCrossMixing);
+    state->dataZoneEquip->CrossMixingReportFlag.allocate(NumOfCrossMixing);
     DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHeatBalance::TotCrossMixing = NumOfCrossMixing;
-    DataZoneEquipment::CrossMixingReportFlag(1) = true;
+    state->dataZoneEquip->CrossMixingReportFlag(1) = true;
     DataHVACGlobals::TimeStepSys = 1.0;
     DataHeatBalFanSys::MCPI = 0.0;
     DataHeatBalFanSys::MCPV = 0.0;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
 
     DataHeatBalance::CrossMixing(1).ZonePtr = 1;
     DataHeatBalance::CrossMixing(1).FromZone = 2;
     DataHeatBalance::CrossMixing(1).DesiredAirFlowRate = 0.1;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
     ReportAirHeatBalance(*state);
@@ -136,7 +135,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataHeatBalance::CrossMixing.deallocate();
     DataHeatBalance::ZnAirRpt.deallocate();
-    DataZoneEquipment::CrossMixingReportFlag.deallocate();
+    state->dataZoneEquip->CrossMixingReportFlag.deallocate();
     DataHeatBalFanSys::MCPI.deallocate();
     DataHeatBalFanSys::MCPV.deallocate();
     DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate();
@@ -156,7 +155,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalance::TotVentilation = 1;
     DataHeatBalance::Ventilation.allocate(DataHeatBalance::TotVentilation);
-    DataZoneEquipment::VentMCP.allocate(1);
+    state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
@@ -164,26 +163,26 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPI(2) = 1.5;
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutHumRat = 0.0005;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     DataHeatBalance::Ventilation(1).ZonePtr = 1;
     DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
-    DataZoneEquipment::VentMCP(1) = DataHeatBalFanSys::MCPV(1);
+    state->dataZoneEquip->VentMCP(1) = DataHeatBalFanSys::MCPV(1);
     // Call HVACManager
     ReportAirHeatBalance(*state);
 
@@ -197,12 +196,12 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
 
     // #8068
-    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).InfilTotalLoss, 0.0001);
-    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
-                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
@@ -226,25 +225,25 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataHeatBalFanSys::MCPI(2) = 1.5;
     DataHeatBalFanSys::MCPV(1) = 2.0;
     DataHeatBalFanSys::MCPV(2) = 2.5;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataEnvironment::OutHumRat = 0.0005;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutHumRat = 0.0005;
     DataHeatBalFanSys::MAT(1) = 22.0;
     DataHeatBalFanSys::MAT(2) = 25.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    DataEnvironment::StdRhoAir = 1.20;
+    state->dataEnvrn->StdRhoAir = 1.20;
     DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
     DataHeatBalance::Zone(2).OutDryBulbTemp = 20.0;
-    DataZoneEquipment::ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumInletNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumExhaustNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
     state->dataFans->NumFans = 1;
@@ -277,7 +276,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataGlobal->WarmupFlag = false;
     DataHVACGlobals::AirLoopsSimOnce = true;
-    DataEnvironment::StdRhoAir = 1.0;
+    state->dataEnvrn->StdRhoAir = 1.0;
 
     DataHVACGlobals::NumPrimaryAirSys = 2;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(DataHVACGlobals::NumPrimaryAirSys);

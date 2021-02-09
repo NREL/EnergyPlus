@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
-#include <string>
 #include <algorithm>
+#include <cmath>
 #include <limits>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -59,12 +59,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -2224,7 +2224,7 @@ namespace CurveManager {
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataCurveManager->NumCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve",
+                SetupEMSActuator(state, "Curve",
                                  state.dataCurveManager->PerfCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2234,7 +2234,7 @@ namespace CurveManager {
         }
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // provide hook for possible EMS control
             for (CurveIndex = 1; CurveIndex <= state.dataBranchAirLoopPlant->NumPressureCurves; ++CurveIndex) {
-                SetupEMSActuator("Curve",
+                SetupEMSActuator(state, "Curve",
                                  state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name,
                                  "Curve Result",
                                  "[unknown]",
@@ -2873,7 +2873,7 @@ namespace CurveManager {
         ConstantF = state.dataBranchAirLoopPlant->PressureCurve(PressureCurveIndex).ConstantF;
 
         // Intermediate calculations
-        CrossSectArea = (DataGlobalConstants::Pi() / 4.0) * pow_2(Diameter);
+        CrossSectArea = (DataGlobalConstants::Pi / 4.0) * pow_2(Diameter);
         Velocity = MassFlow / (Density * CrossSectArea);
         ReynoldsNumber = Density * Diameter * Velocity / Viscosity; // assuming mu here
         RoughnessRatio = Roughness / Diameter;
