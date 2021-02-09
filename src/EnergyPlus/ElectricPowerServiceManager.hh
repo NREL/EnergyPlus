@@ -333,7 +333,7 @@ private: // data
         liIonNmcBattery,
     };
 
-    enum class BatteyDegredationModelType : int
+    enum class BatteryDegradationModelType : int
     {
         degredationNotSet = 0,
         lifeCalculationYes,
@@ -376,7 +376,7 @@ private: // data
     Real64 maxDischargeI_;                         // [A] maximum discharging current
     Real64 cutoffV_;                               // [V] cut-off voltage
     Real64 maxChargeRate_;                         // [1/h] charge rate limit
-    BatteyDegredationModelType lifeCalculation_;   // [ ] battery life calculation: Yes or No
+    BatteryDegradationModelType lifeCalculation_;   // [ ] battery life calculation: Yes or No
     int lifeCurveNum_;                             // [ ] battery life curve name index number
     Real64 liIon_dcToDcChargingEff_;               // [ ] DC to DC Charging Efficiency (Li-ion NMC model)
     Real64 liIon_mass_;                            // [kg] mass of battery (Li-ion NMC model)

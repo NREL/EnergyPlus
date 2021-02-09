@@ -498,6 +498,7 @@ ADD_SIMULATION_TEST(IDF_FILE ReportHeatEmission_RefFSRestaurant.idf EPW_FILE USA
 ADD_SIMULATION_TEST(IDF_FILE RetailPackagedTESCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE RoomAirflowNetwork.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SeriesActiveBranch.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
