@@ -2516,7 +2516,7 @@ namespace HeatBalanceSurfaceManager {
                     SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
                     SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
                 }
-                for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
+                for (int Lay = 1; Lay <= state.dataHeatBal->MaxSolidWinLayers; Lay++) {
                     for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                         SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
                     }
@@ -5638,7 +5638,7 @@ namespace HeatBalanceSurfaceManager {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
-                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
                                                       ((PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->GroundTemp,
@@ -5656,7 +5656,7 @@ namespace HeatBalanceSurfaceManager {
                             // Set variables used in the FD moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
-                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
                                                       ((PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->GroundTemp,
                                                                           PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress,
@@ -5680,7 +5680,7 @@ namespace HeatBalanceSurfaceManager {
                             // Set variables used in the HAMT moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
-                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
                                                       ((PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->GroundTempFC,
@@ -5697,7 +5697,7 @@ namespace HeatBalanceSurfaceManager {
                             // Set variables used in the FD moisture balance
                             TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
-                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
                                                       ((PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->GroundTempFC,
                                                                           PsyWFnTdbRhPb(state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress,
@@ -5756,7 +5756,7 @@ namespace HeatBalanceSurfaceManager {
                             TempOutsideAirFD(SurfNum) = TH(1, 1, SurfNum);
                             RhoVaporAirOut(SurfNum) = PsyRhovFnTdbWPb(TempOutsideAirFD(SurfNum), state.dataEnvrn->OutHumRat,
                                                                       state.dataEnvrn->OutBaroPress);
-                            HConvExtFD(SurfNum) = HighHConvLimit;
+                            HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
                             HMassConvExtFD(SurfNum) = HConvExtFD(SurfNum) /
                                                       ((PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempOutsideAirFD(SurfNum),
                                                                           PsyWFnTdbRhPb(state, TempOutsideAirFD(SurfNum), 1.0,
@@ -6924,9 +6924,9 @@ namespace HeatBalanceSurfaceManager {
             } // ...end of loop to check for convergence
 
             if (!DataHeatBalance::AnyCondFD) {
-                if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
+                if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
             } else {
-                if (MaxDelTemp <= MaxAllowedDelTempCondFD) Converged = true;
+                if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTempCondFD) Converged = true;
 
                 // resets relaxation factor to speed up iterations when under-relaxation is not needed.
                 if (InsideSurfIterations <= 1) {
@@ -6954,14 +6954,14 @@ namespace HeatBalanceSurfaceManager {
                                              format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max "
                                                     "Allowed Temp Diff [C] ={:.3R}",
                                                     MaxDelTemp,
-                                                    MaxAllowedDelTemp));
+                                                    state.dataHeatBal->MaxAllowedDelTemp));
                             ShowContinueErrorTimeStamp(state, "");
                         } else {
                             ShowWarningError(state,
                                              format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max "
                                                     "Allowed Temp Diff [C] ={:.6R}",
                                                     MaxDelTemp,
-                                                    MaxAllowedDelTempCondFD));
+                                                    state.dataHeatBal->MaxAllowedDelTempCondFD));
                             ShowContinueErrorTimeStamp(state, "");
                         }
                     } else {
@@ -7630,7 +7630,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             } // ...end of loop to check for convergence
 
-            if (MaxDelTemp <= MaxAllowedDelTemp) Converged = true;
+            if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) Converged = true;
 
 #ifdef EP_Count_Calls
             NumMaxInsideSurfIterations = max(NumMaxInsideSurfIterations, InsideSurfIterations);
@@ -7646,7 +7646,7 @@ namespace HeatBalanceSurfaceManager {
                                          format("Inside surface heat balance did not converge with Max Temp Difference [C] ={:.3R} vs Max Allowed "
                                                 "Temp Diff [C] ={:.6R}",
                                                 MaxDelTemp,
-                                                MaxAllowedDelTempCondFD));
+                                                state.dataHeatBal->MaxAllowedDelTempCondFD));
                         ShowContinueErrorTimeStamp(state, "");
                     } else {
                         ShowRecurringWarningErrorAtEnd(state, "Inside surface heat balance convergence problem continues",

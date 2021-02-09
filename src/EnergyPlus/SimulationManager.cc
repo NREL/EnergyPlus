@@ -1256,15 +1256,15 @@ namespace SimulationManager {
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
-                            DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
                             ShowWarningError(
                                 state,
                                 format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",
-                                       DataHeatBalance::MaxAllowedDelTemp));
+                                       state.dataHeatBal->MaxAllowedDelTemp));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
-                            ShowContinueError(state, "...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
+                            ShowContinueError(state, "...Care should be used when using the Advanced Override Mode. Results may be significantly different "
                                               "than a simulation not using this mode.");
                         } else {
                             ShowWarningError(state,
@@ -1314,7 +1314,7 @@ namespace SimulationManager {
                     if (overrideMaxAllowedDelTemp) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
-                        DataHeatBalance::MaxAllowedDelTemp = 0.1;
+                        state.dataHeatBal->MaxAllowedDelTemp = 0.1;
                     }
                 }
             }
@@ -1412,7 +1412,7 @@ namespace SimulationManager {
         }
         Alphas(8) = format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0);
         Alphas(9) = format("{:.3R}", state.dataConvergeParams->MaxZoneTempDiff);
-        Alphas(10) = format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp);
+        Alphas(10) = format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
                                 "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
@@ -1471,7 +1471,7 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
         UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
         UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
-        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp));
+        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp));
     }
 
     std::string bool_to_string(bool logical)

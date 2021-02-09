@@ -2268,9 +2268,9 @@ namespace WindowManager {
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
             // of window layer heat balance solution.
             if (surface.IntConvCoeff == 0) {
-                if (state.dataWindowManager->hcin <= LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
+                if (state.dataWindowManager->hcin <= state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
-                    state.dataWindowManager->hcin = LowHConvLimit;
+                    state.dataWindowManager->hcin = state.dataHeatBal->LowHConvLimit;
                     HConvIn(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
                 }
             }
@@ -6811,28 +6811,11 @@ namespace WindowManager {
 
         ScanForReports(state, "Constructions", state.dataWindowManager->DoReport, "Constructions");
 
-        //  DO ThisNum=1,TotConstructs
-        //    IF (.not. Construct(ThisNum)%TypeIsWindow) CYCLE
-        //    HasWindows=.TRUE.
-        //    EXIT
-        //  ENDDO
-
         if (std::any_of(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.TypeIsWindow; })) state.dataWindowManager->HasWindows = true;
         if (std::any_of(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeBSDF; }))
             state.dataWindowManager->HasComplexWindows = true; // Yes, this is a bit different than actually using them.
         if (std::any_of(state.dataConstruction->Construct.begin(), state.dataConstruction->Construct.end(), [](Construction::ConstructionProps const &e) { return e.WindowTypeEQL; }))
             state.dataWindowManager->HasEQLWindows = true; // for reporting purpose only
-
-        //  DO ThisNum=1,TotSurfaces
-        //    SurfConstr = Surface(ThisNum)%Construction
-        //    IF (SurfConstr /= 0) THEN
-        //      IF (Construct(SurfConstr)%WindowTypeBSDF) THEN
-        //        HasComplexWindows=.TRUE.
-        //        EXIT
-        //      END IF
-        //    END IF
-        //  ENDDO
-
         if (state.dataWindowManager->DoReport && (state.dataWindowManager->HasWindows || state.dataWindowManager->HasComplexWindows || state.dataWindowManager->HasEQLWindows)) {
             //                                      Write Descriptions
 
@@ -7213,25 +7196,6 @@ namespace WindowManager {
                 NominalU(ThisNum) = NominalConductanceWinter;
             }
         }
-
-        // IF (HasComplexWindows) THEN
-        // DO ThisNum=1,TotSurfaces
-        //  SurfConstr = Surface(ThisNum)%Construction
-        //  IF (SurfConstr /= 0) THEN
-        //    IF (Construct(SurfConstr)%WindowTypeBSDF) THEN
-        //      Write(OutputFileInits,'(A)') '! <WindowConstructionComplex>,Construction Name,Index,#Layers,'//  &
-        //                         'U-factor {W/m2-K},SHGC'
-        //      CALL CalcComplexWindowThermal(ThisNum, TempVar, TempVar, TempVar, TempVar, winterCondition)
-        //      CALL CalcComplexWindowThermal(ThisNum, TempVar, TempVar, TempVar, TempVar, summerCondition)
-        //      Write(OutputFileInits,800) TRIM(Construct(SurfConstr)%Name), TRIM(RoundSigDigits(SurfConstr)), &
-        //                                 TRIM(RoundSigDigits(Construct(SurfConstr)%TotSolidLayers)), &
-        //                                 TRIM(RoundSigDigits(NominalU(SurfConstr),3)), &
-        //                                 TRIM(RoundSigDigits(Construct(SurfConstr)%SummerSHGC,3))
-        //    END IF
-        //  END IF
-        // ENDDO
-
-        // END IF
     }
 
     //*************************************************************************************
@@ -7336,9 +7300,6 @@ namespace WindowManager {
                         Blind(BlindNum).SolBackDiffAbs(ISlatAng) = max(0.0, 1.0 - st_lay(11) - st_lay(12));
                         Blind(BlindNum).IRFrontTrans(ISlatAng) = st_lay(13);
                         Blind(BlindNum).IRFrontEmiss(ISlatAng) = st_lay(14);
-                        // Blind(BlindNum)%IRBackTrans(ISlatAng)           = st_lay(15)
-                        // Blind(BlindNum)%IRBackEmiss(ISlatAng)           = st_lay(16)
-                        //  Above two lines are incorrect; replaced by (FCW, 2/10/03)
                         Blind(BlindNum).IRBackTrans(ISlatAng) = st_lay(13);
                         Blind(BlindNum).IRBackEmiss(ISlatAng) = st_lay(15);
                     } else { // Fill blind diffuse visible properties

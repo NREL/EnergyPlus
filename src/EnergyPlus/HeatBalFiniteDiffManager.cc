@@ -231,7 +231,6 @@ namespace HeatBalFiniteDiffManager {
         using namespace DataIPShortCuts;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::MaxAllowedDelTempCondFD;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                         // IO Status when calling get input subroutine
@@ -242,7 +241,6 @@ namespace HeatBalFiniteDiffManager {
         int MaterialNumProp;                // Number of material properties being passed
         Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
         static bool ErrorsFound(false);     // If errors detected in input
-        //  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
         int Loop;
         int NumAlphas;
         int NumNumbers;
@@ -294,7 +292,7 @@ namespace HeatBalFiniteDiffManager {
                 CondFDRelaxFactor = CondFDRelaxFactorInput;
             }
             if (!lNumericFieldBlanks(3)) {
-                MaxAllowedDelTempCondFD = rNumericArgs(3);
+                state.dataHeatBal->MaxAllowedDelTempCondFD = rNumericArgs(3);
             }
 
         } // settings object
@@ -1272,7 +1270,6 @@ namespace HeatBalFiniteDiffManager {
 
         // Using/Aliasing
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::MaxAllowedDelTempCondFD;
 
         using General::ScanForReports;
 
@@ -1297,7 +1294,7 @@ namespace HeatBalFiniteDiffManager {
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
               CondFDRelaxFactorInput,
-              MaxAllowedDelTempCondFD);
+              state.dataHeatBal->MaxAllowedDelTempCondFD);
 
         ScanForReports(state, "Constructions", DoReport, "Constructions");
 

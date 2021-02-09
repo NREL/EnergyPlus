@@ -608,11 +608,11 @@ namespace HeatBalanceManager {
 
         // start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files
         // (Construction:WindowDataFile)
-        DataHeatBalance::MaxSolidWinLayers = 7;
+        state.dataHeatBal->MaxSolidWinLayers = 7;
 
         // Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
         if (inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState") > 0) {
-            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, 10);
+            state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, 10);
         }
 
         // then process the rest of the relevant constructions
@@ -632,7 +632,7 @@ namespace HeatBalanceManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             int numLayersInThisConstruct(NumAlpha - 1);
-            DataHeatBalance::MaxSolidWinLayers = max(DataHeatBalance::MaxSolidWinLayers, numLayersInThisConstruct);
+            state.dataHeatBal->MaxSolidWinLayers = max(state.dataHeatBal->MaxSolidWinLayers, numLayersInThisConstruct);
         }
 
         // construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor,
@@ -1051,10 +1051,10 @@ namespace HeatBalanceManager {
             }
 
             if (!lNumericFieldBlanks(2)) {
-                LowHConvLimit = BuildingNumbers(2);
+                state.dataHeatBal->LowHConvLimit = BuildingNumbers(2);
             }
             if (!lNumericFieldBlanks(3)) {
-                HighHConvLimit = BuildingNumbers(3);
+                state.dataHeatBal->HighHConvLimit = BuildingNumbers(3);
             }
 
         } else {
@@ -4264,6 +4264,15 @@ namespace HeatBalanceManager {
 
             e.W5FrameDivider = 0;
             e.FromWindow5DataFile = false;
+
+            e.AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
         }
 
         ConstrNum = 0;

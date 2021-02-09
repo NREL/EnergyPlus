@@ -1648,8 +1648,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
     EXPECT_FALSE(DataHeatBalance::AnyHAMT);
     EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
     EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
-    EXPECT_EQ(DataHeatBalance::LowHConvLimit, 0.004);
-    EXPECT_EQ(DataHeatBalance::HighHConvLimit, 200.6);
+    EXPECT_EQ(state->dataHeatBal->LowHConvLimit, 0.004);
+    EXPECT_EQ(state->dataHeatBal->HighHConvLimit, 200.6);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)

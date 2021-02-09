@@ -857,10 +857,10 @@ namespace SolarShading {
         SurfWinBSDFBeamPhiRep.dimension(TotSurfaces, 0.0);
         SurfWinQRadSWwinAbsTot.dimension(TotSurfaces, 0.0);
 
-        SurfWinQRadSWwinAbsLayer.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
+        SurfWinQRadSWwinAbsLayer.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
 
-        SurfWinFenLaySurfTempFront.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
-        SurfWinFenLaySurfTempBack.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
+        SurfWinFenLaySurfTempFront.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
+        SurfWinFenLaySurfTempBack.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
 
         SurfWinSWwinAbsTotalReport.dimension(TotSurfaces, 0.0);
         SurfInitialDifSolInAbsReport.dimension(TotSurfaces, 0.0);
@@ -6896,7 +6896,7 @@ namespace SolarShading {
                                         ConstrNumBack = Surface(BackSurfNum).StormWinConstruction;
                                         ConstrNumBackSh = Surface(BackSurfNum).activeStormWinShadedConstruction;
                                     }
-                                    AbsBeamWin.dimension(DataHeatBalance::MaxSolidWinLayers, 0.0);
+                                    AbsBeamWin.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
                                     Real64 TransBeamWin = 0.0; // Beam solar transmittance of a window
                                     Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
 

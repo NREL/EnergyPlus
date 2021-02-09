@@ -104,30 +104,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
 
-    int MaxSolidWinLayers(0);                // Maximum number of solid layers in a window construction
-
-    Array1D_string const cMaterialGroupType({-1, 18},
-                                            {"invalid",
-                                             "Material/Material:NoMass",
-                                             "Material:AirGap",
-                                             "WindowMaterial:Shade",
-                                             "WindowMaterial:Glazing*",
-                                             "WindowMaterial:Gas",
-                                             "WindowMaterial:Blind",
-                                             "WindowMaterial:GasMixture",
-                                             "WindowMaterial:Screen",
-                                             "Material:RoofVegetation",
-                                             "Material:InfraredTransparent",
-                                             "WindowMaterial:SimpleGlazingSystem",
-                                             "WindowMaterial:ComplexShade",
-                                             "WindowMaterial:Gap",
-                                             "WindowMaterial:Glazing:EquivalentLayer",
-                                             "WindowMaterial:Shade:EquivalentLayer",
-                                             "WindowMaterial:Drape:EquivalentLayer",
-                                             "WindowMaterial:Blind:EquivalentLayer",
-                                             "WindowMaterial:Screen:EquivalentLayer",
-                                             "WindowMaterial:Gap:EquivalentLayer"});
-
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -243,30 +219,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
-
-    // SiteData aka building data
-    Real64 LowHConvLimit(0.1); // Lowest allowed convection coefficient for detailed model
-    // before reverting to the simple model.  This avoids a
-    // divide by zero elsewhere.  Not based on any physical
-    // reasoning, just the number that was picked.  It corresponds
-    // to a delta T for a vertical surface of 0.000444C.
-    // REAL(r64), PARAMETER :: LowHConvLimit = 1.0 !W/m2-K  Lowest allowed natural convection coefficient
-    //                           ! A lower limit is needed to avoid numerical problems
-    //                           ! Natural convection correlations are a function of temperature difference,
-    //                           !   there are many times when those temp differences pass through zero leading to non-physical results
-    //                           ! Value of 1.0 chosen here is somewhat arbitrary, but based on the following reasons:
-    //                           !  1) Low values of HconvIn indicate a layer of high thermal resistance, however
-    //                           !       the R-value of a convection film layer should be relatively low (compared to building surfaces)
-    //                           !  2) The value of 1.0 corresponds to the thermal resistance of 0.05 m of batt insulation
-    //                           !  3) Limit on the order of 1.0 is suggested by the abrupt changes in an inverse relationship
-    //                           !  4) A conduction-only analysis can model a limit by considering the thermal performance of
-    //                           !       boundary layer to be pure conduction (with no movement to enhance heat transfer);
-    //                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
-    //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
-    //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-    Real64 HighHConvLimit(1000.0);         // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
-    Real64 MaxAllowedDelTemp(0.002);       // Convergence criteria for inside surface temperatures
-    Real64 MaxAllowedDelTempCondFD(0.002); // Convergence criteria for inside surface temperatures for CondFD
 
     std::string BuildingName;           // Name of building
     Real64 BuildingAzimuth(0.0);        // North Axis of Building
@@ -633,11 +585,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        MaxSolidWinLayers = 0;
-        LowHConvLimit = 0.1;
-        HighHConvLimit = 1000.0;
-        MaxAllowedDelTemp = 0.002;
-        MaxAllowedDelTempCondFD = 0.002;
         BuildingName = std::string();
         BuildingAzimuth = 0.0;
         LoadsConvergTol = 0.0;

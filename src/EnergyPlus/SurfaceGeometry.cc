@@ -827,7 +827,7 @@ namespace SurfaceGeometry {
         SurfWinA.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         SurfWinADiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         SurfWinADiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
-        SurfWinACFOverlap.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
+        SurfWinACFOverlap.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -6987,8 +6987,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::HighHConvLimit;
-        using DataHeatBalance::LowHConvLimit;
         using DataHeatBalSurface::MaxSurfaceTempLimit;
         using DataSurfaces::Surface;
 
@@ -7482,31 +7480,31 @@ namespace SurfaceGeometry {
         if (DataHeatBalance::AnyCTF) {
             const auto AlgoName = "CTF - ConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, LowHConvLimit, HighHConvLimit);
+            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
         }
         if (DataHeatBalance::AnyEMPD) {
             DataHeatBalance::AllCTF = false;
             const auto AlgoName = "EMPD - MoisturePenetrationDepthConductionTransferFunction";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, LowHConvLimit, HighHConvLimit);
+            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
         }
         if (DataHeatBalance::AnyCondFD) {
             DataHeatBalance::AllCTF = false;
             const auto AlgoName = "CondFD - ConductionFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, LowHConvLimit, HighHConvLimit);
+            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
         }
         if (DataHeatBalance::AnyHAMT) {
             DataHeatBalance::AllCTF = false;
             const auto AlgoName = "HAMT - CombinedHeatAndMoistureFiniteElement";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, LowHConvLimit, HighHConvLimit);
+            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
         }
         if (DataHeatBalance::AnyKiva) {
             DataHeatBalance::AllCTF = false;
             const auto AlgoName = "KivaFoundation - TwoDimensionalFiniteDifference";
             ++numberOfHeatTransferAlgosUsed;
-            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, LowHConvLimit, HighHConvLimit);
+            print(state.files.eio, Format_725, AlgoName, MaxSurfaceTempLimit, state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit);
         }
 
         // Check HeatTransferAlgorithm for interior surfaces
@@ -10159,12 +10157,35 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, " invalid (not found) " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\"");
                     ErrorsFound = true;
                 } else {
+
+                    Array1D_string const cMaterialGroupType({-1, 18},
+                                                            {"invalid",
+                                                             "Material/Material:NoMass",
+                                                             "Material:AirGap",
+                                                             "WindowMaterial:Shade",
+                                                             "WindowMaterial:Glazing*",
+                                                             "WindowMaterial:Gas",
+                                                             "WindowMaterial:Blind",
+                                                             "WindowMaterial:GasMixture",
+                                                             "WindowMaterial:Screen",
+                                                             "Material:RoofVegetation",
+                                                             "Material:InfraredTransparent",
+                                                             "WindowMaterial:SimpleGlazingSystem",
+                                                             "WindowMaterial:ComplexShade",
+                                                             "WindowMaterial:Gap",
+                                                             "WindowMaterial:Glazing:EquivalentLayer",
+                                                             "WindowMaterial:Shade:EquivalentLayer",
+                                                             "WindowMaterial:Drape:EquivalentLayer",
+                                                             "WindowMaterial:Blind:EquivalentLayer",
+                                                             "WindowMaterial:Screen:EquivalentLayer",
+                                                             "WindowMaterial:Gap:EquivalentLayer"});
+
                     int const MaterialLayerGroup = state.dataMaterial->Material(MaterNum).Group;
                     if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
                         (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
                         (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
                         ShowSevereError(state, "Invalid movable insulation material for " + cCurrentModuleObject + ":");
-                        ShowSevereError(state, "...Movable insulation material type specified = " + DataHeatBalance::cMaterialGroupType(MaterialLayerGroup));
+                        ShowSevereError(state, "...Movable insulation material type specified = " + cMaterialGroupType(MaterialLayerGroup));
                         ShowSevereError(state, "...Movable insulation material name specified = " + cAlphaArgs(3));
                         ErrorsFound = true;
                     }

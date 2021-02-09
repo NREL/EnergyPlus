@@ -72,8 +72,6 @@ struct EnergyPlusData;
 
 namespace DataHeatBalance {
 
-    extern int MaxSolidWinLayers;                // Maximum number of solid layers in a window construction
-
     // Using/Aliasing
     using namespace DataComplexFenestration;
     using DataComplexFenestration::GapDeflectionState;
@@ -106,8 +104,6 @@ namespace DataHeatBalance {
     constexpr int BlindEquivalentLayer(16);
     constexpr int ScreenEquivalentLayer(17);
     constexpr int GapEquivalentLayer(18);
-
-    extern Array1D_string const cMaterialGroupType;
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type (see below):
@@ -279,30 +275,6 @@ namespace DataHeatBalance {
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
-
-    // SiteData aka building data
-    extern Real64 LowHConvLimit; // Lowest allowed convection coefficient for detailed model
-    // before reverting to the simple model.  This avoids a
-    // divide by zero elsewhere.  Not based on any physical
-    // reasoning, just the number that was picked.  It corresponds
-    // to a delta T for a vertical surface of 0.000444C.
-    // REAL(r64), PARAMETER :: LowHConvLimit = 1.0 !W/m2-K  Lowest allowed natural convection coefficient
-    //                           ! A lower limit is needed to avoid numerical problems
-    //                           ! Natural convection correlations are a function of temperature difference,
-    //                           !   there are many times when those temp differences pass through zero leading to non-physical results
-    //                           ! Value of 1.0 chosen here is somewhat arbitrary, but based on the following reasons:
-    //                           !  1) Low values of HconvIn indicate a layer of high thermal resistance, however
-    //                           !       the R-value of a convection film layer should be relatively low (compared to building surfaces)
-    //                           !  2) The value of 1.0 corresponds to the thermal resistance of 0.05 m of batt insulation
-    //                           !  3) Limit on the order of 1.0 is suggested by the abrupt changes in an inverse relationship
-    //                           !  4) A conduction-only analysis can model a limit by considering the thermal performance of
-    //                           !       boundary layer to be pure conduction (with no movement to enhance heat transfer);
-    //                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
-    //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
-    //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-    extern Real64 HighHConvLimit;          // upper limit for HConv, mostly used for user input limits in practice. !W/m2-K
-    extern Real64 MaxAllowedDelTemp;       // Convergence criteria for inside surface temperatures
-    extern Real64 MaxAllowedDelTempCondFD; // Convergence criteria for inside surface temperatures for CondFD
 
     extern std::string BuildingName;        // Name of building
     extern Real64 BuildingAzimuth;          // North Axis of Building
@@ -2229,9 +2201,38 @@ namespace DataHeatBalance {
 
 struct HeatBalanceData : BaseGlobalStruct {
 
+    int MaxSolidWinLayers = 0;                // Maximum number of solid layers in a window construction
+
+    // SiteData aka building data
+    Real64 LowHConvLimit = 0.1; // Lowest allowed convection coefficient for detailed model
+    // before reverting to the simple model.  This avoids a
+    // divide by zero elsewhere.  Not based on any physical
+    // reasoning, just the number that was picked.  It corresponds
+    // to a delta T for a vertical surface of 0.000444C.
+    //                           ! A lower limit is needed to avoid numerical problems
+    //                           ! Natural convection correlations are a function of temperature difference,
+    //                           !   there are many times when those temp differences pass through zero leading to non-physical results
+    //                           ! Value of 1.0 chosen here is somewhat arbitrary, but based on the following reasons:
+    //                           !  1) Low values of HconvIn indicate a layer of high thermal resistance, however
+    //                           !       the R-value of a convection film layer should be relatively low (compared to building surfaces)
+    //                           !  2) The value of 1.0 corresponds to the thermal resistance of 0.05 m of batt insulation
+    //                           !  3) Limit on the order of 1.0 is suggested by the abrupt changes in an inverse relationship
+    //                           !  4) A conduction-only analysis can model a limit by considering the thermal performance of
+    //                           !       boundary layer to be pure conduction (with no movement to enhance heat transfer);
+    //                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
+    //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
+    //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
+    Real64 HighHConvLimit = 1000.0;         // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
+    Real64 MaxAllowedDelTemp = 0.002;       // Convergence criteria for inside surface temperatures
+    Real64 MaxAllowedDelTempCondFD = 0.002; // Convergence criteria for inside surface temperatures for CondFD
+
     void clear_state() override
     {
-
+        this-> MaxSolidWinLayers = 0;
+        this-> LowHConvLimit = 0.1;
+        this-> HighHConvLimit = 1000.0;
+        this-> MaxAllowedDelTemp = 0.002;
+        this-> MaxAllowedDelTempCondFD = 0.002;
     }
 };
 
