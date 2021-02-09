@@ -29,6 +29,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "lib_battery.h"
 #include "lib_battery_capacity_test.h"
 #include "lib_battery_lifetime_test.h"
+#include "lib_battery_lifetime_nmc.h"
 
 static void compareState(thermal_state tested_state, thermal_state expected_state, const std::string& msg){
     double tol = 0.02;
@@ -197,7 +198,7 @@ public:
     capacity_lithium_ion_t * capacityModel;
     voltage_t * voltageModel;
     thermal_t * thermalModel;
-    lifetime_calendar_cycle_t * lifetimeModel;
+    lifetime_t * lifetimeModel;
     losses_t * lossModel;
     std::unique_ptr<battery_t> batteryModel;
 
@@ -260,7 +261,7 @@ public:
         voltageModel = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
                                              C_rate, resistance, dtHour);
         lifetimeModel = new lifetime_calendar_cycle_t(cycleLifeMatrix, dtHour, 1.02, 2.66e-3, -7280, 930);
-        thermalModel = new thermal_t(1.0, mass, surface_area, resistance, Cp, h, capacityVsTemperature, T_room);
+        thermalModel = new thermal_t(dtHour, mass, surface_area, resistance, Cp, h, capacityVsTemperature, T_room);
         lossModel = new losses_t(monthlyLosses, monthlyLosses, monthlyLosses);
         batteryModel = std::unique_ptr<battery_t>(new battery_t(dtHour, chemistry, capacityModel, voltageModel, lifetimeModel, thermalModel, lossModel));
     }
