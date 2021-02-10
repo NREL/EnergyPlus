@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -562,7 +563,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
      "  ,                               !- Outdoor Air Inlet Node Name",
      "  ,                               !- Demand Controlled Ventilation Type",
      "  NoEconomizer,                   !- Outdoor Air Economizer Type",
-     "  Enthalpy,                       !- Heat Recovery Type",
+     "  Sensible,                       !- Heat Recovery Type",
      "  0.7,                            !- Sensible Heat Recovery Effectiveness{ dimensionless }",
      "  0.65;                           !- Latent Heat Recovery Effectiveness{ dimensionless }",
 
@@ -642,25 +643,50 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
 
     EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
-    // Ideal loads air system found the plenum it is attached to
-
-    // Is this the best condition to check/test SupplyTemp and SupplyHumRat? It should be always equal to Zone Supply Node conditions, but is that a sufficient condition?
+    // Expecting SupplyTemp to be the same as Zone supply temp
     EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
     EXPECT_EQ(PurchAir(1).SupplyHumRat, Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
 
-    //Can't figure out what would be a good test for MixedAirTemp/MixedAirHumRat. I wanted to implement a test with outdoor
-    // air as well, since MixedAirTemp/MixedAirHumRat would be the conditions after mixing OA with the incoming stream.
-    // But I cannot seem to hold the temperature at IdealLoadsSystem inlet (same conditions as ZoneExhaustAirNodeNum) which
-    // keeps falling to zero.
-    Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp = 35;
-    Node(PurchAir(1).OutdoorAirNodeNum).Temp = 10;
-    ManageZoneEquipment(*state,
-                        FirstHVACIteration,
-                        SimZone,
-                        SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
-    EXPECT_EQ(0, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
-    EXPECT_EQ(PurchAir(1).MixedAirTemp, Node(PurchAir(1).ZoneExhaustAirNodeNum).Temp);
-    EXPECT_EQ(PurchAir(1).MixedAirHumRat, Node(PurchAir(1).ZoneExhaustAirNodeNum).HumRat);
+    // Test for intermediate variables, MixedAirTemp, MixedAirHumRat
+    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp = 24;
+    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat = 0.00929;
+    Node(PurchAir(1).ZoneRecircAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp,
+                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat
+                                                                    );
+    Node(PurchAir(1).OutdoorAirNodeNum).Temp = 3;
+    Node(PurchAir(1).OutdoorAirNodeNum).HumRat = 0.004586;
+    Node(PurchAir(1).OutdoorAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    Node(PurchAir(1).OutdoorAirNodeNum).Temp,
+                                                                    Node(PurchAir(1).OutdoorAirNodeNum).HumRat
+                                                                    );
+    PurchAir(1).MixedAirTemp = 0;
+    PurchAir(1).MixedAirHumRat = 0;
+    Real64 MixedAirEnthalpy = 0;
+    Real64 OAMassFlowRate = 10;
+    Real64 SupplyMassFlowRate = 11;
+    CalcPurchAirMixedAir(*state,
+                         1,                                 // index to ideal loads unit
+                         OAMassFlowRate,                                // outside air mass flow rate [kg/s]
+                         SupplyMassFlowRate,                            // supply air mass flow rate [kg/s]
+                         PurchAir(1).MixedAirTemp,                // Mixed air dry bulb temperature [C]
+                         PurchAir(1).MixedAirHumRat,              // Mixed air humidity ratio [kgWater/kgDryAir]
+                         MixedAirEnthalpy,                           // Mixed air enthalpy [J/kg]
+                         OpMode::Cool                      // current operating mode, Off, Heating, Cooling, or DeadBand
+                         );
+// Calculations:
+// Stream 1: Recirc stream:         T1: 24 C; W1: 0.00929 kg/kg; h1: 47764.36 J/kg; m_dot1: 11 kg/s
+// Stream 2: Outdoor Air stream:    T2:  3 C; W2:0.004586 kg/kg; h2: 14509.40 J/kg; m_dot2: 10 kg/s
+
+// Mixed stream:
+// When SupplyMassFlowRate > OAMassFlowRate
+// RecircMassFlowRate = SupplyMassFlowRate - OAMassFlowRate = 1 kg/s
+// h_mix_stream = (RecircMassFlowRate X h_Recirc + m_dotOA X h_OA)/SupplyFlowRate = 17532.58 J/kg
+// W_mix_stream = (RecircMassFlowRate X W_Recirc + m_dotOA X W_OA)/SupplyFlowRate = 0.005013 kg/kg
+// T_mix_stream = T as fn (h_mix_stream,W_mix_stream) = 4.924 C
+
+    EXPECT_EQ(PurchAir(1).MixedAirTemp,4.9240554165264818);
+    EXPECT_EQ(PurchAir(1).MixedAirHumRat,0.0050136363636363633);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
