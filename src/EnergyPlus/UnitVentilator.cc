@@ -164,7 +164,7 @@ namespace UnitVentilator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UnitVentNum; // index of unit ventilator being simulated
 
-        // FLOW:
+
         if (state.dataUnitVentilators->GetUnitVentilatorInputFlag) {
             GetUnitVentilatorInput(state);
             state.dataUnitVentilators->GetUnitVentilatorInputFlag = false;
@@ -290,7 +290,7 @@ namespace UnitVentilator {
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
 
-        // FLOW:
+
 
         // Figure out how many unit ventilators there are in the input file
 
@@ -1256,7 +1256,7 @@ namespace UnitVentilator {
         bool SetMassFlowRateToZero; // TRUE when mass flow rates need to be set to zero
 
         SetMassFlowRateToZero = false;
-        // FLOW:
+
 
         // Do the one time initializations
         if (state.dataUnitVentilators->MyOneTimeFlag) {
@@ -3302,7 +3302,7 @@ namespace UnitVentilator {
         static int ZoneNode(0);       // zone node
         Real64 SpecHumMin(0);         // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
-        // FLOW:
+
         InletNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
         OutletNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode;
         ZoneNode = state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ZoneNode;
@@ -3602,7 +3602,7 @@ namespace UnitVentilator {
         int OutsideAirNode;        // outside air node number in unit ventilator loop
         Real64 OutAirMassFlowRate; // Outside air mass flow rate capped for cycling fan
 
-        // FLOW:
+
         AirRelNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirReliefNode;
         InletNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
         OAMixOutNode = state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode;

@@ -609,7 +609,6 @@ SET( SRC
   TARCOGDeflection.hh
   TARCOGGasses90.cc
   TARCOGGasses90.hh
-  TARCOGGassesParams.cc
   TARCOGGassesParams.hh
   TARCOGMain.cc
   TARCOGMain.hh
