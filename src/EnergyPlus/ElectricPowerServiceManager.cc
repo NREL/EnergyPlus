@@ -3165,13 +3165,13 @@ ElectricStorage::ElectricStorage( // main constructor
             // see lib_battery_voltage.cpp line 268
             liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.342 : DataIPShortCuts::rNumericArgs(13);
             liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
-            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.81925 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
-            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.088231 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
+            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
+            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
             // FIXME: Validate Qexp and Qnom are less than Qfull, and Qnom > Qexp?
             liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
             internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
 
-            maxAhCapacity_ = liIon_Qfull_ * seriesNum_ * parallelNum_;
+            maxAhCapacity_ = liIon_Qfull_ * parallelNum_;
 
             // Set the Lifetime model in SSC
             // I'm using a raw pointer here because the the battery_t constructor expects it.
@@ -3196,9 +3196,9 @@ ElectricStorage::ElectricStorage( // main constructor
                     battery_params::CHEM::LITHIUM_ION,
                     new capacity_lithium_ion_t(
                         maxAhCapacity_,  // Capacity of the whole battery
-                        startingSOC_,
+                        startingSOC_ * 100.0,
+                        100.0,  // Reset later
                         0.0,  // Reset later
-                        1.0,  // Reset later
                         DataHVACGlobals::TimeStepSys
                         ),
                     new voltage_dynamic_t(

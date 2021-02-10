@@ -5014,8 +5014,8 @@
     ,                        !- Zone Name
     0,                       !- Radiative Fraction
     KandlerSmith,            !- Lifetime Model
-    35,                      !- Number of Cells in Series
-    270,                     !- Number of Strings in Parallel
+    139,                     !- Number of Cells in Series
+    17360,                   !- Number of Strings in Parallel
     0.7,                     !- Initial Fractional State of Charge
     ,                        !- DC to DC Charging Efficiency
     ,                        !- Battery Mass
