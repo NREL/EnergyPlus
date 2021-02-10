@@ -103,6 +103,32 @@ derivative works thereof, in binary and source code form.
 
 #include "utilXml.h"
 
+
+
+Stack2 expStk; ///< Variables for getxmlvalue function
+
+char * att; ///< Local global variable for function \c getxmlvalue
+char * vals;  ///< Local global variable for function \c getxmlvalue
+size_t * numVals; ///< Local global variable for function \c getxmlvalue
+int PARSEVALUE; ///< flag for parsing xml values 1 if parse, 0 if not parse
+int ERROR_STATUS; ///< flag for xml element handler error status settings
+
+////////////////////////////////////////////////////////////////
+/// local global variables for function \c getepvariables
+////////////////////////////////////////////////////////////////
+char *  outputVarsName; ///< the string pointer to the parsed output variable names
+char *  outputVarsType; ///< the string pointer to the parsed output variable types
+int *   numOutputVars;  ///< the integer pointer to the number of output variables
+char *  inputVars;      ///< the string pointer to the input variables
+int *   numInputVars;   ///< the integer pointer to the number of input variables
+int *   inputVarsType;  ///< the integer array to store the types of each input variables
+char ** inputKeys;      ///< the string array to store the types of input variable types
+int     numInputKeys;   ///< the number of input variable types
+int     source;         ///< flag for function /c getepvariables 0=EnergyPlus, 1=Ptolemy
+size_t const * strLen;     ///< the length of string parsed to this function
+
+
+
 ////////////////////////////////////////////////////////////////
 /// Call back functions that will be used by the expat xml parser.
 ///
@@ -257,6 +283,7 @@ getepvariables(
 )
 {
 
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   FILE * fd;
   XML_Parser p;
   int i, j, count, ret;
@@ -398,6 +425,7 @@ getepvariablesFMU(
 )
 {
 
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   FILE * fd;
   XML_Parser p;
   int i, j, count;
@@ -622,6 +650,7 @@ getxmlvalues(
  size_t const myStrLen
 )
 {
+  char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
   char * temp;
   int i,j;
   FILE * fd;
