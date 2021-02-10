@@ -275,19 +275,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern bool CalcWindowRevealReflection; // True if window reveal reflection is to be calculated
-    // for at least one exterior window
-    extern bool StormWinChangeThisDay; // True if a storm window has been added or removed from any
-    // window during the current day; can only be true for first
-    // time step of the day.
-    extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
-    extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
-    extern bool AdaptiveComfortRequested_ASH55;    // true if people objects have adaptive comfort requests. ASH55
-
-    extern bool NoFfactorConstructionsUsed;
-    extern bool NoCfactorConstructionsUsed;
-    extern bool NoRegularMaterialsUsed;
-
     extern Array1D<Real64> SNLoadHeatEnergy;
     extern Array1D<Real64> SNLoadCoolEnergy;
     extern Array1D<Real64> SNLoadHeatRate;
@@ -2206,7 +2193,16 @@ struct HeatBalanceData : BaseGlobalStruct
     int TotZoneAirBalance = 0;          // Total Zone Air Balance Statements in input
     int TotFrameDivider = 0;            // Total number of window frame/divider objects
     bool AirFlowFlag = false;
-    int TotCO2Gen = 0; // Total CO2 source and sink statements in input
+    int TotCO2Gen = 0;                       // Total CO2 source and sink statements in input
+    bool CalcWindowRevealReflection = false; // True if window reveal reflection is to be calculated for at least one exterior window
+    bool StormWinChangeThisDay = false; // True if a storm window has been added or removed from any window during the current day; can only be true
+                                        // for first time step of the day.
+    bool AnyConstructInternalSourceInInput = false; // true if the user has entered any constructions with internal sources
+    bool AdaptiveComfortRequested_CEN15251 = false; // true if people objects have adaptive comfort requests. CEN15251
+    bool AdaptiveComfortRequested_ASH55 = false;    // true if people objects have adaptive comfort requests. ASH55
+    bool NoFfactorConstructionsUsed = true;
+    bool NoCfactorConstructionsUsed = true;
+    bool NoRegularMaterialsUsed = true;
 
     void clear_state() override
     {
@@ -2301,6 +2297,14 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TotFrameDivider = 0;
         this->AirFlowFlag = false;
         this->TotCO2Gen = 0;
+        this->CalcWindowRevealReflection = false;
+        this->StormWinChangeThisDay = false;
+        this->AnyConstructInternalSourceInInput = false;
+        this->AdaptiveComfortRequested_CEN15251 = false;
+        this->AdaptiveComfortRequested_ASH55 = false;
+        this->NoFfactorConstructionsUsed = true;
+        this->NoCfactorConstructionsUsed = true;
+        this->NoRegularMaterialsUsed = true;
     }
 };
 

@@ -1581,11 +1581,11 @@ namespace HeatBalanceManager {
         TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
-            NoFfactorConstructionsUsed = false;
+            state.dataHeatBal->NoFfactorConstructionsUsed = false;
         }
 
         if (TotCfactorConstructs > 0) {
-            NoCfactorConstructionsUsed = false;
+            state.dataHeatBal->NoCfactorConstructionsUsed = false;
         }
 
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
@@ -4226,11 +4226,11 @@ namespace HeatBalanceManager {
         TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
-            NoFfactorConstructionsUsed = false;
+            state.dataHeatBal->NoFfactorConstructionsUsed = false;
         }
 
         if (TotCfactorConstructs > 0) {
-            NoCfactorConstructionsUsed = false;
+            state.dataHeatBal->NoCfactorConstructionsUsed = false;
         }
 
         state.dataBSDFWindow->TotComplexFenStates = inputProcessor->getNumObjectsFound(state, "Construction:ComplexFenestrationState");
@@ -4355,7 +4355,7 @@ namespace HeatBalanceManager {
                     NominalRforNominalUCalculation(ConstrNum) += NominalR(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer));
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
                         !state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).ROnly) {
-                        NoRegularMaterialsUsed = false;
+                        state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
                 }
 
@@ -4394,7 +4394,7 @@ namespace HeatBalanceManager {
         ConstrNum = 0;
 
         CurrentModuleObject = "Construction:InternalSource";
-        if (TotSourceConstructs > 0) AnyConstructInternalSourceInInput = true;
+        if (TotSourceConstructs > 0) state.dataHeatBal->AnyConstructInternalSourceInInput = true;
         for (Loop = 1; Loop <= TotSourceConstructs; ++Loop) { // Loop through all constructs with sources in the input...
 
             // Get the object names for each construction from the input processor
@@ -4477,7 +4477,7 @@ namespace HeatBalanceManager {
                         NominalR(thisConstruct.LayerPoint(Layer));
                     if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
                         !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).ROnly) {
-                        NoRegularMaterialsUsed = false;
+                        state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
                 }
 
@@ -4489,7 +4489,7 @@ namespace HeatBalanceManager {
         TotRegConstructs += TotSourceConstructs;
         state.dataHeatBal->TotConstructs = TotRegConstructs;
 
-        if (state.dataHeatBal->TotConstructs > 0 && (NoRegularMaterialsUsed && NoCfactorConstructionsUsed && NoFfactorConstructionsUsed)) {
+        if (state.dataHeatBal->TotConstructs > 0 && (state.dataHeatBal->NoRegularMaterialsUsed && state.dataHeatBal->NoCfactorConstructionsUsed && state.dataHeatBal->NoFfactorConstructionsUsed)) {
             ShowWarningError(state, "This building has no thermal mass which can cause an unstable solution.");
             ShowContinueError(state, "Use Material object for all opaque material definitions except very light insulation layers.");
         }
@@ -5295,7 +5295,7 @@ namespace HeatBalanceManager {
                 SetStormWindowControl(state);
                 ChangeSet = false;
             } else if (!ChangeSet) {
-                StormWinChangeThisDay = false;
+                state.dataHeatBal->StormWinChangeThisDay = false;
                 for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
                     SurfNum = StormWindow(StormWinNum).BaseWindowNum;
                     DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
@@ -7160,7 +7160,7 @@ namespace HeatBalanceManager {
         //   1: if the storm window is on this time step
         int DateOff; // Date Off for calculation
 
-        StormWinChangeThisDay = false;
+        state.dataHeatBal->StormWinChangeThisDay = false;
 
         for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
             SurfNum = StormWindow(StormWinNum).BaseWindowNum;
@@ -7175,7 +7175,7 @@ namespace HeatBalanceManager {
             }
             SurfWinStormWinFlag(SurfNum) = StormWinFlag;
             if (state.dataGlobal->BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
-            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) StormWinChangeThisDay = true;
+            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
         }
     }
 
@@ -7255,11 +7255,11 @@ namespace HeatBalanceManager {
         TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
 
         if (TotFfactorConstructs > 0) {
-            NoFfactorConstructionsUsed = false;
+            state.dataHeatBal->NoFfactorConstructionsUsed = false;
         }
 
         if (TotCfactorConstructs > 0) {
-            NoCfactorConstructionsUsed = false;
+            state.dataHeatBal->NoCfactorConstructionsUsed = false;
         }
 
         // First create ground floor constructions defined with F factor method if any

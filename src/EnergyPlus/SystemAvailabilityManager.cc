@@ -4248,7 +4248,6 @@ namespace SystemAvailabilityManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataHeatBalance::AdaptiveComfortRequested_ASH55;
         using DataHeatBalance::Ventilation;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
@@ -4360,7 +4359,7 @@ namespace SystemAvailabilityManager {
                 // check schedule value for adaptive temperature control
                 if (CheckScheduleValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, 5.0) ||
                     CheckScheduleValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, 6.0)) {
-                    if (!AdaptiveComfortRequested_ASH55) {
+                    if (!state.dataHeatBal->AdaptiveComfortRequested_ASH55) {
                         ShowSevereError(state, "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" +
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
                         ShowContinueError(state, "Ventilation Control Mode Schedule Name =\"" +

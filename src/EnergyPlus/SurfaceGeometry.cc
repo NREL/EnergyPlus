@@ -353,7 +353,7 @@ namespace SurfaceGeometry {
 
         AirSkyRadSplit.dimension(TotSurfaces, 0.0);
 
-        CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
+        state.dataHeatBal->CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
         // is requested for one or more exterior windows.
         BuildingShadingCount = 0;
         FixedShadingCount = 0;
@@ -11328,7 +11328,7 @@ namespace SurfaceGeometry {
                         if ((Surface(ThisSurf).Reveal > 0.0 && FrameDivider(FrDivNum).OutsideRevealSolAbs > 0.0) ||
                             (FrameDivider(FrDivNum).InsideSillDepth > 0.0 && FrameDivider(FrDivNum).InsideSillSolAbs > 0.0) ||
                             (FrameDivider(FrDivNum).InsideReveal > 0.0 && FrameDivider(FrDivNum).InsideRevealSolAbs > 0.0))
-                            CalcWindowRevealReflection = true;
+                            state.dataHeatBal->CalcWindowRevealReflection = true;
 
                         // For exterior window with frame, subtract frame area from base surface
                         // (only rectangular windows are allowed to have a frame and/or divider;

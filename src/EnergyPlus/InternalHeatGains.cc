@@ -739,13 +739,13 @@ namespace InternalHeatGains {
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     People(Loop).AdaptiveASH55 = true;
-                                    AdaptiveComfortRequested_ASH55 = true;
+                                    state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     People(Loop).AdaptiveCEN15251 = true;
-                                    AdaptiveComfortRequested_CEN15251 = true;
+                                    state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
                                     MustInpSch = true;
                                     UsingThermalComfort = true;
 
