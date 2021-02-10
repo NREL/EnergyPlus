@@ -1251,105 +1251,97 @@ namespace HeatBalanceManager {
 
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          AlphaName,
-                                          NumAlpha,
-                                          BuildingNumbers,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                CurrentModuleObject,
+                1,
+                AlphaName,
+                NumAlpha,
+                BuildingNumbers,
+                NumNumber,
+                IOStat,
+                lNumericFieldBlanks,
+                lAlphaFieldBlanks,
+                cAlphaFieldNames,
+                cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
-                    if (SELECT_CASE_var == "YES") {
-                        ZoneAirMassFlow.BalanceMixing = true;
+                    if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingOnly;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "Yes";
-                    } else if (SELECT_CASE_var == "NO") {
-                        ZoneAirMassFlow.BalanceMixing = false;
-                        AlphaName(1) = "No";	
+                        AlphaName(1) = "AdjustMixingOnly";
+                    } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnOnly;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustReturnOnly";
+                    } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingThenReturn;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustMixingThenReturn";
+                    } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnThenMixing;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustReturnThenMixing";
+                    } else if (SELECT_CASE_var == "NONE") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = 5;
+                        AlphaName(1) = "None";
                     } else {
-                        ZoneAirMassFlow.BalanceMixing = false;
-                        AlphaName(1) = "No";
-                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No");
+                        ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        AlphaName(1) = "None";
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
             }
-
             if (NumAlpha > 1) {
                 {
                     auto const SELECT_CASE_var(AlphaName(2));
-                    if (SELECT_CASE_var == "YES") {
-                        ZoneAirMassFlow.BalanceMixing = false;
-                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        ZoneAirMassFlow.AdjustZoneReturnFlow = true;
-                        AlphaName(2) = "Yes";
-                    } else if (SELECT_CASE_var == "NO") {
-                        ZoneAirMassFlow.AdjustZoneReturnFlow = false;
-                        AlphaName(2) = "No";	
-                    } else {
-                        ZoneAirMassFlow.AdjustZoneReturnFlow = false;
-                        AlphaName(2) = "No";
-                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = No");
-                    }
-                }
-            }
-
-            if (NumAlpha > 2) {
-                {
-                    auto const SELECT_CASE_var(AlphaName(3));
                     if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(3) = "AddInfiltrationFlow";
+                        AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
                         ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(3) = "AddInfiltrationFlow";
+                        AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
                         ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
-                        AlphaName(3) = "None";
+                        AlphaName(2) = "None";
                     } else {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(3) = "AddInfiltrationFlow";
-                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) +
-                                         ". The default choice is assigned = AddInfiltrationFlow");
+                        AlphaName(2) = "AddInfiltrationFlow";
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) +
+                            ". The default choice is assigned = AddInfiltrationFlow");
                     }
                 }
             } else {
                 ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                 ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                AlphaName(3) = "AddInfiltrationFlow";
+                AlphaName(2) = "AddInfiltrationFlow";
             }
             if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
-                AlphaName(4) = "N/A";
+                AlphaName(3) = "N/A";
             } else {
-                if (NumAlpha > 3) {
+                if (NumAlpha > 2) {
                     {
-                        auto const SELECT_CASE_var(AlphaName(4));
+                        auto const SELECT_CASE_var(AlphaName(3));
                         if (SELECT_CASE_var == "MIXINGSOURCEZONESONLY") {
                             ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
-                            AlphaName(4) = "MixingSourceZonesOnly";
+                            AlphaName(3) = "MixingSourceZonesOnly";
                         } else if (SELECT_CASE_var == "ALLZONES") {
                             ZoneAirMassFlow.InfiltrationZoneType = AllZones;
-                            AlphaName(4) = "AllZones";
+                            AlphaName(3) = "AllZones";
                         } else {
                             ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
-                            AlphaName(4) = "MixingSourceZonesOnly";
-                            ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(4) +
-                                             ". The default choice is assigned = MixingSourceZonesOnly");
+                            AlphaName(3) = "MixingSourceZonesOnly";
+                            ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) +
+                                ". The default choice is assigned = MixingSourceZonesOnly");
                         }
                     }
                 } else {
                     ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
-                    AlphaName(4) = "MixingSourceZonesOnly";
+                    AlphaName(3) = "MixingSourceZonesOnly";
                 }
             }
         } else {
@@ -1357,15 +1349,15 @@ namespace HeatBalanceManager {
         }
 
         static constexpr auto Format_732(
-            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Return, Adjust Zone Infiltration "
+            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing}}, Adjust Zone Infiltration "
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
-        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{},{}\n");
+        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
         print(state.files.eio, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            print(state.files.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3), AlphaName(4));
+            print(state.files.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
-            print(state.files.eio, Format_733, "No", "N/A", "N/A", "N/A", "N/A");
+            print(state.files.eio, Format_733, "No", "N/A", "N/A", "N/A");
         }
 
         // A new object is added by L. Gu, 4/17

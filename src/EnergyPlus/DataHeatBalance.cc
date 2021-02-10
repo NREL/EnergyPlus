@@ -256,6 +256,13 @@ namespace DataHeatBalance {
     int const MixingSourceZonesOnly(1);
     int const AllZones(2);
 
+    // Parameter for zone air flow mass balancing method
+    int const AdjustMixingOnly(1);
+    int const AdjustReturnOnly(2);
+    int const AdjustMixingThenReturn(3);
+    int const AdjustReturnThenMixing(4);
+    int const NoAdjustReturnAndMixing(5);
+
     int const NumZoneIntGainDeviceTypes(53);
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",

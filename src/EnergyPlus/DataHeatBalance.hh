@@ -214,6 +214,13 @@ namespace DataHeatBalance {
     extern int const MixingSourceZonesOnly;
     extern int const AllZones;
 
+    // Parameter for zone air flow mass balancing method
+    extern int const AdjustMixingOnly;
+    extern int const AdjustReturnOnly;
+    extern int const AdjustMixingThenReturn;
+    extern int const AdjustReturnThenMixing;
+    extern int const NoAdjustReturnAndMixing;
+
     extern int const NumZoneIntGainDeviceTypes;
 
     extern Array1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
@@ -1358,14 +1365,14 @@ namespace DataHeatBalance {
     {
         // Members
         bool EnforceZoneMassBalance; // flag to enforce zone air mass conservation
-        bool BalanceMixing;          // flag to allow mixing to be adjusted for zone mass balance
-        bool AdjustZoneReturnFlow;   // flag to allow adjusting return flow but not zone mixing flows for zone mass balance
+        int ZoneFlowAdjustment;      // specifies how zone air flow balance is determined (AdjustMixingOnly, AdjustReturnOnly, AdjustMixingThenReturn, AdjustReturnThenMixing, None)
         int InfiltrationTreatment;   // determines how infiltration is treated for zone mass balance
         int InfiltrationZoneType;    // specifies which types of zones allow infiltration to be changed
                                      // Note, unique global object
 
         // Default Constructor
-        ZoneAirMassFlowConservation() : EnforceZoneMassBalance(false), BalanceMixing(false), AdjustZoneReturnFlow(false), InfiltrationTreatment(0), InfiltrationZoneType(0)
+        ZoneAirMassFlowConservation()
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(1), InfiltrationTreatment(0), InfiltrationZoneType(0)
         {
         }
     };
