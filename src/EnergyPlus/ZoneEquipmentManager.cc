@@ -4664,7 +4664,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         MCPTThermChim = 0.0;
         MassFlowRate = 0.0;
 
-        if (AirFlowFlag != UseSimpleAirFlow) return;
+        if (state.dataHeatBal->AirFlowFlag != UseSimpleAirFlow) return;
         // AirflowNetwork Multizone field /= SIMPLE
         if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimple ||
               AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS)) {
@@ -4694,7 +4694,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
 
         // Initialization of ZoneAirBalance
-        if (TotZoneAirBalance > 0) {
+        if (state.dataHeatBal->TotZoneAirBalance > 0) {
             for (auto &e : ZoneAirBalance) {
                 e.BalMassFlowRate = 0.0;
                 e.InfMassFlowRate = 0.0;
@@ -5458,7 +5458,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         }
 
         // Calculate combined outdoor air flows
-        for (j = 1; j <= TotZoneAirBalance; ++j) {
+        for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
             if (ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature) {
                 if (!ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(state, j);
                 if (ZoneAirBalance(j).NumOfERVs > 0) {

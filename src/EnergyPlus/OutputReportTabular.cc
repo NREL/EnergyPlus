@@ -4281,8 +4281,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::BuildingPreDefRep;
-        using DataHeatBalance::NumRefrigCondensers;
-        using DataHeatBalance::NumRefrigeratedRacks;
         using DataHVACGlobals::AirCooled;
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
@@ -4446,7 +4444,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Refrigerated Rack
         auto &RefrigRack(state.dataRefrigCase->RefrigRack);
-        for (int iRef = 1; iRef <= NumRefrigeratedRacks; ++iRef) {
+        for (int iRef = 1; iRef <= state.dataRefrigCase->NumRefrigeratedRacks; ++iRef) {
             if (RefrigRack(iRef).CondenserType == AirCooled) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += RefrigRack(iRef).RackElecConsumption + RefrigRack(iRef).RackCoolingEnergy;
             } else if (RefrigRack(iRef).CondenserType == EvapCooled) {
@@ -4458,7 +4456,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Refrigerated Case - Condenser
-        for (int iRef = 1; iRef <= NumRefrigCondensers; ++iRef) {
+        for (int iRef = 1; iRef <= state.dataRefrigCase->NumRefrigCondensers; ++iRef) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataRefrigCase->Condenser(iRef).CondEnergy;
         }
 

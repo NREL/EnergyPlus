@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
             break;
         }
     }
-    EXPECT_EQ(1, DataHeatBalance::TotBlindsEQL);
+    EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 

@@ -120,7 +120,6 @@ namespace AirflowNetworkBalanceManager {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataHeatBalance::TotZoneAirBalance;
     using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::WZoneTimeMinus1;
@@ -1849,7 +1848,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + TotZoneAirBalance +
+            if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotZoneAirBalance +
                     inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") + inputProcessor->getNumObjectsFound(state, "ZoneThermalChimney") +
                     inputProcessor->getNumObjectsFound(state, "ZoneCoolTower:Shower") ==
                 0) {
@@ -1883,7 +1882,7 @@ namespace AirflowNetworkBalanceManager {
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCrossMixing objects are present.");
                 ShowContinueError(state, "..ZoneCrossMixing objects will not be simulated.");
             }
-            if (TotZoneAirBalance > 0) {
+            if (state.dataHeatBal->TotZoneAirBalance > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey +
                                   "\" and ZoneAirBalance:OutdoorAir objects are present.");

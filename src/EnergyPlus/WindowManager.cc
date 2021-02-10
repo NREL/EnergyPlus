@@ -306,10 +306,10 @@ namespace WindowManager {
         W5InitGlassParameters(state);
 
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
-        if (TotBlinds > 0) CalcWindowBlindProperties(state);
+        if (state.dataHeatBal->TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
+        if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
         // Get glazing system optical properties of constructions with glass or glass plus
         //   shade, screen or blind
@@ -1549,7 +1549,7 @@ namespace WindowManager {
                     if (ShadingType == WSC_ST_ExteriorScreen) {
                         //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
                         //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
-                        ++NumSurfaceScreens;
+                        ++state.dataHeatBal->NumSurfaceScreens;
                         break; // only need to find the first window shading control since they should be identical
                     }
                 }
@@ -6821,7 +6821,7 @@ namespace WindowManager {
 
             print(state.files.eio, "{}\n", "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,Solar "
                                                  "Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
-            if ((TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
+            if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, "
                                                      "Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible "
                                                      "Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, "
@@ -6829,14 +6829,14 @@ namespace WindowManager {
                                                      "Diffusing");
             if ((state.dataHeatBal->W5GasMat > 0) || (state.dataHeatBal->W5GasMatMixture > 0))
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}");
-            if (TotShades > 0)
+            if (state.dataHeatBal->TotShades > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Shade>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
                                                      "Absorptance,Transmittance,Visible Transmittance,Shade Reflectance");
-            if (TotScreens > 0)
+            if (state.dataHeatBal->TotScreens > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Screen>,Material Name,Thickness {m},Conductivity {W/m-K},Thermal "
                                                      "Absorptance,Transmittance,Reflectance,Visible Reflectance,Diffuse Reflectance,Diffuse Visible "
                                                      "Reflectance,Screen Material Diameter To Spacing Ratio,Screen To GlassDistance {m}");
-            if (TotBlinds > 0)
+            if (state.dataHeatBal->TotBlinds > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness "
                                                      "{m},Slat Angle {deg},Slat Beam Solar Transmittance,Slat Beam Solar Front Reflectance,Blind To "
                                                      "Glass Distance {m}");
@@ -6847,7 +6847,7 @@ namespace WindowManager {
             if (state.dataWindowManager->HasEQLWindows)
                 print(state.files.eio, "{}\n", "! <Construction:WindowEquivalentLayer>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC, "
                                                      "Solar Transmittance at Normal Incidence");
-            if (W5GlsMatEQL > 0)
+            if (state.dataHeatBal->W5GlsMatEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Glazing:EquivalentLayer>, Material Name, Optical Data Type, Spectral Data "
                                                      "Set Name, Front Side Beam-Beam Solar Transmittance, Back Side Beam-Beam Solar Transmittance, "
                                                      "Front Side Beam-Beam Solar Reflectance, Back Side Beam-Beam Solar Reflectance, Front Side "
@@ -6856,14 +6856,14 @@ namespace WindowManager {
                                                      "Solar Transmittance, Front Side Diffuse-Diffuse Solar Reflectance, Back Side Diffuse-Diffuse "
                                                      "Solar Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
                                                      "Emissivity");
-            if (TotShadesEQL > 0)
+            if (state.dataHeatBal->TotShadesEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Shade:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
                                                      "Reflectance, Back Side Beam-Diffuse Solar Reflectance, Infrared Transmittance, Front Side "
                                                      "Infrared Emissivity, Back Side Infrared Emissivity");
 
-            if (TotDrapesEQL > 0)
+            if (state.dataHeatBal->TotDrapesEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Drape:EquivalentLayer>, Material Name, Front Side Beam-Beam Solar "
                                                      "Transmittance, Back Side Beam-Beam Solar Transmittance, Front Side Beam-Diffuse Solar "
                                                      "Transmittance, Back Side Beam-Diffuse Solar Transmittance, , Front Side Beam-Diffuse Solar "
@@ -6871,7 +6871,7 @@ namespace WindowManager {
                                                      "Infrared Emissivity, Back Side Infrared Emissivity, Width of Pleated Fabric, Length of Pleated "
                                                      "Fabric");
 
-            if (TotBlindsEQL > 0)
+            if (state.dataHeatBal->TotBlindsEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Blind:EquivalentLayer>, Material Name, Slat Orientation, Slat Width, Slat "
                                                      "Separation, Slat Crown, Slat Angle, Front Side Slate Beam-Diffuse Solar Transmittance, Back "
                                                      "Side Slate Beam-Diffuse Solar Transmittance, Front Side Slate Beam-Diffuse Solar Reflectance, "
@@ -6879,12 +6879,12 @@ namespace WindowManager {
                                                      "Front Side Slat Diffuse-Diffuse Solar Reflectance, Back Side Slat Diffuse-Diffuse Solar "
                                                      "Reflectance, Infrared Transmittance, Front Side Infrared Emissivity, Back Side Infrared "
                                                      "Emissivity, Slat Angle Control");
-            if (TotScreensEQL > 0)
+            if (state.dataHeatBal->TotScreensEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Screen:EquivalentLayer>, Material Name, Screen Beam-Beam Solar "
                                                      "Transmittance, Screen Beam-Diffuse Solar Transmittance, Screen Beam-Diffuse Solar Reflectance, "
                                                      "Screen Infrared Transmittance, Screen Infrared Emissivity, Screen Wire Spacing, Screen Wire "
                                                      "Diameter");
-            if (W5GapMatEQL > 0)
+            if (state.dataHeatBal->W5GapMatEQL > 0)
                 print(state.files.eio, "{}\n", "! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type");
 
             for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
@@ -7245,7 +7245,7 @@ namespace WindowManager {
         int BlindNum; // Blind number
         int ISlatAng; // Slat angle index
 
-        for (BlindNum = 1; BlindNum <= TotBlinds; ++BlindNum) {
+        for (BlindNum = 1; BlindNum <= state.dataHeatBal->TotBlinds; ++BlindNum) {
 
             bld_pr(2) = Blind(BlindNum).SlatWidth;
             bld_pr(3) = Blind(BlindNum).SlatSeparation;
@@ -7423,8 +7423,8 @@ namespace WindowManager {
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
 
-        SurfaceScreens.allocate(NumSurfaceScreens);
-        ScreenTrans.allocate(NumSurfaceScreens);
+        SurfaceScreens.allocate(state.dataHeatBal->NumSurfaceScreens);
+        ScreenTrans.allocate(state.dataHeatBal->NumSurfaceScreens);
         ScreenNum = 0;
 
         // Pre-calculate these constants
@@ -7553,12 +7553,12 @@ namespace WindowManager {
             auto screenCsvFile = state.files.screenCsv.open(state, "CalcWindowScreenComponents", state.files.outputControl.screen);
 
             //  WRITE(ScreenTransUnitNo,*)' '
-            for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {
+            for (ScreenNum = 1; ScreenNum <= state.dataHeatBal->NumSurfaceScreens; ++ScreenNum) {
                 MatNum = SurfaceScreens(ScreenNum).MaterialNumber;
                 //   Do not print transmittance map if angle increment is equal to 0
                 if (state.dataMaterial->Material(MatNum).ScreenMapResolution == 0) continue;
                 FoundMaterial = false;
-                for (i = ScreenNum + 1; i <= NumSurfaceScreens; ++i) {
+                for (i = ScreenNum + 1; i <= state.dataHeatBal->NumSurfaceScreens; ++i) {
                     //     Write out transmittance data once for each Material:WindowScreen object
                     if (MatNum == SurfaceScreens(i).MaterialNumber) FoundMaterial = true;
                 }

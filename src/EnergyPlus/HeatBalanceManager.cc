@@ -1558,24 +1558,24 @@ namespace HeatBalanceManager {
         state.dataHeatBal->W5GlsMatAlt = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:RefractionExtinctionMethod");
         state.dataHeatBal->W5GasMat = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gas");
         state.dataHeatBal->W5GasMatMixture = inputProcessor->getNumObjectsFound(state, "WindowMaterial:GasMixture");
-        TotShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
-        TotComplexShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
-        TotComplexGaps = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
-        TotScreens = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
-        TotBlinds = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
+        state.dataHeatBal->TotShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade");
+        state.dataHeatBal->TotComplexShades = inputProcessor->getNumObjectsFound(state, "WindowMaterial:ComplexShade");
+        state.dataHeatBal->TotComplexGaps = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap");
+        state.dataHeatBal->TotScreens = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen");
+        state.dataHeatBal->TotBlinds = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind");
         EcoRoofMat = inputProcessor->getNumObjectsFound(state, "Material:RoofVegetation");
-        TotSimpleWindow = inputProcessor->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
+        state.dataHeatBal->TotSimpleWindow = inputProcessor->getNumObjectsFound(state, "WindowMaterial:SimpleGlazingSystem");
 
-        W5GlsMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
-        TotShadesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
-        TotDrapesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
-        TotBlindsEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
-        TotScreensEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
-        W5GapMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
+        state.dataHeatBal->W5GlsMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Glazing:EquivalentLayer");
+        state.dataHeatBal->TotShadesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Shade:EquivalentLayer");
+        state.dataHeatBal->TotDrapesEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Drape:EquivalentLayer");
+        state.dataHeatBal->TotBlindsEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Blind:EquivalentLayer");
+        state.dataHeatBal->TotScreensEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Screen:EquivalentLayer");
+        state.dataHeatBal->W5GapMatEQL = inputProcessor->getNumObjectsFound(state, "WindowMaterial:Gap:EquivalentLayer");
 
-        state.dataHeatBal->TotMaterials = RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat + state.dataHeatBal->W5GasMatMixture + TotShades + TotScreens + TotBlinds +
-                       EcoRoofMat + IRTMat + TotSimpleWindow + TotComplexShades + TotComplexGaps + W5GlsMatEQL + TotShadesEQL + TotDrapesEQL +
-                       TotBlindsEQL + TotScreensEQL + W5GapMatEQL;
+        state.dataHeatBal->TotMaterials = RegMat + RegRMat + AirMat + state.dataHeatBal->W5GlsMat + state.dataHeatBal->W5GlsMatAlt + state.dataHeatBal->W5GasMat + state.dataHeatBal->W5GasMatMixture + state.dataHeatBal->TotShades + state.dataHeatBal->TotScreens + state.dataHeatBal->TotBlinds +
+                       EcoRoofMat + IRTMat + state.dataHeatBal->TotSimpleWindow + state.dataHeatBal->TotComplexShades + state.dataHeatBal->TotComplexGaps + state.dataHeatBal->W5GlsMatEQL + state.dataHeatBal->TotShadesEQL + state.dataHeatBal->TotDrapesEQL +
+                       state.dataHeatBal->TotBlindsEQL + state.dataHeatBal->TotScreensEQL + state.dataHeatBal->W5GapMatEQL;
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:FfactorGroundFloor");
         TotCfactorConstructs = inputProcessor->getNumObjectsFound(state, "Construction:CfactorUndergroundWall");
@@ -2312,7 +2312,7 @@ namespace HeatBalanceManager {
 
         // Glass materials, equivalent layer (ASHWAT) method
         CurrentModuleObject = "WindowMaterial:Glazing:EquivalentLayer";
-        for (Loop = 1; Loop <= W5GlsMatEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GlsMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -2510,7 +2510,7 @@ namespace HeatBalanceManager {
         // Window gap materials (for gaps with a single gas for EquivalentLayer)
 
         CurrentModuleObject = "WindowMaterial:Gap:EquivalentLayer";
-        for (Loop = 1; Loop <= W5GapMatEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->W5GapMatEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -2704,7 +2704,7 @@ namespace HeatBalanceManager {
         // Window Shade Materials
 
         CurrentModuleObject = "WindowMaterial:Shade";
-        for (Loop = 1; Loop <= TotShades; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotShades; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -2779,7 +2779,7 @@ namespace HeatBalanceManager {
         // Window Shade Materials
 
         CurrentModuleObject = "WindowMaterial:Shade:EquivalentLayer";
-        for (Loop = 1; Loop <= TotShadesEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotShadesEQL; ++Loop) {
 
             MaterialProps = 0;
 
@@ -2858,7 +2858,7 @@ namespace HeatBalanceManager {
         // Window drape materials
 
         CurrentModuleObject = "WindowMaterial:Drape:EquivalentLayer";
-        for (Loop = 1; Loop <= TotDrapesEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotDrapesEQL; ++Loop) {
 
             MaterialProps = 0;
 
@@ -2938,7 +2938,7 @@ namespace HeatBalanceManager {
         // Window Screen Materials
 
         CurrentModuleObject = "WindowMaterial:Screen";
-        for (Loop = 1; Loop <= TotScreens; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotScreens; ++Loop) {
 
             // Call GetObjectItem routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -3107,7 +3107,7 @@ namespace HeatBalanceManager {
         }
 
         CurrentModuleObject = "WindowMaterial:Screen:EquivalentLayer";
-        for (Loop = 1; Loop <= TotScreensEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotScreensEQL; ++Loop) {
 
             MaterialProps = 0;
 
@@ -3237,12 +3237,12 @@ namespace HeatBalanceManager {
 
         // Window Blind Materials
 
-        if (TotBlinds > 0) {
-            Blind.allocate(TotBlinds); // Allocate the array Size to the number of blinds
+        if (state.dataHeatBal->TotBlinds > 0) {
+            Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
         }
 
         CurrentModuleObject = "WindowMaterial:Blind";
-        for (Loop = 1; Loop <= TotBlinds; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBlinds; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -3509,7 +3509,7 @@ namespace HeatBalanceManager {
         // Window Blind Materials for EquivalentLayer Model
 
         CurrentModuleObject = "WindowMaterial:Blind:EquivalentLayer";
-        for (Loop = 1; Loop <= TotBlindsEQL; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotBlindsEQL; ++Loop) {
 
             // Call Input Get routine to retrieve material data
             inputProcessor->getObjectItem(state,
@@ -3760,12 +3760,12 @@ namespace HeatBalanceManager {
         // Thermochromic glazing group
         // get the number of WindowMaterial:GlazingGroup:Thermochromic objects in the idf file
         CurrentModuleObject = "WindowMaterial:GlazingGroup:Thermochromic";
-        TotTCGlazings = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        if (TotTCGlazings >= 1) {
+        state.dataHeatBal->TotTCGlazings = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        if (state.dataHeatBal->TotTCGlazings >= 1) {
             // Read TC glazings
-            TCGlazings.allocate(TotTCGlazings);
+            TCGlazings.allocate(state.dataHeatBal->TotTCGlazings);
 
-            for (Loop = 1; Loop <= TotTCGlazings; ++Loop) {
+            for (Loop = 1; Loop <= state.dataHeatBal->TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
@@ -3832,7 +3832,7 @@ namespace HeatBalanceManager {
         }
 
         cCurrentModuleObject = "WindowMaterial:SimpleGlazingSystem";
-        for (Loop = 1; Loop <= TotSimpleWindow; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotSimpleWindow; ++Loop) {
 
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -3864,7 +3864,7 @@ namespace HeatBalanceManager {
         }
 
         // Simon: Place to load materials for complex fenestrations
-        if ((TotComplexShades > 0) || (TotComplexGaps > 0)) {
+        if ((state.dataHeatBal->TotComplexShades > 0) || (state.dataHeatBal->TotComplexGaps > 0)) {
             SetupComplexFenestrationMaterialInput(state, MaterNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowSevereError(state, "Errors found in processing complex fenestration material input");
@@ -6101,13 +6101,13 @@ namespace HeatBalanceManager {
         int Loop;
 
         CurrentModuleObject = "WindowProperty:FrameAndDivider";
-        TotFrameDivider = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        FrameDivider.allocate(TotFrameDivider);
-        if (TotFrameDivider == 0) return;
+        state.dataHeatBal->TotFrameDivider = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        FrameDivider.allocate(state.dataHeatBal->TotFrameDivider);
+        if (state.dataHeatBal->TotFrameDivider == 0) return;
 
         FrameDividerNum = 0;
 
-        for (Loop = 1; Loop <= TotFrameDivider; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotFrameDivider; ++Loop) {
 
             // Call Input Get routine to retrieve frame/divider data
             inputProcessor->getObjectItem(state,
@@ -7044,16 +7044,16 @@ namespace HeatBalanceManager {
 
             // WindowFrameAndDivider objects
 
-            TotFrameDividerPrev = TotFrameDivider;
+            TotFrameDividerPrev = state.dataHeatBal->TotFrameDivider;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
-                    ++TotFrameDivider;
-                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs - NGlSys + IGlSys).W5FrameDivider = TotFrameDivider;
+                    ++state.dataHeatBal->TotFrameDivider;
+                    state.dataConstruction->Construct(state.dataHeatBal->TotConstructs - NGlSys + IGlSys).W5FrameDivider = state.dataHeatBal->TotFrameDivider;
                 }
             }
 
-            if (TotFrameDivider > TotFrameDividerPrev) {
-                FrameDivider.redimension(TotFrameDivider);
+            if (state.dataHeatBal->TotFrameDivider > TotFrameDividerPrev) {
+                FrameDivider.redimension(state.dataHeatBal->TotFrameDivider);
             }
 
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
@@ -8273,13 +8273,13 @@ namespace HeatBalanceManager {
 
         // Reading WindowMaterial:ComplexShade
         cCurrentModuleObject = "WindowMaterial:ComplexShade";
-        TotComplexShades = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotComplexShades = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (TotComplexShades > 0) {
-            ComplexShade.allocate(TotComplexShades); // Allocate the array Size to the number of complex shades
+        if (state.dataHeatBal->TotComplexShades > 0) {
+            ComplexShade.allocate(state.dataHeatBal->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
-        for (Loop = 1; Loop <= TotComplexShades; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotComplexShades; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,

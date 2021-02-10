@@ -220,26 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    int TotBlinds(0);                  // Total number of blind materials
-    int TotScreens(0);                 // Total number of exterior window screen materials
-    int TotTCGlazings(0);              // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumSurfaceScreens(0);          // Total number of screens on exterior windows
-    int TotShades(0);                  // Total number of shade materials
-    int TotComplexShades(0);           // Total number of shading materials for complex fenestrations
-    int TotComplexGaps(0);             // Total number of window gaps for complex fenestrations
-    int TotSimpleWindow;               // number of simple window systems.
-
-    int W5GlsMatEQL(0);   // Window5 Single-Gas Materials for Equivalent Layer window model
-    int TotShadesEQL(0);  // Total number of shade materials for Equivalent Layer window model
-    int TotDrapesEQL(0);  // Total number of drape materials for Equivalent Layer window model
-    int TotBlindsEQL(0);  // Total number of blind materials for Equivalent Layer window model
-    int TotScreensEQL(0); // Total number of exterior window screen materials for Equivalent Layer window model
-    int W5GapMatEQL(0);   // Window5 Equivalent Layer Single-Gas Materials
-
-    int TotZoneAirBalance(0); // Total Zone Air Balance Statements in input
-    int TotFrameDivider(0);   // Total number of window frame/divider objects
-    int AirFlowFlag(0);
-    int TotCO2Gen(0);                       // Total CO2 source and sink statements in input
     bool CalcWindowRevealReflection(false); // True if window reveal reflection is to be calculated
     // for at least one exterior window
     bool StormWinChangeThisDay(false); // True if a storm window has been added or removed from any
@@ -253,10 +233,6 @@ namespace EnergyPlus::DataHeatBalance {
     bool NoCfactorConstructionsUsed(true);
     bool NoRegularMaterialsUsed(true);
 
-    int NumRefrigeratedRacks(0); // Total number of refrigerated case compressor racks in input
-    int NumRefrigSystems(0);     // Total number of detailed refrigeration systems in input
-    int NumRefrigCondensers(0);  // Total number of detailed refrigeration condensers in input
-    int NumRefrigChillerSets(0); // Total number of refrigerated warehouse coils in input
     Array1D<Real64> SNLoadHeatEnergy;
     Array1D<Real64> SNLoadCoolEnergy;
     Array1D<Real64> SNLoadHeatRate;
@@ -509,24 +485,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TotBlinds = 0;
-        TotScreens = 0;
-        TotTCGlazings = 0;
-        NumSurfaceScreens = 0;
-        TotShades = 0;
-        TotComplexShades = 0;
-        TotComplexGaps = 0;
-        TotSimpleWindow = int();
-        W5GlsMatEQL = 0;
-        TotShadesEQL = 0;
-        TotDrapesEQL = 0;
-        TotBlindsEQL = 0;
-        TotScreensEQL = 0;
-        W5GapMatEQL = 0;
-        TotZoneAirBalance = 0;
-        TotFrameDivider = 0;
-        AirFlowFlag = 0;
-        TotCO2Gen = 0;
         CalcWindowRevealReflection = false;
         StormWinChangeThisDay = false;
         AnyConstructInternalSourceInInput = false;
@@ -535,10 +493,6 @@ namespace EnergyPlus::DataHeatBalance {
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
         NoRegularMaterialsUsed = true;
-        NumRefrigeratedRacks = 0;
-        NumRefrigSystems = 0;
-        NumRefrigCondensers = 0;
-        NumRefrigChillerSets = 0;
         SNLoadHeatEnergy.deallocate();
         SNLoadCoolEnergy.deallocate();
         SNLoadHeatRate.deallocate();
@@ -1392,16 +1346,16 @@ namespace EnergyPlus::DataHeatBalance {
         Found = UtilityRoutines::FindItemInList("~" + Blind(inBlindNumber).Name, Blind);
         if (Found == 0) {
             // Add a new blind
-            Blind.redimension(++TotBlinds);
-            Blind(TotBlinds) = Blind(inBlindNumber);
-            Blind(TotBlinds).Name = "~" + Blind(inBlindNumber).Name;
-            outBlindNumber = TotBlinds;
-            Blind(TotBlinds).SlatAngleType = VariableSlats;
+            Blind.redimension(++state.dataHeatBal->TotBlinds);
+            Blind(state.dataHeatBal->TotBlinds) = Blind(inBlindNumber);
+            Blind(state.dataHeatBal->TotBlinds).Name = "~" + Blind(inBlindNumber).Name;
+            outBlindNumber = state.dataHeatBal->TotBlinds;
+            Blind(state.dataHeatBal->TotBlinds).SlatAngleType = VariableSlats;
 
             // Minimum and maximum slat angles allowed by slat geometry
-            if (Blind(TotBlinds).SlatWidth > Blind(TotBlinds).SlatSeparation) {
+            if (Blind(state.dataHeatBal->TotBlinds).SlatWidth > Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
                 MinSlatAngGeom =
-                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
+                    std::asin(Blind(state.dataHeatBal->TotBlinds).SlatThickness / (Blind(state.dataHeatBal->TotBlinds).SlatThickness + Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -1409,52 +1363,52 @@ namespace EnergyPlus::DataHeatBalance {
 
             // Error if maximum slat angle less than minimum
 
-            if (Blind(TotBlinds).MaxSlatAngle < Blind(TotBlinds).MinSlatAngle) {
+            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle < Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
                 errFlag = true;
                 ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
-                                         Blind(TotBlinds).MinSlatAngle,
-                                         Blind(TotBlinds).MaxSlatAngle));
+                                         Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Error if input slat angle not in input min/max range
 
-            if (Blind(TotBlinds).MaxSlatAngle > Blind(TotBlinds).MinSlatAngle &&
-                (Blind(TotBlinds).SlatAngle < Blind(TotBlinds).MinSlatAngle || Blind(TotBlinds).SlatAngle > Blind(TotBlinds).MaxSlatAngle)) {
+            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
+                (Blind(state.dataHeatBal->TotBlinds).SlatAngle < Blind(state.dataHeatBal->TotBlinds).MinSlatAngle || Blind(state.dataHeatBal->TotBlinds).SlatAngle > Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
                 errFlag = true;
                 ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
-                                         Blind(TotBlinds).SlatAngle,
-                                         Blind(TotBlinds).MinSlatAngle,
-                                         Blind(TotBlinds).MaxSlatAngle));
+                                         Blind(state.dataHeatBal->TotBlinds).SlatAngle,
+                                         Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Warning if input minimum slat angle is less than that allowed by slat geometry
 
-            if (Blind(TotBlinds).MinSlatAngle < MinSlatAngGeom) {
+            if (Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
                 ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
                     state,
                     format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
-                           Blind(TotBlinds).MinSlatAngle,
+                           Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
                            MinSlatAngGeom));
                 ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
-                Blind(TotBlinds).MinSlatAngle = MinSlatAngGeom;
+                Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
             }
 
             // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
-            if (Blind(TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
+            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
                 ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
                     state,
                     format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
-                           Blind(TotBlinds).MaxSlatAngle,
+                           Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
                            MaxSlatAngGeom));
                 ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
-                Blind(TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
+                Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
             }
         } else {
             outBlindNumber = Found;

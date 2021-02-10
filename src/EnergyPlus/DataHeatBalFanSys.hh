@@ -64,7 +64,7 @@ namespace DataHeatBalFanSys {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const UseSimpleAirFlow;
+    constexpr bool UseSimpleAirFlow = true;
     extern Real64 const MaxRadHeatFlux; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
 
     // Controls for PredictorCorrector

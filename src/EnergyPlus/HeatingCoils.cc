@@ -112,8 +112,6 @@ namespace HeatingCoils {
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHeatBalance::HeatReclaimRefrigCondenser;
     using DataHeatBalance::HeatReclaimRefrigeratedRack;
-    using DataHeatBalance::NumRefrigCondensers;
-    using DataHeatBalance::NumRefrigeratedRacks;
     using DataHeatBalance::RefrigCondenserTypeAir;
     using DataHeatBalance::RefrigCondenserTypeEvap;
     using DataHeatBalance::RefrigCondenserTypeWater;
@@ -1374,7 +1372,7 @@ namespace HeatingCoils {
         if (!ValidSourceType(CoilNum) && (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingDesuperheater) && ShowSingleWarning(CoilNum)) {
             ++ValidSourceTypeCounter;
             if (HeatingCoil(CoilNum).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE) {
-                for (RackNum = 1; RackNum <= NumRefrigeratedRacks; ++RackNum) {
+                for (RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
                     if (!UtilityRoutines::SameString(HeatReclaimRefrigeratedRack(RackNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName))
                         continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = RackNum;
@@ -1397,7 +1395,7 @@ namespace HeatingCoils {
                     break;
                 }
             } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
-                for (CondNum = 1; CondNum <= NumRefrigCondensers; ++CondNum) {
+                for (CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
                     if (!UtilityRoutines::SameString(HeatReclaimRefrigCondenser(CondNum).Name, HeatingCoil(CoilNum).ReclaimHeatingCoilName)) continue;
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = CondNum;
                     if (allocated(HeatReclaimRefrigCondenser)) {

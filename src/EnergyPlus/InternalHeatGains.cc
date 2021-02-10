@@ -4654,10 +4654,10 @@ namespace InternalHeatGains {
 
         RepVarSet = true;
         CurrentModuleObject = "ZoneContaminantSourceAndSink:CarbonDioxide";
-        TotCO2Gen = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ZoneCO2Gen.allocate(TotCO2Gen);
+        state.dataHeatBal->TotCO2Gen = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        ZoneCO2Gen.allocate(state.dataHeatBal->TotCO2Gen);
 
-        for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
             AlphaName = "";
             IHGNumbers = 0.0;
             inputProcessor->getObjectItem(state,
@@ -5619,7 +5619,7 @@ namespace InternalHeatGains {
             ZoneIntGain(NZ).QBBCON += ZoneBBHeat(Loop).ConGainRate;
         }
 
-        for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
             int NZ = ZoneCO2Gen(Loop).ZonePtr;
             ZoneCO2Gen(Loop).CO2GainRate = ZoneCO2Gen(Loop).CO2DesignRate * GetCurrentScheduleValue(state, ZoneCO2Gen(Loop).SchedPtr);
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;

@@ -2302,7 +2302,6 @@ namespace HVACManager {
         using DataHeatBalance::CrossMixing;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::RefDoorMixing;
-        using DataHeatBalance::TotZoneAirBalance;
         using DataHeatBalance::Ventilation;
         using DataHeatBalance::ZnAirRpt;
         using DataHeatBalance::Zone;
@@ -2710,7 +2709,7 @@ namespace HVACManager {
             }
 
             // Reporting combined outdoor air flows
-            for (j = 1; j <= TotZoneAirBalance; ++j) {
+            for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
                 if (ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature && ZoneLoop == ZoneAirBalance(j).ZonePtr) {
                     if (MAT(ZoneLoop) > Zone(ZoneLoop).OutDryBulbTemp) {
                         ZnAirRpt(ZoneLoop).OABalanceHeatLoss =

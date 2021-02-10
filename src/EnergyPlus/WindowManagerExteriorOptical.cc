@@ -175,11 +175,11 @@ namespace WindowManager {
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
         // Calculation from this is used for IR properties. Need to make sure that properties
         // are calculated with new WCE optical engine (for both blinds and screens)
-        if (TotBlinds > 0) CalcWindowBlindProperties(state);
+        if (state.dataHeatBal->TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
-        NumSurfaceScreens = TotScreens;
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
+        state.dataHeatBal->NumSurfaceScreens = state.dataHeatBal->TotScreens;
+        if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
         for (auto ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {

@@ -6098,8 +6098,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     Surface(4).Zone = 1;
 
     // frames
-    TotFrameDivider = 2;
-    FrameDivider.allocate(TotFrameDivider);
+    state->dataHeatBal->TotFrameDivider = 2;
+    FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
     FrameDivider(1).FrameWidth = 0.3;
     FrameDivider(2).FrameWidth = 0.2;
 

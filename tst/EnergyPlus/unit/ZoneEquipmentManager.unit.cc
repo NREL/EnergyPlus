@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = true;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;

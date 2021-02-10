@@ -282,7 +282,7 @@ namespace HeatBalanceAirManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        AirFlowFlag = UseSimpleAirFlow;
+        state.dataHeatBal->AirFlowFlag = UseSimpleAirFlow;
 
         GetSimpleAirModelInputs(state, ErrorsFound);
         if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotRefDoorMixing > 0) {
@@ -592,11 +592,11 @@ namespace HeatBalanceAirManager {
         lNumericFieldBlanks.dimension(maxNumber, true);
 
         cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
-        TotZoneAirBalance = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataHeatBal->TotZoneAirBalance = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        ZoneAirBalance.allocate(TotZoneAirBalance);
+        ZoneAirBalance.allocate(state.dataHeatBal->TotZoneAirBalance);
 
-        for (Loop = 1; Loop <= TotZoneAirBalance; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotZoneAirBalance; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -889,8 +889,8 @@ namespace HeatBalanceAirManager {
                     }
 
                     // setup a flag if the outdoor air balance method is applied
-                    if (Infiltration(Loop).ZonePtr > 0 && TotZoneAirBalance > 0) {
-                        for (i = 1; i <= TotZoneAirBalance; ++i) {
+                    if (Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                        for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                             if (Infiltration(Loop).ZonePtr == ZoneAirBalance(i).ZonePtr) {
                                 if (ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
                                     Infiltration(Loop).QuadratureSum = true;
@@ -1076,8 +1076,8 @@ namespace HeatBalanceAirManager {
             }
 
             // setup a flag if the outdoor air balance method is applied
-            if (Infiltration(Loop).ZonePtr > 0 && TotZoneAirBalance > 0) {
-                for (i = 1; i <= TotZoneAirBalance; ++i) {
+            if (Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                     if (Infiltration(Loop).ZonePtr == ZoneAirBalance(i).ZonePtr) {
                         if (ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
                             Infiltration(Loop).QuadratureSum = true;
@@ -1139,8 +1139,8 @@ namespace HeatBalanceAirManager {
             }
 
             // setup a flag if the outdoor air balance method is applied
-            if (Infiltration(Loop).ZonePtr > 0 && TotZoneAirBalance > 0) {
-                for (i = 1; i <= TotZoneAirBalance; ++i) {
+            if (Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                     if (Infiltration(Loop).ZonePtr == ZoneAirBalance(i).ZonePtr) {
                         if (ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
                             Infiltration(Loop).QuadratureSum = true;
@@ -1376,8 +1376,8 @@ namespace HeatBalanceAirManager {
                     }
 
                     // setup a flag if the outdoor air balance method is applied
-                    if (Ventilation(Loop).ZonePtr > 0 && TotZoneAirBalance > 0) {
-                        for (i = 1; i <= TotZoneAirBalance; ++i) {
+                    if (Ventilation(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                        for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                             if (Ventilation(Loop).ZonePtr == ZoneAirBalance(i).ZonePtr) {
                                 if (ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
                                     Ventilation(Loop).QuadratureSum = true;
@@ -1991,8 +1991,8 @@ namespace HeatBalanceAirManager {
             }
 
             // setup a flag if the outdoor air balance method is applied
-            if (Ventilation(VentiCount).ZonePtr > 0 && TotZoneAirBalance > 0) {
-                for (i = 1; i <= TotZoneAirBalance; ++i) {
+            if (Ventilation(VentiCount).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
+                for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                     if (Ventilation(VentiCount).ZonePtr == ZoneAirBalance(i).ZonePtr) {
                         if (ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
                             Ventilation(VentiCount).QuadratureSum = true;
@@ -4222,7 +4222,7 @@ namespace HeatBalanceAirManager {
         // Select type of airflow calculation
 
         {
-            auto const SELECT_CASE_var(AirFlowFlag);
+            auto const SELECT_CASE_var(state.dataHeatBal->AirFlowFlag);
 
             if (SELECT_CASE_var == UseSimpleAirFlow) { // Simplified airflow calculation
                 // Process the scheduled Mixing for air heat balance
