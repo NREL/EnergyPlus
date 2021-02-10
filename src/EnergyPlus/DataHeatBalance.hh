@@ -275,27 +275,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern Array1D<Real64> SNLoadHeatEnergy;
-    extern Array1D<Real64> SNLoadCoolEnergy;
-    extern Array1D<Real64> SNLoadHeatRate;
-    extern Array1D<Real64> SNLoadCoolRate;
-    extern Array1D<Real64> SNLoadPredictedRate;
-    extern Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    extern Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    extern Array1D<Real64> MoisturePredictedRate;
-    extern Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
-    extern Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
-
-    extern Array1D<Real64> ListSNLoadHeatEnergy;
-    extern Array1D<Real64> ListSNLoadCoolEnergy;
-    extern Array1D<Real64> ListSNLoadHeatRate;
-    extern Array1D<Real64> ListSNLoadCoolRate;
-
-    extern Array1D<Real64> GroupSNLoadHeatEnergy;
-    extern Array1D<Real64> GroupSNLoadCoolEnergy;
-    extern Array1D<Real64> GroupSNLoadHeatRate;
-    extern Array1D<Real64> GroupSNLoadCoolRate;
-
     extern Array1D<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
     extern Array1D<Real64> SUMAI;          // 1 over the Sum of zone areas or 1/SumA
     extern Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
@@ -2203,6 +2182,24 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoFfactorConstructionsUsed = true;
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
+    Array1D<Real64> SNLoadHeatEnergy;
+    Array1D<Real64> SNLoadCoolEnergy;
+    Array1D<Real64> SNLoadHeatRate;
+    Array1D<Real64> SNLoadCoolRate;
+    Array1D<Real64> SNLoadPredictedRate;
+    Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
+    Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
+    Array1D<Real64> MoisturePredictedRate;
+    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
+    Array1D<Real64> ListSNLoadHeatEnergy;
+    Array1D<Real64> ListSNLoadCoolEnergy;
+    Array1D<Real64> ListSNLoadHeatRate;
+    Array1D<Real64> ListSNLoadCoolRate;
+    Array1D<Real64> GroupSNLoadHeatEnergy;
+    Array1D<Real64> GroupSNLoadCoolEnergy;
+    Array1D<Real64> GroupSNLoadHeatRate;
+    Array1D<Real64> GroupSNLoadCoolRate;
 
     void clear_state() override
     {
@@ -2305,6 +2302,24 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NoFfactorConstructionsUsed = true;
         this->NoCfactorConstructionsUsed = true;
         this->NoRegularMaterialsUsed = true;
+        this->SNLoadHeatEnergy.deallocate();
+        this->SNLoadCoolEnergy.deallocate();
+        this->SNLoadHeatRate.deallocate();
+        this->SNLoadCoolRate.deallocate();
+        this->SNLoadPredictedRate.deallocate();
+        this->SNLoadPredictedHSPRate.deallocate();
+        this->SNLoadPredictedCSPRate.deallocate();
+        this->MoisturePredictedRate.deallocate();
+        this->MoisturePredictedHumSPRate.deallocate();
+        this->MoisturePredictedDehumSPRate.deallocate();
+        this->ListSNLoadHeatEnergy.deallocate();
+        this->ListSNLoadCoolEnergy.deallocate();
+        this->ListSNLoadHeatRate.deallocate();
+        this->ListSNLoadCoolRate.deallocate();
+        this->GroupSNLoadHeatEnergy.deallocate();
+        this->GroupSNLoadCoolEnergy.deallocate();
+        this->GroupSNLoadHeatRate.deallocate();
+        this->GroupSNLoadCoolRate.deallocate();
     }
 };
 

@@ -2659,16 +2659,16 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneEnergyDemand->Setback.dimension(state.dataGlobal->NumOfZones, false);
             state.dataZoneEnergyDemand->DeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
             state.dataZoneEnergyDemand->CurDeadBandOrSetback.dimension(state.dataGlobal->NumOfZones, false);
-            SNLoadHeatEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadCoolEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadHeatRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadCoolRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadPredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadPredictedHSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SNLoadPredictedCSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            MoisturePredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            MoisturePredictedHumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            MoisturePredictedDehumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadHeatEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadCoolEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadHeatRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadCoolRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadPredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadPredictedHSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->SNLoadPredictedCSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->MoisturePredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->MoisturePredictedHumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBal->MoisturePredictedDehumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
             WZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
             WZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
             WZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -2693,15 +2693,15 @@ namespace ZoneTempPredictorCorrector {
             ZoneT1.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZoneW1.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-            ListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-            ListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-            ListSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-            ListSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            state.dataHeatBal->ListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            state.dataHeatBal->ListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            state.dataHeatBal->ListSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+            state.dataHeatBal->ListSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
 
-            GroupSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-            GroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-            GroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-            GroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            state.dataHeatBal->GroupSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            state.dataHeatBal->GroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            state.dataHeatBal->GroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+            state.dataHeatBal->GroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
             AIRRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZTM1.dimension(state.dataGlobal->NumOfZones, 0.0);
             ZTM2.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -2742,7 +2742,7 @@ namespace ZoneTempPredictorCorrector {
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 SetupOutputVariable(state, "Zone Air System Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
-                                    SNLoadHeatEnergy(Loop),
+                                    state.dataHeatBal->SNLoadHeatEnergy(Loop),
                                     "System",
                                     "Sum",
                                     Zone(Loop).Name,
@@ -2756,7 +2756,7 @@ namespace ZoneTempPredictorCorrector {
                                     Zone(Loop).ListMultiplier);
                 SetupOutputVariable(state, "Zone Air System Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
-                                    SNLoadCoolEnergy(Loop),
+                                    state.dataHeatBal->SNLoadCoolEnergy(Loop),
                                     "System",
                                     "Sum",
                                     Zone(Loop).Name,
@@ -2769,9 +2769,9 @@ namespace ZoneTempPredictorCorrector {
                                     Zone(Loop).Multiplier,
                                     Zone(Loop).ListMultiplier);
                 SetupOutputVariable(state,
-                    "Zone Air System Sensible Heating Rate", OutputProcessor::Unit::W, SNLoadHeatRate(Loop), "System", "Average", Zone(Loop).Name);
+                    "Zone Air System Sensible Heating Rate", OutputProcessor::Unit::W, state.dataHeatBal->SNLoadHeatRate(Loop), "System", "Average", Zone(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone Air System Sensible Cooling Rate", OutputProcessor::Unit::W, SNLoadCoolRate(Loop), "System", "Average", Zone(Loop).Name);
+                    "Zone Air System Sensible Cooling Rate", OutputProcessor::Unit::W, state.dataHeatBal->SNLoadCoolRate(Loop), "System", "Average", Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Air Temperature", OutputProcessor::Unit::C, ZT(Loop), "System", "Average", Zone(Loop).Name);
                 SetupOutputVariable(state,
                     "Zone Thermostat Air Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "System", "Average", Zone(Loop).Name);
@@ -2785,19 +2785,19 @@ namespace ZoneTempPredictorCorrector {
                 // First, these report variables are NOT multiplied by zone and group multipliers
                 SetupOutputVariable(state, "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    SNLoadPredictedRate(Loop),
+                                    state.dataHeatBal->SNLoadPredictedRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    SNLoadPredictedHSPRate(Loop),
+                                    state.dataHeatBal->SNLoadPredictedHSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                                    SNLoadPredictedCSPRate(Loop),
+                                    state.dataHeatBal->SNLoadPredictedCSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
@@ -2826,19 +2826,19 @@ namespace ZoneTempPredictorCorrector {
                 // First, these report variables are NOT multiplied by zone and group multipliers
                 SetupOutputVariable(state, "Zone Predicted Moisture Load Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    MoisturePredictedRate(Loop),
+                                    state.dataHeatBal->MoisturePredictedRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    MoisturePredictedHumSPRate(Loop),
+                                    state.dataHeatBal->MoisturePredictedHumSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    MoisturePredictedDehumSPRate(Loop),
+                                    state.dataHeatBal->MoisturePredictedDehumSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
@@ -2931,38 +2931,38 @@ namespace ZoneTempPredictorCorrector {
             // CurrentModuleObject='ZoneList'
             for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneLists; ++Loop) {
                 SetupOutputVariable(state,
-                    "Zone List Sensible Heating Energy", OutputProcessor::Unit::J, ListSNLoadHeatEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
+                    "Zone List Sensible Heating Energy", OutputProcessor::Unit::J, state.dataHeatBal->ListSNLoadHeatEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone List Sensible Cooling Energy", OutputProcessor::Unit::J, ListSNLoadCoolEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
+                    "Zone List Sensible Cooling Energy", OutputProcessor::Unit::J, state.dataHeatBal->ListSNLoadCoolEnergy(Loop), "System", "Sum", ZoneList(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone List Sensible Heating Rate", OutputProcessor::Unit::W, ListSNLoadHeatRate(Loop), "System", "Average", ZoneList(Loop).Name);
+                    "Zone List Sensible Heating Rate", OutputProcessor::Unit::W, state.dataHeatBal->ListSNLoadHeatRate(Loop), "System", "Average", ZoneList(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone List Sensible Cooling Rate", OutputProcessor::Unit::W, ListSNLoadCoolRate(Loop), "System", "Average", ZoneList(Loop).Name);
+                    "Zone List Sensible Cooling Rate", OutputProcessor::Unit::W, state.dataHeatBal->ListSNLoadCoolRate(Loop), "System", "Average", ZoneList(Loop).Name);
             } // Loop
 
             // CurrentModuleObject='ZoneGroup'
             for (Loop = 1; Loop <= state.dataHeatBal->NumOfZoneGroups; ++Loop) {
                 SetupOutputVariable(state, "Zone Group Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
-                                    GroupSNLoadHeatEnergy(Loop),
+                                    state.dataHeatBal->GroupSNLoadHeatEnergy(Loop),
                                     "System",
                                     "Sum",
                                     ZoneGroup(Loop).Name);
                 SetupOutputVariable(state, "Zone Group Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
-                                    GroupSNLoadCoolEnergy(Loop),
+                                    state.dataHeatBal->GroupSNLoadCoolEnergy(Loop),
                                     "System",
                                     "Sum",
                                     ZoneGroup(Loop).Name);
                 SetupOutputVariable(state, "Zone Group Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
-                                    GroupSNLoadHeatRate(Loop),
+                                    state.dataHeatBal->GroupSNLoadHeatRate(Loop),
                                     "System",
                                     "Average",
                                     ZoneGroup(Loop).Name);
                 SetupOutputVariable(state, "Zone Group Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
-                                    GroupSNLoadCoolRate(Loop),
+                                    state.dataHeatBal->GroupSNLoadCoolRate(Loop),
                                     "System",
                                     "Average",
                                     ZoneGroup(Loop).Name);
@@ -3019,16 +3019,16 @@ namespace ZoneTempPredictorCorrector {
             }
 
             state.dataZoneEnergyDemand->DeadBandOrSetback = false;
-            SNLoadHeatEnergy = 0.0;
-            SNLoadCoolEnergy = 0.0;
-            SNLoadHeatRate = 0.0;
-            SNLoadCoolRate = 0.0;
-            SNLoadPredictedRate = 0.0;
-            SNLoadPredictedHSPRate = 0.0;
-            SNLoadPredictedCSPRate = 0.0;
-            MoisturePredictedRate = 0.0;
-            MoisturePredictedHumSPRate = 0.0;
-            MoisturePredictedDehumSPRate = 0.0;
+            state.dataHeatBal->SNLoadHeatEnergy = 0.0;
+            state.dataHeatBal->SNLoadCoolEnergy = 0.0;
+            state.dataHeatBal->SNLoadHeatRate = 0.0;
+            state.dataHeatBal->SNLoadCoolRate = 0.0;
+            state.dataHeatBal->SNLoadPredictedRate = 0.0;
+            state.dataHeatBal->SNLoadPredictedHSPRate = 0.0;
+            state.dataHeatBal->SNLoadPredictedCSPRate = 0.0;
+            state.dataHeatBal->MoisturePredictedRate = 0.0;
+            state.dataHeatBal->MoisturePredictedHumSPRate = 0.0;
+            state.dataHeatBal->MoisturePredictedDehumSPRate = 0.0;
 
             state.dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
             state.dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
@@ -4286,7 +4286,7 @@ namespace ZoneTempPredictorCorrector {
         ReportSensibleLoadsZoneMultiplier(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
                                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
                                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
-                                          SNLoadPredictedRate(ZoneNum),SNLoadPredictedHSPRate(ZoneNum),SNLoadPredictedCSPRate(ZoneNum),
+                                          state.dataHeatBal->SNLoadPredictedRate(ZoneNum),state.dataHeatBal->SNLoadPredictedHSPRate(ZoneNum),state.dataHeatBal->SNLoadPredictedCSPRate(ZoneNum),
                                           LoadToHeatingSetPoint,LoadToCoolingSetPoint,
                                           LoadCorrectionFactor(ZoneNum),Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
@@ -4661,7 +4661,7 @@ namespace ZoneTempPredictorCorrector {
         ReportMoistLoadsZoneMultiplier(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
                                        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
                                        state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
-                                       MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
+                                       state.dataHeatBal->MoisturePredictedRate(ZoneNum),state.dataHeatBal->MoisturePredictedHumSPRate(ZoneNum),state.dataHeatBal->MoisturePredictedDehumSPRate(ZoneNum),
                                        Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
@@ -5039,10 +5039,10 @@ namespace ZoneTempPredictorCorrector {
             MAT(ZoneNum) = ZT(ZoneNum);
 
             // Determine sensible load heating/cooling rate and energy
-            SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
-            SNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
-            SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour;
-            SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour);
+            state.dataHeatBal->SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
+            state.dataHeatBal->SNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
+            state.dataHeatBal->SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataHeatBal->SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour);
 
             // Final humidity calcs
             CorrectZoneHumRat(state, ZoneNum);

@@ -430,27 +430,8 @@ namespace RoomAirModelUserTempPattern {
         // based on user selected mode.
         // calculations vary by mode
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
-        using DataHeatBalance::SNLoadCoolRate;
-        using DataHeatBalance::SNLoadHeatRate;
         using DataHeatBalance::Zone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tmean;                        // MAT deg C
@@ -543,7 +524,7 @@ namespace RoomAirModelUserTempPattern {
 
             } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) {
 
-                CoolLoad = SNLoadCoolRate(ZoneNum);
+                CoolLoad = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
                 if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
                     Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -566,7 +547,7 @@ namespace RoomAirModelUserTempPattern {
 
             } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode) {
 
-                HeatLoad = SNLoadHeatRate(ZoneNum);
+                HeatLoad = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
                 if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
                     Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 

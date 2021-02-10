@@ -8895,7 +8895,7 @@ namespace SolarShading {
                     // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
                     // used in other CASEs) are not allocated at this point for the first time step of the simulation.
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
+                        if (state.dataHeatBal->SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -8929,7 +8929,7 @@ namespace SolarShading {
 
                 } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
+                        if (!state.dataEnvrn->SunIsUp && state.dataHeatBal->SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -8943,7 +8943,7 @@ namespace SolarShading {
                             if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
                         } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                            if (state.dataHeatBal->SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
                             } else if (GlareControlIsActive) {
                                 SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -8955,10 +8955,10 @@ namespace SolarShading {
                            WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
                     if (!state.dataGlobal->BeginSimFlag) {
                         if (!state.dataEnvrn->SunIsUp) { // Night
-                            if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
+                            if (state.dataHeatBal->SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
                                 SurfWinShadingFlag(ISurf) = ShType;
                         } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                            if (state.dataHeatBal->SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                                 SurfWinShadingFlag(ISurf) = ShType;
                             } else if (GlareControlIsActive) {
                                 SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -8969,7 +8969,7 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var ==
                            WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && state.dataHeatBal->SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (GlareControlIsActive) {
                             SurfWinShadingFlag(ISurf) = 10 * ShType;
@@ -8979,7 +8979,7 @@ namespace SolarShading {
                 } else if (SELECT_CASE_var ==
                            WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
                     if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                        if (state.dataEnvrn->SunIsUp && state.dataHeatBal->SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
                             if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
                         } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
                             SurfWinShadingFlag(ISurf) = ShType;

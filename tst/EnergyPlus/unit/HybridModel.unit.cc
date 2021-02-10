@@ -165,10 +165,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
     HConvIn.allocate(1);
-    SNLoadHeatRate.allocate(1);
-    SNLoadCoolRate.allocate(1);
-    SNLoadHeatEnergy.allocate(1);
-    SNLoadCoolEnergy.allocate(1);
+    state->dataHeatBal->SNLoadHeatRate.allocate(1);
+    state->dataHeatBal->SNLoadCoolRate.allocate(1);
+    state->dataHeatBal->SNLoadHeatEnergy.allocate(1);
+    state->dataHeatBal->SNLoadCoolEnergy.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
@@ -584,10 +584,6 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SurfaceWindow.deallocate();
     Surface.deallocate();
     HConvIn.deallocate();
-    SNLoadHeatRate.deallocate();
-    SNLoadCoolRate.deallocate();
-    SNLoadHeatEnergy.deallocate();
-    SNLoadCoolEnergy.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataRoomAirMod->IsZoneCV.deallocate();

@@ -220,27 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    Array1D<Real64> SNLoadHeatEnergy;
-    Array1D<Real64> SNLoadCoolEnergy;
-    Array1D<Real64> SNLoadHeatRate;
-    Array1D<Real64> SNLoadCoolRate;
-    Array1D<Real64> SNLoadPredictedRate;
-    Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedRate;
-    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
-
-    Array1D<Real64> ListSNLoadHeatEnergy;
-    Array1D<Real64> ListSNLoadCoolEnergy;
-    Array1D<Real64> ListSNLoadHeatRate;
-    Array1D<Real64> ListSNLoadCoolRate;
-
-    Array1D<Real64> GroupSNLoadHeatEnergy;
-    Array1D<Real64> GroupSNLoadCoolEnergy;
-    Array1D<Real64> GroupSNLoadHeatRate;
-    Array1D<Real64> GroupSNLoadCoolRate;
-
     Array1D<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
     Array1D<Real64> SUMAI;          // 1 over the Sum of zone areas or 1/SumA
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
@@ -472,24 +451,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        SNLoadHeatEnergy.deallocate();
-        SNLoadCoolEnergy.deallocate();
-        SNLoadHeatRate.deallocate();
-        SNLoadCoolRate.deallocate();
-        SNLoadPredictedRate.deallocate();
-        SNLoadPredictedHSPRate.deallocate();
-        SNLoadPredictedCSPRate.deallocate();
-        MoisturePredictedRate.deallocate();
-        MoisturePredictedHumSPRate.deallocate();
-        MoisturePredictedDehumSPRate.deallocate();
-        ListSNLoadHeatEnergy.deallocate();
-        ListSNLoadCoolEnergy.deallocate();
-        ListSNLoadHeatRate.deallocate();
-        ListSNLoadCoolRate.deallocate();
-        GroupSNLoadHeatEnergy.deallocate();
-        GroupSNLoadCoolEnergy.deallocate();
-        GroupSNLoadHeatRate.deallocate();
-        GroupSNLoadCoolRate.deallocate();
         MRT.deallocate();
         SUMAI.deallocate();
         ZoneTransSolar.deallocate();
