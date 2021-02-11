@@ -4594,8 +4594,7 @@ namespace EnergyPlus::SystemReports {
                     Real64 termUnitOAFrac = DataSizing::TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                         termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
-                    Real64 naturalVentVol = +ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
-                                            ZonePreDefRep(ActualZoneNum).AFNVentVolFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+                    Real64 naturalVentVol = +ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
                     state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
 
                 }
@@ -4644,7 +4643,7 @@ namespace EnergyPlus::SystemReports {
 
             // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
             // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
-            Real64 afnVentVol = ZonePreDefRep(ActualZoneNum).AFNVentVolFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            Real64 afnVentVol = ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
             Real64 totMechNatVentVolStdRho = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) + ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity +
                                              afnVentVol;
             Real64 targetVoz = state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -4671,21 +4670,24 @@ namespace EnergyPlus::SystemReports {
                 // accumulate the occupied time
                 ZonePreDefRep(ActualZoneNum).TotTimeOcc += TimeStepSys;
                 // mechanical ventilation
-                ZonePreDefRep(ActualZoneNum).MechVentVolTotalOcc += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
-                if ((state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) / TimeStepSys) < ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
-                    ZonePreDefRep(ActualZoneNum).MechVentVolMin = state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum) / TimeStepSys;
+                ZonePreDefRep(ActualZoneNum).MechVentVolTotalOcc += state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum);
+                if ((state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) < ZonePreDefRep(ActualZoneNum).MechVentVolMin) {
+                    ZonePreDefRep(ActualZoneNum).MechVentVolMin = state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys;
                 }
+                ZonePreDefRep(ActualZoneNum).MechVentVolTotalOccStdDen += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
                 // infiltration
-                ZonePreDefRep(ActualZoneNum).InfilVolTotalOcc += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
-                if (ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity < ZonePreDefRep(ActualZoneNum).InfilVolMin) {
-                    ZonePreDefRep(ActualZoneNum).InfilVolMin = ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+                ZonePreDefRep(ActualZoneNum).InfilVolTotalOcc += ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+                if (ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < ZonePreDefRep(ActualZoneNum).InfilVolMin) {
+                    ZonePreDefRep(ActualZoneNum).InfilVolMin = ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
                 }
-                // natural ventilation
-                ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOcc +=
+                ZonePreDefRep(ActualZoneNum).InfilVolTotalOccStdDen += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+                // 'simple' natural ventilation
+                ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOcc += ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+                if (ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
+                    ZonePreDefRep(ActualZoneNum).SimpVentVolMin = ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+                }
+                ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOccStdDen +=
                     ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
-                if (ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity < ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
-                    ZonePreDefRep(ActualZoneNum).SimpVentVolMin = ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity;
-                }
                 //target ventilation Voz-dyn
                 ZonePreDefRep(ActualZoneNum).VozTargetTotalOcc += targetVoz;
                 state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
@@ -4701,9 +4703,9 @@ namespace EnergyPlus::SystemReports {
                 ZonePreDefRep(ActualZoneNum).TotVentTimeNonZeroUnocc += state.dataSysRpts->ZoneTimeVentUnocc(CtrlZoneNum);
             }
             // accumulate during occupancy or not
-            ZonePreDefRep(ActualZoneNum).MechVentVolTotal += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
-            ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
-            ZonePreDefRep(ActualZoneNum).SimpVentVolTotal +=
+            ZonePreDefRep(ActualZoneNum).MechVentVolTotalStdDen += state.dataSysRpts->ZoneOAVolStdRho(CtrlZoneNum);
+            ZonePreDefRep(ActualZoneNum).InfilVolTotalStdDen += ZnAirRpt(ActualZoneNum).InfilVolumeStdDensity;
+            ZonePreDefRep(ActualZoneNum).SimpVentVolTotalStdDen +=
                 ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
             ZonePreDefRep(ActualZoneNum).VozTargetTotal += targetVoz;
             ZonePreDefRep(ActualZoneNum).VozTargetTimeBelow += state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);

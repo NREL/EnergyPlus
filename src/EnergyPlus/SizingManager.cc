@@ -1787,7 +1787,7 @@ namespace EnergyPlus::SizingManager {
                                                                      VozHtg,
                                                                      4); // Voz-htg
                         }
-                        // Outdoor Air Summary - Design Zone Outdoor Airflow - Voz
+                        // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz
                         Real64 VozMax = std::max(VozHtg, VozClg);  // take large of the heating and cooling Voz values
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
@@ -1825,7 +1825,7 @@ namespace EnergyPlus::SizingManager {
                     }
                 }
             }
-            // Outdoor Air Summary - Design Zone Outdoor Airflow - Voz - Total Row
+            // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz - Total Row
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
                 "Total", VozSum, 4);
             // System Ventilation Parameters, (Table 4)
