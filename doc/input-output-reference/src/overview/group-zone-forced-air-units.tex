@@ -303,7 +303,7 @@ The Ideal Loads air system outdoor air load variables are only calculated when t
 \item
   HVAC,Average,Zone Ideal Loads Mixed Air Temperature {[}\si{\degreeCelsius}{]}
 \item
-  HVAC,Average,Zone Ideal Loads Mixed Air Humidity Ratio {[}kgWater/kgDryAir{]}            
+  HVAC,Average,Zone Ideal Loads Mixed Air Humidity Ratio {[}kgWater/kgDryAir{]}
 \end{itemize}
 
 \paragraph{Ideal Loads Output Variable Overview}\label{ideal-loads-output-variable-overview}
@@ -3922,13 +3922,13 @@ Terminal units with variable refrigerant flow compound HVAC object are used excl
 
 \begin{callout}
 Note: The terminal unit may be used in the air loop and/or outdoor air system, however, at this time only constant flow (or limited variation within the limits allowed for DX coils) through the unit is allowed. Using a wide range of outdoor air flow rates will cause the DX coil model to fail. For example, if the minimum outdoor air flow rate is allowed to fall near 0, the DX coil model will calculate very low, even very negative, coil outlet temperatures. This can cause psychrometric warnings to occur and cause the simulation to end prematurely.
-\end{callout} 
+\end{callout}
 
 For zone equipment the terminal units are connected to a zone using the inlet and exhaust node names specified in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher).
 
 For air loop equipment and outdoor air system equipment the VRF terminal unit inlet and outlet nodes define the location of the system in the air loop and outdoor air system. The node names must define the path of the air stream in order from the beginning of the air loop or outdoor air system to the outlet of that system.
 
-This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on termninal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a termninal unit or coil outlet node temperature set point. 
+This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on termninal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a termninal unit or coil outlet node temperature set point.
 
 The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
 
@@ -4598,7 +4598,7 @@ This output reports the return air temperature. The return air temperature is in
 This output reports the outdoor air temperature.  The outdoor air temperature is inherited from the associated outdoor air node in each timestep.  The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Supply Air Humidity Ratio [kgWater/kgDryAir]}
-This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kg/kg, and for half of the timestep at 2 kg/s and 0.010 kg/kg, the supply air humidity ratio calculated for the time step would be 0.012\si{\degreeCelsius}. The output is the average over the reporting period.
+This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kgWater/kgDryAir, and for half of the timestep at 2 kg/s and 0.010 kgWater/kgDryAir, the supply air humidity ratio calculated for the time step would be 0.012 kgWater/kgDryAir. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Return Air Humidity Ratio [kgWater/kgDryAir]}
 This output reports the return air humidity ratio. The return air humidity ratio is inherited from the associated zone outlet node in each timestep.  The output is the average over the reporting period.
