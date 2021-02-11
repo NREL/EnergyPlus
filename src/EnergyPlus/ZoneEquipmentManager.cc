@@ -4379,7 +4379,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
             if (DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr > 0) {
                 if (DataHeatBalance::MassConservation(ZoneNum).IsOnlySourceZone ||
                     (DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::AllZones)) {
-                    ZoneInfiltrationMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate +
+                    ZoneInfiltrationMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate - 
+                                                   DataHeatBalance::MassConservation(ZoneNum).MixingMassFlowRate +
                                                    state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate +
                                                    ZoneReturnAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                     if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
