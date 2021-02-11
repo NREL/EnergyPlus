@@ -2405,7 +2405,6 @@ namespace VentilatedSlab {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalSurface::TH;
@@ -2594,9 +2593,9 @@ namespace VentilatedSlab {
             if (SELECT_CASE_var == state.dataVentilatedSlab->MATControl) {
                 SetPointTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->MRTControl) {
-                SetPointTemp = MRT(ZoneNum);
+                SetPointTemp = state.dataHeatBal->MRT(ZoneNum);
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->OPTControl) {
-                SetPointTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                SetPointTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->ODBControl) {
                 SetPointTemp = state.dataEnvrn->OutDryBulbTemp;
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->OWBControl) {

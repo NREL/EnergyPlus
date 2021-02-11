@@ -206,12 +206,12 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     DataHeatBalFanSys::ZTAV.allocate(1);
     DataHeatBalFanSys::ZT.allocate(1);
-    DataHeatBalance::MRT.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
 
     DataHeatBalFanSys::ZT(1) = 0.0;
     DataHeatBalFanSys::ZTAV(1) = 0.0;
-    DataHeatBalance::MRT(1) = 0.0;
+    state->dataHeatBal->MRT(1) = 0.0;
     DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
@@ -555,8 +555,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalance::SurfQRadThermInAbs.allocate(3);
     DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
     DataSurfaces::SurfWinHeatGain.allocate(3);
     DataSurfaces::SurfWinHeatTransfer.allocate(3);
@@ -2782,8 +2782,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalance::SurfQRadThermInAbs.allocate(3);
     DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
     DataSurfaces::SurfWinHeatGain.allocate(3);
     DataSurfaces::SurfWinHeatTransfer.allocate(3);

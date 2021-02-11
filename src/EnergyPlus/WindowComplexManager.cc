@@ -2832,7 +2832,7 @@ namespace WindowComplexManager {
 
                 tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
 
-                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = state.dataHeatBal->MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)

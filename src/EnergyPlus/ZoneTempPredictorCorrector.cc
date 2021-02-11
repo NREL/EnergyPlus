@@ -6892,7 +6892,6 @@ namespace ZoneTempPredictorCorrector {
         // pass in data and alter setpoint if needed
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -6911,7 +6910,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // get mean radiant temperature for zone
-        thisMRT = MRT(ActualZoneNum);
+        thisMRT = state.dataHeatBal->MRT(ActualZoneNum);
 
         // modify setpoint for operative temperature control
         //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.

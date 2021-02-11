@@ -2054,7 +2054,6 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;

@@ -4534,9 +4534,7 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHeatBalance::ZnRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
-        using DataHeatBalance::ZoneWinHeatGainRep;
         using DataHeatBalance::ZoneWinHeatGainRepEnergy;
-        using DataHeatBalance::ZoneWinHeatLossRep;
         using DataHeatBalance::ZoneWinHeatLossRepEnergy;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
@@ -4760,8 +4758,8 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                     // Window Heat Addition
                     // Window Heat Removal
-                    ZonePreDefRep(iZone).SHGSHtWindAdd = ZoneWinHeatGainRep(iZone) * mult;
-                    ZonePreDefRep(iZone).SHGSHtWindRem = -ZoneWinHeatLossRep(iZone) * mult;
+                    ZonePreDefRep(iZone).SHGSHtWindAdd = state.dataHeatBal->ZoneWinHeatGainRep(iZone) * mult;
+                    ZonePreDefRep(iZone).SHGSHtWindRem = -state.dataHeatBal->ZoneWinHeatLossRep(iZone) * mult;
                     // mixing object heat addition and removal
                     if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
                         ZonePreDefRep(iZone).SHGSHtIzaAdd = ZnAirRpt(iZone).SumMCpDTzones * mult;
@@ -4837,8 +4835,8 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                     // Window Heat Addition
                     // Window Heat Removal
-                    ZonePreDefRep(iZone).SHGSClWindAdd = ZoneWinHeatGainRep(iZone) * mult;
-                    ZonePreDefRep(iZone).SHGSClWindRem = -ZoneWinHeatLossRep(iZone) * mult;
+                    ZonePreDefRep(iZone).SHGSClWindAdd = state.dataHeatBal->ZoneWinHeatGainRep(iZone) * mult;
+                    ZonePreDefRep(iZone).SHGSClWindRem = -state.dataHeatBal->ZoneWinHeatLossRep(iZone) * mult;
                     // mixing object cool addition and removal
                     if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
                         ZonePreDefRep(iZone).SHGSClIzaAdd = ZnAirRpt(iZone).SumMCpDTzones * mult;
@@ -4945,8 +4943,8 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // Window Heat Addition
                 // Window Heat Removal
-                BuildingPreDefRep.SHGSHtWindAdd += ZoneWinHeatGainRep(iZone) * mult;
-                BuildingPreDefRep.SHGSHtWindRem -= ZoneWinHeatLossRep(iZone) * mult;
+                BuildingPreDefRep.SHGSHtWindAdd += state.dataHeatBal->ZoneWinHeatGainRep(iZone) * mult;
+                BuildingPreDefRep.SHGSHtWindRem -= state.dataHeatBal->ZoneWinHeatLossRep(iZone) * mult;
                 // mixing object heat addition and removal
                 if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
                     BuildingPreDefRep.SHGSHtIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult;
@@ -5033,8 +5031,8 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 // Window Heat Addition
                 // Window Heat Removal
-                BuildingPreDefRep.SHGSClWindAdd += ZoneWinHeatGainRep(iZone) * mult;
-                BuildingPreDefRep.SHGSClWindRem -= ZoneWinHeatLossRep(iZone) * mult;
+                BuildingPreDefRep.SHGSClWindAdd += state.dataHeatBal->ZoneWinHeatGainRep(iZone) * mult;
+                BuildingPreDefRep.SHGSClWindRem -= state.dataHeatBal->ZoneWinHeatLossRep(iZone) * mult;
                 // mixing object cool addition and removal
                 if (ZnAirRpt(iZone).SumMCpDTzones > 0.0) {
                     BuildingPreDefRep.SHGSClIzaAdd += ZnAirRpt(iZone).SumMCpDTzones * mult;

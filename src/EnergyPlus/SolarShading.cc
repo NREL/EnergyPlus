@@ -79,7 +79,6 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -94,9 +93,7 @@
 #include <EnergyPlus/WindowModel.hh>
 #include <WCEMultiLayerOptics.hpp>
 
-namespace EnergyPlus {
-
-namespace SolarShading {
+namespace EnergyPlus::SolarShading {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
@@ -181,7 +178,7 @@ namespace SolarShading {
                     ShowFatalError(state, "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");
                 }
             } else {
-                shd_stream = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
+                shd_stream = std::make_unique<std::iostream>(nullptr);
             }
 
             if (state.dataSolarShading->GetInputFlag) {
@@ -240,18 +237,18 @@ namespace SolarShading {
             InsideGlassCondensationFlag = 0;
             InsideFrameCondensationFlag = 0;
             InsideDividerCondensationFlag = 0;
-            ZoneTransSolar = 0.0;
-            ZoneBmSolFrExtWinsRep = 0.0;
-            ZoneBmSolFrIntWinsRep = 0.0;
-            InitialZoneDifSolReflW = 0.0;
-            ZoneDifSolFrExtWinsRep = 0.0;
-            ZoneDifSolFrIntWinsRep = 0.0;
-            ZoneWinHeatGain = 0.0;
-            ZoneWinHeatGainRep = 0.0;
-            ZoneWinHeatLossRep = 0.0;
-            ZoneOpaqSurfInsFaceCond = 0.0;
-            ZoneOpaqSurfInsFaceCondGainRep = 0.0;
-            ZoneOpaqSurfInsFaceCondLossRep = 0.0;
+            state.dataHeatBal->ZoneTransSolar = 0.0;
+            state.dataHeatBal->ZoneBmSolFrExtWinsRep = 0.0;
+            state.dataHeatBal->ZoneBmSolFrIntWinsRep = 0.0;
+            state.dataHeatBal->InitialZoneDifSolReflW = 0.0;
+            state.dataHeatBal->ZoneDifSolFrExtWinsRep = 0.0;
+            state.dataHeatBal->ZoneDifSolFrIntWinsRep = 0.0;
+            state.dataHeatBal->ZoneWinHeatGain = 0.0;
+            state.dataHeatBal->ZoneWinHeatGainRep = 0.0;
+            state.dataHeatBal->ZoneWinHeatLossRep = 0.0;
+            state.dataHeatBal->ZoneOpaqSurfInsFaceCond = 0.0;
+            state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep = 0.0;
+            state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep = 0.0;
 
             SurfQRadSWOutIncident = 0.0;
             SurfQRadSWOutIncidentBeam = 0.0;
@@ -471,7 +468,7 @@ namespace SolarShading {
                     }
                 };
                 if (Pumbra::Penumbra::isValidContext()) {
-                    state.dataSolarShading->penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, &state, pixelRes));
+                    state.dataSolarShading->penumbra = std::make_unique<Pumbra::Penumbra>(error_callback, &state, pixelRes);
                 } else {
                     ShowWarningError(state, "No GPU found (required for PixelCounting)");
                     ShowContinueError(state, "PolygonClipping will be used instead");
@@ -813,21 +810,21 @@ namespace SolarShading {
         InsideGlassCondensationFlag.dimension(TotSurfaces, 0);
         InsideFrameCondensationFlag.dimension(TotSurfaces, 0);
         InsideDividerCondensationFlag.dimension(TotSurfaces, 0);
-        ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        InitialZoneDifSolReflW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneDifSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneDifSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneWinHeatGain.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneWinHeatGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneWinHeatLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfInsFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneOpaqSurfExtFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->InitialZoneDifSolReflW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneDifSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneDifSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneWinHeatGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneWinHeatGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneWinHeatLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfInsFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfExtFaceCond.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
 
         SurfQRadSWOutIncident.dimension(TotSurfaces, 0.0);
         SurfQRadSWOutIncidentBeam.dimension(TotSurfaces, 0.0);
@@ -946,38 +943,38 @@ namespace SolarShading {
             auto &thisEnclosureName = DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name;
             SetupOutputVariable(state, "Zone Windows Total Transmitted Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneTransSolar(enclosureNum),
+                                state.dataHeatBal->ZoneTransSolar(enclosureNum),
                                 "Zone",
                                 "Average",
                                 thisEnclosureName);
             SetupOutputVariable(state, "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneBmSolFrExtWinsRep(enclosureNum),
+                                state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum),
                                 "Zone",
                                 "Average",
                                 thisEnclosureName);
             SetupOutputVariable(state, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneBmSolFrIntWinsRep(enclosureNum),
+                                state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum),
                                 "Zone",
                                 "Average",
                                 thisEnclosureName);
             SetupOutputVariable(state, "Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneDifSolFrExtWinsRep(enclosureNum),
+                                state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum),
                                 "Zone",
                                 "Average",
                                 thisEnclosureName);
             SetupOutputVariable(state, "Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate",
                                 OutputProcessor::Unit::W,
-                                ZoneDifSolFrIntWinsRep(enclosureNum),
+                                state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclosureNum),
                                 "Zone",
                                 "Average",
                                 thisEnclosureName);
             SetupOutputVariable(state,
-                "Zone Windows Total Heat Gain Rate", OutputProcessor::Unit::W, ZoneWinHeatGainRep(enclosureNum), "Zone", "Average", thisEnclosureName);
+                "Zone Windows Total Heat Gain Rate", OutputProcessor::Unit::W, state.dataHeatBal->ZoneWinHeatGainRep(enclosureNum), "Zone", "Average", thisEnclosureName);
             SetupOutputVariable(state,
-                "Zone Windows Total Heat Loss Rate", OutputProcessor::Unit::W, ZoneWinHeatLossRep(enclosureNum), "Zone", "Average", thisEnclosureName);
+                "Zone Windows Total Heat Loss Rate", OutputProcessor::Unit::W, state.dataHeatBal->ZoneWinHeatLossRep(enclosureNum), "Zone", "Average", thisEnclosureName);
             // Energy variables
             SetupOutputVariable(state, "Zone Windows Total Transmitted Solar Radiation Energy",
                                 OutputProcessor::Unit::J,
@@ -1027,13 +1024,13 @@ namespace SolarShading {
                 // CurrentModuleObject='Zone(Advanced)'
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Rate",
                                     OutputProcessor::Unit::W,
-                                    ZoneOpaqSurfInsFaceCondGainRep(ZoneLoop),
+                                    state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneLoop),
                                     "Zone",
                                     "Average",
                                     Zone(ZoneLoop).Name);
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate",
                                     OutputProcessor::Unit::W,
-                                    ZoneOpaqSurfInsFaceCondLossRep(ZoneLoop),
+                                    state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneLoop),
                                     "Zone",
                                     "Average",
                                     Zone(ZoneLoop).Name);
@@ -3493,7 +3490,6 @@ namespace SolarShading {
                 XUntrunc = (state.dataSolarShading->HCC(NS2, M) * state.dataSolarShading->HCB(NS1, N) - state.dataSolarShading->HCB(NS2, M) * state.dataSolarShading->HCC(NS1, N)) / W;
                 YUntrunc = (state.dataSolarShading->HCA(NS2, M) * state.dataSolarShading->HCC(NS1, N) - state.dataSolarShading->HCC(NS2, M) * state.dataSolarShading->HCA(NS1, N)) / W;
                 if (NV3 > isize(state.dataSolarShading->XTEMP)) {
-                    //        write(outputfiledebug,*) 'nv3=',nv3,' SIZE(xtemp)=',SIZE(xtemp)
                     state.dataSolarShading->XTEMP.redimension(isize(state.dataSolarShading->XTEMP) + 10, 0.0);
                     state.dataSolarShading->YTEMP.redimension(isize(state.dataSolarShading->YTEMP) + 10, 0.0);
                 }
@@ -7647,12 +7643,12 @@ namespace SolarShading {
 
                         // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
                         if (Surface(SurfNum).Class != SurfaceClass::TDD_Dome) {
-                            ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
-                            ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
-                            ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
-                            ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
-                            ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
-                            ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
+                            state.dataHeatBal->ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
+                            ZoneTransSolarEnergy(enclosureNum) = state.dataHeatBal->ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
+                            state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
+                            state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
+                            ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
+                            ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
                         }
                     }
                 }
@@ -7664,8 +7660,8 @@ namespace SolarShading {
 
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
             EnclSolDB(enclosureNum) += EnclSolDBIntWin(enclosureNum);
-            ZoneBmSolFrIntWinsRep(enclosureNum) = EnclSolDBIntWin(enclosureNum) * state.dataEnvrn->BeamSolarRad;
-            ZoneBmSolFrIntWinsRepEnergy(enclosureNum) = ZoneBmSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
+            state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) = EnclSolDBIntWin(enclosureNum) * state.dataEnvrn->BeamSolarRad;
+            ZoneBmSolFrIntWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
         }
 
         // RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
@@ -7762,10 +7758,10 @@ namespace SolarShading {
 
             Real64 BABSZone = 0;
             Real64 BTOTZone = 0;
-            ZoneTransSolar(enclosureNum) = 0;
+            state.dataHeatBal->ZoneTransSolar(enclosureNum) = 0;
             ZoneTransSolarEnergy(enclosureNum) = 0;
-            ZoneBmSolFrExtWinsRep(enclosureNum) = 0;
-            ZoneDifSolFrExtWinsRep(enclosureNum) = 0;
+            state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) = 0;
+            state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) = 0;
             ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = 0;
             ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = 0;
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
@@ -7939,12 +7935,12 @@ namespace SolarShading {
                         }
                     }
                 }
-                ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
-                ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
-                ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
-                ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
-                ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
-                ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
+                state.dataHeatBal->ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
+                ZoneTransSolarEnergy(enclosureNum) = state.dataHeatBal->ZoneTransSolar(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
+                state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
+                state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
+                ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;   //[J]
+                ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
             }
             EnclSolDB(enclosureNum) = BTOTZone - BABSZone;
         }
@@ -10582,7 +10578,6 @@ namespace SolarShading {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataViewFactorInformation;
         using DataHeatBalance::SurfWinInitialDifSolwinAbs;
-        using DataHeatBalance::InitialZoneDifSolReflW;
         using DataHeatBalSurface::SurfOpaqInitialDifSolInAbs;
         using DataHeatBalSurface::SurfWinInitialDifSolInTrans;
         using namespace DataWindowEquivalentLayer;
@@ -10637,7 +10632,7 @@ namespace SolarShading {
         SurfWinInitialDifSolwinAbs = 0.0;
 
         // Init accumulator for total reflected diffuse solar within each zone for interreflection calcs
-        InitialZoneDifSolReflW = 0.0;
+        state.dataHeatBal->InitialZoneDifSolReflW = 0.0;
 
         // Init accumulator for transmitted diffuse solar for all surfaces for reporting
         SurfWinInitialDifSolInTrans = 0.0;
@@ -10749,7 +10744,7 @@ namespace SolarShading {
                         DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
                         // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                        InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                        state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                         // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
                         // For opaque surfaces all incident diffuse is either absorbed or reflected
@@ -10801,7 +10796,7 @@ namespace SolarShading {
                                 DifSolarReflW = WinDifSolarTrans_Factor * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
 
                                 // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                                InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                                state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
 //                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
@@ -10904,7 +10899,7 @@ namespace SolarShading {
                                 DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
                                 // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                                InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                                state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
 //                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
@@ -10974,7 +10969,7 @@ namespace SolarShading {
                                                 InterpSw(win_SwitchingFactor, construct.ReflectSolDiffBack, construct_sh.ReflectSolDiffBack);
 
                                 // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                                InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                                state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                                 // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
 //                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
@@ -11029,7 +11024,7 @@ namespace SolarShading {
                             DifSolarReflW = WinDifSolarTrans_Factor * state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
 
                             // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                            InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+                            state.dataHeatBal->InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
 
                             // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
 //                            WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
@@ -11169,7 +11164,6 @@ namespace SolarShading {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataViewFactorInformation;
         using DataHeatBalance::SurfWinInitialDifSolwinAbs;
-        using DataHeatBalance::InitialZoneDifSolReflW;
         using DataHeatBalSurface::SurfOpaqInitialDifSolInAbs;
         using DataHeatBalSurface::SurfWinInitialDifSolInTrans;
 
@@ -11376,7 +11370,7 @@ namespace SolarShading {
                         // Get the adjacent zone/enclosure index
                         // Add transmitted diffuse solar to total reflected distributed diffuse solar for each zone
                         // for subsequent interreflection calcs
-                        InitialZoneDifSolReflW(Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
+                        state.dataHeatBal->InitialZoneDifSolReflW(Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
                     }
 
                 } else if (ShadeFlag == IntShadeOn || ShadeFlag >= 3) {
@@ -11542,7 +11536,7 @@ namespace SolarShading {
             } // opaque or window heat transfer surface
 
         } // HeatTransSurfNum = Zone(ZoneNum)%SurfaceFirst, Zone(ZoneNum)%SurfaceLast
-        InitialZoneDifSolReflW(IntWinEnclosureNum) += InitialZoneDifSolReflW_zone;
+        state.dataHeatBal->InitialZoneDifSolReflW(IntWinEnclosureNum) += InitialZoneDifSolReflW_zone;
 
         // Check debug var for view factors here
         // ViewFactorTotal
@@ -11776,7 +11770,5 @@ namespace SolarShading {
             }
         }
     }
-
-} // namespace SolarShading
 
 } // namespace EnergyPlus

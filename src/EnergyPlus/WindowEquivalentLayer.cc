@@ -807,7 +807,7 @@ namespace WindowEquivalentLayer {
                 }
 
                 Tout = RefAirTemp + DataGlobalConstants::KelvinConv;      // outside air temperature
-                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = state.dataHeatBal->MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone

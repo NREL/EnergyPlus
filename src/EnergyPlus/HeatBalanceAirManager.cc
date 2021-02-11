@@ -4364,7 +4364,6 @@ namespace HeatBalanceAirManager {
         // This subroutine updates the report variables for the AirHeatBalance.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4379,7 +4378,7 @@ namespace HeatBalanceAirManager {
             // entire zone time step.
             ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
             ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
-            ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + MRT(ZoneLoop));
+            ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
             ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
@@ -4395,7 +4394,7 @@ namespace HeatBalanceAirManager {
                         } else {
                             thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
-                        ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * MRT(ZoneLoop);
+                        ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
                     }
                 }
             }

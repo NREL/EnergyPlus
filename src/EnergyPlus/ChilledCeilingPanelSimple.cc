@@ -79,9 +79,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
-namespace EnergyPlus {
-
-namespace CoolingPanelSimple {
+namespace EnergyPlus::CoolingPanelSimple {
 
     // Module -- (ref: Object: ZoneHVAC:CoolingPanel:RadiantConvective:Water)
 
@@ -1169,7 +1167,6 @@ namespace CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
@@ -1234,7 +1231,7 @@ namespace CoolingPanelSimple {
             CoolingPanelOn = false;
         }
         // Calculate the "zone" temperature for determining the output of the cooling panel
-        Tzone = Xr * MRT(ZoneNum) + ((1.0 - Xr) * MAT(ZoneNum));
+        Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * MAT(ZoneNum));
 
         // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
         if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1450,7 +1447,6 @@ namespace CoolingPanelSimple {
         // This subroutine sets the control temperature for the simple cooling panel.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
 
@@ -1459,9 +1455,9 @@ namespace CoolingPanelSimple {
             if (SELECT_CASE_var == Control::MAT) {
                 ControlTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == Control::MRT) {
-                ControlTemp = MRT(ZoneNum);
+                ControlTemp = state.dataHeatBal->MRT(ZoneNum);
             } else if (SELECT_CASE_var == Control::Operative) {
-                ControlTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                ControlTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
             } else if (SELECT_CASE_var == Control::ODB) {
                 ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
             } else if (SELECT_CASE_var == Control::OWB) {
@@ -1749,7 +1745,5 @@ namespace CoolingPanelSimple {
 
         return SumHATsurf;
     }
-
-} // namespace CoolingPanelSimple
 
 } // namespace EnergyPlus

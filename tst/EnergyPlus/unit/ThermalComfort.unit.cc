@@ -708,7 +708,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     //	compare_err_stream( "" );
 
     ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -717,7 +717,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
     ZTAVComf(1) = 26.0;
-    MRT(1) = 27.0;
+    state->dataHeatBal->MRT(1) = 27.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -726,7 +726,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
     ZTAVComf(1) = 27.0;
-    MRT(1) = 28.0;
+    state->dataHeatBal->MRT(1) = 28.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -735,7 +735,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
     ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -950,7 +950,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     state->dataGlobal->NumOfZones = 1;
     Zone.allocate(state->dataGlobal->NumOfZones);
     ZTAVComf.allocate(state->dataGlobal->NumOfZones);
-    MRT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MRT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
@@ -980,7 +980,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     People(1).AirVelocityPtr = 0;
 
     ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
     state->dataEnvrn->OutBaroPress = 101217.;
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;

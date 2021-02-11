@@ -65,7 +65,6 @@ using namespace EnergyPlus::AirflowNetworkBalanceManager;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using DataHeatBalFanSys::MAT;
-using DataHeatBalance::MRT;
 using DataHeatBalance::Zone;
 using namespace CurveManager;
 using DataHeatBalFanSys::TempControlType;
@@ -112,9 +111,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataEnvrn->OutDryBulbTemp = 15.0;
     Zone.allocate(1);
     MAT.allocate(1);
-    MRT.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
     MAT(1) = 22.0;
-    MRT(1) = 22.0;
+    state->dataHeatBal->MRT(1) = 22.0;
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
@@ -161,7 +160,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, CloseProbStatus);
 
     MAT(1) = 26.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);

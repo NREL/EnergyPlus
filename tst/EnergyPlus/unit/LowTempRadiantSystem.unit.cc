@@ -2005,7 +2005,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 acceptibleError = 0.001;
 
     DataHeatBalFanSys::MAT.allocate(1);
-    MRT.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
     Zone.allocate(1);
     DataHeatBalSurface::TempSurfIn.allocate(1);
     DataHeatBalSurface::TempUserLoc.allocate(1);
@@ -2015,7 +2015,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test Data
     DataHeatBalFanSys::MAT(1) = 23.456;
-    MRT(1) = 12.345;
+    state->dataHeatBal->MRT(1) = 12.345;
     Zone(1).OutDryBulbTemp = 34.567;
     Zone(1).OutWetBulbTemp = 1.234;
     DataHeatBalSurface::TempSurfIn(1) = 5.678;
@@ -2049,34 +2049,34 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 2: MRT Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 3: Operative Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);

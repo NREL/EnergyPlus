@@ -3867,7 +3867,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
@@ -4921,7 +4920,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
@@ -5247,9 +5245,9 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::MATControl:
             return DataHeatBalFanSys::MAT(this->ZonePtr);
         case LowTempRadiantControlTypes::MRTControl:
-            return DataHeatBalance::MRT(this->ZonePtr);
+            return state.dataHeatBal->MRT(this->ZonePtr);
         case LowTempRadiantControlTypes::OperativeControl:
-            return 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + DataHeatBalance::MRT(this->ZonePtr));
+            return 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + state.dataHeatBal->MRT(this->ZonePtr));
         case LowTempRadiantControlTypes::ODBControl:
             return DataHeatBalance::Zone(this->ZonePtr).OutDryBulbTemp;
         case LowTempRadiantControlTypes::OWBControl:

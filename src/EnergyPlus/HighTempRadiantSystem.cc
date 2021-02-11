@@ -900,7 +900,6 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -941,7 +940,7 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             SetPtTemp = GetCurrentScheduleValue(state, HighTempRadSys(RadSysNum).SetptSchedPtr);
             OffTemp = SetPtTemp + 0.5 * HighTempRadSys(RadSysNum).ThrottlRange;
-            OpTemp = (MAT(ZoneNum) + MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
+            OpTemp = (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             {
@@ -949,9 +948,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == MATControl) {
                     HeatFrac = (OffTemp - MAT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == MRTControl) {
-                    HeatFrac = (OffTemp - MRT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
+                    HeatFrac = (OffTemp - state.dataHeatBal->MRT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == OperativeControl) {
-                    OpTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                    OpTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                     HeatFrac = (OffTemp - OpTemp) / HighTempRadSys(RadSysNum).ThrottlRange;
                 }
             }
@@ -997,7 +996,6 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1056,9 +1054,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == MATSPControl) {
                     ZoneTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == MRTSPControl) {
-                    ZoneTemp = MRT(ZoneNum);
+                    ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
                 } else if (SELECT_CASE_var == OperativeSPControl) {
-                    ZoneTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                    ZoneTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                 } else {
                     assert(false);
                 }
@@ -1098,9 +1096,9 @@ namespace HighTempRadiantSystem {
                         if (SELECT_CASE_var == MATControl) {
                             ZoneTemp = MAT(ZoneNum);
                         } else if (SELECT_CASE_var == MRTControl) {
-                            ZoneTemp = MRT(ZoneNum);
+                            ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
                         } else if (SELECT_CASE_var == OperativeControl) {
-                            ZoneTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                            ZoneTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                         }
                     }
 

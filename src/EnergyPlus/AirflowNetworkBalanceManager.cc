@@ -7917,7 +7917,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine reports outputs of air distribution systems
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalance::ZonePreDefRep;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
@@ -11217,7 +11216,6 @@ namespace AirflowNetworkBalanceManager {
                                               int &OpeningProbStatus,
                                               int &ClosingProbStatus)
     {
-        using DataHeatBalance::MRT;
 
         Real64 Tcomfort;    // Thermal comfort temperature
         Real64 ComfortBand; // Thermal comfort band
@@ -11255,7 +11253,7 @@ namespace AirflowNetworkBalanceManager {
             Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
-        Toperative = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+        Toperative = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
 
         if (Toperative > (Tcomfort + ComfortBand)) {
             if (openingProbability(state, ZoneNum, TimeCloseDuration)) {

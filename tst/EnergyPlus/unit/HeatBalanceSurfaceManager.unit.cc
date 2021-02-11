@@ -806,8 +806,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataMoistureBalance::RhoVaporAirIn.deallocate();
     DataMoistureBalance::HMassConvInFD.deallocate();
     DataHeatBalFanSys::ZoneLatentGain.deallocate();
-    DataHeatBalance::ZoneWinHeatGain.deallocate();
-    DataHeatBalance::ZoneWinHeatGainRep.deallocate();
+    state->dataHeatBal->ZoneWinHeatGain.deallocate();
+    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
     DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate();
 }
 
@@ -1308,8 +1308,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
@@ -1877,8 +1877,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     // Set up
@@ -2442,8 +2442,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     ScheduleManager::Schedule(1).CurrentValue = -0.1;
@@ -2478,8 +2478,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataMoistureBalance::RhoVaporAirIn.deallocate();
     DataMoistureBalance::HMassConvInFD.deallocate();
     DataHeatBalFanSys::ZoneLatentGain.deallocate();
-    DataHeatBalance::ZoneWinHeatGain.deallocate();
-    DataHeatBalance::ZoneWinHeatGainRep.deallocate();
+    state->dataHeatBal->ZoneWinHeatGain.deallocate();
+    state->dataHeatBal->ZoneWinHeatGainRep.deallocate();
     DataHeatBalance::ZoneWinHeatGainRepEnergy.deallocate();
 }
 
@@ -3082,8 +3082,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
-    DataHeatBalance::ZoneWinHeatGain.allocate(1);
-    DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
 
     AllocateSurfaceHeatBalArrays(*state);
@@ -3104,7 +3104,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     // bypass internal solar distribution at night
     DataHeatBalSurface::InterZoneWindow = false;
-    DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
+    state->dataHeatBal->ZoneBmSolFrIntWinsRep(1) = 10.0;
     state->dataEnvrn->SunIsUp = false;
     InitIntSolarDistribution(*state);
     EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));

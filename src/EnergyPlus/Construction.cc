@@ -54,9 +54,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Construction {
+namespace EnergyPlus::Construction {
 
     void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
@@ -2041,7 +2039,5 @@ namespace Construction {
                                    + round(this->userTemperatureLocationPerpendicular * (this->NumOfPerpendNodes - 1)) + 1;
 
     }
-
-}   // namespace Construction
 
 }   // namespace EnergyPlus

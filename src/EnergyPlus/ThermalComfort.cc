@@ -101,7 +101,6 @@ namespace ThermalComfort {
 
     // Using/Aliasing
     using DataHeatBalance::AngleFactor;
-    using DataHeatBalance::MRT;
     using DataHeatBalance::People;
     using DataHeatBalance::PeopleData;
     using DataHeatBalance::SurfaceWeighted;
@@ -1925,9 +1924,9 @@ namespace ThermalComfort {
             auto const SELECT_CASE_var(People(PeopleListNum).MRTCalcType);
 
             if (SELECT_CASE_var == ZoneAveraged) {
-                state.dataThermalComforts->RadTemp = MRT(state.dataThermalComforts->ZoneNum);
+                state.dataThermalComforts->RadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
             } else if (SELECT_CASE_var == SurfaceWeighted) {
-                ZoneRadTemp = MRT(state.dataThermalComforts->ZoneNum);
+                ZoneRadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
                 SurfaceTemp = TH(2, 1, People(PeopleListNum).SurfacePtr);
                 state.dataThermalComforts->RadTemp = CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, People(PeopleListNum).SurfacePtr);
             } else if (SELECT_CASE_var == AngleFactor) {
@@ -2002,7 +2001,7 @@ namespace ThermalComfort {
                 } else {
                     CurAirTemp = ZTAVComf(iZone);
                 }
-                CurMeanRadiantTemp = MRT(iZone);
+                CurMeanRadiantTemp = state.dataHeatBal->MRT(iZone);
                 OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
                 HumidRatio = ZoneAirHumRatAvgComf(iZone);
                 // for debugging
