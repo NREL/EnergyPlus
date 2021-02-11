@@ -4232,7 +4232,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     }
                     // if zone mass balance true, set to expected return flow
                     if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
-                        ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow);
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                     }
                 } else {
@@ -4267,7 +4266,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         }
                         // if zone mass balance true, set to expected return flow
                         if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
-                            ExpTotalReturnMassFlow = max(0.0, ExpTotalReturnMassFlow);
                             returnNodeMassFlow = ExpTotalReturnMassFlow; 
                         }
                     }
