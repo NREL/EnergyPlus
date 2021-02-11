@@ -1,4 +1,3 @@
-
 add_library(fortran_project_options INTERFACE)
 set(FORTRAN_STATIC_EXE FALSE)
 set(FORTRAN_SKIP_RPATH FALSE)
@@ -39,4 +38,3 @@ else() # Windows
   endif()
 endif()
 target_compile_options(fortran_project_options INTERFACE -ffree-line-length-275)
-

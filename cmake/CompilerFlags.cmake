@@ -36,16 +36,17 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   #  4355 Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
   #  4996 Deprecated functions (/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
   #  4503 The decorated name was longer than the compiler limit (4096), and was truncated.
-  target_compile_options(project_warnings INTERFACE 
-    /wd4068
-    /wd4101
-    /wd4102
-    /wd4244
-    /wd4258
-    /wd4267
-    /wd4355
-    /wd4996
-    /wd4503) # Disables warning messages listed above
+  target_compile_options(
+    project_warnings
+    INTERFACE /wd4068
+              /wd4101
+              /wd4102
+              /wd4244
+              /wd4258
+              /wd4267
+              /wd4355
+              /wd4996
+              /wd4503) # Disables warning messages listed above
 
   target_compile_definitions(project_options INTERFACE NOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
   target_compile_definitions(project_options INTERFACE WIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
@@ -59,14 +60,12 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/RTCsu>) # Runtime checks
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:strict>) # Floating point model
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/DMSVC_DEBUG>) # Triggers code in main.cc to catch floating point NaNs
-elseif(
-  CMAKE_COMPILER_IS_GNUCXX
-  OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-  OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
+elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") # g++/Clang
 
   # COMPILER FLAGS
   target_compile_options(project_options INTERFACE -pipe) # Faster compiler processing
-  target_compile_options(project_warnings INTERFACE -Wpedantic) # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
+  target_compile_options(project_warnings INTERFACE -Wpedantic
+  )# Turn on warnings about constructs/situations that may be non-portable or outside of the standard
   target_compile_options(project_warnings INTERFACE -Wall -Wextra) # Turn on warnings
   target_compile_options(project_warnings INTERFACE -Wno-unknown-pragmas)
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
@@ -115,7 +114,8 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   target_compile_options(project_options INTERFACE /nologo) # Skip banner text
   target_compile_options(project_options INTERFACE /Qcxx-features) # Enables standard C++ features without disabling Microsoft extensions
   target_compile_options(project_options INTERFACE /Wall) # Enable all warnings
-  target_compile_options(project_options INTERFACE /Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075) # Disable warnings listed above
+
+  target_compile_options(project_options INTERFACE /Qdiag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075)
   target_compile_definitions(project_options INTERFACE /DNOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
   target_compile_definitions(project_options INTERFACE /DWIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
 
@@ -135,12 +135,17 @@ elseif(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/fp:source>) # Use source-specified floating point precision
-  
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qtrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/check:stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+
+  # Initialize local variables to unusual values to help detect use uninitialized
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Qtrapuv>)
+
+  # Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/check:stack,uninit)
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/Gs0>) # Enable stack checking for all functions
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/GS>) # Buffer overrun detection
-  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)# Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+
+  # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
+  target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:/Qfp-stack-check>)
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:/traceback>) # Enables traceback on error
 
 elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
@@ -160,7 +165,7 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
   # COMPILER FLAGS
   target_compile_options(project_warnings INTERFACE -Wall) # Enable all warnings
-  target_compile_options(project_warnings INTERFACE -diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075) # Disable warnings listed above
+  target_compile_options(project_warnings INTERFACE -diag-disable:161,177,488,809,869,1786,2259,3280,10382,11074,11075)# Disable warnings listed above
 
   # Optimization options that had no significant benefit for EnergyPlus
   #  -ipo instead of -ip
@@ -177,10 +182,13 @@ elseif(UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   target_compile_options(project_options INTERFACE $<$<CONFIG:Release>:-inline-factor=225>) # Enables more aggressive inlining
 
   # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-strict-ansi>) # Strict language conformance: Performance impact so limit to debug build
+  # Strict language conformance: Performance impact so limit to debug build
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-strict-ansi>)
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:-fp-model source>) # Use source-specified floating point precision
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ftrapuv>) # Initialize local variables to unusual values to help detect use uninitialized
-  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-check=stack,uninit)# Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+  # Initialize local variables to unusual values to help detect use uninitialized
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-ftrapuv>)
+  # Enables runtime checking of the stack (buffer over and underruns; pointer verification>) and uninitialized variables
+  target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-check=stack,uninit)
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-fstack-security-check>) # Buffer overrun detection
   target_compile_options(project_fp_options INTERFACE $<$<CONFIG:Debug>:-fp-stack-check>) # Check the floating point stack after every function call
   target_compile_options(project_options INTERFACE $<$<CONFIG:Debug>:-traceback>) # Enables traceback on error

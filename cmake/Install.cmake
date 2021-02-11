@@ -16,102 +16,54 @@
 if(UNIX)
 
   # Set everything to off for now
-  set(CPACK_BINARY_DEB
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_FREEBSD
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_RPM
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_TBZ2
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_NSIS
-      OFF
-      CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_DEB OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_FREEBSD OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_RPM OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_TBZ2 OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_NSIS OFF CACHE BOOL "Recommended OFF")
 
   if(APPLE)
-    set(CPACK_BINARY_IFW
-        ON
-        CACHE BOOL "Enable to build IFW package, which is the recommended method")
-    set(CPACK_BINARY_STGZ
-        OFF
-        CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ OFF CACHE BOOL "Recommended OFF")
 
     # Mac Specific options to turn off
-    set(CPACK_BINARY_BUNDLE
-        OFF
-        CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_DRAGNDROP
-        OFF
-        CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_OSXX11
-        OFF
-        CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_PACKAGEMAKER
-        OFF
-        CACHE BOOL "This was the legacy method on Apple, superseded by IFW")
-    set(CPACK_BINARY_PRODUCTBUILD
-        OFF
-        CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_BUNDLE OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_DRAGNDROP OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_OSXX11 OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_PACKAGEMAKER OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW")
+    set(CPACK_BINARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
     # TODO: Make IFW recommended? Deprecate STGZ?
-    set(CPACK_BINARY_IFW
-        ON
-        CACHE BOOL "Enable to build IFW package, which is the recommended method")
-    set(CPACK_BINARY_STGZ
-        ON
-        CACHE BOOL "Enable to build a Linux sh installer script, which is the legacy method")
+    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
+    set(CPACK_BINARY_STGZ ON CACHE BOOL "Enable to build a Linux sh installer script, which is the legacy method")
 
     # Unix (non Apple CACHE BOOL) specific option to turn off
-    set(CPACK_BINARY_TZ
-        OFF
-        CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_TZ OFF CACHE BOOL "Recommended OFF")
   endif()
 
   # TODO: the "FORCE" is temporary to avoid people having an existing build directory miss the fact that the recommended method changed
   # TODO: remove after next release
   if(UNIX AND NOT APPLE)
     if(NOT CPACK_BINARY_IFW)
-      set(CPACK_BINARY_STGZ
-          OFF
-          CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
-      set(CPACK_BINARY_IFW
-          ON
-          CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
+      set(CPACK_BINARY_STGZ OFF CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
+      set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
       message("Switching from STGZ to IFW as the supported generator has changed on Linux")
     endif()
   endif()
   # END TODO
 
   # Tar.gz for inclusion in other programs for eg
-  set(CPACK_BINARY_TGZ
-      ON
-      CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
+  set(CPACK_BINARY_TGZ ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
 
 elseif(WIN32)
-  set(CPACK_BINARY_IFW
-      ON
-      CACHE BOOL "Enable to build IFW package, which is the recommend method")
-  set(CPACK_BINARY_ZIP
-      ON
-      CACHE BOOL "Enable to build a ZIP package, recommended for an official release")
+  set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
+  set(CPACK_BINARY_ZIP ON CACHE BOOL "Enable to build a ZIP package, recommended for an official release")
 
-  set(CPACK_BINARY_NSIS
-      OFF
-      CACHE BOOL "This was the legacy method on Windows, superseded by IFW")
-  set(CPACK_BINARY_7Z
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_NUGET
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_BINARY_WIX
-      OFF
-      CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_NSIS OFF CACHE BOOL "This was the legacy method on Windows, superseded by IFW")
+  set(CPACK_BINARY_7Z OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_NUGET OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_WIX OFF CACHE BOOL "Recommended OFF")
 
 endif()
 
@@ -123,33 +75,17 @@ endif()
 # Instead use indiv CPACK_SOURCE_<GenName>: all to OFF
 if(UNIX)
 
-  set(CPACK_SOURCE_RPM
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_TBZ2
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_TGZ
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_TXZ
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_TZ
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_ZIP
-      OFF
-      CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_RPM OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TBZ2 OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TGZ OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TXZ OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TZ OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_ZIP OFF CACHE BOOL "Recommended OFF")
 
 elseif(WIN32)
 
-  set(CPACK_SOURCE_7Z
-      OFF
-      CACHE BOOL "Recommended OFF")
-  set(CPACK_SOURCE_ZIP
-      OFF
-      CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_7Z OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_ZIP OFF CACHE BOOL "Recommended OFF")
 endif()
 
 ######################################################################################################################################################
@@ -173,9 +109,9 @@ if(BUILD_FORTRAN)
 endif()
 
 # Need to install the ssc lib...
-install( TARGETS ssc DESTINATION ./ )
+install(TARGETS ssc DESTINATION ./)
 
-set(CPACK_PACKAGE_VENDOR "US Department of Energy" )
+set(CPACK_PACKAGE_VENDOR "US Department of Energy")
 set(CPACK_IFW_PACKAGE_PUBLISHER "${CPACK_PACKAGE_VENDOR}")
 
 set(CPACK_PACKAGE_CONTACT "Edwin Lee <edwin.lee@nrel.gov>")
@@ -270,16 +206,10 @@ elseif(UNIX)
   # OS_RELEASE is the result of `uname -r` which is unhelpful (eg '5.4.0-42-generic')
   find_program(LSB_RELEASE lsb_release)
   # -rs outputs only 16.04, or 18.04
-  execute_process(
-    COMMAND ${LSB_RELEASE} -rs
-    OUTPUT_VARIABLE LSB_RELEASE_VERSION_SHORT
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${LSB_RELEASE} -rs OUTPUT_VARIABLE LSB_RELEASE_VERSION_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # -is outputs "Ubuntu" or "Fedora"
-  execute_process(
-    COMMAND ${LSB_RELEASE} -is
-    OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${LSB_RELEASE} -is OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # eg: `-Ubuntu18.04`
   set(SYSTEM_VERSION "-${LSB_RELEASE_ID_SHORT}${LSB_RELEASE_VERSION_SHORT}")
@@ -309,10 +239,7 @@ if(WIN32 AND NOT UNIX)
   endif()
 endif()
 
-install(
-  FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt"
-  DESTINATION "./"
-  COMPONENT Licenses)
+install(FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt" DESTINATION "./" COMPONENT Licenses)
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.txt")
 
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./)
@@ -335,19 +262,13 @@ install(FILES "${PROJECT_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINAT
 install(
   CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
   COMPONENT ExampleFiles)
-install(
-  FILES "${DOCS_OUT}/ExampleFiles.html"
-  DESTINATION "./ExampleFiles/"
-  COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the example file objects link
 install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/example_file_objects.py\"
 \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${PROJECT_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
         COMPONENT ExampleFiles)
-install(
-  FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html"
-  DESTINATION "./ExampleFiles/"
-  COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 option(BUILD_CHANGELOG "Build a changelog for this package -- requires GITHUB_TOKEN in environment" OFF)
 if(BUILD_CHANGELOG)
@@ -358,10 +279,7 @@ if(BUILD_CHANGELOG)
     install(
       CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${PROJECT_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${PROJECT_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\" \"${CPACK_PACKAGE_VERSION}\")"
     )
-    install(
-      FILES "${DOCS_OUT}/changelog.html"
-      DESTINATION "./"
-      OPTIONAL)
+    install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./" OPTIONAL)
   else()
     message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
   endif()
@@ -370,275 +288,80 @@ endif() # BUILD_CHANGELOG
 #################################################################  D A T A S E T S  ##################################################################
 
 # Install files that are in the current repo
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/AirCooledChiller.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Boilers.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/California_Title_24-2008.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Chillers.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/CompositeWallConstructions.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/DXCoolingCoil.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricGenerators.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricityUSAEnvironmentalImpactFactors.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ElectronicEnthalpyEconomizerCurves.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ExhaustFiredChiller.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/FluidPropertiesRefData.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/FossilFuelEnvironmentalImpactFactors.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/GLHERefData.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/GlycolPropertiesRefData.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2012.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2013.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2014.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2015.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2016.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2017.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2018.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2019.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/MoistureMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/PerfCurves.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/PrecipitationSchedulesUSA.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/RefrigerationCasesDataSet.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/RefrigerationCompressorCurves.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/ResidentialACsAndHPsPerfCurves.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/RooftopPackagedHeatPump.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/SandiaPVdata.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Schedules.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/SolarCollectors.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/StandardReports.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/SurfaceColorSchemes.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/USHolidays-DST.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Window5DataFile.dat"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowBlindMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowConstructs.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowGasMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowGlassMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowScreenMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/WindowShadeMaterials.idf"
-  DESTINATION "./DataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/FMUs/MoistAir.fmu"
-  DESTINATION "./DataSets/FMUs"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/FMUs/ShadingController.fmu"
-  DESTINATION "./DataSets/FMUs"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/TDV/TDV_2008_kBtu_CTZ06.csv"
-  DESTINATION "./DataSets/TDV"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/TDV/TDV_read_me.txt"
-  DESTINATION "./DataSets/TDV"
-  COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/California_Title_24-2008.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Chillers.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/CompositeWallConstructions.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/DXCoolingCoil.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricGenerators.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectricityUSAEnvironmentalImpactFactors.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ElectronicEnthalpyEconomizerCurves.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ExhaustFiredChiller.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/FluidPropertiesRefData.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/FossilFuelEnvironmentalImpactFactors.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/GLHERefData.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/GlycolPropertiesRefData.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2012.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2013.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2014.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2015.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2016.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2017.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2018.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/LCCusePriceEscalationDataSet2019.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/MoistureMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/PerfCurves.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/PrecipitationSchedulesUSA.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/RefrigerationCasesDataSet.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/RefrigerationCompressorCurves.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/ResidentialACsAndHPsPerfCurves.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/RooftopPackagedHeatPump.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/SandiaPVdata.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Schedules.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/SolarCollectors.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/StandardReports.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/SurfaceColorSchemes.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/USHolidays-DST.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Window5DataFile.dat" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowBlindMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowConstructs.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowGasMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowGlassMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowScreenMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/WindowShadeMaterials.idf" DESTINATION "./DataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/FMUs/MoistAir.fmu" DESTINATION "./DataSets/FMUs" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/FMUs/ShadingController.fmu" DESTINATION "./DataSets/FMUs" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/TDV/TDV_2008_kBtu_CTZ06.csv" DESTINATION "./DataSets/TDV" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/TDV/TDV_read_me.txt" DESTINATION "./DataSets/TDV" COMPONENT Datasets)
 
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/Locations-DesignDays.xls"
-  DESTINATION "./MacroDataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/SandiaPVdata.imf"
-  DESTINATION "./MacroDataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/SolarCollectors.imf"
-  DESTINATION "./MacroDataSets"
-  COMPONENT Datasets)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/UtilityTariffObjects.imf"
-  DESTINATION "./MacroDataSets"
-  COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/Locations-DesignDays.xls" DESTINATION "./MacroDataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/SandiaPVdata.imf" DESTINATION "./MacroDataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/SolarCollectors.imf" DESTINATION "./MacroDataSets" COMPONENT Datasets)
+install(FILES "${PROJECT_SOURCE_DIR}/datasets/Macro/UtilityTariffObjects.imf" DESTINATION "./MacroDataSets" COMPONENT Datasets)
 
 #############################################################  W E A T H E R    D A T A  #############################################################
 
 # weather files
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.stat"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.ddy"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.epw"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.stat"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.ddy"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.stat"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.ddy"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.stat"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.ddy"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
-install(
-  FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat"
-  DESTINATION "./WeatherData"
-  COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.ddy" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_CO_Golden-NREL.724666_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.ddy" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_FL_Tampa.Intl.AP.722110_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.ddy" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.ddy" DESTINATION "./WeatherData"
+        COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw" DESTINATION "./WeatherData"
+        COMPONENT WeatherData)
+install(FILES "${PROJECT_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat" DESTINATION "./WeatherData"
+        COMPONENT WeatherData)
 
 #############################################################   E X A M P L E    F I L E S   #########################################################
 
@@ -666,10 +389,7 @@ set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-3-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(
-  FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd"
-  DESTINATION "PreProcess/IDFVersionUpdater/"
-  RENAME "V9-4-0-Energy+.idd")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-4-0-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -771,46 +491,16 @@ if(WIN32)
   # This copies system DLLs into a temp folder. It is later used by the install script of this specific component
   # to check if the dll isn't present on the target system, in which case it will copy it to the system folder (eg: C:\Windows\SysWOW64\)
   # and use the regsvr32.exe to register said DLL.
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/ComDlg32.OCX"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Dforrt.dll"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Graph32.ocx"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Gsw32.exe"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Gswdll32.dll"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSCOMCTL.OCX"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msflxgrd.ocx"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSINET.OCX"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msvcrtd.dll"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
-  install(
-    PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Vsflex7L.ocx"
-    DESTINATION "./temp/"
-    COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/ComDlg32.OCX" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Dforrt.dll" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Graph32.ocx" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Gsw32.exe" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Gswdll32.dll" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSCOMCTL.OCX" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msflxgrd.ocx" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/MSINET.OCX" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Msvcrtd.dll" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
+  install(PROGRAMS "${PROJECT_SOURCE_DIR}/bin/System/Vsflex7L.ocx" DESTINATION "./temp/" COMPONENT CopyAndRegisterSystemDLLs)
 endif()
 
 # The group, which will be used to configure the root package
@@ -951,66 +641,21 @@ if(BUILD_DOCS)
             COMPONENT Documentation)
   endif()
 
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/Acknowledgments.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/AuxiliaryPrograms.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/EMSApplicationGuide.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/EngineeringReference.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/EnergyPlusEssentials.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/ExternalInterfacesApplicationGuide.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/GettingStarted.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/InputOutputReference.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/InterfaceDeveloper.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/ModuleDeveloper.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/OutputDetailsAndExamples.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
-  install(
-    FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html"
-    DESTINATION "./Documentation"
-    COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EngineeringReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EnergyPlusEssentials.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ExternalInterfacesApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/GettingStarted.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/InputOutputReference.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/InterfaceDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html" DESTINATION "./Documentation" COMPONENT Documentation)
 else()
   message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
 endif()
@@ -1028,10 +673,7 @@ if(WIN32 AND NOT UNIX)
 
   include(InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-    install(
-      PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-      DESTINATION "./"
-      COMPONENT Libraries)
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
   endif()
 endif()
 
@@ -1060,31 +702,17 @@ include(CPackIFW)
 #REQUIRED
 #)
 
-cpack_add_component(
-  Documentation
-  DISPLAY_NAME "Documentation"
-  DESCRIPTION "EnergyPlus documentation in PDF format")
+cpack_add_component(Documentation DISPLAY_NAME "Documentation" DESCRIPTION "EnergyPlus documentation in PDF format")
 
-cpack_add_component(
-  Datasets
-  DISPLAY_NAME "Datasets"
-  DESCRIPTION "Useful resources such as material and equipment performance data")
+cpack_add_component(Datasets DISPLAY_NAME "Datasets" DESCRIPTION "Useful resources such as material and equipment performance data")
 
-cpack_add_component(
-  ExampleFiles
-  DISPLAY_NAME "Example Files"
-  DESCRIPTION "IDF Example Files")
+cpack_add_component(ExampleFiles DISPLAY_NAME "Example Files" DESCRIPTION "IDF Example Files")
 
-cpack_add_component(
-  WeatherData
-  DISPLAY_NAME "Weather Data"
-  DESCRIPTION "EPW Weather Files")
+cpack_add_component(WeatherData DISPLAY_NAME "Weather Data" DESCRIPTION "EPW Weather Files")
 
 # This stuff actually requires admin privileges since touched system locations
-cpack_add_component(
-  Symlinks
-  DISPLAY_NAME "Create Symlinks - requires admin"
-  DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page")
+cpack_add_component(Symlinks DISPLAY_NAME "Create Symlinks - requires admin"
+                    DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page")
 
 # Could add any upstream library license to this
 cpack_add_component(
@@ -1094,15 +722,10 @@ cpack_add_component(
   REQUIRED HIDDEN)
 
 # No need for system privileges for this
-cpack_add_component(
-  CreateStartMenu
-  DISPLAY_NAME "Start Menu links"
-  DESCRIPTION "Create Start Menu Links")
+cpack_add_component(CreateStartMenu DISPLAY_NAME "Start Menu links" DESCRIPTION "Create Start Menu Links")
 
-cpack_add_component(
-  RegisterFileType
-  DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
-  DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe")
+cpack_add_component(RegisterFileType DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
+                    DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe")
 
 cpack_add_component(
   CopyAndRegisterSystemDLLs
@@ -1119,24 +742,12 @@ cpack_add_component(
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified SCRIPT cmake/qtifw/install_operations.qs)
 
-cpack_ifw_configure_component(
-  Symlinks
-  SCRIPT cmake/qtifw/install_unix_createsymlinks.qs
-  REQUIRES_ADMIN_RIGHTS)
+cpack_ifw_configure_component(Symlinks SCRIPT cmake/qtifw/install_unix_createsymlinks.qs REQUIRES_ADMIN_RIGHTS)
 
 cpack_ifw_configure_component(CreateStartMenu SCRIPT cmake/qtifw/install_win_createstartmenu.qs)
 
-cpack_ifw_configure_component(
-  RegisterFileType
-  SCRIPT cmake/qtifw/install_registerfiletype.qs
-  REQUIRES_ADMIN_RIGHTS)
+cpack_ifw_configure_component(RegisterFileType SCRIPT cmake/qtifw/install_registerfiletype.qs REQUIRES_ADMIN_RIGHTS)
 
-cpack_ifw_configure_component(
-  CopyAndRegisterSystemDLLs
-  SCRIPT cmake/qtifw/install_win_copydll.qs
-  REQUIRES_ADMIN_RIGHTS)
+cpack_ifw_configure_component(CopyAndRegisterSystemDLLs SCRIPT cmake/qtifw/install_win_copydll.qs REQUIRES_ADMIN_RIGHTS)
 
-cpack_ifw_configure_component(
-  Licenses
-  FORCED_INSTALLATION
-  LICENSES "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE})
+cpack_ifw_configure_component(Licenses FORCED_INSTALLATION LICENSES "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE})

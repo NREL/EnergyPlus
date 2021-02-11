@@ -35,8 +35,6 @@ target_link_libraries(project_options INTERFACE Threads::Threads)
 include(cmake/Sanitizers.cmake)
 enable_sanitizers(project_options)
 
-
-
 include(cmake/Version.cmake)
 
 set(OPENGL_REQUIRED
@@ -208,7 +206,6 @@ include(cmake/CompilerFlags.cmake)
 
 add_subdirectory(third_party)
 
-
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/btwxt/src)
@@ -237,18 +234,17 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 
-
 add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
 set_target_properties(generate_embeddedable_epJSON_schema PROPERTIES FOLDER "Internal")
 
-if( OPENGL_FOUND )
-  set(BUILD_PENUMBRA_TESTING OFF CACHE BOOL "")
+if(OPENGL_FOUND)
+  set(BUILD_PENUMBRA_TESTING
+      OFF
+      CACHE BOOL "")
 endif()
 
 # E+ required libraries
 add_subdirectory(idd)
-
-
 
 execute_process(
   COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
@@ -298,7 +294,7 @@ if(BUILD_TESTING)
 
   set_target_properties(btwxt_tests PROPERTIES FOLDER ThirdParty/Btwxt)
   set_target_properties(kiva_tests PROPERTIES FOLDER ThirdParty/Kiva)
-  if( OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
+  if(OPENGL_FOUND AND BUILD_PENUMBRA_TESTING)
     set_target_properties(penumbra_tests PROPERTIES FOLDER ThirdParty/Penumbra)
   endif()
 endif()

@@ -36,9 +36,7 @@ function(enable_sanitizers project_name)
 
     option(ENABLE_SANITIZER_MEMORY "Enable memory sanitizer" FALSE)
     if(ENABLE_SANITIZER_MEMORY AND CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-      if("address" IN_LIST SANITIZERS
-         OR "thread" IN_LIST SANITIZERS
-         OR "leak" IN_LIST SANITIZERS)
+      if("address" IN_LIST SANITIZERS OR "thread" IN_LIST SANITIZERS OR "leak" IN_LIST SANITIZERS)
         message(WARNING "Memory sanitizer does not work with Address, Thread and Leak sanitizer enabled")
       else()
         list(APPEND SANITIZERS "memory")
@@ -47,10 +45,7 @@ function(enable_sanitizers project_name)
   endif()
 
   if(SANITIZERS)
-    if(NOT
-       "${SANITIZERS}"
-       STREQUAL
-       "")
+    if(NOT "${SANITIZERS}" STREQUAL "")
 
       target_compile_options(${project_name} INTERFACE -g)
 

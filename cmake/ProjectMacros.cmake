@@ -44,7 +44,6 @@ macro(CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES)
       target_compile_options(${BASE_NAME}_tests PRIVATE -diag-disable:1684)
     endif()
 
-
     create_src_groups("${SRC}")
 
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
@@ -168,7 +167,6 @@ function(ADD_SIMULATION_TEST)
   endif()
 
 endfunction()
-
 
 function(fixup_executable EXECUTABLE_PATH)
   include(GetPrerequisites)

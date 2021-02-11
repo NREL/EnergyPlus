@@ -46,20 +46,14 @@ if("${EPMACRO_RESULT}" GREATER -1)
   endforeach()
   # find the appropriate executable file
   if(UNIX AND NOT APPLE)
-    find_program(
-      EPMACRO_EXE EPMacro
-      PATHS "${SOURCE_DIR}/bin/EPMacro/Linux"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+                                                                             NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   elseif(APPLE)
-    find_program(
-      EPMACRO_EXE EPMacro
-      PATHS "${SOURCE_DIR}/bin/EPMacro/Mac"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+                                                                           NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   else() # windows
-    find_program(
-      EPMACRO_EXE EPMacro
-      PATHS "${SOURCE_DIR}/bin/EPMacro/Windows"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows"
+                 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   endif()
   # Move EPMacro to executable directory
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EPMACRO_EXE}" "${EXE_PATH}")
@@ -72,10 +66,8 @@ if(BUILD_FORTRAN)
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if("${PAR_RESULT}" GREATER -1)
-    find_program(
-      PARAMETRIC_EXE ParametricPreprocessor
-      PATHS "${PRODUCT_PATH}"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(PARAMETRIC_EXE ParametricPreprocessor PATHS "${PRODUCT_PATH}"
+                 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}")
     execute_process(COMMAND "${PARAMETRIC_EXE}" "${IDF_FILE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
 
@@ -100,10 +92,8 @@ if(BUILD_FORTRAN)
   string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Basement" BASEMENT_RESULT)
 
   if("${SLAB_RESULT}" GREATER -1 OR "${BASEMENT_RESULT}" GREATER -1)
-    find_program(
-      EXPANDOBJECTS_EXE ExpandObjects
-      PATHS "${BINARY_DIR}/Products/"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/"
+                 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}/in.idf")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${EPW_PATH}" "${OUTPUT_DIR_PATH}/in.epw")
@@ -114,10 +104,8 @@ if(BUILD_FORTRAN)
       # Copy files needed for Slab
       file(COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}")
       # Find and run slab
-      find_program(
-        SLAB_EXE Slab
-        PATHS "${PRODUCT_PATH}"
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_program(SLAB_EXE Slab PATHS "${PRODUCT_PATH}" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH
+                                                         NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
       message("Executing Slab from ${SLAB_EXE}")
       execute_process(COMMAND "${SLAB_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
       # Then copy slab results into the expanded file
@@ -129,10 +117,8 @@ if(BUILD_FORTRAN)
       # Copy files needed for Basement
       file(COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}")
       # Find and run basement
-      find_program(
-        BASEMENT_EXE Basement
-        PATHS "${PRODUCT_PATH}"
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      find_program(BASEMENT_EXE Basement PATHS "${PRODUCT_PATH}" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH
+                                                                 NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
       message("Executing Basement from ${BASEMENT_EXE}")
       execute_process(COMMAND "${BASEMENT_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
       # Then copy basement results into the expanded file
@@ -147,10 +133,8 @@ if(BUILD_FORTRAN)
   list(FIND ENERGYPLUS_FLAGS_LIST -x EXPAND_RESULT)
 
   if("${EXPAND_RESULT}" GREATER -1)
-    find_program(
-      EXPANDOBJECTS_EXE ExpandObjects
-      PATHS "${PRODUCT_PATH}"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${PRODUCT_PATH}" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+                                                                         NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     # Move to executable directory
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXPANDOBJECTS_EXE}" "${EXE_PATH}")
   endif()
@@ -158,10 +142,8 @@ if(BUILD_FORTRAN)
   list(FIND ENERGYPLUS_FLAGS_LIST -r READVARS_RESULT)
 
   if("${READVARS_RESULT}" GREATER -1)
-    find_program(
-      READVARS_EXE ReadVarsESO
-      PATHS "${PRODUCT_PATH}"
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_program(READVARS_EXE ReadVarsESO PATHS "${PRODUCT_PATH}" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH
+                                                                  NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     # Move to executable directory
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${READVARS_EXE}" "${EXE_PATH}")
   endif()

@@ -51,10 +51,8 @@ include(CMakeParseArguments)
 
 function(_setup_mingw_config_and_build source_dir build_dir)
   # Look for a MinGW gfortran.
-  find_program(
-    MINGW_GFORTRAN
-    NAMES gfortran
-    PATHS c:/MinGW/bin "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MinGW;InstallLocation]/bin")
+  find_program(MINGW_GFORTRAN NAMES gfortran
+               PATHS c:/MinGW/bin "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MinGW;InstallLocation]/bin")
   if(NOT MINGW_GFORTRAN)
     message(FATAL_ERROR "gfortran not found, please install MinGW with the gfortran option."
                         "Or set the cache variable MINGW_GFORTRAN to the full path. " " This is required to build")
@@ -149,10 +147,7 @@ function(cmake_add_fortran_subdirectory subdir)
   # create imported targets for all libraries
   foreach(lib ${libraries})
     add_library(${lib} SHARED IMPORTED GLOBAL)
-    set_property(
-      TARGET ${lib}
-      APPEND
-      PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
+    set_property(TARGET ${lib} APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
     set_target_properties(${lib} PROPERTIES IMPORTED_IMPLIB_NOCONFIG "${library_dir}/lib${lib}.lib" IMPORTED_LOCATION_NOCONFIG
                                                                                                     "${binary_dir}/lib${lib}.dll")
     add_dependencies(${lib} ${project_name}_build)
