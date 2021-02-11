@@ -172,7 +172,10 @@ if(BUILD_FORTRAN)
   list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR}/src/AppGPostProcess/;AppGPostProcess;ALL;/")
 endif()
 
-set(CPACK_PACKAGE_VENDOR "US Department of Energy")
+# Need to install the ssc lib...
+install( TARGETS ssc DESTINATION ./ )
+
+set(CPACK_PACKAGE_VENDOR "US Department of Energy" )
 set(CPACK_IFW_PACKAGE_PUBLISHER "${CPACK_PACKAGE_VENDOR}")
 
 set(CPACK_PACKAGE_CONTACT "Edwin Lee <edwin.lee@nrel.gov>")
