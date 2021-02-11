@@ -769,12 +769,31 @@ namespace Psychrometrics {
         // http://www.iapws.org/relguide/IF97-Rev.html Section 8.1 The Saturation-Pressure Equation (Basic Equation)
 
         Real64 const Tkel(T + DataGlobalConstants::KelvinConv); // Dry-bulb in REAL(r64) for function passing
+        Real64 Pascal;
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
-        Real64 if97_pressure = 0.0017;
-        if (Tkel > 173.15) {
-            if97_pressure = psat97(double(Tkel));
+        if (Tkel < 173.15) {
+            Pascal = 0.0017;
+
+            // If below freezing, calculate saturation pressure over ice.
+        } else if (Tkel < DataGlobalConstants::KelvinConv) {      
+            Real64 const C1(-5674.5359);     // Coefficient for TKel < KelvinConvK
+            Real64 const C2(6.3925247);      // Coefficient for TKel < KelvinConvK
+            Real64 const C3(-0.9677843e-2);  // Coefficient for TKel < KelvinConvK
+            Real64 const C4(0.62215701e-6);  // Coefficient for TKel < KelvinConvK
+            Real64 const C5(0.20747825e-8);  // Coefficient for TKel < KelvinConvK
+            Real64 const C6(-0.9484024e-12); // Coefficient for TKel < KelvinConvK
+            Real64 const C7(4.1635019);      // Coefficient for TKel < KelvinConvK
+            Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
+
+            // If above freezing, calculate saturation pressure over liquid water.
+        } else if (Tkel <= 473.15) {
+            Pascal = psat97(double(Tkel));
+
+            // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
+        } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
+            Pascal = 1555000.0;
         }
-        return if97_pressure;
+        return Pascal;
     }
 
 #ifdef EP_psych_errors
