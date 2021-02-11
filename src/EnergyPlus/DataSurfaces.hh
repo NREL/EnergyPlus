@@ -998,15 +998,15 @@ namespace DataSurfaces {
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
-        Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideIR(EnergyPlusData &state, int t_SurfNum) const;
 
-        static Real64 getSWIncident(const int t_SurfNum);
+        static Real64 getSWIncident(EnergyPlusData &state, int t_SurfNum);
 
-        static Real64 getSWBeamIncident(const int t_SurfNum);
+        static Real64 getSWBeamIncident(EnergyPlusData &state, int t_SurfNum);
 
-        static Real64 getSWDiffuseIncident(const int t_SurfNum);
+        static Real64 getSWDiffuseIncident(EnergyPlusData &state, int t_SurfNum);
 
         int getTotLayers(EnergyPlusData &state) const;
 

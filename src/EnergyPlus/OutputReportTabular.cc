@@ -4534,8 +4534,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHeatBalance::ZnRpt;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
-        using DataHeatBalance::ZoneWinHeatGainRepEnergy;
-        using DataHeatBalance::ZoneWinHeatLossRepEnergy;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
@@ -4627,8 +4625,8 @@ namespace EnergyPlus::OutputReportTabular {
             }
             // Window Heat Addition
             // Window Heat Removal
-            ZonePreDefRep(iZone).SHGSAnWindAdd += ZoneWinHeatGainRepEnergy(iZone) * mult * timeStepRatio;
-            ZonePreDefRep(iZone).SHGSAnWindRem -= ZoneWinHeatLossRepEnergy(iZone) * mult * timeStepRatio;
+            ZonePreDefRep(iZone).SHGSAnWindAdd += state.dataHeatBal->ZoneWinHeatGainRepEnergy(iZone) * mult * timeStepRatio;
+            ZonePreDefRep(iZone).SHGSAnWindRem -= state.dataHeatBal->ZoneWinHeatLossRepEnergy(iZone) * mult * timeStepRatio;
             // Infiltration Heat Addition
             // Infiltration Heat Removal
             if (ZnAirRpt(iZone).SumMCpDtInfil > 0.0) {

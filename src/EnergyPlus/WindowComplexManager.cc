@@ -3061,7 +3061,7 @@ namespace WindowComplexManager {
         // direct solar radiation
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ShadeFlag = SurfWinShadingFlag(SurfNum);
-            dir = SurfQRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
+            dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
@@ -3076,7 +3076,7 @@ namespace WindowComplexManager {
 
             // Add contribution of IR from zone internal gains (lights, equipment and people). This is absorbed in zone-side layer and it
             // is assumed that nothing is transmitted through
-            asol(nlayer) += SurfQRadThermInAbs(SurfNum);
+            asol(nlayer) += state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
 
             presure = state.dataEnvrn->OutBaroPress;
 
@@ -3293,7 +3293,7 @@ namespace WindowComplexManager {
             SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv;
             SurfOutsideEmiss = emis(1);
 
-            IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
+            IncidentSolar = Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
             if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
@@ -3420,9 +3420,9 @@ namespace WindowComplexManager {
             }
             if (state.dataEnvrn->SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
-                        SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                        SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
-                                                (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                                                (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
                 SurfWinSysSolTransmittance(SurfNum) = 0.0;

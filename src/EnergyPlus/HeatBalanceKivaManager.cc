@@ -370,7 +370,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
         bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
-                               DataHeatBalance::SurfQRadThermInAbs(floorSurface) + // internal gains
+                               state.dataHeatBal->SurfQRadThermInAbs(floorSurface) + // internal gains
                                DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
@@ -389,7 +389,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         Real64 TAConvTotal = 0.0;
         for (auto &wl : wallSurfaces) {
             Real64 Q = DataHeatBalSurface::SurfOpaqQRadSWInAbs(wl) + // solar
-                       DataHeatBalance::SurfQRadThermInAbs(wl) + // internal gains
+                       state.dataHeatBal->SurfQRadThermInAbs(wl) + // internal gains
                        DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC

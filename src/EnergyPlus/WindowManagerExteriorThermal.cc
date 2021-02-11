@@ -327,7 +327,7 @@ namespace WindowManager {
         if (matGroup == WindowGlass || matGroup == WindowSimpleGlazing || matGroup == WindowBlind || matGroup == Shade || matGroup == Screen ||
             matGroup == ComplexWindowShade) {
             ++m_SolidLayerIndex;
-            aLayer = getSolidLayer(m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
+            aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
         } else if (matGroup == WindowGas || matGroup == WindowGasMixture) {
             aLayer = getGapLayer(*material);
         } else if (matGroup == ComplexWindowGap) {
@@ -345,7 +345,7 @@ namespace WindowManager {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<CBaseIGULayer>
-    CWCEHeatTransferFactory::getSolidLayer(SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index, int const t_SurfNum)
+    CWCEHeatTransferFactory::getSolidLayer(EnergyPlusData &state, SurfaceData const &surface, Material::MaterialProperties const &material, int const t_Index, int const t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -453,12 +453,12 @@ namespace WindowManager {
             auto aOpenings = std::make_shared<CShadeOpenings>(Atop, Abot, Aleft, Aright, Afront);
             aSolidLayer = std::make_shared<CIGUShadeLayer>(aSolidLayer, aOpenings);
         }
-        auto swRadiation = surface.getSWIncident(t_SurfNum);
+        auto swRadiation = surface.getSWIncident(state, t_SurfNum);
         if (swRadiation > 0) {
 
             auto absCoeff = SurfWinQRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += SurfQRadThermInAbs(t_SurfNum) / swRadiation;
+                absCoeff += state.dataHeatBal->SurfQRadThermInAbs(t_SurfNum) / swRadiation;
             }
 
             aSolidLayer->setSolarAbsorptance(absCoeff);
@@ -617,7 +617,7 @@ namespace WindowManager {
         double tout = m_Surface.getOutsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         double IR = m_Surface.getOutsideIR(state, m_SurfNum);
         // double dirSolRad = QRadSWOutIncident( t_SurfNum ) + QS( Surface( t_SurfNum ).Zone );
-        double swRadiation = m_Surface.getSWIncident(m_SurfNum);
+        double swRadiation = m_Surface.getSWIncident(state, m_SurfNum);
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {

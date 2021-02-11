@@ -8320,8 +8320,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
     EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
 
-    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
-    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
+    state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);
 
     GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 

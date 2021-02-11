@@ -2289,7 +2289,7 @@ namespace WindowManager {
 
             // IR from zone internal gains (lights, equipment and people) absorbed on zone-side face
             // (assumes inside glass layer is opaque to IR, so no contribution to other layers)
-            state.dataWindowManager->AbsRadGlassFace(2 * TotGlassLay) += SurfQRadThermInAbs(SurfNum);
+            state.dataWindowManager->AbsRadGlassFace(2 * TotGlassLay) += state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
 
             // Fill the layer properties needed for the thermal calculation.
             // For switchable glazing it is assumed that thermal properties, such
@@ -2486,7 +2486,7 @@ namespace WindowManager {
                 state.dataWindowManager->tout = RefAirTemp + state.dataWindowManager->TKelvin; // outside air temperature
 
                 // Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
-                state.dataWindowManager->AbsRadGlassFace(1) += SurfQRadThermInAbs(SurfNumAdj);
+                state.dataWindowManager->AbsRadGlassFace(1) += state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
@@ -3426,7 +3426,7 @@ namespace WindowManager {
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
-            IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
+            IncidentSolar = Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
             if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                 // Interior shade or blind
                 SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
@@ -3532,9 +3532,9 @@ namespace WindowManager {
             if (state.dataEnvrn->SunIsUp) {
 
                 SurfWinSysSolTransmittance(SurfNum) =
-                        SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                        SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
-                                                (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                                                (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
                 SurfWinSysSolTransmittance(SurfNum) = 0.0;

@@ -840,7 +840,7 @@ namespace Photovoltaics {
 
         ThisSurf = PVarray(thisPV).SurfacePtr;
 
-        if (DataHeatBalance::SurfQRadSWOutIncident(ThisSurf) > MinIrradiance) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > MinIrradiance) {
 
             // get efficiency
             {
@@ -863,7 +863,7 @@ namespace Photovoltaics {
 
             PVarray(thisPV).Report.DCPower =
                 PVarray(thisPV).SimplePVModule.AreaCol * Eff *
-                        DataHeatBalance::SurfQRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
+                        state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
 
             // store sink term in appropriate place for surface heat transfer itegration
             PVarray(thisPV).SurfaceSink = PVarray(thisPV).Report.DCPower;
@@ -958,9 +958,6 @@ namespace Photovoltaics {
         //    integrated photovoltaics. Solar 2002, Sunrise on the Reliable Energy Economy, June 15-19, 2002 Reno, NV
 
         // Using/Aliasing
-        using DataHeatBalance::SurfCosIncidenceAngle;
-        using DataHeatBalance::SurfQRadSWOutIncident;
-        using DataHeatBalance::SurfQRadSWOutIncidentBeam;
         using DataHeatBalSurface::SurfTempOut;
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
@@ -972,9 +969,9 @@ namespace Photovoltaics {
         ThisSurf = PVarray(PVnum).SurfacePtr;
 
         //   get input from elsewhere in Energyplus for the current point in the simulation
-        PVarray(PVnum).SNLPVinto.IcBeam = SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
-        PVarray(PVnum).SNLPVinto.IcDiffuse = SurfQRadSWOutIncident(ThisSurf) - SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians;    // (deg) from dataHeatBalance
+        PVarray(PVnum).SNLPVinto.IcBeam = state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
+        PVarray(PVnum).SNLPVinto.IcDiffuse = state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) - state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
+        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians;    // (deg) from dataHeatBalance
         PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
@@ -1187,31 +1184,10 @@ namespace Photovoltaics {
         // simulation initializations and start of timestep initializations. The structure of the
         // subroutine was taken from InitBaseboard.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         // Using/Aliasing
-        using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;
@@ -1244,9 +1220,9 @@ namespace Photovoltaics {
             PVarray(PVnum).TRNSYSPVcalc.TimeElapsed = TimeElapsed;
         }
 
-        if (any_gt(SurfQRadSWOutIncident, 0.0)) {
+        if (any_gt(state.dataHeatBal->SurfQRadSWOutIncident, 0.0)) {
             //  Determine the amount of radiation incident on each PV
-            PVarray(PVnum).TRNSYSPVcalc.Insolation = SurfQRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
+            PVarray(PVnum).TRNSYSPVcalc.Insolation = state.dataHeatBal->SurfQRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
         } else {
             PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
         }

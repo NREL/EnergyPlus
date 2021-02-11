@@ -275,35 +275,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern Array1D<Real64> ZoneTransSolarEnergy;          // Energy of ZoneTransSolar [J]
-    extern Array1D<Real64> ZoneWinHeatGainRepEnergy;      // Energy of ZoneWinHeatGainRep [J]
-    extern Array1D<Real64> ZoneWinHeatLossRepEnergy;      // Energy of ZoneWinHeatLossRep [J]
-    extern Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;   // Energy of ZoneBmSolFrExtWinsRep [J]
-    extern Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;   // Energy of ZoneBmSolFrIntWinsRep [J]
-    extern Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;  // Energy of ZoneDifSolFrExtWinsRep [J]
-    extern Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;  // Energy of ZoneDifSolFrIntWinsRep [J]
-    extern Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    extern Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    extern Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    extern Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg; // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-
-    extern Array1D<Real64> SurfQRadThermInAbs;              // Thermal radiation absorbed on inside surfaces
-    extern Array1D<Real64> SurfQRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
-    extern Array1D<Real64> SurfBmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
-    extern Array1D<Real64> SurfBmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
-    extern Array1D<Real64> SurfIntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
-    extern Array1D<Real64> SurfIntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
-    extern Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;  // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;   // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
-    extern Array1D<Real64>
-        SurfQRadSWOutIncBmToDiffReflObs;                   // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
-    extern Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
-    extern Array1D<Real64> SurfCosIncidenceAngle;          // Cosine of beam solar incidence angle (for reporting)
-
     extern Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
     extern Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
     extern Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
@@ -2182,19 +2153,45 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
     Array1D<Real64>
         ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
-    Array1D<Real64> ZoneWinHeatGainRep;             // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
-    Array1D<Real64> ZoneWinHeatLossRep;             // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
-    Array1D<Real64> ZoneBmSolFrExtWinsRep;          // Beam solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneBmSolFrIntWinsRep;          // Beam solar into zone from interior windows [W]
-    Array1D<Real64> InitialZoneDifSolReflW;         // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
-    Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
-    Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
+    Array1D<Real64> ZoneWinHeatGainRep;              // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
+    Array1D<Real64> ZoneWinHeatLossRep;              // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
+    Array1D<Real64> ZoneBmSolFrExtWinsRep;           // Beam solar into zone from exterior windows [W]
+    Array1D<Real64> ZoneBmSolFrIntWinsRep;           // Beam solar into zone from interior windows [W]
+    Array1D<Real64> InitialZoneDifSolReflW;          // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
+    Array1D<Real64> ZoneDifSolFrExtWinsRep;          // Diffuse solar into zone from exterior windows [W]
+    Array1D<Real64> ZoneDifSolFrIntWinsRep;          // Diffuse solar into zone from interior windows [W]
+    Array1D<Real64> ZoneOpaqSurfInsFaceCond;         // Zone inside face opaque surface conduction (W)
+    Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep;  // = Zone inside face opaque surface conduction when >= 0
+    Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep;  // = -Zone inside face opaque surface conduction when < 0
+    Array1D<Real64> ZoneOpaqSurfExtFaceCond;         // Zone outside face opaque surface conduction (W)
+    Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep;  // = Zone outside face opaque surface conduction when >= 0
+    Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep;  // = -Zone outside face opaque surface conduction when < 0
+    Array1D<Real64> ZoneTransSolarEnergy;            // Energy of ZoneTransSolar [J]
+    Array1D<Real64> ZoneWinHeatGainRepEnergy;        // Energy of ZoneWinHeatGainRep [J]
+    Array1D<Real64> ZoneWinHeatLossRepEnergy;        // Energy of ZoneWinHeatLossRep [J]
+    Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;     // Energy of ZoneBmSolFrExtWinsRep [J]
+    Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;     // Energy of ZoneBmSolFrIntWinsRep [J]
+    Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;    // Energy of ZoneDifSolFrExtWinsRep [J]
+    Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;    // Energy of ZoneDifSolFrIntWinsRep [J]
+    Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;   // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;   // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;   // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;   // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    Array1D<Real64> SurfQRadThermInAbs;              // Thermal radiation absorbed on inside surfaces
+    Array1D<Real64> SurfQRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
+    Array1D<Real64> SurfIntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
+    Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;  // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;   // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;  // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfCosIncidenceAngle;           // Cosine of beam solar incidence angle (for reporting)
 
     void clear_state() override
     {
@@ -2331,6 +2328,32 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneOpaqSurfExtFaceCond.deallocate();
         this->ZoneOpaqSurfExtFaceCondGainRep.deallocate();
         this->ZoneOpaqSurfExtFaceCondLossRep.deallocate();
+        this->ZoneTransSolarEnergy.deallocate();
+        this->ZoneWinHeatGainRepEnergy.deallocate();
+        this->ZoneWinHeatLossRepEnergy.deallocate();
+        this->ZoneBmSolFrExtWinsRepEnergy.deallocate();
+        this->ZoneBmSolFrIntWinsRepEnergy.deallocate();
+        this->ZoneDifSolFrExtWinsRepEnergy.deallocate();
+        this->ZoneDifSolFrIntWinsRepEnergy.deallocate();
+        this->ZnOpqSurfInsFaceCondGnRepEnrg.deallocate();
+        this->ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
+        this->ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
+        this->ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
+        this->SurfQRadThermInAbs.deallocate();
+        this->SurfQRadSWOutIncident.deallocate();
+        this->SurfQRadSWOutIncidentBeam.deallocate();
+        this->SurfBmIncInsSurfIntensRep.deallocate();
+        this->SurfBmIncInsSurfAmountRep.deallocate();
+        this->SurfIntBmIncInsSurfIntensRep.deallocate();
+        this->SurfIntBmIncInsSurfAmountRep.deallocate();
+        this->SurfQRadSWOutIncidentSkyDiffuse.deallocate();
+        this->SurfQRadSWOutIncidentGndDiffuse.deallocate();
+        this->SurfQRadSWOutIncBmToDiffReflGnd.deallocate();
+        this->SurfQRadSWOutIncSkyDiffReflGnd.deallocate();
+        this->SurfQRadSWOutIncBmToBmReflObs.deallocate();
+        this->SurfQRadSWOutIncBmToDiffReflObs.deallocate();
+        this->SurfQRadSWOutIncSkyDiffReflObs.deallocate();
+        this->SurfCosIncidenceAngle.deallocate();
     }
 };
 

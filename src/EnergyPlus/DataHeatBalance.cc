@@ -220,34 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
-    Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
-    Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
-    Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;    // Energy of ZoneBmSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;    // Energy of ZoneBmSolFrIntWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;   // Energy of ZoneDifSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;   // Energy of ZoneDifSolFrIntWinsRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-
-    Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
-    Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
-    Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
-    Array1D<Real64> SurfBmIncInsSurfAmountRep;          // Beam sol amount from ext wins incident on inside of surface (W)
-    Array1D<Real64> SurfIntBmIncInsSurfIntensRep;       // Beam sol irrad from int wins on inside of surface (W/m2)
-    Array1D<Real64> SurfIntBmIncInsSurfAmountRep;       // Beam sol amount from int wins incident on inside of surface (W)
-    Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse;    // Exterior sky diffuse solar incident on surface (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse;    // Exterior ground diffuse solar incident on surface (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd;    // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;     // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
-    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
-    Array1D<Real64> SurfCosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
-
     Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
     Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
     Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
@@ -272,14 +244,6 @@ namespace EnergyPlus::DataHeatBalance {
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
-
-    // removed variables (these were all arrays):
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRep    !Diffuse sol amount from ext wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfIntensRep    !Diffuse sol irradiance from int wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRep    !Diffuse sol amount from int wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRepEnergy    !energy of DifIncInsSurfAmountRep [J]
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRepEnergy    !energy of IntDifIncInsSurfAmountRep [J]
 
     // Variables moved from HeatBalanceSurfaceManager and SolarShading
     // to avoid conflict with their use in WindowManager
@@ -429,38 +393,10 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZoneTransSolarEnergy.deallocate();
-        ZoneWinHeatGainRepEnergy.deallocate();
-        ZoneWinHeatLossRepEnergy.deallocate();
-        ZoneBmSolFrExtWinsRepEnergy.deallocate();
-        ZoneBmSolFrIntWinsRepEnergy.deallocate();
-        ZoneDifSolFrExtWinsRepEnergy.deallocate();
-        ZoneDifSolFrIntWinsRepEnergy.deallocate();
-        ZnOpqSurfInsFaceCondGnRepEnrg.deallocate();
-        ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
-        ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
-        ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
-
-        SurfQRadThermInAbs.deallocate();
-        SurfQRadSWOutIncident.deallocate();
-        SurfQRadSWOutIncidentBeam.deallocate();
-        SurfBmIncInsSurfIntensRep.deallocate();
-        SurfBmIncInsSurfAmountRep.deallocate();
-        SurfIntBmIncInsSurfIntensRep.deallocate();
-        SurfIntBmIncInsSurfAmountRep.deallocate();
         SurfBmIncInsSurfAmountRepEnergy.deallocate();
         SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
         SurfInitialDifSolInAbsReport.deallocate();
         SurfSWInAbsTotalReport.deallocate();
-
-        SurfQRadSWOutIncidentSkyDiffuse.deallocate();
-        SurfQRadSWOutIncidentGndDiffuse.deallocate();
-        SurfQRadSWOutIncBmToDiffReflGnd.deallocate();
-        SurfQRadSWOutIncSkyDiffReflGnd.deallocate();
-        SurfQRadSWOutIncBmToBmReflObs.deallocate();
-        SurfQRadSWOutIncBmToDiffReflObs.deallocate();
-        SurfQRadSWOutIncSkyDiffReflObs.deallocate();
-        SurfCosIncidenceAngle.deallocate();
 
         SurfWinBSDFBeamDirectionRep.deallocate();
         SurfWinBSDFBeamThetaRep.deallocate();

@@ -924,7 +924,7 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getSWIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -935,10 +935,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -949,10 +949,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident from outside beam
 
-        return  SurfQRadSWOutIncidentBeam(t_SurfNum);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentBeam(t_SurfNum);
     }
 
-    Real64 SurfaceData::getSWDiffuseIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWDiffuseIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -963,7 +963,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const
