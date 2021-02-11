@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -256,7 +256,6 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::PlantLoop;
         using DataPlant::TypeOf_Chiller_ElectricEIR;
         using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using FluidProperties::GetDensityGlycol;
@@ -341,7 +340,7 @@ namespace StandardRatings {
 
         // IPLV calculations:
         for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
-            if (CondenserType == DataPlant::CondenserType::WATERCOOLED) {
+            if (CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // get the entering water temperature for the reduced capacity test conditions
                 if (ReducedPLR(RedCapNum) > 0.50) {
                     EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR(RedCapNum);
@@ -349,7 +348,7 @@ namespace StandardRatings {
                     EnteringWaterTempReduced = 19.0;
                 }
                 CondenserInletTemp = EnteringWaterTempReduced;
-            } else if (CondenserType == DataPlant::CondenserType::AIRCOOLED) {
+            } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
                 if (ReducedPLR(RedCapNum) > 0.3125) {
                     EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR(RedCapNum);
@@ -383,10 +382,10 @@ namespace StandardRatings {
 
                 } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
                     Cp = GetSpecificHeatGlycol(
-                        state, PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
+                        state, state.dataPlnt->PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex, RoutineName);
 
                     Rho =
-                        GetDensityGlycol(state, PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, PlantLoop(CondLoopNum).FluidIndex, RoutineName);
+                        GetDensityGlycol(state, state.dataPlnt->PlantLoop(CondLoopNum).FluidName, EnteringWaterTempReduced, state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex, RoutineName);
 
                     Par(1) = EnteringWaterTempReduced;
                     Par(2) = EvapOutletTemp;
@@ -692,10 +691,10 @@ namespace StandardRatings {
         GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityLWTempMin, CapacityLWTempMax, CapacityEnteringCondTempMin, CapacityEnteringCondTempMax);
         GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRLWTempMin, EIRLWTempMax, EIREnteringCondTempMin, EIREnteringCondTempMax);
 
-        if (CondenserType == DataPlant::CondenserType::WATERCOOLED) {
+        if (CondenserType == DataPlant::CondenserType::WaterCooled) {
             HighCondenserEnteringTempLimit = HighEWTemp;
             LowCondenserEnteringTempLimit = LowEWTemp;
-        } else if (CondenserType == DataPlant::CondenserType::AIRCOOLED) {
+        } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
             HighCondenserEnteringTempLimit = OAHighEDBTemp;
             LowCondenserEnteringTempLimit = OAHighEDBTemp;
         } else { // Evaporatively Cooled Condenser

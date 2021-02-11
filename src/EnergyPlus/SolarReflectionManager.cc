@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -173,7 +173,7 @@ namespace SolarReflectionManager {
         static Vector3<Real64> const unit_z(0.0, 0.0, 1.0);
         static Vector3<Real64> const zero3(0.0);
 
-        // FLOW:
+
 
         // Find number of surfaces that are sun-exposed exterior building heat transfer surfaces.
         // These are candidates for receiving solar reflected from obstructions and ground.
@@ -814,7 +814,7 @@ namespace SolarReflectionManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int IHr(0); // Hour number
 
-        // FLOW:
+
         if (!DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
                 DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
@@ -1073,7 +1073,7 @@ namespace SolarReflectionManager {
         static Vector3<Real64> SurfVertToGndPt(0.0); // Vector from a vertex of possible obstructing surface to ground
         //  hit point (m)
         static Vector3<Real64> SurfVert(0.0); // Surface vertex (m)
-        // FLOW:
+
 
         Real64 const DPhi(DataGlobalConstants::PiOvr2 / (AltAngStepsForSolReflCalc / 2.0));      // Altitude angle and increment (radians)
         Real64 const DTheta(2.0 * DataGlobalConstants::Pi / (2.0 * AzimAngStepsForSolReflCalc)); // Azimuth increment (radians)

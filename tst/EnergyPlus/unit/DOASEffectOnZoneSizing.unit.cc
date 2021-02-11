@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -64,10 +65,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
@@ -151,19 +149,19 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     CalcFinalZoneSizing.allocate(2);
     NonAirSystemResponse.allocate(2);
     SysDepZoneLoads.allocate(2);
-    ZoneEquipConfig.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(2);
     TempControlType.allocate(2);
     TempZoneThermostatSetPoint.allocate(2);
     ZoneThermostatSetPointLo.allocate(2);
     ZoneThermostatSetPointHi.allocate(2);
-    ZoneSysEnergyDemand.allocate(2);
-    ZoneSysMoistureDemand.allocate(2);
-    DeadBandOrSetback.allocate(2);
-    CurDeadBandOrSetback.allocate(2);
-    ZoneEquipConfig(1).InletNode.allocate(2);
-    ZoneEquipConfig(2).InletNode.allocate(2);
-    ZoneEquipConfig(1).ExhaustNode.allocate(1);
-    ZoneEquipConfig(2).ExhaustNode.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(2);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(2);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(2);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
     ZoneMassBalanceFlag.allocate(2);
     state->dataGlobal->NumOfZones = 2;
     MassConservation.allocate(state->dataGlobal->NumOfZones);
@@ -178,45 +176,45 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     ZoneThermostatSetPointHi(1) = 24.;
     ZoneThermostatSetPointHi(2) = 24.;
     CurOverallSimDay = 1;
-    ZoneEquipConfig(1).IsControlled = true;
-    ZoneEquipConfig(2).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = true;
     CalcZoneSizing(1, 1).ActualZoneNum = 1;
     CalcZoneSizing(1, 2).ActualZoneNum = 2;
     CalcZoneSizing(1, 1).AccountForDOAS = true;
     CalcZoneSizing(1, 2).AccountForDOAS = true;
     CurOverallSimDay = 1;
-    ZoneSysEnergyDemand(2).TotalOutputRequired = -2600;
-    ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -21100;
-    ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -2600;
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 3600;
-    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 3600;
-    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 22000.;
-    ZoneSysMoistureDemand(1).TotalOutputRequired = 0.0;
-    ZoneSysMoistureDemand(1).OutputRequiredToHumidifyingSP = 0.0;
-    ZoneSysMoistureDemand(1).OutputRequiredToDehumidifyingSP = 0.0;
-    ZoneSysMoistureDemand(2).TotalOutputRequired = 0.0;
-    ZoneSysMoistureDemand(2).OutputRequiredToHumidifyingSP = 0.0;
-    ZoneSysMoistureDemand(2).OutputRequiredToDehumidifyingSP = 0.0;
-    DeadBandOrSetback(1) = false;
-    DeadBandOrSetback(2) = false;
-    CurDeadBandOrSetback(1) = false;
-    CurDeadBandOrSetback(2) = false;
-    ZoneEquipConfig(1).ZoneNode = 4;
-    ZoneEquipConfig(2).ZoneNode = 9;
-    ZoneEquipConfig(1).NumInletNodes = 2;
-    ZoneEquipConfig(2).NumInletNodes = 2;
-    ZoneEquipConfig(1).NumExhaustNodes = 1;
-    ZoneEquipConfig(2).NumExhaustNodes = 1;
-    ZoneEquipConfig(1).InletNode(1) = 1;
-    ZoneEquipConfig(1).InletNode(2) = 2;
-    ZoneEquipConfig(2).InletNode(1) = 6;
-    ZoneEquipConfig(2).InletNode(2) = 7;
-    ZoneEquipConfig(1).ExhaustNode(1) = 3;
-    ZoneEquipConfig(2).ExhaustNode(1) = 8;
-    ZoneEquipConfig(1).NumReturnNodes = 0;
-    ZoneEquipConfig(2).NumReturnNodes = 0;
-    ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEquipConfig(2).ActualZoneNum = 2;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).TotalOutputRequired = -2600;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -21100;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -2600;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 3600;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 3600;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 22000.;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToHumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).OutputRequiredToDehumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(2).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(2).OutputRequiredToHumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand(2).OutputRequiredToDehumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(2) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 9;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(1) = 6;
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode(2) = 7;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1) = 8;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(2).ActualZoneNum = 2;
     CalcZoneSizing(CurOverallSimDay, 1).DOASHighSetpoint = 14.4;
     CalcZoneSizing(CurOverallSimDay, 1).DOASLowSetpoint = 12.2;
     CalcZoneSizing(CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
@@ -277,12 +275,12 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     Node(8).MassFlowRateMinAvail = 0.0;
     Node(8).MassFlowRateMaxAvail = 0.0;
     Node(8).MassFlowRateMax = 0.0;
-    ZoneEquipConfig(1).ZoneExh = 0.0;
-    ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
-    ZoneEquipConfig(1).PlenumMassFlow = 0.0;
-    ZoneEquipConfig(2).ZoneExh = 0.0;
-    ZoneEquipConfig(2).ZoneExhBalanced = 0.0;
-    ZoneEquipConfig(2).PlenumMassFlow = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExh = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).PlenumMassFlow = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(2).ZoneExhBalanced = 0.0;
+    state->dataZoneEquip->ZoneEquipConfig(2).PlenumMassFlow = 0.0;
     MassConservation(1).MixingMassFlowRate = 0.0;
     MassConservation(2).MixingMassFlowRate = 0.0;
     Zone(1).Multiplier = 1.0;
@@ -323,19 +321,19 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     CalcZoneSizing.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoads.deallocate();
-    ZoneEquipConfig(1).InletNode.deallocate();
-    ZoneEquipConfig(2).InletNode.deallocate();
-    ZoneEquipConfig(1).ExhaustNode.deallocate();
-    ZoneEquipConfig(2).ExhaustNode.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(2).InletNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     TempControlType.deallocate();
     TempZoneThermostatSetPoint.deallocate();
     ZoneThermostatSetPointLo.deallocate();
     ZoneThermostatSetPointHi.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    ZoneSysMoistureDemand.deallocate();
-    DeadBandOrSetback.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.deallocate();
+    state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     ZoneMassBalanceFlag.deallocate();
     MassConservation.deallocate();
 }

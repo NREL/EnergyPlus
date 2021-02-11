@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,15 +52,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/WeatherManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -205,7 +204,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     pvwb.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
     EXPECT_DOUBLE_EQ(thermalPower, 0.0);
     EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-    EXPECT_NEAR(generatorPower, 1621.100, 0.5);
+    EXPECT_NEAR(generatorPower, 1609.812, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
     PVWattsGenerator pvwc(*state, "PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
@@ -226,7 +225,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     pvwd.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
     EXPECT_DOUBLE_EQ(thermalPower, 0.0);
     EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-    EXPECT_NEAR(generatorPower, 2485.686, 0.5);
+    EXPECT_NEAR(generatorPower, 2524.947, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
     PVWattsGenerator pvwe(*state, "PVWattsArrayE", 3800.0, ModuleType::PREMIUM, ArrayType::TWO_AXIS, 0.08, GeometryType::TILT_AZIMUTH, 34.0, 180.);

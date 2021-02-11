@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,6 @@ namespace WaterCoils {
 
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_CoilWaterCooling;
     using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -168,7 +167,7 @@ namespace WaterCoils {
         int OpMode;          // fan operating mode
         Real64 PartLoadFrac; // part-load fraction of heating coil
 
-        // FLOW:
+
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
@@ -974,7 +973,7 @@ namespace WaterCoils {
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
 
-        // FLOW:
+
 
         if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
             // initialize the environment and sizing flags
@@ -1040,7 +1039,7 @@ namespace WaterCoils {
             }
         }
 
-        if (PlantLoopScanFlag(CoilNum) && allocated(PlantLoop)) {
+        if (PlantLoopScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -1070,9 +1069,9 @@ namespace WaterCoils {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(CoilNum)) {
             rho = GetDensityGlycol(state,
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                    DataGlobalConstants::InitConvTemp,
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                    RoutineName);
             // Initialize all report variables to a known state at beginning of simulation
             state.dataWaterCoils->WaterCoil(CoilNum).TotWaterHeatingCoilEnergy = 0.0;
@@ -1094,9 +1093,9 @@ namespace WaterCoils {
                 Node(WaterInletNode).Temp = 5.0;
 
                 Cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                            Node(WaterInletNode).Temp,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                            RoutineName);
 
                 Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
@@ -1109,9 +1108,9 @@ namespace WaterCoils {
                 Node(WaterInletNode).Temp = 60.0;
 
                 Cp = GetSpecificHeatGlycol(state,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                            Node(WaterInletNode).Temp,
-                                           PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                            RoutineName);
 
                 Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
@@ -1326,9 +1325,9 @@ namespace WaterCoils {
 
                     // Enthalpy of Water at Intlet design conditions
                     Cp = GetSpecificHeatGlycol(state,
-                                               PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                                state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp,
-                                               PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                                RoutineName);
 
                     DesOutletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp +
@@ -1504,7 +1503,6 @@ namespace WaterCoils {
                 if (SolFla == -1) {
                     ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating coil UA");
-                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
@@ -1516,7 +1514,6 @@ namespace WaterCoils {
                 } else if (SolFla == -2) {
                     ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "  Bad starting values for UA");
-                    // CALL ShowFatalError(state, 'Preceeding error causes program termination')
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal = UA0 * 10.0;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal = state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal * 3.3;
                     state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal = 1.0 / (1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal + 1.0 / state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal);
@@ -1556,9 +1553,9 @@ namespace WaterCoils {
             CapacitanceAir = state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
 
             Cp = GetSpecificHeatGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
 
             CapacitanceWater = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate * Cp;
@@ -1735,9 +1732,9 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate;
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp;
                 Real64 cp = GetSpecificHeatGlycol(state,
-                                                  PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                                  state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                                   state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp,
-                                                  PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                                  state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                                   "InitWaterCoil");
                 state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy = cp * state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
 
@@ -2465,12 +2462,12 @@ namespace WaterCoils {
                 DataPltSizHeatNum = PltSizHeatNum;
                 DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum;
                 rho = GetDensityGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
                 Cp = GetSpecificHeatGlycol(
-                    state, PlantLoop(DataWaterLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
+                    state, state.dataPlnt->PlantLoop(DataWaterLoopNum).FluidName, DataGlobalConstants::HWInitConvTemp, state.dataPlnt->PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
                 if (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
                 } else if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
@@ -2830,9 +2827,9 @@ namespace WaterCoils {
 
         if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // If the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);
@@ -3121,9 +3118,9 @@ namespace WaterCoils {
             //       Ratio of secondary (fin) to total (secondary plus primary) surface areas
             FinToTotSurfAreaRatio = state.dataWaterCoils->WaterCoil(CoilNum).FinSurfArea / state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             //      known water and air flow parameters:
-            rho = GetDensityGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                    TempWaterIn,
-                                   PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                    RoutineName);
             //      water flow velocity - assuming number of water circuits = NumOfTubesPerRow
             TubeWaterVel = WaterMassFlowRate * 4.0 /
@@ -3237,9 +3234,9 @@ namespace WaterCoils {
             //       dry coil outside thermal resistance = [1/UA] (dry coil)
             CoilToAirThermResistDrySurf = 1.0 / (state.dataWaterCoils->WaterCoil(CoilNum).TotCoilOutsideSurfArea * AirSideDrySurfFilmCoef * DryCoilEfficiency);
             //       definitions made to simplify some of the expressions used below
-            Cp = GetSpecificHeatGlycol(state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             ScaledWaterSpecHeat = WaterMassFlowRate * Cp * ConvK / AirMassFlow;
             DryCoilCoeff1 = 1.0 / (AirMassFlow * MoistAirSpecificHeat) - 1.0 / (WaterMassFlowRate * Cp * ConvK);
@@ -3866,7 +3863,7 @@ namespace WaterCoils {
         CapacitanceAir = AirMassFlow * PsyCpAirFnW(state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat);
         // Water Capacity Rate
         Cp = GetSpecificHeatGlycol(
-            state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
 
         CapacitanceWater = WaterMassFlowRate * Cp;
 
@@ -4007,7 +4004,7 @@ namespace WaterCoils {
         UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
         CapacityRateAirWet = AirMassFlow;
         Cp = GetSpecificHeatGlycol(
-            state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
         CapacityRateWaterWet = WaterMassFlowRate * (Cp / IntermediateCpSat);
         CoilOutletStreamCondition(state, CoilNum,
                                   CapacityRateAirWet,
@@ -4804,7 +4801,7 @@ namespace WaterCoils {
             Tavg = (state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp - state.dataWaterCoils->WaterCoil(CoilNum).OutletAirTemp) / 2.0;
 
             RhoWater = GetDensityGlycol(
-                state, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, Tavg, PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
+                state, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName, Tavg, state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
             //   CR9155 Remove specific humidity calculations
             SpecHumIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
             SpecHumOut = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirHumRat;
@@ -6484,7 +6481,6 @@ namespace WaterCoils {
         using DataHVACGlobals::SimZoneEquipmentFlag;
         using DataLoopNode::Node;
         using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::PlantLoop;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -6551,13 +6547,13 @@ namespace WaterCoils {
 
         if (DidAnythingChange) {
             // set sim flag for this loop
-            PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
             // set sim flags for air side users of coils
 
             SimAirLoopsFlag = true;
             SimZoneEquipmentFlag = true;
         } else { // nothing changed so turn off sim flag
-            PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
         }
     }
 
@@ -6732,9 +6728,9 @@ namespace WaterCoils {
         if (WaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) { // if the coil is operating
             CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(state,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
-                                       PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
                                        RoutineName);
             CapacitanceWater = Cp * WaterMassFlowRate;
             CapacitanceMin = min(CapacitanceAir, CapacitanceWater);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,15 +52,16 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -240,30 +241,30 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
-    DataPlant::TotNumLoops = 1;
-    PlantLoop.allocate(1);
-    PlantLoop(1).Name = "MyPlant";
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "MyPlant";
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // create 2 components on a single branch to simulate water flow control for entire branch
-    PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
     PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
@@ -287,13 +288,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
     // SetActuatedBranchFlowRate(*state, CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
@@ -317,13 +318,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(Node(3).MassFlowRateRequest, NodeMdot);
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
     SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
     EXPECT_EQ(Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(Node(1).MassFlowRateMax, NodeMdot);
@@ -347,8 +348,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     // override flag should also be true
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
     SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
@@ -404,30 +405,30 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     state->dataEMSMgr->FinishProcessingUserInput = true;
 
     // set up plant loop
-    DataPlant::TotNumLoops = 1;
-    PlantLoop.allocate(1);
-    PlantLoop(1).Name = "MyPlant";
-    for (int l = 1; l <= TotNumLoops; ++l) {
-        auto &loop(PlantLoop(l));
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "MyPlant";
+    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+        auto &loop(state->dataPlnt->PlantLoop(l));
         loop.LoopSide.allocate(2);
-        auto &loopside(PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
     // create 2 components on a single branch to simulate water flow control for entire branch
-    PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 41; // Coil:Heating:Water
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "Zone1FanCoilHeatingCoil";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).TypeOf_Num = 21; // Pipe:Adiabatic
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).Name = "Pipe";
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumOut = 3;
     PlantCondLoopOperation::SetupPlantEMSActuators(*state);
 
     // set flow, max and maxavail on the nodes
@@ -450,13 +451,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     // set up EMS
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::SetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent full flow
     // SetComponentFlowRate(*state, CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
@@ -480,13 +481,13 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(Node(3).MassFlowRateRequest, NodeMdot);
 
     // set dummy EMS value
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should remain on this call since EMS calling manager uses BeginTimestepBeforePredictor as the calling point
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginNewEnvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
 
     // expect node data to represent full flow
     SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
@@ -512,8 +513,8 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     // override flag should also be true
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
 
-    EXPECT_TRUE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
-    EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
+    EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
     Real64 tempNodeMdot(NodeMdot);
 
     // expect node data to represent no flow. Max, MaxAvail, and Request are not changed
@@ -915,8 +916,11 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     ErlValueType ReturnValue;
     bool seriousErrorFound = false;
     state->dataEMSMgr->FinishProcessingUserInput = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(*state,
-        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack)).Instruction(1).Argument2,
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+        *state,
+        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
+            .Instruction(1)
+            .Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
     EXPECT_TRUE(seriousErrorFound);
 
@@ -924,8 +928,12 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     // now check that it worked, should stay false
     seriousErrorFound = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(*state,
-        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack)).Instruction(1).Argument2, seriousErrorFound);
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+        *state,
+        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
+            .Instruction(1)
+            .Argument2,
+        seriousErrorFound);
     EXPECT_FALSE(seriousErrorFound);
 }
 
@@ -1345,7 +1353,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR29");
     EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3295072808, 0.00000001); // RhFnTdbRhov 30.0 0.01 =
 
-    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operator, FuncRhFnTdbRhovLBnd0C); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
+    EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operator,
+              FuncRhFnTdbRhovLBnd0C); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).NumOperands, 2);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operand.size(), 2u);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operand(2).Type, 1); // argument was passed to EMS function
@@ -1366,7 +1375,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operand.size(), 3u);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
-    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
+              "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
     EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operator, FuncVFnTdbWPb);
@@ -1374,7 +1384,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operand.size(), 3u);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operand(3).Type, 1); // argument was passed to EMS function
     index = 33 + offset;
-    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR33"); // http://www.sugartech.co.za/psychro/ 30 C db, 14.043895 dp = 0.8432375 m3/kg
+    EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
+              "VAR33"); // http://www.sugartech.co.za/psychro/ 30 C db, 14.043895 dp = 0.8432375 m3/kg
     EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.873152783, 0.00000001); // VFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).Operator, FuncWFnTdpPb);
@@ -1551,8 +1562,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     Node.allocate(3);
     NodeID.allocate(3);
     state->dataRuntimeLang->EMSActuatorUsed.allocate(3);
-    OutAirNodeManager::NumOutsideAirNodes = 3;
-    OutAirNodeManager::OutsideAirNodeList.allocate(3);
+    state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
 
     NodeID(1) = "Node1";
     NodeID(2) = "Node2";
@@ -1566,9 +1577,9 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
     Node(2).MassFlowRate = 0.1;
     Node(3).MassFlowRate = 0.1;
 
-    OutAirNodeManager::OutsideAirNodeList(1) = 1;
-    OutAirNodeManager::OutsideAirNodeList(2) = 2;
-    OutAirNodeManager::OutsideAirNodeList(3) = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     state->dataRuntimeLang->EMSActuatorUsed(1).ComponentTypeName = "Outdoor Air System Node";
     state->dataRuntimeLang->EMSActuatorUsed(2).ComponentTypeName = "";
     state->dataRuntimeLang->EMSActuatorUsed(3).ComponentTypeName = "Outdoor Air System Node";
@@ -1615,8 +1626,10 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     DataSurfaces::TotSurfaces = 2;
 
-    DataSurfaces::Surface(1).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
-    DataSurfaces::Surface(2).activeWindowShadingControl = DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
+    DataSurfaces::Surface(1).activeWindowShadingControl =
+        DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+    DataSurfaces::Surface(2).activeWindowShadingControl =
+        DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
     SetupWindowShadingControlActuators(*state);
 
@@ -1631,7 +1644,6 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(*state);
     EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
-
 }
 TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 {
@@ -1858,7 +1870,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
         "Set TomorrowAlb = @TomorrowAlbedo iHour iTimeStep,",
         "Set TomorrowPrecip = @TomorrowLiquidPrecip iHour iTimeStep;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1890,7 +1902,7 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
     int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayRain", 1);
     ASSERT_GT(internalVarNum, 0);
     bool rainTrueFalse = (state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number > 0.0);
-    EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3,5+1), rainTrueFalse);
+    EXPECT_EQ(state->dataWeatherManager->TodayIsRain(3, 5 + 1), rainTrueFalse);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodaySnow", 1);
     ASSERT_GT(internalVarNum, 0);
@@ -1903,7 +1915,8 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayDewPoint", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TodayOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TodayOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TodayBaroPress", 1);
     ASSERT_GT(internalVarNum, 0);
@@ -1958,15 +1971,18 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDryBulb", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TomorrowOutDryBulbTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDewPoint", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TomorrowOutDewPointTemp(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBaroPress", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowOutBaroPress(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TomorrowOutBaroPress(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowRelHum", 1);
     ASSERT_GT(internalVarNum, 0);
@@ -1990,7 +2006,8 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowBeamSol", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowBeamSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TomorrowBeamSolarRad(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowDifSol", 1);
     ASSERT_GT(internalVarNum, 0);
@@ -2002,5 +2019,216 @@ TEST_F(EnergyPlusFixture, EMS_TodayTomorrowFunctions)
 
     internalVarNum = RuntimeLanguageProcessor::FindEMSVariable(*state, "TomorrowPrecip", 1);
     ASSERT_GT(internalVarNum, 0);
-    EXPECT_NEAR(state->dataWeatherManager->TomorrowLiquidPrecip(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+    EXPECT_NEAR(
+        state->dataWeatherManager->TomorrowLiquidPrecip(3, 5 + 1), state->dataRuntimeLang->ErlVariable(internalVarNum).Value.Number, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
+{
+    std::string const idf_objects = delimited_string({
+        "Version,9.3;",
+
+        "SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "SizingPeriod:DesignDay,",
+        "    SunnyWinterDay,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    WinterDesignDay,         !- Day Type",
+        "    5.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    0.0,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    4.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+        
+        "Material,",
+        "    Concrete Block,          !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.3805070,               !- Conductivity {W/m-K}",
+        "    608.7016,                !- Density {kg/m3}",
+        "    836.8000;                !- Specific Heat {J/kg-K}",
+        
+        "Construction,",
+        "    ConcConstruction,        !- Name",
+        "    Concrete Block;          !- Outside Layer",
+        
+        "WindowMaterial:SimpleGlazingSystem,",
+        "    WindowMaterial,          !- Name",
+        "    1.87374,                 !- U-Factor {W/m2-K}",
+        "    0.45;                    !- Solar Heat Gain Coefficient",
+        
+        "Construction,",
+        "    WindowConstruction 1,    !- Name",
+        "    WindowMaterial;          !- Outside Layer",
+        
+        "FenestrationSurface:Detailed,",
+        "    FenestrationSurface,     !- Name",
+        "    Window,                  !- Surface Type",
+        "    WindowConstruction 1,      !- Construction Name",
+        "    Wall,                    !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    0.200000,0.000000,9.900000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.200000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    9.900000,0.000000,0.1000000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    9.900000,0.000000,9.900000;  !- X,Y,Z ==> Vertex 4 {m}",
+        
+        "BuildingSurface:Detailed,"
+        "    Wall,                    !- Name",
+        "    Wall,                    !- Surface Type",
+        "    ConcConstruction,        !- Construction Name",
+        "    Zone,                    !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000,0.000000,10.00000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    10.00000,0.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    10.00000,0.000000,10.00000;  !- X,Y,Z ==> Vertex 4 {m}",
+        
+        "BuildingSurface:Detailed,"
+        "    Floor,                   !- Name",
+        "    Floor,                   !- Surface Type",
+        "    ConcConstruction,        !- Construction Name",
+        "    Zone,                    !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.0,                     !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000,0.000000,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,10.000000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    10.00000,10.000000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    10.00000,0.000000,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        
+        "Zone,"
+        "    Zone,                    !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    6.000000,                !- X Origin {m}",
+        "    6.000000,                !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+        
+        "EnergyManagementSystem:Actuator,",
+        "    south_window_view_factor_ground_act,  !- Name",
+        "    FenestrationSurface,             !- Actuated Component Unique Name",
+        "    Surface,                 !- Actuated Component Type",
+        "    View Factor To Ground;   !- Actuated Component Control Type",
+        
+        "EnergyManagementSystem:Actuator,",
+        "    surface_south_window_view_factor_ground_act,  !- Name",
+        "    Wall,     !- Actuated Component Unique Name",
+        "    Surface,                 !- Actuated Component Type",
+        "    View Factor To Ground;   !- Actuated Component Control Type",
+        
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "    window_view_factor_ground calling manager,  !- Name",
+        "    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+        "    window_view_factor_ground_adj;  !- Program Name 1",
+        
+        "EnergyManagementSystem:ProgramCallingManager,",
+        "    surface_view_factor_ground calling manager,  !- Name",
+        "    BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point",
+        "    surface_view_factor_ground_adj;  !- Program Name 1",
+        
+        "EnergyManagementSystem:Program,",
+        "    window_view_factor_ground_adj,  !- Name",
+        "    IF (DayOfYear >= 1) && (DayOfYear <= 120),  !- Program Line 1",
+        "    Set south_window_view_factor_ground_act = 0.5 * 0.85,  !- Program Line 2",
+        "    ELSEIF (DayOfYear > 120) && (DayOfYear <= 320),  !- A4",
+        "    Set south_window_view_factor_ground_act = 0.5 * 0.7,  !- A5",
+        "    ELSEIF (DayOfYear > 320) && (DayOfYear <= 365),  !- A6",
+        "    Set south_window_view_factor_ground_act = 0.5 * 0.85,  !- A7",
+        "    ENDIF;                   !- A8",
+        
+            "EnergyManagementSystem:Program,",
+        "    surface_view_factor_ground_adj,  !- Name",
+        "    IF (DayOfYear >= 1) && (DayOfYear <= 120),  !- Program Line 1",
+        "    Set surface_south_window_view_factor_ground_act = 0.5 * 0.85,  !- Program Line 2",
+        "    ELSEIF (DayOfYear > 120) && (DayOfYear <= 320),  !- A4",
+        "    Set surface_south_window_view_factor_ground_act = 0.5 * 0.7,  !- A5",
+        "    ELSEIF (DayOfYear > 320) && (DayOfYear <= 365),  !- A6",
+        "    Set surface_south_window_view_factor_ground_act = 0.5 * 0.85,  !- A7",
+        "    ENDIF;                   !- A8",
+    });
+ 
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(*state);
+
+    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    int wallSurfNum = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
+    bool anyRan;
+
+    // Test 1 - Set day of year to 121
+    state->dataGlobal->DayOfSim = 121; // avoid array bounds problem in RecKeepHeatBalance
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 11;
+    state->dataEnvrn->Month = 5;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataEnvrn->DayOfYear = 121;
+
+    HeatBalanceManager::ManageHeatBalance(*state);
+    // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
+    HeatBalanceManager::ManageHeatBalance(*state);
+
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
+    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).ViewFactorGround, 0.35);
+    EXPECT_EQ(DataSurfaces::Surface(wallSurfNum).ViewFactorGround, 0.35);
+    
+    // Test 2 - Set day of year to 321
+    state->dataGlobal->DayOfSim = 321; // avoid array bounds problem in RecKeepHeatBalance
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 11;
+    state->dataEnvrn->Month = 11;
+    state->dataEnvrn->DayOfMonth = 17;
+    state->dataEnvrn->DayOfYear = 321;
+
+    HeatBalanceManager::ManageHeatBalance(*state);
+    // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
+    HeatBalanceManager::ManageHeatBalance(*state);
+
+    EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
+    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).ViewFactorGround, 0.425);
+    EXPECT_EQ(DataSurfaces::Surface(wallSurfNum).ViewFactorGround, 0.425);
 }

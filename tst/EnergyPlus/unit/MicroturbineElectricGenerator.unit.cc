@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/MicroturbineElectricGenerator.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
 
 using namespace EnergyPlus::MicroturbineElectricGenerator;
 
@@ -128,7 +127,7 @@ TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
     DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
     GetMTGeneratorInput(*state);
 
-    EXPECT_EQ(MTGenerator(1).FuelType, "NaturalGas");
+    EXPECT_EQ(state->dataMircoturbElectGen->MTGenerator(1).FuelType, "NaturalGas");
 }
 
 } // namespace EnergyPlus

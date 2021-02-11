@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -67,18 +67,15 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -104,10 +101,6 @@ using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
 
 using DataHeatBalFanSys::TempControlType;
-using DataZoneEnergyDemands::CurDeadBandOrSetback;
-using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-using MixedAir::OAMixer;
 
 namespace EnergyPlus {
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
@@ -129,7 +122,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -261,7 +254,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -274,8 +267,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -283,16 +276,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -341,13 +334,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -362,27 +355,27 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -412,14 +405,13 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
 
-        PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     {
@@ -440,7 +432,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -574,7 +566,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -587,8 +579,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -597,16 +589,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -655,13 +647,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -676,27 +668,27 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
         HeatingLoad = false;
         CoolingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = -4000.0;
@@ -725,14 +717,13 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         state->dataGlobal->DoingSizing = false;
-        PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     {
@@ -753,7 +744,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -885,7 +876,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -898,8 +889,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -907,16 +898,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -972,13 +963,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -996,25 +987,25 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 2;
         FanCoil(1).HeatCoilLoopNum = 1;
@@ -1029,9 +1020,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -1059,7 +1050,7 @@ namespace EnergyPlus {
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         FirstHVACIteration = false;
-        PlantLoop(1).LoopSide(1).FlowLock = 1;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
         Node(FanCoil(1).HeatCoilFluidInletNode).MassFlowRate = 0.2;
         // Simulate with flow lock on and locked flow > demand flow; bypass extra flow
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1075,8 +1066,8 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         // normal heating, no flow lock, heating capacity exceeded
         QZnReq = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(4420.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
@@ -1084,8 +1075,8 @@ namespace EnergyPlus {
 
         // Coil Off Capacity Test #1 - low heating load, no flow lock, setting QUnitOutNoHC when flow lock = 0
         QZnReq = 80.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 80.00;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC hits the 80 W target load
         EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1096,9 +1087,9 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // Coil Off Capacity Test #2 - lock plant flow after previous call
-        PlantLoop(1).LoopSide(1).FlowLock = 1;
-        Node(OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
-        Node(OAMixer(1).RetNode).Enthalpy = 39000;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 25.0; // change inlet air condition so off capacity will change to see if QUnitOutNoHC remains fixed
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 39000;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC does not hit the 80 W target load since flow is locked at a low value
         EXPECT_NEAR(52.0, QUnitOut, 1.0);
@@ -1110,7 +1101,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // Coil Off Capacity Test #3 - unlock plant flow to ensure that water flow rate would have been different had flow not been locked
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         // FC hits the 80 W target load
         EXPECT_NEAR(80.0, QUnitOut, 1.0);
@@ -1140,7 +1131,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1263,7 +1254,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1276,8 +1267,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", FanCoil(1).HCoilType);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1285,16 +1276,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1340,13 +1331,13 @@ namespace EnergyPlus {
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -1359,15 +1350,15 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(1).Name = "ChilledWaterLoop";
-        PlantLoop(1).FluidName = "ChilledWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 1;
         FanCoil(1).HeatCoilLoopNum = 0;
@@ -1382,9 +1373,9 @@ namespace EnergyPlus {
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = 4000.0;
@@ -1413,21 +1404,20 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
         // normal heating, heating capacity exceeded
         QZnReq = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 5000.00;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(4575.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         state->dataGlobal->DoingSizing = false;
-        PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     {
@@ -1448,7 +1438,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1582,7 +1572,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1595,8 +1585,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1605,16 +1595,16 @@ namespace EnergyPlus {
         HotWaterMassFlowRate = 0.0;
         ColdWaterMassFlowRate = 0.14;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 24.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 24.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 30.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 53000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 30.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 53000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -1670,13 +1660,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -1694,25 +1684,25 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-        PlantLoop(1).LoopSide(1).FlowLock = 0;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
 
         FanCoil(1).CoolCoilLoopNum = 2;
         FanCoil(1).HeatCoilLoopNum = 1;
@@ -1727,9 +1717,9 @@ namespace EnergyPlus {
 
         HeatingLoad = false;
         CoolingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.00;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -8000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QZnReq = -4000.0;
@@ -1757,7 +1747,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         FirstHVACIteration = false;
-        PlantLoop(2).LoopSide(1).FlowLock = 1;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
         Node(FanCoil(1).CoolCoilFluidInletNode).MassFlowRate = 0.2;
         // cooling simulation with flow lock on and locked flow > flow that meets load; bypass extra flow
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
@@ -1775,8 +1765,8 @@ namespace EnergyPlus {
 
         // normal cooling, no flow lock, cooling capacity exceeded
         QZnReq = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
-        PlantLoop(2).LoopSide(1).FlowLock = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.00;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Unlocked;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, LatOutputProvided);
         EXPECT_NEAR(-4420.0, QUnitOut, 5.0);
         // expect inlet and outlet node air mass flow rates are equal
@@ -1800,7 +1790,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1938,7 +1928,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -1951,8 +1941,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -1960,16 +1950,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2019,13 +2009,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2040,29 +2030,29 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -2088,8 +2078,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -2115,7 +2105,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2124,7 +2114,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2134,8 +2124,8 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2144,8 +2134,8 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -5000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4255.0;
         QZnReq = -4255.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2154,7 +2144,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2163,7 +2153,7 @@ namespace EnergyPlus {
         EXPECT_EQ(Node(FanCoil(1).AirInNode).MassFlowRate, Node(FanCoil(1).AirOutNode).MassFlowRate);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         EXPECT_NEAR(QZnReq, QUnitOut, 5.0);
@@ -2174,14 +2164,13 @@ namespace EnergyPlus {
 
         state->dataGlobal->DoingSizing = false;
 
-        PlantLoop.deallocate();
-        ZoneSysEnergyDemand.deallocate();
+        state->dataPlnt->PlantLoop.deallocate();
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
         FanCoil.deallocate();
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
-        ZoneEquipConfig.deallocate();
+        state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
 
     Real64 ResidualFancoil(EnergyPlusData &state, Real64 const mdot,
@@ -2214,11 +2203,11 @@ namespace EnergyPlus {
         bool FirstHVACIteration(false);
         bool ErrorsFound(false);
         Real64 QZnReq(-1000.0);
-        DataPlant::TotNumLoops = 2;
+        state->dataPlnt->TotNumLoops = 2;
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2274,21 +2263,21 @@ namespace EnergyPlus {
         // OutputProcessor::TimeValue.allocate(2);
 
         GetZoneData(*state, ErrorsFound);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         SetPredefinedTables(*state);
         GetFanInput(*state);
         GetFanCoilUnits(*state);
 
-        PlantLoop.allocate(TotNumLoops);
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2303,23 +2292,23 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         bool CoolingLoad = true;
         bool HeatingLoad = false;
@@ -2503,7 +2492,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2648,7 +2637,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanInput(*state);
@@ -2661,8 +2650,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", FanCoil(1).CCoilType);
         EXPECT_EQ("COIL:HEATING:WATER", FanCoil(1).HCoilType);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -2670,16 +2659,16 @@ namespace EnergyPlus {
         ColdWaterMassFlowRate = 0.0;
         HotWaterMassFlowRate = 1.0;
 
-        Node(OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
-        Node(OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRate = AirMassFlow;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).MassFlowRateMax = MaxAirMassFlow;
 
-        Node(OAMixer(1).RetNode).Temp = 22.0;
-        Node(OAMixer(1).RetNode).Enthalpy = 36000;
-        Node(OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).RetNode).Temp, Node(OAMixer(1).RetNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Temp = 22.0;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy = 36000;
+        Node(state->dataMixedAir->OAMixer(1).RetNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).RetNode).Temp, Node(state->dataMixedAir->OAMixer(1).RetNode).Enthalpy);
 
-        Node(OAMixer(1).InletNode).Temp = 10.0;
-        Node(OAMixer(1).InletNode).Enthalpy = 18000;
-        Node(OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(OAMixer(1).InletNode).Temp, Node(OAMixer(1).InletNode).Enthalpy);
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Temp = 10.0;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy = 18000;
+        Node(state->dataMixedAir->OAMixer(1).InletNode).HumRat = PsyWFnTdbH(*state, Node(state->dataMixedAir->OAMixer(1).InletNode).Temp, Node(state->dataMixedAir->OAMixer(1).InletNode).Enthalpy);
 
         Node(FanCoil(1).AirInNode).MassFlowRate = AirMassFlow;
         Node(FanCoil(1).AirInNode).MassFlowRateMin = AirMassFlow;
@@ -2728,13 +2717,13 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = HotWaterMassFlowRate;
         state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
@@ -2749,30 +2738,30 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
-        PlantLoop(2).Name = "ChilledWaterLoop";
-        PlantLoop(2).FluidName = "ChilledWater";
-        PlantLoop(2).FluidIndex = 1;
-        PlantLoop(2).FluidName = "WATER";
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-        PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(2).Name = "ChilledWaterLoop";
+        state->dataPlnt->PlantLoop(2).FluidName = "ChilledWater";
+        state->dataPlnt->PlantLoop(2).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(2).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_Cooling;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
-        PlantLoop(1).Name = "HotWaterLoop";
-        PlantLoop(1).FluidName = "HotWater";
-        PlantLoop(1).FluidIndex = 1;
-        PlantLoop(1).FluidName = "WATER";
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-        PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+        state->dataPlnt->PlantLoop(1).Name = "HotWaterLoop";
+        state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
+        state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+        state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
         FanCoil(1).SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -2798,8 +2787,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -2825,8 +2814,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow, 0.0000000001);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -2838,8 +2827,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).LowSpeedRatio, 0.0000000001);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -2851,9 +2840,9 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).MedSpeedRatio, 0.0000000001);
 
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -2865,8 +2854,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow, 0.0000000001);
 
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -2878,8 +2867,8 @@ namespace EnergyPlus {
         EXPECT_NEAR(Node(1).MassFlowRate, FanCoil(1).PLR * FanCoil(1).MaxAirMassFlow * FanCoil(1).LowSpeedRatio, 0.0000000001);
 
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -2908,7 +2897,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3066,7 +3055,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
 
@@ -3081,8 +3070,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 2;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 2;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
@@ -3100,7 +3089,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
 
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3148,18 +3137,18 @@ namespace EnergyPlus {
         HWCoil.WaterLoopBranchNum = 1;
         HWCoil.WaterLoopCompNum = 1;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(2));
+        auto &CWLoop(state->dataPlnt->PlantLoop(2));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3169,7 +3158,7 @@ namespace EnergyPlus {
         CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
         CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
         // hot water plant loop
-        auto &HWLoop(PlantLoop(1));
+        auto &HWLoop(state->dataPlnt->PlantLoop(1));
         HWLoop.Name = "HotWaterLoop";
         HWLoop.FluidName = "HotWater";
         HWLoop.FluidIndex = 1;
@@ -3182,10 +3171,10 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 4000.0;
         thisFanCoil.SpeedFanSel = 2;
         QUnitOut = 0.0;
         QLatOut = 0.0;
@@ -3211,8 +3200,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -3237,8 +3226,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
         QZnReq = 1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -3248,8 +3237,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2500.0;
         QZnReq = 2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -3261,9 +3250,9 @@ namespace EnergyPlus {
 
         // cooling mode tests
         // expect full flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -4000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -4000.0;
         QZnReq = -4000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 3 and near full air and water flow and meet capacity
@@ -3273,8 +3262,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow, 0.0000000001);
         // expect minimum flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
         QZnReq = -1000.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 1 and moderate air and water flow and meet capacity
@@ -3284,8 +3273,8 @@ namespace EnergyPlus {
         // cycling fan proportional to PLR and fan speed ratio
         EXPECT_NEAR(Node(1).MassFlowRate, thisFanCoil.PLR * thisFanCoil.MaxAirMassFlow * thisFanCoil.LowSpeedRatio, 0.0000000001);
         // expect modulated flow and meet capacity
-        ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
-        ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2500.0;
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -2500.0;
         QZnReq = -2500.0;
         Sim4PipeFanCoil(*state, FanCoilNum, ZoneNum, ZoneNum, FirstHVACIteration, QUnitOut, QLatOut);
         // expect fan speed 2 and moderate air and water flow and meet capacity
@@ -3312,7 +3301,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3468,7 +3457,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -3480,8 +3469,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3494,7 +3483,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3529,18 +3518,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3558,8 +3547,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -3573,8 +3562,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -3679,7 +3668,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3835,7 +3824,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -3847,8 +3836,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -3861,7 +3850,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -3896,18 +3885,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -3925,8 +3914,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -3940,8 +3929,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -4046,7 +4035,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -4202,7 +4191,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4214,8 +4203,8 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
         EXPECT_EQ(DataHVACGlobals::FanType_SystemModelObject, thisFanCoil.FanType_Num);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
@@ -4228,7 +4217,7 @@ namespace EnergyPlus {
         Node(thisFanCoil.AirInNode).MassFlowRateMax = MaxAirMassFlow;
         Node(thisFanCoil.AirInNode).MassFlowRateMaxAvail = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 22.0;
@@ -4263,18 +4252,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -4292,8 +4281,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->StdRhoAir = 1.2;
         state->dataEnvrn->Month = 1;
@@ -4307,8 +4296,8 @@ namespace EnergyPlus {
         ZoneEqSizing.allocate(1);
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
         ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;
@@ -4524,7 +4513,7 @@ namespace EnergyPlus {
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", Zone(1).Name);
-        GetZoneEquipmentData1(*state);
+        GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
@@ -4535,15 +4524,15 @@ namespace EnergyPlus {
         EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
         EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
 
-        TotNumLoops = 1;
-        PlantLoop.allocate(TotNumLoops);
+        state->dataPlnt->TotNumLoops = 1;
+        state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         AirMassFlow = 0.60;
         MaxAirMassFlow = 0.60;
         ColdWaterMassFlowRate = 1.0;
         thisFanCoil.OutAirMassFlow = 0.0;
         thisFanCoil.MaxAirMassFlow = MaxAirMassFlow;
         // outside air mixer
-        auto &MixerOA(OAMixer(1));
+        auto &MixerOA(state->dataMixedAir->OAMixer(1));
         Node(MixerOA.RetNode).MassFlowRate = AirMassFlow;
         Node(MixerOA.RetNode).MassFlowRateMax = MaxAirMassFlow;
         Node(MixerOA.RetNode).Temp = 20.0;
@@ -4575,18 +4564,18 @@ namespace EnergyPlus {
         Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
         Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
-        for (int l = 1; l <= TotNumLoops; ++l) {
-            auto &loop(PlantLoop(l));
+        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
+            auto &loop(state->dataPlnt->PlantLoop(l));
             loop.LoopSide.allocate(2);
-            auto &loopside(PlantLoop(l).LoopSide(1));
+            auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(PlantLoop(l).LoopSide(1).Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
             loopsidebranch.TotalComponents = 1;
             loopsidebranch.Comp.allocate(1);
         }
         // chilled water plant loop
-        auto &CWLoop(PlantLoop(1));
+        auto &CWLoop(state->dataPlnt->PlantLoop(1));
         CWLoop.Name = "ChilledWaterLoop";
         CWLoop.FluidName = "ChilledWater";
         CWLoop.FluidIndex = 1;
@@ -4604,8 +4593,8 @@ namespace EnergyPlus {
         // heating mode tests
         CoolingLoad = false;
         HeatingLoad = true;
-        ZoneSysEnergyDemand.allocate(1);
-        auto &zSysEDemand(ZoneSysEnergyDemand(1));
+        state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+        auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));
 
         state->dataEnvrn->Month = 1;
         state->dataEnvrn->DayOfMonth = 21;
@@ -4616,8 +4605,8 @@ namespace EnergyPlus {
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
         ZoneEqSizing.allocate(1);
-        CurDeadBandOrSetback.allocate(1);
-        CurDeadBandOrSetback(1) = false;
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
+        state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
         ZoneSizingRunDone = true;

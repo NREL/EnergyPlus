@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,8 +87,6 @@ namespace SwimmingPool {
         std::string ActivityFactorSchedName;    // Activity factor schedule name
         int ActivityFactorSchedPtr;             // Activity factor schedule pointer
         Real64 CurActivityFactor;               // Current activity factor value
-        std::string MakeupWaterSupplyName;      // Name of make-up water source
-        std::string MakeupWaterSupplySchedName; // Name of make-up water supply schedule
         int MakeupWaterSupplySchedPtr;          // Index to schedule for make-up water
         Real64 CurMakeupWaterTemp;              // Current makeup water temperature
         std::string CoverSchedName;             // Pool cover schedule name
@@ -104,7 +102,6 @@ namespace SwimmingPool {
         Real64 CurCoverLWRadFac;                // Current pool cover long-wavelength radiation factor
         Real64 RadConvertToConvect;             // LW and SW radiation converted to convective gain by pool cover in W/m2
         Real64 MiscPowerFactor;                 // Pool miscellaneous power equipment consumption coefficient in W/(kg/s)
-        std::string SetPtTempSchedName;         // Schedule name for water setpoint temperature
         int SetPtTempSchedPtr;                  // Schedule pointer for water setpoint temperature
         Real64 CurSetPtTemp;                    // Current water setpoint temperature
         Real64 MaxNumOfPeople;                  // Number of people in the pool as defined by user input
@@ -163,9 +160,9 @@ namespace SwimmingPool {
         void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
-                                        std::string const Alpha1,
-                                        std::string const Alpha2,
-                                        std::string const cAlphaField2,
+                                        std::string const &Alpha1,
+                                        std::string const &Alpha2,
+                                        std::string const &cAlphaField2,
                                         bool &ErrorsFound
         );
 
@@ -176,8 +173,7 @@ namespace SwimmingPool {
 
         void initSwimmingPoolPlantLoopIndex(EnergyPlusData &state);
 
-        void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-        );
+        void initSwimmingPoolPlantNodeFlow() const;
 
         void calculate(EnergyPlusData &state);
 
