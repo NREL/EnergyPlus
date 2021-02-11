@@ -874,7 +874,8 @@ namespace Psychrometrics {
         } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
             Pascal = 1555000.0;
         }
-
+        Real64 if97_pressure = psat97(double(Tkel));
+        Real64 if97_compare = (Pascal - if97_pressure) / Pascal;
         return Pascal;
     }
 
