@@ -2048,7 +2048,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         return GetStandAloneERVReturnAirNode;
     }
 
-    bool StandAloneERVAFNExceptions(EnergyPlusData &state, int const NodeNumber)
+    bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     {
         // PURPOSE OF THIS FUNCTION:
         // Check if a node is used by a stand alone ERV
@@ -2069,13 +2069,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) { 
 
             auto StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
-
-            // Supply air inlet node
-            if (NodeNumber == StandAloneERV.SupplyAirInletNode) {
-                StandSloneERVAFNException = true;
-                break;
-            }
-
             bool ErrorsFound{false};
             int SupplyFanInletNodeIndex(0);
             int SupplyFanOutletNodeIndex(0);
@@ -2084,8 +2077,8 @@ namespace EnergyPlus::HVACStandAloneERV {
             Real64 SupplyFanAirFlow;
             Real64 ExhaustFanAirFlow;
 
+            // Get supply air fan inlet and outlet node index and air flow
             // ZoneHVAC:EnergyRecoveryVentilator only accepts Fan:SystemModel or Fan:OnOff
-            // Supply air fan
             if (StandAloneERV.SupplyAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 // Fan:SystemModel
                 SupplyFanInletNodeIndex = HVACFan::fanObjs[StandAloneERV.SupplyAirFanIndex]->inletNodeNum;
@@ -2101,7 +2094,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                     ErrorsFound = true;
                 }
             }
-            // Exhaust air fan
+            // Get exhaust air fan inlet and outlet node index and air flow
             if (StandAloneERV.ExhaustAirFanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 // Fan:SystemModel
                 ExhaustFanInletNodeIndex = HVACFan::fanObjs[StandAloneERV.ExhaustAirFanIndex]->inletNodeNum;
@@ -2124,7 +2117,15 @@ namespace EnergyPlus::HVACStandAloneERV {
                 break;
             }
 
-            if (NodeNumber == SupplyFanInletNodeIndex || NodeNumber == SupplyFanOutletNodeIndex) {
+            // Supply air fan nodes
+            if (NodeNumber == SupplyFanInletNodeIndex || NodeNumber == SupplyFanOutletNodeIndex || NodeNumber == ExhaustFanInletNodeIndex ||
+                NodeNumber == ExhaustFanOutletNodeIndex) {
+                StandSloneERVAFNException = true;
+                break;
+            }
+
+            // Supply air inlet node
+            if (NodeNumber == StandAloneERV.SupplyAirInletNode) {
                 StandSloneERVAFNException = true;
                 break;
             }

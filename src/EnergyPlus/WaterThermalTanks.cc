@@ -11855,7 +11855,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    bool HeatPumpWaterHeaterNodeAFNExceptions(EnergyPlusData &state, int const NodeNumber)
+    bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber)
     {
         // PURPOSE OF THIS FUNCTION:
         // Check if a node is used by a heat pump water heater
@@ -11878,7 +11878,7 @@ namespace WaterThermalTanks {
             // Get heat pump water heater data
             HeatPumpWaterHeaterData &HPWH = state.dataWaterThermalTanks->HPWaterHeater(HeatPumpWaterHeaterIndex);
 
-            // "Zone and outdoor air" configuration is expected to change the zone pressure balance
+            // "Zone and outdoor air" configuration is expected break the conservation of mass
             if (HPWH.InletAirConfiguration != AmbientTempEnum::ZoneAndOA) {
 
                 // Air outlet node

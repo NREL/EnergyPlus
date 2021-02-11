@@ -894,7 +894,7 @@ namespace WaterThermalTanks {
 
     int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
-    bool HeatPumpWaterHeaterNodeAFNExceptions(EnergyPlusData &state, int const NodeNumber);
+    bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber);
 
 } // namespace WaterThermalTanks
 
