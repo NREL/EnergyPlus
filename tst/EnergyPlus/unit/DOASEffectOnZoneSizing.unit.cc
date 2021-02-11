@@ -292,27 +292,27 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     SizeZoneEquipment(*state);
 
     EXPECT_DOUBLE_EQ(12.2, CalcZoneSizing(1, 1).DOASSupTemp);
-    EXPECT_NEAR(.00795195, CalcZoneSizing(1, 1).DOASSupHumRat, .00000001);
+    EXPECT_NEAR(.00795195, CalcZoneSizing(1, 1).DOASSupHumRat, .000002);
     EXPECT_DOUBLE_EQ(0.1, CalcZoneSizing(1, 1).DOASSupMassFlow);
-    EXPECT_NEAR(-999.229, CalcZoneSizing(1, 1).DOASHeatAdd, .001);
+    EXPECT_NEAR(-999.229, CalcZoneSizing(1, 1).DOASHeatAdd, .005);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 1).DOASHeatLoad);
-    EXPECT_NEAR(-999.229, CalcZoneSizing(1, 1).DOASCoolLoad, .001);
-    EXPECT_NEAR(-1011.442, CalcZoneSizing(1, 1).DOASTotCoolLoad, .001);
-    EXPECT_NEAR(4599.229, CalcZoneSizing(1, 1).HeatLoad, .001);
+    EXPECT_NEAR(-999.229, CalcZoneSizing(1, 1).DOASCoolLoad, .005);
+    EXPECT_NEAR(-1011.442, CalcZoneSizing(1, 1).DOASTotCoolLoad, .5);
+    EXPECT_NEAR(4599.229, CalcZoneSizing(1, 1).HeatLoad, .005);
     EXPECT_NEAR(.161083, CalcZoneSizing(1, 1).HeatMassFlow, .00001);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 1).CoolLoad);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 1).CoolMassFlow);
 
     EXPECT_DOUBLE_EQ(12.2, CalcZoneSizing(1, 2).DOASSupTemp);
-    EXPECT_NEAR(.00795195, CalcZoneSizing(1, 2).DOASSupHumRat, .00000001);
+    EXPECT_NEAR(.00795195, CalcZoneSizing(1, 2).DOASSupHumRat, .000002);
     EXPECT_DOUBLE_EQ(0.11, CalcZoneSizing(1, 2).DOASSupMassFlow);
-    EXPECT_NEAR(-1155.232, CalcZoneSizing(1, 2).DOASHeatAdd, .001);
+    EXPECT_NEAR(-1155.232, CalcZoneSizing(1, 2).DOASHeatAdd, .005);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 2).DOASHeatLoad);
-    EXPECT_NEAR(-1155.232, CalcZoneSizing(1, 2).DOASCoolLoad, .001);
-    EXPECT_NEAR(-1308.522, CalcZoneSizing(1, 2).DOASTotCoolLoad, .001);
+    EXPECT_NEAR(-1155.232, CalcZoneSizing(1, 2).DOASCoolLoad, .005);
+    EXPECT_NEAR(-1308.522, CalcZoneSizing(1, 2).DOASTotCoolLoad, .5);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 2).HeatLoad);
     EXPECT_DOUBLE_EQ(0.0, CalcZoneSizing(1, 2).HeatMassFlow);
-    EXPECT_NEAR(1444.767, CalcZoneSizing(1, 2).CoolLoad, .001);
+    EXPECT_NEAR(1444.767, CalcZoneSizing(1, 2).CoolLoad, .005);
     EXPECT_NEAR(.127528, CalcZoneSizing(1, 2).CoolMassFlow, .000001);
 
     Node.deallocate();

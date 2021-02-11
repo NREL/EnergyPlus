@@ -3770,8 +3770,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ASSERT_EQ(ZoneInletAirNode,
               state->dataZoneEquip->ZoneEquipConfig(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 0.001);
-    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 0.001);
+    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, 1.0);
+    EXPECT_NEAR(11170.869, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity, 1.0);
     EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
@@ -11266,7 +11266,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.02);
     EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.01);
-    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0005);
+    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.02);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
 
@@ -15674,7 +15674,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.02);
     EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.01);
-    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0005);
+    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.02);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.01);
 }
 

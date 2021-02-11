@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
     PB = 0.91325e5;
     result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 18.819;
-    EXPECT_NEAR(actual_result, result, 0.001);
+    EXPECT_NEAR(actual_result, result, 0.002);
 
     // Test 14: Cache version of the function - hit call
     H = 7.5223e4 - 1.78637e4;
@@ -198,19 +198,19 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     TDP = 99.0;
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
 
-    EXPECT_NEAR(17.5250143, W, 0.0001);
+    EXPECT_NEAR(17.5250143, W, 0.002);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid "
         "(PsyWFnTdpPb).",
         "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 101325.00",
-        "   **   ~~~   ** Instead, calculated Humidity Ratio at 99.0 (1 degree less) = 17.5250 will be used. Simulation continues.",
+        "   **   ~~~   ** Instead, calculated Humidity Ratio at 99.0 (1 degree less) = 17.5235 will be used. Simulation continues.",
     });
 
     TDP = 100.0;
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
-    EXPECT_NEAR(17.5250143, W, 0.0001);
+    EXPECT_NEAR(17.5250143, W, 0.002);
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     // Denver barometric pressure
@@ -220,11 +220,11 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
         "(PsyWFnTdpPb).",
         "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
-        "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
+        "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0941 will be used. Simulation continues.",
     });
     Psychrometrics::iPsyErrIndex(5) = 0;
     W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
-    EXPECT_NEAR(20.07942181, W, 0.0001);
+    EXPECT_NEAR(20.07942181, W, 0.02);
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 }
 

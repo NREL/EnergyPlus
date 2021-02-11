@@ -1448,11 +1448,11 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
-    EXPECT_NEAR(57.2028862, Tank.TankTemp, 0.0000001); // final tank temperature
+    EXPECT_NEAR(57.2028862, Tank.TankTemp, 0.0005); // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
     EXPECT_EQ(state->dataWaterThermalTanks->heatMode, HeatPump.Mode);     // expect HP to remain in heating mode
-    EXPECT_NEAR(53.6014431, Tank.TankTempAvg, 0.0000001);             // average tank temp over time step
-    EXPECT_NEAR(53.6014431, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
+    EXPECT_NEAR(53.6014431, Tank.TankTempAvg, 0.0005);             // average tank temp over time step
+    EXPECT_NEAR(53.6014431, Tank.SourceOutletTemp, 0.0005); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp needing only partial HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 56.0;
@@ -1462,11 +1462,11 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
-    EXPECT_NEAR(60.0011328, Tank.TankTemp, 0.0000001);
-    EXPECT_NEAR(0.5548081, HeatPump.HeatingPLR, 0.0000001);
+    EXPECT_NEAR(60.0011328, Tank.TankTemp, 0.0005);
+    EXPECT_NEAR(0.5548081, HeatPump.HeatingPLR, 0.00005);
     EXPECT_EQ(state->dataWaterThermalTanks->floatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
-    EXPECT_NEAR(58.0005664, Tank.TankTempAvg, 0.0000001);       // average tank temp over time step
-    EXPECT_NEAR(58.0005664, Tank.SourceOutletTemp, 0.0000001);  // source outlet = average tank temp
+    EXPECT_NEAR(58.0005664, Tank.TankTempAvg, 0.0005);       // average tank temp over time step
+    EXPECT_NEAR(58.0005664, Tank.SourceOutletTemp, 0.0005);  // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
