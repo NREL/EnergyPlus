@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,22 +47,29 @@
 
 #ifndef HybridEvapCoolingModel_hh_INCLUDED
 #define HybridEvapCoolingModel_hh_INCLUDED
-#include <iostream>
 
+// C++ Headers
+#include <iostream>
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 #define MINIMUM_LOAD_TO_ACTIVATE 0.5 // (kw) sets a minimum load to avoid the system fluttering on and off.
 #define IMPLAUSIBLE_POWER 10000000
+
+// EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HybridEvapCoolingModel {
 
@@ -382,10 +389,10 @@ namespace HybridEvapCoolingModel {
         void Initialize(int ZoneNumber);
         void InitializeModelParams();
         void ResetOutputs();
-        bool MeetsSupplyAirTOC(Real64 Tosa);
-        bool MeetsSupplyAirRHOC(Real64 Wosa);
-        Real64 CheckVal_T(Real64 T);
-        Real64 CheckVal_W(Real64 W, Real64 T, Real64 P); // pascals
+        bool MeetsSupplyAirTOC(EnergyPlusData &state, Real64 Tosa);
+        bool MeetsSupplyAirRHOC(EnergyPlusData &state, Real64 Wosa);
+        Real64 CheckVal_T(EnergyPlusData &state, Real64 T);
+        Real64 CheckVal_W(EnergyPlusData &state, Real64 W, Real64 T, Real64 P); // pascals
         bool SetStandByMode(EnergyPlusData &state, CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra);
         Real64 CalculateTimeStepAverage(SYSTEMOUTPUTS val);
         int SetOperatingSetting(EnergyPlusData &state, CStepInputs StepIns);

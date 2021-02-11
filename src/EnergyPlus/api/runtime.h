@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -190,6 +190,7 @@ ENERGYPLUSLIB_API void registerProgressCallback(EnergyPlusState state, void (*f)
 /// \details During an EnergyPlus simulation, there are a number of output messages being sent to standard output on the
 ///          command line.  This function can be used to get copies of those messages during the simulation which could
 ///          be captured and better presented to the user during an API workflow.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] f The function to be called back during the simulation.  The function should expect one constant char *
 ///              argument, which will be the message being sent to standard output.
 /// \remark This function has limited usefulness in Python Plugin applications, but is highly valuable for being able

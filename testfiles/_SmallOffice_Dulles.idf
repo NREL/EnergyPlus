@@ -159,7 +159,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -4741,7 +4743,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    NaturalGas:Facility,            !- Variable Name
+    NaturalGas:Facility,     !- Variable Name
     0,                       !- Interval Start
     750,                     !- Interval Size
     20;                      !- Interval Count
@@ -4873,9 +4875,9 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    Heating:NaturalGas,             !- Variable or Meter 1 Name
+    Heating:NaturalGas,      !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    WaterSystems:NaturalGas,        !- Variable or Meter 2 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -4913,9 +4915,9 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    Heating:NaturalGas,             !- Variable or Meter 1 Name
+    Heating:NaturalGas,      !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    WaterSystems:NaturalGas,        !- Variable or Meter 2 Name
+    WaterSystems:NaturalGas, !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -5165,7 +5167,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Water Heater Use Side Heat Transfer Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Water Heater NaturalGas Energy, !- Variable or Meter 3 Name
+    Water Heater NaturalGas Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
@@ -5177,11 +5179,11 @@
   Output:Table:Monthly,
     Fan Report,              !- Name
     ,                        !- Digits After Decimal
-    Fan Electricity Energy,     !- Variable or Meter 1 Name
+    Fan Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Fan Rise in Air Temperature,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Fan Electricity Rate,      !- Variable or Meter 3 Name
+    Fan Electricity Rate,    !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Fan Rise in Air Temperature,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 4

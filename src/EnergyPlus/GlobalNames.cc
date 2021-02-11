@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,14 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace GlobalNames {
+namespace EnergyPlus::GlobalNames {
 
     // Module containing the routines dealing with matching and assuring that
     // various component types are unique by name (e.g. Chillers).
@@ -68,55 +65,15 @@ namespace GlobalNames {
     // This module allows for verification of uniqueness (by name) across
     // certain component names (esp. Chillers, Boilers)
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using namespace DataGlobals;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumChillers(0);
-    int NumBoilers(0);
-    int NumBaseboards(0);
-    int NumCoils(0);
-    int numAirDistUnits(0);
-    int CurMaxChillers(0);
-    int CurMaxBoilers(0);
-    int CurMaxBaseboards(0);
-    int CurMaxCoils(0);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
-
-    // Object Data
-    std::unordered_map<std::string, std::string> ChillerNames;
-    std::unordered_map<std::string, std::string> BoilerNames;
-    std::unordered_map<std::string, std::string> BaseboardNames;
-    std::unordered_map<std::string, std::string> CoilNames;
-    std::unordered_map<std::string, std::string> aDUNames;
-
-    // Functions
-
-    void IntraObjUniquenessCheck(std::string &NameToVerify,
+    void IntraObjUniquenessCheck(EnergyPlusData &state,
+                                 std::string &NameToVerify,
                                  std::string const &CurrentModuleObject,
                                  std::string const &FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
                                  bool &ErrorsFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError("E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
+            ShowSevereError(state, "E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
             ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
@@ -127,18 +84,19 @@ namespace GlobalNames {
             UniqueStrings.emplace(NameToVerify);
         } else {
             ErrorsFound = true;
-            ShowSevereError(CurrentModuleObject + " has a duplicate field " + NameToVerify);
+            ShowSevereError(state, CurrentModuleObject + " has a duplicate field " + NameToVerify);
         }
     }
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      std::string const &field_name,
                                      bool &ErrorsFound)
     {
         if (object_name.empty()) {
-            ShowSevereError("E+ object type " + object_name + " cannot have blank " + field_name + " field");
+            ShowSevereError(state, "E+ object type " + object_name + " cannot have blank " + field_name + " field");
             ErrorsFound = true;
             object_name = "xxxxx";
             return true;
@@ -148,19 +106,20 @@ namespace GlobalNames {
             names.emplace(object_name, object_type);
         } else {
             ErrorsFound = true;
-            ShowSevereError(object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+            ShowSevereError(state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
             return true;
         }
         return false;
     }
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      bool &ErrorsFound)
     {
         if (object_name.empty()) {
-            ShowSevereError("E+ object type " + object_name + " has a blank field");
+            ShowSevereError(state, "E+ object type " + object_name + " has a blank field");
             ErrorsFound = true;
             object_name = "xxxxx";
             return true;
@@ -170,14 +129,14 @@ namespace GlobalNames {
             names.emplace(object_name, object_type);
         } else {
             ErrorsFound = true;
-            ShowSevereError(object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+            ShowSevereError(state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
             return true;
         }
         return false;
     }
 
     void
-    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueChillerName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -187,22 +146,22 @@ namespace GlobalNames {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name will be unique in the list of
+        // This subroutine verifies that a new name will be unique in the list of
         // chillers.  If not found in the list, it is added before returning.
 
-        auto const iter = ChillerNames.find(NameToVerify);
-        if (iter != ChillerNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
+        auto const iter = state.dataGlobalNames->ChillerNames.find(NameToVerify);
+        if (iter != state.dataGlobalNames->ChillerNames.end()) {
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
-            ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
-            NumChillers = static_cast<int>(ChillerNames.size());
+            state.dataGlobalNames->ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
+            state.dataGlobalNames->NumChillers = static_cast<int>(state.dataGlobalNames->ChillerNames.size());
         }
     }
 
     void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueBaseboardName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -212,22 +171,22 @@ namespace GlobalNames {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name will be unique in the list of
+        // This subroutine verifies that a new name will be unique in the list of
         // Baseboards.  If not found in the list, it is added before returning.
 
-        auto const iter = BaseboardNames.find(NameToVerify);
-        if (iter != BaseboardNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
+        auto const iter = state.dataGlobalNames->BaseboardNames.find(NameToVerify);
+        if (iter != state.dataGlobalNames->BaseboardNames.end()) {
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
-            BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
-            NumBaseboards = static_cast<int>(BaseboardNames.size());
+            state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
+            state.dataGlobalNames->NumBaseboards = static_cast<int>(state.dataGlobalNames->BaseboardNames.size());
         }
     }
 
     void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    VerifyUniqueBoilerName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -237,21 +196,21 @@ namespace GlobalNames {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name will be unique in the list of
+        // This subroutine verifies that a new name will be unique in the list of
         // Boilers.  If not found in the list, it is added before returning.
 
-        auto const iter = BoilerNames.find(NameToVerify);
-        if (iter != BoilerNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
+        auto const iter = state.dataGlobalNames->BoilerNames.find(NameToVerify);
+        if (iter != state.dataGlobalNames->BoilerNames.end()) {
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
-            BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
-            NumBoilers = static_cast<int>(BoilerNames.size());
+            state.dataGlobalNames->BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
+            state.dataGlobalNames->NumBoilers = static_cast<int>(state.dataGlobalNames->BoilerNames.size());
         }
     }
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    void VerifyUniqueCoilName(EnergyPlusData &state, std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -261,61 +220,38 @@ namespace GlobalNames {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name will be unique in the list of
+        // This subroutine verifies that a new name will be unique in the list of
         // Coils.  If not found in the list, it is added before returning.
 
         if (NameToVerify.empty()) {
-            ShowSevereError("\"" + TypeToVerify + "\" cannot have a blank field");
+            ShowSevereError(state, "\"" + TypeToVerify + "\" cannot have a blank field");
             ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
         }
 
-        auto const iter = CoilNames.find(NameToVerify);
-        if (iter != CoilNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Coil Type=\"" + TypeToVerify + "\".");
+        auto const iter = state.dataGlobalNames->CoilNames.find(NameToVerify);
+        if (iter != state.dataGlobalNames->CoilNames.end()) {
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Coil Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
-            CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
-            NumCoils = static_cast<int>(CoilNames.size());
+            state.dataGlobalNames->CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
+            state.dataGlobalNames->NumCoils = static_cast<int>(state.dataGlobalNames->CoilNames.size());
         }
     }
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
+    void VerifyUniqueADUName(EnergyPlusData &state, std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-        auto const iter = aDUNames.find(NameToVerify);
-        if (iter != aDUNames.end()) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
-            ShowContinueError("...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
+        auto const iter = state.dataGlobalNames->aDUNames.find(NameToVerify);
+        if (iter != state.dataGlobalNames->aDUNames.end()) {
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
+            ShowContinueError(state, "...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
             ErrorsFound = true;
         } else {
-            aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
-            numAirDistUnits = static_cast<int>(aDUNames.size());
+            state.dataGlobalNames->aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
+            state.dataGlobalNames->numAirDistUnits = static_cast<int>(state.dataGlobalNames->aDUNames.size());
         }
     }
-
-    // Clears the global data in GlobalNames.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumChillers = 0;
-        NumBoilers = 0;
-        NumBaseboards = 0;
-        NumCoils = 0;
-        numAirDistUnits = 0;
-        CurMaxChillers = 0;
-        CurMaxBoilers = 0;
-        CurMaxBaseboards = 0;
-        CurMaxCoils = 0;
-
-        ChillerNames.clear();
-        BoilerNames.clear();
-        BaseboardNames.clear();
-        CoilNames.clear();
-        aDUNames.clear();
-    }
-
-} // namespace GlobalNames
 
 } // namespace EnergyPlus

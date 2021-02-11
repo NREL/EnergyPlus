@@ -112,7 +112,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -207,7 +207,9 @@
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -1661,7 +1663,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -1692,7 +1699,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -1723,7 +1735,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -1754,7 +1771,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -1785,7 +1807,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Account for Dedicated Outdoor Air System
+    ,                        !- Dedicated Outdoor Air System Control Strategy
+    ,                        !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    ;                        !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -1917,15 +1944,12 @@
 
   ScheduleTypeLimits,
     OnOff,                   !- Name
-    0,                       !- Lower Limit Value {BasedOnField A3}
-    1,                       !- Upper Limit Value {BasedOnField A3}
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
     Discrete,                !- Numeric Type
     availability;            !- Unit Type
 
-  Schedule:Constant,
-    Always On Discrete,      !- Name
-    OnOff,                   !- Schedule Type Limits Name
-    1;                       !- Hourly Value
+  Schedule:Constant,Always On Discrete,OnOff,1;
 
   Schedule:Compact,
     CW Loop Temp Schedule,   !- Name
@@ -2406,7 +2430,7 @@
 
   AvailabilityManager:Scheduled,
     VAV Sys 1 Avail,         !- Name
-    Always On Discrete;           !- Schedule Name
+    Always On Discrete;      !- Schedule Name
 
   BranchList,
     VAV Sys 1 Branches,      !- Name
@@ -2495,42 +2519,43 @@
 !*** OPERATIONAL FAULTS ***
 
   Schedule:Compact,
-    Fouling Availability Schedule,   !- Name
+    Fouling Availability Schedule,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
 
   Schedule:Compact,
-    Fouling Severity Schedule,   !- Name
+    Fouling Severity Schedule,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
 
 ! Main Heating Coil 1 gets autosized to a UA of 144 W/K
+
   FaultModel:Fouling:Coil,
-    Main Heating Coil 1 Fouling, !- Name
+    Main Heating Coil 1 Fouling,  !- Name
     Main Heating Coil 1,     !- Coil Name
-    Fouling Availability Schedule, !- Availability Schedule Name
-    Fouling Severity Schedule,     !- Severity Schedule Name
+    Fouling Availability Schedule,  !- Availability Schedule Name
+    Fouling Severity Schedule,  !- Severity Schedule Name
     FouledUARated,           !- Fouling Input Method
     30.0;                    !- UAFouled {W/K}
 
 ! Main Cooling Coil 1 reports a nominal UA of 3005 W/K, Nominal Coil Surface Area of 30.48 m2
 ! Temporarily switch to 'FouledUARated' instead of 'FoulingFactor' for easier investigation
+
   FaultModel:Fouling:Coil,
-    Main Cooling Coil 1 Fouling, !- Name
+    Main Cooling Coil 1 Fouling,  !- Name
     Main Cooling Coil 1,     !- Coil Name
-    Fouling Availability Schedule, !- Availability Schedule Name
-    Fouling Severity Schedule,     !- Severity Schedule Name
+    Fouling Availability Schedule,  !- Availability Schedule Name
+    Fouling Severity Schedule,  !- Severity Schedule Name
     FouledUARated,           !- Fouling Input Method
     500,                     !- UAFouled {W/K}
     0.0005,                  !- Water Side Fouling Factor {m2-K/W}
     0.0001,                  !- Air Side Fouling Factor {m2-K/W}
     30.0,                    !- Outside Coil Surface Area {m2}
-    0.1;                     !- Inside to Outside Coil Surface Area Ratio
-
+    0.1;                     !- Inside to Outside Coil Surface Area Ratio {dimensionless}
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
@@ -2839,7 +2864,7 @@
     Hot Loop Operation,      !- Name
     PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
     Central Boiler Only,     !- Control Scheme 1 Name
-    Always On Discrete;            !- Control Scheme 1 Schedule Name
+    Always On Discrete;      !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:HeatingLoad,
     Central Boiler Only,     !- Name
@@ -2929,7 +2954,7 @@
     CW Low Temp Limit,       !- Name
     Outside Air Inlet Node 1,!- Sensor Node Name
     2.0,                     !- Temperature {C}
-    Always On Discrete;   !- Applicability Schedule Name
+    Always On Discrete;      !- Applicability Schedule Name
 
   SetpointManager:Scheduled,
     Chilled Water Loop Setpoint Manager,  !- Name
@@ -3151,21 +3176,28 @@
     INTERMITTENT,            !- Pump Control Type
     Always On Discrete;      !- Pump Flow Rate Schedule Name
 
-
   Output:Variable,Main Heating Coil 1,Heating Coil U Factor Times Area Value,Detailed;
 
   Output:Variable,Main Heating Coil 1,Heating Coil Heating Rate,Detailed;
 
   ! Only available if Coil:Heating:Water has a FaultModel:Fouling:Coil object attached
+
   Output:Variable,Main Heating Coil 1,Heating Coil U Factor Times Area Value Before Fouling,Detailed;
 
   Output:Variable,Main Cooling Coil 1,Cooling Coil Total Cooling Rate,Detailed;
+
   ! Only available if Coil:Cooling:Water has a FaultModel:Fouling:Coil object attached
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil Total U Factor Times Area Value,Detailed;
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil External U Factor Times Area Value,Detailed;
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil Internal U Factor Times Area Value,Detailed;
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil Total U Factor Times Area Value Before Fouling,Detailed;
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil External U Factor Times Area Value Before Fouling,Detailed;
+
   Output:Variable,Main Cooling Coil 1,Cooling Coil Internal U Factor Times Area Value Before Fouling,Detailed;
 
   Output:Variable,*,Coil Fouling Factor,Detailed;
@@ -3181,3 +3213,4 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:VariableDictionary,IDF;
+

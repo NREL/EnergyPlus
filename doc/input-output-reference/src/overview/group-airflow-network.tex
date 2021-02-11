@@ -541,7 +541,7 @@ AirflowNetwork:MultiZone:Zone,
 
 \subsection{AirflowNetwork:MultiZone:Surface}\label{airflownetworkmultizonesurface}
 
-The AirflowNetwork:MultiZone:Surface object specifies the properties of a surface ``linkage'' through which air flows. This linkage is always associated with a heat transfer surface (wall, roof, floor, or a ceiling) or subsurface (door, glass door, or window) with both faces exposed to air. The linkage specifies two connected nodes: two zone nodes defined in \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone} objects based on inside and outside face environment for an interior surface, or a zone node defined in an \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone} object based on inside face environment and an external node defined in an \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} object for an exterior surface. The associated leakage component for this surface can be a crack (or surface effective leakage area) in an exterior or interior heat transfer surface or subsurface, or an exterior or interior window, door or glass door (heat transfer subsurface) that can be opened to allow air flow. The allowed surface air leakage components are:
+The AirflowNetwork:MultiZone:Surface object specifies the properties of a surface ``linkage'' through which air flows. This linkage is always associated with a building surface (wall, roof, floor, or a ceiling) or subsurface (door, glass door, or window) with both faces exposed to air. The linkage specifies two connected nodes: two zone nodes defined in \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone} objects based on inside and outside face environment for an interior surface, or a zone node defined in an \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone} object based on inside face environment and an external node defined in an \hyperref[airflownetworkmultizoneexternalnode]{AirflowNetwork:MultiZone:ExternalNode} object for an exterior surface. The associated leakage component for this surface can be a crack (or surface effective leakage area) in an exterior or interior heat transfer surface or subsurface, or an exterior or interior window, door or glass door (heat transfer subsurface) that can be opened to allow air flow. The allowed surface air leakage components are:
 
 \begin{itemize}
 \item
@@ -558,13 +558,16 @@ The AirflowNetwork:MultiZone:Surface object specifies the properties of a surfac
   \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:MultiZone:Component:ZoneExhaustFan}
 \end{itemize}
 
-The two ``opening'' components are used to modulate openness based on required conditions.
+The three ``opening'' components are used to modulate openness based on required conditions.
 
-The AirflowNetwork:MultiZone:Surface object allows a heat transfer surface or subsurface to have one crack (or one surface effective leakage area object), or a subsurface (i.e., window, door or glass door) to have one opening (detailed or simple).
+The AirflowNetwork:MultiZone:Surface object allows a heat transfer surface or subsurface to have one crack (or one surface effective leakage area object), or a subsurface (i.e., window, door or glass door) to have one opening (detailed, simple, or horizontal).
 
-An interior heat transfer surface (\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) whose surface name is used as the input for the Outside Boundary Condition Object field represents a floor without ground contact and is not allowed as an AirflowNetwork:MultiZone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
+
+An interior heat transfer surface (\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) whose surface name is used as the input for the Outside Boundary Condition Object field is adiabatic and is not allowed as an AirflowNetwork:MultiZone:Surface. A heat transfer surface defined in the BuildingSurface:Detailed:ExteriorNaturalVentedCavity is also not allowed.
 
 When a non-rectangular subsurface is used, the model will automatically convert it into a rectangular subsurface using equivalent width and height based on an entered choice from the Equivalent Rectangle Method field or a default choice.
+
+When an air boundary surface or subsurface is used (\hyperref[constructionairboundary]{Construction:AirBoundary}), all types of leakage component are allowed except AirflowNetwork:MultiZone:Component:ZoneExhaustFan. The only allowed venting control type for an air boundary surface is Constant, and the venting schedule is ignored (which means the opening is always fully open at the specified Window/Door Opening Factor, or Crack Factor). EnergyManagementSystem:Actuator ``AirFlow Network Window/Door Opening'' is available for special applications where control of the air boundary opening is required.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name-000}
 
@@ -572,11 +575,19 @@ This is the name of the corresponding surface (wall, roof, ceiling, floor, windo
 
 Information on this surface is used by the program as follows:
 
-(1)~~For a linkage associated with an exterior heat transfer surface: air flow through this linkage is between the outside environment and the thermal zone to which the surface belongs.
+\begin{itemize}
+\item
+For a linkage associated with an exterior heat transfer surface: air flow through this linkage is between the outside environment and the thermal zone to which the surface belongs.
 
-(2)~~For a linkage associated with an interior (i.e., interzone) heat transfer surface: air flow through this linkage is between the thermal zones separated by the surface (i.e., the thermal zone associated with the inside face environment and the thermal zone associated with the outside face environment).
+\item
+For a linkage associated with an interior (i.e., interzone) heat transfer surface: air flow through this linkage is between the thermal zones separated by the surface (i.e., the thermal zone associated with the inside face environment and the thermal zone associated with the outside face environment).
 
-(3)~~This heat transfer surface determines the height of the linkage, which is used in calculating buoyancy-related flow through the linkage.
+\item
+This heat transfer surface determines the height of the linkage, which is used in calculating buoyancy-related flow through the linkage.
+
+\item
+The surface may be an air boundary surface or subsurface (\hyperref[constructionairboundary]{Construction:AirBoundary}).
+\end{itemize}
 
 \textbf{Note:} It is possible to define an interzone surface twice in EnergyPlus, once in each of the zones that the surface separates. Previously this was a requirement of EnergyPlus (prior to version 2.0), but now it is optional and the user also has the option of only defining the surface once (EnergyPlus defines the second surface automatically within the program). For each interzone surface, use only one (of possible two) interzone surface names in the AirflowNetwork:MultiZone:Surface object for ``Surface Name.'' \textbf{Do not} enter two AirflowNetwork:MultiZone:Surface objects corresponding to the two possible interzone names. This would cause the air flow through the surface to be counted twice.
 
@@ -584,7 +595,7 @@ Information on this surface is used by the program as follows:
 
 The name of the \hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}, \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea}, \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}, \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening}, \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening} or \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:MultiZone:Component:ZoneExhaustFan} object associated with this air flow linkage.
 
-If the name of an opening component (i.e.~\hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening}. \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening},~ or \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening} is given here, then the Surface Name in the previous field must be that of a window, door or glass door heat transfer subsurface. Otherwise an error message will be reported.
+If the name of an opening component (i.e.~\hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening}. \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening},~ or \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening} is given here, then the Surface Name in the previous field must be that of a window, door or glass door heat transfer subsurface or a building surface which is an air boundary. Otherwise an error message will be reported.
 
 If the name of an \hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack} object or \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea} object is given here, the program will position the crack at the average height of the associated heat transfer surface or subsurface. The user can define multiple heat transfer surfaces (e.g., split a wall into several surfaces) to be more precise in establishing the crack location. Similarly, the user can define multiple heat transfer surfaces if a wall, for example, has multiple cracks or openings that need to be defined individually.
 
@@ -652,7 +663,7 @@ Venting Availability Schedule (see below) allows venting.
 opened if $H_{zone} > H_{out}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
 Venting Availability Schedule allows venting.
 
-\textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep.
+\textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep. If the surface is an air boundary (\hyperref[constructionairboundary]{Construction:AirBoundary}) then Constant is the only valid option (other options will throw a warning and be reset to Constant).
 
 \textbf{ASHRAE55Adaptive}: The openable window or door associated with this surface is opened if the operative temperature is greater than the comfort temperature (central line) calculated from the ASHRAE Standard 55-2010 adaptive comfort model \textbf{and} Venting Availability Schedule allows venting.
 
@@ -718,7 +729,7 @@ See Figure~\ref{fig:modulation-of-venting-area-according-to-001}. This field app
 
 \subsubsection{Field: Venting Availability Schedule Name}\label{field-venting-availability-schedule-name-1}
 
-The name of a schedule that specifies when venting is available. A zero or negative schedule value means venting is not allowed. A value greater than zero means venting can occur if other venting control conditions (specified by Ventilation Control Mode and Vent Temperature Schedule Name) are satisfied. This schedule name should not be confused with Vent Temperature Schedule Name.
+The name of a schedule that specifies when venting is available. A zero or negative schedule value means venting is not allowed. A value greater than zero means venting can occur if other venting control conditions (specified by Ventilation Control Mode and Vent Temperature Schedule Name) are satisfied. This schedule name should not be confused with Vent Temperature Schedule Name.  If the surface is an air boundary (\hyperref[constructionairboundary]{Construction:AirBoundary}) then this field is ignored and venting is always available.
 
 If a Venting Availability Schedule Name is not specified, it is assumed that venting is always available.
 

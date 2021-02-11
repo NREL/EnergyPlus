@@ -53,7 +53,9 @@
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -1483,7 +1485,7 @@
     8.69489229,              !- Cooling Compressor Power Coefficient 3
     0.02501669,              !- Cooling Compressor Power Coefficient 4
     -0.20132665,             !- Cooling Compressor Power Coefficient 5
-    8.0,                     !- Reference Coefficient of Performance
+    8.0,                     !- Reference Coefficient of Performance {W/W}
     1.0,                     !- Sizing Factor
     GshpHeating;             !- Companion Heating Heat Pump Name
 
@@ -1787,7 +1789,7 @@
     1.29660976,              !- Heating Compressor Power Coefficient 3
     -0.21629222,             !- Heating Compressor Power Coefficient 4
     0.033862378,             !- Heating Compressor Power Coefficient 5
-    7.5,                     !- Reference Coefficient of Performance
+    7.5,                     !- Reference Coefficient of Performance {W/W}
     1.0,                     !- Sizing Factor
     GshpCLG;                 !- Companion Cooling Heat Pump Name
 

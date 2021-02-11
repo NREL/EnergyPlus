@@ -1,4 +1,4 @@
-name: Verify that the PR has a valid label
+name: Verify Pull Request Labeling
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_pr_labels:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2

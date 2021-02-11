@@ -220,7 +220,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
  ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 
@@ -3772,7 +3774,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3780,7 +3782,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electricity Rate,  !- Variable Name
+    Chiller Electricity Rate,!- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count

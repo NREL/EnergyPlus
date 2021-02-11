@@ -142,13 +142,13 @@
     SET IVOnea = MyWB,       !- <none>
     SET IVTwo = OAT,         !- <none>
     SET IVThree = IVOnea*IVTwo,  !- <none>
-    SET C1 = 0.942567793d0,  !- <none>
-    SET C2 = 0.009543347D0,  !- <none>
+    SET C1 = 0.942567793,  !- <none>
+    SET C2 = 0.009543347,  !- <none>
     SET C2a = 0.009543347e0, !- <none>
     SET C3 = 0.00068377E0,   !- <none>
-    SET C4 = 0.011042676d0,  !- <none>
-    SET C5 = 0.000005249d0,  !- <none>
-    SET C6 = 0.000009720d0,  !- <none>
+    SET C4 = 0.011042676,  !- <none>
+    SET C5 = 0.000005249,  !- <none>
+    SET C6 = 0.000009720,  !- <none>
     SET CurveInput = C1+(C2*IVOnea) + (C3*IVOnea*IVonea) - (C4*IVTwo) + (C5*IVTwo*IVTwo) - (C6*IVThree),  !- <none>
     SET CurveInput2 = CurveInput,  !- <none>
     IF OAT > 31.0,           !- <none>
@@ -265,7 +265,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 

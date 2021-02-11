@@ -286,10 +286,18 @@ namespace doj {
     Algorithm". If the objects are no std::string, they must
     implement "std::ostream operator<< (std::ostream&, const Ty&)".
     */
-  template < class Ty >
-    struct alphanum_less : public std::binary_function < Ty, Ty, bool > {
+  template < class Ty = void >
+    struct alphanum_less  {
       bool operator()( const Ty & left, const Ty & right ) const {
         return alphanum_comp( left, right ) < 0;
+      }
+    };
+
+  template <>
+    struct alphanum_less<void> {
+      template<typename LHS, typename RHS>
+      bool operator()(const LHS& left, const RHS& right) const {
+        return alphanum_comp(left, right) < 0;
       }
     };
 

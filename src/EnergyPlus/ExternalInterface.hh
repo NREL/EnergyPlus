@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@ extern "C" {
 }
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 
@@ -65,7 +66,8 @@ extern "C" {
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ExternalInterface {
 
@@ -92,7 +94,6 @@ namespace ExternalInterface {
     extern int const fmiFatal;             // fmiPending
     extern int const fmiPending;           // fmiPending
     extern std::string const socCfgFilNam; // socket configuration file
-    extern std::string const BlankString;
 
     void clear_state();
 
@@ -103,7 +104,7 @@ namespace ExternalInterface {
         int ValueReference; // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuInputVariableType() : Name(BlankString), ValueReference(0)
+        fmuInputVariableType() : Name(std::string()), ValueReference(0)
         {
         }
     };
@@ -114,7 +115,7 @@ namespace ExternalInterface {
         std::string Name; // Name of fmu instance
 
         // Default Constructor
-        checkFMUInstanceNameType() : Name(BlankString)
+        checkFMUInstanceNameType() : Name(std::string())
         {
         }
     };
@@ -131,7 +132,7 @@ namespace ExternalInterface {
         std::string VarUnits; // Units string, may be blank
 
         // Default Constructor
-        eplusOutputVariableType() : Name(BlankString), VarKey(BlankString), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(0), VarUnits(BlankString)
+        eplusOutputVariableType() : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(0), VarUnits(std::string())
         {
         }
     };
@@ -144,7 +145,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableScheduleType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableScheduleType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -157,7 +158,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableVariableType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableVariableType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -170,7 +171,7 @@ namespace ExternalInterface {
         int ValueReference;  // = fmiValueReference specific to FMU variable
 
         // Default Constructor
-        fmuOutputVariableActuatorType() : Name(BlankString), RealVarValue(0.0), ValueReference(0)
+        fmuOutputVariableActuatorType() : Name(std::string()), RealVarValue(0.0), ValueReference(0)
         {
         }
     };
@@ -183,7 +184,7 @@ namespace ExternalInterface {
         int InitialValue; // Initial value used during the warmup
 
         // Default Constructor
-        eplusInputVariableScheduleType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableScheduleType() : Name(std::string()), VarIndex(0)
         {
             // InitialValue not initialized in default constructor
         }
@@ -196,7 +197,7 @@ namespace ExternalInterface {
         int VarIndex;     // Index Value of this variable
 
         // Default Constructor
-        eplusInputVariableVariableType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableVariableType() : Name(std::string()), VarIndex(0)
         {
         }
     };
@@ -208,7 +209,7 @@ namespace ExternalInterface {
         int VarIndex;     // Index Value of this variable
 
         // Default Constructor
-        eplusInputVariableActuatorType() : Name(BlankString), VarIndex(0)
+        eplusInputVariableActuatorType() : Name(std::string()), VarIndex(0)
         {
         }
     };
@@ -257,8 +258,8 @@ namespace ExternalInterface {
 
         // Default Constructor
         InstanceType()
-            : Name(BlankString), modelID(BlankString), modelGUID(BlankString), WorkingFolder(BlankString), WorkingFolder_wLib(BlankString),
-              fmiVersionNumber(BlankString), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
+            : Name(std::string()), modelID(std::string()), modelGUID(std::string()), WorkingFolder(std::string()), WorkingFolder_wLib(std::string()),
+              fmiVersionNumber(std::string()), NumInputVariablesInFMU(0), NumInputVariablesInIDF(0), NumOutputVariablesInFMU(0),
               NumOutputVariablesInIDF(0), NumOutputVariablesSchedule(0), NumOutputVariablesVariable(0), NumOutputVariablesActuator(0), LenModelID(0),
               LenModelGUID(0), LenWorkingFolder(0), LenWorkingFolder_wLib(0)
         {
@@ -283,7 +284,7 @@ namespace ExternalInterface {
 
         // Default Constructor
         FMUType()
-            : Name(BlankString), TimeOut(0.0), Visible(0), Interactive(0), LoggingOn(0), NumInstances(0), TotNumInputVariablesInIDF(0),
+            : Name(std::string()), TimeOut(0.0), Visible(0), Interactive(0), LoggingOn(0), NumInstances(0), TotNumInputVariablesInIDF(0),
               TotNumOutputVariablesSchedule(0), TotNumOutputVariablesVariable(0), TotNumOutputVariablesActuator(0)
         {
             // Instance not instantiated in default constructor
@@ -328,44 +329,56 @@ namespace ExternalInterface {
 
     void CloseSocket(int const FlagToWriteToSocket);
 
-    void InitExternalInterface();
+    void InitExternalInterface(EnergyPlusData &state);
 
-    void GetExternalInterfaceInput();
+    void GetExternalInterfaceInput(EnergyPlusData &state);
 
     void CalcExternalInterface(EnergyPlusData &state);
 
     void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
-    void GetReportVariableKey(
-        const Array1D_string &varKeys, int const numberOfKeys, const Array1D_string &varNames, Array1D_int &keyVarIndexes, Array1D_int &varTypes);
+    void GetReportVariableKey(EnergyPlusData &state,
+                              const Array1D_string &varKeys,
+                              int const numberOfKeys,
+                              const Array1D_string &varNames,
+                              Array1D_int &keyVarIndexes,
+                              Array1D_int &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
     std::string getStringFromCharArray(std::vector<char> originalCharArray);
 
-    void StopExternalInterfaceIfError();
+    void StopExternalInterfaceIfError(EnergyPlusData &state);
 
-    void ValidateRunControl();
+    void ValidateRunControl(EnergyPlusData &state);
 
-    void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
+    void WarnIfExternalInterfaceObjectsAreUsed(EnergyPlusData &state, std::string const &ObjectWord);
 
     void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InitExternalInterfaceFMUImport(IOFiles &ioFiles);
+    void InitExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InstantiateInitializeFMUImport();
+    void InstantiateInitializeFMUImport(EnergyPlusData &state);
 
-    void TerminateResetFreeFMUImport(int fmiEndSimulation);
+    void TerminateResetFreeFMUImport(EnergyPlusData &state, int fmiEndSimulation);
 
     void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
 
-    void VerifyExternalInterfaceObject();
+    void VerifyExternalInterfaceObject(EnergyPlusData &state);
 
-    Real64 GetCurSimStartTimeSeconds();
+    Real64 GetCurSimStartTimeSeconds(EnergyPlusData &state);
 
     std::string trim(std::string const &str);
 
 } // namespace ExternalInterface
+
+struct ExternalInterfaceData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

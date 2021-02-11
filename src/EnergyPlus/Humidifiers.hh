@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -97,7 +98,6 @@ namespace Humidifiers {
     public:
         // Members
         std::string Name; // unique name of component
-        //    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
         int HumType_Code;           // Pointer to Humidifier in list of humidifiers
         int EquipIndex;             // Pointer to Humidifier in list of humidifiers
         std::string Sched;          // name of availability schedule
@@ -157,22 +157,22 @@ namespace Humidifiers {
         {
         }
 
-        void InitHumidifier(); // number of the current humidifier being simulated
+        void InitHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void SizeHumidifier(); // number of the current humidifier being sized
+        void SizeHumidifier(EnergyPlusData &state); // number of the current humidifier being sized
 
-        void ControlHumidifier(Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+        void ControlHumidifier(EnergyPlusData &state, Real64 &WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
         );
 
-        void CalcElecSteamHumidifier(Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+        void CalcElecSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
         void CalcGasSteamHumidifier(EnergyPlusData &state, Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
         );
 
-        void UpdateReportWaterSystem(); // number of the current humidifier being simulated
+        void UpdateReportWaterSystem(EnergyPlusData &state); // number of the current humidifier being simulated
 
-        void UpdateHumidifier(); // number of the current humidifier being simulated
+        void UpdateHumidifier(EnergyPlusData &state); // number of the current humidifier being simulated
 
         void ReportHumidifier(); // number of the current humidifier being simulated
     };
@@ -203,6 +203,15 @@ namespace Humidifiers {
     );
 
 } // namespace Humidifiers
+
+struct HumidifiersData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

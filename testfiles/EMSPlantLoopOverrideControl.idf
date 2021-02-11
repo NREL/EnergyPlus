@@ -91,7 +91,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     first part of Feb,       !- Name
@@ -7160,7 +7162,7 @@
 
   UtilityCost:Tariff,
     FL_EIAMonthlyRateGas,    !- Name
-    NaturalGas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7830,7 +7832,7 @@
     3,                       !- Digits After Decimal
     Cooling:Electricity,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:NaturalGas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Variable,*,Pump Electricity Rate,hourly;

@@ -198,7 +198,9 @@
     Yes,                     !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -2753,7 +2755,7 @@
     ,                        !- Basin Heater Operating Schedule Name
     36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
-    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
     10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}

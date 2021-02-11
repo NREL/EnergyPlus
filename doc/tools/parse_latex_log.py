@@ -1,3 +1,58 @@
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 """
 Parse the LaTeX log file.
 """
@@ -168,40 +223,6 @@ def find_multiply_defined_labels(root_dir, label):
     target = "\\label{" + label + "}"
     return find_locations(root_dir, target)
 
-
-def parse_warning(line, src_dir):
-    """
-    - line: string, the line to parse
-    - src_dir: string, the root directory of the LaTeX source files
-    RETURN: None or one of:
-    - {'type': 'Label multiply defined',
-       'label': string,
-       'message': string}
-    - {'type': 'Hyper reference undefined',
-       'label': string,
-       'message': string}
-    """
-    m = LABEL_MULTIPLY_DEFINED_WARN.match(line)
-    if m is not None:
-        label = m.group(1)
-        locations = find_multiply_defined_labels(src_dir, label)
-        return {'severity': SEVERITY_WARNING,
-                'type': "Label multiply defined",
-                'locations': locations,
-                'message': line,
-                'label': m.group(1)}
-    m = HYPER_UNDEFINED_WARN.match(line)
-    if m is not None:
-        label = m.group(1)
-        locations = find_undefined_hyperref(src_dir, label)
-        return {'severity': SEVERITY_WARNING,
-                'type': "Hyper reference undefined",
-                'locations': locations,
-                'message': line,
-                'label': m.group(1)}
-    return None
-
-
 def parse_line_number(message):
     """
     - message: string
@@ -233,41 +254,56 @@ class LogParser:
         self.src_dir = src_dir
         self.verbose = verbose
 
-    def _read_tex_error(self, line):
+    def _read_tex_error(self):
         line_no = parse_line_number(self._current_issue)
         self._issues['issues'].append({
-            'severity': SEVERITY_ERROR,
+            'level': SEVERITY_ERROR,
             'type': self._type,
-            'locations': [{
-                'file': self._current_tex_file,
-                'line': line_no}],
+            'path': self._current_tex_file,
+            'line': {"start": line_no, "end": line_no},
             'message': self._current_issue.strip()})
 
-    def _read_warning(self, line):
-        warn = parse_warning(self._current_issue, self.src_dir)
-        if self._current_issue.strip() not in ISSUES_TO_SKIP:
-            if warn is not None:
-                self._issues['issues'].append(warn)
-            else:
-                line_no = parse_on_input_line(self._current_issue)
-                self._issues['issues'].append({
-                    'severity': SEVERITY_WARNING,
-                    'type': self._type,
-                    'locations': [{
-                        'file': self._current_tex_file,
-                        'line': line_no}],
-                    'message': self._current_issue.strip()})
-
-    def _read_error(self, line):
-        if self._current_issue not in ISSUES_TO_SKIP:
+    def _read_warning(self):
+        warns = []
+        m1 = LABEL_MULTIPLY_DEFINED_WARN.match(self._current_issue)
+        m2 = HYPER_UNDEFINED_WARN.match(self._current_issue)
+        if m1 is not None:
+            label = m1.group(1)
+            locations = find_multiply_defined_labels(self.src_dir, label)
+            for loc in locations:
+                warns.append({
+                    'level': SEVERITY_WARNING,
+                    'type': "Label multiply defined",
+                    'path': loc["file"],
+                    'line': {"start": loc["line"], "end": loc["line"]},
+                    'message': self._current_issue.strip(),
+                    'label': m1.group(1)
+                })
+        elif m2 is not None:
+            label = m2.group(1)
+            locations = find_undefined_hyperref(self.src_dir, label)
+            for loc in locations:
+                warns.append({
+                    'level': SEVERITY_WARNING,
+                    'type': "Hyper reference undefined",
+                    'path': loc["file"],
+                    'line': {"start": loc["line"], "end": loc["line"]},
+                    'message': self._current_issue.strip(),
+                    'label': m2.group(1)
+                })
+        elif self._current_issue.strip() not in ISSUES_TO_SKIP:
             line_no = parse_on_input_line(self._current_issue)
-            self._issues['issues'].append({
-                'severity': SEVERITY_ERROR,
+            warns = [{
+                'level': SEVERITY_WARNING,
                 'type': self._type,
-                'locations': [{
-                    'file': self._current_tex_file,
-                    'line': line_no}],
-                'message': self._current_issue.strip()})
+                'path': self._current_tex_file,
+                'line': {"start": line_no, "end": line_no},
+                'message': self._current_issue.strip()}]
+        self._issues['issues'] += warns
+
+    def _read_error(self):
+        if self._current_issue not in ISSUES_TO_SKIP:
+            self._read_tex_error()
 
     def _read_issue(self, line):
         is_ws = (line.strip() == "")
@@ -275,11 +311,11 @@ class LogParser:
         nonempty = len(line) > 1
         if is_ws and (not (first_line and nonempty)):
             if self._in_tex_err:
-                self._read_tex_error(line)
+                self._read_tex_error()
             elif self._in_warn:
-                self._read_warning(line)
+                self._read_warning()
             elif self._in_err:
-                self._read_error(line)
+                self._read_error()
             else:
                 raise Exception("unhandled issue read")
             self._reset_after_read()
@@ -388,16 +424,10 @@ def update_paths_to_be_from_repo_root(issues, repo_root_to_src):
     updated = []
     for issue in issues:
         update = copy.deepcopy(issue)
-        if 'locations' in update:
-            new_locs = []
-            for location in update['locations']:
-                loc = copy.deepcopy(location)
-                if 'file' in location:
-                    loc['file'] = os.path.join(
-                            repo_root_to_src,
-                            location['file'])
-                new_locs.append(loc)
-            update['locations'] = new_locs
+        if 'path' in update:
+            update['path'] = os.path.join(
+                    repo_root_to_src,
+                    update['path'])
         updated.append(update)
     return updated
 
@@ -440,16 +470,14 @@ def find_issues(log_path, json_error_path, src_dir):
         f = sys.stdout
         for issue in errs['issues']:
             f.write("[LATEX")
-            f.write(issue['severity'] + "::")
-            locs = [loc['file'] + ":" + str(loc['line'])
-                    for loc in issue['locations']]
-            f.write(",".join(locs) + "::")
+            f.write(issue['level'] + "::")
+            f.write(issue['path'] + ":" + str(issue["line"]["start"]))
             msg = issue['message'].replace("\r\n", " ")
             msg = msg.replace("\n", " ")
             msg = msg.replace("\r", " ")
             msg = msg.replace("\t", " ")
             msg = " ".join(msg.split())
-            f.write(msg + "]\n")
+            f.write("::" + msg + "]\n")
         with open(json_error_path, 'w', encoding='utf-8') as f:
             json.dump(errs, f, ensure_ascii=False, indent=4)
     return (num_issues > 0)

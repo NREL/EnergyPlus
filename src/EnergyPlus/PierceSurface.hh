@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -384,7 +384,7 @@ void PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
     //  Jan 2016: Initial release
 
     // Input checks
-    assert(std::abs(rayDir.mag_squared() - 1.0) < 4 * std::numeric_limits<Real64>::epsilon()); // Check unit vector
+    assert(std::abs(rayDir.mag_squared() - 1.0) < 6 * std::numeric_limits<Real64>::epsilon()); // Check unit vector (6x is rough estimate. Increase slightly as needed.)
     assert(dMax >= 0.0);                                                                       // Distance must be nonnegative
 
     // Find ray intersection with surface plane

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,8 +50,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 using namespace EnergyPlus;
@@ -62,7 +62,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     IntegratedHeatPumpData IHP;
 
@@ -70,18 +70,18 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
     IHP.IHPCoilsSized = true;
     IHP.CurMode = IHPOperationMode::DWHMode;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_ANY_THROW(GetCurWorkMode(state, 0););
+    EXPECT_ANY_THROW(GetCurWorkMode(*state, 0););
 
-    EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(state, 1));
+    EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(*state, 1));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
     bool ErrorsFound = false;
 
     IntegratedHeatPumpData IHP;
@@ -89,13 +89,13 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_EQ(0, GetCoilIndexIHP(state, "", "", ErrorsFound));
+    EXPECT_EQ(0, GetCoilIndexIHP(*state, "", "", ErrorsFound));
     EXPECT_TRUE(ErrorsFound);
 
     ErrorsFound = false;
-    EXPECT_EQ(1, GetCoilIndexIHP(state, "", "ASIHP", ErrorsFound));
+    EXPECT_EQ(1, GetCoilIndexIHP(*state, "", "ASIHP", ErrorsFound));
     EXPECT_FALSE(ErrorsFound);
 }
 
@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilInletNodeIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
     bool ErrorsFound = false;
 
     IntegratedHeatPumpData IHP;
@@ -112,13 +112,13 @@ TEST_F(EnergyPlusFixture, ASIHP_GetCoilInletNodeIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_EQ(0, GetCoilInletNodeIHP(state, "", "", ErrorsFound));
+    EXPECT_EQ(0, GetCoilInletNodeIHP(*state, "", "", ErrorsFound));
     EXPECT_TRUE(ErrorsFound);
 
     ErrorsFound = false;
-    EXPECT_EQ(999, GetCoilInletNodeIHP(state, "", "ASIHP", ErrorsFound));
+    EXPECT_EQ(999, GetCoilInletNodeIHP(*state, "", "ASIHP", ErrorsFound));
     EXPECT_FALSE(ErrorsFound);
 }
 
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     IntegratedHeatPumpData IHP;
     IHP.Name = "ASIHP";
@@ -136,49 +136,49 @@ TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_ANY_THROW(GetLowSpeedNumIHP(state, 0););
+    EXPECT_ANY_THROW(GetLowSpeedNumIHP(*state, 0););
 
-    auto &instance(IntegratedHeatPumps(1));
+    auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
     instance.CurMode = IHPOperationMode::IdleMode;
-    EXPECT_EQ(1, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCMode;
-    EXPECT_EQ(1, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHMode;
-    EXPECT_EQ(1, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::DWHMode;
-    EXPECT_EQ(1, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(1, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCWHMatchSCMode;
-    EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCWHMatchWHMode;
-    EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(IHP.MinSpedSCWH, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCDWHMode;
-    EXPECT_EQ(IHP.MinSpedSCDWH, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(IHP.MinSpedSCDWH, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHDWHElecHeatOffMode;
-    EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHDWHElecHeatOnMode;
-    EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(state, 1));
+    EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(*state, 1));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
 {
 
     // Don't get any inputs
-    GetCoilsInputFlag = false;
+    state->dataIntegratedHP->GetCoilsInputFlag = false;
 
     VariableSpeedCoils::VariableSpeedCoilData vsCoil;
     vsCoil.NumOfSpeeds = 999;
-    VariableSpeedCoils::VarSpeedCoil.push_back(vsCoil);
+    state->dataVariableSpeedCoils->VarSpeedCoil.push_back(vsCoil);
 
     IntegratedHeatPumpData IHP;
     IHP.Name = "ASIHP";
@@ -194,38 +194,38 @@ TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
     // don't size for this test
     IHP.IHPCoilsSized = true;
 
-    IntegratedHeatPumps.push_back(IHP);
+    state->dataIntegratedHP->IntegratedHeatPumps.push_back(IHP);
 
-    EXPECT_ANY_THROW(GetMaxSpeedNumIHP(state, 0););
+    EXPECT_ANY_THROW(GetMaxSpeedNumIHP(*state, 0););
 
-    auto &instance(IntegratedHeatPumps(1));
+    auto &instance(state->dataIntegratedHP->IntegratedHeatPumps(1));
 
     instance.CurMode = IHPOperationMode::IdleMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::DWHMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCWHMatchSCMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCWHMatchWHMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SCDWHMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHDWHElecHeatOffMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 
     instance.CurMode = IHPOperationMode::SHDWHElecHeatOnMode;
-    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(state, 1));
+    EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(*state, 1));
 }
 
 TEST_F(EnergyPlusFixture, ASIHP_GetIHPInput)
@@ -1568,6 +1568,6 @@ TEST_F(EnergyPlusFixture, ASIHP_GetIHPInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_NO_THROW(GetIHPInput(state));
+    EXPECT_NO_THROW(GetIHPInput(*state));
     compare_err_stream("");
 }

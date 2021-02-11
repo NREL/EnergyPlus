@@ -1,3 +1,58 @@
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 import re
 
 # Preston Shires
@@ -99,6 +154,7 @@ class Data:
 def parse_idd(data):
     root = {'$schema': "http://json-schema.org/draft-04/schema#", 'properties': {}}
     data.file_size = len(data.file)
+    current_group_name = '**ungrouped**'
 
     while data.index < data.file_size:
         token = look_ahead(data)
@@ -111,7 +167,7 @@ def parse_idd(data):
             eat_comment(data)
         elif token == TOKEN_GROUP:
             next_token(data)
-            eat_comment(data)
+            current_group_name = parse_line(data)
         else:
             obj_name = parse_string(data)
             if obj_name is None or obj_name == "":
@@ -119,6 +175,7 @@ def parse_idd(data):
             obj_data = parse_obj(data)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
+            root['properties'][obj_name]['group'] = current_group_name
 
             name_pattern_properties = '.*'
             if 'name' in obj_data:
@@ -370,13 +427,14 @@ def parse_field(data, token):
                     root['data_type'] = 'external_list'
                 else:
                     raise RuntimeError("Two external-lists?")
-
             elif match_string(data, REAL_STR) or match_string(data, INTEGER_STR):
                 if 'type' not in root or 'type' != 'number':
                     root['type'] = 'number'
-
             elif match_string(data, NODE_STR):
                 root['type'] = 'string'
+            else:
+                bad_type = parse_line(data)
+                raise RuntimeError("Invalid \\type: \"%s\"" % bad_type)
 
         elif token == TOKEN_OBJ_LIST:
             next_token(data)
@@ -480,11 +538,7 @@ def parse_field(data, token):
             next_token(data)
             root['retaincase'] = True
 
-        elif token == TOKEN_GROUP:
-            next_token(data)
-            eat_comment(data)
-
-        elif token == TOKEN_A or token == TOKEN_N or token == TOKEN_END or token == TOKEN_STRING:
+        elif token in [TOKEN_A, TOKEN_N, TOKEN_END, TOKEN_STRING, TOKEN_GROUP]:
             has_default = 'default' in root
             if is_autocalculatable:
                 create_any_of(root, TOKEN_AUTOCALCULATABLE, has_default)

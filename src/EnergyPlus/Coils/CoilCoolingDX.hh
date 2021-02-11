@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,13 @@
 #include <vector>
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoilCoolingDXInputSpecification
 {
@@ -79,7 +81,7 @@ struct CoilCoolingDX
     static void getInput(EnergyPlusData &state);
     static void clear_state();
     void instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data);
-    void oneTimeInit();
+    void oneTimeInit(EnergyPlusData &state);
     void simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
@@ -152,6 +154,14 @@ struct CoilCoolingDX
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;
 extern std::string const coilCoolingDXObjectName;
+
+struct CoilCoolingDXData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

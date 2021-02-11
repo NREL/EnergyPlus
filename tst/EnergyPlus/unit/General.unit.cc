@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,14 +50,16 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/General.hh>
+// Objexx Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/string.functions.hh>
 
+// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Array1D.hh>
+#include <EnergyPlus/General.hh>
 
 namespace EnergyPlus {
 
@@ -309,7 +311,7 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     Par.allocate(2);
     Par(1) = 1.0;
     Par(2) = 1.0;
-    
+
     General::SolveRoot(ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
     EXPECT_EQ(-1, SolFla);
 
@@ -326,70 +328,88 @@ TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
     //			int const & monthNumber // January = 1
     //		)
 
-    DataEnvironment::CurrentYearIsLeapYear = false; // based on 2017
-    DataEnvironment::RunPeriodStartDayOfWeek = 1;   // sunday
+    state->dataEnvrn->CurrentYearIsLeapYear = false; // based on 2017
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 1;   // sunday
 
-    EXPECT_EQ(1, nthDayOfWeekOfMonth(1, 1, 1));  // first sunday of january
-    EXPECT_EQ(8, nthDayOfWeekOfMonth(1, 2, 1));  // second sunday of january
-    EXPECT_EQ(15, nthDayOfWeekOfMonth(1, 3, 1)); // third sunday of january
-    EXPECT_EQ(22, nthDayOfWeekOfMonth(1, 4, 1)); // fourth sunday of january
+    EXPECT_EQ(1, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january
+    EXPECT_EQ(8, nthDayOfWeekOfMonth(*state, 1, 2, 1));  // second sunday of january
+    EXPECT_EQ(15, nthDayOfWeekOfMonth(*state, 1, 3, 1)); // third sunday of january
+    EXPECT_EQ(22, nthDayOfWeekOfMonth(*state, 1, 4, 1)); // fourth sunday of january
 
-    EXPECT_EQ(2, nthDayOfWeekOfMonth(2, 1, 1));  // first monday of january
-    EXPECT_EQ(10, nthDayOfWeekOfMonth(3, 2, 1)); // second tuesday of january
-    EXPECT_EQ(19, nthDayOfWeekOfMonth(5, 3, 1)); // third thursday of january
-    EXPECT_EQ(28, nthDayOfWeekOfMonth(7, 4, 1)); // fourth saturday of january
+    EXPECT_EQ(2, nthDayOfWeekOfMonth(*state, 2, 1, 1));  // first monday of january
+    EXPECT_EQ(10, nthDayOfWeekOfMonth(*state, 3, 2, 1)); // second tuesday of january
+    EXPECT_EQ(19, nthDayOfWeekOfMonth(*state, 5, 3, 1)); // third thursday of january
+    EXPECT_EQ(28, nthDayOfWeekOfMonth(*state, 7, 4, 1)); // fourth saturday of january
 
-    EXPECT_EQ(32, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(60, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(60, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true;
-    DataEnvironment::RunPeriodStartDayOfWeek = 1; // sunday
+    state->dataEnvrn->CurrentYearIsLeapYear = true;
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 1; // sunday
 
-    EXPECT_EQ(32, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(61, nthDayOfWeekOfMonth(5, 1, 3)); // first thursday of march
-    EXPECT_EQ(67, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(32, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(61, nthDayOfWeekOfMonth(*state, 5, 1, 3)); // first thursday of march
+    EXPECT_EQ(67, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 
-    DataEnvironment::CurrentYearIsLeapYear = true; // based on 2016
-    DataEnvironment::RunPeriodStartDayOfWeek = 6;  // friday
+    state->dataEnvrn->CurrentYearIsLeapYear = true; // based on 2016
+    state->dataEnvrn->RunPeriodStartDayOfWeek = 6;  // friday
 
-    EXPECT_EQ(3, nthDayOfWeekOfMonth(1, 1, 1));  // first sunday of january
-    EXPECT_EQ(10, nthDayOfWeekOfMonth(1, 2, 1)); // second sunday of january
-    EXPECT_EQ(17, nthDayOfWeekOfMonth(1, 3, 1)); // third sunday of january
-    EXPECT_EQ(24, nthDayOfWeekOfMonth(1, 4, 1)); // fourth sunday of january
-    EXPECT_EQ(31, nthDayOfWeekOfMonth(1, 5, 1)); // fifth sunday of january
+    EXPECT_EQ(3, nthDayOfWeekOfMonth(*state, 1, 1, 1));  // first sunday of january
+    EXPECT_EQ(10, nthDayOfWeekOfMonth(*state, 1, 2, 1)); // second sunday of january
+    EXPECT_EQ(17, nthDayOfWeekOfMonth(*state, 1, 3, 1)); // third sunday of january
+    EXPECT_EQ(24, nthDayOfWeekOfMonth(*state, 1, 4, 1)); // fourth sunday of january
+    EXPECT_EQ(31, nthDayOfWeekOfMonth(*state, 1, 5, 1)); // fifth sunday of january
 
-    EXPECT_EQ(1, nthDayOfWeekOfMonth(6, 1, 1));  // first friday of january
-    EXPECT_EQ(8, nthDayOfWeekOfMonth(6, 2, 1));  // second friday of january
-    EXPECT_EQ(15, nthDayOfWeekOfMonth(6, 3, 1)); // third friday of january
-    EXPECT_EQ(22, nthDayOfWeekOfMonth(6, 4, 1)); // fourth friday of january
+    EXPECT_EQ(1, nthDayOfWeekOfMonth(*state, 6, 1, 1));  // first friday of january
+    EXPECT_EQ(8, nthDayOfWeekOfMonth(*state, 6, 2, 1));  // second friday of january
+    EXPECT_EQ(15, nthDayOfWeekOfMonth(*state, 6, 3, 1)); // third friday of january
+    EXPECT_EQ(22, nthDayOfWeekOfMonth(*state, 6, 4, 1)); // fourth friday of january
 
-    EXPECT_EQ(34, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
-    EXPECT_EQ(62, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+    EXPECT_EQ(34, nthDayOfWeekOfMonth(*state, 4, 1, 2)); // first wednesday of february
+    EXPECT_EQ(62, nthDayOfWeekOfMonth(*state, 4, 1, 3)); // first wednesday of march
 }
 
 TEST_F(EnergyPlusFixture, General_EpexpTest)
 {
     //Global exp function test
     Real64 x;
+    Real64 d(1.0);
     Real64 y;
 
-    // Negative value
+    // Underflow and near zero tests
     x = -69.0;
-    y = epexp(x);
+    y = epexp(x,d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
     x = -700.0;
-    y = epexp(x);
+    y = epexp(x,d);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
-    // Positive values
+    x = -1000.0; // Will cause underflow
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    // Divide by zero tests
+    d = 0.0;
+    x = -1000.0;
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    d = 0.0;
+    x = 1000.0;
+    y = epexp(x,d);
+    EXPECT_EQ(0.0, y);
+
+    /*// Overflow and near-overflow tests (Not currently used in code)
     x = 10.0;
-    y = epexp(x, 700.0);
+    d = 1.0;
+    y = epexpOverflow(x, d);
     EXPECT_NEAR(22026.46579480, y, 0.00001);
 
     x = 800.0;
-    y = epexp(x, 700.0);
+    d = 1.0;
+    y = epexpOverflow(x, d);
     EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
+    */
 }
-
 } // namespace EnergyPlus

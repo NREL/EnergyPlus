@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -136,7 +137,6 @@ namespace DualDuct {
     {
         // Members
         std::string Name; // Name of the Damper
-        //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
         int SchedPtr;              // Pointer to the correct schedule
@@ -192,9 +192,9 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(bool const FirstHVACIteration);
+        void InitDualDuct(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeDualDuct();
+        void SizeDualDuct(EnergyPlusData &state);
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -202,19 +202,20 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum);
 
         void CalcOAMassFlow(EnergyPlusData &state,
                             Real64 &SAMassFlow,   // outside air based on optional user input
                             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
-            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+        void CalcOAOnlyMassFlow(EnergyPlusData &state,
+                                Real64 &OAMassFlow,               // outside air flow from user input kg/s
+                                Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
         // End Algorithm Section of the Module
@@ -247,14 +248,14 @@ namespace DualDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput();
+    void GetDualDuctInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
 
-    void ReportDualDuctConnections(EnergyPlusData &state, IOFiles &ioFiles);
+    void ReportDualDuctConnections(EnergyPlusData &state);
 
-    void GetDualDuctOutdoorAirRecircUse(std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
+    void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state, std::string const &CompTypeName, std::string const &CompName, bool &RecircIsUsed);
 
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************
@@ -264,6 +265,14 @@ namespace DualDuct {
     void clear_state();
 
 } // namespace DualDuct
+
+struct DualDuctData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

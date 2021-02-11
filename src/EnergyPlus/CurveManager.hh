@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,13 +68,14 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace CurveManager {
 
@@ -239,12 +240,12 @@ namespace CurveManager {
     {
     public:
         TableFile() = default;
-        TableFile(IOFiles &ioFiles, std::string path);
+        TableFile(EnergyPlusData &state, std::string path);
         std::string filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        void load(IOFiles &ioFiles, std::string path);
-        std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
+        bool load(EnergyPlusData &state, std::string path);
+        std::vector<double>& getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
         std::size_t numRows = 0u;
@@ -266,7 +267,7 @@ namespace CurveManager {
         };
         double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> &target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
-        int getGridIndex(std::string &indVarListName, bool &ErrorsFound);
+        int getGridIndex(EnergyPlusData &state, std::string &indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
@@ -369,7 +370,7 @@ namespace CurveManager {
 
     void GetPressureCurveTypeAndIndex(EnergyPlusData &state,
                                       std::string const &PressureCurveName, // name of the curve
-                                      int &PressureCurveType,
+                                      DataBranchAirLoopPlant::PressureCurveType &PressureCurveType,
                                       int &PressureCurveIndex);
 
     Real64 PressureCurveValue(EnergyPlusData &state, int PressureCurveIndex, Real64 MassFlow, Real64 Density, Real64 Viscosity);
@@ -391,17 +392,26 @@ namespace CurveManager {
 
 } // namespace CurveManager
 
-struct CurveManagerData : BaseGlobalStruct {
-    int NumCurves = 0;
-    bool GetCurvesInputFlag = true;
-    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
-    CurveManager::BtwxtManager btwxtManager;
-    std::unordered_map<std::string, std::string> UniqueCurveNames;
-    bool CurveValueMyBeginTimeStepFlag;
-    bool FrictionFactorErrorHasOccurred = false;
+    struct CurveManagerData : BaseGlobalStruct {
+        int NumCurves = 0;
+        bool GetCurvesInputFlag = true;
+        bool CurveValueMyBeginTimeStepFlag = false;
+        bool FrictionFactorErrorHasOccurred = false;
+        Array1D<CurveManager::PerformanceCurveData> PerfCurve;
+        CurveManager::BtwxtManager btwxtManager;
+        std::unordered_map<std::string, std::string> UniqueCurveNames;
 
-    void clear_state() override;
-};
+        void clear_state() override
+        {
+            this->NumCurves = 0;
+            this->GetCurvesInputFlag = true;
+            this->CurveValueMyBeginTimeStepFlag = false;
+            this->FrictionFactorErrorHasOccurred = false;
+            PerfCurve.deallocate();
+            btwxtManager.clear();
+            UniqueCurveNames.clear();
+        }
+    };
 
 } // namespace EnergyPlus
 

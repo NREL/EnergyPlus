@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -60,22 +61,22 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataEnvironment_WindSpeedAt)
 {
-    DataEnvironment::WindSpeed = 10;
-    DataEnvironment::WeatherFileWindModCoeff = 0.3;
-    DataEnvironment::SiteWindBLHeight = 20;
+    state->dataEnvrn->WindSpeed = 10;
+    state->dataEnvrn->WeatherFileWindModCoeff = 0.3;
+    state->dataEnvrn->SiteWindBLHeight = 20;
 
     // Start with normal mode
-    DataEnvironment::SiteWindExp = 0.1;
-    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(-1.0), 0.001);
-    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(0.0), 0.001);
-    EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(1.0), 0.001);
-    EXPECT_NEAR(2.612, DataEnvironment::WindSpeedAt(5.0), 0.001);
-    EXPECT_NEAR(2.799, DataEnvironment::WindSpeedAt(10.0), 0.001);
-    EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(20.0), 0.001);
+    state->dataEnvrn->SiteWindExp = 0.1;
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
+    EXPECT_NEAR(0.000, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
+    EXPECT_NEAR(2.223, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);
+    EXPECT_NEAR(2.612, DataEnvironment::WindSpeedAt(*state, 5.0), 0.001);
+    EXPECT_NEAR(2.799, DataEnvironment::WindSpeedAt(*state, 10.0), 0.001);
+    EXPECT_NEAR(3.000, DataEnvironment::WindSpeedAt(*state, 20.0), 0.001);
 
     // If the site wind exponent is zero, the wind speed is either zero or the actual wind speed
-    DataEnvironment::SiteWindExp = 0.0;
-    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(-1.0), 0.001);
-    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(0.0), 0.001);
-    EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(1.0), 0.001);
+    state->dataEnvrn->SiteWindExp = 0.0;
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, -1.0), 0.001);
+    EXPECT_NEAR(0.0, DataEnvironment::WindSpeedAt(*state, 0.0), 0.001);
+    EXPECT_NEAR(10.0, DataEnvironment::WindSpeedAt(*state, 1.0), 0.001);
 }

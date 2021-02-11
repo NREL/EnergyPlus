@@ -117,7 +117,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1425,7 +1427,7 @@
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
-    LatentWithSensibleLoadControl, !- Latent Load Control
+    LatentWithSensibleLoadControl,  !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Humidistat Reheat Coil 1,!- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
@@ -1846,3 +1848,4 @@
   Output:DebuggingData,
     No,                      !- Report Debugging Data
     No;                      !- Report During Warmup
+

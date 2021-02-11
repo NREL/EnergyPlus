@@ -155,7 +155,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -3227,8 +3229,8 @@
   PythonPlugin:Instance,
     RH Controlled Open Factor,  !- Name
     Yes,                     !- Run During Warmup Days
-    PythonPluginAirflowNetworkOpeningControlByHumidity, !- Python Module Name
-    RH_OpeningController;        !- Plugin Class Name
+    PythonPluginAirflowNetworkOpeningControlByHumidity,  !- Python Module Name
+    RH_OpeningController;    !- Plugin Class Name
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting

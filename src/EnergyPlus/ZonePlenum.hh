@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,9 +59,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZonePlenum {
 
@@ -169,17 +168,17 @@ namespace ZonePlenum {
 
     void GetZonePlenumInput(EnergyPlusData &state);
 
-    void InitAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    void CalcAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void CalcAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstCall);
+    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
 
-    void UpdateAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void UpdateAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
+    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 
@@ -208,15 +207,15 @@ namespace ZonePlenum {
 
         void clear_state() override
         {
-            GetInputFlag = true;
-            InitAirZoneReturnPlenumEnvrnFlag = true;
-            InitAirZoneReturnPlenumOneTimeFlag = true;
-            NumZonePlenums = 0;
-            NumZoneReturnPlenums = 0;
-            NumZoneSupplyPlenums = 0;
-            ZoneRetPlenCond.deallocate();
-            ZoneSupPlenCond.deallocate();
-            MyEnvrnFlag = true;
+            this->GetInputFlag = true;
+            this->InitAirZoneReturnPlenumEnvrnFlag = true;
+            this->InitAirZoneReturnPlenumOneTimeFlag = true;
+            this->NumZonePlenums = 0;
+            this->NumZoneReturnPlenums = 0;
+            this->NumZoneSupplyPlenums = 0;
+            this->ZoneRetPlenCond.deallocate();
+            this->ZoneSupPlenCond.deallocate();
+            this->MyEnvrnFlag = true;
         }
 
         // Default Constructor

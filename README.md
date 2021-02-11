@@ -1,5 +1,8 @@
-EnergyPlus [![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?colorB=FF7300)]()
-===================================================================================================
+EnergyPlus [![](https://img.shields.io/github/release/NREL/energyplus.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
+==========
+
+![](https://img.shields.io/github/downloads/NREL/EnergyPlus/latest/total?color=5AC451)
+![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?color=5AC451&label=downloads_since_v8.1)
 
 This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.
 
@@ -10,19 +13,44 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
  - Many users (and developers) of EnergyPlus are active on [Unmet Hours](https://unmethours.com/), so that's a great place to start if you have a question about EnergyPlus or building simulation.
  - For more in-depth, developer-driven support, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
-## Releases [![](https://img.shields.io/github/release/NREL/energyplus.svg?colorB=FF7300)](https://github.com/NREL/EnergyPlus/releases/latest)
+## Testing
+
+![](https://github.com/NREL/EnergyPlus/workflows/Custom%20Check/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Documentation/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/CppCheck/badge.svg)
+
+Every commit and every release of EnergyPlus undergoes rigorous testing.
+The testing consists of building EnergyPlus, of course, then there are unit tests, integration tests, API tests, and regression tests.
+Since 2014, most of the testing has been performed by our bots ([Tik-Tok](https://github.com/nrel-bot), [Gort](https://github.com/nrel-bot-2), and [Marvin](https://github.com/nrel-bot-3)), using a fork of the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
+We are now adapting our efforts to use the Github Actions system to handle more of our testing processes.
+In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/).
+
+## Releases
+
+![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Mac%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)
 
 EnergyPlus is released twice annually, usually in March and September.
 It is recommended all use of EnergyPlus is production workflows use these formal, public releases.
 Iteration **(pre-)releases** may be created during a development cycle, however users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.
 If an interim release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
+Our releases are now built by Github Actions.
 
-## Documentation [![](https://img.shields.io/badge/docs-pdf-FF7300.svg)](https://energyplus.net/documentation) [![](https://img.shields.io/badge/docs-html-FF7300.svg)](http://bigladdersoftware.com/epx/docs/)
+## Core Documentation
 
 Program documentation is installed alongside the program, with the pdfs also available [online](https://energyplus.net/documentation).
 Big Ladder also produces html based documentation [online](http://bigladdersoftware.com/epx/docs/).
 
-## License & Contributing Development [![](https://img.shields.io/badge/license-BSD--3--like-FF7300.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
+## API Documentation
+
+[![Read the Docs](https://img.shields.io/readthedocs/energyplus?label=docs%20%28latest%29&color=5AC451)](https://energyplus.readthedocs.io/en/latest/)
+[![Read the Docs](https://img.shields.io/readthedocs/energyplus?label=docs%20%28stable%29&color=5AC451)](https://energyplus.readthedocs.io/en/stable/)
+
+An API has been developed to allow access to internal EnergyPlus functionality and open up the possibility for new workflow opportunities around EnergyPlus.
+A C API is developed to expose the C++ functions, then Python bindings are built on top of that to maximize the accessibility.
+Documentation is being built and posted on ReadTheDocs and that documentation will continue to be expanded over time as the API grows.
+The badges above here show the status, and link out to, the `latest` documentation (most recent commit to the `develop` branch) as well as the `stable` documentation (most recent release tag).
+
+## License & Contributing Development
+
+[![](https://img.shields.io/badge/license-BSD--3--like-5AC451.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
 
 EnergyPlus is available under a BSD-3-like license.
 For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).
@@ -32,6 +60,5 @@ If you are interested in contributing, please start there, but feel free to reac
 
 ## Building EnergyPlus
 
-Commits to EnergyPlus are built by our team of robots ([Tik-Tok](https://github.com/nrel-bot), [Gort](https://github.com/nrel-bot-2), and [Marvin](https://github.com/nrel-bot-3)), using the [Decent CI](https://github.com/lefticus/decent_ci) continuous integration system.
-The testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/) gives a continually updated view of the status of all active branches, pull requests, and tags.
 A detailed description of compiling EnergyPlus on multiple platforms is available on the [wiki](https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus).
+Also, as we are adapting to using Github Actions, the recipes for building EnergyPlus can be found in our [workflow files](https://github.com/NREL/EnergyPlus/tree/develop/.github/workflows).

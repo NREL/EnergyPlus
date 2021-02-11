@@ -194,7 +194,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
  !  Data Source=ASHRAE 2009 Annual Design Conditions
 
@@ -2173,7 +2175,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     23125.6,                 !- Gross Rated Total Cooling Capacity {W}
     16267.06,                !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2202,7 +2204,7 @@
     1.0,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     19156.73,                !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -2447,7 +2449,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     11562.8,                 !- Gross Rated Total Cooling Capacity {W}
     8133.53,                 !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2476,7 +2478,7 @@
     1.0,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     10078.365,               !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -2721,7 +2723,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     23125.6,                 !- Gross Rated Total Cooling Capacity {W}
     16267.06,                !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -2750,7 +2752,7 @@
     1.0,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     19156.73,                !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -2995,7 +2997,7 @@
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     11562.8,                 !- Gross Rated Total Cooling Capacity {W}
     8133.53,                 !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -3024,7 +3026,7 @@
     1.0,                     !- Rated Air Flow Rate {m3/s}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     10078.365,               !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3
@@ -3269,7 +3271,7 @@
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     23125.59,                !- Gross Rated Total Cooling Capacity {W}
     16267,                   !- Gross Rated Sensible Cooling Capacity {W}
-    7.007757577,             !- Gross Rated Cooling COP
+    7.007757577,             !- Gross Rated Cooling COP {W/W}
     -0.68126221,             !- Total Cooling Capacity Coefficient 1
     1.99529297,              !- Total Cooling Capacity Coefficient 2
     -0.93611888,             !- Total Cooling Capacity Coefficient 3
@@ -3298,7 +3300,7 @@
     1.0,                     !- Rated Air Flow Rate {m3/s}
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     19156.73,                !- Gross Rated Heating Capacity {W}
-    3.167053691,             !- Gross Rated Heating COP
+    3.167053691,             !- Gross Rated Heating COP {W/W}
     -5.50102734,             !- Heating Capacity Coefficient 1
     -0.96688754,             !- Heating Capacity Coefficient 2
     7.70755007,              !- Heating Capacity Coefficient 3

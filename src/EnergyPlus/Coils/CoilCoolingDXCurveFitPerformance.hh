@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,13 +52,14 @@
 #include <vector>
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
@@ -69,8 +70,8 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     Real64 unit_internal_static_air_pressure;
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
-    std::string basin_heater_operating_shedule_name;
-    int compressor_fuel_type;
+    std::string basin_heater_operating_schedule_name;
+    DataGlobalConstants::ResourceType compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
     std::string alternate_operating_mode2_name;
@@ -103,14 +104,13 @@ struct CoilCoolingDXCurveFitPerformance
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-    void calcStandardRatings(EnergyPlusData &state,
-        int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::IOFiles &ioFiles);
+    void calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex);
     Real64 calcIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);
     void size(EnergyPlusData &state);
-    void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
+    void setOperMode(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;

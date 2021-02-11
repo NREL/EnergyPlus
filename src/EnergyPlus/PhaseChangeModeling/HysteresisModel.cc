@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -47,6 +47,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -62,10 +63,10 @@ namespace HysteresisPhaseChange {
     int numHysteresisModels = 0;
     std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
-    HysteresisPhaseChange *HysteresisPhaseChange::factory(const std::string &objectName)
+    HysteresisPhaseChange *HysteresisPhaseChange::factory(EnergyPlusData &state, const std::string &objectName)
     {
         if (getHysteresisModels) {
-            readAllHysteresisModels();
+            readAllHysteresisModels(state);
             getHysteresisModels = false;
         }
         for (auto &hm : hysteresisPhaseChangeModels) {
@@ -317,12 +318,12 @@ namespace HysteresisPhaseChange {
         }
     }
 
-    void readAllHysteresisModels()
+    void readAllHysteresisModels(EnergyPlusData &state)
     {
 
         // convenience variables
         DataIPShortCuts::cCurrentModuleObject = "MaterialProperty:PhaseChangeHysteresis";
-        numHysteresisModels = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        numHysteresisModels = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
         // loop over all hysteresis input instances, if zero, this will simply not do anything
         for (int hmNum = 1; hmNum <= numHysteresisModels; ++hmNum) {
@@ -333,7 +334,8 @@ namespace HysteresisPhaseChange {
             int numNumbers;
 
             // get the input data and store it in the Shortcuts structures
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(state,
+                                          DataIPShortCuts::cCurrentModuleObject,
                                           hmNum,
                                           DataIPShortCuts::cAlphaArgs,
                                           numAlphas,
@@ -349,13 +351,13 @@ namespace HysteresisPhaseChange {
             // still validate the name to make sure there aren't any duplicates or blanks
             // blanks are easy: fatal if blank
             if (DataIPShortCuts::lAlphaFieldBlanks[0]) {
-                ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
             }
 
             // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
             for (auto &existingHysteresisModel : hysteresisPhaseChangeModels) {
                 if (DataIPShortCuts::cAlphaArgs(1) == existingHysteresisModel.name) {
-                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                    ShowFatalError(state, "Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
                                    " object: Duplicate name found: " + existingHysteresisModel.name);
                 }
             }

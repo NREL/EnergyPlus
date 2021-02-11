@@ -154,7 +154,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
@@ -1716,13 +1718,13 @@
 
   ! Output:Variable,*,Zone 1 WinAC Total Cooling Rate,hourly;
 
-  Output:Variable, Zone 1 WinAC Total Cooling Rate, PythonPlugin:OutputVariable, hourly;
+  Output:Variable,Zone 1 WinAC Total Cooling Rate,PythonPlugin:OutputVariable,hourly;
 
   ! Output:Variable,*,Zone 1 WinAC Electricity Power,hourly;
 
-  Output:Variable, Zone 1 WinAC Electricity Power, PythonPlugin:OutputVariable, hourly;
+  Output:Variable,Zone 1 WinAC Electricity Power,PythonPlugin:OutputVariable,hourly;
 
-  Output:Variable, Zone 1 WinAC Electricity Consumption, PythonPlugin:OutputVariable, hourly;
+  Output:Variable,Zone 1 WinAC Electricity Consumption,PythonPlugin:OutputVariable,hourly;
 
   Output:Variable,Zone1WindACAirOutletNode,System Node Mass Flow Rate,hourly;
 
@@ -1809,11 +1811,9 @@
 !    Zone 1 Window AC Init Program Manager,  !- Name
 !    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
 !    InitZone1WinACModel;     !- Program Name 1
-
 !  EnergyManagementSystem:Program,
 !    InitZone1WinACModel,     !- Name
 !    Set dummy = 1;           !- Program Line 1
-
 !  EnergyManagementSystem:ProgramCallingManager,
 !    Zone 1 Window AC Model Program Manager,  !- Name
 !    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
@@ -1823,9 +1823,9 @@
 
   PythonPlugin:Instance,
     Zone 1 Window AC Model Program Manager,  !- Name
-    Yes,                                     !- Run During Warmup Days
-    PythonPluginUserDefinedWindACAuto,       !- Python Module Name
-    Zone1WinACModel;                         !- Plugin Class Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginUserDefinedWindACAuto,  !- Python Module Name
+    Zone1WinACModel;         !- Plugin Class Name
 
 !  EnergyManagementSystem:Program,
 !    Zone1_WinAC_ModelInput,  !- Name
@@ -1961,20 +1961,20 @@
 
   PythonPlugin:Variables,
     MyGlobalVariables,       !- Name
-    Zone1WinAC_ElectPower,     !- Variable Name 1
-    Zone1WinAC_tot_cool_Power,
-    Zone1WinAC_ElectEnergy;
+    Zone1WinAC_ElectPower,   !- Variable Name 1
+    Zone1WinAC_tot_cool_Power,  !- Variable Name 2
+    Zone1WinAC_ElectEnergy;  !- Variable Name 3
 
   PythonPlugin:OutputVariable,
     Zone 1 WinAC Electricity Power,  !- Name
-    Zone1WinAC_ElectPower,     !- PythonPlugin:Variable Name
+    Zone1WinAC_ElectPower,   !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     SystemTimestep,          !- Update Frequency
     W;                       !- Units
 
   PythonPlugin:OutputVariable,
     Zone 1 WinAC Total Cooling Rate,  !- Name
-    Zone1WinAC_tot_cool_Power,     !- PythonPlugin:Variable Name
+    Zone1WinAC_tot_cool_Power,  !- Python Plugin Variable Name
     Averaged,                !- Type of Data in Variable
     SystemTimestep,          !- Update Frequency
     W;                       !- Units
@@ -1986,7 +1986,6 @@
 !    SystemTimestep,          !- Update Frequency
 !    Zone1_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
 !    W;                       !- Units
-
 !  EnergyManagementSystem:MeteredOutputVariable,
 !    Zone 1 WinAC Electricity Consumption,  !- Name
 !    Zone1WinAC_ElectEnergy,  !- EMS Variable Name
@@ -2000,7 +1999,7 @@
 
   PythonPlugin:OutputVariable,
     Zone 1 WinAC Electricity Consumption,  !- Name
-    Zone1WinAC_ElectEnergy,  !- PythonPlugin:Variable
+    Zone1WinAC_ElectEnergy,  !- Python Plugin Variable Name
     Metered,                 !- Type of Data in Variable
     SystemTimestep,          !- Update Frequency
     J,                       !- Units
@@ -2334,13 +2333,14 @@
 
   EnergyManagementSystem:MeteredOutputVariable,
     Zone 3 WinAC Electricity Consumption [J],  !- Name
-    Zone3WinAC_ElectEnergy, !- EMS Variable Name
-    SystemTimestep,         !- Update Frequency
-    Zone3_WinAC_ModelOuput, !- EMS Program or Subroutine Name
-    Electricity,            !- Resource Type
-    HVAC,                   !- Group Type
-    Cooling,                !- End Use Category
-    Window Air Conditioners;!- End Use Subcategory
+    Zone3WinAC_ElectEnergy,  !- EMS Variable Name
+    SystemTimestep,          !- Update Frequency
+    Zone3_WinAC_ModelOuput,  !- EMS Program or Subroutine Name
+    Electricity,             !- Resource Type
+    HVAC,                    !- Group Type
+    Cooling,                 !- End-Use Category
+    Window Air Conditioners; !- End-Use Subcategory
+
      ! turn it off and leave
    ! unit is on and doing some cooling
    ! determine mixed air conditions
