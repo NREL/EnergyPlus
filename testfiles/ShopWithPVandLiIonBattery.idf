@@ -5015,11 +5015,11 @@
     0,                       !- Radiative Fraction
     KandlerSmith,            !- Lifetime Model
     139,                     !- Number of Cells in Series
-    17360,                   !- Number of Strings in Parallel
+    8,                       !- Number of Strings in Parallel
     0.7,                     !- Initial Fractional State of Charge
     ,                        !- DC to DC Charging Efficiency
-    ,                        !- Battery Mass
-    ,                        !- Battery Surface Area
+    114,                     !- Battery Mass
+    1.42,                    !- Battery Surface Area
     ,                        !- Battery Specific Heat Capacity
     ;                        !- Heat Transfer Coefficient Between Battery and Ambient
 
