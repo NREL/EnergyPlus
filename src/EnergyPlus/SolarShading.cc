@@ -758,7 +758,7 @@ namespace SolarShading {
         int I;
         int NumOfLayers;
 
-        // FLOW:
+
 
         state.dataSolarShading->CTHETA.dimension(TotSurfaces, 0.0);
         state.dataSolarShading->SAREA.dimension(TotSurfaces, 0.0);
@@ -2285,7 +2285,7 @@ namespace SolarShading {
         Real64 ViewFactorSkyGeom;      // Geometrical sky view factor
         Real64 const cosine_tolerance(0.0001);
 
-        // FLOW:
+
 #ifdef EP_Count_Calls
         ++NumAnisoSky_Calls;
 #endif
@@ -8175,7 +8175,7 @@ namespace SolarShading {
         // Certain operations performed only if reveal status not yet set.
         int RevealStatus; // Status of the reveal, takes the parameter values above
 
-        // FLOW:
+
         RevealStatus = None;
         RevealStatusSet = false;
 
@@ -9289,7 +9289,7 @@ namespace SolarShading {
         //                                                           ! sky on surface, without shading
         // INTEGER iHour,iTS
 
-        // FLOW:
+
 
         // Initialize Surfaces Arrays
         state.dataSolarShading->SAREA = 0.0;
@@ -11624,9 +11624,7 @@ namespace SolarShading {
         }
 
         // This calculates the area stored in XVS and YVS
-        // CALL HTRANS(1,LOCHCA,NVT)
         HTRANS1(state, state.dataSolarShading->LOCHCA, NVT);
-        // HCAREA(LOCHCA) = -HCAREA(LOCHCA)
 
         // Calculation of overlap areas for each outgoing basis direction
         for (IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay) { // basis directions loop (on back surface)
@@ -11670,9 +11668,7 @@ namespace SolarShading {
                 // Transform to the homogeneous coordinate system.
 
                 NS3 = state.dataSolarShading->LOCHCA + 1;
-                // NS3      = LOCHCA
                 state.dataSolarShading->HCT(NS3) = 0.0;
-                // CALL HTRANS(1,NS3,NVT)
                 HTRANS1(state, NS3, NVT);
 
                 // Determine area of overlap of projected back surface and receiving surface.

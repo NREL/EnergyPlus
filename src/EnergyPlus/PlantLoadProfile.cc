@@ -286,7 +286,7 @@ namespace EnergyPlus::PlantLoadProfile {
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        // FLOW:
+
         this->Energy = this->Power * TimeStepSys * DataGlobalConstants::SecInHour;
 
         if (this->Energy >= 0.0) {
@@ -325,7 +325,7 @@ namespace EnergyPlus::PlantLoadProfile {
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int ProfileNum;                 // PLANT LOAD PROFILE (PlantProfile) object number
 
-        // FLOW:
+
         cCurrentModuleObject = "LoadProfile:Plant";
         state.dataPlantLoadProfile->NumOfPlantProfile = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
