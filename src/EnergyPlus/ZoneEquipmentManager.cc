@@ -4000,7 +4000,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
                     if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
                         if (MassConservation(ZoneNum).IsOnlySourceZone || (ZoneAirMassFlow.InfiltrationZoneType == AllZones)) {
-                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate +
+                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate - MassConservation(ZoneNum).MixingMassFlowRate +
                                                            state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
                                                            state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
                             if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
