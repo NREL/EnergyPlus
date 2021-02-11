@@ -665,7 +665,7 @@ namespace ThermalChimney {
                 if (Surface(SurfNum).Width == majorW) {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
-                        ConvTransCoeffWallFluid = HConvIn(SurfNum);
+                        ConvTransCoeffWallFluid = state.dataHeatBal->HConvIn(SurfNum);
                         SurfTempAbsorberWall = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
@@ -679,7 +679,7 @@ namespace ThermalChimney {
 
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
-                        ConvTransCoeffGlassFluid = HConvIn(SurfNum);
+                        ConvTransCoeffGlassFluid = state.dataHeatBal->HConvIn(SurfNum);
                         SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }

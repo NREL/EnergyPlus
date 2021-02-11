@@ -846,7 +846,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = ThisCP.ZonePtr;
-            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             state.dataChilledCeilingPanelSimple->CoolingPanelSrcAvg(CoolingPanelNum) = 0.0;
             state.dataChilledCeilingPanelSimple->LastCoolingPanelSrc(CoolingPanelNum) = 0.0;
             state.dataChilledCeilingPanelSimple->LastSysTimeElapsed(CoolingPanelNum) = 0.0;
@@ -1410,7 +1410,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
+                LoadMet = (SumHATsurf(state, ZoneNum) - state.dataChilledCeilingPanelSimple->ZeroSourceSumHATsurf(ZoneNum)) + (CoolingPanelCool * this->FracConvect) +
                           (RadHeat * this->FracDistribPerson);
             }
             this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
@@ -1673,7 +1673,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         this->RadEnergy = this->RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1689,7 +1689,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::IntBlindOn;
@@ -1730,17 +1729,17 @@ namespace EnergyPlus::CoolingPanelSimple {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn && SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
-                        HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);
+                        state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

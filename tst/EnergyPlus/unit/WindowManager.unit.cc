@@ -239,12 +239,12 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     Real64 v_ws = 5.5;
 
     // Overrides for testing
-    DataHeatBalance::CosIncAng.dimension(1, 1, 3, 1.0);
-    DataHeatBalance::SunlitFrac.dimension(1, 1, 3, 1.0);
-    DataHeatBalance::SunlitFracWithoutReveal.dimension(1, 1, 3, 1.0);
+    state->dataHeatBal->CosIncAng.dimension(1, 1, 3, 1.0);
+    state->dataHeatBal->SunlitFrac.dimension(1, 1, 3, 1.0);
+    state->dataHeatBal->SunlitFracWithoutReveal.dimension(1, 1, 3, 1.0);
 
     DataSurfaces::Surface(winNum).OutDryBulbTemp = T_out;
-    DataHeatBalance::TempEffBulkAir(winNum) = T_in;
+    state->dataHeatBal->TempEffBulkAir(winNum) = T_in;
     DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
     DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(1, 0.01);
     DataHeatBalFanSys::ZoneAirHumRat.dimension(1, 0.01);
@@ -289,7 +289,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(*state,
             winNum, outSurfTemp,
             T_out); // This subroutine sets the global HConvIn( 1 ) variable. We will use it to set the exterior natural convection.
-        h_exterior = h_exterior_f + DataHeatBalance::HConvIn(winNum); // add natural convection
+        h_exterior = h_exterior_f + state->dataHeatBal->HConvIn(winNum); // add natural convection
 
         // revert tilt for interior natural convection calculations
         DataSurfaces::Surface(1).Tilt = tiltSave;
@@ -500,7 +500,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
-    DataHeatBalance::TempEffBulkAir.allocate(3);
+    state->dataHeatBal->TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
@@ -522,9 +522,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
     DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
     DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
-    DataHeatBalance::TempEffBulkAir(surfNum1) = 10.0;
-    DataHeatBalance::TempEffBulkAir(surfNum2) = 10.0;
-    DataHeatBalance::TempEffBulkAir(surfNum3) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum1) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -535,10 +535,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataLoopNode::Node(3).MassFlowRate = 0.1;
     DataLoopNode::Node(4).MassFlowRate = 0.1;
 
-    DataHeatBalance::HConvIn.allocate(3);
-    DataHeatBalance::HConvIn(surfNum1) = 0.5;
-    DataHeatBalance::HConvIn(surfNum2) = 0.5;
-    DataHeatBalance::HConvIn(surfNum3) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(3);
+    state->dataHeatBal->HConvIn(surfNum1) = 0.5;
+    state->dataHeatBal->HConvIn(surfNum2) = 0.5;
+    state->dataHeatBal->HConvIn(surfNum3) = 0.5;
     DataHeatBalance::Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
@@ -564,7 +564,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataSurfaces::SurfWinGainIRGlazToZoneRep.allocate(3);
     DataSurfaces::SurfWinGapConvHtFlowRep.allocate(3);
     DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    DataHeatBalance::QS.allocate(1);
+    state->dataHeatBal->QS.allocate(1);
     DataSurfaces::SurfWinLossSWZoneToOutWinRep.allocate(3);
     DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
     DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
@@ -593,34 +593,34 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
     DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
     DataSurfaces::SurfWinTransSolar = 0.0;
-    DataHeatBalance::QS = 0.0;
+    state->dataHeatBal->QS = 0.0;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
 
     // Claculate temperature based on supply flow rate
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(20.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
     // Claculate temperature based on zone temperature with supply flow rate = 0
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(25.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 
     // Adjacent surface
     DataLoopNode::Node(1).MassFlowRate = 0.1;
     DataLoopNode::Node(2).MassFlowRate = 0.1;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(20.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
     DataSurfaces::Surface(2).ExtBoundCond = 1;
     DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(25.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
@@ -2727,7 +2727,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataLoopNode::Node.allocate(4);
-    DataHeatBalance::TempEffBulkAir.allocate(3);
+    state->dataHeatBal->TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
@@ -2749,9 +2749,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
     DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
     DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
-    DataHeatBalance::TempEffBulkAir(surfNum1) = 10.0;
-    DataHeatBalance::TempEffBulkAir(surfNum2) = 10.0;
-    DataHeatBalance::TempEffBulkAir(surfNum3) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum1) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum2) = 10.0;
+    state->dataHeatBal->TempEffBulkAir(surfNum3) = 10.0;
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -2762,10 +2762,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataLoopNode::Node(3).MassFlowRate = 0.1;
     DataLoopNode::Node(4).MassFlowRate = 0.1;
 
-    DataHeatBalance::HConvIn.allocate(3);
-    DataHeatBalance::HConvIn(surfNum1) = 0.5;
-    DataHeatBalance::HConvIn(surfNum2) = 0.5;
-    DataHeatBalance::HConvIn(surfNum3) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(3);
+    state->dataHeatBal->HConvIn(surfNum1) = 0.5;
+    state->dataHeatBal->HConvIn(surfNum2) = 0.5;
+    state->dataHeatBal->HConvIn(surfNum3) = 0.5;
     DataHeatBalance::Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
@@ -2791,7 +2791,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataSurfaces::SurfWinGainIRGlazToZoneRep.allocate(3);
     DataSurfaces::SurfWinGapConvHtFlowRep.allocate(3);
     DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    DataHeatBalance::QS.allocate(1);
+    state->dataHeatBal->QS.allocate(1);
     DataSurfaces::SurfWinLossSWZoneToOutWinRep.allocate(3);
     DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
     DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
@@ -2820,14 +2820,14 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
     DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
     DataSurfaces::SurfWinTransSolar = 0.0;
-    DataHeatBalance::QS = 0.0;
+    state->dataHeatBal->QS = 0.0;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Calculate temperature based on supply flow rate
 
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(DataGlobalConstants::StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + DataGlobalConstants::KelvinConv) - pow_4(state->dataWindowManager->thetas(1))), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);

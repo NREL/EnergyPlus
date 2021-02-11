@@ -5651,11 +5651,11 @@ namespace InternalHeatGains {
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
-            QL(enclosureNum) = 0.0;
+            state.dataHeatBal->QL(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
                 SumAllInternalRadiationGains(zoneNum, zoneQL);
-                QL(enclosureNum) += zoneQL;
+                state.dataHeatBal->QL(enclosureNum) += zoneQL;
             }
         }
 
@@ -5673,9 +5673,9 @@ namespace InternalHeatGains {
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    curQL = QL(radEnclosureNum);
+                    curQL = state.dataHeatBal->QL(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
                     adjQL = curQL +
@@ -5683,11 +5683,11 @@ namespace InternalHeatGains {
                     // ITABSF is the Inside Thermal Absorptance
                     // TMULT is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
                     state.dataOutRptTab->radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     state.dataOutRptTab->radiantPulseReceived(CurOverallSimDay, SurfNum) =
-                            (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                            (adjQL - curQL) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum) * Surface(SurfNum).Area;
                 }
             }
         }

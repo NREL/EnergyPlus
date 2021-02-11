@@ -6294,22 +6294,22 @@ namespace ZoneTempPredictorCorrector {
                 // Add to the surface convection sums
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    Real64 const HA_surf(HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)));
+                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)));
                     SumHATsurf += HA_surf * SurfWinFrameTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && shading_flag != IntShadeOn && shading_flag != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    Real64 const HA_surf(HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
+                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
                     SumHATsurf += HA_surf * SurfWinDividerTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
             } // End of check if window
 
-            HA += HConvIn(SurfNum) * Area;
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            HA += state.dataHeatBal->HConvIn(SurfNum) * Area;
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
 
             // determine reference air temperature for this surface
             {
@@ -6319,7 +6319,7 @@ namespace ZoneTempPredictorCorrector {
                     RefAirTemp = MAT(ZoneNum);
                     SumHA += HA;
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                     SumHATref += HA * RefAirTemp;
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // check whether this zone is a controlled zone or not
@@ -6554,7 +6554,7 @@ namespace ZoneTempPredictorCorrector {
                     // The zone air is the reference temperature
                     RefAirTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // check whether this zone is a controlled zone or not
                     if (!ControlledZoneAirFlag) {
@@ -6617,20 +6617,20 @@ namespace ZoneTempPredictorCorrector {
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
 
-                    SumHADTsurfs += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                     (SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
                     SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHADTsurfs += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                     (SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
             } // End of check if window
 
-            SumHADTsurfs += HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
+            SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
             if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {

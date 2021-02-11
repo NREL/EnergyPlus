@@ -2196,7 +2196,7 @@ namespace LowTempRadiantSystem {
                 if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::HydronicSystem) {
 
                     ZoneNum = HydrRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -2208,7 +2208,7 @@ namespace LowTempRadiantSystem {
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
 
                     ZoneNum = CFloRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -2220,7 +2220,7 @@ namespace LowTempRadiantSystem {
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
                     ZoneNum = ElecRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -3832,7 +3832,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
+        LoadMet = SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -4850,7 +4850,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = SumHATsurf(state, this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
     }
 
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state)
@@ -4976,7 +4976,7 @@ namespace LowTempRadiantSystem {
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-                LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
+                LoadMet = SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 
@@ -5540,7 +5540,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -5573,19 +5573,19 @@ namespace LowTempRadiantSystem {
 
                 if (SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
                                   SurfWinFrameTempSurfIn(surfNum);
                 }
 
                 if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != IntShadeOn &&
                     SurfWinShadingFlag(surfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
                                   SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 
-            sumHATsurf += HConvIn(surfNum) * Area * TempSurfInTmp(surfNum);
+            sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * Area * TempSurfInTmp(surfNum);
         }
 
         return sumHATsurf;

@@ -1235,15 +1235,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
-    DataHeatBalance::HConvIn.allocate(6);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
-    DataHeatBalance::HConvIn(4) = 0.5;
-    DataHeatBalance::HConvIn(5) = 0.5;
-    DataHeatBalance::HConvIn(6) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn(1) = 0.5;
+    state->dataHeatBal->HConvIn(2) = 0.5;
+    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBal->HConvIn(4) = 0.5;
+    state->dataHeatBal->HConvIn(5) = 0.5;
+    state->dataHeatBal->HConvIn(6) = 0.5;
 
     state->dataGlobal->KickOffSimulation = true;
     DataHeatBalFanSys::ZoneLatentGain.allocate(1);

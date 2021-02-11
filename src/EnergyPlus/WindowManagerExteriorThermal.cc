@@ -149,7 +149,7 @@ namespace WindowManager {
             }
         }
 
-        HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
+        state.dataHeatBal->HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
         if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn || aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
@@ -176,7 +176,7 @@ namespace WindowManager {
                                       EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
-            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
+            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBal->HConvIn(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
 
@@ -221,9 +221,9 @@ namespace WindowManager {
         }
 
         auto TransDiff = construction.TransDiff;
-        SurfWinHeatGain(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        SurfWinHeatTransfer(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
@@ -593,7 +593,7 @@ namespace WindowManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Creates indoor environment object from surface properties in EnergyPlus
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
-        auto hcin = HConvIn(m_SurfNum);
+        auto hcin = state.dataHeatBal->HConvIn(m_SurfNum);
 
         auto IR = m_Surface.getInsideIR(m_SurfNum);
 

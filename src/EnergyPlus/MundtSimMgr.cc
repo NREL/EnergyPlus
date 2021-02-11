@@ -368,7 +368,6 @@ namespace MundtSimMgr {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPI;
@@ -474,7 +473,7 @@ namespace MundtSimMgr {
         // get surface data
         for (SurfNum = 1; SurfNum <= ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
             MundtAirSurf(SurfNum, MundtZoneNum).Temp = TempSurfIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
-            MundtAirSurf(SurfNum, MundtZoneNum).Hc = HConvIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+            MundtAirSurf(SurfNum, MundtZoneNum).Hc = state.dataHeatBal->HConvIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
         }
     }
 
@@ -761,7 +760,6 @@ namespace MundtSimMgr {
         //     map data from air domain back to surface domain for each particular zone
 
         // Using/Aliasing
-        using DataHeatBalance::TempEffBulkAir;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempTstatAir;
@@ -789,7 +787,7 @@ namespace MundtSimMgr {
                 // Use direct coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                    TempEffBulkAir(SurfFirst + SurfNum - 1) = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir;
+                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
                     Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
                 }
@@ -807,7 +805,7 @@ namespace MundtSimMgr {
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                     DeltaTemp = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir - LineNode(TstatNodeID, MundtZoneNum).Temp;
-                    TempEffBulkAir(SurfFirst + SurfNum - 1) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
+                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
                     Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
                 }
@@ -828,7 +826,7 @@ namespace MundtSimMgr {
         } else { // Controlled zone when the system is off --> Use the mixing model instead of the Mundt model
             // Bulk air temperatures -> TempEffBulkAir(SurfNum)
             for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                TempEffBulkAir(SurfFirst + SurfNum - 1) = MAT(ZoneNum);
+                state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = MAT(ZoneNum);
                 // set flag for reference air temperature
                 Surface(SurfFirst + SurfNum - 1).TAirRef = ZoneMeanAirTemp;
             }

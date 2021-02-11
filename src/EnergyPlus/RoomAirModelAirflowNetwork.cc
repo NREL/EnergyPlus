@@ -1083,30 +1083,30 @@ namespace RoomAirModelAirflowNetwork {
                 // Add to the surface convection sums
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
-                    HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
                     SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
-                    HA += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window
 
-            HA = HA + HConvIn(SurfNum) * Area;
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
 
             if (Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
             } else if (Surface(SurfNum).TAirRef == AdjacentAirTemp) {
-                RefAirTemp = TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
             } else if (Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not

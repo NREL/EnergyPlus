@@ -2130,7 +2130,7 @@ namespace WindowManager {
                 state.dataWindowManager->thetas(i) = window.ThetaFace(i);
             }
             state.dataWindowManager->hcout = HextConvCoeff;
-            state.dataWindowManager->hcin = HConvIn(SurfNum);
+            state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum);
             state.dataWindowManager->tin = MAT(surface.Zone) + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // This is code repeating and it is necessary to calculate report variables.  Do not know
@@ -2214,16 +2214,16 @@ namespace WindowManager {
             state.dataWindowManager->tilt = surface.Tilt;
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
-            state.dataWindowManager->hcin = HConvIn(SurfNum); // Room-side surface convective film conductance
+            state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
 
             // determine reference air temperature for this surface
             {
                 auto const SELECT_CASE_var(surface.TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = MAT(ZoneNum);
-                    TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2254,12 +2254,12 @@ namespace WindowManager {
                     } else {
                         RefAirTemp = MAT(ZoneNum);
                     }
-                    TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
 
                 } else {
                     // currently set to mean air temp but should add error warning here
                     RefAirTemp = MAT(ZoneNum);
-                    TempEffBulkAir(SurfNum) = RefAirTemp;
+                    state.dataHeatBal->TempEffBulkAir(SurfNum) = RefAirTemp;
                 }
             }
 
@@ -2271,7 +2271,7 @@ namespace WindowManager {
                 if (state.dataWindowManager->hcin <= state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
                     state.dataWindowManager->hcin = state.dataHeatBal->LowHConvLimit;
-                    HConvIn(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
+                    state.dataHeatBal->HConvIn(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
                 }
             }
 
@@ -2447,9 +2447,9 @@ namespace WindowManager {
                     auto const SELECT_CASE_var(Surface(SurfNumAdj).TAirRef);
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
-                        TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNumAdj;
@@ -2475,11 +2475,11 @@ namespace WindowManager {
                         } else {
                             RefAirTemp = MAT(ZoneNumAdj);
                         }
-                        TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     } else {
                         // currently set to mean air temp but should add error warning here
                         RefAirTemp = MAT(ZoneNumAdj);
-                        TempEffBulkAir(SurfNumAdj) = RefAirTemp;
+                        state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
                     }
                 }
 
@@ -2992,7 +2992,7 @@ namespace WindowManager {
                     InsideFaceIndex = state.dataWindowManager->nglface;
                 }
                 CalcISO15099WindowIntConvCoeff(state, SurfNum, state.dataWindowManager->thetas(InsideFaceIndex) - DataGlobalConstants::KelvinConv, state.dataWindowManager->tin - DataGlobalConstants::KelvinConv);
-                state.dataWindowManager->hcin = HConvIn(SurfNum);
+                state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum);
             }
 
             Aface = 0.0;
@@ -3518,10 +3518,10 @@ namespace WindowManager {
             } else if (ShadeFlag == SwitchableGlazing) {
                 TransDiff = InterpSw(SurfWinSwitchingFactor(SurfNum), state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
-            SurfWinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
-            SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {

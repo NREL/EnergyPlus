@@ -651,7 +651,7 @@ namespace ElectricBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBElecRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBElecRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -849,7 +849,7 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
+                LoadMet = (SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                           (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
 
                 if (LoadMet < 0.0) {
@@ -866,14 +866,14 @@ namespace ElectricBaseboardRadiator {
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
+                    TempZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
-                    LoadMet = (SumHATsurf(ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
+                    LoadMet = (SumHATsurf(state, ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                               (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
@@ -1115,7 +1115,7 @@ namespace ElectricBaseboardRadiator {
         ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1154,19 +1154,19 @@ namespace ElectricBaseboardRadiator {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
                     SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

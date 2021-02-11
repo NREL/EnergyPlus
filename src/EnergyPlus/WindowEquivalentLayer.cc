@@ -721,7 +721,7 @@ namespace WindowEquivalentLayer {
         ConvHeatFlowNatural = 0.0;
 
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-        HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
+        HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
 
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ZoneNum = Surface(SurfNum).Zone;
@@ -733,7 +733,7 @@ namespace WindowEquivalentLayer {
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
@@ -776,7 +776,7 @@ namespace WindowEquivalentLayer {
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
@@ -8131,7 +8131,7 @@ namespace WindowEquivalentLayer {
         ConstrNum = Surface(SurfNum).Construction;
         EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
-            if (CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
+            if (state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
@@ -8143,7 +8143,7 @@ namespace WindowEquivalentLayer {
                 }
             }
             // Incident angle
-            IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+            IncAng = std::acos(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
             CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
@@ -8158,7 +8158,7 @@ namespace WindowEquivalentLayer {
                         }
                     }
                 }
-                IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+                IncAng = std::acos(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
                 CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});

@@ -220,48 +220,7 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    Array1D<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
-    // inside surface heat balances
-    Array1D<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64> AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
-    // account for anisotropy of sky radiance; = 1.0 for
-    // for isotropic sky
-
-    // Moved from SolarShading to avoid conflicts in DaylightingDevices
-    Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array3D<Real64> DifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array1D<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
-    Array1D<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
-    Array1D<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface,
-    // with shading
-    Array1D<Real64> WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
-    // without shading
-    Array1D<Real64> MultIsoSky;        // Contribution to eff sky view factor from isotropic sky
-    Array1D<Real64> MultCircumSolar;   // Contribution to eff sky view factor from circumsolar brightening
-    Array1D<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
-
-    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
-    //     radiation absorbed on inside surfaces of zone or enclosure
-    Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
-
-    Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
-    Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-    Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
-    Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
-    Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
-    Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
-    // without shadowing by the reveal
-    Array3D<Real64> CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
-    Array4D_int BackSurfaces;  // For a given hour and timestep, a list of up to 20 surfaces receiving
-    // beam solar radiation from a given exterior window
-    Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
-                                  // beam solar radiation to the surfaces listed in BackSurfaces
-                                  //                       Air       Argon     Krypton   Xenon
+    //                       Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCon(
         3,
         10,
@@ -365,34 +324,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TempEffBulkAir.deallocate();
-        HConvIn.deallocate();
-        AnisoSkyMult.deallocate();
-        DifShdgRatioIsoSky.deallocate();
-        DifShdgRatioIsoSkyHRTS.deallocate();
-        curDifShdgRatioIsoSky.deallocate();
-        DifShdgRatioHoriz.deallocate();
-        DifShdgRatioHorizHRTS.deallocate();
-        WithShdgIsoSky.deallocate();
-        WoShdgIsoSky.deallocate();
-        WithShdgHoriz.deallocate();
-        WoShdgHoriz.deallocate();
-        MultIsoSky.deallocate();
-        MultCircumSolar.deallocate();
-        MultHorizonZenith.deallocate();
-        QS.deallocate();
-        QSLights.deallocate();
-        QSDifSol.deallocate();
-        ITABSF.deallocate();
-        TMULT.deallocate();
-        QL.deallocate();
-        SunlitFracHR.deallocate();
-        CosIncAngHR.deallocate();
-        SunlitFrac.deallocate();
-        SunlitFracWithoutReveal.deallocate();
-        CosIncAng.deallocate();
-        BackSurfaces.deallocate();
-        OverlapAreas.deallocate();
         ZonePreDefRep.deallocate();
         BuildingPreDefRep = ZonePreDefRepType();
         ZoneIntGain.deallocate();

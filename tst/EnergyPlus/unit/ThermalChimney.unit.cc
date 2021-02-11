@@ -1118,8 +1118,8 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalance::Zone(2).HasWindow = true;
     DataHeatBalance::Zone(4).HasWindow = true;
     EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn = 0.1;
+    state->dataHeatBal->HConvIn.allocate(TotSurfaces);
+    state->dataHeatBal->HConvIn = 0.1;
     DataHeatBalSurface::TempSurfIn = 25.00;
     int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;

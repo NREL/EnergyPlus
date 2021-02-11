@@ -824,7 +824,7 @@ namespace SteamBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
-            state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             state.dataSteamBaseboardRadiator->QBBSteamRadSrcAvg(BaseboardNum) = 0.0;
             state.dataSteamBaseboardRadiator->LastQBBSteamRadSrc(BaseboardNum) = 0.0;
             state.dataSteamBaseboardRadiator->LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -1138,7 +1138,7 @@ namespace SteamBaseboardRadiator {
             // should include this.
 
             // Actual system load that the unit should meet
-            LoadMet = (SumHATsurf(ZoneNum) - state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf(ZoneNum)) + (SteamBBHeat * state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect) +
+            LoadMet = (SumHATsurf(state, ZoneNum) - state.dataSteamBaseboardRadiator->ZeroSourceSumHATsurf(ZoneNum)) + (SteamBBHeat * state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect) +
                       (RadHeat * state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribPerson);
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletEnthalpy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletEnthalpy - SteamBBHeat / SteamMassFlowRate;
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletQuality = 0.0;
@@ -1336,7 +1336,7 @@ namespace SteamBaseboardRadiator {
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadEnergy = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1387,19 +1387,19 @@ namespace SteamBaseboardRadiator {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
                     SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

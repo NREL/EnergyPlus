@@ -713,8 +713,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface.allocate(SurfNum);
     DataSurfaces::Surface(SurfNum).Zone = 1;
     state->dataRoomAirMod->AirModel.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir(1) = 1.0;
+    state->dataHeatBal->TempEffBulkAir.allocate(1);
+    state->dataHeatBal->TempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
@@ -770,15 +770,15 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
-    if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
+    if (allocated(DataLoopNode::Node)) DataLoopNode::Node.deallocate();
     ACHExpected = 0.0;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
-    EnergyPlus::DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
-    EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
-    EnergyPlus::DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
+    DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
+    DataLoopNode::Node(ZoneNode).Temp = 20.0;
+    DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
@@ -1437,11 +1437,11 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).CosTilt = 0;
 
-    DataHeatBalance::HConvIn.allocate(1);
+    state->dataHeatBal->HConvIn.allocate(1);
 
     CalcASHRAESimpleIntConvCoeff(*state, 1, 20.0, 30.0);
 
-    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+    ConvectionCoefficient = state->dataHeatBal->HConvIn(1);
 
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }

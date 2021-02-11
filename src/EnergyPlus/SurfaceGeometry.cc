@@ -817,7 +817,7 @@ namespace SurfaceGeometry {
 
         EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
         EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
         SurfOpaqAI.dimension(TotSurfaces, 0.0);
         SurfOpaqAO.dimension(TotSurfaces, 0.0);
         SurfBmToBmReflFacObs.dimension(TotSurfaces, 0.0);

@@ -3463,10 +3463,10 @@ namespace EnergyPlus::DaylightingManager {
                     if (dot(Ray, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                 }
                 if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-                    SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                    SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 } else {
                     SkyReflVisLum =
-                        ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                        ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 }
                 assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
                 auto l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
@@ -3766,7 +3766,7 @@ namespace EnergyPlus::DaylightingManager {
                                 // Vector to sun that is mirrored in obstruction
                                 SunVecMir = RAYCOS - 2.0 * dot(RAYCOS, ReflNorm) * ReflNorm;
                                 // Skip if reflecting surface is not sunlit
-                                if (SunlitFrac(1, iHour, ReflSurfNumX) < 0.01) continue;
+                                if (state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNumX) < 0.01) continue;
                                 // Skip if altitude angle of mirrored sun is negative since reflected sun cannot
                                 // reach reference point in this case
                                 if (SunVecMir(3) <= 0.0) continue;
@@ -7853,10 +7853,10 @@ namespace EnergyPlus::DaylightingManager {
                             if (dot(U, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                         }
                         if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-                            SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                            SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         } else {
                             SkyReflVisLum =
-                                ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         }
                         dReflObsSky = SkyReflVisLum * COSB * DA;
                         for (ISky = 1; ISky <= 4; ++ISky) {
@@ -8124,7 +8124,7 @@ namespace EnergyPlus::DaylightingManager {
                 FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
 
                 if (ISky == 1) {
-                    ZSU = state.dataDaylightingManager->GILSU(IHR) * SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+                    ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
                     FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
                 }
             } // ISKY
@@ -8149,7 +8149,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Beam reaching window directly (without specular reflection from exterior obstructions)
 
-        if (SunlitFracHR(IHR, IWin) > 0.0) {
+        if (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0) {
             // Cos of angle of incidence
             COSBSun =
                 state.dataDaylightingManager->SPHSUN * std::sin(SurfWinPhi(IWin)) + state.dataDaylightingManager->CPHSUN * std::cos(SurfWinPhi(IWin)) * std::cos(state.dataDaylightingManager->THSUN - SurfWinTheta(IWin));
@@ -8160,7 +8160,7 @@ namespace EnergyPlus::DaylightingManager {
                 // Note that in the following SunlitFracHR accounts for possibly non-zero transmittance of
                 // shading surfaces.
 
-                ZSU1 = COSBSun * SunlitFracHR(IHR, IWin);
+                ZSU1 = COSBSun * state.dataHeatBal->SunlitFracHR(IHR, IWin);
 
                 // Contribution to window luminance and downgoing flux
 
@@ -8469,7 +8469,7 @@ namespace EnergyPlus::DaylightingManager {
                 ElementLuminanceSun(iIncElem) = 0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
             }
             // Sun beam calculations
-            if ((SolBmIndex == iIncElem) && (SunlitFracHR(IHR, IWin) > 0.0)) {
+            if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0)) {
                 ElementLuminanceSunDisk(iIncElem) = 1.0;
             }
         }
@@ -8650,7 +8650,7 @@ namespace EnergyPlus::DaylightingManager {
         } else {
             COSIncSun = 0.0;
         }
-        ElementLuminanceSunDisk *= SunlitFracHR(IHR, IWin) * COSIncSun;
+        ElementLuminanceSunDisk *= state.dataHeatBal->SunlitFracHR(IHR, IWin) * COSIncSun;
 
         //		FLSKTot = 0.0;
         FLSUTot = 0.0;
@@ -10582,7 +10582,7 @@ namespace EnergyPlus::DaylightingManager {
                 // This is an interior window in ZoneNum
                 int const ConstrNum = Surface(IWin).Construction;
                 int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
-                QDifTrans = QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * state.dataEnvrn->PDIFLW;
+                QDifTrans = state.dataHeatBal->QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * state.dataEnvrn->PDIFLW;
                 QDifTransUp = QDifTrans * SurfWinFractionUpgoing(IWin);
                 QDifTransDn = QDifTrans * (1.0 - SurfWinFractionUpgoing(IWin));
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect) != 0.0) {

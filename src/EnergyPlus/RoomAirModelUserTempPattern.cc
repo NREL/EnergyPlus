@@ -796,7 +796,6 @@ namespace RoomAirModelUserTempPattern {
 
         // Using/Aliasing
         using DataHeatBalance::RefrigCaseCredit;
-        using DataHeatBalance::TempEffBulkAir;
         using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::SysDepZoneLoads;
@@ -977,7 +976,7 @@ namespace RoomAirModelUserTempPattern {
 
         // set results for all surface
         for (int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j) {
-            TempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
+            state.dataHeatBal->TempEffBulkAir(i) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(j).TadjacentAir;
         }
 
         // set flag for reference air temperature mode

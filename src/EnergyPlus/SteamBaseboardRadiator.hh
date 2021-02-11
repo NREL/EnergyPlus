@@ -163,7 +163,7 @@ namespace SteamBaseboardRadiator {
 
     void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
     void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state, int const BaseboardTypeNum,       // type index
                                              std::string const &BaseboardName, // component name

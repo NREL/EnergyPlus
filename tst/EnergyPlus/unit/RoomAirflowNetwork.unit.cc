@@ -107,7 +107,7 @@ protected:
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
         Surface.allocate(NumOfSurfaces);
-        HConvIn.allocate(NumOfSurfaces);
+        state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
         TempSurfInTmp.allocate(NumOfSurfaces);
         RVSurface.allocate(NumOfSurfaces);
         RVSurfaceOld.allocate(NumOfSurfaces);
@@ -278,15 +278,15 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     Node(1).MassFlowRate = 0.01;
 
     MAT(1) = 20.0;
-    HConvIn(1) = 1.0;
-    HConvIn(2) = 1.0;
+    state->dataHeatBal->HConvIn(1) = 1.0;
+    state->dataHeatBal->HConvIn(2) = 1.0;
     TempSurfInTmp(1) = 25.0;
     TempSurfInTmp(2) = 30.0;
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
-    HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
+    HMassConvInFD(1) = state->dataHeatBal->HConvIn(1) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
-    HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
+    HMassConvInFD(2) = state->dataHeatBal->HConvIn(2) / ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
                                      PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;

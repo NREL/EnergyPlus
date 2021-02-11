@@ -823,7 +823,7 @@ namespace DataSurfaces {
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 RefAirTemp = MAT(Zone);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = DataHeatBalance::TempEffBulkAir(t_SurfNum);
+                RefAirTemp = state.dataHeatBal->TempEffBulkAir(t_SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // determine ZoneEquipConfigNum for this zone
                 //            ControlledZoneAirFlag = .FALSE.
@@ -935,7 +935,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
@@ -963,7 +963,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const

@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     ComputeIntThermalAbsorpFactors(*state);
 
-    EXPECT_EQ(0.2, DataHeatBalance::ITABSF(1));
+    EXPECT_EQ(0.2, state->dataHeatBal->ITABSF(1));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -758,13 +758,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataHeatBalSurface::TH(1, 1, 4) = 20;
     DataHeatBalSurface::TH(1, 1, 5) = 20;
     DataHeatBalSurface::TH(1, 1, 6) = 20;
-    DataHeatBalance::HConvIn.allocate(6);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
-    DataHeatBalance::HConvIn(4) = 0.5;
-    DataHeatBalance::HConvIn(5) = 0.5;
-    DataHeatBalance::HConvIn(6) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn(1) = 0.5;
+    state->dataHeatBal->HConvIn(2) = 0.5;
+    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBal->HConvIn(4) = 0.5;
+    state->dataHeatBal->HConvIn(5) = 0.5;
+    state->dataHeatBal->HConvIn(6) = 0.5;
     DataMoistureBalance::HConvInFD.allocate(6);
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
@@ -778,9 +778,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     createFacilityElectricPowerServiceObject();
     // with supply air
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(1));
-    EXPECT_EQ(23.0, DataHeatBalance::TempEffBulkAir(2));
-    EXPECT_EQ(20.0, DataHeatBalance::TempEffBulkAir(3));
+    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(1));
+    EXPECT_EQ(23.0, state->dataHeatBal->TempEffBulkAir(2));
+    EXPECT_EQ(20.0, state->dataHeatBal->TempEffBulkAir(3));
 
     // Supply air flow rate = 0
     DataLoopNode::Node(1).MassFlowRate = 0.0;
@@ -788,9 +788,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataLoopNode::Node(3).MassFlowRate = 0.0;
     DataLoopNode::Node(4).MassFlowRate = 0.0;
     CalcHeatBalanceInsideSurf(*state);
-    EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(1));
-    EXPECT_EQ(23.0, DataHeatBalance::TempEffBulkAir(2));
-    EXPECT_EQ(24.0, DataHeatBalance::TempEffBulkAir(3));
+    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(1));
+    EXPECT_EQ(23.0, state->dataHeatBal->TempEffBulkAir(2));
+    EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(3));
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     DataSizing::ZoneEqSizing.deallocate();
@@ -799,9 +799,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     DataLoopNode::Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
-    DataHeatBalance::TempEffBulkAir.deallocate();
+    state->dataHeatBal->TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
-    DataHeatBalance::HConvIn.deallocate();
+    state->dataHeatBal->HConvIn.deallocate();
     DataMoistureBalance::HConvInFD.deallocate();
     DataMoistureBalance::RhoVaporAirIn.deallocate();
     DataMoistureBalance::HMassConvInFD.deallocate();
@@ -1276,7 +1276,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -1294,13 +1294,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     DataHeatBalSurface::TH(1, 1, 4) = 20;
     DataHeatBalSurface::TH(1, 1, 5) = 20;
     DataHeatBalSurface::TH(1, 1, 6) = 20;
-    DataHeatBalance::HConvIn.allocate(6);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
-    DataHeatBalance::HConvIn(4) = 0.5;
-    DataHeatBalance::HConvIn(5) = 0.5;
-    DataHeatBalance::HConvIn(6) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn(1) = 0.5;
+    state->dataHeatBal->HConvIn(2) = 0.5;
+    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBal->HConvIn(4) = 0.5;
+    state->dataHeatBal->HConvIn(5) = 0.5;
+    state->dataHeatBal->HConvIn(6) = 0.5;
     DataMoistureBalance::HConvInFD.allocate(6);
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
@@ -1851,7 +1851,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -1863,13 +1863,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     DataLoopNode::Node(4).MassFlowRate = 0.1;
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
-    DataHeatBalance::HConvIn.allocate(6);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
-    DataHeatBalance::HConvIn(4) = 0.5;
-    DataHeatBalance::HConvIn(5) = 0.5;
-    DataHeatBalance::HConvIn(6) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn(1) = 0.5;
+    state->dataHeatBal->HConvIn(2) = 0.5;
+    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBal->HConvIn(4) = 0.5;
+    state->dataHeatBal->HConvIn(5) = 0.5;
+    state->dataHeatBal->HConvIn(6) = 0.5;
     DataMoistureBalance::HConvInFD.allocate(6);
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
@@ -2410,7 +2410,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -2428,13 +2428,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataHeatBalSurface::TH(1, 1, 4) = 20;
     DataHeatBalSurface::TH(1, 1, 5) = 20;
     DataHeatBalSurface::TH(1, 1, 6) = 20;
-    DataHeatBalance::HConvIn.allocate(6);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
-    DataHeatBalance::HConvIn(4) = 0.5;
-    DataHeatBalance::HConvIn(5) = 0.5;
-    DataHeatBalance::HConvIn(6) = 0.5;
+    state->dataHeatBal->HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn(1) = 0.5;
+    state->dataHeatBal->HConvIn(2) = 0.5;
+    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBal->HConvIn(4) = 0.5;
+    state->dataHeatBal->HConvIn(5) = 0.5;
+    state->dataHeatBal->HConvIn(6) = 0.5;
     DataMoistureBalance::HConvInFD.allocate(6);
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);
@@ -2471,9 +2471,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     DataLoopNode::Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
-    DataHeatBalance::TempEffBulkAir.deallocate();
+    state->dataHeatBal->TempEffBulkAir.deallocate();
     DataHeatBalSurface::TH.deallocate();
-    DataHeatBalance::HConvIn.deallocate();
+    state->dataHeatBal->HConvIn.deallocate();
     DataMoistureBalance::HConvInFD.deallocate();
     DataMoistureBalance::RhoVaporAirIn.deallocate();
     DataMoistureBalance::HMassConvInFD.deallocate();
@@ -3071,10 +3071,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
 
     DataHeatBalSurface::TempSurfInTmp.allocate(6);
-    DataHeatBalance::TempEffBulkAir.allocate(6);
+    state->dataHeatBal->TempEffBulkAir.allocate(6);
 
     DataHeatBalSurface::TH.allocate(2, 2, 6);
-    DataHeatBalance::HConvIn.allocate(6);
+    state->dataHeatBal->HConvIn.allocate(6);
     DataMoistureBalance::HConvInFD.allocate(6);
     DataMoistureBalance::RhoVaporAirIn.allocate(6);
     DataMoistureBalance::HMassConvInFD.allocate(6);

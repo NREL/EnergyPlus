@@ -2748,7 +2748,7 @@ namespace WindowComplexManager {
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2798,7 +2798,7 @@ namespace WindowComplexManager {
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
@@ -2877,7 +2877,7 @@ namespace WindowComplexManager {
                         Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = HConvIn(SurfNum); // Room-side surface convective film conductance
+            hin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
             ibc(2) = 0;             // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
@@ -3061,7 +3061,7 @@ namespace WindowComplexManager {
         // direct solar radiation
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ShadeFlag = SurfWinShadingFlag(SurfNum);
-            dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
+            dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
@@ -3282,7 +3282,7 @@ namespace WindowComplexManager {
             // Window heat balance solution has converged.
 
             SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            HConvIn(SurfNum) = hcin;
+            state.dataHeatBal->HConvIn(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
@@ -3409,9 +3409,9 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            SurfWinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *

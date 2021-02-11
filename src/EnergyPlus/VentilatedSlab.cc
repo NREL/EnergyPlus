@@ -1610,7 +1610,7 @@ namespace VentilatedSlab {
 
             // The first pass through in a particular time step
             ZoneNum = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+            state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
             for (RadSurfNum = 1; RadSurfNum <= state.dataVentilatedSlab->VentSlab(Item).NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum);
                 state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -4414,7 +4414,7 @@ namespace VentilatedSlab {
         return CalcVentSlabHXEffectTerm;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -4465,19 +4465,19 @@ namespace VentilatedSlab {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
                     SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;
