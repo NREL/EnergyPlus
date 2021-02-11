@@ -2918,7 +2918,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     }
 }
 
-TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingOnly_wAdjustInfiltrationFlow)
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrationFlow)
 {
 
     std::string const idf_objects = delimited_string({
