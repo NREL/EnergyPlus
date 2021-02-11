@@ -4019,19 +4019,19 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingOnly ||
                         ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
-                        ZoneMixingAirMassFlowRate = max(0.0,
-                                                        ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate +
-                                                            MassConservation(ZoneNum).MixingSourceMassFlowRate);
-                        CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
-                        ZoneMixingNetAirMassFlowRate =
-                            MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
+                        //ZoneMixingAirMassFlowRate = max(0.0,
+                        //                                ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate +
+                        //                                    MassConservation(ZoneNum).MixingSourceMassFlowRate);
+                        //CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+                        //ZoneMixingNetAirMassFlowRate =
+                        //    MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
 
                         Real64 AdjustedTotalReturnMassFlow = 0;
-                        // Calculate return air flow rate using mass conservation equation
-                        AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
-                        AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
-                        // add adjust zone return node air flow calc
-                        CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                        //// Calculate return air flow rate using mass conservation equation
+                        //AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
+                        //AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
+                        //// add adjust zone return node air flow calc
+                        //CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
 
