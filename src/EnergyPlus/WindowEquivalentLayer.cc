@@ -864,7 +864,7 @@ namespace WindowEquivalentLayer {
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
         NL = CFS(EQLNum).NL;
-        QAllSWwinAbs({1, NL + 1}) = SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
+        QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
         ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
@@ -8209,7 +8209,7 @@ namespace WindowEquivalentLayer {
 
         // calculate fenestration air-to-air U-value
         CalcEQLWindowUvalue(state, CFS(EQLNum), UValue);
-        NominalU(ConstrNum) = UValue;
+        state.dataHeatBal->NominalU(ConstrNum) = UValue;
 
         // calculate the SHGC and Normal Transmittance
         CalcEQLWindowSHGCAndTransNormal(state, CFS(EQLNum), SHGCSummer, TransNormal);

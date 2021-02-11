@@ -1448,30 +1448,30 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                         if (SELECT_CASE_var == SurfaceClass::Wall) {
                             // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                             // Exterior:  vertical, exterior wind exposure, Rcout = 0.17 ft2-F-hr/BTU
-                            if (NominalU(Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs = 1.0 / (0.1197548 + (1.0 / NominalU(Surface(surf).Construction)) + 0.0299387);
+                            if (state.dataHeatBal->NominalU(Surface(surf).Construction) > 0.0) {
+                                NominalUwithConvCoeffs = 1.0 / (0.1197548 + (1.0 / state.dataHeatBal->NominalU(Surface(surf).Construction)) + 0.0299387);
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
                         } else if (SELECT_CASE_var == SurfaceClass::Floor) {
                             // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                             // Exterior:  horizontal, semi-exterior (crawlspace), Rcout = 0.46 ft2-F-hr/BTU
-                            if (NominalU(Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs = 1.0 / (0.1620212 + (1.0 / NominalU(Surface(surf).Construction)) + 0.0810106);
+                            if (state.dataHeatBal->NominalU(Surface(surf).Construction) > 0.0) {
+                                NominalUwithConvCoeffs = 1.0 / (0.1620212 + (1.0 / state.dataHeatBal->NominalU(Surface(surf).Construction)) + 0.0810106);
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
                         } else if (SELECT_CASE_var == SurfaceClass::Roof) {
                             // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                             // Exterior:  horizontal, semi-exterior (attic), Rcout = 0.46 ft2-F-hr/BTU
-                            if (NominalU(Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs = 1.0 / (0.1074271 + (1.0 / NominalU(Surface(surf).Construction)) + 0.0810106);
+                            if (state.dataHeatBal->NominalU(Surface(surf).Construction) > 0.0) {
+                                NominalUwithConvCoeffs = 1.0 / (0.1074271 + (1.0 / state.dataHeatBal->NominalU(Surface(surf).Construction)) + 0.0810106);
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
                         } else {
-                            if (NominalU(Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs = NominalU(Surface(surf).Construction);
+                            if (state.dataHeatBal->NominalU(Surface(surf).Construction) > 0.0) {
+                                NominalUwithConvCoeffs = state.dataHeatBal->NominalU(Surface(surf).Construction);
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
@@ -1491,7 +1491,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             SolarDiffusing = "No";
                         }
                     } else {
-                        cNominalU = format("{:.3R}", NominalU(Surface(surf).Construction));
+                        cNominalU = format("{:.3R}", state.dataHeatBal->NominalU(Surface(surf).Construction));
                     }
                 } else {
                     cNominalUwithConvCoeffs = "**";

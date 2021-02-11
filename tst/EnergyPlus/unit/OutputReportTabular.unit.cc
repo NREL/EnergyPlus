@@ -7377,12 +7377,12 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     DataHeatBalance::Zone(1).ListMultiplier = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).Name = "A Construction";
-    // Avoid trigerring CalcNominalWindowCond
+    // Avoid triggering CalcNominalWindowCond
     state->dataConstruction->Construct(1).SummerSHGC = 0.70;
     state->dataConstruction->Construct(1).VisTransNorm = 0.80;
 
-    DataHeatBalance::NominalU.allocate(1);
-    DataHeatBalance::NominalU(1) = 0.2;
+    state->dataHeatBal->NominalU.allocate(1);
+    state->dataHeatBal->NominalU(1) = 0.2;
 
     // Create one wall and one window with each azimuth from expectedAzimuthToCards
     // Azimuth & Cardinal entries happen in two separate blocks,
@@ -7502,8 +7502,8 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     state->dataConstruction->Construct(1).Name = "A Construction";
     state->dataConstruction->Construct(1).OutsideAbsorpSolar = 0.4;
 
-    DataHeatBalance::NominalU.allocate(1);
-    DataHeatBalance::NominalU(1) = 0.2;
+    state->dataHeatBal->NominalU.allocate(1);
+    state->dataHeatBal->NominalU(1) = 0.2;
 
     DataSurfaces::TotSurfaces = 4 ;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);

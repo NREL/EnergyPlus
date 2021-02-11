@@ -3067,7 +3067,7 @@ namespace WindowComplexManager {
             // if (dir.ne.0.0d0) then
             for (IGlass = 1; IGlass <= nlayer; ++IGlass) {
                 // IF (dir > 0.0D0 ) THEN
-                asol(IGlass) = SurfWinQRadSWwinAbs(IGlass, SurfNum);
+                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum);
                 // ELSE
                 //  asol(IGLASS) = 0.0D0
                 // ENDIF
@@ -3254,7 +3254,7 @@ namespace WindowComplexManager {
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == DataBSDFWindow::winterCondition) {
-            NominalU(ConstrNum) = ufactor;
+            state.dataHeatBal->NominalU(ConstrNum) = ufactor;
         } else if (CalcCondition == DataBSDFWindow::summerCondition) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
@@ -3421,7 +3421,7 @@ namespace WindowComplexManager {
             if (state.dataEnvrn->SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                SurfWinSysSolAbsorptance(SurfNum) = (state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
                                                 (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
@@ -3452,8 +3452,8 @@ namespace WindowComplexManager {
                 SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
-                SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
                 // thetas(k) = theta(k)
             }
         }

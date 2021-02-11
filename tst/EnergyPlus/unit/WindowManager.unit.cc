@@ -551,7 +551,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
@@ -585,7 +585,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
-    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;
@@ -2778,7 +2778,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
@@ -2812,7 +2812,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
-    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;

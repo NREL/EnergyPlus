@@ -275,43 +275,6 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    extern Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
-    extern Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> SurfInitialDifSolInAbsReport;       // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
-
-    extern Array1D_int SurfWinBSDFBeamDirectionRep;      // BSDF beam direction number for given complex fenestration state (for reporting) []
-    extern Array1D<Real64> SurfWinBSDFBeamThetaRep;      // BSDF beam Theta angle (for reporting) [rad]
-    extern Array1D<Real64> SurfWinBSDFBeamPhiRep;        // BSDF beam Phi angle (for reporting) [rad]
-    extern Array1D<Real64> SurfWinQRadSWwinAbsTot;       // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    extern Array2D<Real64> SurfWinQRadSWwinAbsLayer;     // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    extern Array2D<Real64> SurfWinFenLaySurfTempFront;   // Front surface temperatures of fenestration layers
-    extern Array2D<Real64> SurfWinFenLaySurfTempBack;    // Back surface temperatures of fenestration layers
-    extern Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy; // Energy of QRadSWwinAbsTot [J]
-    extern Array1D<Real64> SurfWinSWwinAbsTotalReport;   // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
-    extern Array1D<Real64>
-        SurfWinInitialDifSolInTransReport;      // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
-    extern Array2D<Real64> SurfWinQRadSWwinAbs; // Short wave radiation absorbed in window glass layers
-    extern Array2D<Real64> SurfWinInitialDifSolwinAbs; // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
-
-    extern Array1D<Real64> SurfOpaqSWOutAbsTotalReport;  // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
-    extern Array1D<Real64> SurfOpaqSWOutAbsEnergyReport; // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
-
-    extern Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
-    extern Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
-    extern Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
-
-    // removed variables (these were all arrays):
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRep    !Diffuse sol amount from ext wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfIntensRep    !Diffuse sol irradiance from int wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRep    !Diffuse sol amount from int wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRepEnergy    !energy of DifIncInsSurfAmountRep [J]
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRepEnergy    !energy of IntDifIncInsSurfAmountRep [J]
-
-    // Variables moved from HeatBalanceSurfaceManager and SolarShading
-    // to avoid conflict with their use in WindowManager
-
     extern Array1D<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
     // inside surface heat balances
     extern Array1D<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
@@ -1999,7 +1962,8 @@ namespace DataHeatBalance {
 
     std::string DisplayMaterialRoughness(int Roughness); // Roughness String
 
-    Real64 ComputeNominalUwithConvCoeffs(int numSurf,  // index for Surface array.
+    Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
+                                         int numSurf,  // index for Surface array.
                                          bool &isValid // returns true if result is valid
     );
 
@@ -2192,6 +2156,27 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
     Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;  // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
     Array1D<Real64> SurfCosIncidenceAngle;           // Cosine of beam solar incidence angle (for reporting)
+    Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
+    Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
+    Array1D_int SurfWinBSDFBeamDirectionRep;               // BSDF beam direction number for given complex fenestration state (for reporting) []
+    Array1D<Real64> SurfWinBSDFBeamThetaRep;               // BSDF beam Theta angle (for reporting) [rad]
+    Array1D<Real64> SurfWinBSDFBeamPhiRep;                 // BSDF beam Phi angle (for reporting) [rad]
+    Array1D<Real64> SurfWinQRadSWwinAbsTot;                // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    Array2D<Real64> SurfWinQRadSWwinAbsLayer;              // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    Array2D<Real64> SurfWinFenLaySurfTempFront;            // Front surface temperatures of fenestration layers
+    Array2D<Real64> SurfWinFenLaySurfTempBack;             // Back surface temperatures of fenestration layers
+    Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
+    Array1D<Real64> SurfWinSWwinAbsTotalReport;            // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
+    Array1D<Real64> SurfWinInitialDifSolInTransReport;     // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
+    Array2D<Real64> SurfWinQRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
+    Array2D<Real64> SurfWinInitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
+    Array1D<Real64> SurfOpaqSWOutAbsTotalReport;           // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
+    Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;          // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
+    Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
+    Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
+    Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
 
     void clear_state() override
     {
@@ -2354,6 +2339,27 @@ struct HeatBalanceData : BaseGlobalStruct
         this->SurfQRadSWOutIncBmToDiffReflObs.deallocate();
         this->SurfQRadSWOutIncSkyDiffReflObs.deallocate();
         this->SurfCosIncidenceAngle.deallocate();
+        this->SurfSWInAbsTotalReport.deallocate();
+        this->SurfBmIncInsSurfAmountRepEnergy.deallocate();
+        this->SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
+        this->SurfInitialDifSolInAbsReport.deallocate();
+        this->SurfWinBSDFBeamDirectionRep.deallocate();
+        this->SurfWinBSDFBeamThetaRep.deallocate();
+        this->SurfWinBSDFBeamPhiRep.deallocate();
+        this->SurfWinQRadSWwinAbsTot.deallocate();
+        this->SurfWinQRadSWwinAbsLayer.deallocate();
+        this->SurfWinFenLaySurfTempFront.deallocate();
+        this->SurfWinFenLaySurfTempBack.deallocate();
+        this->SurfWinQRadSWwinAbsTotEnergy.deallocate();
+        this->SurfWinSWwinAbsTotalReport.deallocate();
+        this->SurfWinInitialDifSolInTransReport.deallocate();
+        this->SurfWinQRadSWwinAbs.deallocate();
+        this->SurfWinInitialDifSolwinAbs.deallocate();
+        this->SurfOpaqSWOutAbsTotalReport.deallocate();
+        this->SurfOpaqSWOutAbsEnergyReport.deallocate();
+        this->NominalR.deallocate();
+        this->NominalRforNominalUCalculation.deallocate();
+        this->NominalU.deallocate();
     }
 };
 

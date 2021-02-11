@@ -1596,7 +1596,7 @@ namespace HeatBalanceManager {
         state.dataMaterial->Material.allocate(state.dataHeatBal->TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(state.dataHeatBal->TotMaterials));
 
-        NominalR.dimension(state.dataHeatBal->TotMaterials, 0.0);
+        state.dataHeatBal->NominalR.dimension(state.dataHeatBal->TotMaterials, 0.0);
 
         MaterNum = 0;
 
@@ -1657,8 +1657,8 @@ namespace HeatBalanceManager {
             }
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                state.dataMaterial->Material(MaterNum).Resistance = NominalR(MaterNum);
+                state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
                 ShowSevereError(state, "Positive thermal conductivity required for material " + state.dataMaterial->Material(MaterNum).Name);
                 ErrorsFound = true;
@@ -1679,8 +1679,8 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpSolar = 0.7;
             state.dataMaterial->Material(MaterNum).AbsorpThermal = 0.9;
             state.dataMaterial->Material(MaterNum).AbsorpVisible = 0.7;
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-            state.dataMaterial->Material(MaterNum).Resistance = NominalR(MaterNum);
+            state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+            state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
 
             ++RegMat;
         }
@@ -1738,7 +1738,7 @@ namespace HeatBalanceManager {
                 state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = 0.7;
             }
 
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
+            state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
         }
 
         // Add a fictitious insulation layer for each construction defined with F or C factor method
@@ -1789,7 +1789,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Resistance = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
+            state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
         }
 
         CurrentModuleObject = "Material:InfraredTransparent";
@@ -1830,7 +1830,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpVisible = 1.0;
             state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = 1.0;
 
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
+            state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Resistance;
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -1885,8 +1885,8 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpThermal = state.dataMaterial->Material(MaterNum).AbsorpThermalBack;
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                state.dataMaterial->Material(MaterNum).Resistance = NominalR(MaterNum);
+                state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
                 ErrorsFound = true;
                 ShowSevereError(state, "Window glass material " + state.dataMaterial->Material(MaterNum).Name + " has Conductivity = 0.0, must be >0.0, default = .9");
@@ -2285,8 +2285,8 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpThermal = state.dataMaterial->Material(MaterNum).AbsorpThermalBack;
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                state.dataMaterial->Material(MaterNum).Resistance = NominalR(MaterNum);
+                state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
             }
 
             state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
@@ -2497,7 +2497,7 @@ namespace HeatBalanceManager {
             if (!ErrorsFound) {
                 DenomRGas = (state.dataMaterial->Material(MaterNum).GasCon(1, 1) + state.dataMaterial->Material(MaterNum).GasCon(2, 1) * 300.0 + state.dataMaterial->Material(MaterNum).GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
-                    NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / DenomRGas;
+                    state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / DenomRGas;
                 } else {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(
@@ -2618,7 +2618,7 @@ namespace HeatBalanceManager {
             if (!ErrorsFound) {
                 DenomRGas = (state.dataMaterial->Material(MaterNum).GasCon(1, 1) + state.dataMaterial->Material(MaterNum).GasCon(2, 1) * 300.0 + state.dataMaterial->Material(MaterNum).GasCon(3, 1) * 90000.0);
                 if (DenomRGas > 0.0) {
-                    NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / DenomRGas;
+                    state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / DenomRGas;
                 } else {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
                     ShowContinueError(
@@ -2697,7 +2697,7 @@ namespace HeatBalanceManager {
             }
 
             // Nominal resistance of gap at room temperature (based on first gas in mixture)
-            NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / (state.dataMaterial->Material(MaterNum).GasCon(1, 1) + state.dataMaterial->Material(MaterNum).GasCon(2, 1) * 300.0 +
+            state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / (state.dataMaterial->Material(MaterNum).GasCon(1, 1) + state.dataMaterial->Material(MaterNum).GasCon(2, 1) * 300.0 +
                                                                  state.dataMaterial->Material(MaterNum).GasCon(3, 1) * 90000.0);
         }
 
@@ -2752,9 +2752,9 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
             } else {
-                NominalR(MaterNum) = 1.0;
+                state.dataHeatBal->NominalR(MaterNum) = 1.0;
             }
 
             if (MaterialProps(1) + MaterialProps(2) >= 1.0) {
@@ -3077,9 +3077,9 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpThermalInput = state.dataMaterial->Material(MaterNum).AbsorpThermal;
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = (1.0 - state.dataMaterial->Material(MaterNum).Trans) * state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataHeatBal->NominalR(MaterNum) = (1.0 - state.dataMaterial->Material(MaterNum).Trans) * state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
             } else {
-                NominalR(MaterNum) = 1.0;
+                state.dataHeatBal->NominalR(MaterNum) = 1.0;
                 ShowWarningError(state,
                     "Conductivity for material=\"" + state.dataMaterial->Material(MaterNum).Name +
                     "\" must be greater than 0 for calculating Nominal R-value, Nominal R is defaulted to 1 and the simulation continues.");
@@ -3735,8 +3735,8 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).InitMoisture = MaterialProps(15);
 
             if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                state.dataMaterial->Material(MaterNum).Resistance = NominalR(MaterNum);
+                state.dataHeatBal->NominalR(MaterNum) = state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
+                state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
             } else {
                 ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" is not defined correctly.");
                 ShowContinueError(state, cNumericFieldNames(7) + " is <=0.");
@@ -4242,8 +4242,8 @@ namespace HeatBalanceManager {
         state.dataHeatBal->TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
                         state.dataBSDFWindow->TotComplexFenStates + TotWinEquivLayerConstructs;
 
-        NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
-        NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
         state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);
@@ -4352,7 +4352,7 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    NominalRforNominalUCalculation(ConstrNum) += NominalR(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer));
+                    state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataHeatBal->NominalR(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer));
                     if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
                         !state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
@@ -4473,8 +4473,8 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
-                    NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                        NominalR(thisConstruct.LayerPoint(Layer));
+                    state.dataHeatBal->NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
+                        state.dataHeatBal->NominalR(thisConstruct.LayerPoint(Layer));
                     if (state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).Group == RegularMaterial &&
                         !state.dataMaterial->Material(thisConstruct.LayerPoint(Layer)).ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
@@ -4554,8 +4554,8 @@ namespace HeatBalanceManager {
                     if (ConstructNumAlpha <= 2) {
 
                     } else {
-                        NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
-                            NominalR(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
+                        state.dataHeatBal->NominalRforNominalUCalculation(TotRegConstructs + ConstrNum) +=
+                            state.dataHeatBal->NominalR(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer));
                     }
                 }
 
@@ -4635,8 +4635,8 @@ namespace HeatBalanceManager {
 
             // For air boundaries, skip TypeIsAirBoundary
             if (state.dataConstruction->Construct(ConstrNum).TypeIsAirBoundary) continue;
-            if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
-                NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
+            if (state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) != 0.0) {
+                state.dataHeatBal->NominalU(ConstrNum) = 1.0 / state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum);
             } else {
                 if (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) {
                     ShowSevereError(state, "Nominal U is zero, for construction=" + state.dataConstruction->Construct(ConstrNum).Name);
@@ -5944,8 +5944,8 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
             }
         }
@@ -6638,7 +6638,7 @@ namespace HeatBalanceManager {
             // reallocate Material type
 
             state.dataMaterial->Material.redimension(state.dataHeatBal->TotMaterials);
-            NominalR.redimension(state.dataHeatBal->TotMaterials, 0.0);
+            state.dataHeatBal->NominalR.redimension(state.dataHeatBal->TotMaterials, 0.0);
 
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
@@ -6791,7 +6791,7 @@ namespace HeatBalanceManager {
                                  state.dataMaterial->Material(MaterNum).GasVis(_, IGas),
                                  state.dataMaterial->Material(MaterNum).GasCp(_, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
-                        NominalR(MaterNum) =
+                        state.dataHeatBal->NominalR(MaterNum) =
                             state.dataMaterial->Material(MaterNum).Thickness /
                             (state.dataMaterial->Material(MaterNum).GasCon(1, 1) + state.dataMaterial->Material(MaterNum).GasCon(2, 1) * 300.0 + state.dataMaterial->Material(MaterNum).GasCon(3, 1) * 90000.0);
                     }
@@ -6803,8 +6803,8 @@ namespace HeatBalanceManager {
             // reallocate Construct types
             state.dataHeatBal->TotConstructs += NGlSys;
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
-            NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
 
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
@@ -7027,14 +7027,14 @@ namespace HeatBalanceManager {
 
                 // NominalRforNominalUCalculation of this construction (actually the total resistance of all of its layers; gas layer
                 // conductivity here ignores convective effects in gap.)
-                NominalRforNominalUCalculation(ConstrNum) = 0.0;
+                state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(loop);
                     if (state.dataMaterial->Material(MatNum).Group == WindowGlass) {
-                        NominalRforNominalUCalculation(ConstrNum) += state.dataMaterial->Material(MatNum).Thickness / state.dataMaterial->Material(MatNum).Conductivity;
+                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += state.dataMaterial->Material(MatNum).Thickness / state.dataMaterial->Material(MatNum).Conductivity;
                     } else if (state.dataMaterial->Material(MatNum).Group == WindowGas || state.dataMaterial->Material(MatNum).Group == WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
-                        NominalRforNominalUCalculation(ConstrNum) +=
+                        state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             state.dataMaterial->Material(MatNum).Thickness /
                             (state.dataMaterial->Material(MatNum).GasCon(1, 1) + state.dataMaterial->Material(MatNum).GasCon(2, 1) * 300.0 + state.dataMaterial->Material(MatNum).GasCon(3, 1) * 90000.0);
                     }
@@ -7343,11 +7343,11 @@ namespace HeatBalanceManager {
             }
 
             state.dataMaterial->Material(MaterNum).Resistance = Rfic;
-            NominalR(MaterNum) = Rfic;
+            state.dataHeatBal->NominalR(MaterNum) = Rfic;
 
             // excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
-            NominalRforNominalUCalculation(ConstrNum) = Reff;
+            state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = Reff;
         }
 
         // Then create underground wall constructions defined with C factor method if any
@@ -7426,11 +7426,11 @@ namespace HeatBalanceManager {
             }
 
             state.dataMaterial->Material(MaterNum).Resistance = Rfic;
-            NominalR(MaterNum) = Rfic;
+            state.dataHeatBal->NominalR(MaterNum) = Rfic;
 
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
-            NominalRforNominalUCalculation(ConstrNum) = Reff;
+            state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = Reff;
         }
     }
 
@@ -7879,8 +7879,8 @@ namespace HeatBalanceManager {
 
         // Increase Construct() and copy the extra constructions
         state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
-        NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
-        NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
+        state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs + NumNewConst);
 
         NumNewConst = state.dataHeatBal->TotConstructs;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
@@ -7993,7 +7993,7 @@ namespace HeatBalanceManager {
 
         state.dataMaterial->Material(MaterNum).Conductivity = state.dataMaterial->Material(MaterNum).Thickness / Rlw;
         if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-            NominalR(MaterNum) = Rlw;
+            state.dataHeatBal->NominalR(MaterNum) = Rlw;
             state.dataMaterial->Material(MaterNum).Resistance = Rlw;
         } else {
             ErrorsFound = true;
@@ -8691,7 +8691,7 @@ namespace HeatBalanceManager {
             // Glass layer counter
             iMatGlass = 0;
             // Simon TODO: This is to be confirmed.  If this is just initial value, then we might want to make better guess
-            NominalRforNominalUCalculation(ConstrNum) = 0.1;
+            state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.1;
             // Simon TODO: If I do not put this, then it is considered that surface is NOT window
             state.dataConstruction->Construct(ConstrNum).TransDiff = 0.1; // This is a place holder to flag
             // the construction as a window until

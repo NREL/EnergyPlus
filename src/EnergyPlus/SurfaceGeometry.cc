@@ -619,7 +619,7 @@ namespace SurfaceGeometry {
 
         for (int SurfNum : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(SurfNum).Construction > 0 && Surface(SurfNum).Construction <= state.dataHeatBal->TotConstructs) {
-                NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(SurfNum, isWithConvCoefValid);
+                NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(state, SurfNum, isWithConvCoefValid);
                 if (isWithConvCoefValid) {
                     cNominalUwithConvCoeffs = format("{:.3R}", NominalUwithConvCoeffs);
                 } else {
@@ -629,7 +629,7 @@ namespace SurfaceGeometry {
                     // SurfaceClass::Window also covers glass doors and TDD:Diffusers
                     cNominalU = "N/A";
                 } else {
-                    cNominalU = format("{:.3R}", NominalU(Surface(SurfNum).Construction));
+                    cNominalU = format("{:.3R}", state.dataHeatBal->NominalU(Surface(SurfNum).Construction));
                 }
             } else {
                 cNominalUwithConvCoeffs = "**";
@@ -1571,7 +1571,7 @@ namespace SurfaceGeometry {
                             TotLayFound = state.dataConstruction->Construct(ConstrNumFound).TotLayers;
                             if (TotLay != TotLayFound) { // Different number of layers
                                 // match on like Uvalues (nominal)
-                                if (std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
+                                if (std::abs(state.dataHeatBal->NominalU(ConstrNum) - state.dataHeatBal->NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(state, RoutineName + "Construction " + state.dataConstruction->Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name + " does not have the same number of layers as the construction " +
                                                     state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
@@ -1588,7 +1588,7 @@ namespace SurfaceGeometry {
                                 izConstDiff = false;
                                 // ok if same nominal U
                                 CheckForReversedLayers(state, izConstDiff, ConstrNum, ConstrNumFound, TotLay);
-                                if (izConstDiff && std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
+                                if (izConstDiff && std::abs(state.dataHeatBal->NominalU(ConstrNum) - state.dataHeatBal->NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(state, RoutineName + "Construction " + state.dataConstruction->Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
@@ -1609,7 +1609,7 @@ namespace SurfaceGeometry {
                                     ShowContinueError(state, "or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     ShowContinueError(state,
                                                       format("...but Nominal U values are similar, diff=[{:.4R}] ... simulation proceeds.",
-                                                             std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound))));
+                                                             std::abs(state.dataHeatBal->NominalU(ConstrNum) - state.dataHeatBal->NominalU(ConstrNumFound))));
                                     if (!izConstDiffMsg) {
                                         ShowContinueError(state, "...if the two zones are expected to have significantly different temperatures, the proper "
                                                           "\"reverse\" construction should be created.");
@@ -11732,10 +11732,10 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNewSh; //set the active to the current for now
             state.dataHeatBal->TotConstructs = ConstrNewSh;
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
-            NominalU.redimension(state.dataHeatBal->TotConstructs);
-            NominalU(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
 
             TotLayersOld = state.dataConstruction->Construct(ConstrNum).TotLayers;
             TotLayersNew = TotLayersOld + 1;
@@ -11886,7 +11886,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->TotMaterials = state.dataHeatBal->TotMaterials + 1;
             newAirMaterial = state.dataHeatBal->TotMaterials;
             state.dataMaterial->Material.redimension(state.dataHeatBal->TotMaterials);
-            NominalR.redimension(state.dataHeatBal->TotMaterials);
+            state.dataHeatBal->NominalR.redimension(state.dataHeatBal->TotMaterials);
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Name = MatNameStAir;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Group = WindowGas;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Roughness = 3;
@@ -11956,8 +11956,8 @@ namespace SurfaceGeometry {
             state.dataHeatBal->TotConstructs = state.dataHeatBal->TotConstructs + 1;
             newConstruct = state.dataHeatBal->TotConstructs;
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
-            NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
 
             int TotLayersOld = state.dataConstruction->Construct(oldConstruction).TotLayers;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({ 1, Construction::MaxLayersInConstruct }) = 0;

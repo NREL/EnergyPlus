@@ -1068,7 +1068,7 @@ namespace HeatBalanceHAMTManager {
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
                 static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
-                print(state.files.eio, Format_111, state.dataMaterial->Material(MaterNum).Name, NominalR(MaterNum));
+                print(state.files.eio, Format_111, state.dataMaterial->Material(MaterNum).Name, state.dataHeatBal->NominalR(MaterNum));
             }
         }
     }

@@ -342,13 +342,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(2).Group = 4; // WindowGas
     state->dataMaterial->Material(3).Group = 3; // WindowGlass
 
-    NominalRforNominalUCalculation.allocate(1);
-    NominalRforNominalUCalculation(1) = 0.0;
-    NominalR.allocate(state->dataHeatBal->TotMaterials);
-    NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at
+    state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
+    state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;
+    state->dataHeatBal->NominalR.allocate(state->dataHeatBal->TotMaterials);
+    state->dataHeatBal->NominalR(1) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at
                        // end of GetConstructData
-    NominalR(2) = 0.4;
-    NominalR(3) = 0.4;
+    state->dataHeatBal->NominalR(2) = 0.4;
+    state->dataHeatBal->NominalR(3) = 0.4;
 
     // call to get valid window material types
     ErrorsFound = false;
@@ -1807,7 +1807,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
-    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+    EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
     constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
@@ -1817,7 +1817,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.4);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 1);
-    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+    EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
 
@@ -1868,7 +1868,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryACH, 0.1);
     EXPECT_EQ(state->dataConstruction->Construct(constrNum).AirBoundaryMixingSched, 0);
-    EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+    EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
 }
 
@@ -1894,8 +1894,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state->dataConstruction->Construct(3).TotLayers = 1;
 
-    SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
     DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
@@ -1910,16 +1910,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin(*state);
 
     // First surface is NOT a window so these should NOT be set
-    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,1),ZeroResult,0.0001);
-    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1,1),ZeroResult,0.0001);
 
     // Second surface is a window so these should be set
-    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
-    EXPECT_NEAR(SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
 
     // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
-    EXPECT_NEAR(SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);
-    EXPECT_NEAR(SurfWinFenLaySurfTempBack(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempFront(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(state->dataHeatBal->SurfWinFenLaySurfTempBack(1,3),ZeroResult,0.0001);
 
 }
 

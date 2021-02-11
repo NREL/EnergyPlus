@@ -2283,8 +2283,8 @@ namespace WindowManager {
             // absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
 
             for (IGlass = 1; IGlass <= TotGlassLay; ++IGlass) {
-                state.dataWindowManager->AbsRadGlassFace(2 * IGlass - 1) = SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
-                state.dataWindowManager->AbsRadGlassFace(2 * IGlass) = SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
+                state.dataWindowManager->AbsRadGlassFace(2 * IGlass - 1) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
+                state.dataWindowManager->AbsRadGlassFace(2 * IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum) / 2.0;
             }
 
             // IR from zone internal gains (lights, equipment and people) absorbed on zone-side face
@@ -3533,7 +3533,7 @@ namespace WindowManager {
 
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                SurfWinSysSolAbsorptance(SurfNum) = (state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
                                                 (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
@@ -6901,7 +6901,7 @@ namespace WindowManager {
                           state.dataConstruction->Construct(ThisNum).Name,
                           ThisNum,
                           state.dataConstruction->Construct(ThisNum).TotSolidLayers,
-                          NominalU(ThisNum),
+                          state.dataHeatBal->NominalU(ThisNum),
                           state.dataConstruction->Construct(ThisNum).SummerSHGC);
 
                 } else if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) {
@@ -6923,7 +6923,7 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).Name,
                               ThisNum,
                               state.dataConstruction->Construct(ThisNum).TotSolidLayers,
-                              NominalU(ThisNum),
+                              state.dataHeatBal->NominalU(ThisNum),
                               state.dataConstruction->Construct(ThisNum).SummerSHGC,
                               state.dataConstruction->Construct(ThisNum).SolTransNorm);
 
@@ -6947,7 +6947,7 @@ namespace WindowManager {
                             continue;
                         }
 
-                        NominalU(ThisNum) = NominalConductanceWinter;
+                        state.dataHeatBal->NominalU(ThisNum) = NominalConductanceWinter;
                         if (!state.dataConstruction->Construct(ThisNum).WindowTypeEQL) {
                             CalcNominalWindowCond(state, ThisNum, 2, NominalConductanceSummer, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                         }
@@ -7193,7 +7193,7 @@ namespace WindowManager {
                 CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
 
                 if (errFlag == 1 || errFlag == 2) continue;
-                NominalU(ThisNum) = NominalConductanceWinter;
+                state.dataHeatBal->NominalU(ThisNum) = NominalConductanceWinter;
             }
         }
     }

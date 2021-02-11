@@ -220,34 +220,6 @@ namespace EnergyPlus::DataHeatBalance {
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
                                                                         // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
 
-    Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
-    Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
-
-    Array1D_int SurfWinBSDFBeamDirectionRep;               // BSDF beam direction number for given complex fenestration state (for reporting) []
-    Array1D<Real64> SurfWinBSDFBeamThetaRep;               // BSDF beam Theta angle (for reporting) [rad]
-    Array1D<Real64> SurfWinBSDFBeamPhiRep;                 // BSDF beam Phi angle (for reporting) [rad]
-    Array1D<Real64> SurfWinQRadSWwinAbsTot;                // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    Array2D<Real64> SurfWinQRadSWwinAbsLayer;              // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    Array2D<Real64> SurfWinFenLaySurfTempFront;            // Front surface temperatures of fenestration layers
-    Array2D<Real64> SurfWinFenLaySurfTempBack;             // Back surface temperatures of fenestration layers
-    Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
-    Array1D<Real64> SurfWinSWwinAbsTotalReport;            // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
-    Array1D<Real64> SurfWinInitialDifSolInTransReport;     // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
-    Array2D<Real64> SurfWinQRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
-    Array2D<Real64> SurfWinInitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
-
-    Array1D<Real64> SurfOpaqSWOutAbsTotalReport;           // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
-    Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;          // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
-
-    Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
-    Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
-    Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
-
-    // Variables moved from HeatBalanceSurfaceManager and SolarShading
-    // to avoid conflict with their use in WindowManager
-
     Array1D<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
     // inside surface heat balances
     Array1D<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
@@ -393,30 +365,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        SurfBmIncInsSurfAmountRepEnergy.deallocate();
-        SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
-        SurfInitialDifSolInAbsReport.deallocate();
-        SurfSWInAbsTotalReport.deallocate();
-
-        SurfWinBSDFBeamDirectionRep.deallocate();
-        SurfWinBSDFBeamThetaRep.deallocate();
-        SurfWinBSDFBeamPhiRep.deallocate();
-        SurfWinQRadSWwinAbsTot.deallocate();
-        SurfWinQRadSWwinAbsLayer.deallocate();
-        SurfWinFenLaySurfTempFront.deallocate();
-        SurfWinFenLaySurfTempBack.deallocate();
-        SurfWinQRadSWwinAbs.deallocate();
-        SurfWinInitialDifSolwinAbs.deallocate();
-        SurfWinQRadSWwinAbsTotEnergy.deallocate();
-        SurfWinSWwinAbsTotalReport.deallocate();
-        SurfWinInitialDifSolInTransReport.deallocate();
-
-        SurfOpaqSWOutAbsTotalReport.deallocate();
-        SurfOpaqSWOutAbsEnergyReport.deallocate();
-
-        NominalR.deallocate();
-        NominalRforNominalUCalculation.deallocate();
-        NominalU.deallocate();
         TempEffBulkAir.deallocate();
         HConvIn.deallocate();
         AnisoSkyMult.deallocate();
@@ -1040,26 +988,8 @@ namespace EnergyPlus::DataHeatBalance {
         // METHODOLOGY EMPLOYED:
         // Create reverse layers.  Look in current constructions to see if match.  If no match, create a new one.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NewConstrNum; // Reverse Construction Number
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         static Array1D_int LayerPoint(Construction::MaxLayersInConstruct, 0); // Pointer array which refers back to
@@ -1101,10 +1031,10 @@ namespace EnergyPlus::DataHeatBalance {
         if (NewConstrNum == 0) {
             ++state.dataHeatBal->TotConstructs;
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
-            NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
-            NominalU.redimension(state.dataHeatBal->TotConstructs);
-            NominalU(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
             //  Put in new attributes
             NewConstrNum = state.dataHeatBal->TotConstructs;
             state.dataConstruction->Construct(NewConstrNum).IsUsed = true;
@@ -1115,14 +1045,14 @@ namespace EnergyPlus::DataHeatBalance {
             for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
                 state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
                 if (LayerPoint(nLayer) != 0) {
-                    NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += NominalR(LayerPoint(nLayer));
+                    state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += state.dataHeatBal->NominalR(LayerPoint(nLayer));
                 }
             }
 
             // no error if zero -- that will have been caught with earlier construction
             // the following line was changed to fix CR7601
-            if (NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) != 0.0) {
-                NominalU(state.dataHeatBal->TotConstructs) = 1.0 / NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs);
+            if (state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) != 0.0) {
+                state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 1.0 / state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs);
             }
 
             CheckAndSetConstructionProperties(state, state.dataHeatBal->TotConstructs, ErrorsFound);
@@ -1149,26 +1079,6 @@ namespace EnergyPlus::DataHeatBalance {
         // the program needs to set the property to "variable"/movable slats.  Since a blind could be in use
         // elsewhere with "fixed", a material needs to be added with variable properties -- having most of the
         // "fixed" properties in tact.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Found;
@@ -1295,9 +1205,6 @@ namespace EnergyPlus::DataHeatBalance {
 
         //  CALL's passing the screen number without the relative azimuth and altitude angles is not allowed
         //  CALL CalcScreenTransmittance(0, ScreenNumber=ScNum) ! DO NOT use this syntax
-
-        // REFERENCES:
-        // na
 
         // Using/Aliasing
         using DataSurfaces::DoNotModel;
@@ -1580,31 +1487,8 @@ namespace EnergyPlus::DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is given a roughness value and returns the character representation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string cRoughness; // Character representation of Roughness
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Select the correct Number for the associated ascii name for the roughness type
         {
@@ -1629,7 +1513,8 @@ namespace EnergyPlus::DataHeatBalance {
         return cRoughness;
     }
 
-    Real64 ComputeNominalUwithConvCoeffs(int const numSurf, // index for Surface array.
+    Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
+                                         int const numSurf, // index for Surface array.
                                          bool &isValid      // returns true if result is valid
     )
     {
@@ -1653,12 +1538,6 @@ namespace EnergyPlus::DataHeatBalance {
         //      Interior vertical surfaces                     IP: 0.68  SI: 0.1198
         // This section shows the same value in 90.1-2007 and 90.2-2010
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
@@ -1668,19 +1547,6 @@ namespace EnergyPlus::DataHeatBalance {
 
         // Return value
         Real64 NominalUwithConvCoeffs; // return value
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 insideFilm;
         Real64 outsideFilm;
@@ -1717,7 +1583,7 @@ namespace EnergyPlus::DataHeatBalance {
             }
         }
         // interior conditions
-        if (NominalU(Surface(numSurf).Construction) > 0.0) {
+        if (state.dataHeatBal->NominalU(Surface(numSurf).Construction) > 0.0) {
             {
                 auto const SELECT_CASE_var(Surface(numSurf).Class);
                 if ((SELECT_CASE_var == SurfaceClass::Wall) ||
@@ -1732,10 +1598,10 @@ namespace EnergyPlus::DataHeatBalance {
                     outsideFilm = 0.0;
                 }
             }
-            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / NominalU(Surface(numSurf).Construction)) + outsideFilm);
+            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(Surface(numSurf).Construction)) + outsideFilm);
         } else {
             isValid = false;
-            NominalUwithConvCoeffs = NominalU(Surface(numSurf).Construction);
+            NominalUwithConvCoeffs = state.dataHeatBal->NominalU(Surface(numSurf).Construction);
         }
 
         return NominalUwithConvCoeffs;
@@ -1752,26 +1618,10 @@ namespace EnergyPlus::DataHeatBalance {
         // Loop through Surface and register any shading controls, and loop through the construction
         // material layer
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // surface index
