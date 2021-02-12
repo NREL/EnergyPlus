@@ -656,7 +656,7 @@ namespace ThermalComfort {
         XN = state.dataThermalComforts->AbsCloSurfTemp / 100.0;
         state.dataThermalComforts->HcFor = 12.1 * std::sqrt(AirVel); // Heat transfer coefficient by forced convection
         state.dataThermalComforts->IterNum = 0;
-        XF = XN * 2;
+        XF = XN;
 
         // COMPUTE SURFACE TEMPERATURE OF CLOTHING BY ITERATIONS
         while (((std::abs(XN - XF) > StopIterCrit) || (state.dataThermalComforts->IterNum == 0)) && (state.dataThermalComforts->IterNum < MaxIter)) {

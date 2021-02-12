@@ -232,7 +232,6 @@ namespace InternalHeatGains {
         Array1D<Real64> IHGNumbers;
         int IOStat;
         int Loop;
-        bool MustInpSch;
         int NumAlpha;
         int NumNumber;
         int MaxAlpha;
@@ -692,7 +691,6 @@ namespace InternalHeatGains {
                     }
 
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
-                        MustInpSch = false;
                         UsingThermalComfort = false;
                         if (NumAlpha > 20) {
                             lastOption = 20;
@@ -728,43 +726,36 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     People(Loop).Fanger = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     People(Loop).Pierce = true;
                                     AnyThermalComfortPierceModel = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     People(Loop).KSU = true;
                                     AnyThermalComfortKSUModel = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     People(Loop).AdaptiveASH55 = true;
                                     AdaptiveComfortRequested_ASH55 = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     People(Loop).AdaptiveCEN15251 = true;
                                     AdaptiveComfortRequested_CEN15251 = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "COOLINGEFFECTASH55") {
                                     People(Loop).CoolingEffectASH55 = true;
                                     AnyThermalComfortCoolingEffectModel = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ANKLEDRAFTASH55") {
                                     People(Loop).AnkleDraftASH55 = true;
                                     AnyThermalComfortAnkleDraftModel = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
@@ -785,7 +776,7 @@ namespace InternalHeatGains {
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
                             People(Loop).MRTCalcType = ZoneAveraged;
 
-                            bool ThermalComfortRuns = People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55;
+                            bool ModelWithAdditionalInputs = People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
                             {
@@ -797,15 +788,15 @@ namespace InternalHeatGains {
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     People(Loop).MRTCalcType = SurfaceWeighted;
                                     People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
-                                    if (People(Loop).SurfacePtr == 0 && ThermalComfortRuns) {
+                                    if (People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr && ThermalComfortRuns) {
+                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr && ModelWithAdditionalInputs) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
-                                                        cAlphaFieldNames(7) + '=' + AlphaName(8) + " in different zone.");
+                                                        cAlphaFieldNames(7) + '=' + AlphaName(7) + " in different zone.");
                                         ShowContinueError(state, "Surface is in Zone=" + Zone(Surface(People(Loop).SurfacePtr).Zone).Name + " and " +
                                                           CurrentModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
@@ -816,12 +807,12 @@ namespace InternalHeatGains {
                                     People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
-                                    if (MustInpSch && Item1 == 1 && ThermalComfortRuns)
+                                    if (Item1 == 1 && ModelWithAdditionalInputs)
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                          cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
-                                    if (MustInpSch && Item1 == 1 && ThermalComfortRuns) {
+                                    if (Item1 == 1 && ModelWithAdditionalInputs) {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(7) + '=' + AlphaName(7));
                                         ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
@@ -874,7 +865,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && ThermalComfortRuns) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
                                                     " is required for this item.");
@@ -888,7 +879,7 @@ namespace InternalHeatGains {
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         People(Loop).ClothingType = 1;
                                         People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (People(Loop).ClothingPtr == 0 && ThermalComfortRuns) {
+                                        if (People(Loop).ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(12) + " entered=" + AlphaName(12));
@@ -1002,7 +993,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && ThermalComfortRuns) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
@@ -1010,7 +1001,6 @@ namespace InternalHeatGains {
                                 }
                             }
 
-                            // TODO: why Item1 == 1 (first People object) required in all People input error logging?
                             int indexAnkleAirVelPtr = 21;
                             if (!lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "" ) {
                                 People(Loop).AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
