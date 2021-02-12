@@ -3385,6 +3385,7 @@ void ElectricStorage::reinitAtBeginEnvironment()
     } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_);
     }
     myWarmUpFlag_ = true;
 }
@@ -3425,6 +3426,7 @@ void ElectricStorage::reinitAtEndWarmup()
     } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_);
     }
     myWarmUpFlag_ = false;
 }
