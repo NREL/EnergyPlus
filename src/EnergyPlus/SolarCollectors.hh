@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,11 +131,11 @@ namespace SolarCollectors {
         std::string OSCMName;     // OtherSideConditionsModel
         int VentCavIndex;         // index of ventilated cavity object
         TankTypeEnum ICSType_Num; // ICS collector type number
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
-        int WLoopNum;             // Water plant loop index number                      !DSU
-        int WLoopSideNum;         // Water plant loop side index                        !DSU
-        int WLoopBranchNum;       // Water plant loop branch index                      !DSU
-        int WLoopCompNum;         // Water plant loop component index                   !DSU
+        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant
+        int WLoopNum;             // Water plant loop index number
+        int WLoopSideNum;         // Water plant loop side index
+        int WLoopBranchNum;       // Water plant loop branch index
+        int WLoopCompNum;         // Water plant loop component index
         bool Init;                // Flag for initialization:  TRUE means do the init
         bool InitSizing;          // Flag for initialization of plant sizing
         int Parameters;           // Parameters object number

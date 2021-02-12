@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
@@ -72,6 +73,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -895,6 +897,10 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeStateOldOld.allocate(TotNodes + 1);
             SurfaceFD(Surf).PhaseChangeTemperatureReverse.allocate(TotNodes + 1);
+            SurfaceFD(Surf).condMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).specHeatMaterialActuators.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
+            SurfaceFD(Surf).condNodeReport.allocate(TotNodes + 1);
+            SurfaceFD(Surf).specHeatNodeReport.allocate(TotNodes + 1);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -921,6 +927,19 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeStateOld = 0;
             SurfaceFD(Surf).PhaseChangeStateOldOld = 0;
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
+            SurfaceFD(Surf).condNodeReport = 0.0;
+            SurfaceFD(Surf).specHeatNodeReport = 0.0;
+
+            // Setup EMS data
+            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                // Setup material layer names actuators
+                int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
+                // Actuator name format: "{SurfName}:{MaterialLayerName}"
+                std::string actName = fmt::format("{}:{}", Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
+                SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
+                SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
+            }
+
         }
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -934,6 +953,25 @@ namespace HeatBalFiniteDiffManager {
                                 "Zone",
                                 "Sum",
                                 Surface(SurfNum).Name);
+
+            // Setup EMS Material Actuators
+            ConstrNum = Surface(SurfNum).Construction;
+            for (int mat = 1; mat <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++mat) {
+                EnergyPlus::SetupEMSActuator(state,
+                                             "CondFD Surface Material Layer",
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatorName,
+                                             "Thermal Conductivity",
+                                             "[W/m-K]",
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).isActuated,
+                                             SurfaceFD(SurfNum).condMaterialActuators(mat).actuatedValue);
+                EnergyPlus::SetupEMSActuator(state,
+                                             "CondFD Surface Material Layer",
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatorName,
+                                             "Specific Heat",
+                                             "[J/kg-C]",
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).isActuated,
+                                             SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatedValue);
+            }
 
             TotNodes = ConstructFD(Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
             for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                     // include inside face node
@@ -972,6 +1010,20 @@ namespace HeatBalFiniteDiffManager {
                                     "Zone",
                                     "State",
                                     Surface(SurfNum).Name);
+                SetupOutputVariable(state,
+                                    format("CondFD Phase Change Node Conductivity {}", Lay),
+                                    OutputProcessor::Unit::W_mK,
+                                    SurfaceFD(SurfNum).condNodeReport(Lay),
+                                    "Zone",
+                                    "State",
+                                    Surface(SurfNum).Name);
+                SetupOutputVariable(state,
+                                    format("CondFD Phase Change Node Specific Heat {}", Lay),
+                                    OutputProcessor::Unit::J_kgK,
+                                    SurfaceFD(SurfNum).specHeatNodeReport(Lay),
+                                    "Zone",
+                                    "State",
+                                    Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
@@ -993,6 +1045,24 @@ namespace HeatBalFiniteDiffManager {
         } // End of the Surface Loop for Report Variable Setup
 
         ReportFiniteDiffInits(state); // Report the results from the Finite Diff Inits
+
+    }
+
+    int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)
+    {
+        for (auto &surface : Surface) {
+            if (surface.Name == surfName) {
+                int constrNum = surface.Construction;
+                for (int lay = 1; lay <= state.dataConstruction->Construct(constrNum).TotLayers; ++lay) {
+                    int matLay = state.dataConstruction->Construct(constrNum).LayerPoint(lay);
+                    if (state.dataMaterial->Material(matLay).Name == matName) {
+                        return ConstructFD(constrNum).NodeNumPoint(lay);
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 
     void relax_array(Array1D<Real64> &a,       // Array to relax
@@ -1530,6 +1600,8 @@ namespace HeatBalFiniteDiffManager {
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
                 auto const &mat(state.dataMaterial->Material(MatLay));
                 auto const &matFD(MaterialFD(MatLay));
+                auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+                auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
                 // regular outside conditions
 
@@ -1578,6 +1650,20 @@ namespace HeatBalFiniteDiffManager {
                             Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
                         }
                     } // Phase Change Material option
+
+                    // EMS Conductivity Override
+                    if (condActuator.isActuated) {
+                        kt = condActuator.actuatedValue;
+                    }
+
+                    // EMS Specific Heat Override
+                    if (specHeatActuator.isActuated) {
+                        Cp = specHeatActuator.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    SurfaceFD(Surf).condNodeReport(i) = kt;
+                    SurfaceFD(Surf).specHeatNodeReport(i) = Cp;
 
                     // Choose Regular or Transparent Insulation Case
                     Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
@@ -1687,6 +1773,8 @@ namespace HeatBalFiniteDiffManager {
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto const &mat(state.dataMaterial->Material(MatLay));
         auto const &matFD(MaterialFD(MatLay));
+        auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+        auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
         auto const TD_i(TD(i));
 
@@ -1732,6 +1820,20 @@ namespace HeatBalFiniteDiffManager {
                 Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
             }
         } // Phase Change case
+
+        // EMS Conductivity Override
+        if (condActuator.isActuated) {
+            kt = condActuator.actuatedValue;
+        }
+
+        // EMS Specific Heat Override
+        if (specHeatActuator.isActuated) {
+            Cp = specHeatActuator.actuatedValue;
+        }
+
+        // Update EMS internal variables
+        SurfaceFD(Surf).condNodeReport(i) = kt;
+        SurfaceFD(Surf).specHeatNodeReport(i) = Cp;
 
         Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
@@ -1797,6 +1899,12 @@ namespace HeatBalFiniteDiffManager {
 
             int const MatLay2(construct.LayerPoint(Lay + 1));
             auto const &mat2(state.dataMaterial->Material(MatLay2));
+
+            auto const &condActuator1(SurfaceFD(Surf).condMaterialActuators(Lay));
+            auto const &condActuator2(SurfaceFD(Surf).condMaterialActuators(Lay + 1));
+
+            auto const &specHeatActuator1(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
+            auto const &specHeatActuator2(SurfaceFD(Surf).specHeatMaterialActuators(Lay + 1));
 
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
@@ -1931,6 +2039,32 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
 
+                    // EMS Conductivity 1 Override
+                    if (condActuator1.isActuated) {
+                        kt1 = condActuator1.actuatedValue;
+                    }
+
+                    // EMS Conductivity 2 Override
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator2.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 1 Override
+                    if (specHeatActuator1.isActuated) {
+                        Cp1 = specHeatActuator1.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 2 Override
+                    if (specHeatActuator2.isActuated) {
+                        Cp2 = specHeatActuator2.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    SurfaceFD(Surf).condNodeReport(i) = kt1;
+                    SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
+                    SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
+                    SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
                     Real64 const Delt_kt1_Rlayer2(Delt * kt1 * Rlayer2);
@@ -2004,6 +2138,32 @@ namespace HeatBalFiniteDiffManager {
                     if (mat2.phaseChange) {
                         adjustPropertiesForPhaseChange(i, Surf, mat2, TD_i, TDT_i, Cp2, RhoS2, kt2);
                     }
+
+                    // EMS Conductivity 1 Override
+                    if (condActuator1.isActuated) {
+                        kt1 = condActuator1.actuatedValue;
+                    }
+
+                    // EMS Conductivity 2 Override
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator2.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 1 Override
+                    if (specHeatActuator1.isActuated) {
+                        Cp1 = specHeatActuator1.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 2 Override
+                    if (specHeatActuator2.isActuated) {
+                        Cp2 = specHeatActuator2.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    SurfaceFD(Surf).condNodeReport(i) = kt1;
+                    SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
+                    SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
+                    SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Delt_Delx2(Delt * Delx2);
@@ -2122,6 +2282,8 @@ namespace HeatBalFiniteDiffManager {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(MaterialFD(MatLay));
+            auto const &condActuator(SurfaceFD(Surf).condMaterialActuators(Lay));
+            auto const &specHeatActuator(SurfaceFD(Surf).specHeatMaterialActuators(Lay));
 
             // Calculate the Dry Heat Conduction Equation
 
@@ -2172,6 +2334,20 @@ namespace HeatBalFiniteDiffManager {
                         Cp = max(Cpo, (EnthNew(i) - EnthOld(i)) / (TDT_i - TD_i));
                     }
                 } // Phase change material check
+
+                // EMS Conductivity Override
+                if (condActuator.isActuated) {
+                    kt = condActuator.actuatedValue;
+                }
+
+                // EMS Specific Heat Override
+                if (specHeatActuator.isActuated) {
+                    Cp = specHeatActuator.actuatedValue;
+                }
+
+                // Update EMS internal variables
+                SurfaceFD(Surf).condNodeReport(i) = kt;
+                SurfaceFD(Surf).specHeatNodeReport(i) = Cp;
 
                 Real64 const DelX(ConstructFD(ConstrNum).DelX(Lay));
                 Real64 const Delt_DelX(Delt * DelX);

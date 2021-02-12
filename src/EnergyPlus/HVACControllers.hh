@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -205,9 +205,9 @@ namespace HVACControllers {
         int ActuatedNode;                   // The node that is acted upon by the controller
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
-        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node DSU3
-        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node DSU3
-        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node DSU3
+        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node
+        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node
+        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node
         // --------------------
         // Sensed variable
         // --------------------

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -156,21 +156,19 @@ namespace ConvectionCoefficients {
         using DataHeatBalFanSys::MAT;
         using DataLoopNode::Node;
         using DataLoopNode::NumOfNodes;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
-        using DataZoneEquipment::ZoneEquipSimulatedOnce;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;                          // DO loop counter for zones
         int SurfNum;                          // DO loop counter for surfaces in zone
 
-        // FLOW:
+
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
             GetUserConvectionCoefficients(state);
             state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
         }
 
         if (state.dataConvectionCoefficient->NodeCheck) { // done once when conditions are ready...
-            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && ZoneEquipInputsFilled && allocated(Node)) {
+            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled && allocated(Node)) {
                 state.dataConvectionCoefficient->NodeCheck = false;
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
@@ -184,7 +182,7 @@ namespace ConvectionCoefficients {
             }
         }
 
-        if (state.dataConvectionCoefficient->ActiveSurfaceCheck && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && ZoneEquipSimulatedOnce) {
+        if (state.dataConvectionCoefficient->ActiveSurfaceCheck && !state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipSimulatedOnce) {
             SetupAdaptiveConvectionRadiantSurfaceData(state);
             state.dataConvectionCoefficient->ActiveSurfaceCheck = false;
         }
@@ -373,7 +371,7 @@ namespace ConvectionCoefficients {
         int BaseSurf;
         int SrdSurfsNum; // Srd surface counter
 
-        // FLOW:
+
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
              GetUserConvectionCoefficients(state);
             state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
@@ -2353,7 +2351,7 @@ namespace ConvectionCoefficients {
         static Array1D<Real64> const E(6, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
         static Array1D<Real64> const F(6, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
 
-        // FLOW:
+
         CalcASHRAESimpExtConvectCoeff = D(Roughness) + E(Roughness) * SurfWindSpeed + F(Roughness) * pow_2(SurfWindSpeed);
 
         return CalcASHRAESimpExtConvectCoeff;
@@ -2593,7 +2591,7 @@ namespace ConvectionCoefficients {
 
     Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
     {
-        // FLOW:
+
         if (!allocated(Node)) {
             return 0.0;
         } else {
@@ -2606,7 +2604,7 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcZoneSupplyAirTemp(int const ZoneNum)
+    Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int const ZoneNum)
     {
         using namespace DataZoneEquipment;
 
@@ -2615,9 +2613,9 @@ namespace ConvectionCoefficients {
         if (ZoneNode > 0) {
             Real64 SumMdotTemp = 0.0;
             Real64 SumMdot = 0.0;
-            for (int EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
-                    thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
+            for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
+                if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
+                    thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                     if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
                         SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
                         SumMdot += Node(thisZoneInletNode).MassFlowRate;
@@ -2802,7 +2800,7 @@ namespace ConvectionCoefficients {
         Real64 Tilt;                // Surface tilt
         Real64 ZoneMult;
 
-        // FLOW:
+
         if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
             ACH = 0.0;
         } else {
@@ -4193,13 +4191,13 @@ namespace ConvectionCoefficients {
             } // surface loop
 
             if ((state.dataConvectionCoefficient->ActiveWallCount > 0) && (state.dataConvectionCoefficient->ActiveWallArea > 0.0)) {
-                ZoneEquipConfig(ZoneLoop).InWallActiveElement = true;
+                state.dataZoneEquip->ZoneEquipConfig(ZoneLoop).InWallActiveElement = true;
             }
             if ((state.dataConvectionCoefficient->ActiveCeilingCount > 0) && (state.dataConvectionCoefficient->ActiveCeilingArea > 0.0)) {
-                ZoneEquipConfig(ZoneLoop).InCeilingActiveElement = true;
+                state.dataZoneEquip->ZoneEquipConfig(ZoneLoop).InCeilingActiveElement = true;
             }
             if ((state.dataConvectionCoefficient->ActiveFloorCount > 0) && (state.dataConvectionCoefficient->ActiveFloorArea > 0)) {
-                ZoneEquipConfig(ZoneLoop).InFloorActiveElement = true;
+                state.dataZoneEquip->ZoneEquipConfig(ZoneLoop).InFloorActiveElement = true;
             }
         } // zone loop
     }
@@ -4472,7 +4470,7 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                         return CalcBeausoleilMorrisonMixedAssistedWall(
-                            Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight, Tsurf, CalcZoneSupplyAirTemp(ZoneNum), CalcZoneSystemACH(state, ZoneNum));
+                            Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight, Tsurf, CalcZoneSupplyAirTemp(state, ZoneNum), CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
                     tmpHc = CalcBeausoleilMorrisonMixedAssistedWall(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, ZoneNum);
@@ -4482,7 +4480,7 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=, &state](double Tsurf, double Tamb, double, double, double) -> double {
                         return CalcBeausoleilMorrisonMixedOpposingWall(
-                            Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight, Tsurf, CalcZoneSupplyAirTemp(ZoneNum), CalcZoneSystemACH(state, ZoneNum));
+                            Tsurf - Tamb, Surface(SurfNum).IntConvZoneWallHeight, Tsurf, CalcZoneSupplyAirTemp(state, ZoneNum), CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
                     tmpHc = CalcBeausoleilMorrisonMixedOpposingWall(state, (Tsurface - Tzone), Surface(SurfNum).IntConvZoneWallHeight, Tsurface, ZoneNum);
@@ -4494,7 +4492,7 @@ namespace ConvectionCoefficients {
                         return CalcBeausoleilMorrisonMixedStableCeiling(Tsurf - Tamb,
                                                                         Surface(SurfNum).IntConvZoneHorizHydrDiam,
                                                                         Tsurf,
-                                                                        CalcZoneSupplyAirTemp(ZoneNum),
+                                                                        CalcZoneSupplyAirTemp(state, ZoneNum),
                                                                         CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
@@ -4508,7 +4506,7 @@ namespace ConvectionCoefficients {
                         return CalcBeausoleilMorrisonMixedUnstableCeiling(Tsurf - Tamb,
                                                                           Surface(SurfNum).IntConvZoneHorizHydrDiam,
                                                                           Tsurf,
-                                                                          CalcZoneSupplyAirTemp(ZoneNum),
+                                                                          CalcZoneSupplyAirTemp(state, ZoneNum),
                                                                           CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
@@ -4522,7 +4520,7 @@ namespace ConvectionCoefficients {
                         return CalcBeausoleilMorrisonMixedStableFloor(Tsurf - Tamb,
                                                                       Surface(SurfNum).IntConvZoneHorizHydrDiam,
                                                                       Tsurf,
-                                                                      CalcZoneSupplyAirTemp(ZoneNum),
+                                                                      CalcZoneSupplyAirTemp(state, ZoneNum),
                                                                       CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
@@ -4535,7 +4533,7 @@ namespace ConvectionCoefficients {
                         return CalcBeausoleilMorrisonMixedUnstableFloor(Tsurf - Tamb,
                                                                         Surface(SurfNum).IntConvZoneHorizHydrDiam,
                                                                         Tsurf,
-                                                                        CalcZoneSupplyAirTemp(ZoneNum),
+                                                                        CalcZoneSupplyAirTemp(state, ZoneNum),
                                                                         CalcZoneSystemACH(state, ZoneNum));
                     };
                 } else {
@@ -5084,36 +5082,36 @@ namespace ConvectionCoefficients {
             FlowRegimeStack(0) = InConvFlowRegime_A3;
         } else { // is controlled, lets see by how and if that means is currently active
 
-            if (!(ZoneEquipConfig(ZoneNum).EquipListIndex > 0) || state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !ZoneEquipSimulatedOnce) {
+            if (!(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) || state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !state.dataZoneEquip->ZoneEquipSimulatedOnce) {
                 FlowRegimeStack(0) = InConvFlowRegime_A3;
             } else {
 
-                for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
+                for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
 
                     {
-                        auto const SELECT_CASE_var(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum));
+                        auto const SELECT_CASE_var(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum));
 
                         if ((SELECT_CASE_var == AirDistUnit_Num) || (SELECT_CASE_var == PurchasedAir_Num)) { // central air equipment
-                            if (!(allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
+                            if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
                             // get inlet node, not zone node if possible
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
+                            thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
                                 if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                     CoolingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
                                 if (Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                     CoolingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             }
                         } else if ((SELECT_CASE_var == WindowAC_Num) || (SELECT_CASE_var == PkgTermHPAirToAir_Num) ||
@@ -5121,47 +5119,47 @@ namespace ConvectionCoefficients {
                                    (SELECT_CASE_var == PkgTermHPWaterToAir_Num) || (SELECT_CASE_var == FanCoil4Pipe_Num) ||
                                    (SELECT_CASE_var == UnitVentilator_Num) || (SELECT_CASE_var == UnitHeater_Num) ||
                                    (SELECT_CASE_var == OutdoorAirUnit_Num)) {
-                            if (!(allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
-                            thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
+                            if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
+                            thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
                                 if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                     CoolingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
                                 if (Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                     CoolingPriorityStack(EquipOnCount) =
-                                        ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                        state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             }
                         } else if ((SELECT_CASE_var == CoolingPanel_Num) || (SELECT_CASE_var == BBSteam_Num) ||
                                    (SELECT_CASE_var == BBWaterConvective_Num) || (SELECT_CASE_var == BBElectricConvective_Num) ||
                                    (SELECT_CASE_var == BBWater_Num)) {
 
-                            if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
+                            if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack(EquipOnCount) = InConvFlowRegime_B;
-                                HeatingPriorityStack(EquipOnCount) = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                HeatingPriorityStack(EquipOnCount) = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                CoolingPriorityStack(EquipOnCount) = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                             }
                         } else if ((SELECT_CASE_var == BBElectric_Num) || (SELECT_CASE_var == HiTempRadiant_Num)) {
-                            if (ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
+                            if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack(EquipOnCount) = InConvFlowRegime_B;
-                                HeatingPriorityStack(EquipOnCount) = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                HeatingPriorityStack(EquipOnCount) = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                CoolingPriorityStack(EquipOnCount) = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                             }
                         } else if ((SELECT_CASE_var == VentilatedSlab_Num) || (SELECT_CASE_var == LoTempRadiant_Num)) {
 
-                            if (ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Floor) {
@@ -5171,16 +5169,16 @@ namespace ConvectionCoefficients {
                                             EquipOnCount = min(EquipOnCount + 1, 10);
                                             FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A1;
                                             HeatingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                             CoolingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                             break;
                                         }
                                     }
                                 }
                             }
 
-                            if (ZoneEquipConfig(ZoneNum).InCeilingActiveElement) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InCeilingActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Roof) {
@@ -5190,16 +5188,16 @@ namespace ConvectionCoefficients {
                                             EquipOnCount = min(EquipOnCount + 1, 10);
                                             FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A1;
                                             HeatingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                             CoolingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                             break;
                                         }
                                     }
                                 }
                             }
 
-                            if (ZoneEquipConfig(ZoneNum).InWallActiveElement) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InWallActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Wall || Surface(SurfLoop).Class == SurfaceClass::Door) {
@@ -5209,16 +5207,16 @@ namespace ConvectionCoefficients {
                                             EquipOnCount = min(EquipOnCount + 1, 10);
                                             FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A2;
                                             HeatingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                             CoolingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                         } else { // not heating, no special models wall cooling so use simple bouyancy
                                             EquipOnCount = min(EquipOnCount + 1, 10);
                                             FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A3;
                                             HeatingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).HeatingPriority(EquipNum);
                                             CoolingPriorityStack(EquipOnCount) =
-                                                ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
+                                                state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                         }
                                     }
                                 }
@@ -6058,10 +6056,10 @@ namespace ConvectionCoefficients {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
             AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
-            if (ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
-                for (EquipNum = 1; EquipNum <= ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
-                    if (allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
-                        thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
+                for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
+                    if (allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
+                        thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                         if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
                             SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
                         }
@@ -6828,7 +6826,7 @@ namespace ConvectionCoefficients {
     )
     {
         if ((std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) && (Height != 0.0)) {
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedAssistedWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
@@ -6932,7 +6930,7 @@ namespace ConvectionCoefficients {
                     "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]",
                     state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX2);
             }
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedOpposingWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
 
@@ -6997,7 +6995,7 @@ namespace ConvectionCoefficients {
     {
 
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedStableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
@@ -7074,7 +7072,7 @@ namespace ConvectionCoefficients {
     {
 
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedUnstableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
@@ -7150,7 +7148,7 @@ namespace ConvectionCoefficients {
     {
 
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedStableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
@@ -7226,7 +7224,7 @@ namespace ConvectionCoefficients {
     )
     {
         if ((HydraulicDiameter != 0.0) && (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff)) {
-            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
+            Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(state, ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(state, ZoneNum);
             return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {

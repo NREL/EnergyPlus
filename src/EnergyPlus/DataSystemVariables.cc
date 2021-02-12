@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,7 +89,6 @@ namespace DataSystemVariables {
     using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
     using DataStringGlobals::ProgramPath;
-    using namespace FileSystem;
 
     // Data
     // -only module should be available to other modules and routines.
@@ -242,7 +241,7 @@ namespace DataSystemVariables {
         FileFound = false;
         CheckedFileName.clear();
         InputFileName = originalInputFileName;
-        makeNativePath(InputFileName);
+        FileSystem::makeNativePath(InputFileName);
 
         std::vector<std::pair<std::string, std::string>> pathsChecked;
 
@@ -262,10 +261,12 @@ namespace DataSystemVariables {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 FileFound = true;
                 CheckedFileName = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", getAbsolutePath(CheckedFileName));
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(CheckedFileName));
                 return;
             } else {
-                std::pair <std::string,std::string> currentPath(getParentDirectoryPath(getAbsolutePath(pathsToCheck[i].first)), pathsToCheck[i].second);
+                std::pair <std::string,std::string> currentPath(
+                        FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
+                        pathsToCheck[i].second);
                 bool found = false;
                 for(auto path: pathsChecked){
                     if (path.first == currentPath.first){
@@ -275,7 +276,8 @@ namespace DataSystemVariables {
                 if (!found){
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"", getAbsolutePath(pathsToCheck[i].first));
+                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"",
+                      FileSystem::getAbsolutePath(pathsToCheck[i].first));
             }
         }
         if (!FileFound) {

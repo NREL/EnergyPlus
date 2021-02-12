@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -146,9 +146,8 @@ namespace ChillerExhaustAbsorption {
         int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potential less than thermal energy needed during heating
         std::string TypeOf;                      // Generator type
         std::string ExhaustSourceName;           // Generator type Name
-        bool oneTimeInit;
+        bool oneTimeFlag;
         bool envrnInit;
-        bool plantScanInit;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
         // Members from old report struct
@@ -204,7 +203,7 @@ namespace ChillerExhaustAbsorption {
               DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
               HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Unassigned), ExhTempLTAbsLeavingTempIndex(0),
-              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeInit(true), envrnInit(true), plantScanInit(true), oldCondSupplyTemp(0.0),
+              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeFlag(true), envrnInit(true), oldCondSupplyTemp(0.0),
               CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
               ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
               ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),
@@ -224,6 +223,8 @@ namespace ChillerExhaustAbsorption {
         void getSizingFactor(Real64 &SizFac) override;
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 

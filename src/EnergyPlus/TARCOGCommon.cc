@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,20 +69,6 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    // Functions
-
     bool IsShadingLayer(int const layertype)
     {
 
@@ -100,7 +86,6 @@ namespace TARCOGCommon {
 
         // Using/Aliasing
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMax;
@@ -129,13 +114,12 @@ namespace TARCOGCommon {
 
         // Using/Aliasing
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMean;
 
         // Locals
-        static Real64 const Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
+        Real64 constexpr Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
         int i;
         int j;
 
@@ -323,8 +307,8 @@ namespace TARCOGCommon {
     {
 
         // Locals
-        static int const NMAX(500);
-        static Array1D<Real64> vv(NMAX);
+        int constexpr NMAX(500);
+        static Array1D<Real64> vv(NMAX);  // TODO: Make this a state variable
 
         Real64 const TINY(1.0e-20);
 
@@ -393,9 +377,6 @@ namespace TARCOGCommon {
 
     void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b)
     {
-        //***********************************************************************
-        //***********************************************************************
-
         // Argument array dimensioning
         a.dim(n, n);
         EP_SIZE_CHECK(indx, n);
@@ -434,15 +415,7 @@ namespace TARCOGCommon {
 
     Real64 pos(Real64 const x)
     {
-        //***********************************************************************
-        //***********************************************************************
-
-        // Return value
-        Real64 pos;
-
-        pos = (x + std::abs(x)) / 2.0;
-
-        return pos;
+        return (x + std::abs(x)) / 2.0;
     }
 
 } // namespace TARCOGCommon

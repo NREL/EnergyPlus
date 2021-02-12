@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,9 +101,6 @@ namespace HVACDXHeatPumpSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS
     Real64 const MinAirMassFlow(0.001);
-    // Compressor operation
-    int const On(1);  // normal compressor operation
-    int const Off(0); // signal DXCoil that compressor shouldn't run
 
     bool GetInputFlag(true); // Flag to get input only once
 
@@ -509,7 +506,7 @@ namespace HVACDXHeatPumpSystem {
         static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
-        // FLOW:
+
 
         //  IF (MyOneTimeFlag) THEN
         //    MyOneTimeFlag = .FALSE.
@@ -591,7 +588,6 @@ namespace HVACDXHeatPumpSystem {
         // Using/Aliasing
         using namespace ScheduleManager;
         using DataHVACGlobals::TempControlTol;
-        using DXCoils::DXCoilOutletTemp;
         using DXCoils::SimDXCoil;
         using FaultsManager::FaultsCoilSATSensor;
 
@@ -718,7 +714,7 @@ namespace HVACDXHeatPumpSystem {
                             //           OutletTempDXCoil is the full capacity outlet temperature at PartLoadFrac = 1 from the CALL above. If this
                             //           temp is greater than the desired outlet temp, then run the compressor at PartLoadFrac = 1, otherwise find the
                             //           operating PLR.
-                            OutletTempDXCoil = DXCoilOutletTemp(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
+                            OutletTempDXCoil = state.dataDXCoils->DXCoilOutletTemp(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
@@ -1097,7 +1093,6 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using DXCoils::CalcDXHeatingCoil;
-        using DXCoils::DXCoilOutletTemp;
 
         // Return value
         Real64 Residuum; // Residual to be minimized to zero
@@ -1127,7 +1122,7 @@ namespace HVACDXHeatPumpSystem {
 
         CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
 
-        OutletAirTemp = DXCoilOutletTemp(CoilIndex);
+        OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;

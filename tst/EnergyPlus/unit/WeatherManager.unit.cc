@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
@@ -66,6 +66,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
+// Fixtures
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
 
@@ -689,8 +690,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::WriteTabularFiles = true;
-    OutputReportTabular::displayEioSummary = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
+    state->dataOutRptTab->displayEioSummary = true;
 
     std::string const idf_objects = delimited_string({
 

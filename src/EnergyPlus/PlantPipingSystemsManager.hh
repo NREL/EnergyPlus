@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 // C++ Headers
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <utility>
 
 // ObjexxFCL Headers
@@ -505,9 +506,9 @@ namespace PlantPipingSystemsManager {
         Real64 Width = 0;  // m
         Real64 Length = 0; // m
         bool ShiftPipesByWidth = false;
-        std::string WallBoundaryOSCMName = "";
+        std::string WallBoundaryOSCMName;
         int WallBoundaryOSCMIndex = 0;
-        std::string FloorBoundaryOSCMName = "";
+        std::string FloorBoundaryOSCMName;
         int FloorBoundaryOSCMIndex = 0;
         std::vector<int> WallSurfacePointers;
         std::vector<int> FloorSurfacePointers;
@@ -561,7 +562,7 @@ namespace PlantPipingSystemsManager {
     struct Segment {
         // Members
         // ID
-        std::string Name = "";
+        std::string Name;
         // Misc inputs
         PointF PipeLocation;
         Point PipeCellCoordinates;
@@ -591,10 +592,10 @@ namespace PlantPipingSystemsManager {
 
         // Members
         // ID
-        std::string Name = "";
+        std::string Name;
         // Inlet and outlet information
-        std::string InletNodeName = "";
-        std::string OutletNodeName = "";
+        std::string InletNodeName;
+        std::string OutletNodeName;
         int InletNodeNum = 0;
         int OutletNodeNum = 0;
         Point3DInteger CircuitInletCell;
@@ -923,13 +924,6 @@ namespace PlantPipingSystemsManager {
 
     };
 
-    // Object Data
-    extern std::vector<Domain> domains;
-    extern std::vector<Circuit> circuits;
-    extern std::vector<Segment> segments;
-
-    void clear_state();
-
     void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
 
     void CheckIfAnySlabs(EnergyPlusData &state);
@@ -1015,9 +1009,25 @@ namespace PlantPipingSystemsManager {
 
 struct PlantPipingSysMgrData : BaseGlobalStruct {
 
+    bool GetInputFlag = true;
+    bool GetSegmentInputFlag = true;
+    bool GetCircuitInputFlag = true;
+    bool WriteEIOFlag = true;
+    std::vector<PlantPipingSystemsManager::Domain> domains;
+    std::vector<PlantPipingSystemsManager::Circuit> circuits;
+    std::vector<PlantPipingSystemsManager::Segment> segments;
+    std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
+
     void clear_state() override
     {
-
+        this->GetInputFlag = true;
+        this->GetSegmentInputFlag = true;
+        this->GetCircuitInputFlag = true;
+        this->WriteEIOFlag = true;
+        this->domains.clear();
+        this->circuits.clear();
+        this->segments.clear();
+        this->GroundDomainUniqueNames.clear();
     }
 };
 

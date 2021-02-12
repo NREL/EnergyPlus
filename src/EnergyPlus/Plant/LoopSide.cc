@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,7 +93,7 @@ namespace DataPlant {
         // the flow resolver and locking those flows down.  Available components are then re-simulated using the
         // corrected flow rates.
 
-        auto &thisPlantLoop = DataPlant::PlantLoop(this->myLoopNum);
+        auto &thisPlantLoop = state.dataPlnt->PlantLoop(this->myLoopNum);
         int ThisSideInletNode = this->NodeNumIn;
 
         this->InitialDemandToLoopSetPoint = 0.0;
@@ -122,7 +122,7 @@ namespace DataPlant {
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
         if (this->myLoopSideNum == DataPlant::DemandSide) {
-            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Init);
         }
 
         // Turn on any previously disabled branches due to constant speed branch pump issue
@@ -153,7 +153,7 @@ namespace DataPlant {
         } else { // LoopSide == SupplySide
 
             // Update pressure drop reporting, calculate total loop pressure drop for use elsewhere
-            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Update);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Update);
 
             // Pass the loop information via the HVAC interface manager (only the flow)
             HVACInterfaceManager::UpdatePlantLoopInterface(state, this->myLoopNum,
@@ -164,9 +164,9 @@ namespace DataPlant {
                                                            thisPlantLoop.CommonPipeType);
 
             // Update the loop outlet node conditions
-            DataPlant::PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
+            state.dataPlnt->PlantLoop(this->myLoopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
 
-            DataPlant::PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
+            state.dataPlnt->PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED,
                                                                            this->LoadToLoopSetPointThatWasntMet);
 
         }
@@ -589,9 +589,9 @@ namespace DataPlant {
                 this->SimulateLoopSideBranchGroup(state, 1, 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
                 break;
             case ParallelBranchSet:
-                this->UpdatePlantSplitter();
+                this->UpdatePlantSplitter(state);
                 this->SimulateLoopSideBranchGroup(state, 2, this->TotalBranches - 1, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
-                this->UpdatePlantMixer();
+                this->UpdatePlantMixer(state);
                 break;
             case OutletBranch:
                 this->SimulateLoopSideBranchGroup(state, this->TotalBranches, this->TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
@@ -673,14 +673,14 @@ namespace DataPlant {
         Real64 SumMdotTimesTemp = 0.0;
         Real64 SumMdot = 0.0;
 
-        auto &thisPlantLoop = DataPlant::PlantLoop(this->myLoopNum);
+        auto &thisPlantLoop = state.dataPlnt->PlantLoop(this->myLoopNum);
 
         // We will place one specialized case in here for common pipe simulations.
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
         if (this->hasConstSpeedBranchPumps && this->myLoopSideNum == 2 &&
-            thisPlantLoop.CommonPipeType != DataPlant::CommonPipe_No) {
+            thisPlantLoop.CommonPipeType != DataPlant::iCommonPipeType::No) {
             const int OtherSide = 3 - this->myLoopSideNum;
             const int otherSideOutletNodeNum = thisPlantLoop.LoopSide(OtherSide).NodeNumOut;
             Real64 commonPipeFlow = DataLoopNode::Node(otherSideOutletNodeNum).MassFlowRate - ThisLoopSideFlow;
@@ -721,7 +721,7 @@ namespace DataPlant {
             {
                 auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;
@@ -731,7 +731,7 @@ namespace DataPlant {
                     // Calculate the demand on the loop
                     LoadToLoopSetPoint = SumMdot * Cp * DeltaTemp;
 
-                } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
 
                     // Get the range of setpoints
                     Real64 LoopSetPointTemperatureHi = DataLoopNode::Node(thisPlantLoop.TempSetPointNodeNum).TempSetPointHi;
@@ -798,7 +798,7 @@ namespace DataPlant {
             {
                 auto const SELECT_CASE_var(thisPlantLoop.LoopDemandCalcScheme);
 
-                if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
 
                     // Pick up the loop setpoint temperature
                     Real64 LoopSetPointTemperature = this->TempSetPoint;
@@ -848,7 +848,7 @@ namespace DataPlant {
         return this->EvaluateLoopSetPointLoad(state, 1, 1, ThisLoopSideFlow);
     }
 
-    Real64 HalfLoopData::SetupLoopFlowRequest(int const OtherSide) {
+    Real64 HalfLoopData::SetupLoopFlowRequest(EnergyPlusData &state, int const OtherSide) {
 
         // FUNCTION INFORMATION:
         //       AUTHOR:          Dan Fisher, Edwin Lee
@@ -870,7 +870,7 @@ namespace DataPlant {
         Real64 LoopFlow = 0.0; // Once all flow requests are evaluated, this is the desired flow on this side
 
         // reference
-        auto &loop(DataPlant::PlantLoop(this->myLoopNum));
+        auto &loop(state.dataPlnt->PlantLoop(this->myLoopNum));
 
         //~ First we need to set up the flow requests on each LoopSide
         for (int LoopSideCounter = DataPlant::DemandSide;
@@ -937,7 +937,7 @@ namespace DataPlant {
                         }
                     } else { // handle pumps differently
                         if ((BranchCounter == 1) && (LoopSideCounter == DataPlant::SupplySide) &&
-                            (loop.CommonPipeType == DataPlant::CommonPipe_TwoWay)) {
+                            (loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay)) {
                             // special primary side flow request for two way common pipe
                             int const CompIndex = component.CompNum;
                             {
@@ -948,15 +948,15 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed)) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            Pumps::PumpEquip(
+                                                                            state.dataPumps->PumpEquip(
                                                                                 CompIndex).MassFlowRateMax);
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn =
                                             max(ThisBranchFlowRequestNeedIfOn,
-                                                Pumps::PumpEquip(CompIndex).MassFlowRateMax /
-                                                Pumps::PumpEquip(CompIndex).NumPumpsInBank);
+                                                state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
                                     }
                                 } else {
                                     ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
@@ -965,7 +965,7 @@ namespace DataPlant {
                             }
 
                         } else if ((BranchCounter == 1) && (LoopSideCounter == DataPlant::SupplySide) &&
-                                   (loop.CommonPipeType == DataPlant::CommonPipe_Single)) {
+                                   (loop.CommonPipeType == DataPlant::iCommonPipeType::Single)) {
                             int const CompIndex = component.CompNum;
                             {
                                 auto const SELECT_CASE_var(component.TypeOf_Num);
@@ -975,15 +975,15 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed)) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
-                                                                            Pumps::PumpEquip(
+                                                                            state.dataPumps->PumpEquip(
                                                                                 CompIndex).MassFlowRateMax);
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
                                         ThisBranchFlowRequestNeedIfOn =
                                             max(ThisBranchFlowRequestNeedIfOn,
-                                                Pumps::PumpEquip(CompIndex).MassFlowRateMax /
-                                                Pumps::PumpEquip(CompIndex).NumPumpsInBank);
+                                                state.dataPumps->PumpEquip(CompIndex).MassFlowRateMax /
+                                                state.dataPumps->PumpEquip(CompIndex).NumPumpsInBank);
                                     }
                                 } else {
                                     ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
@@ -996,13 +996,13 @@ namespace DataPlant {
                                 auto const SELECT_CASE_var(component.TypeOf_Num);
                                 if (SELECT_CASE_var == DataPlant::TypeOf_PumpConstantSpeed) {
                                     if (CompIndex > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(CompIndex));
+                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                         if (ParallelBranchIndex >= 1) { // branch pump
                                             if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                                 ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
                                                                                     this_pump.MassFlowRateMax);
                                             } else if (loop.CommonPipeType !=
-                                                       DataPlant::CommonPipe_No) { // common pipe and constant branch pumps
+                                                       DataPlant::iCommonPipeType::No) { // common pipe and constant branch pumps
                                                 ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn,
                                                                                     this_pump.MassFlowRateMax);
                                             }
@@ -1016,14 +1016,14 @@ namespace DataPlant {
                                     }
                                 } else if (SELECT_CASE_var == DataPlant::TypeOf_PumpBankConstantSpeed) {
                                     if (CompIndex > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(CompIndex));
+                                        auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                         if (ParallelBranchIndex >= 1) { // branch pump
                                             if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                                 ThisBranchFlowRequestNeedIfOn =
                                                     max(ThisBranchFlowRequestNeedIfOn,
                                                         this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
                                             } else if (loop.CommonPipeType !=
-                                                       DataPlant::CommonPipe_No) { // common pipe and constant branch pumps
+                                                       DataPlant::iCommonPipeType::No) { // common pipe and constant branch pumps
                                                 ThisBranchFlowRequestNeedIfOn =
                                                     max(ThisBranchFlowRequestNeedIfOn,
                                                         this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
@@ -1045,7 +1045,7 @@ namespace DataPlant {
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed) ||
                                     (SELECT_CASE_var == DataPlant::TypeOf_PumpCondensate)) {
                                     if (component.CompNum > 0) {
-                                        auto &this_pump(Pumps::PumpEquip(component.CompNum));
+                                        auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                         this_pump.LoopSolverOverwriteFlag = false;
                                     }
                                 }
@@ -1091,7 +1091,7 @@ namespace DataPlant {
         this_loop_side.FlowRequest = this_loop_side.flowRequestFinal;
         other_loop_side.FlowRequest = other_loop_side.flowRequestFinal;
 
-        if (loop.CommonPipeType == DataPlant::CommonPipe_No) {
+        if (loop.CommonPipeType == DataPlant::iCommonPipeType::No) {
             // we may or may not have a pump on this side, but the flow request is the larger of the two side's final
             if ((!this_loop_side.hasConstSpeedBranchPumps) && (!other_loop_side.hasConstSpeedBranchPumps)) {
                 LoopFlow = max(this_loop_side.flowRequestFinal, other_loop_side.flowRequestFinal);
@@ -1179,9 +1179,9 @@ namespace DataPlant {
                     }
                 }
             }
-        } else if (loop.CommonPipeType == DataPlant::CommonPipe_TwoWay) {
+        } else if (loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
             LoopFlow = this_loop_side.flowRequestFinal;
-        } else if (loop.CommonPipeType == DataPlant::CommonPipe_Single) {
+        } else if (loop.CommonPipeType == DataPlant::iCommonPipeType::Single) {
             LoopFlow = this_loop_side.flowRequestFinal;
         }
 
@@ -1199,7 +1199,7 @@ namespace DataPlant {
                             (SELECT_CASE_var == DataPlant::TypeOf_PumpBankVariableSpeed) ||
                             (SELECT_CASE_var == DataPlant::TypeOf_PumpCondensate)) {
                             if (component.CompNum > 0) {
-                                auto &this_pump(Pumps::PumpEquip(component.CompNum));
+                                auto &this_pump(state.dataPumps->PumpEquip(component.CompNum));
                                 this_pump.LoopSolverOverwriteFlag = true;
                             }
                         }
@@ -1218,7 +1218,7 @@ namespace DataPlant {
         bool LoopShutDownFlag = false;
 
         // First thing is to setup mass flow request information
-        Real64 ThisLoopSideFlowRequest = this->SetupLoopFlowRequest(OtherSide);
+        Real64 ThisLoopSideFlowRequest = this->SetupLoopFlowRequest(state, OtherSide);
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
@@ -1237,10 +1237,10 @@ namespace DataPlant {
         // We can now make a first pass through the component simulation, requesting flow as necessary.
         // Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
         // while "Demand side" components will set a a mass flow request on their inlet node to request flow.
-        this->FlowLock = DataPlant::FlowUnlocked;
+        this->FlowLock = DataPlant::iFlowLock::Unlocked;
         this->SimulateAllLoopSideBranches(state, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
 
-        // DSU? discussion/comments about loop solver/flow resolver interaction
+        // discussion/comments about loop solver/flow resolver interaction
         // At this point, the components have been simulated.  They should have either:
         //  - logged a massflowrequest
         //  - or logged a MassFlowRate
@@ -1274,7 +1274,7 @@ namespace DataPlant {
         //  flag, and resimulate.  During this simulation each component will still use the
         //  SetFlowRequest routine, but this routine will also set the outlet flow rate
         //  equal to the inlet flow rate, according to flowlock logic.
-        this->FlowLock = DataPlant::FlowLocked;
+        this->FlowLock = DataPlant::iFlowLock::Locked;
         this->SimulateAllLoopSideBranches(state, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
     }
 
@@ -1599,7 +1599,6 @@ namespace DataPlant {
                 if (FlowRemaining == 0.0) return;
 
                 // 6) Adjust Inlet branch and outlet branch flow rates to match parallel branch rate
-                // DSU? do we need this logic?   or should we fatal on a diagnostic error
                 TotParallelBranchFlowReq = 0.0;
                 for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
                     BranchNum = this->Splitter.BranchNumOut(iBranch);
@@ -1622,7 +1621,6 @@ namespace DataPlant {
                 // IF INSUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
             } else if (FlowRemaining < TotParallelBranchFlowReq) {
 
-                // DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
                 // 1) apportion flow based on requested fraction of total
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
 
@@ -1758,7 +1756,7 @@ namespace DataPlant {
                     if (this->myLoopSideNum == DataPlant::SupplySide) {
                         int const curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
                         int const OpSchemePtr = this_comp.OpScheme(curCompOpSchemePtr).OpSchemePtr;
-                        DataPlant::PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
+                        state.dataPlnt->PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
                     }
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                         this->myLoopNum,
@@ -1790,9 +1788,9 @@ namespace DataPlant {
             } //~ CompCounter
         components_end:;
 
-            if (this->FlowLock == DataPlant::FlowLocked) {
+            if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1866,9 +1864,9 @@ namespace DataPlant {
         components2_end:;
 
             //~ If we are locked, go ahead and simulate the pressure components on this branch
-            if (this->FlowLock == DataPlant::FlowLocked) {
+            if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1917,9 +1915,9 @@ namespace DataPlant {
 
             } //~ CompCounter
 
-            if (this->FlowLock == DataPlant::FlowLocked) {
+            if (this->FlowLock == DataPlant::iFlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(state,
-                    this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
+                    this->myLoopNum, FirstHVACIteration, DataPlant::iPressureCall::Calc, this->myLoopSideNum, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1955,11 +1953,8 @@ namespace DataPlant {
 
         // Using/Aliasing
         using DataLoopNode::Node;
-        using DataPlant::FlowLocked;
-        using DataPlant::FlowUnlocked;
         using DataPlant::LoadRangeBasedMax;
         using DataPlant::LoadRangeBasedMin;
-        using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1974,9 +1969,7 @@ namespace DataPlant {
         int const InletNode(this_comp.NodeNumIn);
         int const OutletNode(this_comp.NodeNumOut);
 
-        if (this->FlowLock == FlowUnlocked) {
-
-            // For unlocked flow, use the inlet request -- !DSU? for now
+        if (this->FlowLock == DataPlant::iFlowLock::Unlocked) {
             {
                 auto const SELECT_CASE_var(this_comp.CurOpSchemeType);
                 if ((SELECT_CASE_var >= LoadRangeBasedMin) && (SELECT_CASE_var <= LoadRangeBasedMax)) {
@@ -1984,11 +1977,11 @@ namespace DataPlant {
                 } else {
                     // pumps pipes, etc. will be lumped in here with other component types, but they will have no delta T anyway
                     ComponentMassFlowRate = Node(InletNode).MassFlowRateRequest;
-                    // DSU? make sure components like economizers use the mass flow request
+                    // make sure components like economizers use the mass flow request
                 }
             }
 
-        } else if (this->FlowLock == FlowLocked) {
+        } else if (this->FlowLock == DataPlant::iFlowLock::Locked) {
 
             // For locked flow just use the mass flow rate
             {
@@ -2012,7 +2005,7 @@ namespace DataPlant {
         Real64 const OutletTemp(Node(OutletNode).Temp);
         Real64 const AverageTemp((InletTemp + OutletTemp) / 2.0);
         Real64 const ComponentCp(
-            GetSpecificHeatGlycol(state, PlantLoop(this->myLoopNum).FluidName, AverageTemp, PlantLoop(this->myLoopNum).FluidIndex, RoutineName));
+            GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->myLoopNum).FluidName, AverageTemp, state.dataPlnt->PlantLoop(this->myLoopNum).FluidIndex, RoutineName));
 
         // Calculate the load altered by this component
         Real64 const LoadAlteration(ComponentMassFlowRate * ComponentCp * (OutletTemp - InletTemp));
@@ -2031,7 +2024,7 @@ namespace DataPlant {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        auto &loop(DataPlant::PlantLoop(SpecificPumpLocation.loopNum));
+        auto &loop(state.dataPlnt->PlantLoop(SpecificPumpLocation.loopNum));
         auto &loop_side(loop.LoopSide(SpecificPumpLocation.loopSideNum));
         auto &loop_side_branch(loop_side.Branch(SpecificPumpLocation.branchNum));
         auto &comp(loop_side_branch.Comp(SpecificPumpLocation.compNum));
@@ -2083,7 +2076,7 @@ namespace DataPlant {
             PumpLoopSideNum = SpecificPumpLocation().loopSideNum;
             int const PumpBranchNum = SpecificPumpLocation().branchNum;
             int const PumpCompNum = SpecificPumpLocation().compNum;
-            PumpIndexStart = DataPlant::PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(
+            PumpIndexStart = state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(
                 PumpCompNum).IndexInLoopSidePumps;
             PumpIndexEnd = PumpIndexStart;
         } else {
@@ -2102,7 +2095,7 @@ namespace DataPlant {
         }
 
         //~ Now loop through all the pumps and simulate them, keeping track of their status
-        auto &loop_side(DataPlant::PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
+        auto &loop_side(state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
         auto &loop_side_branch(loop_side.Branch);
         for (int PumpCounter = PumpIndexStart; PumpCounter <= PumpIndexEnd; ++PumpCounter) {
 
@@ -2146,7 +2139,7 @@ namespace DataPlant {
                 e.CurrentMinAvail = 0.0;
                 e.CurrentMaxAvail = 0.0;
             }
-            this->FlowLock = DataPlant::FlowPumpQuery;
+            this->FlowLock = DataPlant::iFlowLock::PumpQuery;
 
             //~ Simulate pumps
             this->SimulateAllLoopSidePumps(state);
@@ -2179,7 +2172,7 @@ namespace DataPlant {
         return ThisLoopSideFlow;
     }
 
-    void HalfLoopData::UpdatePlantMixer()
+    void HalfLoopData::UpdatePlantMixer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2236,7 +2229,7 @@ namespace DataPlant {
 
         DataLoopNode::Node(MixerOutletNode).MassFlowRate = MixerOutletMassFlow;
         DataLoopNode::Node(MixerOutletNode).Temp = MixerOutletTemp;
-        if (DataPlant::PlantLoop(this->myLoopNum).HasPressureComponents) {
+        if (state.dataPlnt->PlantLoop(this->myLoopNum).HasPressureComponents) {
             // Don't update pressure, let pressure system handle this...
         } else {
             // Go ahead and update!
@@ -2254,7 +2247,7 @@ namespace DataPlant {
             max(MixerOutletMassFlowMinAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail);
     }
 
-    void HalfLoopData::UpdatePlantSplitter()
+    void HalfLoopData::UpdatePlantSplitter(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2280,7 +2273,7 @@ namespace DataPlant {
                 DataLoopNode::Node(SplitterOutletNode).Temp = DataLoopNode::Node(SplitterInletNode).Temp;
                 DataLoopNode::Node(SplitterOutletNode).TempMin = DataLoopNode::Node(SplitterInletNode).TempMin;
                 DataLoopNode::Node(SplitterOutletNode).TempMax = DataLoopNode::Node(SplitterInletNode).TempMax;
-                if (DataPlant::PlantLoop(this->myLoopNum).HasPressureComponents) {
+                if (state.dataPlnt->PlantLoop(this->myLoopNum).HasPressureComponents) {
                     // Don't update pressure, let pressure system handle this...
                 } else {
                     // Go ahead and update!
@@ -2288,14 +2281,14 @@ namespace DataPlant {
                 }
                 DataLoopNode::Node(SplitterOutletNode).Quality = DataLoopNode::Node(SplitterInletNode).Quality;
 
-                // DSU? These two blocks and the following one which I added need to be cleaned up
+                // These two blocks and the following one which I added need to be cleaned up
                 // I think we will always pass maxavail down the splitter, min avail is the issue.
-                // Changed to include hardware max in next line 7/26/2011
+                // Changed to include hardware max in next line
                 DataLoopNode::Node(SplitterOutletNode).MassFlowRateMaxAvail =
                     min(DataLoopNode::Node(SplitterInletNode).MassFlowRateMaxAvail, DataLoopNode::Node(SplitterOutletNode).MassFlowRateMax);
                 DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = 0.0;
 
-                // DSU? Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
+                // Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
                 // min flow rate, and it is causing problems because this routine passes zero down.  Perhaps if
                 // it is a single parallel branch, we are safe to assume we need to just pass it down.
                 // But need to test for multiple branches (or at least think about it), to see what we need to do...

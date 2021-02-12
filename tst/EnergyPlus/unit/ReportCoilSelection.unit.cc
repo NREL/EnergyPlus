@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,22 +54,17 @@
 #include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Plant/Loop.hh>
-#include <EnergyPlus/Plant/LoopSide.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -81,26 +76,26 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     int chWInletNodeNum = 9;
     int chWOutletNodeNum = 15;
 
-    EnergyPlus::DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).Name = "Chilled Water Loop";
-    DataPlant::PlantLoop(1).FluidName = "Water";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).MaxMassFlowRate = 0.1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "Chilled Water Loop";
+    state->dataPlnt->PlantLoop(1).FluidName = "Water";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 0.1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
 
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = chWInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = chWOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = chWInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = chWOutletNodeNum;
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
@@ -118,7 +113,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
-    EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1->plantLoopName);
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1->plantLoopName);
     EXPECT_EQ(-999, c1->rhoFluid);
     EXPECT_EQ(-999, c1->cpFluid);
     EXPECT_EQ(-999, c1->coilDesWaterMassFlow);
@@ -135,7 +130,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     auto &c2(coilSelectionReportObj->coilSelectionDataObjs[1]);
     EXPECT_EQ(-999, c2->pltSizNum);
     EXPECT_EQ(loopNum, c2->waterLoopNum);
-    EXPECT_EQ(DataPlant::PlantLoop(1).Name, c2->plantLoopName);
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c2->plantLoopName);
     EXPECT_EQ(-999, c2->rhoFluid);
     EXPECT_EQ(-999, c2->cpFluid);
     EXPECT_EQ(-999, c2->coilDesWaterMassFlow);
@@ -150,7 +145,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);
-    EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1b->plantLoopName);
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1b->plantLoopName);
     EXPECT_NEAR(999.9, c1b->rhoFluid, 0.1);
     EXPECT_NEAR(4197.9, c1b->cpFluid, 0.1);
     Real64 expFlow = waterVdot * c1b->rhoFluid;
@@ -232,26 +227,26 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     int wInletNodeNum = 9;
     int wOutletNodeNum = 15;
 
-    EnergyPlus::DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).Name = "Steam Loop";
-    DataPlant::PlantLoop(1).FluidName = "Steam";
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).MaxMassFlowRate = 0.1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).Name = "Steam Loop";
+    state->dataPlnt->PlantLoop(1).FluidName = "Steam";
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).MaxMassFlowRate = 0.1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
 
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = wInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = wOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = wInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = wOutletNodeNum;
 
     Real64 airVdot(0.052);   // air flow rate in m3/s
     bool isAutoSized(false); // true if autosized
@@ -269,7 +264,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
     EXPECT_EQ(-999, c1->pltSizNum);
     EXPECT_EQ(loopNum, c1->waterLoopNum);
-    EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1->plantLoopName);
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1->plantLoopName);
     EXPECT_EQ(-999, c1->rhoFluid);
     EXPECT_EQ(-999, c1->cpFluid);
     EXPECT_EQ(-999, c1->coilDesWaterMassFlow);
@@ -285,7 +280,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
     EXPECT_EQ(1, c1b->pltSizNum);
     EXPECT_EQ(loopNum, c1b->waterLoopNum);
-    EXPECT_EQ(DataPlant::PlantLoop(1).Name, c1b->plantLoopName);
+    EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, c1b->plantLoopName);
     EXPECT_NEAR(0.6, c1b->rhoFluid, 0.01);
     EXPECT_NEAR(4216.0, c1b->cpFluid, 0.1);
     Real64 expFlow = waterVdot * c1b->rhoFluid;
@@ -310,17 +305,17 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     int curSysNum = 0;
     int curZoneEqNum = 2;
     int curOASysNum = 0;
-    DataZoneEquipment::ZoneEquipList.allocate(3);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num.allocate(2);
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num(1) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
-    DataZoneEquipment::ZoneEquipList(curZoneEqNum).EquipType_Num(2) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
+    state->dataZoneEquip->ZoneEquipList.allocate(3);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(1) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(2) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
 
     Real64 totGrossCap = 500.0;
     Real64 sensGrossCap = 500.0;
@@ -459,9 +454,9 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     DataSizing::CurTermUnitSizingNum = curZoneEqNum;
     DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
     DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
-    DataZoneEquipment::ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
     DataSizing::FinalZoneSizing.allocate(1);
     DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
     DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
