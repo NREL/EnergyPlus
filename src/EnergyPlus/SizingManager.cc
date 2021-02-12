@@ -1647,7 +1647,6 @@ namespace EnergyPlus::SizingManager {
             Real64 VbzSum(0.0);
             Real64 VozClgSum(0.0);
             Real64 VozHtgSum(0.0);
-            Real64 VozSum(0.0);
             Real64 VdzClgSum(0.0);
             Real64 VdzHtgSum(0.0);
             Real64 VpzMinClgSum(0.0);
@@ -1788,12 +1787,12 @@ namespace EnergyPlus::SizingManager {
                                                                      4); // Voz-htg
                         }
                         // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz
-                        Real64 VozMax = std::max(VozHtg, VozClg);  // take large of the heating and cooling Voz values
+                        Real64 VozMax = std::max(VozHtg, VozClg);  // take larger of the heating and cooling Voz values
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
                             TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                             VozMax,
                             4);
-                        VozSum += VozMax * DataHeatBalance::Zone(zoneNum).Multiplier * DataHeatBalance::Zone(zoneNum).ListMultiplier;
+                        state.dataOutRptPredefined->TotalVozMax += VozMax * DataHeatBalance::Zone(zoneNum).Multiplier * DataHeatBalance::Zone(zoneNum).ListMultiplier;
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdZpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZpzHtgByZone,
@@ -1825,9 +1824,7 @@ namespace EnergyPlus::SizingManager {
                     }
                 }
             }
-            // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz - Total Row
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
-                "Total", VozSum, 4);
+
             // System Ventilation Parameters, (Table 4)
             if (PzSumBySys(AirLoopNum) != 0.0) {
                 OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62svpRp,

@@ -1163,6 +1163,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
 
     // Totals for OA details report
+    Real64 TotalVozMax = 0.0; // total Voz (max of heating and cooling)
     Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
     Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at target Voz-Dyn
     Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn
@@ -2049,6 +2050,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->TotalNotMetCoolingOccupiedForABUPS = 0.0;
         this->TotalNotMetOccupiedForABUPS = 0.0;
         this->TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+        this->TotalVozMax = 0.0;
         this->TotalAnyZoneBelowVozDynForOA = 0.0;
         this->TotalAllZonesAtVozDynForOA = 0.0;
         this->TotalAnyZoneAboveVozDynForOA = 0.0;

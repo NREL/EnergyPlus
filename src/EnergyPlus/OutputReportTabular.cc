@@ -6143,7 +6143,10 @@ namespace EnergyPlus::OutputReportTabular {
             }
         }
 
-        // add total rows
+        // add total rows for outdoor air details
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
+            "Total", state.dataOutRptPredefined->TotalVozMax, 4);
+
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total", totalVolume);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, "Total", totalArea);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, "Total", totalOccupants);
