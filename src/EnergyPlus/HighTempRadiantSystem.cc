@@ -1001,7 +1001,7 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        float const TempConvToler(0.1); // Temperature controller tries to converge to within 0.1C
+        float const TempConvToler(0.1f); // Temperature controller tries to converge to within 0.1C
         int const MaxIterations(10);    // Maximum number of iterations to achieve temperature control
         // (10 interval halvings achieves control to 0.1% of capacity)
         // These two parameters are intended to achieve reasonable control
