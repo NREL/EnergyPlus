@@ -82,9 +82,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
-// SSC Headers
-#include <../third_party/ssc/shared/lib_battery.h>
-
 namespace EnergyPlus {
 
 std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
@@ -3150,12 +3147,12 @@ ElectricStorage::ElectricStorage( // main constructor
             } else {
                 lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             }
-            seriesNum_ = DataIPShortCuts::lNumericFieldBlanks(2) ? 3 : static_cast<int>(DataIPShortCuts::rNumericArgs(2));
-            parallelNum_ = DataIPShortCuts::lNumericFieldBlanks(3) ? 1 : static_cast<int>(DataIPShortCuts::rNumericArgs(3));
+            seriesNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(2));
+            parallelNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
             startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.5 : DataIPShortCuts::rNumericArgs(4);
             liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
-            liIon_mass_ = DataIPShortCuts::lNumericFieldBlanks(6) ? 95.1255 : DataIPShortCuts::rNumericArgs(6);
-            liIon_surfaceArea_ = DataIPShortCuts::lNumericFieldBlanks(7) ? 0.5 : DataIPShortCuts::rNumericArgs(7);
+            liIon_mass_ = DataIPShortCuts::rNumericArgs(6);
+            liIon_surfaceArea_ = DataIPShortCuts::rNumericArgs(7);
             liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 1500.0 : DataIPShortCuts::rNumericArgs(8);
             liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 7.5 : DataIPShortCuts::rNumericArgs(9);
             liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 4.2 : DataIPShortCuts::rNumericArgs(10);
@@ -3167,7 +3164,7 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
             liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
             liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
-            // FIXME: Validate Qexp and Qnom are less than Qfull, and Qnom > Qexp?
+            // FIXME: Validate Qexp and Qnom are less than Qfull, and Qnom > Qexp
             liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
             internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
 
@@ -3290,7 +3287,6 @@ ElectricStorage::ElectricStorage( // main constructor
             } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
                 SetupEMSInternalVariable(state, "Electrical Storage Battery Maximum Capacity", name_, "[Ah]", maxAhCapacity_);
             }
-            // FIXME: Add EMS Variable for Li-ion battery
         }
 
         if (zoneNum_ > 0) {
