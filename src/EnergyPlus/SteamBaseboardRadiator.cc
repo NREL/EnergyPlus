@@ -115,8 +115,7 @@ namespace SteamBaseboardRadiator {
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     static std::string const fluidNameSteam("STEAM");
-
-    Array1D_string SteamBaseboardDesignNames;
+    Array1D_string SteamBaseboardDesignNames;           // Array that contains the names of Design objects
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,
@@ -185,7 +184,9 @@ namespace SteamBaseboardRadiator {
 
             QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
-            SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+            SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->
+                                                                    SteamBaseboardDesign(state.dataSteamBaseboardRadiator->
+                                                                                         SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Array that contains the design data for steam baseboard objects
 
             if (QZnReq > SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ActualZoneNum) &&
                 (GetCurrentScheduleValue(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SchedPtr) > 0.0)) {
@@ -352,17 +353,8 @@ namespace SteamBaseboardRadiator {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueBaseboardName(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design, cAlphaArgs(1), ErrorsFound, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " Name");
 
-            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName = cAlphaArgs(1);                     // Name of the baseboard
-            SteamBaseboardDesignNames(BaseboardDesignNum) = cAlphaArgs(1);
-
-            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = rNumericArgs(3);
-            // Set default convergence tolerance
-            if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset <= 0.0) {
-                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = 0.001;
-                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
-                                        " was less than the allowable minimum.");
-                ShowContinueError(state, "...reset to default value=[0.001].");
-            }
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName = cAlphaArgs(1);      // Name of the design object of baseboard
+            SteamBaseboardDesignNames(BaseboardDesignNum) = cAlphaArgs(1);                                              // Add to  array of design object names
 
             // Determine steam baseboard radiator system heating design capacity sizing method
             if (UtilityRoutines::SameString(cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
@@ -413,6 +405,15 @@ namespace SteamBaseboardRadiator {
                 ShowSevereError(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + " = " + state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).designName);
                 ShowContinueError(state, "Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
                 ErrorsFound = true;
+            }
+
+            state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = rNumericArgs(3);
+            // Set default convergence tolerance
+            if (state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset <= 0.0) {
+                state.dataSteamBaseboardRadiator->SteamBaseboardDesign(BaseboardDesignNum).Offset = 0.001;
+                ShowWarningError(state, RoutineName + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam_Design + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(3) +
+                                        " was less than the allowable minimum.");
+                ShowContinueError(state, "...reset to default value=[0.001].");
             }
 
             // Fraction of radiant heat out of the total heating rate of the unit
