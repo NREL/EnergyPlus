@@ -247,8 +247,8 @@ namespace WindowManager {
                         SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        auto TauShIR = Blind(BlNum).IRFrontTrans(ISlatAng);
-                        auto EpsShIR = Blind(BlNum).IRBackEmiss(ISlatAng);
+                        auto TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        auto EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
                         SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
                         SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
@@ -256,7 +256,7 @@ namespace WindowManager {
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (Blind(BlNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == FixedSlats) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind
@@ -327,10 +327,10 @@ namespace WindowManager {
     void CWCEMaterialDualBandFactory::init([[maybe_unused]] EnergyPlusData &state)
     {
         if (m_Range == WavelengthRange::Visible) {
-            m_Material = createVisibleRangeMaterial();
+            m_Material = createVisibleRangeMaterial(state);
         } else {
-            auto aVisibleRangeMaterial = createVisibleRangeMaterial();
-            auto aSolarRangeMaterial = createSolarRangeMaterial();
+            auto aVisibleRangeMaterial = createVisibleRangeMaterial(state);
+            auto aSolarRangeMaterial = createSolarRangeMaterial(state);
             // Ratio visible to solar range. It can be calculated from solar spectrum.
             auto ratio = 0.49;
             m_Material = std::make_shared<CMaterialDualBand>(aVisibleRangeMaterial, aSolarRangeMaterial, ratio);
@@ -346,10 +346,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
     {
         auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
@@ -364,10 +364,10 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
@@ -393,7 +393,7 @@ namespace WindowManager {
         // To enable that, it would be necessary to change input in IDF
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
         auto lowLambda = aRange.minLambda();
@@ -407,7 +407,7 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
         auto lowLambda = aRange.minLambda();
@@ -430,7 +430,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
         auto lowLambda = aRange.minLambda();
@@ -444,7 +444,7 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
         auto lowLambda = aRange.minLambda();
@@ -472,7 +472,7 @@ namespace WindowManager {
     CWCESpecularCellFactory::CWCESpecularCellFactory(const Material::MaterialProperties & t_Material) : IWCECellDescriptionFactory( t_Material ) {
     }
 
-    std::shared_ptr<ICellDescription> CWCESpecularCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCESpecularCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         return std::make_shared<CSpecularCellDescription>();
     }
@@ -485,10 +485,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         const auto blindDataPtr = m_Material.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto slatWidth = blind.SlatWidth;
@@ -507,7 +507,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         auto diameter = m_Material.Thickness; // Thickness in this case is diameter
         // ratio is not saved withing material but rather calculated from transmittance
@@ -524,7 +524,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEDiffuseShadeCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEDiffuseShadeCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         return std::make_shared<CPerfectDiffuseCellDescription>();
     }
@@ -542,7 +542,7 @@ namespace WindowManager {
         createMaterialFactory();
         auto aMaterial = m_MaterialFactory->getMaterial(state);
         assert(aMaterial != nullptr);
-        auto aCellDescription = getCellDescription();
+        auto aCellDescription = getCellDescription(state);
         assert(aCellDescription != nullptr);
 
         return std::make_pair(aMaterial, aCellDescription);
@@ -572,9 +572,9 @@ namespace WindowManager {
         return m_ScatteringLayer;
     }
 
-    std::shared_ptr<ICellDescription> CWCELayerFactory::getCellDescription() const
+    std::shared_ptr<ICellDescription> CWCELayerFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state) const
     {
-        return m_CellFactory->getCellDescription();
+        return m_CellFactory->getCellDescription(state);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

@@ -558,13 +558,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     state->dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
     state->dataAirLoop->AirLoopFlow(1).MaxOutAir = state->dataAirLoop->AirLoopFlow(1).OAFlow;
     state->dataHeatBal->Infiltration(1).MassFlowRate = 0.5;
-    Mixing(1).MixingMassFlowRate = 0.1;
+    state->dataHeatBal->Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
     CalcZoneMassBalance(*state, false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(state->dataHeatBal->Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
-    EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
+    EXPECT_EQ(state->dataHeatBal->Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
     EXPECT_EQ(Node(8).MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 

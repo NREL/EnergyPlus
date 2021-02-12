@@ -876,7 +876,7 @@ namespace SteamBaseboardRadiator {
         using FluidProperties::GetSatSpecificHeatRefrig;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         //  USE BranchInputManager,  ONLY: MyPlantSizingIndex
-                using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::HeatingCapacitySizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1268,7 +1268,7 @@ namespace SteamBaseboardRadiator {
         // Note that the energy radiated to people is assumed to affect them
         // but them it is assumed to be convected to the air.
 
-                using DataHeatBalFanSys::MaxRadHeatFlux;
+        using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QSteamBaseboardSurf;
         using DataHeatBalFanSys::QSteamBaseboardToPerson;
         using DataSurfaces::Surface;

@@ -117,7 +117,6 @@ namespace WaterToAirHeatPumpSimple {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataSizing;
-    using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::Cooling;
     using DataHVACGlobals::CycFanCycCoil;
@@ -318,7 +317,7 @@ namespace WaterToAirHeatPumpSimple {
         if (state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs > 0) {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
             state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag.dimension(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs, true);
-            DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
+            state.dataHeatBal->HeatReclaimSimple_WAHPCoil.allocate(state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs);
         }
 
         inputProcessor->getObjectDefMaxArgs(state, "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
@@ -381,8 +380,8 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower5 = NumArray(21);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(22);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(23);
-            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
-            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+            state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
@@ -1067,7 +1066,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergyLatent = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).EnergySource = 0.0;
         state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).COP = 0.0;
-        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
     void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum)
@@ -2334,13 +2333,13 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->QSensible *= PartLoadRatio;
         state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
         state.dataWaterToAirHeatPumpSimple->QSource = state.dataWaterToAirHeatPumpSimple->QLoadTotal + state.dataWaterToAirHeatPumpSimple->Winput;
-        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = state.dataWaterToAirHeatPumpSimple->QSource;
+        state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = state.dataWaterToAirHeatPumpSimple->QSource;
 
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = state.dataWaterToAirHeatPumpSimple->Winput;
 
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
-        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
+        DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum);
         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
         if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
             for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)

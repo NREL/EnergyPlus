@@ -243,22 +243,6 @@ namespace EnergyPlus::DataHeatBalance {
     Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Object Data
-    Array1D<MixingData> Mixing;
-    Array1D<MixingData> CrossMixing;
-    Array1D<MixingData> RefDoorMixing;
-    Array1D<WindowBlindProperties> Blind;
-    Array1D<WindowComplexShade> ComplexShade;
-    Array1D<WindowThermalModelParams> WindowThermalModel;
-    Array1D<SurfaceScreenProperties> SurfaceScreens;
-    Array1D<ScreenTransData> ScreenTrans;
-    Array1D<ZoneCatEUseData> ZoneIntEEuse;
-    Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    Array1D<HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
-    Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    Array1D<HeatReclaimDataBase> HeatReclaimDXCoil;
-    Array1D<HeatReclaimDataBase> HeatReclaimVS_DXCoil;
-    Array1D<HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
-    Array1D<AirReportVars> ZnAirRpt;
     Array1D<TCGlazingsType> TCGlazings;
     Array1D<ZoneEquipData> ZoneCO2Gen;
     Array1D<GlobalInternalGainMiscObject> PeopleObjects;
@@ -281,22 +265,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        Mixing.deallocate();
-        CrossMixing.deallocate();
-        RefDoorMixing.deallocate();
-        Blind.deallocate();
-        ComplexShade.deallocate();
-        WindowThermalModel.deallocate();
-        SurfaceScreens.deallocate();
-        ScreenTrans.deallocate();
-        ZoneIntEEuse.deallocate();
-        RefrigCaseCredit.deallocate();
-        HeatReclaimRefrigeratedRack.deallocate();
-        HeatReclaimRefrigCondenser.deallocate();
-        HeatReclaimDXCoil.deallocate();
-        HeatReclaimVS_DXCoil.deallocate();
-        HeatReclaimSimple_WAHPCoil.deallocate();
-        ZnAirRpt.deallocate();
         TCGlazings.deallocate();
         ZoneCO2Gen.deallocate();
         PeopleObjects.deallocate();
@@ -711,7 +679,7 @@ namespace EnergyPlus::DataHeatBalance {
                             if (state.dataMaterial->Material(MatSh).Group == WindowBlind) {
                                 BlNum = state.dataMaterial->Material(MatSh).BlindDataPtr;
                                 if (BlNum > 0) {
-                                    if ((state.dataMaterial->Material(MatGapL).Thickness + state.dataMaterial->Material(MatGapR).Thickness) < Blind(BlNum).SlatWidth) {
+                                    if ((state.dataMaterial->Material(MatGapL).Thickness + state.dataMaterial->Material(MatGapR).Thickness) < state.dataHeatBal->Blind(BlNum).SlatWidth) {
                                         ErrorsFound = true;
                                         ShowSevereError(state, "CheckAndSetConstructionProperties: For window construction " + state.dataConstruction->Construct(ConstrNum).Name);
                                         ShowContinueError(state, "the slat width of the between-glass blind is greater than");
@@ -955,19 +923,19 @@ namespace EnergyPlus::DataHeatBalance {
 
         // maybe it's already there
         errFlag = false;
-        Found = UtilityRoutines::FindItemInList("~" + Blind(inBlindNumber).Name, Blind);
+        Found = UtilityRoutines::FindItemInList("~" + state.dataHeatBal->Blind(inBlindNumber).Name, state.dataHeatBal->Blind);
         if (Found == 0) {
             // Add a new blind
-            Blind.redimension(++state.dataHeatBal->TotBlinds);
-            Blind(state.dataHeatBal->TotBlinds) = Blind(inBlindNumber);
-            Blind(state.dataHeatBal->TotBlinds).Name = "~" + Blind(inBlindNumber).Name;
+            state.dataHeatBal->Blind.redimension(++state.dataHeatBal->TotBlinds);
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds) = state.dataHeatBal->Blind(inBlindNumber);
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataHeatBal->Blind(inBlindNumber).Name;
             outBlindNumber = state.dataHeatBal->TotBlinds;
-            Blind(state.dataHeatBal->TotBlinds).SlatAngleType = VariableSlats;
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = VariableSlats;
 
             // Minimum and maximum slat angles allowed by slat geometry
-            if (Blind(state.dataHeatBal->TotBlinds).SlatWidth > Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatWidth > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
                 MinSlatAngGeom =
-                    std::asin(Blind(state.dataHeatBal->TotBlinds).SlatThickness / (Blind(state.dataHeatBal->TotBlinds).SlatThickness + Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
+                    std::asin(state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness / (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness + state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -975,52 +943,52 @@ namespace EnergyPlus::DataHeatBalance {
 
             // Error if maximum slat angle less than minimum
 
-            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle < Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
                 errFlag = true;
-                ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowSevereError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
-                                         Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                         Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Error if input slat angle not in input min/max range
 
-            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
-                (Blind(state.dataHeatBal->TotBlinds).SlatAngle < Blind(state.dataHeatBal->TotBlinds).MinSlatAngle || Blind(state.dataHeatBal->TotBlinds).SlatAngle > Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
+                (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle || state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
                 errFlag = true;
-                ShowSevereError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowSevereError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(state,
                                   format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
-                                         Blind(state.dataHeatBal->TotBlinds).SlatAngle,
-                                         Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
-                                         Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Warning if input minimum slat angle is less than that allowed by slat geometry
 
-            if (Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
-                ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
+                ShowWarningError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
                     state,
                     format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
-                           Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                           state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
                            MinSlatAngGeom));
                 ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
-                Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
+                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
             }
 
             // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
-            if (Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
-                ShowWarningError(state, "WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
+                ShowWarningError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
                 ShowContinueError(
                     state,
                     format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
-                           Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
+                           state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
                            MaxSlatAngGeom));
                 ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
-                Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
+                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
             }
         } else {
             outBlindNumber = Found;
@@ -1191,7 +1159,7 @@ namespace EnergyPlus::DataHeatBalance {
         }
 
         // ratio of screen material diameter to screen material spacing
-        Gamma = SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
+        Gamma = state.dataHeatBal->SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
 
         // ************************************************************************************************
         // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
@@ -1240,8 +1208,8 @@ namespace EnergyPlus::DataHeatBalance {
         // * calculate transmittance of scattered beam due to reflecting screen material *
         // *******************************************************************************
 
-        ReflectCyl = SurfaceScreens(ScNum).ReflectCylinder;
-        ReflectCylVis = SurfaceScreens(ScNum).ReflectCylinderVis;
+        ReflectCyl = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinder;
+        ReflectCylVis = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinderVis;
 
         if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
             Tscattered = 0.0;
@@ -1282,62 +1250,62 @@ namespace EnergyPlus::DataHeatBalance {
         Tscattered = max(0.0, Tscattered);
         TscatteredVis = max(0.0, TscatteredVis);
 
-        if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
+        if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
             if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
             }
             Tscattered = 0.0;
             TscatteredVis = 0.0;
-        } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
+        } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
             if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
             }
             Tscattered = 0.0;
             TscatteredVis = 0.0;
-        } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
+        } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
             if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
             }
         }
 
         if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
-            SurfaceScreens(ScNum).BmDifTrans = Tscattered;
-            SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
-            SurfaceScreens(ScNum).BmDifTransBack = 0.0;
-            SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-            SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-            SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-            SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
-            SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
-            SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = Tscattered;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
         } else {
-            SurfaceScreens(ScNum).BmDifTrans = 0.0;
-            SurfaceScreens(ScNum).BmDifTransVis = 0.0;
-            SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
-            SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-            SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-            SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-            SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
-            SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
-            SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
         }
     }
 

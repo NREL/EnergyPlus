@@ -2726,13 +2726,13 @@ namespace WindowComplexManager {
         Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
-        standard = WindowThermalModel(ThermalModelNum).CalculationStandard;
-        ThermalMod = WindowThermalModel(ThermalModelNum).ThermalModel;
-        CalcDeflection = WindowThermalModel(ThermalModelNum).DeflectionModel;
-        SDScalar = WindowThermalModel(ThermalModelNum).SDScalar;
-        VacuumPressure = WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
-        Pini = WindowThermalModel(ThermalModelNum).InitialPressure;
+        standard = state.dataHeatBal->WindowThermalModel(ThermalModelNum).CalculationStandard;
+        ThermalMod = state.dataHeatBal->WindowThermalModel(ThermalModelNum).ThermalModel;
+        CalcDeflection = state.dataHeatBal->WindowThermalModel(ThermalModelNum).DeflectionModel;
+        SDScalar = state.dataHeatBal->WindowThermalModel(ThermalModelNum).SDScalar;
+        VacuumPressure = state.dataHeatBal->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
+        Tini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
+        Pini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
         isky = 3; // IR radiation is provided from external source
@@ -2952,28 +2952,28 @@ namespace WindowComplexManager {
             } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
                 ++IGlass;
                 TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
-                LayerType(IGlass) = ComplexShade(TempInt).LayerType;
+                LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
 
-                thick(IGlass) = ComplexShade(TempInt).Thickness;
-                scon(IGlass) = ComplexShade(TempInt).Conductivity;
-                emis(2 * IGlass - 1) = ComplexShade(TempInt).FrontEmissivity;
-                emis(2 * IGlass) = ComplexShade(TempInt).BackEmissivity;
-                tir(2 * IGlass - 1) = ComplexShade(TempInt).IRTransmittance;
-                tir(2 * IGlass) = ComplexShade(TempInt).IRTransmittance;
+                thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
+                scon(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Conductivity;
+                emis(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).FrontEmissivity;
+                emis(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).BackEmissivity;
+                tir(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
+                tir(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
 
                 // This needs to be converted into correct areas. That can be done only after loading complete window data
-                Atop(IGlass) = ComplexShade(TempInt).TopOpeningMultiplier;
-                Abot(IGlass) = ComplexShade(TempInt).BottomOpeningMultiplier;
-                Al(IGlass) = ComplexShade(TempInt).LeftOpeningMultiplier;
-                Ar(IGlass) = ComplexShade(TempInt).RightOpeningMultiplier;
-                Ah(IGlass) = ComplexShade(TempInt).FrontOpeningMultiplier;
+                Atop(IGlass) = state.dataHeatBal->ComplexShade(TempInt).TopOpeningMultiplier;
+                Abot(IGlass) = state.dataHeatBal->ComplexShade(TempInt).BottomOpeningMultiplier;
+                Al(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LeftOpeningMultiplier;
+                Ar(IGlass) = state.dataHeatBal->ComplexShade(TempInt).RightOpeningMultiplier;
+                Ah(IGlass) = state.dataHeatBal->ComplexShade(TempInt).FrontOpeningMultiplier;
 
-                SlatThick(IGlass) = ComplexShade(TempInt).SlatThickness;
-                SlatWidth(IGlass) = ComplexShade(TempInt).SlatWidth;
-                SlatAngle(IGlass) = ComplexShade(TempInt).SlatAngle;
-                SlatCond(IGlass) = ComplexShade(TempInt).SlatConductivity;
-                SlatSpacing(IGlass) = ComplexShade(TempInt).SlatSpacing;
-                SlatCurve(IGlass) = ComplexShade(TempInt).SlatCurve;
+                SlatThick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatThickness;
+                SlatWidth(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatWidth;
+                SlatAngle(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatAngle;
+                SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
+                SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
+                SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
             } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;

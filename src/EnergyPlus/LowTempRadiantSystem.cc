@@ -360,7 +360,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-                using DataSizing::AutoSize;
+        using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::CoolingDesignCapacity;
         using DataSizing::FractionOfAutosizedCoolingCapacity;
@@ -2421,7 +2421,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::AutoCalculateSizing;
+        using DataHVACGlobals::AutoCalculateSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
@@ -3207,7 +3207,7 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-                using DataHeatBalance::ZoneData;
+        using DataHeatBalance::ZoneData;
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3365,7 +3365,7 @@ namespace LowTempRadiantSystem {
         //   Engineering.
 
         // Using/Aliasing
-                using DataHeatBalFanSys::CTFTsrcConstPart;
+        using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
         using DataHeatBalFanSys::RadSysTiHBToutCoef;
@@ -3863,7 +3863,7 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-                using DataHeatBalance::ZoneData;
+        using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
@@ -4364,7 +4364,7 @@ namespace LowTempRadiantSystem {
         //   Engineering.
 
         // Using/Aliasing
-                using DataHeatBalFanSys::CTFTsrcConstPart;
+        using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
         using DataHeatBalFanSys::RadSysTiHBToutCoef;
@@ -4914,7 +4914,7 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-                using DataHeatBalance::ZoneData;
+        using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -4993,7 +4993,7 @@ namespace LowTempRadiantSystem {
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
         // Using/Aliasing
-                using DataHVACGlobals::SysTimeElapsed;
+        using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5022,7 +5022,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-                using DataLoopNode::Node;
+        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
@@ -5100,7 +5100,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-                using DataLoopNode::Node;
+        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
         using PlantUtilities::SetComponentFlowRate;
@@ -5585,7 +5585,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-                using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
@@ -5630,7 +5630,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-                using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -5702,7 +5702,7 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-                using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::TimeStepSys;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 

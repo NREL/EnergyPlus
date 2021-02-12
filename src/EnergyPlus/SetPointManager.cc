@@ -241,7 +241,7 @@ namespace EnergyPlus::SetPointManager {
         // Use the Get routines from the InputProcessor module.
 
         // Using/Aliasing
-                using DataZoneEquipment::GetSystemNodeNumberForZone;
+        using DataZoneEquipment::GetSystemNodeNumberForZone;
         using General::FindNumberInList;
 
         using NodeInputManager::GetNodeNums;
@@ -3560,7 +3560,7 @@ namespace EnergyPlus::SetPointManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-                using DataHVACGlobals::NumCondLoops;
+        using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
         using namespace DataPlant;
         using OutAirNodeManager::CheckOutAirNodeNumber;

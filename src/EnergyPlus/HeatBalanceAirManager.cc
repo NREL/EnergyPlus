@@ -77,9 +77,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus {
-
-namespace HeatBalanceAirManager {
+namespace EnergyPlus::HeatBalanceAirManager {
     // Module containing the air heat balance simulation routines
     // calculation (initialization) routines
 
@@ -303,7 +301,6 @@ namespace HeatBalanceAirManager {
         // This subroutine sets the zone mass conservation flag to true.
 
         // Using/Aliasing
-        using DataHeatBalance::Mixing;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::MixingMassFlowZone;
         using DataHeatBalFanSys::ZoneMassBalanceFlag;
@@ -313,8 +310,8 @@ namespace HeatBalanceAirManager {
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
             for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
-                ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
+                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).ZonePtr) = true;
+                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).FromZone) = true;
             }
         }
     }
@@ -424,119 +421,119 @@ namespace HeatBalanceAirManager {
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         // Following used for reporting
-        ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
 
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // CurrentModuleObject='Zone'
             SetupOutputVariable(state,
-                "Zone Mean Air Temperature", OutputProcessor::Unit::C, ZnAirRpt(Loop).MeanAirTemp, "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
+                "Zone Mean Air Temperature", OutputProcessor::Unit::C, state.dataHeatBal->ZnAirRpt(Loop).MeanAirTemp, "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state,
-                "Zone Operative Temperature", OutputProcessor::Unit::C, ZnAirRpt(Loop).OperativeTemp, "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
+                "Zone Operative Temperature", OutputProcessor::Unit::C, state.dataHeatBal->ZnAirRpt(Loop).OperativeTemp, "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Mean Air Dewpoint Temperature",
                                 OutputProcessor::Unit::C,
-                                ZnAirRpt(Loop).MeanAirDewPointTemp,
+                                state.dataHeatBal->ZnAirRpt(Loop).MeanAirDewPointTemp,
                                 "Zone",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Mean Air Humidity Ratio",
                                 OutputProcessor::Unit::kgWater_kgDryAir,
-                                ZnAirRpt(Loop).MeanAirHumRat,
+                                state.dataHeatBal->ZnAirRpt(Loop).MeanAirHumRat,
                                 "Zone",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance Internal Convective Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumIntGains,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumIntGains,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance Surface Convection Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumHADTsurfs,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumHADTsurfs,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance Interzone Air Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumMCpDTzones,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTzones,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance Outdoor Air Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumMCpDtInfil,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumMCpDtInfil,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance System Air Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumMCpDTsystem,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumMCpDTsystem,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance System Convective Heat Gain Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).SumNonAirSystem,
+                                state.dataHeatBal->ZnAirRpt(Loop).SumNonAirSystem,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Air Heat Balance Air Energy Storage Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).CzdTdt,
+                                state.dataHeatBal->ZnAirRpt(Loop).CzdTdt,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             if (state.dataGlobal->DisplayAdvancedReportVariables) {
                 SetupOutputVariable(state, "Zone Phase Change Material Melting Enthalpy",
                                     OutputProcessor::Unit::J_kg,
-                                    ZnAirRpt(Loop).SumEnthalpyM,
+                                    state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyM,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Phase Change Material Freezing Enthalpy",
                                     OutputProcessor::Unit::J_kg,
-                                    ZnAirRpt(Loop).SumEnthalpyH,
+                                    state.dataHeatBal->ZnAirRpt(Loop).SumEnthalpyH,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, ZnAirRpt(Loop).imBalance, "System", "Average", state.dataHeatBal->Zone(Loop).Name);
+                    "Zone Air Heat Balance Deviation Rate", OutputProcessor::Unit::W, state.dataHeatBal->ZnAirRpt(Loop).imBalance, "System", "Average", state.dataHeatBal->Zone(Loop).Name);
             }
 
 
             SetupOutputVariable(state, "Zone Exfiltration Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExfilTotalLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExfilTotalLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Exfiltration Sensible Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExfilSensiLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExfilSensiLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Exfiltration Latent Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExfilLatentLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExfilLatentLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Exhaust Air Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExhTotalLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExhTotalLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Exhaust Air Sensible Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExhSensiLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExhSensiLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
             SetupOutputVariable(state, "Zone Exhaust Air Latent Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                ZnAirRpt(Loop).ExhLatentLoss,
+                                state.dataHeatBal->ZnAirRpt(Loop).ExhLatentLoss,
                                 "System",
                                 "Average",
                                 state.dataHeatBal->Zone(Loop).Name);
@@ -682,85 +679,85 @@ namespace HeatBalanceAirManager {
             if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatLoss,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatLoss,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Sensible Heat Gain Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatGain,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceHeatGain,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Latent Heat Loss Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentLoss,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentLoss,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Latent Heat Gain Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentGain,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceLatentGain,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Total Heat Loss Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalLoss,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalLoss,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Total Heat Gain Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalGain,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceTotalGain,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Current Density Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotCurDensity,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotCurDensity,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Standard Density Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotStdDensity,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVdotStdDensity,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Current Density Volume",
                                     OutputProcessor::Unit::m3,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeCurDensity,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeCurDensity,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Standard Density Volume",
                                     OutputProcessor::Unit::m3,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeStdDensity,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceVolumeStdDensity,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Mass",
                                     OutputProcessor::Unit::kg,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMass,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMass,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMdot,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceMdot,
                                     "System",
                                     "Average",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Changes per Hour",
                                     OutputProcessor::Unit::ach,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceAirChangeRate,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceAirChangeRate,
                                     "System",
                                     "Average",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name);
                 SetupOutputVariable(state, "Zone Combined Outdoor Air Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
-                                    ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceFanElec,
+                                    state.dataHeatBal->ZnAirRpt(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).OABalanceFanElec,
                                     "System",
                                     "Sum",
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr).Name,
@@ -1185,79 +1182,79 @@ namespace HeatBalanceAirManager {
                     RepVarSet(state.dataHeatBal->Infiltration(Loop).ZonePtr) = false;
                     SetupOutputVariable(state, "Zone Infiltration Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilHeatLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilHeatLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilHeatGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilHeatGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilLatentLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilLatentLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilLatentGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilLatentGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilTotalLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilTotalLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilTotalGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilTotalGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVdotCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVdotCurDensity,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVdotStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVdotStdDensity,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Current Density Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVolumeCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVolumeCurDensity,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Standard Density Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVolumeStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilVolumeStdDensity,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Mass",
                                         OutputProcessor::Unit::kg,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilMass,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilMass,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilMdot,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilMdot,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Infiltration Air Change Rate",
                                         OutputProcessor::Unit::ach,
-                                        ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilAirChangeRate,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Infiltration(Loop).ZonePtr).InfilAirChangeRate,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Infiltration(Loop).ZonePtr).Name);
@@ -1851,85 +1848,85 @@ namespace HeatBalanceAirManager {
                             RepVarSet(state.dataHeatBal->Ventilation(Loop).ZonePtr) = false;
                             SetupOutputVariable(state, "Zone Ventilation Sensible Heat Loss Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilHeatLoss,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilHeatLoss,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Sensible Heat Gain Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilHeatGain,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilHeatGain,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Latent Heat Loss Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilLatentLoss,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilLatentLoss,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Latent Heat Gain Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilLatentGain,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilLatentGain,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Total Heat Loss Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilTotalLoss,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilTotalLoss,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Total Heat Gain Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilTotalGain,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilTotalGain,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Current Density Volume Flow Rate",
                                                 OutputProcessor::Unit::m3_s,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVdotCurDensity,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVdotCurDensity,
                                                 "System",
                                                 "Average",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Standard Density Volume Flow Rate",
                                                 OutputProcessor::Unit::m3_s,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVdotStdDensity,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVdotStdDensity,
                                                 "System",
                                                 "Average",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Current Density Volume",
                                                 OutputProcessor::Unit::m3,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVolumeCurDensity,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVolumeCurDensity,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Standard Density Volume",
                                                 OutputProcessor::Unit::m3,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVolumeStdDensity,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilVolumeStdDensity,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Mass",
                                                 OutputProcessor::Unit::kg,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilMass,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilMass,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Mass Flow Rate",
                                                 OutputProcessor::Unit::kg_s,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilMdot,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilMdot,
                                                 "System",
                                                 "Average",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Air Change Rate",
                                                 OutputProcessor::Unit::ach,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilAirChangeRate,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilAirChangeRate,
                                                 "System",
                                                 "Average",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Fan Electricity Energy",
                                                 OutputProcessor::Unit::J,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilFanElec,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilFanElec,
                                                 "System",
                                                 "Sum",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name,
@@ -1941,7 +1938,7 @@ namespace HeatBalanceAirManager {
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
                             SetupOutputVariable(state, "Zone Ventilation Air Inlet Temperature",
                                                 OutputProcessor::Unit::C,
-                                                ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilAirTemp,
+                                                state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(Loop).ZonePtr).VentilAirTemp,
                                                 "System",
                                                 "Average",
                                                 state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(Loop).ZonePtr).Name);
@@ -2284,85 +2281,85 @@ namespace HeatBalanceAirManager {
                     RepVarSet(state.dataHeatBal->Ventilation(VentiCount).ZonePtr) = false;
                     SetupOutputVariable(state, "Zone Ventilation Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilHeatGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilLatentGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalLoss,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilTotalGain,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotCurDensity,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVdotStdDensity,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Current Density Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeCurDensity,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Standard Density Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilVolumeStdDensity,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Mass",
                                         OutputProcessor::Unit::kg,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMass,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMass,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMdot,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilMdot,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Air Change Rate",
                                         OutputProcessor::Unit::ach,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirChangeRate,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirChangeRate,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilFanElec,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilFanElec,
                                         "System",
                                         "Sum",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name,
@@ -2374,7 +2371,7 @@ namespace HeatBalanceAirManager {
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Ventilation Air Inlet Temperature",
                                         OutputProcessor::Unit::C,
-                                        ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirTemp,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).VentilAirTemp,
                                         "System",
                                         "Average",
                                         state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(VentiCount).ZonePtr).Name);
@@ -2395,7 +2392,7 @@ namespace HeatBalanceAirManager {
 
         cCurrentModuleObject = "ZoneMixing";
         state.dataHeatBal->TotMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        Mixing.allocate(state.dataHeatBal->TotMixing);
+        state.dataHeatBal->Mixing.allocate(state.dataHeatBal->TotMixing);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
 
@@ -2413,18 +2410,18 @@ namespace HeatBalanceAirManager {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            Mixing(Loop).Name = cAlphaArgs(1);
+            state.dataHeatBal->Mixing(Loop).Name = cAlphaArgs(1);
 
-            Mixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-            if (Mixing(Loop).ZonePtr == 0) {
+            state.dataHeatBal->Mixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            if (state.dataHeatBal->Mixing(Loop).ZonePtr == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
                                 "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             }
 
-            Mixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+            state.dataHeatBal->Mixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
 
-            if (Mixing(Loop).SchedPtr == 0) {
+            if (state.dataHeatBal->Mixing(Loop).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(3)) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
                                     " is required but field is blank.");
@@ -2439,17 +2436,17 @@ namespace HeatBalanceAirManager {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(4));
                 if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                    Mixing(Loop).DesignLevel = rNumericArgs(1);
+                    state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(1);
                     if (lNumericFieldBlanks(1)) {
                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                          cNumericFieldNames(1) + ", but that field is blank.  0 Mixing will result.");
                     }
 
                 } else if (SELECT_CASE_var == "FLOW/AREA") {
-                    if (Mixing(Loop).ZonePtr != 0) {
+                    if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            Mixing(Loop).DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).FloorArea;
-                            if (state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                            state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea;
+                            if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).FloorArea <= 0.0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Mixing will result.");
                             }
@@ -2469,10 +2466,10 @@ namespace HeatBalanceAirManager {
                     }
 
                 } else if (SELECT_CASE_var == "FLOW/PERSON") {
-                    if (Mixing(Loop).ZonePtr != 0) {
+                    if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            Mixing(Loop).DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).TotOccupants;
-                            if (state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                            state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants;
+                            if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).TotOccupants <= 0.0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(3) + ", but Zone Total Occupants = 0.  0 Mixing will result.");
                             }
@@ -2492,10 +2489,10 @@ namespace HeatBalanceAirManager {
                     }
 
                 } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                    if (Mixing(Loop).ZonePtr != 0) {
+                    if (state.dataHeatBal->Mixing(Loop).ZonePtr != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            Mixing(Loop).DesignLevel = rNumericArgs(4) * state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
-                            if (state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Volume <= 0.0) {
+                            state.dataHeatBal->Mixing(Loop).DesignLevel = rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
+                            if (state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Volume <= 0.0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
                             }
@@ -2520,29 +2517,29 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            Mixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-            if (Mixing(Loop).FromZone == 0) {
+            state.dataHeatBal->Mixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+            if (state.dataHeatBal->Mixing(Loop).FromZone == 0) {
                 ShowSevereError(state, RoutineName + cAlphaFieldNames(5) + " not found=" + cAlphaArgs(5) + " for " + cCurrentModuleObject + '=' +
                                 cAlphaArgs(1));
                 ErrorsFound = true;
             }
-            Mixing(Loop).DeltaTemperature = rNumericArgs(5);
+            state.dataHeatBal->Mixing(Loop).DeltaTemperature = rNumericArgs(5);
 
             if (NumAlpha > 5) {
-                Mixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
-                if (Mixing(Loop).DeltaTempSchedPtr > 0) {
+                state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                if (state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr > 0) {
                     if (!lNumericFieldBlanks(5))
                         ShowWarningError(state, RoutineName +
                                          "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
                                          cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                    if (GetScheduleMinValue(state, Mixing(Loop).DeltaTempSchedPtr) < -MixingTempLimit) {
+                    if (GetScheduleMinValue(state, state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr) < -MixingTempLimit) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
                                         " must have a delta temperature equal to or above -100C defined in the schedule = " + cAlphaArgs(6));
                         ErrorsFound = true;
                     }
                 }
             }
-            if (Mixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
+            if (state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
                 ShowWarningError(state,
                                  format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
                                         RoutineName,
@@ -2550,7 +2547,7 @@ namespace HeatBalanceAirManager {
                                         rNumericArgs(5)));
                 ShowContinueError(state, "in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
             }
-            if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && Mixing(Loop).DeltaTempSchedPtr == 0)) {
+            if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && state.dataHeatBal->Mixing(Loop).DeltaTempSchedPtr == 0)) {
                 ShowWarningError(state,
                                  format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
                                         RoutineName,
@@ -2561,17 +2558,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 6) {
-                Mixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
-                if (Mixing(Loop).MinIndoorTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                if (state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(7))) {
                         ShowSevereError(state, RoutineName + cAlphaFieldNames(7) + " not found=" + cAlphaArgs(7) + " for " + cCurrentModuleObject + '=' +
                                         cAlphaArgs(1));
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MinIndoorTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + " statement = " + cAlphaArgs(1) +
                                         " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
                         ErrorsFound = true;
@@ -2580,17 +2577,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 7) {
-                Mixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
-                if (Mixing(Loop).MaxIndoorTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                if (state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(8))) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(8) + " not found=\"" +
                                         cAlphaArgs(8) + "\".");
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MaxIndoorTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                         "\" must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
                         ErrorsFound = true;
@@ -2599,17 +2596,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 8) {
-                Mixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
-                if (Mixing(Loop).MinSourceTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                if (state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(9))) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(9) + " not found=\"" +
                                         cAlphaArgs(9) + "\".");
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MinSourceTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state,
                             RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                             "\" must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
@@ -2619,17 +2616,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 9) {
-                Mixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
-                if (Mixing(Loop).MaxSourceTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
+                if (state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(10))) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(10) + " not found=\"" +
                                         cAlphaArgs(10) + "\".");
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MaxSourceTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state,
                             RoutineName + cCurrentModuleObject + " statement =\"" + cAlphaArgs(1) +
                             "\" must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
@@ -2639,17 +2636,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 10) {
-                Mixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
-                if (Mixing(Loop).MinOutdoorTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
+                if (state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(11))) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(11) + " not found=\"" +
                                         cAlphaArgs(11) + "\".");
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MinOutdoorTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state,
                             RoutineName + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
                             "\" must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
@@ -2659,17 +2656,17 @@ namespace HeatBalanceAirManager {
             }
 
             if (NumAlpha > 11) {
-                Mixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
-                if (Mixing(Loop).MaxOutdoorTempSchedPtr == 0) {
+                state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
+                if (state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr == 0) {
                     if ((!lAlphaFieldBlanks(12))) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(12) + " not found=\"" +
                                         cAlphaArgs(12) + "\".");
                         ErrorsFound = true;
                     }
                 }
-                if (Mixing(Loop).MaxOutdoorTempSchedPtr > 0) {
+                if (state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr > 0) {
                     // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(state, Mixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                    if (!CheckScheduleValueMinMax(state, state.dataHeatBal->Mixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                         ShowSevereError(state,
                             RoutineName + cCurrentModuleObject + " =\"" + cAlphaArgs(1) +
                             "\" must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
@@ -2678,84 +2675,84 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (Mixing(Loop).ZonePtr > 0) {
-                if (RepVarSet(Mixing(Loop).ZonePtr)) {
-                    RepVarSet(Mixing(Loop).ZonePtr) = false;
+            if (state.dataHeatBal->Mixing(Loop).ZonePtr > 0) {
+                if (RepVarSet(state.dataHeatBal->Mixing(Loop).ZonePtr)) {
+                    RepVarSet(state.dataHeatBal->Mixing(Loop).ZonePtr) = false;
                     SetupOutputVariable(state, "Zone Mixing Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixVolume,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVolume,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixVdotCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVdotCurDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixVdotStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixVdotStdDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass",
                                         OutputProcessor::Unit::kg,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixMass,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixMass,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixMdot,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixMdot,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixHeatLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixHeatLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixHeatGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixHeatGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixLatentLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixLatentLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixLatentGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixLatentGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixTotalLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixTotalLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(Mixing(Loop).ZonePtr).MixTotalGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->Mixing(Loop).ZonePtr).MixTotalGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(Mixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).ZonePtr).Name);
                 }
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state, "ZoneMixing",
-                                 Mixing(Loop).Name,
+                                 state.dataHeatBal->Mixing(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
-                                 Mixing(Loop).EMSSimpleMixingOn,
-                                 Mixing(Loop).EMSimpleMixingFlowRate);
+                                 state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn,
+                                 state.dataHeatBal->Mixing(Loop).EMSimpleMixingFlowRate);
             }
         }
 
@@ -2769,7 +2766,7 @@ namespace HeatBalanceAirManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 SourceCount = 0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                    if (ZoneNum == Mixing(Loop).FromZone) {
+                    if (ZoneNum == state.dataHeatBal->Mixing(Loop).FromZone) {
                         SourceCount += 1;
                         ZoneMixingNum(SourceCount) = Loop;
                     }
@@ -2788,10 +2785,10 @@ namespace HeatBalanceAirManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 IsSourceZone = false;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                    if (ZoneNum != Mixing(Loop).FromZone) continue;
+                    if (ZoneNum != state.dataHeatBal->Mixing(Loop).FromZone) continue;
                     MassConservation(ZoneNum).IsOnlySourceZone = true;
                     for (Loop1 = 1; Loop1 <= state.dataHeatBal->TotMixing; ++Loop1) {
-                        if (ZoneNum == Mixing(Loop1).ZonePtr) {
+                        if (ZoneNum == state.dataHeatBal->Mixing(Loop1).ZonePtr) {
                             MassConservation(ZoneNum).IsOnlySourceZone = false;
                             break;
                         }
@@ -2803,7 +2800,7 @@ namespace HeatBalanceAirManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 ReceivingCount = 0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                    if (ZoneNum == Mixing(Loop).ZonePtr) {
+                    if (ZoneNum == state.dataHeatBal->Mixing(Loop).ZonePtr) {
                         ReceivingCount += 1;
                         ZoneMixingNum(ReceivingCount) = Loop;
                     }
@@ -2840,7 +2837,7 @@ namespace HeatBalanceAirManager {
         cCurrentModuleObject = "ZoneCrossMixing";
         int inputCrossMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataHeatBal->TotCrossMixing = inputCrossMixing + state.dataHeatBal->NumAirBoundaryMixing;
-        CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
+        state.dataHeatBal->CrossMixing.allocate(state.dataHeatBal->TotCrossMixing);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
 
@@ -2849,11 +2846,11 @@ namespace HeatBalanceAirManager {
                 int airBoundaryIndex = Loop - inputCrossMixing - 1; //zero-based
                 int zone1 = state.dataHeatBal->AirBoundaryMixingZone1[airBoundaryIndex];
                 int zone2 = state.dataHeatBal->AirBoundaryMixingZone2[airBoundaryIndex];
-                CrossMixing(Loop).Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
-                CrossMixing(Loop).ZonePtr = zone1;
-                CrossMixing(Loop).SchedPtr = state.dataHeatBal->AirBoundaryMixingSched[airBoundaryIndex];
-                CrossMixing(Loop).DesignLevel = state.dataHeatBal->AirBoundaryMixingVol[airBoundaryIndex];
-                CrossMixing(Loop).FromZone = zone2;
+                state.dataHeatBal->CrossMixing(Loop).Name = fmt::format("Air Boundary Mixing Zones {} and {}", zone1, zone2);
+                state.dataHeatBal->CrossMixing(Loop).ZonePtr = zone1;
+                state.dataHeatBal->CrossMixing(Loop).SchedPtr = state.dataHeatBal->AirBoundaryMixingSched[airBoundaryIndex];
+                state.dataHeatBal->CrossMixing(Loop).DesignLevel = state.dataHeatBal->AirBoundaryMixingVol[airBoundaryIndex];
+                state.dataHeatBal->CrossMixing(Loop).FromZone = zone2;
             }
             else {
                 inputProcessor->getObjectItem(state,
@@ -2870,17 +2867,17 @@ namespace HeatBalanceAirManager {
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                CrossMixing(Loop).Name = cAlphaArgs(1);
+                state.dataHeatBal->CrossMixing(Loop).Name = cAlphaArgs(1);
 
-                CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
-                if (CrossMixing(Loop).ZonePtr == 0) {
+                state.dataHeatBal->CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                if (state.dataHeatBal->CrossMixing(Loop).ZonePtr == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
                         "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
 
-                CrossMixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
-                if (CrossMixing(Loop).SchedPtr == 0) {
+                state.dataHeatBal->CrossMixing(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
+                if (state.dataHeatBal->CrossMixing(Loop).SchedPtr == 0) {
                     if (lAlphaFieldBlanks(3)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
                             " is required but field is blank.");
@@ -2896,7 +2893,7 @@ namespace HeatBalanceAirManager {
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(4));
                     if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                        CrossMixing(Loop).DesignLevel = rNumericArgs(1);
+                        state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(1);
                         if (lNumericFieldBlanks(1)) {
                             ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
                                 cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
@@ -2904,10 +2901,10 @@ namespace HeatBalanceAirManager {
 
                     }
                     else if (SELECT_CASE_var == "FLOW/AREA") {
-                        if (CrossMixing(Loop).ZonePtr != 0) {
+                        if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
                             if (rNumericArgs(2) >= 0.0) {
-                                CrossMixing(Loop).DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).FloorArea;
-                                if (state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                                state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(2) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea;
+                                if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
                                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                         " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
                                 }
@@ -2929,10 +2926,10 @@ namespace HeatBalanceAirManager {
 
                     }
                     else if (SELECT_CASE_var == "FLOW/PERSON") {
-                        if (CrossMixing(Loop).ZonePtr != 0) {
+                        if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
                             if (rNumericArgs(3) >= 0.0) {
-                                CrossMixing(Loop).DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).TotOccupants;
-                                if (state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(3) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants;
+                                if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
                                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                         " specifies " + cNumericFieldNames(3) +
                                         ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
@@ -2955,10 +2952,10 @@ namespace HeatBalanceAirManager {
 
                     }
                     else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                        if (CrossMixing(Loop).ZonePtr != 0) {
+                        if (state.dataHeatBal->CrossMixing(Loop).ZonePtr != 0) {
                             if (rNumericArgs(4) >= 0.0) {
-                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
-                                if (state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
+                                state.dataHeatBal->CrossMixing(Loop).DesignLevel = rNumericArgs(4) * state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
+                                if (state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
                                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                         " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
                                 }
@@ -2985,29 +2982,29 @@ namespace HeatBalanceAirManager {
                     }
                 }
 
-                CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
-                if (CrossMixing(Loop).FromZone == 0) {
+                state.dataHeatBal->CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                if (state.dataHeatBal->CrossMixing(Loop).FromZone == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(5) +
                         "=\"" + cAlphaArgs(5) + "\".");
                     ErrorsFound = true;
                 }
-                CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
+                state.dataHeatBal->CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
 
                 if (NumAlpha > 5) {
-                    CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
-                    if (CrossMixing(Loop).DeltaTempSchedPtr > 0) {
+                    state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(6));
+                    if (state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr > 0) {
                         if (!lNumericFieldBlanks(5))
                             ShowWarningError(state, RoutineName +
                                 "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
                                 cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                        if (GetScheduleMinValue(state, CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
+                        if (GetScheduleMinValue(state, state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
                             ErrorsFound = true;
                         }
                     }
                 }
-                if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
+                if (state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
                     ShowWarningError(state,
                                      format("{}{}: the value field is blank and schedule field is invalid. The default value will be used ({:.1R}) ",
                                             RoutineName,
@@ -3015,7 +3012,7 @@ namespace HeatBalanceAirManager {
                                             rNumericArgs(5)));
                     ShowContinueError(state, "in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
                 }
-                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
+                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && state.dataHeatBal->CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
                     ShowWarningError(state,
                                      format("{}{} = {} is invalid. The constant value will be used at {:.1R} degrees C ",
                                             RoutineName,
@@ -3026,17 +3023,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 6) {
-                    CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
-                    if (CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(7));
+                    if (state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(7))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
                                 " not found=" + cAlphaArgs(7) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
                             ErrorsFound = true;
@@ -3045,17 +3042,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 7) {
-                    CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
-                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(8));
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(8))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) + " not found=\"" +
                                 cAlphaArgs(8) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
                             ErrorsFound = true;
@@ -3064,17 +3061,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 8) {
-                    CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
-                    if (CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(9));
+                    if (state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(9))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) + " not found=\"" +
                                 cAlphaArgs(9) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
                             ErrorsFound = true;
@@ -3083,17 +3080,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 9) {
-                    CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
-                    if (CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(10));
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(10))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) + " not found=\"" +
                                 cAlphaArgs(9) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
                             ErrorsFound = true;
@@ -3102,17 +3099,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 10) {
-                    CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
-                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(11));
+                    if (state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(11))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) + " not found=\"" +
                                 cAlphaArgs(9) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state,
                                 RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
@@ -3122,17 +3119,17 @@ namespace HeatBalanceAirManager {
                 }
 
                 if (NumAlpha > 11) {
-                    CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
-                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
+                    state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(state, cAlphaArgs(12));
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
                         if ((!lAlphaFieldBlanks(12))) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) + " not found=\"" +
                                 cAlphaArgs(9) + "\".");
                             ErrorsFound = true;
                         }
                     }
-                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
+                    if (state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
                         // Check min and max values in the schedule to ensure both values are within the range
-                        if (!CheckScheduleValueMinMax(state, CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
                             ShowSevereError(state,
                                 RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                 " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
@@ -3142,164 +3139,164 @@ namespace HeatBalanceAirManager {
                 }
             }
 
-            if (CrossMixing(Loop).ZonePtr > 0) {
-                if (RepVarSet(CrossMixing(Loop).ZonePtr)) {
-                    RepVarSet(CrossMixing(Loop).ZonePtr) = false;
+            if (state.dataHeatBal->CrossMixing(Loop).ZonePtr > 0) {
+                if (RepVarSet(state.dataHeatBal->CrossMixing(Loop).ZonePtr)) {
+                    RepVarSet(state.dataHeatBal->CrossMixing(Loop).ZonePtr) = false;
                     SetupOutputVariable(state, "Zone Mixing Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixVolume,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVolume,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixVdotCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVdotCurDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixVdotStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixVdotStdDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass",
                                         OutputProcessor::Unit::kg,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixMass,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixMass,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixMdot,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixMdot,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixHeatLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixHeatLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixHeatGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixHeatGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixLatentLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixLatentLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixLatentGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixLatentGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixTotalLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixTotalLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).ZonePtr).MixTotalGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).ZonePtr).MixTotalGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).ZonePtr).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).ZonePtr).Name);
                 }
             }
-            if (CrossMixing(Loop).FromZone > 0) {
-                if (RepVarSet(CrossMixing(Loop).FromZone)) {
-                    RepVarSet(CrossMixing(Loop).FromZone) = false;
+            if (state.dataHeatBal->CrossMixing(Loop).FromZone > 0) {
+                if (RepVarSet(state.dataHeatBal->CrossMixing(Loop).FromZone)) {
+                    RepVarSet(state.dataHeatBal->CrossMixing(Loop).FromZone) = false;
                     SetupOutputVariable(state, "Zone Mixing Volume",
                                         OutputProcessor::Unit::m3,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixVolume,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVolume,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Current Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixVdotCurDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVdotCurDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Standard Density Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixVdotStdDensity,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixVdotStdDensity,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass",
                                         OutputProcessor::Unit::kg,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixMass,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixMass,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixMdot,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixMdot,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixHeatLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixHeatLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Sensible Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixHeatGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixHeatGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixLatentLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixLatentLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Latent Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixLatentGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixLatentGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixTotalLoss,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixTotalLoss,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                     SetupOutputVariable(state, "Zone Mixing Total Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        ZnAirRpt(CrossMixing(Loop).FromZone).MixTotalGain,
+                                        state.dataHeatBal->ZnAirRpt(state.dataHeatBal->CrossMixing(Loop).FromZone).MixTotalGain,
                                         "System",
                                         "Sum",
-                                        state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
+                                        state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
                 }
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state, "ZoneCrossMixing",
-                                 CrossMixing(Loop).Name,
+                                 state.dataHeatBal->CrossMixing(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
-                                 CrossMixing(Loop).EMSSimpleMixingOn,
-                                 CrossMixing(Loop).EMSimpleMixingFlowRate);
+                                 state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn,
+                                 state.dataHeatBal->CrossMixing(Loop).EMSimpleMixingFlowRate);
             }
         }
 
         cCurrentModuleObject = "ZoneRefrigerationDoorMixing";
         state.dataHeatBal->TotRefDoorMixing = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataHeatBal->TotRefDoorMixing > 0) {
-            RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : RefDoorMixing)
+            state.dataHeatBal->RefDoorMixing.allocate(state.dataGlobal->NumOfZones);
+            for (auto &e : state.dataHeatBal->RefDoorMixing)
                 e.NumRefDoorConnections = 0;
 
             for (Loop = 1; Loop <= state.dataHeatBal->TotRefDoorMixing; ++Loop) {
@@ -3348,72 +3345,72 @@ namespace HeatBalanceAirManager {
                     ZoneNumB = Zone1Num;
                 }
 
-                if (!allocated(RefDoorMixing(ZoneNumA).OpenSchedPtr)) {
-                    RefDoorMixing(ZoneNumA).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorHeight.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorArea.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).Protection.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumA).DoorMixingObjectName = "";
-                    RefDoorMixing(ZoneNumA).OpenSchedPtr = 0;
-                    RefDoorMixing(ZoneNumA).DoorHeight = 0.0;
-                    RefDoorMixing(ZoneNumA).DoorArea = 0.0;
-                    RefDoorMixing(ZoneNumA).Protection = RefDoorNone;
-                    RefDoorMixing(ZoneNumA).MateZonePtr = 0;
-                    RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn = false;
-                    RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate = 0.0;
-                    RefDoorMixing(ZoneNumA).VolRefDoorFlowRate = 0.0;
-                    RefDoorMixing(ZoneNumA).DoorProtTypeName = "";
+                if (!allocated(state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr)) {
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName = "";
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr = 0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection = RefDoorNone;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr = 0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn = false;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).VolRefDoorFlowRate = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName = "";
                 } // First refrigeration mixing in this zone
 
-                if (!allocated(RefDoorMixing(ZoneNumB).OpenSchedPtr)) {
-                    RefDoorMixing(ZoneNumB).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorHeight.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorArea.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).Protection.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
-                    RefDoorMixing(ZoneNumB).DoorMixingObjectName = "";
-                    RefDoorMixing(ZoneNumB).OpenSchedPtr = 0;
-                    RefDoorMixing(ZoneNumB).DoorHeight = 0.0;
-                    RefDoorMixing(ZoneNumB).DoorArea = 0.0;
-                    RefDoorMixing(ZoneNumB).Protection = RefDoorNone;
-                    RefDoorMixing(ZoneNumB).MateZonePtr = 0;
-                    RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn = false;
-                    RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate = 0.0;
-                    RefDoorMixing(ZoneNumB).VolRefDoorFlowRate = 0.0;
-                    RefDoorMixing(ZoneNumB).DoorProtTypeName = "";
+                if (!allocated(state.dataHeatBal->RefDoorMixing(ZoneNumB).OpenSchedPtr)) {
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorMixingObjectName.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).OpenSchedPtr.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorHeight.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorArea.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).Protection.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).MateZonePtr.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).VolRefDoorFlowRate.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorProtTypeName.allocate(state.dataGlobal->NumOfZones);
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorMixingObjectName = "";
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).OpenSchedPtr = 0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorHeight = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorArea = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).Protection = RefDoorNone;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).MateZonePtr = 0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).EMSRefDoorMixingOn = false;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).EMSRefDoorFlowRate = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).VolRefDoorFlowRate = 0.0;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).DoorProtTypeName = "";
                 } // First refrigeration mixing in this zone
 
-                ConnectionNumber = RefDoorMixing(ZoneNumA).NumRefDoorConnections + 1;
-                RefDoorMixing(ZoneNumA).NumRefDoorConnections = ConnectionNumber;
-                RefDoorMixing(ZoneNumA).ZonePtr = ZoneNumA;
-                RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber) = ZoneNumB;
-                RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) = NameThisObject;
+                ConnectionNumber = state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections + 1;
+                state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections = ConnectionNumber;
+                state.dataHeatBal->RefDoorMixing(ZoneNumA).ZonePtr = ZoneNumA;
+                state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber) = ZoneNumB;
+                state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) = NameThisObject;
                 // need to make sure same pair of zones is only entered once.
-                if (RefDoorMixing(ZoneNumA).RefDoorMixFlag && RefDoorMixing(ZoneNumB).RefDoorMixFlag) {
-                    if (RefDoorMixing(ZoneNumA).NumRefDoorConnections > 1) {
+                if (state.dataHeatBal->RefDoorMixing(ZoneNumA).RefDoorMixFlag && state.dataHeatBal->RefDoorMixing(ZoneNumB).RefDoorMixFlag) {
+                    if (state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections > 1) {
                         for (ConnectTest = 1; ConnectTest <= (ConnectionNumber - 1); ++ConnectTest) {
-                            if (RefDoorMixing(ZoneNumA).MateZonePtr(ConnectTest) != RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber)) continue;
+                            if (state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectTest) != state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber)) continue;
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", and " +
-                                            RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectTest));
+                                            state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectTest));
                             ShowContinueError(state, " Share same pair of zones: \"" + state.dataHeatBal->Zone(ZoneNumA).Name + "\" and \"" + state.dataHeatBal->Zone(ZoneNumB).Name +
                                               "\". Only one RefrigerationDoorMixing object is allowed for any unique pair of zones.");
                             ErrorsFound = true;
                         } // ConnectTest
                     }     // NumRefDoorconnections > 1
                 } else {  // Both zones need to be flagged with ref doors
-                    RefDoorMixing(ZoneNumA).RefDoorMixFlag = true;
-                    RefDoorMixing(ZoneNumB).RefDoorMixFlag = true;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).RefDoorMixFlag = true;
+                    state.dataHeatBal->RefDoorMixing(ZoneNumB).RefDoorMixFlag = true;
                 } // Both zones already flagged with ref doors
 
                 ++AlphaNum; // 4
@@ -3422,13 +3419,13 @@ namespace HeatBalanceAirManager {
                                     " is required but field is blank.");
                     ErrorsFound = true;
                 } else { //(lAlphaFieldBlanks(AlphaNum)) THEN
-                    RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber) = GetScheduleIndex(state, cAlphaArgs(AlphaNum));
-                    if (RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber) == 0) {
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber) = GetScheduleIndex(state, cAlphaArgs(AlphaNum));
+                    if (state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber) == 0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " +
                                         cAlphaFieldNames(AlphaNum) + "=\"" + cAlphaArgs(AlphaNum) + "\".");
                         ErrorsFound = true;
                     } else { // OpenSchedPtr(ConnectionNumber) ne 0)
-                        if (!CheckScheduleValueMinMax(state, RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber), ">=", 0.0, "<=", 1.0)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber), ">=", 0.0, "<=", 1.0)) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(AlphaNum) + "=\"" +
                                             cAlphaArgs(AlphaNum) + "\" has schedule values < 0 or > 1.");
                             ErrorsFound = true;
@@ -3438,12 +3435,12 @@ namespace HeatBalanceAirManager {
 
                 NumbNum = 1;
                 if (lNumericFieldBlanks(NumbNum)) {
-                    RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = 3.0; // default height of 3 meters
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = 3.0; // default height of 3 meters
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + cNumericFieldNames(NumbNum) +
                                      " is blank and the default value of 3.0 will be used.");
                 } else {
-                    RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = rNumericArgs(NumbNum);
-                    if ((RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) < 0) || (RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) > 50.0)) {
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) = rNumericArgs(NumbNum);
+                    if ((state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) < 0) || (state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber) > 50.0)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                         " must have a door height between 0 and 50 meters. ");
                         ErrorsFound = true;
@@ -3452,12 +3449,12 @@ namespace HeatBalanceAirManager {
 
                 ++NumbNum; // 2
                 if (lNumericFieldBlanks(NumbNum)) {
-                    RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) = 9.0; // default area of 9 m2
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) = 9.0; // default area of 9 m2
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + cNumericFieldNames(NumbNum) +
                                      " is blank and the default value of 9 m2 will be used.");
                 } else {
-                    RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) = rNumericArgs(NumbNum);
-                    if ((RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) < 0) || (RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) > 400.0)) {
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) = rNumericArgs(NumbNum);
+                    if ((state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) < 0) || (state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber) > 400.0)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
                                         " must have a door height between 0 and 400 square meters. ");
                         ErrorsFound = true;
@@ -3467,20 +3464,20 @@ namespace HeatBalanceAirManager {
                 ++AlphaNum; // 5
                 // Door protection type.
                 if (lAlphaFieldBlanks(AlphaNum)) {
-                    RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorNone;  // Default
-                    RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "None"; // Default
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorNone;  // Default
+                    state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "None"; // Default
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"  " + cAlphaFieldNames(AlphaNum) +
                                      " is blank. Default of no door protection will be used");
                 } else {
                     if (cAlphaArgs(AlphaNum) == "NONE") {
-                        RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorNone;
-                        RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "None";
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorNone;
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "None";
                     } else if (cAlphaArgs(AlphaNum) == "AIRCURTAIN") {
-                        RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorAirCurtain;
-                        RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "AirCurtain";
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorAirCurtain;
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "AirCurtain";
                     } else if (cAlphaArgs(AlphaNum) == "STRIPCURTAIN") {
-                        RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorStripCurtain;
-                        RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "StripCurtain";
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).Protection(ConnectionNumber) = RefDoorStripCurtain;
+                        state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber) = "StripCurtain";
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                         "\", invalid calculation method=" + cAlphaArgs(AlphaNum) + " with alphanum of 5: " + cAlphaArgs(5));
@@ -3492,60 +3489,60 @@ namespace HeatBalanceAirManager {
                     if (RepVarSet(ZoneNumA)) {
                         RepVarSet(ZoneNumA) = false;
                         SetupOutputVariable(state,
-                            "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt(ZoneNumA).MixVolume, "System", "Sum", state.dataHeatBal->Zone(ZoneNumA).Name);
+                            "Zone Mixing Volume", OutputProcessor::Unit::m3, state.dataHeatBal->ZnAirRpt(ZoneNumA).MixVolume, "System", "Sum", state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Current Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
-                                            ZnAirRpt(ZoneNumA).MixVdotCurDensity,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixVdotCurDensity,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Standard Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
-                                            ZnAirRpt(ZoneNumA).MixVdotStdDensity,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixVdotStdDensity,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state,
-                            "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt(ZoneNumA).MixMass, "System", "Sum", state.dataHeatBal->Zone(ZoneNumA).Name);
+                            "Zone Mixing Mass", OutputProcessor::Unit::kg, state.dataHeatBal->ZnAirRpt(ZoneNumA).MixMass, "System", "Sum", state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
-                                            ZnAirRpt(ZoneNumA).MixMdot,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixMdot,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Sensible Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixHeatLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixHeatLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Sensible Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixHeatGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixHeatGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Latent Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixLatentLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixLatentLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Latent Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixLatentGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixLatentGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Total Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixTotalLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixTotalLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
                         SetupOutputVariable(state, "Zone Mixing Total Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumA).MixTotalGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumA).MixTotalGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumA).Name);
@@ -3553,71 +3550,71 @@ namespace HeatBalanceAirManager {
                 }
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator(state, "ZoneRefDoorMixing",
-                                     RefDoorMixing(ZoneNumA).Name,
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumA).Name,
                                      "Air Exchange Flow Rate",
                                      "[m3/s]",
-                                     RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn(ConnectionNumber),
-                                     RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate(ConnectionNumber));
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn(ConnectionNumber),
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate(ConnectionNumber));
                 }
 
                 if (ZoneNumB > 0) {
                     if (RepVarSet(ZoneNumB)) {
                         RepVarSet(ZoneNumB) = false;
                         SetupOutputVariable(state,
-                            "Zone Mixing Volume", OutputProcessor::Unit::m3, ZnAirRpt(ZoneNumB).MixVolume, "System", "Sum", state.dataHeatBal->Zone(ZoneNumB).Name);
+                            "Zone Mixing Volume", OutputProcessor::Unit::m3, state.dataHeatBal->ZnAirRpt(ZoneNumB).MixVolume, "System", "Sum", state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Current Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
-                                            ZnAirRpt(ZoneNumB).MixVdotCurDensity,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixVdotCurDensity,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Standard Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
-                                            ZnAirRpt(ZoneNumB).MixVdotStdDensity,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixVdotStdDensity,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state,
-                            "Zone Mixing Mass", OutputProcessor::Unit::kg, ZnAirRpt(ZoneNumB).MixMass, "System", "Sum", state.dataHeatBal->Zone(ZoneNumB).Name);
+                            "Zone Mixing Mass", OutputProcessor::Unit::kg, state.dataHeatBal->ZnAirRpt(ZoneNumB).MixMass, "System", "Sum", state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
-                                            ZnAirRpt(ZoneNumB).MixMdot,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixMdot,
                                             "System",
                                             "Average",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Sensible Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixHeatLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixHeatLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Sensible Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixHeatGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixHeatGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Latent Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixLatentLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixLatentLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Latent Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixLatentGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixLatentGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Total Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixTotalLoss,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixTotalLoss,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
                         SetupOutputVariable(state, "Zone Mixing Total Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            ZnAirRpt(ZoneNumB).MixTotalGain,
+                                            state.dataHeatBal->ZnAirRpt(ZoneNumB).MixTotalGain,
                                             "System",
                                             "Sum",
                                             state.dataHeatBal->Zone(ZoneNumB).Name);
@@ -3625,11 +3622,11 @@ namespace HeatBalanceAirManager {
                 }
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSActuator(state, "ZoneRefDoorMixing",
-                                     RefDoorMixing(ZoneNumB).Name,
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumB).Name,
                                      "Air Exchange Flow Rate",
                                      "[m3/s]",
-                                     RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn(ConnectionNumber),
-                                     RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate(ConnectionNumber));
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorMixingOn(ConnectionNumber),
+                                     state.dataHeatBal->RefDoorMixing(ZoneNumA).EMSRefDoorFlowRate(ConnectionNumber));
                 }
 
             } // DO Loop=1,TotRefDoorMixing
@@ -3765,27 +3762,27 @@ namespace HeatBalanceAirManager {
                     "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}");
 
-            ZoneNum = Mixing(Loop).ZonePtr;
+            ZoneNum = state.dataHeatBal->Mixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(state.files.eio, Format_722, "Mixing-Illegal Zone specified", Mixing(Loop).Name);
+                print(state.files.eio, Format_722, "Mixing-Illegal Zone specified", state.dataHeatBal->Mixing(Loop).Name);
                 continue;
             }
-            TotMixingFlow(ZoneNum) += Mixing(Loop).DesignLevel;
+            TotMixingFlow(ZoneNum) += state.dataHeatBal->Mixing(Loop).DesignLevel;
             print(state.files.eio,
                   Format_720,
                   "Mixing",
-                  Mixing(Loop).Name,
-                  GetScheduleName(state, Mixing(Loop).SchedPtr),
+                  state.dataHeatBal->Mixing(Loop).Name,
+                  GetScheduleName(state, state.dataHeatBal->Mixing(Loop).SchedPtr),
                   state.dataHeatBal->Zone(ZoneNum).Name,
                   state.dataHeatBal->Zone(ZoneNum).FloorArea,
                   state.dataHeatBal->Zone(ZoneNum).TotOccupants);
-            print(state.files.eio, "{:.3R},", Mixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, Mixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, Mixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+            print(state.files.eio, "{:.3R},", state.dataHeatBal->Mixing(Loop).DesignLevel);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, state.dataHeatBal->Mixing(Loop).DesignLevel);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, state.dataHeatBal->Mixing(Loop).DesignLevel);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume, state.dataHeatBal->Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
-            print(state.files.eio, "{},", state.dataHeatBal->Zone(Mixing(Loop).FromZone).Name);
-            print(state.files.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
+            print(state.files.eio, "{},", state.dataHeatBal->Zone(state.dataHeatBal->Mixing(Loop).FromZone).Name);
+            print(state.files.eio, "{:.2R}\n", state.dataHeatBal->Mixing(Loop).DeltaTemperature);
         }
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
@@ -3797,29 +3794,29 @@ namespace HeatBalanceAirManager {
                       "Changes per Hour,From/Source Zone,Delta Temperature {C}");
             }
 
-            ZoneNum = CrossMixing(Loop).ZonePtr;
+            ZoneNum = state.dataHeatBal->CrossMixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                print(state.files.eio, Format_722, "CrossMixing-Illegal Zone specified", CrossMixing(Loop).Name);
+                print(state.files.eio, Format_722, "CrossMixing-Illegal Zone specified", state.dataHeatBal->CrossMixing(Loop).Name);
                 continue;
             }
-            TotMixingFlow(ZoneNum) += CrossMixing(Loop).DesignLevel;
+            TotMixingFlow(ZoneNum) += state.dataHeatBal->CrossMixing(Loop).DesignLevel;
             print(state.files.eio,
                   Format_720,
                   "CrossMixing",
-                  CrossMixing(Loop).Name,
-                  GetScheduleName(state, CrossMixing(Loop).SchedPtr),
+                  state.dataHeatBal->CrossMixing(Loop).Name,
+                  GetScheduleName(state, state.dataHeatBal->CrossMixing(Loop).SchedPtr),
                   state.dataHeatBal->Zone(ZoneNum).Name,
                   state.dataHeatBal->Zone(ZoneNum).FloorArea,
                   state.dataHeatBal->Zone(ZoneNum).TotOccupants);
 
-            print(state.files.eio,"{:.3R},",CrossMixing(Loop).DesignLevel);
+            print(state.files.eio,"{:.3R},",state.dataHeatBal->CrossMixing(Loop).DesignLevel);
 
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, CrossMixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, CrossMixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).FloorArea, state.dataHeatBal->CrossMixing(Loop).DesignLevel);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).TotOccupants, state.dataHeatBal->CrossMixing(Loop).DesignLevel);
+            divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume, state.dataHeatBal->CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
-            print(state.files.eio, "{},", state.dataHeatBal->Zone(CrossMixing(Loop).FromZone).Name);
-            print(state.files.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
+            print(state.files.eio, "{},", state.dataHeatBal->Zone(state.dataHeatBal->CrossMixing(Loop).FromZone).Name);
+            print(state.files.eio, "{:.2R}\n", state.dataHeatBal->CrossMixing(Loop).DeltaTemperature);
         }
 
         if (state.dataHeatBal->TotRefDoorMixing > 0) {
@@ -3828,21 +3825,21 @@ namespace HeatBalanceAirManager {
                 "RefrigerationDoorMixing ",
                 "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type");
             for (ZoneNumA = 1; ZoneNumA <= (state.dataGlobal->NumOfZones - 1); ++ZoneNumA) {
-                if (!RefDoorMixing(ZoneNumA).RefDoorMixFlag) continue;
-                for (ConnectionNumber = 1; ConnectionNumber <= RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
-                    ZoneNumB = RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
+                if (!state.dataHeatBal->RefDoorMixing(ZoneNumA).RefDoorMixFlag) continue;
+                for (ConnectionNumber = 1; ConnectionNumber <= state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
+                    ZoneNumB = state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
                     // TotMixingFlow(ZoneNum)=TotMixingFlow(ZoneNum)+RefDoorMixing(Loop)%!DesignLevel
                     static constexpr auto Format_723(" {} Airflow Stats Nominal, {},{},{},{},{:.3R},{:.3R},{}\n");
                     print(state.files.eio,
                           Format_723,
                           "RefrigerationDoorMixing",
-                          RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber),
+                          state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber),
                           state.dataHeatBal->Zone(ZoneNumA).Name,
                           state.dataHeatBal->Zone(ZoneNumB).Name,
-                          GetScheduleName(state, RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber)),
-                          RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber),
-                          RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber),
-                          RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber));
+                          GetScheduleName(state, state.dataHeatBal->RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber)),
+                          state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber),
+                          state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorArea(ConnectionNumber),
+                          state.dataHeatBal->RefDoorMixing(ZoneNumA).DoorProtTypeName(ConnectionNumber));
                 } // ConnectionNumber
             }     // ZoneNumA
         }         //(TotRefDoorMixing .GT. 0)
@@ -4226,10 +4223,10 @@ namespace HeatBalanceAirManager {
             if (SELECT_CASE_var == UseSimpleAirFlow) { // Simplified airflow calculation
                 // Process the scheduled Mixing for air heat balance
                 for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                    NZ = Mixing(Loop).ZonePtr;
-                    Mixing(Loop).DesiredAirFlowRate = Mixing(Loop).DesignLevel * GetCurrentScheduleValue(state, Mixing(Loop).SchedPtr);
-                    if (Mixing(Loop).EMSSimpleMixingOn) Mixing(Loop).DesiredAirFlowRate = Mixing(Loop).EMSimpleMixingFlowRate;
-                    Mixing(Loop).DesiredAirFlowRateSaved = Mixing(Loop).DesiredAirFlowRate;
+                    NZ = state.dataHeatBal->Mixing(Loop).ZonePtr;
+                    state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate = state.dataHeatBal->Mixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(Loop).SchedPtr);
+                    if (state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn) state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate = state.dataHeatBal->Mixing(Loop).EMSimpleMixingFlowRate;
+                    state.dataHeatBal->Mixing(Loop).DesiredAirFlowRateSaved = state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate;
                 }
 
                 // if zone air mass flow balance enforced calculate the fraction of
@@ -4239,11 +4236,11 @@ namespace HeatBalanceAirManager {
                         ZoneMixingFlowSum = 0.0;
                         NumOfMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
                         for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
-                            ZoneMixingFlowSum = ZoneMixingFlowSum + Mixing(Loop).DesignLevel;
+                            ZoneMixingFlowSum = ZoneMixingFlowSum + state.dataHeatBal->Mixing(Loop).DesignLevel;
                         }
                         if (ZoneMixingFlowSum > 0.0) {
                             for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
-                                MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) = Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
+                                MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) = state.dataHeatBal->Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
                             }
                         }
                     }
@@ -4251,9 +4248,9 @@ namespace HeatBalanceAirManager {
 
                 // Process the scheduled CrossMixing for air heat balance
                 for (Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
-                    NZ = CrossMixing(Loop).ZonePtr;
-                    CrossMixing(Loop).DesiredAirFlowRate = CrossMixing(Loop).DesignLevel * GetCurrentScheduleValue(state, CrossMixing(Loop).SchedPtr);
-                    if (CrossMixing(Loop).EMSSimpleMixingOn) CrossMixing(Loop).DesiredAirFlowRate = CrossMixing(Loop).EMSimpleMixingFlowRate;
+                    NZ = state.dataHeatBal->CrossMixing(Loop).ZonePtr;
+                    state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate = state.dataHeatBal->CrossMixing(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(Loop).SchedPtr);
+                    if (state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn) state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate = state.dataHeatBal->CrossMixing(Loop).EMSimpleMixingFlowRate;
                 }
 
                 // Note - do each Pair a Single time, so must do increment reports for both zones
@@ -4264,12 +4261,12 @@ namespace HeatBalanceAirManager {
                 if (state.dataHeatBal->TotRefDoorMixing > 0) {
                     for (NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
                          ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
-                        if (!RefDoorMixing(NZ).RefDoorMixFlag) continue;
-                        if (RefDoorMixing(NZ).ZonePtr == NZ) {
-                            for (J = 1; J <= RefDoorMixing(NZ).NumRefDoorConnections; ++J) {
-                                RefDoorMixing(NZ).VolRefDoorFlowRate(J) = 0.0;
-                                if (RefDoorMixing(NZ).EMSRefDoorMixingOn(J))
-                                    RefDoorMixing(NZ).VolRefDoorFlowRate(J) = RefDoorMixing(NZ).EMSRefDoorFlowRate(J);
+                        if (!state.dataHeatBal->RefDoorMixing(NZ).RefDoorMixFlag) continue;
+                        if (state.dataHeatBal->RefDoorMixing(NZ).ZonePtr == NZ) {
+                            for (J = 1; J <= state.dataHeatBal->RefDoorMixing(NZ).NumRefDoorConnections; ++J) {
+                                state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = 0.0;
+                                if (state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorMixingOn(J))
+                                    state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorFlowRate(J);
                             }
                         }
                     }
@@ -4375,10 +4372,10 @@ namespace HeatBalanceAirManager {
             // The mean air temperature is actually ZTAV which is the average
             // temperature of the air temperatures at the system time step for the
             // entire zone time step.
-            ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
-            ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
-            ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
-            ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period
@@ -4393,13 +4390,11 @@ namespace HeatBalanceAirManager {
                         } else {
                             thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
-                        ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
+                        state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
                     }
                 }
             }
         }
     }
-
-} // namespace HeatBalanceAirManager
 
 } // namespace EnergyPlus

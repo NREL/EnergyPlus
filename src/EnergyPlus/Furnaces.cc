@@ -828,7 +828,7 @@ namespace Furnaces {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-                using DataLoopNode::NodeID;
+        using DataLoopNode::NodeID;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetWtoAHPSimpleCoilCapacity(WaterToAirHeatPumpSimple::GetCoilCapacity);
         auto &GetWtoAHPSimpleCoilInletNode(WaterToAirHeatPumpSimple::GetCoilInletNode);
@@ -4791,7 +4791,7 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-                using DataHeatBalFanSys::TempControlType;
+        using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;

@@ -778,7 +778,7 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-                using DataSurfaces::Surface;
+        using DataSurfaces::Surface;
 
         int GetPVZone(0);
 
@@ -891,7 +891,7 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-                using DataHeatBalFanSys::QPVSysSource;
+        using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
 
@@ -1247,7 +1247,7 @@ namespace Photovoltaics {
 
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
-                using DataHeatBalSurface::SurfTempOut;
+        using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         Real64 const EPS(0.001);

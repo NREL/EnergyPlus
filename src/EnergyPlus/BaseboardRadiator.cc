@@ -643,7 +643,7 @@ namespace BaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;

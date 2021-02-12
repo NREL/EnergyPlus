@@ -925,7 +925,7 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::HeatingAirflowSizing;
+        using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
 
         using PlantUtilities::MyPlantSizingIndex;

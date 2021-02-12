@@ -233,7 +233,7 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-                using DataPhotovoltaics::iSimplePVModel;
+        using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
         using HeatingCoils::HeatingCoil;

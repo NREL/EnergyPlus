@@ -1355,7 +1355,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using ScheduleManager::GetScheduleIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
-                using DataSizing::AutoSize;
+        using DataSizing::AutoSize;
         using DataSizing::ZoneHVACSizing;
         using DXCoils::GetCoilCondenserInletNode;
         using DXCoils::GetCoilTypeNum;
@@ -7137,7 +7137,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using namespace DataSizing;
         using CurveManager::CurveValue;
         auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
-                using DataHVACGlobals::CoolingAirflowSizing;
+        using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;

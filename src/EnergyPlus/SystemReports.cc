@@ -4041,7 +4041,6 @@ namespace EnergyPlus::SystemReports {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataZoneEnergyDemands;
         using namespace DataGlobalConstants;
-        using DataHeatBalance::ZnAirRpt;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using FanCoilUnits::GetFanCoilMixedAirNode;
@@ -4466,14 +4465,14 @@ namespace EnergyPlus::SystemReports {
                     state.dataHeatBal->ZonePreDefRep(ActualZoneNum).MechVentVolMin = state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys;
                 }
                 // infiltration
-                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotal += ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
-                if (ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin) {
-                    state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin = ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolTotal += state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
+                if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin) {
+                    state.dataHeatBal->ZonePreDefRep(ActualZoneNum).InfilVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).InfilVolumeCurDensity;
                 }
                 //'simple' mechanical ventilation
-                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotal += ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
-                if (ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
-                    state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin = ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+                state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolTotal += state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
+                if (state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity < state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin) {
+                    state.dataHeatBal->ZonePreDefRep(ActualZoneNum).SimpVentVolMin = state.dataHeatBal->ZnAirRpt(ActualZoneNum).VentilVolumeCurDensity;
                 }
             }
 
@@ -4751,7 +4750,7 @@ namespace EnergyPlus::SystemReports {
         // na
 
         // Using/Aliasing
-                using DataHVACGlobals::NumPrimaryAirSys;
+        using DataHVACGlobals::NumPrimaryAirSys;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

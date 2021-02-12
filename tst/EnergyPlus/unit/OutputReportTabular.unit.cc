@@ -8318,7 +8318,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
 
     DataHeatBalance::ZnRpt.allocate(1);
-    DataHeatBalance::ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
 
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
     state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);

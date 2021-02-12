@@ -4703,7 +4703,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::CoolingCapacitySizing;
+        using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataZoneEquipment::PkgTermACAirToAir_Num;

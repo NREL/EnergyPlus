@@ -1862,7 +1862,7 @@ namespace ZoneTempPredictorCorrector {
                         // CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
                         SetupOutputVariable(state, "Zone Thermostat Operative Temperature",
                                             OutputProcessor::Unit::C,
-                                            ZnAirRpt(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
+                                            state.dataHeatBal->ZnAirRpt(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
                                             "Zone",
                                             "Average",
                                             state.dataHeatBal->Zone(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
@@ -1962,7 +1962,7 @@ namespace ZoneTempPredictorCorrector {
                         // CurrentModuleObject='ZoneControl:Thermostat:OperativeTemperature'
                         SetupOutputVariable(state, "Zone Thermostat Operative Temperature",
                                             OutputProcessor::Unit::C,
-                                            ZnAirRpt(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
+                                            state.dataHeatBal->ZnAirRpt(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
                                             "Zone",
                                             "Average",
                                             state.dataHeatBal->Zone(state.dataZoneCtrls->TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
@@ -5096,16 +5096,16 @@ namespace ZoneTempPredictorCorrector {
                                       ZoneNum,
                                       TempDepCoef,
                                       TempIndCoef,
-                                      ZnAirRpt(ZoneNum).SumIntGains,
-                                      ZnAirRpt(ZoneNum).SumHADTsurfs,
-                                      ZnAirRpt(ZoneNum).SumMCpDTzones,
-                                      ZnAirRpt(ZoneNum).SumMCpDtInfil,
-                                      ZnAirRpt(ZoneNum).SumMCpDTsystem,
-                                      ZnAirRpt(ZoneNum).SumNonAirSystem,
-                                      ZnAirRpt(ZoneNum).CzdTdt,
-                                      ZnAirRpt(ZoneNum).imBalance,
-                                      ZnAirRpt(ZoneNum).SumEnthalpyM,
-                                      ZnAirRpt(ZoneNum).SumEnthalpyH);
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumIntGains,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumHADTsurfs,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumMCpDTzones,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumMCpDtInfil,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumMCpDTsystem,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumNonAirSystem,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).CzdTdt,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).imBalance,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM,
+                                      state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH);
 
         } // ZoneNum
     }
@@ -6634,8 +6634,8 @@ namespace ZoneTempPredictorCorrector {
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
             if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
-                ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
-                ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
+                state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
             }
         } // SurfNum
 

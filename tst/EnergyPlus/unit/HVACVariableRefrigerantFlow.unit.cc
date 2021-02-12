@@ -185,7 +185,7 @@ protected:
 
         state->dataDXCoils->CheckEquipName.allocate(10);
         state->dataDXCoils->DXCoilNumericFields.allocate(10);
-        DataHeatBalance::HeatReclaimDXCoil.allocate(10);
+        state->dataHeatBal->HeatReclaimDXCoil.allocate(10);
         state->dataDXCoils->NumDXCoils = 10;
         state->dataMixedAir->OAMixer.allocate(5);
         DataSizing::NumSysSizInput = 1;

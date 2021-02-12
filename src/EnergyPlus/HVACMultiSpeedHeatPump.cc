@@ -540,7 +540,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-                using DataHVACGlobals::FanType_SimpleConstVolume;
+        using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::AutoSize;
         using Fans::GetFanIndex;

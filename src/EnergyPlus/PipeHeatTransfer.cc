@@ -197,7 +197,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // Using/Aliasing
         using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-                using namespace DataIPShortCuts; // Data for field names, blank numerics
+        using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
 
         using NodeInputManager::GetOnlySingleNode;

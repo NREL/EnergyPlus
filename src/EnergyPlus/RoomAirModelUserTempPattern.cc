@@ -670,7 +670,7 @@ namespace RoomAirModelUserTempPattern {
         // non dimensionalize surface's centroid's Z value
 
         // Using/Aliasing
-                using DataSurfaces::Surface;
+        using DataSurfaces::Surface;
         using DataVectorTypes::Vector;
 
         // Return value
@@ -793,8 +793,7 @@ namespace RoomAirModelUserTempPattern {
         // sets values in Heat balance variables
 
         // Using/Aliasing
-        using DataHeatBalance::RefrigCaseCredit;
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -940,14 +939,14 @@ namespace RoomAirModelUserTempPattern {
                 } else {
                     // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
                     Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
-                    RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
+                    state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
                     ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
                 Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
-                RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
+                state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                 ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;

@@ -378,7 +378,7 @@ namespace WindowManager {
         }
         if (material.Group == WindowBlind) {
             auto blNum = SurfWinBlindNumber(m_SurfNum);
-            auto blind = Blind(blNum);
+            auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
             conductivity = blind.SlatConductivity;
             Atop = blind.BlindTopOpeningMult;
@@ -430,7 +430,7 @@ namespace WindowManager {
         }
         if (material.Group == ComplexWindowShade) {
             auto shdPtr = material.ComplexShadePtr;
-            auto &shade(ComplexShade(shdPtr));
+            auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;
             conductivity = shade.Conductivity;
             emissFront = shade.FrontEmissivity;
@@ -500,7 +500,7 @@ namespace WindowManager {
         auto thickness = 0.0;
 
         if (SurfWinShadingFlag(m_SurfNum) == IntBlindOn || SurfWinShadingFlag(m_SurfNum) == ExtBlindOn) {
-            thickness = Blind(SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
+            thickness = state.dataHeatBal->Blind(SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
         if (SurfWinShadingFlag(m_SurfNum) == IntShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
             auto material = getLayerMaterial(state, t_Index);

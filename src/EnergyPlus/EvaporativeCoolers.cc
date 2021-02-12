@@ -4213,7 +4213,7 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::CoolingCapacitySizing;
+        using DataHVACGlobals::CoolingCapacitySizing;
         using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CurZoneEqNum;

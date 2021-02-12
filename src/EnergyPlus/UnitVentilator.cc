@@ -1554,7 +1554,7 @@ namespace UnitVentilator {
         // Obtains flow rates from the zone sizing arrays and plant sizing data.
 
         using namespace DataSizing;
-                using DataHVACGlobals::CoolingAirflowSizing;
+        using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;

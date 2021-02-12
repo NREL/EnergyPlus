@@ -283,8 +283,8 @@ namespace InternalHeatGains {
 
         state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         ZnRpt.allocate(state.dataGlobal->NumOfZones);
-        ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
-        RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->RefrigCaseCredit.allocate(state.dataGlobal->NumOfZones);
 
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
@@ -5343,7 +5343,7 @@ namespace InternalHeatGains {
             e.QSELost = 0.0;
         }
 
-        ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
+        state.dataHeatBal->ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
         for (auto &e : ZnRpt) {
             e.LtsPower = 0.0;
@@ -5734,7 +5734,7 @@ namespace InternalHeatGains {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
-                using DataHVACGlobals::SmallAirVolFlow;
+        using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
         using DataLoopNode::Node;
 

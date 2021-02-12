@@ -273,7 +273,7 @@ namespace HighTempRadiantSystem {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-                using DataSizing::AutoSize;
+        using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
@@ -780,7 +780,7 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::HeatingCapacitySizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1304,7 +1304,7 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MaxRadHeatFlux;
+        using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHTRadSysSurf;
         using DataHeatBalFanSys::QHTRadSysToPerson;
         using DataHeatBalFanSys::SumConvHTRadSys;

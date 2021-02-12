@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
-    ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -589,7 +589,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataRoomAirMod->IsZoneCV.deallocate();
     state->dataRoomAirMod->IsZoneUI.deallocate();
     state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
-    ZnAirRpt.deallocate();
+    state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
     ZoneEqSizing.deallocate();
@@ -676,7 +676,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
-    ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEqSizing.allocate(1);
@@ -917,7 +917,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->IsZoneCV.deallocate();
     state->dataRoomAirMod->IsZoneUI.deallocate();
     state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
-    ZnAirRpt.deallocate();
+    state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     ZoneEqSizing.deallocate();
     MixingMassFlowZone.deallocate();

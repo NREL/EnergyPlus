@@ -237,7 +237,7 @@ namespace VentilatedSlab {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         auto &GetSteamCoilMaxFlowRate(SteamCoils::GetCoilMaxWaterFlowRate);
         auto &GetHXAssistedCoilFlowRate(HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate);
-                using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
+        using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
         using namespace DataSurfaceLists;
@@ -1639,7 +1639,7 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::CoolingCapacitySizing;
+        using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
@@ -3390,7 +3390,7 @@ namespace VentilatedSlab {
         // simulation.  Other than that, the subroutine is very straightforward.
 
         // Using/Aliasing
-                using DataHeatBalFanSys::CTFTsrcConstPart;
+        using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
@@ -4161,7 +4161,7 @@ namespace VentilatedSlab {
         // values to the running average.
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -4495,7 +4495,7 @@ namespace VentilatedSlab {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-                using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         // unused-12/12/08  USE FluidProperties, ONLY : GetSpecificHeatGlycol

@@ -122,7 +122,7 @@ protected:
         MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
         SurfaceWindow.allocate(1);
-        RefrigCaseCredit.allocate(1);
+        state->dataHeatBal->RefrigCaseCredit.allocate(1);
         ZoneLatentGain.allocate(1);
 
         TempControlType.allocate(1);

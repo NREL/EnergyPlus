@@ -240,7 +240,7 @@ namespace OutdoorAirUnit {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
-                using FluidProperties::FindRefrigerant;
+        using FluidProperties::FindRefrigerant;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
         using SteamCoils::GetCoilAirOutletNode;
@@ -2592,7 +2592,7 @@ namespace OutdoorAirUnit {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-                using DataHVACGlobals::TimeStepSys;
+        using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);

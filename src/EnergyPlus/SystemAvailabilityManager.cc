@@ -4475,7 +4475,6 @@ namespace SystemAvailabilityManager {
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
-        using DataHeatBalance::Mixing;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -4821,14 +4820,14 @@ namespace SystemAvailabilityManager {
                         }
                         // Setup flag for Mixing objects
                         for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
-                            if (Mixing(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                            if (state.dataHeatBal->Mixing(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
+                                state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    Mixing(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        Mixing(i).HybridControlType = HybridControlTypeGlobal;
-                                        Mixing(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
+                                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Mixing(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
                                 }
                             }
@@ -4855,14 +4854,14 @@ namespace SystemAvailabilityManager {
             }
             // Setup flag for Mixing objects
             for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
-                if (Mixing(i).ZonePtr == state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                if (state.dataHeatBal->Mixing(i).ZonePtr == state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
+                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        Mixing(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
                     } else {
                         if (SimpleControlType == 1) {
-                            Mixing(i).HybridControlType = HybridControlTypeGlobal;
-                            Mixing(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
+                            state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Mixing(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }
                     }
                 }

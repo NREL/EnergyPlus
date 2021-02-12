@@ -896,7 +896,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataSizing::ZoneEqSizing;
         using DataSizing::ZoneSizingRunDone;
 
-                using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::MyPlantSizingIndex;
@@ -1446,7 +1446,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // This subroutine sets the control temperature for the simple cooling panel.
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
 
         {
             auto const SELECT_CASE_var(this->ControlType);
@@ -1687,7 +1687,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-                using DataHeatBalSurface::TempSurfInTmp;
+        using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;

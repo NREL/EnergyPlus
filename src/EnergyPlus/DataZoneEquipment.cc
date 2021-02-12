@@ -108,7 +108,7 @@ namespace EnergyPlus::DataZoneEquipment {
         // a zone
 
         // Using/Aliasing
-                using NodeInputManager::CheckUniqueNodes;
+        using NodeInputManager::CheckUniqueNodes;
         using NodeInputManager::EndUniqueNodeCheck;
         using NodeInputManager::GetNodeNums;
         using NodeInputManager::GetOnlySingleNode;

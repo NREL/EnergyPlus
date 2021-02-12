@@ -3675,17 +3675,17 @@ namespace EnergyPlus::DaylightingManager {
 
                         TransBmBmMult = 0.0;
                         if (ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind) {
-                            ProfileAngle(IWin, RAYCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                            ProfileAngle(IWin, RAYCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
                             // Contribution of beam passing through slats and reaching reference point
                             for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                 // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                 if (SurfWinMovableSlats(IWin)) {
                                     SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                                 } else {
-                                    SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                    SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                 }
                                 TransBmBmMult(JB) = BlindBeamBeamTrans(
-                                    ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                    ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
                                 // do this only once for fixed slat blinds
@@ -3696,7 +3696,7 @@ namespace EnergyPlus::DaylightingManager {
                             //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                             //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
                             CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                            TransBmBmMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                            TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                             state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                         }
 
@@ -3842,7 +3842,7 @@ namespace EnergyPlus::DaylightingManager {
 
                                 TransBmBmMultRefl = 0.0;
                                 if (ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind) {
-                                    ProfileAngle(IWin, SunVecMir, Blind(BlNum).SlatOrientation, ProfAng);
+                                    ProfileAngle(IWin, SunVecMir, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
                                     // Contribution of reflected beam passing through slats and reaching reference point
                                     Real64 const Pi_SlatAng_fac(DataGlobalConstants::Pi / (MaxSlatAngs - 1));
                                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
@@ -3850,10 +3850,10 @@ namespace EnergyPlus::DaylightingManager {
                                         if (SurfWinMovableSlats(IWin)) {
                                             SlatAng = double(JB - 1) * Pi_SlatAng_fac;
                                         } else {
-                                            SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                            SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                         }
                                         TransBmBmMultRefl(JB) = BlindBeamBeamTrans(
-                                            ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                            ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                         state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
                                         if (!SurfWinMovableSlats(IWin)) break;
@@ -3863,7 +3863,7 @@ namespace EnergyPlus::DaylightingManager {
                                     //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                     //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
                                     CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                                    TransBmBmMultRefl(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                                    TransBmBmMultRefl(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                                     state.dataDaylightingManager->EDIRSUdisk(iHour, 2) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
                                 } // End of check if window has a blind or screen
 
@@ -8002,34 +8002,34 @@ namespace EnergyPlus::DaylightingManager {
                     } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
                         CalcScreenTransmittance(state, IWin, (PH - SurfWinPhi(IWin)), (TH - SurfWinTheta(IWin)));
                         ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                        ReflScDiffDiffBack = SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
-                        TransScBmDiffFront = SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;
+                        ReflScDiffDiffBack = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
+                        TransScBmDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;
                         TransMult(1) = TransScBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
                                        (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * SurfWinLightWellEff(IWin);
-                        TransBmBmMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis;
+                        TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis;
 
                     } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                         // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
 
-                        ProfileAngle(IWin, U, Blind(BlNum).SlatOrientation, ProfAng);
+                        ProfileAngle(IWin, U, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                             if (!SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                            TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                             if (ShType == WSC_ST_InteriorBlind) { // Interior blind
                                 ReflGlDiffDiffBack = state.dataConstruction->Construct(IConst).ReflectVisDiffBack;
-                                ReflBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                                 TransMult(JB) = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                    (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                                ReflBlDiffDiffBack = Blind(BlNum).VisBackDiffDiffRefl(JB);
+                                ReflBlDiffDiffBack = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB);
                                 TransMult(JB) = TransBlBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
                                                 (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * SurfWinLightWellEff(IWin);
 
@@ -8038,10 +8038,10 @@ namespace EnergyPlus::DaylightingManager {
                                 td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                                 rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
                                 rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
-                                tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                                tfshd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                                rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                                rbshd = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                                tfshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                rbshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
@@ -8058,11 +8058,11 @@ namespace EnergyPlus::DaylightingManager {
                             if (SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
-                                SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                             }
                             TransBmBmMult(JB) =
                                 TVISBR *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // End of loop over slat angles
 
                     } else { // Diffusing glass
@@ -8197,7 +8197,7 @@ namespace EnergyPlus::DaylightingManager {
                     TransMult = 0.0;
 
                     // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
-                    if (BlindOn) ProfileAngle(IWin, SUNCOSHR(IHR, {1, 3}), Blind(BlNum).SlatOrientation, ProfAng);
+                    if (BlindOn) ProfileAngle(IWin, SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                         if (!SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8208,7 +8208,7 @@ namespace EnergyPlus::DaylightingManager {
                                 TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
                             } else {
                                 if (ScreenOn) {
-                                    TransMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *
+                                    TransMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *
                                                    SurfWinLightWellEff(IWin);
                                 } else {
                                     TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
@@ -8221,16 +8221,16 @@ namespace EnergyPlus::DaylightingManager {
                             // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                             // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
-                            TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                             if (ShType == WSC_ST_InteriorBlind) { // Interior blind
                                 // TH CR 8121, 7/7/2010
                                 // ReflBlBmDiffFront = InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                                ReflBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
 
                                 // TH added 7/12/2010 for CR 8121
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
 
                                 TransMult(JB) = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                      (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -8238,13 +8238,13 @@ namespace EnergyPlus::DaylightingManager {
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlBmDiffFront *
-                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
-                                tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                                rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                                rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
@@ -8257,11 +8257,11 @@ namespace EnergyPlus::DaylightingManager {
                             if (SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
-                                SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                             }
                             TransBmBmMult(JB) =
                                 TVISBSun *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                         if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
@@ -8318,15 +8318,15 @@ namespace EnergyPlus::DaylightingManager {
                             TransMult(1) = state.dataConstruction->Construct(IConstShaded).TransDiffVis * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                         } else if (ScreenOn) { // Exterior screen on
-                            TransScDiffDiffFront = SurfaceScreens(SurfWinScreenNumber(IWin)).DifDifTransVis;
+                            TransScDiffDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifDifTransVis;
                             TransMult(1) = TransScDiffDiffFront *
                                            (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
                                            SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                         } else { // Blind on
-                            TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                            TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                             if (ShType == WSC_ST_InteriorBlind) { // Interior blind
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 TransMult(JB) =
                                     TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                               (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -8334,13 +8334,13 @@ namespace EnergyPlus::DaylightingManager {
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlDiffDiffFront *
-                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = state.dataConstruction->Construct(IConst).tBareVisDiff(1);
-                                tfshBd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                                rfshB = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                tfshBd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                rfshB = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);

@@ -240,7 +240,7 @@ namespace EnergyPlus::Pumps {
         using DataHeatBalance::IntGainTypeOf_Pump_VarSpeed;
         using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
         using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
-                using DataIPShortCuts::cAlphaArgs;
+        using DataIPShortCuts::cAlphaArgs;
         using DataIPShortCuts::cAlphaFieldNames;
         using DataIPShortCuts::cCurrentModuleObject;
         using DataIPShortCuts::cNumericFieldNames;

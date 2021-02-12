@@ -184,7 +184,7 @@ namespace MundtSimMgr {
         //     initialize Mundt-model variables
 
         // Using/Aliasing
-                using DataRoomAirModel::FloorAirNode;
+        using DataRoomAirModel::FloorAirNode;
         using DataRoomAirModel::MundtRoomAirNode;
         using DataSurfaces::Surface;
 
@@ -367,7 +367,7 @@ namespace MundtSimMgr {
         // na
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPI;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SumConvHTRadSys;
@@ -757,7 +757,7 @@ namespace MundtSimMgr {
         //     map data from air domain back to surface domain for each particular zone
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZT;

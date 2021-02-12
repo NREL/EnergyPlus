@@ -5163,7 +5163,7 @@ namespace EnergyPlus::SimAirServingZones {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace OutputReportPredefined;
-                using namespace DataSizing;
+        using namespace DataSizing;
 
         // Locals
         int numOfTimeStepInDay; // number of zone time steps in a day

@@ -261,7 +261,7 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-                using DataHeatBalFanSys::NonAirSystemResponse;
+        using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SumLatentHTRadSys;
         using DataHeatBalFanSys::SysDepZoneLoadsLagged;
         using DataHeatBalFanSys::ZoneLatentGain;
@@ -760,7 +760,7 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-                using DataHeatBalFanSys::TempTstatAir;
+        using DataHeatBalFanSys::TempTstatAir;
         using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -840,7 +840,7 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // USE STATEMENTS:
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;

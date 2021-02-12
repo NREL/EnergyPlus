@@ -199,7 +199,7 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
-                using DataSizing::AutoSize;
+        using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;

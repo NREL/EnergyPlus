@@ -16183,8 +16183,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     DataLoopNode::NodeID(20) = "East Zone Air Node";
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
-    DataHeatBalance::RefrigCaseCredit.allocate(1);
-    DataHeatBalance::RefrigCaseCredit(1).SenCaseCreditToZone = 0;
+    state->dataHeatBal->RefrigCaseCredit.allocate(1);
+    state->dataHeatBal->RefrigCaseCredit(1).SenCaseCreditToZone = 0;
     DataLoopNode::Node.allocate(20);
     DataLoopNode::Node(20).Temp = 24.0;         // 24C db
     DataLoopNode::Node(20).HumRat = 0.00922;    // 17C wb

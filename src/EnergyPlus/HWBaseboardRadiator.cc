@@ -950,7 +950,7 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -1585,7 +1585,7 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-                using DataHeatBalFanSys::MaxRadHeatFlux;
+        using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHWBaseboardSurf;
         using DataHeatBalFanSys::QHWBaseboardToPerson;
         using DataSurfaces::Surface;

@@ -249,7 +249,7 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-                using DataSurfaces::Surface;
+        using DataSurfaces::Surface;
         using DataZoneEquipment::EquipConfiguration;
 
         using RoomAirModelUserTempPattern::FigureNDheightInZone;
@@ -595,7 +595,7 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-                using DataSurfaces::Surface;
+        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -898,7 +898,7 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-                using namespace ScheduleManager;
+        using namespace ScheduleManager;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;
@@ -1132,7 +1132,7 @@ namespace RoomAirModelManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-                using namespace ScheduleManager;
+        using namespace ScheduleManager;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;
@@ -1315,7 +1315,7 @@ namespace RoomAirModelManager {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using DataHeatBalance::NumZoneIntGainDeviceTypes;
-                using DataHeatBalance::ZoneIntGainDeviceTypes;
+        using DataHeatBalance::ZoneIntGainDeviceTypes;
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using DataSurfaces::Surface;
@@ -1802,7 +1802,7 @@ namespace RoomAirModelManager {
         using namespace DataEnvironment;
         using namespace DataHeatBalFanSys;
         using namespace DataSurfaces;
-                using Psychrometrics::PsyRhoAirFnPbTdbW;
+        using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

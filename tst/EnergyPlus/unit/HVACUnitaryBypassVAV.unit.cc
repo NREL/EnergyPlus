@@ -228,7 +228,7 @@ protected:
         state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
         state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
         state->dataDXCoils->DXCoilFanOpMode.allocate(1);
-        DataHeatBalance::HeatReclaimDXCoil.allocate(1);
+        state->dataHeatBal->HeatReclaimDXCoil.allocate(1);
 
         cbvav.DXCoolCoilName = "MyDXCoolCoil";
         state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;

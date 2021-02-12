@@ -224,7 +224,7 @@ namespace EnergyPlus::ZonePlenum {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-                using DataZoneEquipment::EquipConfiguration;
+        using DataZoneEquipment::EquipConfiguration;
         using NodeInputManager::CheckUniqueNodes;
         using NodeInputManager::EndUniqueNodeCheck;
         using NodeInputManager::GetNodeNums;

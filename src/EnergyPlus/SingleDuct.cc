@@ -2356,7 +2356,7 @@ namespace EnergyPlus::SingleDuct {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-                using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using General::SafeDivide;

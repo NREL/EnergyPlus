@@ -1820,22 +1820,6 @@ namespace DataHeatBalance {
     };
 
     // Object Data
-    extern Array1D<MixingData> Mixing;
-    extern Array1D<MixingData> CrossMixing;
-    extern Array1D<MixingData> RefDoorMixing;
-    extern Array1D<WindowBlindProperties> Blind;
-    extern Array1D<WindowComplexShade> ComplexShade;
-    extern Array1D<WindowThermalModelParams> WindowThermalModel;
-    extern Array1D<SurfaceScreenProperties> SurfaceScreens;
-    extern Array1D<ScreenTransData> ScreenTrans;
-    extern Array1D<ZoneCatEUseData> ZoneIntEEuse;
-    extern Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    extern Array1D<HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
-    extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    extern Array1D<HeatReclaimDataBase> HeatReclaimDXCoil;
-    extern Array1D<HeatReclaimDataBase> HeatReclaimVS_DXCoil;
-    extern Array1D<HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
-    extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;
     extern Array1D<GlobalInternalGainMiscObject> PeopleObjects;
@@ -2164,6 +2148,22 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<DataHeatBalance::InfiltrationData> Infiltration;
     Array1D<DataHeatBalance::VentilationData> Ventilation;
     Array1D<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
+    Array1D<DataHeatBalance::MixingData> Mixing;
+    Array1D<DataHeatBalance::MixingData> CrossMixing;
+    Array1D<DataHeatBalance::MixingData> RefDoorMixing;
+    Array1D<DataHeatBalance::WindowBlindProperties> Blind;
+    Array1D<DataHeatBalance::WindowComplexShade> ComplexShade;
+    Array1D<DataHeatBalance::WindowThermalModelParams> WindowThermalModel;
+    Array1D<DataHeatBalance::SurfaceScreenProperties> SurfaceScreens;
+    Array1D<DataHeatBalance::ScreenTransData> ScreenTrans;
+    Array1D<DataHeatBalance::ZoneCatEUseData> ZoneIntEEuse;
+    Array1D<DataHeatBalance::RefrigCaseCreditData> RefrigCaseCredit;
+    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
+    Array1D<DataHeatBalance::HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
+    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimDXCoil;
+    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
+    Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
+    Array1D<DataHeatBalance::AirReportVars> ZnAirRpt;
 
     void clear_state() override
     {
@@ -2402,6 +2402,22 @@ struct HeatBalanceData : BaseGlobalStruct
         this->Infiltration.deallocate();
         this->Ventilation.deallocate();
         this->ZoneAirBalance.deallocate();
+        this->Mixing.deallocate();
+        this->CrossMixing.deallocate();
+        this->RefDoorMixing.deallocate();
+        this->Blind.deallocate();
+        this->ComplexShade.deallocate();
+        this->WindowThermalModel.deallocate();
+        this->SurfaceScreens.deallocate();
+        this->ScreenTrans.deallocate();
+        this->ZoneIntEEuse.deallocate();
+        this->RefrigCaseCredit.deallocate();
+        this->HeatReclaimRefrigeratedRack.deallocate();
+        this->HeatReclaimRefrigCondenser.deallocate();
+        this->HeatReclaimDXCoil.deallocate();
+        this->HeatReclaimVS_DXCoil.deallocate();
+        this->HeatReclaimSimple_WAHPCoil.deallocate();
+        this->ZnAirRpt.deallocate();
     }
 };
 

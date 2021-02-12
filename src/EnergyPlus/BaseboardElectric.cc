@@ -448,7 +448,7 @@ namespace BaseboardElectric {
 
         // Using/Aliasing
         using namespace DataSizing;
-                using DataHVACGlobals::HeatingCapacitySizing;
+        using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");

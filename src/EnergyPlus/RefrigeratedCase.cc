@@ -440,7 +440,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
         if (state.dataRefrigCase->NumRefrigeratedRacks > 0) {
             RefrigRack.allocate(state.dataRefrigCase->NumRefrigeratedRacks);
-            DataHeatBalance::HeatReclaimRefrigeratedRack.allocate(state.dataRefrigCase->NumRefrigeratedRacks);
+            state.dataHeatBal->HeatReclaimRefrigeratedRack.allocate(state.dataRefrigCase->NumRefrigeratedRacks);
         }
         if (state.dataRefrigCase->NumRefrigSystems > 0) {
             System.allocate(state.dataRefrigCase->NumRefrigSystems);
@@ -455,7 +455,7 @@ namespace EnergyPlus::RefrigeratedCase {
         }
         if (state.dataRefrigCase->NumRefrigChillerSets > 0) AirChillerSet.allocate(state.dataRefrigCase->NumRefrigChillerSets);
         if (state.dataRefrigCase->NumRefrigCondensers > 0) {
-            DataHeatBalance::HeatReclaimRefrigCondenser.allocate(state.dataRefrigCase->NumRefrigCondensers);
+            state.dataHeatBal->HeatReclaimRefrigCondenser.allocate(state.dataRefrigCase->NumRefrigCondensers);
             Condenser.allocate(state.dataRefrigCase->NumRefrigCondensers);
             state.dataRefrigCase->UniqueCondenserNames.reserve(static_cast<unsigned>(state.dataRefrigCase->NumRefrigCondensers));
         }
@@ -2408,8 +2408,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 RefrigRack(RackNum).Name = Alphas(1);
                 RefrigRack(RackNum).MyIdx = RackNum;
-                DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name = Alphas(1);
-                DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).SourceType = CurrentModuleObject;
+                state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name = Alphas(1);
+                state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).SourceType = CurrentModuleObject;
                 if (UtilityRoutines::SameString(Alphas(2), "Outdoors")) {
                     RefrigRack(RackNum).HeatRejectionLocation = iLocation::Outdoors;
                 } else if (UtilityRoutines::SameString(Alphas(2), "Zone")) {
@@ -2845,7 +2845,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                   cNumericFieldNames);
                     GlobalNames::VerifyUniqueInterObjectName(state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                     Condenser(CondNum).Name = Alphas(1);
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
                     Condenser(CondNum).CapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                     if (Condenser(CondNum).CapCurvePtr == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
@@ -2859,7 +2859,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // set CondenserType and rated temperature difference (51.7 - 35)C per ARI 460
                     Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeAir;
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     Condenser(CondNum).RatedDelT = CondARI460DelT; //= 16.7d0 ,Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
                     Condenser(CondNum).RatedTCondense = CondARI460Tcond;
                     if (Condenser(CondNum).CapCurvePtr > 0) {
@@ -2973,7 +2973,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     GlobalNames::VerifyUniqueInterObjectName(state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                     Condenser(CondNum).Name = Alphas(1);
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
 
                     // set start of count for number of systems attached to this condenser
                     Condenser(CondNum).NumSysAttach = 0;
@@ -2981,7 +2981,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // set CondenserType and rated Heat Rejection per ARI 490 rating
                     Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeEvap;
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     Condenser(CondNum).RatedTCondense = CondARI490Tcond;
                     Condenser(CondNum).RatedDelT = CondARI490DelT;
 
@@ -3199,7 +3199,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     GlobalNames::VerifyUniqueInterObjectName(state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                     Condenser(CondNum).Name = Alphas(1);
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
 
                     // set start of count for number of systems attached to this condenser
                     Condenser(CondNum).NumSysAttach = 0;
@@ -3207,7 +3207,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     // set CondenserType and rated Heat Rejection per ARI 450 rating
                     Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeWater;
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     if ((!lNumericBlanks(1)) && (Numbers(1) > 0.0)) {
                         Condenser(CondNum).RatedCapacity = Numbers(1);
                     } else {
@@ -3359,7 +3359,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     GlobalNames::VerifyUniqueInterObjectName(state, state.dataRefrigCase->UniqueCondenserNames, Alphas(1), CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
                     Condenser(CondNum).Name = Alphas(1);
-                    DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
+                    state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name = Alphas(1);
 
                     // set start of count for number of systems attached to this condenser
                     Condenser(CondNum).NumSysAttach = 0;
@@ -6803,7 +6803,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 if (state.dataRefrigCase->HaveCasesOrWalkins) {
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Sensible Cooling Rate",
                                         OutputProcessor::Unit::W,
-                                        DataHeatBalance::RefrigCaseCredit(zoneID).SenCaseCreditToZone,
+                                        state.dataHeatBal->RefrigCaseCredit(zoneID).SenCaseCreditToZone,
                                         "Zone",
                                         "Average",
                                         state.dataHeatBal->Zone(zoneID).Name);
@@ -8754,8 +8754,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
             // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is false
             if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                for (int i = DataHeatBalance::RefrigCaseCredit.l(), e = DataHeatBalance::RefrigCaseCredit.u(); i <= e; ++i) {
-                    DataHeatBalance::RefrigCaseCredit(i).reset();
+                for (int i = state.dataHeatBal->RefrigCaseCredit.l(), e = state.dataHeatBal->RefrigCaseCredit.u(); i <= e; ++i) {
+                    state.dataHeatBal->RefrigCaseCredit(i).reset();
                 }
                 for (int i = CaseWIZoneReport.l(), e = CaseWIZoneReport.u(); i <= e; ++i) {
                     CaseWIZoneReport(i).reset();
@@ -8791,7 +8791,7 @@ namespace EnergyPlus::RefrigeratedCase {
             for (int i = RefrigRack.l(), e = RefrigRack.u(); i <= e; ++i) {
                 RefrigRack(i).reset_init();
             }
-            for (auto &e : DataHeatBalance::HeatReclaimRefrigeratedRack)
+            for (auto &e : state.dataHeatBal->HeatReclaimRefrigeratedRack)
                 e.AvailCapacity = 0.0;
             // Note don't reset basin heat to zero when no load because heater would remain on
             // RefrigRack.BasinHeaterPower = 0.0;
@@ -8804,7 +8804,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 Condenser(i).reset_init();
             }
             // N don't reset basin heat to zero when no load because heater would remain on
-            for (auto &e : DataHeatBalance::HeatReclaimRefrigCondenser) {
+            for (auto &e : state.dataHeatBal->HeatReclaimRefrigCondenser) {
                 e.AvailCapacity = 0.0;
                 e.AvailTemperature = 0.0;
             }
@@ -8882,7 +8882,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     e.UnmetEnergy = 0.0;
             }
             if (state.dataRefrigCase->NumRefrigeratedRacks > 0) {
-                for (auto &e : DataHeatBalance::HeatReclaimRefrigeratedRack) {
+                for (auto &e : state.dataHeatBal->HeatReclaimRefrigeratedRack) {
                     e.HVACDesuperheaterReclaimedHeatTotal = 0.0;
                     e.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
                 }
@@ -8892,7 +8892,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
             }
             if (state.dataRefrigCase->NumRefrigCondensers > 0) {
-                for (auto &e : DataHeatBalance::HeatReclaimRefrigCondenser) {
+                for (auto &e : state.dataHeatBal->HeatReclaimRefrigCondenser) {
                     e.HVACDesuperheaterReclaimedHeatTotal = 0.0;
                     e.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
                 }
@@ -8995,16 +8995,16 @@ namespace EnergyPlus::RefrigeratedCase {
                         }
                     }
                     // Following lagged variables set for consistency to value calculated prev time through HVAC time step loops
-                    if (allocated(DataHeatBalance::HeatReclaimRefrigeratedRack)) {
+                    if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
                         for (int IRack = 1; IRack <= state.dataRefrigCase->NumRefrigeratedRacks; ++IRack) {
-                            RefrigRack(IRack).LaggedUsedHVACCoil = DataHeatBalance::HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
-                            RefrigRack(IRack).LaggedUsedWaterHeater = DataHeatBalance::HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedHVACCoil = state.dataHeatBal->HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedWaterHeater = state.dataHeatBal->HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
-                    if (allocated(DataHeatBalance::HeatReclaimRefrigCondenser)) {
+                    if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         for (int ICond = 1; ICond <= state.dataRefrigCase->NumRefrigCondensers; ++ICond) {
-                            Condenser(ICond).LaggedUsedHVACCoil = DataHeatBalance::HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
-                            Condenser(ICond).LaggedUsedWaterHeater = DataHeatBalance::HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedHVACCoil = state.dataHeatBal->HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedWaterHeater = state.dataHeatBal->HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                 } // repeating same time step
@@ -9031,16 +9031,16 @@ namespace EnergyPlus::RefrigeratedCase {
                         }
                     }
                     // Following lagged variables set for consistency to value calculated prev time through HVAC time step loops
-                    if (allocated(DataHeatBalance::HeatReclaimRefrigeratedRack)) {
+                    if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
                         for (int IRack = 1; IRack <= state.dataRefrigCase->NumRefrigeratedRacks; ++IRack) {
-                            RefrigRack(IRack).LaggedUsedHVACCoil = DataHeatBalance::HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
-                            RefrigRack(IRack).LaggedUsedWaterHeater = DataHeatBalance::HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedHVACCoil = state.dataHeatBal->HeatReclaimRefrigeratedRack(IRack).HVACDesuperheaterReclaimedHeatTotal;
+                            RefrigRack(IRack).LaggedUsedWaterHeater = state.dataHeatBal->HeatReclaimRefrigeratedRack(IRack).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
-                    if (allocated(DataHeatBalance::HeatReclaimRefrigCondenser)) {
+                    if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         for (int ICond = 1; ICond <= state.dataRefrigCase->NumRefrigCondensers; ++ICond) {
-                            Condenser(ICond).LaggedUsedHVACCoil = DataHeatBalance::HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
-                            Condenser(ICond).LaggedUsedWaterHeater = DataHeatBalance::HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedHVACCoil = state.dataHeatBal->HeatReclaimRefrigCondenser(ICond).HVACDesuperheaterReclaimedHeatTotal;
+                            Condenser(ICond).LaggedUsedWaterHeater = state.dataHeatBal->HeatReclaimRefrigCondenser(ICond).WaterHeatingDesuperheaterReclaimedHeatTotal;
                         }
                     }
                 } // if first time
@@ -9412,7 +9412,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     CondenserFrac =
                         max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, DataLoopNode::Node(HeatRejectZoneNodeNum).Temp)));
                     state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
-                    DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
+                    state.dataHeatBal->RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += this->CondenserFanPower * CondenserFrac;
                 } else {
                     CondenserFrac = max(0.0, min(1.0, CurveManager::CurveValue(state, this->TotCondFTempPtr, EffectTemp)));
                     state.dataRefrigCase->TotalCondenserFanPower = this->CondenserFanPower * CondenserFrac;
@@ -9467,9 +9467,9 @@ namespace EnergyPlus::RefrigeratedCase {
                     state.dataRefrigCase->RackSenCreditToHVAC = 0.0;
                 } // walkins present
                 //     Update globals for use in Air Heat Balance and Zone Equipment Manager
-                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += state.dataRefrigCase->RackSenCreditToZone;
+                state.dataHeatBal->RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToZone += state.dataRefrigCase->RackSenCreditToZone;
 
-                DataHeatBalance::RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToHVAC += state.dataRefrigCase->RackSenCreditToHVAC;
+                state.dataHeatBal->RefrigCaseCredit(HeatRejectZoneNum).SenCaseCreditToHVAC += state.dataRefrigCase->RackSenCreditToHVAC;
             } // zone # > 0 and tot del cap > 0
         }     // rack heat rejection to zone
     }
@@ -9510,9 +9510,9 @@ namespace EnergyPlus::RefrigeratedCase {
         this->CondEnergy = state.dataRefrigCase->TotalCondenserHeat * LocalTimeStep * DataGlobalConstants::SecInHour;
         // Set total rack heat rejection used for heat reclaim. Do not allow heat reclaim on stand alone (indoor) display cases.
         if (this->HeatRejectionLocation == iLocation::Zone) {
-            DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = 0.0;
+            state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = 0.0;
         } else {
-            DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = state.dataRefrigCase->TotalRackDeliveredCapacity * (1.0 + 1.0 / state.dataRefrigCase->CompressorCOPactual);
+            state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).AvailCapacity = state.dataRefrigCase->TotalRackDeliveredCapacity * (1.0 + 1.0 / state.dataRefrigCase->CompressorCOPactual);
         }
 
         // set water system demand request (if needed)
@@ -9858,10 +9858,10 @@ namespace EnergyPlus::RefrigeratedCase {
         // Amount of latent case credit applied to HVAC RA duct (W)
         Real64 CaseLatCreditToHVAC = LatentCaseCredit * state.dataRefrigCase->CaseRAFactor;
 
-        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToZone += CaseSenCreditToZone;
-        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToZone += CaseLatCreditToZone;
-        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToHVAC += CaseSenCreditToHVAC;
-        DataHeatBalance::RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToHVAC += CaseLatCreditToHVAC;
+        state.dataHeatBal->RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToZone += CaseSenCreditToZone;
+        state.dataHeatBal->RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToZone += CaseLatCreditToZone;
+        state.dataHeatBal->RefrigCaseCredit(this->ActualZoneNum).SenCaseCreditToHVAC += CaseSenCreditToHVAC;
+        state.dataHeatBal->RefrigCaseCredit(this->ActualZoneNum).LatCaseCreditToHVAC += CaseLatCreditToHVAC;
 
         // ReportRefrigeratedCase(CaseID)
         this->TotalCoolingLoad = TotalCap_Actual;
@@ -10216,7 +10216,7 @@ namespace EnergyPlus::RefrigeratedCase {
         PlantCompIndex = this->PlantCompNum;
 
         state.dataRefrigCase->TotalCondenserHeat =
-            DataHeatBalance::HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
+            state.dataHeatBal->HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
         TypeName = "Refrigeration:CompressorRack:";
         ErrIntro = "Condenser for refrigeration rack ";
 
@@ -10513,7 +10513,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                     // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
                     if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                        DataHeatBalance::RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= System(SysNum).PipeHeatLoad;
+                        state.dataHeatBal->RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= System(SysNum).PipeHeatLoad;
                     } // UseSysTimeStep
                 }
             } //(((.NOT. UseSysTimeStep).AND.(.NOT. System(SysNum)%CoilFlag)).OR.((UseSysTimeStep).AND.(System(SysNum)%CoilFlag)))
@@ -10738,7 +10738,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                     // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
                     if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                        DataHeatBalance::RefrigCaseCredit(CondInletAirZoneNum).SenCaseCreditToZone +=
+                        state.dataHeatBal->RefrigCaseCredit(CondInletAirZoneNum).SenCaseCreditToZone +=
                             System(SysNum).NetHeatRejectLoad; // Adding heat is positive
                     }                                                                                                  // UseSystimestep
                 }                                                                                                      // Reject heat to zone
@@ -10874,7 +10874,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 int SuctionPipeActualZoneNum = TransSystem(SysNum).SuctionPipeActualZoneNumMT;
                 // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
                 if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                    DataHeatBalance::RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= TransSystem(SysNum).PipeHeatLoadMT;
+                    state.dataHeatBal->RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= TransSystem(SysNum).PipeHeatLoadMT;
                 } // UseSysTimeStep
             }
 
@@ -10888,7 +10888,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 int SuctionPipeActualZoneNum = TransSystem(SysNum).SuctionPipeActualZoneNumLT;
                 // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
                 if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                    DataHeatBalance::RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= TransSystem(SysNum).PipeHeatLoadLT;
+                    state.dataHeatBal->RefrigCaseCredit(SuctionPipeActualZoneNum).SenCaseCreditToZone -= TransSystem(SysNum).PipeHeatLoadLT;
                 } // UseSysTimeStep
             }
 
@@ -10984,7 +10984,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     int CondInletAirZoneNum = GasCooler(TransSystem(SysNum).GasCoolerNum(1)).InletAirZoneNum;
                     // Can arrive here when load call to refrigeration looks for cases/walkin systems and usetimestep is .FALSE.
                     if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
-                        DataHeatBalance::RefrigCaseCredit(CondInletAirZoneNum).SenCaseCreditToZone +=
+                        state.dataHeatBal->RefrigCaseCredit(CondInletAirZoneNum).SenCaseCreditToZone +=
                             TransSystem(SysNum).NetHeatRejectLoad; // Adding heat is positive
                     }                                                                                                       // UseSystimestep
                 }                                                                                                           // Reject heat to zone
@@ -12037,16 +12037,16 @@ namespace EnergyPlus::RefrigeratedCase {
         HSatVapCondense = FluidProperties::GetSatEnthalpyRefrig(state, this->RefrigerantName, this->TCondense, 1.0, this->RefIndex, RoutineName);
         CpSatVapCondense = FluidProperties::GetSatSpecificHeatRefrig(state, this->RefrigerantName, this->TCondense, 1.0, this->RefIndex, RoutineName);
         if (this->NumStages == 1) { // Single-stage systems
-            DataHeatBalance::HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowComps * (this->HCompOut - HSatVapCondense);
+            state.dataHeatBal->HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowComps * (this->HCompOut - HSatVapCondense);
         } else { // Two-stage systems
-            DataHeatBalance::HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowHiStageComps * (this->HCompOut - HSatVapCondense);
+            state.dataHeatBal->HeatReclaimRefrigCondenser(CondID).AvailCapacity = this->RefMassFlowHiStageComps * (this->HCompOut - HSatVapCondense);
         } // NumStages
 
         // No function available to get Tout as f(Pout, Hout), so use estimate based on constant cp in superheat range...
         //  Use average of Tcondense and Tout of condenser as check for whether heat reclaim is reasonable.
         TCompOutEstimate = this->TCondense + (this->HCompOut - HSatVapCondense) / CpSatVapCondense;
 
-        DataHeatBalance::HeatReclaimRefrigCondenser(CondID).AvailTemperature = (TsatforPdisch + TCompOutEstimate) / 2.0;
+        state.dataHeatBal->HeatReclaimRefrigCondenser(CondID).AvailTemperature = (TsatforPdisch + TCompOutEstimate) / 2.0;
         this->AverageCompressorCOP = this->TotCompCapacity / (this->TotCompPower + this->TotHiStageCompPower);
         this->TotCompElecConsump = this->TotCompPower * LocalTimeStepSec;
         if (this->NumStages == 2) {
@@ -13551,8 +13551,8 @@ namespace EnergyPlus::RefrigeratedCase {
             //   Zone Equipment Manager. Sum walk-in credits to zone using existing 'casecredit' variable
             //   No return air fractions are applied to walk-ins, and no latent in stocking -
 
-            DataHeatBalance::RefrigCaseCredit(zoneNum).SenCaseCreditToZone += ZoneSensLoad;
-            DataHeatBalance::RefrigCaseCredit(zoneNum).LatCaseCreditToZone += ZoneLatentLoad;
+            state.dataHeatBal->RefrigCaseCredit(zoneNum).SenCaseCreditToZone += ZoneSensLoad;
+            state.dataHeatBal->RefrigCaseCredit(zoneNum).LatCaseCreditToZone += ZoneLatentLoad;
 
             // Set up report variables for each zone for this walk-in
             // Sensible heat exchange can be positive or negative, split into separate output variables and always report positive value
@@ -13845,7 +13845,7 @@ namespace EnergyPlus::RefrigeratedCase {
             // pipe heat load is a positive number (ie. heat absorbed by pipe, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
             this->DistPipeZoneHeatGain = -distPipeHeatGain;
-            DataHeatBalance::RefrigCaseCredit(this->DistPipeZoneNum).SenCaseCreditToZone -= distPipeHeatGain;
+            state.dataHeatBal->RefrigCaseCredit(this->DistPipeZoneNum).SenCaseCreditToZone -= distPipeHeatGain;
         } // calc distribution piping heat gains
 
         Real64 receiverHeatGain = 0.0;
@@ -13856,7 +13856,7 @@ namespace EnergyPlus::RefrigeratedCase {
             // receiver heat load is a positive number (ie. heat absorbed by receiver, so needs to be subtracted
             //     from refrigcasecredit (- for cooling zone, + for heating zone)
             this->ReceiverZoneHeatGain = -receiverHeatGain;
-            DataHeatBalance::RefrigCaseCredit(this->ReceiverZoneNum).SenCaseCreditToZone -= receiverHeatGain;
+            state.dataHeatBal->RefrigCaseCredit(this->ReceiverZoneNum).SenCaseCreditToZone -= receiverHeatGain;
         } // calc receiver heat gains
 
         // Sum up all the case and walk-in loads served by the secondary loop
@@ -14069,31 +14069,31 @@ namespace EnergyPlus::RefrigeratedCase {
         if ((!state.dataRefrigCase->UseSysTimeStep) && ((state.dataRefrigCase->NumSimulationCases > 0) || (state.dataRefrigCase->NumSimulationWalkIns > 0))) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 CaseWIZoneReport(ZoneNum).SenCaseCreditToZoneEnergy =
-                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
+                    state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 // Latent always negative
-                CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
+                CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate = -state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
                 CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy = CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate * state.dataGlobal->TimeStepZoneSec;
                 // Sensible rate can be positive or negative, split into separate output variables and
                 //   always report positive value
-                if (DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone <= 0.0) {
-                    CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate = -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
+                if (state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone <= 0.0) {
+                    CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate = -state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy =
-                        -DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
+                        -state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneRate = 0.0;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy = 0.0;
                 } else {
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate = 0.0;
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy = 0.0;
-                    CaseWIZoneReport(ZoneNum).HeatingToZoneRate = DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
+                    CaseWIZoneReport(ZoneNum).HeatingToZoneRate = state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone;
                     CaseWIZoneReport(ZoneNum).HeatingToZoneEnergy =
-                        DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
+                        state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone * state.dataGlobal->TimeStepZoneSec;
                 }
                 CaseWIZoneReport(ZoneNum).TotCoolingToZoneRate =
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneRate + CaseWIZoneReport(ZoneNum).LatCoolingToZoneRate;
                 CaseWIZoneReport(ZoneNum).TotCoolingToZoneEnergy =
                     CaseWIZoneReport(ZoneNum).SenCoolingToZoneEnergy + CaseWIZoneReport(ZoneNum).LatCoolingToZoneEnergy;
                 CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate =
-                    DataHeatBalance::RefrigCaseCredit(ZoneNum).SenCaseCreditToZone + DataHeatBalance::RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
+                    state.dataHeatBal->RefrigCaseCredit(ZoneNum).SenCaseCreditToZone + state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone;
                 CaseWIZoneReport(ZoneNum).TotHtXferToZoneEnergy = CaseWIZoneReport(ZoneNum).TotHtXferToZoneRate * state.dataGlobal->TimeStepZoneSec;
             } // over zones for cases and walkins
         }

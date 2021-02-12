@@ -4264,7 +4264,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         Real64 ambTemp = 20.0;
         if (heatLossesDestination_ == ThermalLossDestination::zoneGains) {
 
-            ambTemp = DataHeatBalance::ZnAirRpt(zoneNum_).MeanAirTemp;
+            ambTemp = state.dataHeatBal->ZnAirRpt(zoneNum_).MeanAirTemp;
         } else {
             ambTemp = 20.0;
         }

@@ -3238,7 +3238,7 @@ namespace HeatBalanceManager {
         // Window Blind Materials
 
         if (state.dataHeatBal->TotBlinds > 0) {
-            Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
+            state.dataHeatBal->Blind.allocate(state.dataHeatBal->TotBlinds); // Allocate the array Size to the number of blinds
         }
 
         CurrentModuleObject = "WindowMaterial:Blind";
@@ -3269,58 +3269,58 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            Blind(Loop).Name = MaterialNames(1);
+            state.dataHeatBal->Blind(Loop).Name = MaterialNames(1);
             state.dataMaterial->Material(MaterNum).Roughness = Rough;
             state.dataMaterial->Material(MaterNum).BlindDataPtr = Loop;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
-            Blind(Loop).MaterialNumber = MaterNum;
+            state.dataHeatBal->Blind(Loop).MaterialNumber = MaterNum;
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-                Blind(Loop).SlatOrientation = Horizontal;
+                state.dataHeatBal->Blind(Loop).SlatOrientation = Horizontal;
             } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-                Blind(Loop).SlatOrientation = Vertical;
+                state.dataHeatBal->Blind(Loop).SlatOrientation = Vertical;
             }
-            Blind(Loop).SlatWidth = MaterialProps(1);
-            Blind(Loop).SlatSeparation = MaterialProps(2);
-            Blind(Loop).SlatThickness = MaterialProps(3);
-            Blind(Loop).SlatAngle = MaterialProps(4);
-            Blind(Loop).SlatConductivity = MaterialProps(5);
-            Blind(Loop).SlatTransSolBeamDiff = MaterialProps(6);
-            Blind(Loop).SlatFrontReflSolBeamDiff = MaterialProps(7);
-            Blind(Loop).SlatBackReflSolBeamDiff = MaterialProps(8);
-            Blind(Loop).SlatTransSolDiffDiff = MaterialProps(9);
-            Blind(Loop).SlatFrontReflSolDiffDiff = MaterialProps(10);
-            Blind(Loop).SlatBackReflSolDiffDiff = MaterialProps(11);
-            Blind(Loop).SlatTransVisBeamDiff = MaterialProps(12);
-            Blind(Loop).SlatFrontReflVisBeamDiff = MaterialProps(13);
-            Blind(Loop).SlatBackReflVisBeamDiff = MaterialProps(14);
-            Blind(Loop).SlatTransVisDiffDiff = MaterialProps(15);
-            Blind(Loop).SlatFrontReflVisDiffDiff = MaterialProps(16);
-            Blind(Loop).SlatBackReflVisDiffDiff = MaterialProps(17);
-            Blind(Loop).SlatTransIR = MaterialProps(18);
-            Blind(Loop).SlatFrontEmissIR = MaterialProps(19);
-            Blind(Loop).SlatBackEmissIR = MaterialProps(20);
-            Blind(Loop).BlindToGlassDist = MaterialProps(21);
-            Blind(Loop).BlindTopOpeningMult = MaterialProps(22);
-            Blind(Loop).BlindBottomOpeningMult = MaterialProps(23);
-            Blind(Loop).BlindLeftOpeningMult = MaterialProps(24);
-            Blind(Loop).BlindRightOpeningMult = MaterialProps(25);
-            Blind(Loop).MinSlatAngle = MaterialProps(26);
-            Blind(Loop).MaxSlatAngle = MaterialProps(27);
+            state.dataHeatBal->Blind(Loop).SlatWidth = MaterialProps(1);
+            state.dataHeatBal->Blind(Loop).SlatSeparation = MaterialProps(2);
+            state.dataHeatBal->Blind(Loop).SlatThickness = MaterialProps(3);
+            state.dataHeatBal->Blind(Loop).SlatAngle = MaterialProps(4);
+            state.dataHeatBal->Blind(Loop).SlatConductivity = MaterialProps(5);
+            state.dataHeatBal->Blind(Loop).SlatTransSolBeamDiff = MaterialProps(6);
+            state.dataHeatBal->Blind(Loop).SlatFrontReflSolBeamDiff = MaterialProps(7);
+            state.dataHeatBal->Blind(Loop).SlatBackReflSolBeamDiff = MaterialProps(8);
+            state.dataHeatBal->Blind(Loop).SlatTransSolDiffDiff = MaterialProps(9);
+            state.dataHeatBal->Blind(Loop).SlatFrontReflSolDiffDiff = MaterialProps(10);
+            state.dataHeatBal->Blind(Loop).SlatBackReflSolDiffDiff = MaterialProps(11);
+            state.dataHeatBal->Blind(Loop).SlatTransVisBeamDiff = MaterialProps(12);
+            state.dataHeatBal->Blind(Loop).SlatFrontReflVisBeamDiff = MaterialProps(13);
+            state.dataHeatBal->Blind(Loop).SlatBackReflVisBeamDiff = MaterialProps(14);
+            state.dataHeatBal->Blind(Loop).SlatTransVisDiffDiff = MaterialProps(15);
+            state.dataHeatBal->Blind(Loop).SlatFrontReflVisDiffDiff = MaterialProps(16);
+            state.dataHeatBal->Blind(Loop).SlatBackReflVisDiffDiff = MaterialProps(17);
+            state.dataHeatBal->Blind(Loop).SlatTransIR = MaterialProps(18);
+            state.dataHeatBal->Blind(Loop).SlatFrontEmissIR = MaterialProps(19);
+            state.dataHeatBal->Blind(Loop).SlatBackEmissIR = MaterialProps(20);
+            state.dataHeatBal->Blind(Loop).BlindToGlassDist = MaterialProps(21);
+            state.dataHeatBal->Blind(Loop).BlindTopOpeningMult = MaterialProps(22);
+            state.dataHeatBal->Blind(Loop).BlindBottomOpeningMult = MaterialProps(23);
+            state.dataHeatBal->Blind(Loop).BlindLeftOpeningMult = MaterialProps(24);
+            state.dataHeatBal->Blind(Loop).BlindRightOpeningMult = MaterialProps(25);
+            state.dataHeatBal->Blind(Loop).MinSlatAngle = MaterialProps(26);
+            state.dataHeatBal->Blind(Loop).MaxSlatAngle = MaterialProps(27);
 
             // TH 2/11/2010. For CR 8010
             // By default all blinds have fixed slat angle, new blinds with variable slat angle are created if
             //  they are used with window shading controls that adjust slat angles like ScheduledSlatAngle or BlockBeamSolar
-            Blind(Loop).SlatAngleType = FixedSlats;
+            state.dataHeatBal->Blind(Loop).SlatAngleType = FixedSlats;
 
-            if (Blind(Loop).SlatWidth < Blind(Loop).SlatSeparation) {
+            if (state.dataHeatBal->Blind(Loop).SlatWidth < state.dataHeatBal->Blind(Loop).SlatSeparation) {
                 ShowWarningError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Angles/Widths");
                 ShowContinueError(state,
                                   format("{} [{:.2R}] is less than {} [{:.2R}].",
                                          cNumericFieldNames(1),
-                                         Blind(Loop).SlatWidth,
+                                         state.dataHeatBal->Blind(Loop).SlatWidth,
                                          cNumericFieldNames(2),
-                                         Blind(Loop).SlatSeparation));
+                                         state.dataHeatBal->Blind(Loop).SlatSeparation));
                 ShowContinueError(state, "This will allow direct beam to be transmitted when Slat angle = 0.");
             }
 
@@ -3429,37 +3429,37 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, cNumericFieldNames(18) + " + " + cNumericFieldNames(20) + " not < 1.0");
             }
 
-            if (Blind(Loop).BlindToGlassDist < 0.5 * Blind(Loop).SlatWidth) {
+            if (state.dataHeatBal->Blind(Loop).BlindToGlassDist < 0.5 * state.dataHeatBal->Blind(Loop).SlatWidth) {
                 ErrorsFound = true;
                 ShowSevereError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                 ShowContinueError(state, cNumericFieldNames(21) + " is less than half of the " + cNumericFieldNames(1));
             }
 
             // Minimum and maximum slat angles allowed by slat geometry
-            if (Blind(Loop).SlatWidth > Blind(Loop).SlatSeparation) {
-                MinSlatAngGeom = std::asin(Blind(Loop).SlatThickness / (Blind(Loop).SlatThickness + Blind(Loop).SlatSeparation)) / DataGlobalConstants::DegToRadians;
+            if (state.dataHeatBal->Blind(Loop).SlatWidth > state.dataHeatBal->Blind(Loop).SlatSeparation) {
+                MinSlatAngGeom = std::asin(state.dataHeatBal->Blind(Loop).SlatThickness / (state.dataHeatBal->Blind(Loop).SlatThickness + state.dataHeatBal->Blind(Loop).SlatSeparation)) / DataGlobalConstants::DegToRadians;
             } else {
                 MinSlatAngGeom = 0.0;
             }
             MaxSlatAngGeom = 180.0 - MinSlatAngGeom;
 
             // Error if input slat angle not in range allowed by slat geometry
-            if ((Blind(Loop).SlatSeparation + Blind(Loop).SlatThickness) < Blind(Loop).SlatWidth) {
-                if (Blind(Loop).SlatAngle < MinSlatAngGeom) {
+            if ((state.dataHeatBal->Blind(Loop).SlatSeparation + state.dataHeatBal->Blind(Loop).SlatThickness) < state.dataHeatBal->Blind(Loop).SlatWidth) {
+                if (state.dataHeatBal->Blind(Loop).SlatAngle < MinSlatAngGeom) {
                     ErrorsFound = true;
                     ShowSevereError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                     ShowContinueError(state,
                                       format("{}=[{:.1R}], is less than smallest allowed by slat dimensions and spacing, [{:.1R}] deg.",
                                              cNumericFieldNames(4),
-                                             Blind(Loop).SlatAngle,
+                                             state.dataHeatBal->Blind(Loop).SlatAngle,
                                              MinSlatAngGeom));
-                } else if (Blind(Loop).SlatAngle > MaxSlatAngGeom) {
+                } else if (state.dataHeatBal->Blind(Loop).SlatAngle > MaxSlatAngGeom) {
                     ErrorsFound = true;
                     ShowSevereError(state, CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
                     ShowContinueError(state,
                                       format("{}=[{:.1R}], is greater than largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
                                              cNumericFieldNames(4),
-                                             Blind(Loop).SlatAngle,
+                                             state.dataHeatBal->Blind(Loop).SlatAngle,
                                              MinSlatAngGeom));
                 }
             }
@@ -8276,7 +8276,7 @@ namespace HeatBalanceManager {
         state.dataHeatBal->TotComplexShades = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataHeatBal->TotComplexShades > 0) {
-            ComplexShade.allocate(state.dataHeatBal->TotComplexShades); // Allocate the array Size to the number of complex shades
+            state.dataHeatBal->ComplexShade.allocate(state.dataHeatBal->TotComplexShades); // Allocate the array Size to the number of complex shades
         }
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotComplexShades; ++Loop) {
@@ -8308,23 +8308,23 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).ComplexShadePtr = Loop;
 
             state.dataMaterial->Material(MaterNum).Name = cAlphaArgs(1);
-            ComplexShade(Loop).Name = cAlphaArgs(1);
+            state.dataHeatBal->ComplexShade(Loop).Name = cAlphaArgs(1);
 
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
-                    ComplexShade(Loop).LayerType = csOtherShadingType;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csOtherShadingType;
                 } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
-                    ComplexShade(Loop).LayerType = csVenetianHorizontal;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csVenetianHorizontal;
                 } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
-                    ComplexShade(Loop).LayerType = csVenetianVertical;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csVenetianVertical;
                 } else if (SELECT_CASE_var == "WOVEN") {
-                    ComplexShade(Loop).LayerType = csWoven;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csWoven;
                 } else if (SELECT_CASE_var == "PERFORATED") {
-                    ComplexShade(Loop).LayerType = csPerforated;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csPerforated;
                 } else if (SELECT_CASE_var == "BSDF") {
-                    ComplexShade(Loop).LayerType = csBSDF;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = csBSDF;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8334,13 +8334,13 @@ namespace HeatBalanceManager {
                 }
             }
 
-            ComplexShade(Loop).Thickness = rNumericArgs(1);
+            state.dataHeatBal->ComplexShade(Loop).Thickness = rNumericArgs(1);
             state.dataMaterial->Material(MaterNum).Thickness = rNumericArgs(1);
-            ComplexShade(Loop).Conductivity = rNumericArgs(2);
+            state.dataHeatBal->ComplexShade(Loop).Conductivity = rNumericArgs(2);
             state.dataMaterial->Material(MaterNum).Conductivity = rNumericArgs(2);
-            ComplexShade(Loop).IRTransmittance = rNumericArgs(3);
-            ComplexShade(Loop).FrontEmissivity = rNumericArgs(4);
-            ComplexShade(Loop).BackEmissivity = rNumericArgs(5);
+            state.dataHeatBal->ComplexShade(Loop).IRTransmittance = rNumericArgs(3);
+            state.dataHeatBal->ComplexShade(Loop).FrontEmissivity = rNumericArgs(4);
+            state.dataHeatBal->ComplexShade(Loop).BackEmissivity = rNumericArgs(5);
 
             // Simon: in heat balance radiation exchange routines AbsorpThermal is used
             // and program will crash if value is not assigned.  Not sure if this is correct
@@ -8349,18 +8349,18 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).AbsorpThermalFront = rNumericArgs(4);
             state.dataMaterial->Material(MaterNum).AbsorpThermalBack = rNumericArgs(5);
 
-            ComplexShade(Loop).TopOpeningMultiplier = rNumericArgs(6);
-            ComplexShade(Loop).BottomOpeningMultiplier = rNumericArgs(7);
-            ComplexShade(Loop).LeftOpeningMultiplier = rNumericArgs(8);
-            ComplexShade(Loop).RightOpeningMultiplier = rNumericArgs(9);
-            ComplexShade(Loop).FrontOpeningMultiplier = rNumericArgs(10);
+            state.dataHeatBal->ComplexShade(Loop).TopOpeningMultiplier = rNumericArgs(6);
+            state.dataHeatBal->ComplexShade(Loop).BottomOpeningMultiplier = rNumericArgs(7);
+            state.dataHeatBal->ComplexShade(Loop).LeftOpeningMultiplier = rNumericArgs(8);
+            state.dataHeatBal->ComplexShade(Loop).RightOpeningMultiplier = rNumericArgs(9);
+            state.dataHeatBal->ComplexShade(Loop).FrontOpeningMultiplier = rNumericArgs(10);
 
-            ComplexShade(Loop).SlatWidth = rNumericArgs(11);
-            ComplexShade(Loop).SlatSpacing = rNumericArgs(12);
-            ComplexShade(Loop).SlatThickness = rNumericArgs(13);
-            ComplexShade(Loop).SlatAngle = rNumericArgs(14);
-            ComplexShade(Loop).SlatConductivity = rNumericArgs(15);
-            ComplexShade(Loop).SlatCurve = rNumericArgs(16);
+            state.dataHeatBal->ComplexShade(Loop).SlatWidth = rNumericArgs(11);
+            state.dataHeatBal->ComplexShade(Loop).SlatSpacing = rNumericArgs(12);
+            state.dataHeatBal->ComplexShade(Loop).SlatThickness = rNumericArgs(13);
+            state.dataHeatBal->ComplexShade(Loop).SlatAngle = rNumericArgs(14);
+            state.dataHeatBal->ComplexShade(Loop).SlatConductivity = rNumericArgs(15);
+            state.dataHeatBal->ComplexShade(Loop).SlatCurve = rNumericArgs(16);
 
             // IF (dataMaterial.Material(MaterNum)%Conductivity > 0.0) THEN
             //  NominalR(MaterNum)=dataMaterial.Material(MaterNum)%Thickness/dataMaterial.Material(MaterNum)%Conductivity
@@ -8438,7 +8438,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, format("{} must be >=0 or <=1, entered value = {:.2R}", cNumericFieldNames(10), rNumericArgs(10)));
             }
 
-            if (ComplexShade(Loop).LayerType == csVenetianHorizontal || ComplexShade(Loop).LayerType == csVenetianVertical) {
+            if (state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianHorizontal || state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianVertical) {
                 if (rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8548,7 +8548,7 @@ namespace HeatBalanceManager {
         // Reading WindowThermalModel:Params
         cCurrentModuleObject = "WindowThermalModel:Params";
         state.dataBSDFWindow->TotThermalModels = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
+        state.dataHeatBal->WindowThermalModel.allocate(state.dataBSDFWindow->TotThermalModels);
 
         for (Loop = 1; Loop <= state.dataBSDFWindow->TotThermalModels; ++Loop) {
             inputProcessor->getObjectItem(state,
@@ -8565,9 +8565,9 @@ namespace HeatBalanceManager {
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
-            WindowThermalModel(Loop).Name = cAlphaArgs(1);
+            state.dataHeatBal->WindowThermalModel(Loop).Name = cAlphaArgs(1);
 
-            WindowThermalModel(Loop).SDScalar = rNumericArgs(1);
+            state.dataHeatBal->WindowThermalModel(Loop).SDScalar = rNumericArgs(1);
             if ((rNumericArgs(1) < 0.0) || (rNumericArgs(1) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
@@ -8578,11 +8578,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
                 if (SELECT_CASE_var == "ISO15099") {
-                    WindowThermalModel(Loop).CalculationStandard = csISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csISO15099;
                 } else if (SELECT_CASE_var == "EN673DECLARED") {
-                    WindowThermalModel(Loop).CalculationStandard = csEN673Declared;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Declared;
                 } else if (SELECT_CASE_var == "EN673DESIGN") {
-                    WindowThermalModel(Loop).CalculationStandard = csEN673Design;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Design;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8595,13 +8595,13 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
                 if (SELECT_CASE_var == "ISO15099") {
-                    WindowThermalModel(Loop).ThermalModel = tmISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmISO15099;
                 } else if (SELECT_CASE_var == "SCALEDCAVITYWIDTH") {
-                    WindowThermalModel(Loop).ThermalModel = tmScaledCavityWidth;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmScaledCavityWidth;
                 } else if (SELECT_CASE_var == "CONVECTIVESCALARMODEL_NOSDTHICKNESS") {
-                    WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_NoSDThickness;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_NoSDThickness;
                 } else if (SELECT_CASE_var == "CONVECTIVESCALARMODEL_WITHSDTHICKNESS") {
-                    WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_WithSDThickness;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_WithSDThickness;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8615,11 +8615,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(4));
                 if (SELECT_CASE_var == "NODEFLECTION") {
-                    WindowThermalModel(Loop).DeflectionModel = dmNoDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmNoDeflection;
                 } else if (SELECT_CASE_var == "TEMPERATUREANDPRESSUREINPUT") {
-                    WindowThermalModel(Loop).DeflectionModel = dmTemperatureAndPressureInput;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmTemperatureAndPressureInput;
                 } else if (SELECT_CASE_var == "MEASUREDDEFLECTION") {
-                    WindowThermalModel(Loop).DeflectionModel = dmMeasuredDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmMeasuredDeflection;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8629,8 +8629,8 @@ namespace HeatBalanceManager {
                 }
             }
 
-            if (WindowThermalModel(Loop).DeflectionModel == dmTemperatureAndPressureInput) {
-                WindowThermalModel(Loop).VacuumPressureLimit = rNumericArgs(2);
+            if (state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel == dmTemperatureAndPressureInput) {
+                state.dataHeatBal->WindowThermalModel(Loop).VacuumPressureLimit = rNumericArgs(2);
                 if (rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8638,7 +8638,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, format("{} must be > 0, entered value = {:.2R}", cNumericFieldNames(2), rNumericArgs(2)));
                 }
 
-                WindowThermalModel(Loop).InitialTemperature = rNumericArgs(3);
+                state.dataHeatBal->WindowThermalModel(Loop).InitialTemperature = rNumericArgs(3);
                 if (rNumericArgs(3) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8646,7 +8646,7 @@ namespace HeatBalanceManager {
                     ShowContinueError(state, format("{} must be > 0, entered value = {:.2R}", cNumericFieldNames(3), rNumericArgs(3)));
                 }
 
-                WindowThermalModel(Loop).InitialPressure = rNumericArgs(4);
+                state.dataHeatBal->WindowThermalModel(Loop).InitialPressure = rNumericArgs(4);
                 if (rNumericArgs(4) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -8735,7 +8735,7 @@ namespace HeatBalanceManager {
             }
 
             // Simon: Assign thermal model number
-            ThermalModelNum = UtilityRoutines::FindItemInList(locAlphaArgs(4), WindowThermalModel);
+            ThermalModelNum = UtilityRoutines::FindItemInList(locAlphaArgs(4), state.dataHeatBal->WindowThermalModel);
             if (ThermalModelNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs(1) + ", object. Illegal value for " +
                                 locAlphaFieldNames(4) + " has been found.");
