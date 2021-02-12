@@ -3158,8 +3158,15 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 4.2 : DataIPShortCuts::rNumericArgs(10);
             liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 3.53 : DataIPShortCuts::rNumericArgs(11);
             liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 3.342 : DataIPShortCuts::rNumericArgs(12);
-            // FIXME: Validate Vnom < Vexp
-            // see lib_battery_voltage.cpp line 268
+            if (liIon_Vfull_ < liIon_Vexp_ or liIon_Vexp_ < liIon_Vnom_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(11) + ",");
+                ShowContinueError(state, "which must be greater than " + DataIPShortCuts::cNumericFieldNames(12) + ".");
+                for (int i = 10; i <= 12; ++i) {
+                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                }
+                errorsFound = true;
+            }
             liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.342 : DataIPShortCuts::rNumericArgs(13);
             liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
             liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
@@ -3170,63 +3177,64 @@ ElectricStorage::ElectricStorage( // main constructor
 
             maxAhCapacity_ = liIon_Qfull_ * parallelNum_;
 
-            // Set the Lifetime model in SSC
-            // I'm using a raw pointer here because the the battery_t constructor expects it.
-            // The pointer is then passed into the battery_t where it is converted into a unique_ptr and persists along with that object.
-            // Therefore I am not deleting this pointer here because that will be handled by the battery_t class.
-            lifetime_t* battLifetime;
-            if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
-                battLifetime = new lifetime_nmc_t(DataHVACGlobals::TimeStepSys);
-            } else {
-                // This sets a lifetime model where the capacity is always 100%.
-                std::vector<double> tblVals{{20, 0, 100, 20, 5000, 100, 20, 10000, 100, 80, 0, 100, 80, 1000, 100, 80, 2000, 100}};
-                util::matrix_t<double> battLifetimeMatrix(6, 3, &tblVals);
-                battLifetime = new lifetime_calendar_cycle_t(battLifetimeMatrix, DataHVACGlobals::TimeStepSys);
-            }
+            if (!errorsFound) {
+                // Set the Lifetime model in SSC
+                // I'm using a raw pointer here because the the battery_t constructor expects it.
+                // The pointer is then passed into the battery_t where it is converted into a unique_ptr and persists along with that object.
+                // Therefore I am not deleting this pointer here because that will be handled by the battery_t class.
+                lifetime_t* battLifetime;
+                if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
+                    battLifetime = new lifetime_nmc_t(DataHVACGlobals::TimeStepSys);
+                } else {
+                    // This sets a lifetime model where the capacity is always 100%.
+                    std::vector<double> tblVals{{20, 0, 100, 20, 5000, 100, 20, 10000, 100, 80, 0, 100, 80, 1000, 100, 80, 2000, 100}};
+                    util::matrix_t<double> battLifetimeMatrix(6, 3, &tblVals);
+                    battLifetime = new lifetime_calendar_cycle_t(battLifetimeMatrix, DataHVACGlobals::TimeStepSys);
+                }
+                std::vector<double> batt_losses{0};  // using double because SSC expects a double
 
-            std::vector<double> batt_losses{0};  // using double because SSC expects a double
-
-            // Create the SSC battery object
-            ssc_battery_ = std::unique_ptr<battery_t>(
-                new battery_t(
-                    DataHVACGlobals::TimeStepSys,
-                    battery_params::CHEM::LITHIUM_ION,
-                    new capacity_lithium_ion_t(
-                        maxAhCapacity_,  // Capacity of the whole battery
-                        startingSOC_ * 100.0,
-                        100.0,  // Reset later
-                        0.0,  // Reset later
-                        DataHVACGlobals::TimeStepSys
+                // Create the SSC battery object
+                ssc_battery_ = std::unique_ptr<battery_t>(
+                    new battery_t(
+                        DataHVACGlobals::TimeStepSys,
+                        battery_params::CHEM::LITHIUM_ION,
+                        new capacity_lithium_ion_t(
+                            maxAhCapacity_,  // Capacity of the whole battery
+                            startingSOC_ * 100.0,
+                            100.0,  // Reset later
+                            0.0,  // Reset later
+                            DataHVACGlobals::TimeStepSys
                         ),
-                    new voltage_dynamic_t(
-                        seriesNum_,
-                        parallelNum_,
-                        liIon_Vnom_default_,
-                        liIon_Vfull_,
-                        liIon_Vexp_,
-                        liIon_Vnom_,
-                        liIon_Qfull_,  // Capacity of one cell
-                        liIon_Qexp_,
-                        liIon_Qnom_,
-                        liIon_C_rate_,
-                        internalR_,
-                        DataHVACGlobals::TimeStepSys
+                        new voltage_dynamic_t(
+                            seriesNum_,
+                            parallelNum_,
+                            liIon_Vnom_default_,
+                            liIon_Vfull_,
+                            liIon_Vexp_,
+                            liIon_Vnom_,
+                            liIon_Qfull_,  // Capacity of one cell
+                            liIon_Qexp_,
+                            liIon_Qnom_,
+                            liIon_C_rate_,
+                            internalR_,
+                            DataHVACGlobals::TimeStepSys
                         ),
                         battLifetime,
-                    new thermal_t(
-                        DataHVACGlobals::TimeStepSys,
-                        liIon_mass_,
-                        liIon_surfaceArea_,
-                        internalR_ * seriesNum_ / parallelNum_,  // Electric resistance of the whole battery
-                        liIon_Cp_,
-                        liIon_heatTransferCoef_,
-                        20.0  // Picking a temperature for now, will reset before each run.
+                        new thermal_t(
+                            DataHVACGlobals::TimeStepSys,
+                            liIon_mass_,
+                            liIon_surfaceArea_,
+                            internalR_ * seriesNum_ / parallelNum_,  // Electric resistance of the whole battery
+                            liIon_Cp_,
+                            liIon_heatTransferCoef_,
+                            20.0  // Picking a temperature for now, will reset before each run.
                         ),
-                    new losses_t(batt_losses)
+                        new losses_t(batt_losses)
                     )
                 );
-            ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
-            ssc_initBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+                ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+                ssc_initBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+            }
 
             break;
         }
