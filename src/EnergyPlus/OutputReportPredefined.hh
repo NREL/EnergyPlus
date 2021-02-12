@@ -1162,7 +1162,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     Real64 TotalNotMetOccupiedForABUPS = 0.0;
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
 
-    // Totals for OA report
+    // Totals for OA details report
     Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
     Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at target Voz-Dyn
     Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn

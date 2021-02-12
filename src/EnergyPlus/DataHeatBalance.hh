@@ -1860,34 +1860,34 @@ namespace DataHeatBalance {
         //  - system time step [hrs]
 
         // OA Reports
-        Real64 MechVentVolTotalOcc; // volume for mechanical ventilation of outside air for entire simulation during occupied at current
-        Real64 MechVentVolMin;   // a large number since finding minimum volume at current zone air density
-        Real64 InfilVolTotalOcc;    // volume for infiltration of outside air for entire simulation during occupied at current density
-        Real64 InfilVolMin;      // a large number since finding minimum volume at current zone air density
-        Real64 AFNInfilVolTotalOcc; // volume for infiltration of outside air for entire simulation during occupied at zone air density
-        Real64 AFNInfilVolMin;   // a large number since finding minimum volume at current zone air density
-        Real64 SimpVentVolTotalOcc; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
-        Real64 SimpVentVolMin;   // a large number since finding minimum volumeat current zone air density
-        Real64 MechVentVolTotalStdDen; // volume for mechanical ventilation of outside air for entire simulation at standard density
+        Real64 MechVentVolTotalOcc;       // volume for mechanical ventilation of outside air for entire simulation during occupied at current
+        Real64 MechVentVolMin;            // a large number since finding minimum volume at current zone air density
+        Real64 InfilVolTotalOcc;          // volume for infiltration of outside air for entire simulation during occupied at current density
+        Real64 InfilVolMin;               // a large number since finding minimum volume at current zone air density
+        Real64 AFNInfilVolTotalOcc;       // volume for infiltration of outside air for entire simulation during occupied at zone air density
+        Real64 AFNInfilVolMin;            // a large number since finding minimum volume at current zone air density
+        Real64 SimpVentVolTotalOcc;       // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied current
+        Real64 SimpVentVolMin;            // a large number since finding minimum volumeat current zone air density
+        Real64 MechVentVolTotalStdDen;    // volume for mechanical ventilation of outside air for entire simulation at standard density
         Real64 MechVentVolTotalOccStdDen; // volume for mechanical ventilation of outside air for entire simulation during occupied at std
-        Real64 InfilVolTotalStdDen;    // volume for infiltration of outside air for entire simulation at standard density
+        Real64 InfilVolTotalStdDen;       // volume for infiltration of outside air for entire simulation at standard density
         Real64 InfilVolTotalOccStdDen;    // volume for infiltration of outside air for entire simulation standard density
-        Real64 AFNInfilVolTotalStdDen; // volume for infiltration of outside air for entire simulation at standard density
+        Real64 AFNInfilVolTotalStdDen;    // volume for infiltration of outside air for entire simulation at standard density
         Real64 AFNInfilVolTotalOccStdDen; // volume for infiltration of outside air for entire simulation during occupied at std density
-        Real64 AFNVentVolTotalStdDen;   // current volume flow rate for natural ventilation at standard density
-        Real64 AFNVentVolTotalOccStdDen;   // current volume flow rate for natural ventilation during occupied at standard density
-        Real64 SimpVentVolTotalStdDen; // volume for simple 'ZoneVentilation' of outside air for entire simulation at std density
+        Real64 AFNVentVolTotalStdDen;     // current volume flow rate for natural ventilation at standard density
+        Real64 AFNVentVolTotalOccStdDen;  // current volume flow rate for natural ventilation during occupied at standard density
+        Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' of outside air for entire simulation at std density
         Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied std
-        Real64 VozMin;           // minimum outdoor zone ventilation 
-        Real64 VozTargetTotal;   // volume for target Voz-dyn for entire simulation
-        Real64 VozTargetTotalOcc;   // volume for target Voz-dyn for entire simulation during occupied
-        Real64 VozTargetTimeBelow;  // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
-        Real64 VozTargetTimeAt;  // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
-        Real64 VozTargetTimeAbove;  // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
-        Real64 VozTargetTimeBelowOcc;  // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
-        Real64 VozTargetTimeAtOcc;  // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occupied
-        Real64 VozTargetTimeAboveOcc;  // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
-        Real64 TotVentTimeNonZeroUnocc;  // time [hrs] that mechanical+natural ventilation is > zero during UNoccupied
+        Real64 VozMin;                    // minimum outdoor zone ventilation
+        Real64 VozTargetTotal;            // volume for target Voz-dyn for entire simulation
+        Real64 VozTargetTotalOcc;         // volume for target Voz-dyn for entire simulation during occupied
+        Real64 VozTargetTimeBelow;        // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 VozTargetTimeAt;           // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 VozTargetTimeAbove;        // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 VozTargetTimeBelowOcc;     // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
+        Real64 VozTargetTimeAtOcc;        // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occupied
+        Real64 VozTargetTimeAboveOcc;     // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
+        Real64 TotVentTimeNonZeroUnocc;   // time [hrs] that mechanical+natural ventilation is > zero during UNoccupied
 
         // for Sensible Heat Gas Component Report
         // annual

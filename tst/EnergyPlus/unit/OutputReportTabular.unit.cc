@@ -1487,7 +1487,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     EXPECT_EQ(DataHeatBalance::ZonePreDefRep(1).NumOccAccum, DataHeatBalance::ZonePreDefRep(2).NumOccAccum);
 
     // expect energy to report according to multipliers
-    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotal / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotal), 0.00001);
+    EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolTotalOcc / DataHeatBalance::ZonePreDefRep(1).MechVentVolTotalOcc), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).MechVentVolMin / DataHeatBalance::ZonePreDefRep(1).MechVentVolMin), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnZoneEqCl / DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl), 0.00001);
     EXPECT_NEAR(10.0, (DataHeatBalance::ZonePreDefRep(2).SHGSAnPeoplAdd / DataHeatBalance::ZonePreDefRep(1).SHGSAnPeoplAdd), 0.00001);

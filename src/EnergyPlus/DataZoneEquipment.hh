@@ -295,12 +295,10 @@ namespace DataZoneEquipment {
         // Default Constructor
         EquipConfiguration()
             : ZoneName("Uncontrolled Zone"), ActualZoneNum(0), EquipListIndex(0), ZoneNode(0), NumInletNodes(0), NumExhaustNodes(0),
-              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false),
-
-              ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0),
-              TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0), TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false),
-              InWallActiveElement(false), InCeilingActiveElement(false), ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false),
-              ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0)
+              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false),
+              ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
+              TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
+              ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0)
         {
         }
     };

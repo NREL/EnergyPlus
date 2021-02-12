@@ -4590,8 +4590,13 @@ namespace EnergyPlus::SystemReports {
 
                     // Collect air loop Voz-dyn and natural ventilation
                     int ADUNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeADUNum(ZoneInNum);
-                    int termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(ADUNum).TermUnitSizingNum;
-                    Real64 termUnitOAFrac = DataSizing::TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
+                    Real64 termUnitOAFrac = 1.0;
+                    if (ADUNum > 0) {
+                        int termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(ADUNum).TermUnitSizingNum;
+                        if (termUnitSizingNum > 0) {
+                            termUnitOAFrac = DataSizing::TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
+                        }
+                    }
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                         termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
                     Real64 naturalVentVol = +ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
