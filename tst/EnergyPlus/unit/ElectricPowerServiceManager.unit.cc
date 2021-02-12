@@ -1058,7 +1058,11 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Constructor)
         "  ,               !- Heat Transfer Coefficient Between Battery and Ambient",
         "  1,              !- Fully Charged Cell Voltage",
         "  2,              !- Cell Voltage at End of Exponential Zone",
-        "  3;              !- Cell Voltage at End of Nominal Zone",
+        "  3,              !- Cell Voltage at End of Nominal Zone",
+        "  ,               !- Default Nominal Cell Voltage",
+        "  ,               !- Fully Charged Cell Capacity",
+        "  0.9,            !- Fraction of Cell Capacity Removed at the End of Exponential Zone",
+        "  0.8;            !- Fraction of Cell Capacity Removed at the End of Nominal Zone",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1073,9 +1077,13 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Constructor)
         "   **   ~~~   ** Fully Charged Cell Voltage = 1.000",
         "   **   ~~~   ** Cell Voltage at End of Exponential Zone = 2.000",
         "   **   ~~~   ** Cell Voltage at End of Nominal Zone = 3.000",
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Nominal Zone must be greater than Fraction of Cell Capacity Removed at the End of Exponential Zone.",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Exponential Zone = 0.900",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Nominal Zone = 0.800",
         "   **  Fatal  ** ElectricStorage constructor Preceding errors terminate program.",
         "   ...Summary of Errors that led to program termination:",
-        "   ..... Reference severe error count=1",
+        "   ..... Reference severe error count=2",
         "   ..... Last severe error=ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry."
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));

@@ -3172,8 +3172,14 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
             liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
             liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
-            // FIXME: Validate Qexp and Qnom are less than Qfull, and Qnom > Qexp
-            // Qexp < Qnom < Qfull
+            if (liIon_Qexp_ >= liIon_Qnom_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(16) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(15) + ".");
+                for (int i = 15; i <= 16; ++i) {
+                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                }
+                errorsFound = true;
+            }
             liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
             internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
 
