@@ -838,6 +838,7 @@ namespace LowTempRadiantSystem {
 
             // Determine Low Temp Radiant cooling design capacity sizing method
             if (variableFlowDesignDataObject.DesignCoolingCapMethod == CoolingDesignCapacity) {
+                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
                 if (!lNumericBlanks(4)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(4);
                     if (thisRadSys.ScaledCoolingCapacity < 0.0 && thisRadSys.ScaledCoolingCapacity != AutoSize) {
@@ -854,9 +855,9 @@ namespace LowTempRadiantSystem {
                     }
                 }
             } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == CapacityPerFloorArea) {
-                thisRadSys.CoolingCapMethod = variableFlowDesignDataObject.ScaledCoolingCapacity;
+                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
             } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                thisRadSys.CoolingCapMethod = variableFlowDesignDataObject.ScaledCoolingCapacity;
+                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
             }
 
             // Cooling user input data
