@@ -644,19 +644,19 @@ namespace ThermalComfort {
         state.dataThermalComforts->AbsRadTemp = RadTemp + state.dataThermalComforts->TAbsConv;
         state.dataThermalComforts->AbsAirTemp = AirTemp + state.dataThermalComforts->TAbsConv;
 
-        state.dataThermalComforts->CloInsul = CloUnit * state.dataThermalComforts->CloBodyRat * 0.155; // Thermal resistance of the clothing
+        state.dataThermalComforts->CloInsul = CloUnit * state.dataThermalComforts->CloBodyRat * 0.155; // Thermal resistance of the clothing // icl
 
         P2 = state.dataThermalComforts->CloInsul * 3.96;
         P3 = state.dataThermalComforts->CloInsul * 100.0;
-        P1 = state.dataThermalComforts->CloInsul * state.dataThermalComforts->AbsAirTemp;
-        P4 = 308.7 - 0.028 * state.dataThermalComforts->IntHeatProd + P2 * pow_4(state.dataThermalComforts->AbsRadTemp / 100.0);
+        P1 = state.dataThermalComforts->CloInsul * state.dataThermalComforts->AbsAirTemp; // p4
+        P4 = 308.7 - 0.028 * state.dataThermalComforts->IntHeatProd + P2 * pow_4(state.dataThermalComforts->AbsRadTemp / 100.0); // p5
 
         // First guess for clothed surface tempeature
         state.dataThermalComforts->AbsCloSurfTemp = state.dataThermalComforts->AbsAirTemp + (35.5 - AirTemp) / (3.5 * (CloUnit + 0.1));
         XN = state.dataThermalComforts->AbsCloSurfTemp / 100.0;
         state.dataThermalComforts->HcFor = 12.1 * std::sqrt(AirVel); // Heat transfer coefficient by forced convection
         state.dataThermalComforts->IterNum = 0;
-        XF = XN;
+        XF = XN * 2;
 
         // COMPUTE SURFACE TEMPERATURE OF CLOTHING BY ITERATIONS
         while (((std::abs(XN - XF) > StopIterCrit) || (state.dataThermalComforts->IterNum == 0)) && (state.dataThermalComforts->IterNum < MaxIter)) {

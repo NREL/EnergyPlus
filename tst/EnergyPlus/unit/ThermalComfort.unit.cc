@@ -744,6 +744,31 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.201, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 35.3, 0.1);
+
+
+//    People(1).ActivityLevelPtr = 2;
+//    People(1).ClothingPtr = 3;
+//    People(1).AirVelocityPtr = 4;
+//    ScheduleManager::Schedule.allocate(3);
+//
+    Real64 AirTemp = 26.8;
+    Real64 RadTemp = 26.8;
+    Real64 RelHum = 0.56;
+    Real64 ActMet = 1.1;
+    Real64 CloUnit = 1.0;
+    Real64 AirVel = 0.1;
+
+    ZTAVComf(1) = AirTemp;
+    MRT(1) = RadTemp;
+    ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
+    ScheduleManager::Schedule(2).CurrentValue = ActMet * state->dataThermalComforts->BodySurfArea * state->dataThermalComforts->ActLevelConv;
+    ScheduleManager::Schedule(3).CurrentValue = CloUnit;
+    ScheduleManager::Schedule(4).CurrentValue = AirVel;
+
+    CalcThermalComfortFanger(*state);
+
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, 0.5, 0.005); // -0.44, 0.51, 0.55, 1.16
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 10, 0.1); // 9.1, 10.4, 11.55, 33.48
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
@@ -1018,7 +1043,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 
     ZTAVComf(1) = AirTemp;
     MRT(1) = RadTemp;
-    ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1),RelHum, state->dataEnvrn->OutBaroPress);
+    ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
     ScheduleManager::Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
     ScheduleManager::Schedule(2).CurrentValue = CloUnit;
 

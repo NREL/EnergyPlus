@@ -269,7 +269,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
 
     // MODULE PARAMETER DEFINITIONS
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
-    Real64 const ActLevelConv = 58.2;   // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 const ActLevelConv = 58.15;   // Converter for activity level (1Met = 58.2 W/m2)
     Real64 const BodySurfArea = 1.8;    // Dubois body surface area of the human body (m2)
     Real64 const BodySurfAreaPierce = 1.8258;    // Pierce two node body surface area of the human body (m2)
     Real64 const RadSurfEff = 0.72;     // Fraction of surface effective for radiation
