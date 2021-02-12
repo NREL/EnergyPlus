@@ -1247,7 +1247,7 @@ namespace HeatBalanceManager {
         // A new object is added by B. Nigusse, 02/14
         CurrentModuleObject = "ZoneAirMassFlowConservation";
         NumObjects = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        ZoneAirMassFlow.EnforceZoneMassBalance = false;
+        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
 
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
@@ -1266,14 +1266,14 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "YES") {
-                        ZoneAirMassFlow.BalanceMixing = true;
-                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        state.dataHeatBal->ZoneAirMassFlow.BalanceMixing = true;
+                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "Yes";
                     } else if (SELECT_CASE_var == "NO") {
-                        ZoneAirMassFlow.BalanceMixing = false;
+                        state.dataHeatBal->ZoneAirMassFlow.BalanceMixing = false;
                         AlphaName(1) = "No";
                     } else {
-                        ZoneAirMassFlow.BalanceMixing = false;
+                        state.dataHeatBal->ZoneAirMassFlow.BalanceMixing = false;
                         AlphaName(1) = "No";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No");
                     }
@@ -1283,57 +1283,57 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(2));
                     if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
-                        ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
-                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
-                        ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
-                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
-                        ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
                         AlphaName(2) = "None";
                     } else {
-                        ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
-                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) +
                                          ". The default choice is assigned = AddInfiltrationFlow");
                     }
                 }
             } else {
-                ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
-                ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                 AlphaName(2) = "AddInfiltrationFlow";
             }
-            if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
                 AlphaName(3) = "N/A";
             } else {
                 if (NumAlpha > 2) {
                     {
                         auto const SELECT_CASE_var(AlphaName(3));
                         if (SELECT_CASE_var == "MIXINGSOURCEZONESONLY") {
-                            ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                         } else if (SELECT_CASE_var == "ALLZONES") {
-                            ZoneAirMassFlow.InfiltrationZoneType = AllZones;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = AllZones;
                             AlphaName(3) = "AllZones";
                         } else {
-                            ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) +
                                              ". The default choice is assigned = MixingSourceZonesOnly");
                         }
                     }
                 } else {
-                    ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
                     AlphaName(3) = "MixingSourceZonesOnly";
                 }
             }
         } else {
-            ZoneAirMassFlow.EnforceZoneMassBalance = false;
+            state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
         static constexpr auto Format_732(
@@ -1342,7 +1342,7 @@ namespace HeatBalanceManager {
         static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
         print(state.files.eio, Format_732);
-        if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+        if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
             print(state.files.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
             print(state.files.eio, Format_733, "No", "N/A", "N/A", "N/A");
@@ -3763,7 +3763,7 @@ namespace HeatBalanceManager {
         state.dataHeatBal->TotTCGlazings = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataHeatBal->TotTCGlazings >= 1) {
             // Read TC glazings
-            TCGlazings.allocate(state.dataHeatBal->TotTCGlazings);
+            state.dataHeatBal->TCGlazings.allocate(state.dataHeatBal->TotTCGlazings);
 
             for (Loop = 1; Loop <= state.dataHeatBal->TotTCGlazings; ++Loop) {
                 // Get each TCGlazings from the input processor
@@ -3793,19 +3793,19 @@ namespace HeatBalanceManager {
                 }
 
                 // Allocate arrays
-                TCGlazings(Loop).SpecTemp.allocate(MaterialNumProp);
-                TCGlazings(Loop).LayerName.allocate(MaterialNumProp);
-                TCGlazings(Loop).LayerPoint.allocate(MaterialNumProp);
-                TCGlazings(Loop).SpecTemp = 0.0;
-                TCGlazings(Loop).LayerName = "";
-                TCGlazings(Loop).LayerPoint = 0;
+                state.dataHeatBal->TCGlazings(Loop).SpecTemp.allocate(MaterialNumProp);
+                state.dataHeatBal->TCGlazings(Loop).LayerName.allocate(MaterialNumProp);
+                state.dataHeatBal->TCGlazings(Loop).LayerPoint.allocate(MaterialNumProp);
+                state.dataHeatBal->TCGlazings(Loop).SpecTemp = 0.0;
+                state.dataHeatBal->TCGlazings(Loop).LayerName = "";
+                state.dataHeatBal->TCGlazings(Loop).LayerPoint = 0;
 
-                TCGlazings(Loop).Name = cAlphaArgs(1);
-                TCGlazings(Loop).NumGlzMat = MaterialNumProp;
+                state.dataHeatBal->TCGlazings(Loop).Name = cAlphaArgs(1);
+                state.dataHeatBal->TCGlazings(Loop).NumGlzMat = MaterialNumProp;
 
                 for (iTC = 1; iTC <= MaterialNumProp; ++iTC) {
-                    TCGlazings(Loop).SpecTemp(iTC) = rNumericArgs(iTC);
-                    TCGlazings(Loop).LayerName(iTC) = cAlphaArgs(1 + iTC);
+                    state.dataHeatBal->TCGlazings(Loop).SpecTemp(iTC) = rNumericArgs(iTC);
+                    state.dataHeatBal->TCGlazings(Loop).LayerName(iTC) = cAlphaArgs(1 + iTC);
 
                     // Find this glazing material in the material list
                     iMat = UtilityRoutines::FindItemInList(cAlphaArgs(1 + iTC), state.dataMaterial->Material);
@@ -3813,7 +3813,7 @@ namespace HeatBalanceManager {
                         // TC glazing
                         state.dataMaterial->Material(iMat).SpecTemp = rNumericArgs(iTC);
                         state.dataMaterial->Material(iMat).TCParent = Loop;
-                        TCGlazings(Loop).LayerPoint(iTC) = iMat;
+                        state.dataHeatBal->TCGlazings(Loop).LayerPoint(iTC) = iMat;
 
                         // test that named material is of the right type
                         if (state.dataMaterial->Material(iMat).Group != WindowGlass) {
@@ -4332,11 +4332,11 @@ namespace HeatBalanceManager {
 
                 if (state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) == 0) {
                     // This may be a TC GlazingGroup
-                    state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), TCGlazings);
+                    state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
 
                     if (state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) > 0) {
                         // reset layer pointer to the first glazing in the TC GlazingGroup
-                        state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) = TCGlazings(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).LayerPoint(1);
+                        state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) = state.dataHeatBal->TCGlazings(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).LayerPoint(1);
                         state.dataConstruction->Construct(ConstrNum).TCLayer = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass) ++iMatGlass;
                         state.dataConstruction->Construct(ConstrNum).TCFlag = 1;
@@ -4947,28 +4947,17 @@ namespace HeatBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // load input data for Outdoor Air Node for zones
 
-        // METHODOLOGY EMPLOYED:
-        // usual E+ input processes
-
         // Using/Aliasing
         using namespace DataIPShortCuts;
-
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
-
-        using DataHeatBalance::ZoneLocalEnvironment;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetZoneLocalEnvData: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS:na
-        // DERIVED TYPE DEFINITIONS:na
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
         int NumNumeric;
@@ -4991,8 +4980,8 @@ namespace HeatBalanceManager {
             // Check if IDD definition is correct
             state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
-            if (!allocated(ZoneLocalEnvironment)) {
-                ZoneLocalEnvironment.allocate(TotZoneEnv);
+            if (!allocated(state.dataHeatBal->ZoneLocalEnvironment)) {
+                state.dataHeatBal->ZoneLocalEnvironment.allocate(TotZoneEnv);
             }
 
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
@@ -5010,7 +4999,7 @@ namespace HeatBalanceManager {
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                ZoneLocalEnvironment(Loop).Name = cAlphaArgs(1);
+                state.dataHeatBal->ZoneLocalEnvironment(Loop).Name = cAlphaArgs(1);
 
                 // Assign zone number
                 ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
@@ -5021,7 +5010,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding zone has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    ZoneLocalEnvironment(Loop).ZonePtr = ZoneNum;
+                    state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr = ZoneNum;
                 }
 
                 // Assign outdoor air node number;
@@ -5034,17 +5023,17 @@ namespace HeatBalanceManager {
                                       "\" no corresponding schedule has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    ZoneLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
+                    state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr = NodeNum;
                 }
             }
         }
         // Link zone properties to zone object
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
-                if (ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
-                    if (ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
+                if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
+                    if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
                         state.dataHeatBal->Zone(ZoneLoop).HasLinkedOutAirNode = true;
-                        state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
+                        state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                 }
             }
@@ -7868,7 +7857,7 @@ namespace HeatBalanceManager {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
-                iMat = TCGlazings(iTCG).NumGlzMat;
+                iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
                     ++NumNewConst;
                 }
@@ -7887,13 +7876,13 @@ namespace HeatBalanceManager {
             if (state.dataConstruction->Construct(Loop).TCFlag == 1) {
                 iTCG = state.dataMaterial->Material(state.dataConstruction->Construct(Loop).TCLayer).TCParent;
                 if (iTCG == 0) continue; // hope this was caught already
-                iMat = TCGlazings(iTCG).NumGlzMat;
+                iMat = state.dataHeatBal->TCGlazings(iTCG).NumGlzMat;
                 for (iTC = 1; iTC <= iMat; ++iTC) {
                     ++NumNewConst;
                     state.dataConstruction->Construct(NumNewConst) = state.dataConstruction->Construct(Loop); // copy data
                     state.dataConstruction->Construct(NumNewConst).Name =
-                        format("{}_TC_{:.0R}", state.dataConstruction->Construct(Loop).Name, TCGlazings(iTCG).SpecTemp(iTC));
-                    state.dataConstruction->Construct(NumNewConst).TCLayer = TCGlazings(iTCG).LayerPoint(iTC);
+                        format("{}_TC_{:.0R}", state.dataConstruction->Construct(Loop).Name, state.dataHeatBal->TCGlazings(iTCG).SpecTemp(iTC));
+                    state.dataConstruction->Construct(NumNewConst).TCLayer = state.dataHeatBal->TCGlazings(iTCG).LayerPoint(iTC);
                     state.dataConstruction->Construct(NumNewConst).LayerPoint(state.dataConstruction->Construct(Loop).TCLayerID) = state.dataConstruction->Construct(NumNewConst).TCLayer;
                     state.dataConstruction->Construct(NumNewConst).TCFlag = 1;
                     state.dataConstruction->Construct(NumNewConst).TCMasterConst = Loop;

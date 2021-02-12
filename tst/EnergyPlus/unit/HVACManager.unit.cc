@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 {
 
     state->dataGlobal->isPulseZoneSizing = false;
-    DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance = false;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     state->dataGlobal->WarmupFlag = false;
     DataHVACGlobals::AirLoopsSimOnce = true;
     state->dataEnvrn->StdRhoAir = 1.0;

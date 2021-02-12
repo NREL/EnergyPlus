@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
     bool simZone = false;
     bool simAir = false;
-    DataHeatBalance::MassConservation.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     ZoneEquipmentManager::ManageZoneEquipment(*state, firstHVACIteration, simZone, simAir);
     SimAirServingZones::GetAirPathData(*state);
     SplitterComponent::GetSplitterInput(*state);

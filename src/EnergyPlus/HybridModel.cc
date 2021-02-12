@@ -442,8 +442,8 @@ namespace HybridModel {
             }
 
             // ZoneAirMassFlowConservation should not be activated during the Hybrid Modeling infiltration calculations
-            if (HybridModelZone(ZonePtr).InfiltrationCalc_T && ZoneAirMassFlow.EnforceZoneMassBalance) {
-                ZoneAirMassFlow.EnforceZoneMassBalance = false;
+            if (HybridModelZone(ZonePtr).InfiltrationCalc_T && state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
+                state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
                 ShowWarningError(state, "ZoneAirMassFlowConservation is deactivated when Hybrid Modeling is performed.");
             }
 

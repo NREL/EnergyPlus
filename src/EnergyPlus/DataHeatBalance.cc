@@ -147,10 +147,7 @@ namespace EnergyPlus::DataHeatBalance {
                                                  "COIL:COOLING:DX:MULTISPEED",
                                                  "COIL:HEATING:DX:MULTISPEED",
                                                  "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-                                                 "FAN:SYSTEMMODEL"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16
-                                                                      // | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 |
-                                                                      // 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47
-                                                                      // | 48 | 49 | 50 | 51 | 52 | 53
+                                                 "FAN:SYSTEMMODEL"});
 
     Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                   {"People",
@@ -205,12 +202,9 @@ namespace EnergyPlus::DataHeatBalance {
                                                    "Coil:Cooling:DX:MultiSpeed",
                                                    "Coil:Heating:DX:MultiSpeed",
                                                    "ElectricLoadCenter:Storage:Converter",
-                                                   "Fan:SystemModel"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 |
-                                                                        // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
-                                                                        // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
-                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
+                                                   "Fan:SystemModel"});
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCon(
         3,
         10,
@@ -219,7 +213,7 @@ namespace EnergyPlus::DataHeatBalance {
              0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
             {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsVis(
         3,
         10,
@@ -228,7 +222,7 @@ namespace EnergyPlus::DataHeatBalance {
              0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
             {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                     Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCp(
         3,
         10,
@@ -237,50 +231,13 @@ namespace EnergyPlus::DataHeatBalance {
              0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
             {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
+
     // Gas specific heat ratios.  Used for gasses in low pressure
     Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
-    // Object Data
-    Array1D<TCGlazingsType> TCGlazings;
-    Array1D<ZoneEquipData> ZoneCO2Gen;
-    Array1D<GlobalInternalGainMiscObject> PeopleObjects;
-    Array1D<GlobalInternalGainMiscObject> LightsObjects;
-    Array1D<GlobalInternalGainMiscObject> ZoneElectricObjects;
-    Array1D<GlobalInternalGainMiscObject> ZoneGasObjects;
-    Array1D<GlobalInternalGainMiscObject> HotWaterEqObjects;
-    Array1D<GlobalInternalGainMiscObject> SteamEqObjects;
-    Array1D<GlobalInternalGainMiscObject> OtherEqObjects;
-    Array1D<GlobalInternalGainMiscObject> InfiltrationObjects;
-    Array1D<GlobalInternalGainMiscObject> VentilationObjects;
-    Array1D<ZoneReportVars> ZnRpt;
-    Array1D<ZoneMassConservationData> MassConservation;
-    ZoneAirMassFlowConservation ZoneAirMassFlow;
-    Array1D<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
-
     // Functions
-
-    // Clears the global data in DataHeatBalance.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        TCGlazings.deallocate();
-        ZoneCO2Gen.deallocate();
-        PeopleObjects.deallocate();
-        LightsObjects.deallocate();
-        ZoneElectricObjects.deallocate();
-        ZoneGasObjects.deallocate();
-        HotWaterEqObjects.deallocate();
-        SteamEqObjects.deallocate();
-        OtherEqObjects.deallocate();
-        InfiltrationObjects.deallocate();
-        VentilationObjects.deallocate();
-        ZnRpt.deallocate();
-        MassConservation.deallocate();
-        ZoneLocalEnvironment.deallocate();
-        ZoneAirMassFlow = ZoneAirMassFlowConservation();
-    }
 
     void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
     {

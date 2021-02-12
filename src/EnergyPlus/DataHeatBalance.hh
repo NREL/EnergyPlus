@@ -209,13 +209,8 @@ namespace DataHeatBalance {
 
     constexpr int NumZoneIntGainDeviceTypes(53);
 
-    extern Array1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
-                                                        // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
-                                                        // 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
-
-    extern Array1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 |
-                                                          // 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 |
-                                                          // 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51
+    extern Array1D_string const ZoneIntGainDeviceTypes;
+    extern Array1D_string const ccZoneIntGainDeviceTypes;
 
     constexpr int IntGainTypeOf_People(1);
     constexpr int IntGainTypeOf_Lights(2);
@@ -275,19 +270,20 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     extern Array2D<Real64> const GasCoeffsCon; // Gas conductivity coefficients for gases in a mixture
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     extern Array2D<Real64> const GasCoeffsVis; // Gas viscosity coefficients for gases in a mixture
 
-    //                     Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     extern Array2D<Real64> const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     extern Array1D<Real64> const GasWght; // Gas molecular weights for gases in a mixture
 
-    extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
+    // Gas specific heat ratios.  Used for gasses in low pressure
+    extern Array1D<Real64> const GasSpecificHeatRatio;
 
     struct TCGlazingsType
     {
@@ -1819,28 +1815,7 @@ namespace DataHeatBalance {
         }
     };
 
-    // Object Data
-    extern Array1D<TCGlazingsType> TCGlazings;
-    extern Array1D<ZoneEquipData> ZoneCO2Gen;
-    extern Array1D<GlobalInternalGainMiscObject> PeopleObjects;
-    extern Array1D<GlobalInternalGainMiscObject> LightsObjects;
-    extern Array1D<GlobalInternalGainMiscObject> ZoneElectricObjects;
-    extern Array1D<GlobalInternalGainMiscObject> ZoneGasObjects;
-    extern Array1D<GlobalInternalGainMiscObject> HotWaterEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> SteamEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> OtherEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> InfiltrationObjects;
-    extern Array1D<GlobalInternalGainMiscObject> VentilationObjects;
-    extern Array1D<ZoneReportVars> ZnRpt;
-    extern Array1D<ZoneMassConservationData> MassConservation;
-    extern Array1D<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
-    extern ZoneAirMassFlowConservation ZoneAirMassFlow;
-
     // Functions
-
-    // Clears the global data in DataHeatBalance.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     void SetZoneOutBulbTempAt(EnergyPlusData &state);
 
@@ -2164,6 +2139,21 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimVS_DXCoil;
     Array1D<DataHeatBalance::HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     Array1D<DataHeatBalance::AirReportVars> ZnAirRpt;
+    Array1D<DataHeatBalance::TCGlazingsType> TCGlazings;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneCO2Gen;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> PeopleObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> LightsObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneElectricObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> ZoneGasObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> HotWaterEqObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> SteamEqObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> OtherEqObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
+    Array1D<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
+    Array1D<DataHeatBalance::ZoneReportVars> ZnRpt;
+    Array1D<DataHeatBalance::ZoneMassConservationData> MassConservation;
+    DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
+    Array1D<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
 
     void clear_state() override
     {
@@ -2418,6 +2408,21 @@ struct HeatBalanceData : BaseGlobalStruct
         this->HeatReclaimVS_DXCoil.deallocate();
         this->HeatReclaimSimple_WAHPCoil.deallocate();
         this->ZnAirRpt.deallocate();
+        this->TCGlazings.deallocate();
+        this->ZoneCO2Gen.deallocate();
+        this->PeopleObjects.deallocate();
+        this->LightsObjects.deallocate();
+        this->ZoneElectricObjects.deallocate();
+        this->ZoneGasObjects.deallocate();
+        this->HotWaterEqObjects.deallocate();
+        this->SteamEqObjects.deallocate();
+        this->OtherEqObjects.deallocate();
+        this->InfiltrationObjects.deallocate();
+        this->VentilationObjects.deallocate();
+        this->ZnRpt.deallocate();
+        this->MassConservation.deallocate();
+        this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
+        this->ZoneLocalEnvironment.deallocate();
     }
 };
 

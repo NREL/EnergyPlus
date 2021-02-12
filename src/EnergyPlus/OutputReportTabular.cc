@@ -4526,7 +4526,6 @@ namespace EnergyPlus::OutputReportTabular {
         // The peak reports follow a similar example.
 
         // Using/Aliasing
-        using DataHeatBalance::ZnRpt;
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
@@ -4597,9 +4596,9 @@ namespace EnergyPlus::OutputReportTabular {
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             mult = state.dataHeatBal->Zone(iZone).Multiplier * state.dataHeatBal->Zone(iZone).ListMultiplier;
             // People Sensible Heat Addition
-            state.dataHeatBal->ZonePreDefRep(iZone).SHGSAnPeoplAdd += ZnRpt(iZone).PeopleSenGain * mult * timeStepRatio;
+            state.dataHeatBal->ZonePreDefRep(iZone).SHGSAnPeoplAdd += state.dataHeatBal->ZnRpt(iZone).PeopleSenGain * mult * timeStepRatio;
             // Lights Sensible Heat Addition
-            state.dataHeatBal->ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
+            state.dataHeatBal->ZonePreDefRep(iZone).SHGSAnLiteAdd += state.dataHeatBal->ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
             Real64 ZoneEqHeatorCool =
@@ -4630,9 +4629,9 @@ namespace EnergyPlus::OutputReportTabular {
             // Equipment Sensible Heat Addition
             // Equipment Sensible Heat Removal
             // the following variables are already gains so they do not need to be converted by multiplying by time.
-            eqpSens = (ZnRpt(iZone).ElecRadGain + ZnRpt(iZone).GasRadGain + ZnRpt(iZone).HWRadGain + ZnRpt(iZone).SteamRadGain +
-                       ZnRpt(iZone).OtherRadGain + ZnRpt(iZone).ElecConGain + ZnRpt(iZone).GasConGain + ZnRpt(iZone).HWConGain +
-                       ZnRpt(iZone).SteamConGain + ZnRpt(iZone).OtherConGain) *
+            eqpSens = (state.dataHeatBal->ZnRpt(iZone).ElecRadGain + state.dataHeatBal->ZnRpt(iZone).GasRadGain + state.dataHeatBal->ZnRpt(iZone).HWRadGain + state.dataHeatBal->ZnRpt(iZone).SteamRadGain +
+                       state.dataHeatBal->ZnRpt(iZone).OtherRadGain + state.dataHeatBal->ZnRpt(iZone).ElecConGain + state.dataHeatBal->ZnRpt(iZone).GasConGain + state.dataHeatBal->ZnRpt(iZone).HWConGain +
+                       state.dataHeatBal->ZnRpt(iZone).SteamConGain + state.dataHeatBal->ZnRpt(iZone).OtherConGain) *
                       timeStepRatio;
             if (eqpSens > 0.0) {
                 state.dataHeatBal->ZonePreDefRep(iZone).SHGSAnEquipAdd += eqpSens * mult;
@@ -4730,16 +4729,16 @@ namespace EnergyPlus::OutputReportTabular {
                     state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtHvacATUHt = ATUHeat(iZone); // multipliers included above
                     state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtHvacATUCl = ATUCool(iZone); // multipliers included above
                     // People Sensible Heat Addition
-                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtPeoplAdd = ZnRpt(iZone).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtPeoplAdd = state.dataHeatBal->ZnRpt(iZone).PeopleSenGainRate * mult;
                     // Lights Sensible Heat Addition
-                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtLiteAdd = ZnRpt(iZone).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtLiteAdd = state.dataHeatBal->ZnRpt(iZone).LtsTotGainRate * mult;
                     // Equipment Sensible Heat Addition
                     // Equipment Sensible Heat Removal
                     // non-HVAC ZnAirRpt variables DO NOT include zone multipliers
-                    eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate +
-                              ZnRpt(iZone).SteamRadGainRate + ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate +
-                              ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate + ZnRpt(iZone).SteamConGainRate +
-                              ZnRpt(iZone).OtherConGainRate;
+                    eqpSens = state.dataHeatBal->ZnRpt(iZone).ElecRadGainRate + state.dataHeatBal->ZnRpt(iZone).GasRadGainRate + state.dataHeatBal->ZnRpt(iZone).HWRadGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).SteamRadGainRate + state.dataHeatBal->ZnRpt(iZone).OtherRadGainRate + state.dataHeatBal->ZnRpt(iZone).ElecConGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).GasConGainRate + state.dataHeatBal->ZnRpt(iZone).HWConGainRate + state.dataHeatBal->ZnRpt(iZone).SteamConGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).OtherConGainRate;
                     if (eqpSens > 0.0) {
                         state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtEquipAdd = eqpSens * mult;
                         state.dataHeatBal->ZonePreDefRep(iZone).SHGSHtEquipRem = 0.0;
@@ -4808,15 +4807,15 @@ namespace EnergyPlus::OutputReportTabular {
                     state.dataHeatBal->ZonePreDefRep(iZone).SHGSClHvacATUHt = ATUHeat(iZone);
                     state.dataHeatBal->ZonePreDefRep(iZone).SHGSClHvacATUCl = ATUCool(iZone);
                     // People Sensible Heat Addition
-                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSClPeoplAdd = ZnRpt(iZone).PeopleSenGainRate * mult;
+                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSClPeoplAdd = state.dataHeatBal->ZnRpt(iZone).PeopleSenGainRate * mult;
                     // Lights Sensible Heat Addition
-                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSClLiteAdd = ZnRpt(iZone).LtsTotGainRate * mult;
+                    state.dataHeatBal->ZonePreDefRep(iZone).SHGSClLiteAdd = state.dataHeatBal->ZnRpt(iZone).LtsTotGainRate * mult;
                     // Equipment Sensible Heat Addition
                     // Equipment Sensible Heat Removal
-                    eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate +
-                              ZnRpt(iZone).SteamRadGainRate + ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate +
-                              ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate + ZnRpt(iZone).SteamConGainRate +
-                              ZnRpt(iZone).OtherConGainRate;
+                    eqpSens = state.dataHeatBal->ZnRpt(iZone).ElecRadGainRate + state.dataHeatBal->ZnRpt(iZone).GasRadGainRate + state.dataHeatBal->ZnRpt(iZone).HWRadGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).SteamRadGainRate + state.dataHeatBal->ZnRpt(iZone).OtherRadGainRate + state.dataHeatBal->ZnRpt(iZone).ElecConGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).GasConGainRate + state.dataHeatBal->ZnRpt(iZone).HWConGainRate + state.dataHeatBal->ZnRpt(iZone).SteamConGainRate +
+                              state.dataHeatBal->ZnRpt(iZone).OtherConGainRate;
                     if (eqpSens > 0.0) {
                         state.dataHeatBal->ZonePreDefRep(iZone).SHGSClEquipAdd = eqpSens * mult;
                         state.dataHeatBal->ZonePreDefRep(iZone).SHGSClEquipRem = 0.0;
@@ -4919,14 +4918,14 @@ namespace EnergyPlus::OutputReportTabular {
                 state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUHt += ATUHeat(iZone);
                 state.dataHeatBal->BuildingPreDefRep.SHGSHtHvacATUCl += ATUCool(iZone);
                 // People Sensible Heat Addition
-                state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd += ZnRpt(iZone).PeopleSenGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtPeoplAdd += state.dataHeatBal->ZnRpt(iZone).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
-                state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += ZnRpt(iZone).LtsTotGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSHtLiteAdd += state.dataHeatBal->ZnRpt(iZone).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate + ZnRpt(iZone).SteamRadGainRate +
-                          ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate + ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate +
-                          ZnRpt(iZone).SteamConGainRate + ZnRpt(iZone).OtherConGainRate;
+                eqpSens = state.dataHeatBal->ZnRpt(iZone).ElecRadGainRate + state.dataHeatBal->ZnRpt(iZone).GasRadGainRate + state.dataHeatBal->ZnRpt(iZone).HWRadGainRate + state.dataHeatBal->ZnRpt(iZone).SteamRadGainRate +
+                          state.dataHeatBal->ZnRpt(iZone).OtherRadGainRate + state.dataHeatBal->ZnRpt(iZone).ElecConGainRate + state.dataHeatBal->ZnRpt(iZone).GasConGainRate + state.dataHeatBal->ZnRpt(iZone).HWConGainRate +
+                          state.dataHeatBal->ZnRpt(iZone).SteamConGainRate + state.dataHeatBal->ZnRpt(iZone).OtherConGainRate;
                 if (eqpSens > 0.0) {
                     state.dataHeatBal->BuildingPreDefRep.SHGSHtEquipAdd += eqpSens * mult;
                 } else {
@@ -5007,14 +5006,14 @@ namespace EnergyPlus::OutputReportTabular {
                 state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUHt += ATUHeat(iZone);
                 state.dataHeatBal->BuildingPreDefRep.SHGSClHvacATUCl += ATUCool(iZone);
                 // People Sensible Heat Addition
-                state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd += ZnRpt(iZone).PeopleSenGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClPeoplAdd += state.dataHeatBal->ZnRpt(iZone).PeopleSenGainRate * mult;
                 // Lights Sensible Heat Addition
-                state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += ZnRpt(iZone).LtsTotGainRate * mult;
+                state.dataHeatBal->BuildingPreDefRep.SHGSClLiteAdd += state.dataHeatBal->ZnRpt(iZone).LtsTotGainRate * mult;
                 // Equipment Sensible Heat Addition
                 // Equipment Sensible Heat Removal
-                eqpSens = ZnRpt(iZone).ElecRadGainRate + ZnRpt(iZone).GasRadGainRate + ZnRpt(iZone).HWRadGainRate + ZnRpt(iZone).SteamRadGainRate +
-                          ZnRpt(iZone).OtherRadGainRate + ZnRpt(iZone).ElecConGainRate + ZnRpt(iZone).GasConGainRate + ZnRpt(iZone).HWConGainRate +
-                          ZnRpt(iZone).SteamConGainRate + ZnRpt(iZone).OtherConGainRate;
+                eqpSens = state.dataHeatBal->ZnRpt(iZone).ElecRadGainRate + state.dataHeatBal->ZnRpt(iZone).GasRadGainRate + state.dataHeatBal->ZnRpt(iZone).HWRadGainRate + state.dataHeatBal->ZnRpt(iZone).SteamRadGainRate +
+                          state.dataHeatBal->ZnRpt(iZone).OtherRadGainRate + state.dataHeatBal->ZnRpt(iZone).ElecConGainRate + state.dataHeatBal->ZnRpt(iZone).GasConGainRate + state.dataHeatBal->ZnRpt(iZone).HWConGainRate +
+                          state.dataHeatBal->ZnRpt(iZone).SteamConGainRate + state.dataHeatBal->ZnRpt(iZone).OtherConGainRate;
                 if (eqpSens > 0.0) {
                     state.dataHeatBal->BuildingPreDefRep.SHGSClEquipAdd += eqpSens * mult;
                 } else {

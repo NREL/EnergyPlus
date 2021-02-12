@@ -886,7 +886,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalance::ZnRpt.allocate(1);
+    state->dataHeatBal->ZnRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -1326,26 +1326,26 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     // First time should be all good, because ZnRpt values initialize to zero
     InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
     InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)

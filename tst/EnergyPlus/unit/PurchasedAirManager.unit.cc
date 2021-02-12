@@ -119,7 +119,7 @@ protected:
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
         NonAirSystemResponse.allocate(1);
         SysDepZoneLoads.allocate(1);
-        MassConservation.allocate(1);
+        state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
         SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);

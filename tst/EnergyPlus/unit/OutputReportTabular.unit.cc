@@ -1441,43 +1441,43 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGain, DataHeatBalance::ZnRpt(2).PeopleRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleConGain, DataHeatBalance::ZnRpt(2).PeopleConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleSenGain, DataHeatBalance::ZnRpt(2).PeopleSenGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleNumOcc, DataHeatBalance::ZnRpt(2).PeopleNumOcc);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleLatGain, DataHeatBalance::ZnRpt(2).PeopleLatGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleTotGain, DataHeatBalance::ZnRpt(2).PeopleTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGainRate, DataHeatBalance::ZnRpt(2).PeopleRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleConGainRate, DataHeatBalance::ZnRpt(2).PeopleConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleSenGainRate, DataHeatBalance::ZnRpt(2).PeopleSenGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleLatGainRate, DataHeatBalance::ZnRpt(2).PeopleLatGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleTotGainRate, DataHeatBalance::ZnRpt(2).PeopleTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGain, state->dataHeatBal->ZnRpt(2).PeopleRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleConGain, state->dataHeatBal->ZnRpt(2).PeopleConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleSenGain, state->dataHeatBal->ZnRpt(2).PeopleSenGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleNumOcc, state->dataHeatBal->ZnRpt(2).PeopleNumOcc);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleLatGain, state->dataHeatBal->ZnRpt(2).PeopleLatGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleTotGain, state->dataHeatBal->ZnRpt(2).PeopleTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGainRate, state->dataHeatBal->ZnRpt(2).PeopleRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleConGainRate, state->dataHeatBal->ZnRpt(2).PeopleConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleSenGainRate, state->dataHeatBal->ZnRpt(2).PeopleSenGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleLatGainRate, state->dataHeatBal->ZnRpt(2).PeopleLatGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleTotGainRate, state->dataHeatBal->ZnRpt(2).PeopleTotGainRate);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, DataHeatBalance::ZnRpt(2).LtsPower);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsElecConsump, DataHeatBalance::ZnRpt(2).LtsElecConsump);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRadGain, DataHeatBalance::ZnRpt(2).LtsRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsVisGain, DataHeatBalance::ZnRpt(2).LtsVisGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsConGain, DataHeatBalance::ZnRpt(2).LtsConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRetAirGain, DataHeatBalance::ZnRpt(2).LtsRetAirGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsTotGain, DataHeatBalance::ZnRpt(2).LtsTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRadGainRate, DataHeatBalance::ZnRpt(2).LtsRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsVisGainRate, DataHeatBalance::ZnRpt(2).LtsVisGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsConGainRate, DataHeatBalance::ZnRpt(2).LtsConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsRetAirGainRate, DataHeatBalance::ZnRpt(2).LtsRetAirGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsTotGainRate, DataHeatBalance::ZnRpt(2).LtsTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, state->dataHeatBal->ZnRpt(2).LtsPower);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsElecConsump, state->dataHeatBal->ZnRpt(2).LtsElecConsump);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRadGain, state->dataHeatBal->ZnRpt(2).LtsRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsVisGain, state->dataHeatBal->ZnRpt(2).LtsVisGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsConGain, state->dataHeatBal->ZnRpt(2).LtsConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRetAirGain, state->dataHeatBal->ZnRpt(2).LtsRetAirGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsTotGain, state->dataHeatBal->ZnRpt(2).LtsTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRadGainRate, state->dataHeatBal->ZnRpt(2).LtsRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsVisGainRate, state->dataHeatBal->ZnRpt(2).LtsVisGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsConGainRate, state->dataHeatBal->ZnRpt(2).LtsConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsRetAirGainRate, state->dataHeatBal->ZnRpt(2).LtsRetAirGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsTotGainRate, state->dataHeatBal->ZnRpt(2).LtsTotGainRate);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, DataHeatBalance::ZnRpt(2).ElecPower);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConsump, DataHeatBalance::ZnRpt(2).ElecConsump);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecRadGain, DataHeatBalance::ZnRpt(2).ElecRadGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConGain, DataHeatBalance::ZnRpt(2).ElecConGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLatGain, DataHeatBalance::ZnRpt(2).ElecLatGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLost, DataHeatBalance::ZnRpt(2).ElecLost);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecTotGain, DataHeatBalance::ZnRpt(2).ElecTotGain);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecRadGainRate, DataHeatBalance::ZnRpt(2).ElecRadGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecConGainRate, DataHeatBalance::ZnRpt(2).ElecConGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLatGainRate, DataHeatBalance::ZnRpt(2).ElecLatGainRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecLostRate, DataHeatBalance::ZnRpt(2).ElecLostRate);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecTotGainRate, DataHeatBalance::ZnRpt(2).ElecTotGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, state->dataHeatBal->ZnRpt(2).ElecPower);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConsump, state->dataHeatBal->ZnRpt(2).ElecConsump);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecRadGain, state->dataHeatBal->ZnRpt(2).ElecRadGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConGain, state->dataHeatBal->ZnRpt(2).ElecConGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLatGain, state->dataHeatBal->ZnRpt(2).ElecLatGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLost, state->dataHeatBal->ZnRpt(2).ElecLost);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecTotGain, state->dataHeatBal->ZnRpt(2).ElecTotGain);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecRadGainRate, state->dataHeatBal->ZnRpt(2).ElecRadGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecConGainRate, state->dataHeatBal->ZnRpt(2).ElecConGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLatGainRate, state->dataHeatBal->ZnRpt(2).ElecLatGainRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecLostRate, state->dataHeatBal->ZnRpt(2).ElecLostRate);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecTotGainRate, state->dataHeatBal->ZnRpt(2).ElecTotGainRate);
 
     // expect occupancy time data to be equal
     EXPECT_EQ(state->dataHeatBal->ZonePreDefRep(1).NumOccAccumTime, state->dataHeatBal->ZonePreDefRep(2).NumOccAccumTime);
@@ -8317,7 +8317,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataHeatBal->Zone(1).Multiplier = 1;
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
 
-    DataHeatBalance::ZnRpt.allocate(1);
+    state->dataHeatBal->ZnRpt.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
 
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);

@@ -434,7 +434,7 @@ namespace OutdoorAirUnit {
 
             if (lAlphaBlanks(7)) {
                 OutAirUnit(OAUnitNum).ExtFan = false;
-                if (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance) {
+                if (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFields(7) + " is blank.");
                     ShowContinueError(state, "Unbalanced mass flow rates between supply from outdoor air and exhaust from zone air will be introduced.");
                 }
@@ -475,7 +475,7 @@ namespace OutdoorAirUnit {
 
             // N2
             OutAirUnit(OAUnitNum).ExtAirVolFlow = NumArray(2);
-            if ((OutAirUnit(OAUnitNum).ExtFan) && (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
+            if ((OutAirUnit(OAUnitNum).ExtFan) && (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance)) {
                 if (NumArray(2) != NumArray(1)) {
                     ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFields(1) + " and " + cNumericFields(2) +
                                      " are not equal. This may cause unbalanced flow.");
@@ -493,7 +493,7 @@ namespace OutdoorAirUnit {
                     ErrorsFound = true;
                 } else {
                     if ((OutAirUnit(OAUnitNum).ExtOutAirSchedPtr != OutAirUnit(OAUnitNum).OutAirSchedPtr) &&
-                        (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
+                        (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance)) {
                         ShowWarningError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                          "\", different schedule inputs for outdoor air and exhaust air schedules may cause unbalanced mass flow.");
                         ShowContinueError(state, cAlphaFields(4) + "=" + cAlphaArgs(4) + " and " + cAlphaFields(8) + "=" + cAlphaArgs(8));
@@ -1795,7 +1795,7 @@ namespace OutdoorAirUnit {
 
             // Air mass balance check
             if ((std::abs(OutAirUnit(OAUnitNum).ExtAirMassFlow - OutAirUnit(OAUnitNum).OutAirMassFlow) > 0.001) &&
-                (!DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance)) {
+                (!state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance)) {
                 if (!OutAirUnit(OAUnitNum).FlowError) {
                     ShowWarningError(state, "Air mass flow between zone supply and exhaust is not balanced. Only the first occurrence is reported.");
                     ShowContinueError(state, "Occurs in ZoneHVAC:OutdoorAirUnit Object= " + OutAirUnit(OAUnitNum).Name);

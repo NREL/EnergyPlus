@@ -345,7 +345,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -470,7 +470,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -577,7 +577,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -689,7 +689,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -802,7 +802,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -900,7 +900,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);
@@ -999,7 +999,7 @@ namespace ZoneContaminantPredictorCorrector {
                 RepVarSet(ZonePtr) = false;
                 SetupOutputVariable(state, "Zone Generic Air Contaminant Generation Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
-                                    ZnRpt(ZonePtr).GCRate,
+                                    state.dataHeatBal->ZnRpt(ZonePtr).GCRate,
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(ZonePtr).Name);

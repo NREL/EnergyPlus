@@ -1527,13 +1527,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::ZoneAirMassFlow;
         using Fans::SimulateFanComponents;
-
         using HeatRecovery::SimHeatRecovery;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1681,7 +1676,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             //      END DO
             TotalExhaustMassFlow = Node(ExhaustInletNode).MassFlowRate;
             TotalSupplyMassFlow = Node(SupInletNode).MassFlowRate;
-            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !ZoneAirMassFlow.EnforceZoneMassBalance) {
+            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                 ShowWarningError(state, "For " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name +
                                  "\" there is unbalanced exhaust air flow.");
                 ShowContinueError(state, format("... The exhaust air mass flow rate = {:.6R}", Node(ExhaustInletNode).MassFlowRate));
