@@ -56,12 +56,8 @@
 
 import json
 import os
+import re
 import sys
-
-
-def usage():
-    print("""This script verifies that the idf list in CMakeLists.txt matches the idf files in the testfiles directory.
-Call with one argument: the directory which includes idfs and the CMakeLists.txt file""")
 
 
 current_script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -70,13 +66,15 @@ test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
 cmake_lists_file = os.path.join(test_files_dir, "CMakeLists.txt")
 cmake_list_idf_files = set()
 with open(cmake_lists_file) as f:
-    for line in f.readlines():
-        line_stripped = line.strip()
-        if "ADD_SIMULATION_TEST" in line_stripped:
-            idf_file_index = line_stripped.index("IDF_FILE")
-            epw_file_index = line_stripped.index("EPW_FILE")
-            filename = line_stripped[idf_file_index + 9:epw_file_index - 1]
-            cmake_list_idf_files.add(filename)
+    contents = f.read()
+    matches = re.findall(r'\(([^)]+)\)', contents, re.MULTILINE)
+    for match in matches:
+        if 'IDF_FILE' not in match:
+            continue
+        cleaned_match = match.replace('\n', '')
+        tokens = cleaned_match.split()  # special case that allows multiple whitespace delimiters
+        filename = tokens[1]
+        cmake_list_idf_files.add(filename)
 
 found_idf_files = set()
 for root, dirs, files in os.walk(test_files_dir):
