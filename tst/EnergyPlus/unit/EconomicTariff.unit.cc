@@ -678,9 +678,9 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
 }
 
-TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 {
-    // Test for PR #8456 and Issue #8455 ...
+    // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
     // to ensure UtilityCost:Variable inputs being procesed properly
 
     std::string const idf_objects = delimited_string({
@@ -757,6 +757,12 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test1)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 1 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
 
     std::string const idf_objects1 = delimited_string({
 
@@ -810,6 +816,8 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
         "11.00, !-November Value",
         "12.00; !-December Value"});
 
+    bool ErrorsFound = false;
+
     ASSERT_TRUE(process_idf(idf_objects1));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
@@ -828,6 +836,12 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test2)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 2 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
 
     std::string const idf_objects2 = delimited_string({
 
@@ -881,6 +895,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
         "11.00, !-November Value",
         "12.00; !-December Value"});
 
+    bool ErrorsFound = false;
     ASSERT_TRUE(process_idf(idf_objects2));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
@@ -899,6 +914,12 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
     EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test3)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 3 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
 
     std::string const idf_objects3 = delimited_string({
 
@@ -952,6 +973,7 @@ TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable)
         "11.00, !-November Value",
         "12.00; !-December Value"});
 
+    bool ErrorsFound = false;
     ASSERT_TRUE(process_idf(idf_objects3));
     GetInputEconomicsVariable(*state, ErrorsFound);
 
