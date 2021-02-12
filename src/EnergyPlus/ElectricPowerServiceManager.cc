@@ -2945,13 +2945,14 @@ ElectricStorage::ElectricStorage( // main constructor
       energeticEfficCharge_(0.0), energeticEfficDischarge_(0.0), maxPowerDraw_(0.0), maxPowerStore_(0.0), maxEnergyCapacity_(0.0), parallelNum_(0),
       seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0),
       availableFrac_(0.0), chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
-      maxChargeRate_(0.0), lifeCalculation_(BatteryDegradationModelType::degredationNotSet), lifeCurveNum_(0), thisTimeStepStateOfCharge_(0.0),
-      lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0),
-      timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0), lastTimeStepBound_(0.0),
-      lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0), thermLossRate_(0.0), thermLossEnergy_(0.0),
-      storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0), batteryDamage_(0.0),
+      maxChargeRate_(0.0), lifeCalculation_(BatteryDegradationModelType::degredationNotSet), lifeCurveNum_(0),
       liIon_dcToDcChargingEff_(0.0), liIon_mass_(0.0), liIon_surfaceArea_(0.0), liIon_Cp_(0.0), liIon_heatTransferCoef_(0.0), liIon_Vfull_(0.0),
-      liIon_Vexp_(0.0), liIon_Vnom_(0.0), liIon_Vnom_default_(0.0), liIon_Qfull_(0.0), liIon_Qexp_(0.0), liIon_Qnom_(0.0), liIon_C_rate_(0.0)
+      liIon_Vexp_(0.0), liIon_Vnom_(0.0), liIon_Vnom_default_(0.0), liIon_Qfull_(0.0), liIon_Qexp_(0.0), liIon_Qnom_(0.0), liIon_C_rate_(0.0),
+      thisTimeStepStateOfCharge_(0.0), lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0),
+      qdotConvZone_(0.0), qdotRadZone_(0.0), timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0),
+      lastTimeStepBound_(0.0), lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0),
+      thermLossRate_(0.0), thermLossEnergy_(0.0), storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0),
+      batteryDamage_(0.0)
 {
 
     std::string const routineName = "ElectricStorage constructor ";
@@ -3172,6 +3173,7 @@ ElectricStorage::ElectricStorage( // main constructor
             liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
             liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
             // FIXME: Validate Qexp and Qnom are less than Qfull, and Qnom > Qexp
+            // Qexp < Qnom < Qfull
             liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
             internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
 
