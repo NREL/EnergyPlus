@@ -7,7 +7,8 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGING_INSTALL_PREFIX}")
   set(CPACK_NSIS_INSTALL_ROOT "C:")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGING_INSTALL_PREFIX}")
-  set(CPACK_NSIS_DEFINES "
+  set(CPACK_NSIS_DEFINES
+      "
     !define MUI_STARTMENUPAGE_DEFAULTFOLDER \"${CPACK_PACKAGING_INSTALL_PREFIX} Programs\"
     !include \"LogicLib.nsh\"
     !include \"x64.nsh\"
@@ -15,19 +16,29 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   set(CPACK_PACKAGING_INSTALL_PREFIX "")
 
   set(CPACK_NSIS_MENU_LINKS
-    "Documentation/index.html" "EnergyPlus Documentation"
-    "PostProcess/EP-Compare/EP-Compare.exe" "EP-Compare"
-    "PreProcess/EPDraw/EPDrawGUI.exe" "EPDrawGUI"
-    "EP-Launch.exe" "EP-Launch"
-    "ExampleFiles/ExampleFiles.html" "Example Files Summary"
-    "ExampleFiles/ExampleFiles-ObjectsLink.html" "ExampleFiles Link to Objects"
-    "PreProcess/IDFEditor/IDFEditor.exe" "IDFEditor"
-    "PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe" "IDFVersionUpdater"
-    "readme.html" "Readme Notes"
-    "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions"
-  )
+      "Documentation/index.html"
+      "EnergyPlus Documentation"
+      "PostProcess/EP-Compare/EP-Compare.exe"
+      "EP-Compare"
+      "PreProcess/EPDraw/EPDrawGUI.exe"
+      "EPDrawGUI"
+      "EP-Launch.exe"
+      "EP-Launch"
+      "ExampleFiles/ExampleFiles.html"
+      "Example Files Summary"
+      "ExampleFiles/ExampleFiles-ObjectsLink.html"
+      "ExampleFiles Link to Objects"
+      "PreProcess/IDFEditor/IDFEditor.exe"
+      "IDFEditor"
+      "PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe"
+      "IDFVersionUpdater"
+      "readme.html"
+      "Readme Notes"
+      "PreProcess/WeatherConverter/Weather.exe"
+      "Weather Statistics and Conversions")
 
-  set(CPACK_NSIS_PAGE_COMPONENTS "
+  set(CPACK_NSIS_PAGE_COMPONENTS
+      "
     !define MUI_FINISHPAGE_RUN
     !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
     !define MUI_FINISHPAGE_SHOWREADME \"$INSTDIR\\readme.html\"
@@ -64,7 +75,8 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     FunctionEnd
   ")
 
-  set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+      "
     WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"AutoCheck\" \"True\"
     WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"CheckURL\" \"http://nrel.github.io/EnergyPlus/epupdate.htm\"
     StrCpy $0 \"#@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@-@CPACK_PACKAGE_VERSION_BUILD@\"
@@ -164,7 +176,8 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     \${EndIf}
     RMDir /r $INSTDIR\\temp
   ")
-  set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+  set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS
+      "
     MessageBox MB_YESNO|MB_ICONEXCLAMATION \"The installer copied the following files to the system directory during installation:$\\r$\\n$\\r$\\nMSCOMCTL.OCX$\\r$\\nComDlg32.OCX$\\r$\\nMsvcrtd.dll$\\r$\\nDforrt.dll$\\r$\\nGswdll32.dll$\\r$\\nGsw32.exe$\\r$\\nGraph32.ocx$\\r$\\nMSINET.OCX$\\r$\\nVsflex7L.ocx$\\r$\\nMsflxgrd.ocx$\\r$\\n$\\r$\\nThese files may be in use by other programs. Click Yes to remove these files. If you are unsure, click No.\" IDYES true IDNO false
     true:
       \${If} \${RunningX64}
@@ -211,8 +224,7 @@ endif()
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
   set(CPACK_PACKAGE_RELOCATABLE false)
-  set( CPACK_PACKAGE_VENDOR "usdoe" )
+  set(CPACK_PACKAGE_VENDOR "usdoe")
   configure_file(@CMAKE_SOURCE_DIR@/cmake/CPack.Info.plist.in.in "@CMAKE_BINARY_DIR@/Modules/CPack.Info.plist.in")
   set(CPACK_RESOURCE_FILE_README "@CMAKE_SOURCE_DIR@/release/readme.html")
 endif()
-
