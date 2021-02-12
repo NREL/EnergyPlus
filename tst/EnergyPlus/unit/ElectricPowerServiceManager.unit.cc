@@ -1127,7 +1127,8 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     ASSERT_NEAR(battery.storedEnergy(), 0.0, 0.1);
     ASSERT_NEAR(battery.drawnPower(), powerDischarge, 0.1);
     ASSERT_NEAR(battery.drawnEnergy(), powerDischarge * 15 * 60, 0.1);
-    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.9, 0.01);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.929, 0.01);
+    ASSERT_NEAR(battery.batteryTemperature(), 20.1, 0.1);
 
     DataHVACGlobals::SysTimeElapsed += DataHVACGlobals::TimeStepSys;
     powerDischarge = 0.0;
@@ -1139,8 +1140,8 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
 
     // Doesn't accept all the power, because the battery will be at capacity.
-    ASSERT_NEAR(battery.storedPower(), 3148.8, 0.1);
-    ASSERT_NEAR(battery.storedEnergy(), 2833963.1, 0.1);
+    ASSERT_NEAR(battery.storedPower(), 1330.35, 0.1);
+    ASSERT_NEAR(battery.storedEnergy(), 1197315.3, 0.1);
     ASSERT_NEAR(battery.drawnPower(), 0.0, 0.1);
     ASSERT_NEAR(battery.drawnEnergy(), 0.0, 0.1);
     ASSERT_NEAR(battery.stateOfChargeFraction(), socMax, 0.01);
@@ -1152,7 +1153,7 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     discharging = true;
     battery.timeCheckAndUpdate(*state);
     battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
-    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.813, 0.01);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.837, 0.01);
 
     // See that the battery state is reset at the beginning of a new environment (and also at the end of warmup)
     DataHVACGlobals::SysTimeElapsed = 0.0;

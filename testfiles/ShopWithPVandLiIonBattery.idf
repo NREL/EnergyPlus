@@ -5225,6 +5225,8 @@
 
   Output:Variable,*,Electric Storage Total Voltage,timestep;
 
+  Output:Variable,*,Electric Storage Battery Temperature,timestep;
+
   Output:Variable,*,Electric Load Center Produced Electricity Rate,timestep;
 
   Output:Variable,*,Electric Load Center Produced Electricity Energy,timestep;

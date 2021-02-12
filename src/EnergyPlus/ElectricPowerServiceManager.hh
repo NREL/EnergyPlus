@@ -272,6 +272,8 @@ public: // methods
 
     Real64 stateOfChargeFraction() const;
 
+    Real64 batteryTemperature() const;
+
     bool determineCurrentForBatteryDischarge(EnergyPlusData &state,
                                              Real64 &curI0,
                                              Real64 &curT0,
@@ -428,6 +430,7 @@ private: // data
     Real64 batteryCurrent_;       // [A] total current
     Real64 batteryVoltage_;       // [V] total voltage
     Real64 batteryDamage_;        // [ ] fractional battery damage
+    Real64 batteryTemperature_;    // [C] battery temperature (only used in Li-ion batteries)
 
 }; // ElectricStorage
 

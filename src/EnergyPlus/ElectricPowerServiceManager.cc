@@ -2952,7 +2952,7 @@ ElectricStorage::ElectricStorage( // main constructor
       qdotConvZone_(0.0), qdotRadZone_(0.0), timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0),
       lastTimeStepBound_(0.0), lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0),
       thermLossRate_(0.0), thermLossEnergy_(0.0), storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0),
-      batteryDamage_(0.0)
+      batteryDamage_(0.0), batteryTemperature_(0.0)
 {
 
     std::string const routineName = "ElectricStorage constructor ";
@@ -3303,6 +3303,9 @@ ElectricStorage::ElectricStorage( // main constructor
             } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
                 SetupEMSInternalVariable(state, "Electrical Storage Battery Maximum Capacity", name_, "[Ah]", maxAhCapacity_);
             }
+        }
+        if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+            SetupOutputVariable(state, "Electric Storage Battery Temperature", OutputProcessor::Unit::C, batteryTemperature_, "System", "Average", name_);
         }
 
         if (zoneNum_ > 0) {
@@ -3913,6 +3916,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     decrementedEnergyStored_ = - storedEnergy_;
     thermLossRate_ = battState2.thermal->heat_dissipated * 1000.0;  // kW -> W
     thermLossEnergy_ = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    batteryTemperature_ = battState2.thermal->T_batt;
 
     // Zone Heat Gains
     if (zoneNum_ > 0) { // set values for zone heat gains
@@ -3944,6 +3948,12 @@ Real64 ElectricStorage::storedEnergy() const
 Real64 ElectricStorage::stateOfChargeFraction() const
 {
     return fractionSOC_;
+}
+
+Real64 ElectricStorage::batteryTemperature() const
+{
+    assert(storageModelMode_ == StorageModelType::liIonNmcBattery);
+    return batteryTemperature_;
 }
 
 bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
