@@ -3843,8 +3843,6 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
                                                    Real64 const controlSOCMinFracLimit)
 {
 
-    // FIXME: Do availability schedule check.
-
     // Copy the battery state from the end of last timestep
     battery_state battState = *ssc_lastBatteryState_;
 
@@ -3935,6 +3933,11 @@ Real64 ElectricStorage::drawnEnergy() const
 Real64 ElectricStorage::storedEnergy() const
 {
     return storedEnergy_;
+}
+
+Real64 ElectricStorage::stateOfChargeFraction() const
+{
+    return fractionSOC_;
 }
 
 bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,

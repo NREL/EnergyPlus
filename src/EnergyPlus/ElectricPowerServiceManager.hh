@@ -270,6 +270,8 @@ public: // methods
 
     Real64 storedEnergy() const;
 
+    Real64 stateOfChargeFraction() const;
+
     bool determineCurrentForBatteryDischarge(EnergyPlusData &state,
                                              Real64 &curI0,
                                              Real64 &curT0,
