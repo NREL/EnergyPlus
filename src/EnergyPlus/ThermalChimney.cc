@@ -336,8 +336,8 @@ namespace ThermalChimney {
         Array1D_bool RepVarSet;
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
         for (Loop = 1; Loop <= state.dataHeatBal->TotInfiltration; ++Loop) {
-            if (Infiltration(Loop).ZonePtr > 0 && !Infiltration(Loop).QuadratureSum) {
-                RepVarSet(Infiltration(Loop).ZonePtr) = false;
+            if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && !state.dataHeatBal->Infiltration(Loop).QuadratureSum) {
+                RepVarSet(state.dataHeatBal->Infiltration(Loop).ZonePtr) = false;
             }
         }
         // Set up the output variables for thermal chimneys

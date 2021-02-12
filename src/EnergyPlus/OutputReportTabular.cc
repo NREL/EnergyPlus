@@ -9602,10 +9602,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataHeatBalance::ZoneElectric;
-        using DataHeatBalance::ZoneGas;
-        using DataHeatBalance::ZoneHWEq;
-        using DataHeatBalance::ZoneOtherEq;
         using DataStringGlobals::VerString;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::FrameDivider;
@@ -10306,23 +10302,23 @@ namespace EnergyPlus::OutputReportTabular {
                 // plug and process density
                 totPlugProcess = 0.0;
                 for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotElecEquip; ++iPlugProc) {
-                    if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
+                    if (iZone == state.dataHeatBal->ZoneElectric(iPlugProc).ZonePtr) {
+                        totPlugProcess += state.dataHeatBal->ZoneElectric(iPlugProc).DesignLevel;
                     }
                 }
                 for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotGasEquip; ++iPlugProc) {
-                    if (iZone == ZoneGas(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
+                    if (iZone == state.dataHeatBal->ZoneGas(iPlugProc).ZonePtr) {
+                        totPlugProcess += state.dataHeatBal->ZoneGas(iPlugProc).DesignLevel;
                     }
                 }
                 for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotOthEquip; ++iPlugProc) {
-                    if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
+                    if (iZone == state.dataHeatBal->ZoneOtherEq(iPlugProc).ZonePtr) {
+                        totPlugProcess += state.dataHeatBal->ZoneOtherEq(iPlugProc).DesignLevel;
                     }
                 }
                 for (iPlugProc = 1; iPlugProc <= state.dataHeatBal->TotHWEquip; ++iPlugProc) {
-                    if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
+                    if (iZone == state.dataHeatBal->ZoneHWEq(iPlugProc).ZonePtr) {
+                        totPlugProcess += state.dataHeatBal->ZoneHWEq(iPlugProc).DesignLevel;
                     }
                 }
                 if (state.dataHeatBal->Zone(iZone).FloorArea > 0) {

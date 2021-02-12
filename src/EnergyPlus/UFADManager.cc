@@ -369,32 +369,32 @@ namespace EnergyPlus::UFADManager {
                 }
                 ZoneElecConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
-                    if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
-                        ZoneElecConv += ZoneElectric(Ctd).DesignLevel * ZoneElectric(Ctd).FractionConvected;
+                    if (state.dataHeatBal->ZoneElectric(Ctd).ZonePtr == ZoneNum) {
+                        ZoneElecConv += state.dataHeatBal->ZoneElectric(Ctd).DesignLevel * state.dataHeatBal->ZoneElectric(Ctd).FractionConvected;
                     }
                 }
                 ZoneGasConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
-                    if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
-                        ZoneGasConv += ZoneGas(Ctd).DesignLevel * ZoneGas(Ctd).FractionConvected;
+                    if (state.dataHeatBal->ZoneGas(Ctd).ZonePtr == ZoneNum) {
+                        ZoneGasConv += state.dataHeatBal->ZoneGas(Ctd).DesignLevel * state.dataHeatBal->ZoneGas(Ctd).FractionConvected;
                     }
                 }
                 ZoneOthEqConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
-                    if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel * ZoneOtherEq(Ctd).FractionConvected;
+                    if (state.dataHeatBal->ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneOthEqConv += state.dataHeatBal->ZoneOtherEq(Ctd).DesignLevel * state.dataHeatBal->ZoneOtherEq(Ctd).FractionConvected;
                     }
                 }
                 ZoneHWEqConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
-                    if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel * ZoneHWEq(Ctd).FractionConvected;
+                    if (state.dataHeatBal->ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneHWEqConv += state.dataHeatBal->ZoneHWEq(Ctd).DesignLevel * state.dataHeatBal->ZoneHWEq(Ctd).FractionConvected;
                     }
                 }
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
-                    if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel * ZoneSteamEq(Ctd).FractionConvected;
+                    if (state.dataHeatBal->ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneSteamEqConv += state.dataHeatBal->ZoneSteamEq(Ctd).DesignLevel * state.dataHeatBal->ZoneSteamEq(Ctd).FractionConvected;
                     }
                 }
                 state.dataRoomAirMod->ZoneUCSDUI(UINum).PowerPerPlume =
@@ -544,32 +544,32 @@ namespace EnergyPlus::UFADManager {
                 }
                 ZoneElecConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
-                    if (ZoneElectric(Ctd).ZonePtr == ZoneNum) {
-                        ZoneElecConv += ZoneElectric(Ctd).DesignLevel;
+                    if (state.dataHeatBal->ZoneElectric(Ctd).ZonePtr == ZoneNum) {
+                        ZoneElecConv += state.dataHeatBal->ZoneElectric(Ctd).DesignLevel;
                     }
                 }
                 ZoneGasConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
-                    if (ZoneGas(Ctd).ZonePtr == ZoneNum) {
-                        ZoneGasConv += ZoneGas(Ctd).DesignLevel;
+                    if (state.dataHeatBal->ZoneGas(Ctd).ZonePtr == ZoneNum) {
+                        ZoneGasConv += state.dataHeatBal->ZoneGas(Ctd).DesignLevel;
                     }
                 }
                 ZoneOthEqConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
-                    if (ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneOthEqConv += ZoneOtherEq(Ctd).DesignLevel;
+                    if (state.dataHeatBal->ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneOthEqConv += state.dataHeatBal->ZoneOtherEq(Ctd).DesignLevel;
                     }
                 }
                 ZoneHWEqConv = 0.0;
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
-                    if (ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneHWEqConv += ZoneHWEq(Ctd).DesignLevel;
+                    if (state.dataHeatBal->ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneHWEqConv += state.dataHeatBal->ZoneHWEq(Ctd).DesignLevel;
                     }
                 }
                 for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
                     ZoneSteamEqConv = 0.0;
-                    if (ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
-                        ZoneSteamEqConv += ZoneSteamEq(Ctd).DesignLevel;
+                    if (state.dataHeatBal->ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
+                        ZoneSteamEqConv += state.dataHeatBal->ZoneSteamEq(Ctd).DesignLevel;
                     }
                 }
                 state.dataRoomAirMod->ZoneUCSDUE(UINum).PowerPerPlume =

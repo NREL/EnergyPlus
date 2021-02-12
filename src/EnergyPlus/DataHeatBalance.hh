@@ -1820,16 +1820,6 @@ namespace DataHeatBalance {
     };
 
     // Object Data
-    extern Array1D<ZoneEquipData> ZoneElectric;
-    extern Array1D<ZoneEquipData> ZoneGas;
-    extern Array1D<ZoneEquipData> ZoneOtherEq;
-    extern Array1D<ZoneEquipData> ZoneHWEq;
-    extern Array1D<ZoneEquipData> ZoneSteamEq;
-    extern Array1D<ITEquipData> ZoneITEq;
-    extern Array1D<BBHeatData> ZoneBBHeat;
-    extern Array1D<InfiltrationData> Infiltration;
-    extern Array1D<VentilationData> Ventilation;
-    extern Array1D<ZoneAirBalanceData> ZoneAirBalance;
     extern Array1D<MixingData> Mixing;
     extern Array1D<MixingData> CrossMixing;
     extern Array1D<MixingData> RefDoorMixing;
@@ -2164,6 +2154,16 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<DataHeatBalance::ZoneGroupData> ZoneGroup;
     Array1D<DataHeatBalance::PeopleData> People;
     Array1D<DataHeatBalance::LightsData> Lights;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneElectric;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneGas;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneOtherEq;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneHWEq;
+    Array1D<DataHeatBalance::ZoneEquipData> ZoneSteamEq;
+    Array1D<DataHeatBalance::ITEquipData> ZoneITEq;
+    Array1D<DataHeatBalance::BBHeatData> ZoneBBHeat;
+    Array1D<DataHeatBalance::InfiltrationData> Infiltration;
+    Array1D<DataHeatBalance::VentilationData> Ventilation;
+    Array1D<DataHeatBalance::ZoneAirBalanceData> ZoneAirBalance;
 
     void clear_state() override
     {
@@ -2287,11 +2287,11 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MRT.deallocate();
         this->ZoneTransSolar.deallocate();
         this->ZoneWinHeatGain.deallocate();
-        this->ZoneWinHeatGainRep;
-        this->ZoneWinHeatLossRep;
-        this->ZoneBmSolFrExtWinsRep;
-        this->ZoneBmSolFrIntWinsRep;
-        this->InitialZoneDifSolReflW;
+        this->ZoneWinHeatGainRep.deallocate();
+        this->ZoneWinHeatLossRep.deallocate();
+        this->ZoneBmSolFrExtWinsRep.deallocate();
+        this->ZoneBmSolFrIntWinsRep.deallocate();
+        this->InitialZoneDifSolReflW.deallocate();
         this->ZoneDifSolFrExtWinsRep.deallocate();
         this->ZoneDifSolFrIntWinsRep.deallocate();
         this->ZoneOpaqSurfInsFaceCond.deallocate();
@@ -2392,6 +2392,16 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZoneGroup.deallocate();
         this->People.deallocate();
         this->Lights.deallocate();
+        this->ZoneElectric.deallocate();
+        this->ZoneGas.deallocate();
+        this->ZoneOtherEq.deallocate();
+        this->ZoneHWEq.deallocate();
+        this->ZoneSteamEq.deallocate();
+        this->ZoneITEq.deallocate();
+        this->ZoneBBHeat.deallocate();
+        this->Infiltration.deallocate();
+        this->Ventilation.deallocate();
+        this->ZoneAirBalance.deallocate();
     }
 };
 

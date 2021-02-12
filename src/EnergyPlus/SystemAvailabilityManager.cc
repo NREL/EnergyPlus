@@ -3722,8 +3722,7 @@ namespace SystemAvailabilityManager {
         // Uses InputProcessor "Get" routines to obtain data.
 
         // Using/Aliasing
-        using DataHeatBalance::Ventilation;
-                using NodeInputManager::GetOnlySingleNode;
+        using NodeInputManager::GetOnlySingleNode;
         using NodeInputManager::MarkNode;
         using namespace DataLoopNode;
 
@@ -4058,7 +4057,7 @@ namespace SystemAvailabilityManager {
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0) {
                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationName = cAlphaArgs(10);
                 if (state.dataHeatBal->TotVentilation > 0) {
-                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr = UtilityRoutines::FindItemInList(cAlphaArgs(10), Ventilation);
+                    state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr = UtilityRoutines::FindItemInList(cAlphaArgs(10), state.dataHeatBal->Ventilation);
                     HybridVentSysAvailMaster(SysAvailNum) = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr);
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr <= 0 && int(SchedMax) == 1) {
@@ -4072,10 +4071,10 @@ namespace SystemAvailabilityManager {
             // Check simple airflow object
             if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 && state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr > 0) {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum !=
-                    Ventilation(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr) {
+                    state.dataHeatBal->Ventilation(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, "The Zone name specified in the Ventilation object " +
-                                      state.dataHeatBal->Zone(Ventilation(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr).Name);
+                                      state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr).ZonePtr).Name);
                     ShowContinueError(state, "is not equal to the " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                 }
@@ -4244,7 +4243,6 @@ namespace SystemAvailabilityManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataHeatBalance::Ventilation;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4269,7 +4267,7 @@ namespace SystemAvailabilityManager {
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr > 0 && state.dataHeatBal->TotVentilation > 0 &&
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr == 0) {
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr =
-                        UtilityRoutines::FindItemInList(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationName, Ventilation);
+                        UtilityRoutines::FindItemInList(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationName, state.dataHeatBal->Ventilation);
                     HybridVentSysAvailMaster(SysAvailNum) = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).SimpleControlTypeSchedPtr);
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr <= 0 && int(SchedMax) == 1) {
@@ -4478,8 +4476,7 @@ namespace SystemAvailabilityManager {
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
         using DataHeatBalance::Mixing;
-        using DataHeatBalance::Ventilation;
-                using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
         using DataHeatBalFanSys::ZoneAirHumRat;
@@ -4810,14 +4807,14 @@ namespace SystemAvailabilityManager {
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode)) {
                         // Setup flag for ventilation objects
                         for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
-                            if (Ventilation(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                            if (state.dataHeatBal->Ventilation(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
+                                state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    Ventilation(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        Ventilation(i).HybridControlType = HybridControlTypeGlobal;
-                                        Ventilation(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
+                                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Ventilation(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
                                 }
                             }
@@ -4844,14 +4841,14 @@ namespace SystemAvailabilityManager {
             // Hybrid ventilation manager is applied to zone component
             // setup flag for ventilation objects
             for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
-                if (Ventilation(i).ZonePtr == state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                if (state.dataHeatBal->Ventilation(i).ZonePtr == state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
+                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        Ventilation(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
                     } else {
                         if (SimpleControlType == 1) {
-                            Ventilation(i).HybridControlType = HybridControlTypeGlobal;
-                            Ventilation(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
+                            state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Ventilation(i).HybridControlMasterNum = state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }
                     }
                 }

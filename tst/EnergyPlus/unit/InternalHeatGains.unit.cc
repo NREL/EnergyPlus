@@ -124,10 +124,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
+    ASSERT_EQ(state->dataHeatBal->ZoneOtherEq.size(), 2u);
 
-    for (unsigned long i = 1; i <= DataHeatBalance::ZoneOtherEq.size(); ++i) {
-        const DataHeatBalance::ZoneEquipData &equip = DataHeatBalance::ZoneOtherEq(i);
+    for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
+        const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
         } else if (equip.Name == "OTHEREQ2") {
@@ -480,16 +480,16 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData();
 
     InternalHeatGains::CalcZoneITEq(*state);
-    NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -896,9 +896,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
+    ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
                      state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
+    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp, state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
@@ -1049,10 +1049,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     InternalHeatGains::CalcZoneITEq(*state);
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
-                             max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
+    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower) *
+                             max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
+    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).UPSPower);
 
 }
 

@@ -570,7 +570,6 @@ namespace EnergyPlus::DemandManager {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using DataHeatBalance::LightsObjects;
-        using DataHeatBalance::ZoneElectric;
         using DataHeatBalance::ZoneElectricObjects;
 
         using MixedAir::GetOAController;
@@ -995,7 +994,7 @@ namespace EnergyPlus::DemandManager {
                     if (LoadPtr > 0) {
                         DemandMgr(MgrNum).NumOfLoads += ZoneElectricObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), ZoneElectric);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
@@ -1019,7 +1018,7 @@ namespace EnergyPlus::DemandManager {
                                 DemandMgr(MgrNum).Load(LoadNum) = ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
                             }
                         } else {
-                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), ZoneElectric);
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
                             if (LoadPtr > 0) {
                                 ++LoadNum;
                                 DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1468,7 +1467,6 @@ namespace EnergyPlus::DemandManager {
         // It updates availability flags, expires managers that ended in the last timestep, etc.
 
         // Using/Aliasing
-        using DataHeatBalance::ZoneElectric;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1685,7 +1683,6 @@ namespace EnergyPlus::DemandManager {
         // and new GetInput code.
 
         // Using/Aliasing
-        using DataHeatBalance::ZoneElectric;
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1728,14 +1725,14 @@ namespace EnergyPlus::DemandManager {
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeElecEquip) {
-                LowestPower = ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataHeatBal->ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    ZoneElectric(LoadPtr).ManageDemand = true;
-                    ZoneElectric(LoadPtr).DemandLimit = LowestPower;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = true;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == DemandAction::ClearLimit) {
-                    ZoneElectric(LoadPtr).ManageDemand = false;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeThermostats) {

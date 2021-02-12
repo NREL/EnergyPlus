@@ -167,28 +167,28 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             sqlite->addNominalPeopleData(peopleNum, state.dataHeatBal->People(peopleNum));
         }
         for (int elecEquipNum = 1; elecEquipNum <= state.dataHeatBal->TotElecEquip; ++elecEquipNum) {
-            sqlite->addNominalElectricEquipmentData(elecEquipNum, DataHeatBalance::ZoneElectric(elecEquipNum));
+            sqlite->addNominalElectricEquipmentData(elecEquipNum, state.dataHeatBal->ZoneElectric(elecEquipNum));
         }
         for (int gasEquipNum = 1; gasEquipNum <= state.dataHeatBal->TotGasEquip; ++gasEquipNum) {
-            sqlite->addNominalGasEquipmentData(gasEquipNum, DataHeatBalance::ZoneGas(gasEquipNum));
+            sqlite->addNominalGasEquipmentData(gasEquipNum, state.dataHeatBal->ZoneGas(gasEquipNum));
         }
         for (int steamEquipNum = 1; steamEquipNum <= state.dataHeatBal->TotStmEquip; ++steamEquipNum) {
-            sqlite->addNominalSteamEquipmentData(steamEquipNum, DataHeatBalance::ZoneSteamEq(steamEquipNum));
+            sqlite->addNominalSteamEquipmentData(steamEquipNum, state.dataHeatBal->ZoneSteamEq(steamEquipNum));
         }
         for (int hWEquipNum = 1; hWEquipNum <= state.dataHeatBal->TotHWEquip; ++hWEquipNum) {
-            sqlite->addNominalHotWaterEquipmentData(hWEquipNum, DataHeatBalance::ZoneHWEq(hWEquipNum));
+            sqlite->addNominalHotWaterEquipmentData(hWEquipNum, state.dataHeatBal->ZoneHWEq(hWEquipNum));
         }
         for (int otherEquipNum = 1; otherEquipNum <= state.dataHeatBal->TotOthEquip; ++otherEquipNum) {
-            sqlite->addNominalOtherEquipmentData(otherEquipNum, DataHeatBalance::ZoneOtherEq(otherEquipNum));
+            sqlite->addNominalOtherEquipmentData(otherEquipNum, state.dataHeatBal->ZoneOtherEq(otherEquipNum));
         }
         for (int bBHeatNum = 1; bBHeatNum <= state.dataHeatBal->TotBBHeat; ++bBHeatNum) {
-            sqlite->addNominalBaseboardData(bBHeatNum, DataHeatBalance::ZoneBBHeat(bBHeatNum));
+            sqlite->addNominalBaseboardData(bBHeatNum, state.dataHeatBal->ZoneBBHeat(bBHeatNum));
         }
         for (int infilNum = 1; infilNum <= state.dataHeatBal->TotInfiltration; ++infilNum) {
-            sqlite->addInfiltrationData(infilNum, DataHeatBalance::Infiltration(infilNum));
+            sqlite->addInfiltrationData(infilNum, state.dataHeatBal->Infiltration(infilNum));
         }
         for (int ventNum = 1; ventNum <= state.dataHeatBal->TotVentilation; ++ventNum) {
-            sqlite->addVentilationData(ventNum, DataHeatBalance::Ventilation(ventNum));
+            sqlite->addVentilationData(ventNum, state.dataHeatBal->Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));

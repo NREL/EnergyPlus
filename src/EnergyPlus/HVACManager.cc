@@ -2302,9 +2302,7 @@ namespace HVACManager {
         using DataHeatBalance::CrossMixing;
         using DataHeatBalance::Mixing;
         using DataHeatBalance::RefDoorMixing;
-        using DataHeatBalance::Ventilation;
         using DataHeatBalance::ZnAirRpt;
-                using DataHeatBalance::ZoneAirBalance;
         using DataHeatBalFanSys::MCPI; // , MCPTI, MCPTV, MCPM, MCPTM, MixingMassFlowZone
         using DataHeatBalFanSys::MCPV;
         using DataHeatBalFanSys::MDotCPOA;
@@ -2474,25 +2472,25 @@ namespace HVACManager {
             VentZoneAirTemp = 0.0;
 
             for (VentNum = 1; VentNum <= state.dataHeatBal->TotVentilation; ++VentNum) {
-                if (Ventilation(VentNum).ZonePtr == ZoneLoop) {
+                if (state.dataHeatBal->Ventilation(VentNum).ZonePtr == ZoneLoop) {
                     // moved into CalcAirFlowSimple
                     //        ZnAirRpt(ZoneLoop)%VentilFanElec  = ZnAirRpt(ZoneLoop)%VentilFanElec+Ventilation(VentNum)%FanPower*TimeStepSys*DataGlobalConstants::SecInHour()
                     //        &
                     //          *ADSCorrectionFactor
                     if (ADSCorrectionFactor > 0) {
-                        ZnAirRpt(ZoneLoop).VentilAirTemp += Ventilation(VentNum).AirTemp * state.dataZoneEquip->VentMCP(VentNum);
+                        ZnAirRpt(ZoneLoop).VentilAirTemp += state.dataHeatBal->Ventilation(VentNum).AirTemp * state.dataZoneEquip->VentMCP(VentNum);
                         VentZoneMassflow += state.dataZoneEquip->VentMCP(VentNum);
-                        VentZoneAirTemp += Ventilation(VentNum).AirTemp;
+                        VentZoneAirTemp += state.dataHeatBal->Ventilation(VentNum).AirTemp;
                     } else {
                         ZnAirRpt(ZoneLoop).VentilAirTemp = state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp;
                     }
                     // Break the ventilation load into heat gain and loss components
-                    if (MAT(ZoneLoop) > Ventilation(VentNum).AirTemp) {
+                    if (MAT(ZoneLoop) > state.dataHeatBal->Ventilation(VentNum).AirTemp) {
                         ZnAirRpt(ZoneLoop).VentilHeatLoss +=
-                            state.dataZoneEquip->VentMCP(VentNum) * (MAT(ZoneLoop) - Ventilation(VentNum).AirTemp) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
-                    } else if (MAT(ZoneLoop) <= Ventilation(VentNum).AirTemp) {
+                            state.dataZoneEquip->VentMCP(VentNum) * (MAT(ZoneLoop) - state.dataHeatBal->Ventilation(VentNum).AirTemp) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                    } else if (MAT(ZoneLoop) <= state.dataHeatBal->Ventilation(VentNum).AirTemp) {
                         ZnAirRpt(ZoneLoop).VentilHeatGain +=
-                            state.dataZoneEquip->VentMCP(VentNum) * (Ventilation(VentNum).AirTemp - MAT(ZoneLoop)) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
+                            state.dataZoneEquip->VentMCP(VentNum) * (state.dataHeatBal->Ventilation(VentNum).AirTemp - MAT(ZoneLoop)) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;
                     }
 
                     ++VentZoneNum;
@@ -2709,7 +2707,7 @@ namespace HVACManager {
 
             // Reporting combined outdoor air flows
             for (j = 1; j <= state.dataHeatBal->TotZoneAirBalance; ++j) {
-                if (ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature && ZoneLoop == ZoneAirBalance(j).ZonePtr) {
+                if (state.dataHeatBal->ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature && ZoneLoop == state.dataHeatBal->ZoneAirBalance(j).ZonePtr) {
                     if (MAT(ZoneLoop) > state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) {
                         ZnAirRpt(ZoneLoop).OABalanceHeatLoss =
                             MDotCPOA(ZoneLoop) * (MAT(ZoneLoop) - state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp) * TimeStepSys * DataGlobalConstants::SecInHour * ADSCorrectionFactor;

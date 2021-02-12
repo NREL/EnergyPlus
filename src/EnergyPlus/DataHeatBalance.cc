@@ -243,16 +243,6 @@ namespace EnergyPlus::DataHeatBalance {
     Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Object Data
-    Array1D<ZoneEquipData> ZoneElectric;
-    Array1D<ZoneEquipData> ZoneGas;
-    Array1D<ZoneEquipData> ZoneOtherEq;
-    Array1D<ZoneEquipData> ZoneHWEq;
-    Array1D<ZoneEquipData> ZoneSteamEq;
-    Array1D<ITEquipData> ZoneITEq;
-    Array1D<BBHeatData> ZoneBBHeat;
-    Array1D<InfiltrationData> Infiltration;
-    Array1D<VentilationData> Ventilation;
-    Array1D<ZoneAirBalanceData> ZoneAirBalance;
     Array1D<MixingData> Mixing;
     Array1D<MixingData> CrossMixing;
     Array1D<MixingData> RefDoorMixing;
@@ -291,16 +281,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZoneElectric.deallocate();
-        ZoneGas.deallocate();
-        ZoneOtherEq.deallocate();
-        ZoneHWEq.deallocate();
-        ZoneSteamEq.deallocate();
-        ZoneITEq.deallocate();
-        ZoneBBHeat.deallocate();
-        Infiltration.deallocate();
-        Ventilation.deallocate();
-        ZoneAirBalance.deallocate();
         Mixing.deallocate();
         CrossMixing.deallocate();
         RefDoorMixing.deallocate();

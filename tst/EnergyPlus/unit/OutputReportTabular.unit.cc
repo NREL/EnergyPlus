@@ -6211,7 +6211,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
     state->dataHeatBal->TotElecEquip = 3;
-    ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
@@ -6227,12 +6227,12 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->People(3).ZonePtr = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
@@ -6353,13 +6353,13 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
         {"Unconditioned Total", "People", state->dataHeatBal->Zone(2).FloorArea / state->dataHeatBal->People(2).NumberOfPeople},
         {"Not Part of Total", "People", state->dataHeatBal->Zone(3).FloorArea / state->dataHeatBal->People(3).NumberOfPeople},
 
-        {state->dataHeatBal->Zone(1).Name, "Plug and Process", ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
-        {state->dataHeatBal->Zone(2).Name, "Plug and Process", ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
-        {state->dataHeatBal->Zone(3).Name, "Plug and Process", ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
-        {"Total", "Plug and Process", (ZoneElectric(1).DesignLevel + ZoneElectric(2).DesignLevel) / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
-        {"Conditioned Total", "Plug and Process", ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
-        {"Unconditioned Total", "Plug and Process", ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
-        {"Not Part of Total", "Plug and Process", ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+        {state->dataHeatBal->Zone(1).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {state->dataHeatBal->Zone(2).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {state->dataHeatBal->Zone(3).Name, "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
+        {"Total", "Plug and Process", (state->dataHeatBal->ZoneElectric(1).DesignLevel + state->dataHeatBal->ZoneElectric(2).DesignLevel) / (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea)},
+        {"Conditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(1).DesignLevel / state->dataHeatBal->Zone(1).FloorArea},
+        {"Unconditioned Total", "Plug and Process", state->dataHeatBal->ZoneElectric(2).DesignLevel / state->dataHeatBal->Zone(2).FloorArea},
+        {"Not Part of Total", "Plug and Process", state->dataHeatBal->ZoneElectric(3).DesignLevel / state->dataHeatBal->Zone(3).FloorArea},
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
@@ -7681,7 +7681,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
 
     state->dataHeatBal->TotElecEquip = 3;
-    ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
 
     state->dataHeatBal->Lights(1).ZonePtr = 1;
     state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
@@ -7697,12 +7697,12 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataHeatBal->People(3).ZonePtr = 3;
     state->dataHeatBal->People(3).NumberOfPeople = 1.0;
 
-    ZoneElectric(1).ZonePtr = 1;
-    ZoneElectric(1).DesignLevel = 500.0;
-    ZoneElectric(2).ZonePtr = 2;
-    ZoneElectric(2).DesignLevel = 50.0;
-    ZoneElectric(3).ZonePtr = 3;
-    ZoneElectric(3).DesignLevel = 5.0;
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
 
     // zone
     state->dataGlobal->NumOfZones = 3;
