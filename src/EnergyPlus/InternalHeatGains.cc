@@ -4952,14 +4952,14 @@ namespace InternalHeatGains {
                     print(state.files.eio, "No,");
                 }
                 if (People(Loop).KSU) {
-                    print(state.files.eio, "Yes\n");
+                    print(state.files.eio, "Yes,");
                 } else {
-                    print(state.files.eio, "No\n");
+                    print(state.files.eio, "No,");
                 }
                 if (People(Loop).CoolingEffectASH55) {
-                    print(state.files.eio, "Yes\n");
+                    print(state.files.eio, "Yes,");
                 } else {
-                    print(state.files.eio, "No\n");
+                    print(state.files.eio, "No,");
                 }
                 if (People(Loop).AnkleDraftASH55) {
                     print(state.files.eio, "Yes\n");
