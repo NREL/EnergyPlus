@@ -855,10 +855,10 @@ namespace LowTempRadiantSystem {
                     }
                 }
             } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == CapacityPerFloorArea) {
-                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
+                thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
                 thisRadSys.ScaledCoolingCapacity = variableFlowDesignDataObject.DesignScaledCoolingCapacity;
             } else if (variableFlowDesignDataObject.DesignCoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                thisRadSys.CoolingCapMethod = CoolingDesignCapacity;
+                thisRadSys.CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
                 thisRadSys.ScaledCoolingCapacity = variableFlowDesignDataObject.DesignScaledCoolingCapacity;
             }
 
