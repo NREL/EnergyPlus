@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 
     // Check conversion choice
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
 /** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     // Check conversion choice
 
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
 /** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
@@ -398,8 +398,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
     // Check conversion choice, should force back to kWh
     EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
-    ASSERT_FLOAT_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
+    ASSERT_DOUBLE_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)

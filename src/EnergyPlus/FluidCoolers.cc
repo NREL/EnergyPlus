@@ -731,7 +731,6 @@ namespace EnergyPlus::FluidCoolers {
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false); // Flag if input data errors are found
 
         if (this->oneTimeInitFlag) {
             this->setupOutputVars(state);
