@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1270,11 +1270,6 @@ namespace HybridEvapCoolingModel {
         Real64 PreviousMaxiumConditioningOutput = 0;
         Real64 PreviousMaxiumHumidOrDehumidOutput = 0;
         std::string ObjectID = Name.c_str();
-        int size = CurrentOperatingSettings.size();
-        CSetting empty_setting;
-        for (int i = 0; i < size; i++) {
-            CurrentOperatingSettings[i] = empty_setting;
-        }
         if (StepIns.RHosa > 1) {
             ShowSevereError(state, "Unitary hybrid system error, required relative humidity value 0-1, called in object" + ObjectID + ".Check inputs");
             assert(true);
@@ -1853,6 +1848,14 @@ namespace HybridEvapCoolingModel {
             UnitOn = 0;
             ForceOff = true;
         }
+
+        // Initialize all settings for all operating modes
+        int size = CurrentOperatingSettings.size();
+        CSetting empty_setting;
+        for (int i = 1; i < size; i++) {
+            CurrentOperatingSettings[i] = empty_setting;
+        }
+
         // Go into standby if unit is off or not needed
         if ((!CoolingRequested && !HeatingRequested && !VentilationRequested && !HumidificationRequested && !DehumidificationRequested) ||
             ForceOff)

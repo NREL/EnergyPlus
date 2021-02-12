@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -389,6 +389,7 @@ namespace EnergyPlus {
         this->dataHVACDuct->clear_state();
         this->dataHVACFan->clear_state();
         this->dataHVACGlobal->clear_state();
+        this->dataHVACInterfaceMgr->clear_state();
         this->dataHVACMgr->clear_state();
         this->dataHVACMultiSpdHP->clear_state();
         this->dataHVACSingleDuctInduc->clear_state();
@@ -544,7 +545,6 @@ namespace EnergyPlus {
         this->dataZoneTempPredictorCorrector->clear_state();
 
         this->files.debug.close();
-        this->files.err_stream.reset();
         this->files.err_stream.reset();
         this->files.eso.close();
         this->files.mtr.close();

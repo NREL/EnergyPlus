@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::FluidCoolers;
@@ -82,52 +82,52 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
     }
     std::string const cCurrentModuleObject("FluidCooler:TwoSpeed");
     int FluidCoolerNum(1);
-    SimpleFluidCooler.allocate(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
 
-    SimpleFluidCooler(FluidCoolerNum).Name = "Test";
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
-    SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
-    SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPowerWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCap = 30000;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = "Test";
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPowerWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCap = 30000;
 
     AlphArray(4) = "NominalCapacity";
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = 0;
-    SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
-    bool testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = 0;
+    state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler(1).DesignEnteringWaterTemp = -10;
-    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = -10;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
-    SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
-    SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = AutoSize;
-    SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = true;
-    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
+    state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = true;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition
-    SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = false;
-    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition
+    state->dataFluidCoolers->SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = false;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
-    SimpleFluidCooler.deallocate();
+    state->dataFluidCoolers->SimpleFluidCooler.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
@@ -148,42 +148,40 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
     }
     std::string const cCurrentModuleObject("FluidCooler:TwoSpeed");
     int FluidCoolerNum(1);
-    bool ErrrorsFound(false);
-    SimpleFluidCooler.allocate(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
 
-    SimpleFluidCooler(FluidCoolerNum).Name = "Test";
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 1.0;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPowerWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCap = 30000;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUAWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = "Test";
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 1.0;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPowerWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCap = 30000;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUAWasAutoSized = true;
 
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
-    bool testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
-    ErrrorsFound = false;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
-    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateTwoSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler.deallocate();
+    state->dataFluidCoolers->SimpleFluidCooler.deallocate();
     cNumericFieldNames.deallocate();
     cAlphaFieldNames.deallocate();
     AlphArray.deallocate();
@@ -206,43 +204,43 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
     }
     std::string const cCurrentModuleObject("FluidCooler:SingleSpeed");
     int FluidCoolerNum(1);
-    SimpleFluidCooler.allocate(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
 
-    SimpleFluidCooler(FluidCoolerNum).Name = "Test";
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
-    SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
-    SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
-    SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
-    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = "Test";
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
 
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    bool testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
+    bool testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
+    testResult = state->dataFluidCoolers->SimpleFluidCooler(1).validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 }
 
@@ -269,7 +267,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test4)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetFluidCoolerInput(*state);
-    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+    auto &thisFluidCooler = state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum);
     EXPECT_TRUE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, DataSizing::AutoSize);
     EXPECT_EQ(thisFluidCooler.FluidCoolerNominalCapacity, 0.0);
@@ -292,8 +290,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     }
     std::string const cCurrentModuleObject("FluidCooler:SingleSpeed");
     int FluidCoolerNum(1);
-    FluidCoolers::SimpleFluidCooler.allocate(FluidCoolerNum);
-    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
+    auto &thisFluidCooler = state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum);
 
     thisFluidCooler.Name = "Test";
     thisFluidCooler.FluidCoolerMassFlowRateMultiplier = 2.5;
@@ -345,12 +343,12 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
 
     GetFluidCoolerInput(*state);
 
-    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+    auto &thisFluidCooler = state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum);
 
-    DataPlant::PlantLoop.allocate(FluidCoolerNum);
-    SimpleFluidCooler.allocate(FluidCoolerNum);
-    SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
-    DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
+    state->dataPlnt->PlantLoop.allocate(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
+    state->dataPlnt->PlantLoop(FluidCoolerNum).PlantSizNum = 0;
 
     EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);

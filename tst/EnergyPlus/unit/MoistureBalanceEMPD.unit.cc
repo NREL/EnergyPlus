@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,24 +51,21 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -147,7 +144,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     Real64 Tsat(0.0);
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
     EXPECT_DOUBLE_EQ(0.0071762141417078054, DataMoistureBalanceEMPD::RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
@@ -273,7 +270,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     Real64 Tsat(0.0);
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, 19.907302679986064, 19.901185713164697, Tsat);
 
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(1);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
     EXPECT_DOUBLE_EQ(0.0071815819413115663, DataMoistureBalanceEMPD::RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
@@ -392,7 +389,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 
     // Calculate and verify it against the results determined above
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, Taver, Taver, Tsat);
-    auto const &report_vars = MoistureBalanceEMPDManager::EMPDReportVars(surfNum);
+    auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(surfNum);
     EXPECT_DOUBLE_EQ(mass_flux_surf_deep_result, report_vars.mass_flux_deep);
 
 }

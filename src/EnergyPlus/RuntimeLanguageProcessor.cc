@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -229,7 +229,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         std::string datestring; // supposedly returns blank when no date available.
 
-        // FLOW:
+
         if (InitializeOnce) {
 
             state.dataRuntimeLang->False = SetErlValueNumber(0.0);
@@ -484,7 +484,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         Array1D_bool ReadyForElse(IfDepthAllowed);
         Array1D_bool ReadyForEndif(IfDepthAllowed);
 
-        // FLOW:
+
         LineNum = 1;
         NestedIfDepth = 0;
         ReadyForElse = false;
@@ -785,7 +785,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         ErlStackType TempStack;
 
-        // FLOW:
+
         if (state.dataRuntimeLang->ErlStack(StackNum).NumInstructions == 0) {
             state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(1);
             state.dataRuntimeLang->ErlStack(StackNum).NumInstructions = 1;
@@ -834,7 +834,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         ErlStackType TempStack; // temporary copy of single ErlStack
 
-        // FLOW:
+
         if (state.dataRuntimeLang->ErlStack(StackNum).NumErrors == 0) {
             state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(1);
             state.dataRuntimeLang->ErlStack(StackNum).NumErrors = 1;
@@ -1029,7 +1029,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         std::string TimeString;
         std::string DuringWarmup;
 
-        // FLOW:
+
         if ((!state.dataRuntimeLang->OutputFullEMSTrace) && (!state.dataRuntimeLang->OutputEMSErrors) && (!seriousErrorFound)) return;
 
         if ((state.dataRuntimeLang->OutputEMSErrors) && (!state.dataRuntimeLang->OutputFullEMSTrace) && (!seriousErrorFound)) {
@@ -1134,7 +1134,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         static Array1D<TokenType> Token;
 
-        // FLOW:
+
         CountDoLooping = 0;
         NumErrors = 0;
         //  Error = 'No errors.'
@@ -1520,7 +1520,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         Array1D<TokenType> Token(TokenIN);
         Array1D<TokenType> SubTokenList;
 
-        // FLOW:
+
         ExpressionNum = 0;
         NumTokens = NumTokensIN;
 
@@ -1761,7 +1761,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // Object Data
 
-        // FLOW:
+
         if (state.dataRuntimeLang->NumExpressions == 0) {
             state.dataRuntimeLang->ErlExpression.allocate(1);
             state.dataRuntimeLang->NumExpressions = 1;
@@ -1819,7 +1819,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
-        // FLOW:
+
 
         ReturnValue.Type = ValueNumber;
         ReturnValue.Number = 0.0;
@@ -2636,7 +2636,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         OutputProcessor::Unit curUnit(OutputProcessor::Unit::None);
         std::string::size_type ptr;
 
-        // FLOW:
+
         if (GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
             GetInput = false;
 
@@ -3618,7 +3618,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int RuntimeReportVarNum;
         int VariableNum;
 
-        // FLOW:
+
         for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
             VariableNum = RuntimeReportVar(RuntimeReportVarNum).VariableNum;
             if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == ValueNumber) {
@@ -3668,7 +3668,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         if (present(OrigValue)) { // preserve other parts of structure and only updated Value%Number
             newValue = OrigValue;
             newValue.Number = Number;
@@ -3719,7 +3719,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-        // FLOW:
+
 
         Value.Type = ValueString;
         Value.String = String;
@@ -3752,7 +3752,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
 
-        // FLOW:
+
         String = "";
 
         {
@@ -3798,7 +3798,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         bool Found;
         int TrendVarNum;
 
-        // FLOW:
+
         Found = false;
         std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
 
@@ -3840,7 +3840,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // PURPOSE OF THIS FUNCTION:
         // Creates new variable if it doesn't exist.  If exists, returns existing variable number.
 
-        // FLOW:
+
         int VariableNum = FindEMSVariable(state, VariableName, StackNum);
 
         if (VariableNum == 0) { // Variable does not exist anywhere yet

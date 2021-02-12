@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,9 +81,7 @@
 #include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace SwimmingPool {
+namespace EnergyPlus::SwimmingPool {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand, Ho-Sung Kim
@@ -169,12 +167,11 @@ namespace SwimmingPool {
         Array1D_string Alphas;           // Alpha items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        int IOStatus;                    // Used in GetObjectItem
-        int Item;                        // Item to be "gotten"
+        int IOStatus = 0;                    // Used in GetObjectItem
         Array1D<Real64> Numbers;         // Numeric items for object
-        int NumAlphas;                   // Number of Alphas for each GetObjectItem call
-        int NumArgs;                     // Unused variable that is part of a subroutine call
-        int NumNumbers;                  // Number of Numbers for each GetObjectItem call
+        int NumAlphas = 0;                   // Number of Alphas for each GetObjectItem call
+        int NumArgs = 0;                     // Unused variable that is part of a subroutine call
+        int NumNumbers = 0;                  // Number of Numbers for each GetObjectItem call
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
@@ -207,7 +204,7 @@ namespace SwimmingPool {
 
         // Obtain all of the user data related to indoor swimming pools...
         CurrentModuleObject = "SwimmingPool:Indoor";
-        for (Item = 1; Item <= state.dataSwimmingPools->NumSwimmingPools; ++Item) {
+        for (int Item = 1; Item <= state.dataSwimmingPools->NumSwimmingPools; ++Item) {
 
             inputProcessor->getObjectItem(state,
                                           CurrentModuleObject,
@@ -253,7 +250,6 @@ namespace SwimmingPool {
                 ErrorsFound = true;
             }
 
-            state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedName = Alphas(4);
             state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(4));
             if ((state.dataSwimmingPools->Pool(Item).MakeupWaterSupplySchedPtr == 0) && (!lAlphaBlanks(4))) {
                 ShowSevereError(state, cAlphaFields(4) + " not found: " + Alphas(4));
@@ -346,7 +342,6 @@ namespace SwimmingPool {
                 state.dataSwimmingPools->Pool(Item).MiscPowerFactor = MinPowerFactor;
             }
 
-            state.dataSwimmingPools->Pool(Item).SetPtTempSchedName = Alphas(8);
             state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(8));
             if ((state.dataSwimmingPools->Pool(Item).SetPtTempSchedPtr == 0) && (!lAlphaBlanks(8))) {
                 ShowSevereError(state, cAlphaFields(8) + " not found: " + Alphas(8));
@@ -396,9 +391,9 @@ namespace SwimmingPool {
     }
 
     void SwimmingPoolData::ErrorCheckSetupPoolSurface(EnergyPlusData &state,
-                                                      std::string const Alpha1,
-                                                      std::string const Alpha2,
-                                                      std::string const cAlphaField2,
+                                                      std::string const &Alpha1,
+                                                      std::string const &Alpha2,
+                                                      std::string const &cAlphaField2,
                                                       bool &ErrorsFound
     )
     {
@@ -516,7 +511,7 @@ namespace SwimmingPool {
             Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
             this->WaterMass = DataSurfaces::Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
             this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
-            initSwimmingPoolPlantNodeFlow(this->MyPlantScanFlagPool);
+            this->initSwimmingPoolPlantNodeFlow();
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
@@ -699,11 +694,10 @@ namespace SwimmingPool {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
 
-        bool errFlag;
         static std::string const RoutineName("InitSwimmingPoolPlantLoopIndex");
 
-        if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
-            errFlag = false;
+        if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
+            bool errFlag = false;
             if (this->WaterInletNode > 0) {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
@@ -728,11 +722,10 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(bool const MyPlantScanFlagPool // logical flag true when plant index has not yet been set
-    )
+    void SwimmingPoolData::initSwimmingPoolPlantNodeFlow() const
     {
 
-        if (!MyPlantScanFlagPool) {
+        if (!this->MyPlantScanFlagPool) {
             if (this->WaterInletNode > 0) {
                 PlantUtilities::InitComponentNodes(0.0,
                                                    this->WaterMassFlowRateMax,
@@ -793,8 +786,7 @@ namespace SwimmingPool {
         static std::string const RoutineName("CalcSwimmingPool");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 EvapRate;  // evaporation rate for pool in kg/s
-        Real64 CpDeltaTi; // inverse of specific heat of water times the plant loop temperature difference
+        Real64 EvapRate = 0.0;  // evaporation rate for pool in kg/s
 
         // initialize local variables
         int SurfNum = this->SurfacePtr;                    // surface number of floor that is the pool
@@ -836,11 +828,6 @@ namespace SwimmingPool {
         Real64 TLoopInletTemp = DataLoopNode::Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
         this->WaterInletTemp = TLoopInletTemp;
 
-        if (TLoopInletTemp <= TInSurf) {
-            CpDeltaTi = 0.0;
-        } else {
-            CpDeltaTi = 1.0 / (Cp * (TInSurf - TLoopInletTemp));
-        }
         // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
         // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
         // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
@@ -922,12 +909,10 @@ namespace SwimmingPool {
         this->LastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
         this->LastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
 
-        int WaterInletNode = this->WaterInletNode;   // inlet node number
-        int WaterOutletNode = this->WaterOutletNode; // outlet node number
-        PlantUtilities::SafeCopyPlantNode(WaterInletNode, WaterOutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
 
-        Real64 WaterMassFlow = DataLoopNode::Node(WaterInletNode).MassFlowRate; // water mass flow rate
-        if (WaterMassFlow > 0.0) DataLoopNode::Node(WaterOutletNode).Temp = this->PoolWaterTemp;
+        Real64 WaterMassFlow = DataLoopNode::Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
+        if (WaterMassFlow > 0.0) DataLoopNode::Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
     }
 
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
@@ -950,17 +935,14 @@ namespace SwimmingPool {
         Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum; // DO loop counter for surface index
-
         SwimmingPoolOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-
         for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
             if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
 
             // If it was allocated, then we have to check to see if this was running at all
-            for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
                 if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
                     SwimmingPoolOn = true;
                     break; // DO loop
@@ -973,7 +955,7 @@ namespace SwimmingPool {
 
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
             if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) -
                              DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
@@ -990,7 +972,7 @@ namespace SwimmingPool {
         }
         // For interzone surfaces, PoolHeatTransCoefs was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
             if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) -
                              DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
@@ -1103,18 +1085,12 @@ namespace SwimmingPool {
 
     Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density)
     {
-        Real64 MakeUpWaterVolumeFlow;
-        MakeUpWaterVolumeFlow = MakeUpWaterMassFlowRate / Density;
-        return MakeUpWaterVolumeFlow;
+        return MakeUpWaterMassFlowRate / Density;
     }
 
     Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density)
     {
-        Real64 MakeUpWaterVolume;
-        MakeUpWaterVolume = MakeUpWaterMass / Density;
-        return MakeUpWaterVolume;
+        return MakeUpWaterMass / Density;
     }
-
-} // namespace SwimmingPool
 
 } // namespace EnergyPlus

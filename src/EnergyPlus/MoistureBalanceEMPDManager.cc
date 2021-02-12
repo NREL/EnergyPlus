@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,9 +70,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace MoistureBalanceEMPDManager {
+namespace EnergyPlus::MoistureBalanceEMPDManager {
 
     // Module containing the routines to calculate moisture adsorption and desorption
     // at interior wall surfaces
@@ -105,10 +103,6 @@ namespace MoistureBalanceEMPDManager {
     // investigation of simultaneous heat and moisture transfer in buildings: 'Effective
     // penetration depth' theory," ASHRAE Trans., 1990, Vol. 96, Part 1, 447-454
 
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data used in the module
     // Using/Aliasing
     using namespace DataHeatBalance;
     using DataHeatBalFanSys::ZoneAirHumRat;
@@ -118,22 +112,6 @@ namespace MoistureBalanceEMPDManager {
     using DataMoistureBalance::HConvInFD;
     using DataMoistureBalance::HMassConvInFD;
     using DataMoistureBalance::RhoVaporAirIn;
-
-    // Data
-    // MODULE VARIABLE and Function DECLARATIONs
-    Array1D<EMPDReportVarsData> EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
-    bool InitEnvrnFlag(true);
-
-    // SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
-    //******************************************************************************
-
-    // Functions
-
-    void clear_state()
-    {
-        EMPDReportVars.deallocate();
-        InitEnvrnFlag = true;
-    }
 
     Real64 CalcDepthFromPeriod(EnergyPlusData &state,
                                Real64 const period,          // in seconds
@@ -355,35 +333,20 @@ namespace MoistureBalanceEMPDManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Create dynamic array for surface moisture calculation
 
-        // METHODOLOGY EMPLOYED:
-
         // USE STATEMENTS:
         using DataHeatBalFanSys::MAT;
         using Psychrometrics::PsyRhovFnTdbRh;
         using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int SurfNum;
 
-        if (InitEnvrnFlag) {
+        if (state.dataMoistureBalEMPD->InitEnvrnFlag) {
             RVSurfaceOld.allocate(TotSurfaces);
             RVSurface.allocate(TotSurfaces);
             HeatFluxLatent.allocate(TotSurfaces);
-            EMPDReportVars.allocate(TotSurfaces);
+            state.dataMoistureBalEMPD->EMPDReportVars.allocate(TotSurfaces);
             RVSurfLayer.allocate(TotSurfaces);
             RVSurfLayerOld.allocate(TotSurfaces);
             RVDeepLayer.allocate(TotSurfaces);
@@ -404,7 +367,7 @@ namespace MoistureBalanceEMPDManager {
             RVdeepOld(SurfNum) = rv_air_in_initval;
             RVwall(SurfNum) = rv_air_in_initval;
         }
-        if (!InitEnvrnFlag) return;
+        if (!state.dataMoistureBalEMPD->InitEnvrnFlag) return;
         // Initialize the report variable
 
         GetMoistureBalanceEMPDInput(state);
@@ -412,7 +375,7 @@ namespace MoistureBalanceEMPDManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
-            EMPDReportVarsData &rvd = EMPDReportVars(SurfNum);
+            EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);
             const std::string surf_name = Surface(SurfNum).Name;
             SetupOutputVariable(state,
                 "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name);
@@ -434,7 +397,7 @@ namespace MoistureBalanceEMPDManager {
             SetupOutputVariable(state, "EMPD Deep Layer Moisture Flux", OutputProcessor::Unit::kg_m2s, rvd.mass_flux_deep, "Zone", "State", surf_name);
         }
 
-        if (InitEnvrnFlag) InitEnvrnFlag = false;
+        if (state.dataMoistureBalEMPD->InitEnvrnFlag) state.dataMoistureBalEMPD->InitEnvrnFlag = false;
     }
 
     void CalcMoistureBalanceEMPD(EnergyPlusData &state,
@@ -454,9 +417,6 @@ namespace MoistureBalanceEMPDManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate surface moisture level using EMPD model
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
         // Using/Aliasing
         using DataMoistureBalanceEMPD::Lam;
         using Psychrometrics::PsyCpAirFnW;
@@ -470,18 +430,7 @@ namespace MoistureBalanceEMPDManager {
         using Psychrometrics::PsyRhovFnTdbWPb_fast;
         using Psychrometrics::PsyWFnTdbRhPb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // Real64 const Lam( 2500000.0 ); // Heat of vaporization (J/kg)
         static std::string const RoutineName("CalcMoistureEMPD");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NOFITR;           // Number of iterations
@@ -693,7 +642,7 @@ namespace MoistureBalanceEMPDManager {
         // Put results in the reporting variables
         // Will add RH and W of deep layer as outputs
         // Need to also add moisture content (kg/kg) of surface and deep layers, and moisture flow from each surface (kg/s), per Rongpeng's suggestion
-        EMPDReportVarsData &rvd = EMPDReportVars(SurfNum);
+        EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);
         rvd.rv_surface = rv_surface;
         rvd.RH_surface_layer = RH_surf_layer * 100.0;
         rvd.RH_deep_layer = RH_deep_layer * 100.0;
@@ -718,26 +667,7 @@ namespace MoistureBalanceEMPDManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Update inside surface vapor density
-        // METHODOLOGY EMPLOYED:
 
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // if (SurfNum==194) std::cout << "---" << std::endl;
         RVSurfaceOld(SurfNum) = RVSurface(SurfNum);
         RVdeepOld(SurfNum) = RVDeepLayer(SurfNum);
         RVSurfLayerOld(SurfNum) = RVSurfLayer(SurfNum);
@@ -756,26 +686,8 @@ namespace MoistureBalanceEMPDManager {
         // This routine gives a detailed report to the user about
         // EMPD Properties of each construction.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // The subroutine of ReportCTFs written by Linda Lawrie was used to develop this routine.
-
         // Using/Aliasing
         using General::ScanForReports;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -815,7 +727,5 @@ namespace MoistureBalanceEMPDManager {
             }
         }
     }
-
-} // namespace MoistureBalanceEMPDManager
 
 } // namespace EnergyPlus
