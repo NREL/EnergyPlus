@@ -3028,7 +3028,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
 
         "ZoneInfiltration:DesignFlowRate,",
         "  RZone Infiltration,          !- Name",
-        "  SZone,                       !- Zone or ZoneList Name",
+        "  RZone,                       !- Zone or ZoneList Name",
         "  AlwaysOn,                    !- Schedule Name",
         "  flow/zone,                   !- Design Flow Rate Calculation Method",
         "  0.05,                        !- Design Flow Rate{ m3 / s }",
