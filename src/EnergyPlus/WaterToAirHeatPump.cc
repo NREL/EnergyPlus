@@ -139,7 +139,7 @@ namespace WaterToAirHeatPump {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HPNum; // The state.dataWaterToAirHeatPump->WatertoAirHP that you are currently loading input into
 
-        // FLOW:
+
 
         // Obtains and Allocates state.dataWaterToAirHeatPump->WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPump->GetCoilsInputFlag) {                     // First time subroutine has been entered
@@ -244,7 +244,7 @@ namespace WaterToAirHeatPump {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        // FLOW
+
 
         NumCool = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation");
         NumHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation");

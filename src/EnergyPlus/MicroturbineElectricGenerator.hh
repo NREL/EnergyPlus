@@ -65,11 +65,6 @@ struct EnergyPlusData;
 
 namespace MicroturbineElectricGenerator {
 
-    extern int NumMTGenerators; // number of MT Generators specified in input
-    extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
-
-    void clear_state();
-
     struct MTGeneratorSpecs : PlantComponent
     {
         // Members
@@ -224,17 +219,21 @@ namespace MicroturbineElectricGenerator {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
 
 struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
 
+    int NumMTGenerators = 0;
+    bool GetMTInput = true;
+    Array1D<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
+
     void clear_state() override
     {
-
+        this->NumMTGenerators = 0;
+        this->GetMTInput = true;
+        this->MTGenerator.clear();
     }
 };
 

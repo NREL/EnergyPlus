@@ -349,7 +349,7 @@ SSCEXPORT void ssc_module_free( ssc_module_t p_mod );
 	}
 	\endverbatim
 */
-SSCEXPORT const ssc_info_t ssc_module_var_info( ssc_module_t p_mod, int index );
+SSCEXPORT ssc_info_t ssc_module_var_info( ssc_module_t p_mod, int index );
 
 /** Returns variable type information: SSC_INPUT, SSC_OUTPUT, or SSC_INOUT */
 SSCEXPORT int ssc_info_var_type( ssc_info_t p_inf );
