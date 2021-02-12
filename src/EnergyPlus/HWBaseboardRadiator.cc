@@ -506,13 +506,13 @@ namespace HWBaseboardRadiator {
 
             // Get schedule
             HWBaseboard(BaseboardNum).Schedule = cAlphaArgs(3);
-            if (lAlphaFieldBlanks(2)) {
+            if (lAlphaFieldBlanks(3)) {
                 HWBaseboard(BaseboardNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 HWBaseboard(BaseboardNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (HWBaseboard(BaseboardNum).SchedPtr == 0) {
                     ShowSevereError(state, RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(3) + "=\"" +
-                                    cAlphaArgs(2) + "\" not found.");
+                                    cAlphaArgs(3) + "\" not found.");
                     ErrorsFound = true;
                 }
             }
