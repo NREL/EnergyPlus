@@ -224,7 +224,7 @@ namespace ChillerIndirectAbsorption {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
