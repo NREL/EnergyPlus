@@ -579,6 +579,7 @@ void battery_t::ChangeTimestep(double dt_hr) {
     params->capacity->dt_hr = dt_hr;
     params->voltage->dt_hr = dt_hr;
     params->thermal->dt_hr = dt_hr;
+    thermal->dt_sec = dt_hr * 3600;
     params->lifetime->dt_hr = dt_hr;
 }
 
