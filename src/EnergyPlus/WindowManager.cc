@@ -71,7 +71,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -476,15 +475,15 @@ namespace WindowManager {
                     // back reflectance (all at normal incidence) for this layer.
                     // In this case, "front" means incident from the outside and "back"
                     // means incident from the inside.
-                    numptDAT = SpectralData(SpecDataNum).NumOfWavelengths;
+                    numptDAT = state.dataHeatBal->SpectralData(SpecDataNum).NumOfWavelengths;
                     state.dataWindowManager->numpt(IGlass) = numptDAT;
 
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
-                        state.dataWindowManager->wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
-                        state.dataWindowManager->t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
+                        state.dataWindowManager->wlt(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).WaveLength(ILam);
+                        state.dataWindowManager->t(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).Trans(ILam);
                         if ((IGlass == 1 || (IGlass == 2 && StormWinConst)) && (!state.dataWindowManager->BGFlag)) state.dataWindowManager->t(IGlass, ILam) *= state.dataMaterial->Material(LayPtr).GlassTransDirtFactor;
-                        state.dataWindowManager->rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
-                        state.dataWindowManager->rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
+                        state.dataWindowManager->rff(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).ReflFront(ILam);
+                        state.dataWindowManager->rbb(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).ReflBack(ILam);
                     }
 
                     // If there is spectral data for between-glass shades or blinds, calc the average spectral properties for use.
@@ -750,15 +749,15 @@ namespace WindowManager {
                     // In this case, "front" means incident from the inside and "back"
                     // means incident from the outside.
 
-                    numptDAT = SpectralData(SpecDataNum).NumOfWavelengths;
+                    numptDAT = state.dataHeatBal->SpectralData(SpecDataNum).NumOfWavelengths;
                     state.dataWindowManager->numpt(IGlass) = numptDAT;
 
                     for (ILam = 1; ILam <= numptDAT; ++ILam) {
-                        state.dataWindowManager->wlt(IGlass, ILam) = SpectralData(SpecDataNum).WaveLength(ILam);
-                        state.dataWindowManager->t(IGlass, ILam) = SpectralData(SpecDataNum).Trans(ILam);
+                        state.dataWindowManager->wlt(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).WaveLength(ILam);
+                        state.dataWindowManager->t(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).Trans(ILam);
                         if (IGlass == NGlass || (IGlass == (NGlass - 1) && StormWinConst)) state.dataWindowManager->t(IGlass, ILam) *= state.dataMaterial->Material(LayPtr).GlassTransDirtFactor;
-                        state.dataWindowManager->rff(IGlass, ILam) = SpectralData(SpecDataNum).ReflBack(ILam);
-                        state.dataWindowManager->rbb(IGlass, ILam) = SpectralData(SpecDataNum).ReflFront(ILam);
+                        state.dataWindowManager->rff(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).ReflBack(ILam);
+                        state.dataWindowManager->rbb(IGlass, ILam) = state.dataHeatBal->SpectralData(SpecDataNum).ReflFront(ILam);
                     }
 
                 } else { // No spectral data for this layer; use spectral average values
@@ -2234,8 +2233,8 @@ namespace WindowManager {
                     //                EXIT
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
-                    if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2454,9 +2453,9 @@ namespace WindowManager {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNumAdj;
                         // check whether this zone is a controlled zone or not
-                        if (!Zone(ZoneNumAdj).IsControlled) {
+                        if (!state.dataHeatBal->Zone(ZoneNumAdj).IsControlled) {
                             ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           Zone(ZoneNum).Name);
+                                           state.dataHeatBal->Zone(ZoneNum).Name);
                             return;
                         }
                         // determine supply air conditions
@@ -2982,7 +2981,7 @@ namespace WindowManager {
             }
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
-            if (((Surface(SurfNum).IntConvCoeff == 0) && (Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
+            if (((Surface(SurfNum).IntConvCoeff == 0) && (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
                 (Surface(SurfNum).IntConvCoeff == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
@@ -7032,7 +7031,7 @@ namespace WindowManager {
                                 SpectralDataName = "";
                                 if (state.dataMaterial->Material(Layer).GlassSpectralDataPtr > 0) {
                                     OpticalDataType = "Spectral";
-                                    SpectralDataName = SpectralData(state.dataMaterial->Material(Layer).GlassSpectralDataPtr).Name;
+                                    SpectralDataName = state.dataHeatBal->SpectralData(state.dataMaterial->Material(Layer).GlassSpectralDataPtr).Name;
                                 }
                                 if (state.dataMaterial->Material(Layer).GlassSpectralAndAngle) {
                                     OpticalDataType = "SpectralAndAngle";

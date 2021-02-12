@@ -567,12 +567,8 @@ namespace EnergyPlus::DemandManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the DEMAND MANAGER input from the input file.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using DataHeatBalance::Lights;
         using DataHeatBalance::LightsObjects;
         using DataHeatBalance::ZoneElectric;
         using DataHeatBalance::ZoneElectricObjects;
@@ -864,7 +860,7 @@ namespace EnergyPlus::DemandManager {
                     if (LoadPtr > 0) {
                         DemandMgr(MgrNum).NumOfLoads += LightsObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), Lights);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->Lights);
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
@@ -888,7 +884,7 @@ namespace EnergyPlus::DemandManager {
                                 DemandMgr(MgrNum).Load(LoadNum) = LightsObjects(LoadPtr).StartPtr + Item1 - 1;
                             }
                         } else {
-                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), Lights);
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->Lights);
                             if (LoadPtr > 0) {
                                 ++LoadNum;
                                 DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1471,14 +1467,10 @@ namespace EnergyPlus::DemandManager {
         // Expires limits and rotates loads after specified time duration.
         // It updates availability flags, expires managers that ended in the last timestep, etc.
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
-        using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MgrNum;
         int LoadNum;
@@ -1692,10 +1684,7 @@ namespace EnergyPlus::DemandManager {
         // Demand managers for new types of loads can be easily added with a new CASE statement in this subroutine
         // and new GetInput code.
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
-        using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -1728,14 +1717,14 @@ namespace EnergyPlus::DemandManager {
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeLights) {
-                LowestPower = Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataHeatBal->Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    Lights(LoadPtr).ManageDemand = true;
-                    Lights(LoadPtr).DemandLimit = LowestPower;
+                    state.dataHeatBal->Lights(LoadPtr).ManageDemand = true;
+                    state.dataHeatBal->Lights(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == DemandAction::ClearLimit) {
-                    Lights(LoadPtr).ManageDemand = false;
+                    state.dataHeatBal->Lights(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeElecEquip) {

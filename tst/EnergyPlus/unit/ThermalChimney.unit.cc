@@ -1115,8 +1115,8 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataHeatBalance::Zone(2).HasWindow = true;
-    DataHeatBalance::Zone(4).HasWindow = true;
+    state->dataHeatBal->Zone(2).HasWindow = true;
+    state->dataHeatBal->Zone(4).HasWindow = true;
     EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
     state->dataHeatBal->HConvIn.allocate(TotSurfaces);
     state->dataHeatBal->HConvIn = 0.1;

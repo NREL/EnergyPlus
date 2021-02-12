@@ -448,8 +448,7 @@ namespace BaseboardElectric {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::HeatingCapacitySizing;
+                using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -495,7 +494,7 @@ namespace BaseboardElectric {
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {

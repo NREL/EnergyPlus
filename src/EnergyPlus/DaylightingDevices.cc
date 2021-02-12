@@ -166,8 +166,7 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-    using DataHeatBalance::Zone;
-    using DataSurfaces::CalcSolRefl;
+        using DataSurfaces::CalcSolRefl;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::Surface;
@@ -684,7 +683,7 @@ namespace DaylightingDevices {
 
                     for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                         TZoneName = cAlphaArgs(TZoneNum + 4);
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = UtilityRoutines::FindItemInList(TZoneName, Zone);
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = UtilityRoutines::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone " + TZoneName + " not found.");
                             ErrorsFound = true;

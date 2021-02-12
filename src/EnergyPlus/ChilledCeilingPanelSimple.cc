@@ -896,8 +896,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataSizing::ZoneEqSizing;
         using DataSizing::ZoneSizingRunDone;
 
-        using DataHeatBalance::Zone;
-        using FluidProperties::GetDensityGlycol;
+                using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::MyPlantSizingIndex;
@@ -956,7 +955,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
-                    TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
+                    TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
@@ -990,7 +989,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                             ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                             ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
-                        TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
+                        TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                         DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         CheckZoneSizing(state, CompType, CompName);
@@ -1447,8 +1446,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // This subroutine sets the control temperature for the simple cooling panel.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
+                using DataHeatBalFanSys::MAT;
 
         {
             auto const SELECT_CASE_var(this->ControlType);
@@ -1459,9 +1457,9 @@ namespace EnergyPlus::CoolingPanelSimple {
             } else if (SELECT_CASE_var == Control::Operative) {
                 ControlTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
             } else if (SELECT_CASE_var == Control::ODB) {
-                ControlTemp = Zone(ZoneNum).OutDryBulbTemp;
+                ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
             } else if (SELECT_CASE_var == Control::OWB) {
-                ControlTemp = Zone(ZoneNum).OutWetBulbTemp;
+                ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
             } else { // Should never get here
                 ControlTemp = MAT(ZoneNum);
                 ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
@@ -1689,8 +1687,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalSurface::TempSurfInTmp;
+                using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
@@ -1712,7 +1709,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
             auto &ThisSurf(Surface(SurfNum));
 

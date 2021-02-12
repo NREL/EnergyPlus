@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     // SingleHeatingSetPoint thermostat
 
@@ -753,14 +753,14 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     TH.deallocate();
     Surface.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
     TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
     TH.allocate(2, 2, TotSurfaces);
     Surface.allocate(TotSurfaces);
     state->dataConstruction->Construct.allocate(TotSurfaces);
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
 
     Surface(1).Area = 20.0;
     Surface(2).Area = 15.0;
@@ -777,8 +777,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 3;
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
     TH(2, 1, 3) = 10.0;
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
     state->dataGlobal->TimeStepZone = 0.25;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
     TempControlType(1) = DualSetPointWithDeadBand;
@@ -945,10 +945,10 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
 
     // Set the data for the test
     state->dataHeatBal->TotPeople = 1;
-    People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     ZTAVComf.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->MRT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
@@ -960,24 +960,24 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
     QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeoplePtr = -1;
-    People(1).NumberOfPeople = 5.0;
-    People(1).NomMinNumberPeople = 5.0;
-    People(1).NomMaxNumberPeople = 5.0;
-    Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
-    People(1).FractionRadiant = 0.3;
-    People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
-    People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
-    People(1).CO2RateFactor = 3.82e-8;
-    People(1).ActivityLevelPtr = -1;
-    People(1).Show55Warning = true;
-    People(1).Pierce = true;
-    People(1).MRTCalcType = ZoneAveraged;
-    People(1).WorkEffPtr = 0;
-    People(1).ClothingType = 1;
-    People(1).ClothingPtr = -1;
-    People(1).AirVelocityPtr = 0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
+    state->dataHeatBal->People(1).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(1).NomMinNumberPeople = 5.0;
+    state->dataHeatBal->People(1).NomMaxNumberPeople = 5.0;
+    state->dataHeatBal->Zone(state->dataHeatBal->People(1).ZonePtr).TotOccupants = state->dataHeatBal->People(1).NumberOfPeople;
+    state->dataHeatBal->People(1).FractionRadiant = 0.3;
+    state->dataHeatBal->People(1).FractionConvected = 1.0 - state->dataHeatBal->People(1).FractionRadiant;
+    state->dataHeatBal->People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+    state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
+    state->dataHeatBal->People(1).ActivityLevelPtr = -1;
+    state->dataHeatBal->People(1).Show55Warning = true;
+    state->dataHeatBal->People(1).Pierce = true;
+    state->dataHeatBal->People(1).MRTCalcType = ZoneAveraged;
+    state->dataHeatBal->People(1).WorkEffPtr = 0;
+    state->dataHeatBal->People(1).ClothingType = 1;
+    state->dataHeatBal->People(1).ClothingPtr = -1;
+    state->dataHeatBal->People(1).AirVelocityPtr = 0;
 
     ZTAVComf(1) = 25.0;
     state->dataHeatBal->MRT(1) = 26.0;

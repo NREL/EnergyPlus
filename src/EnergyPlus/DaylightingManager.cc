@@ -83,7 +83,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PierceSurface.hh>
@@ -197,7 +196,7 @@ namespace EnergyPlus::DaylightingManager {
         AR = 0.0;
         ARH = 0.0;
         // Loop over surfaces in the zone's enclosure
-        auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum));
+        auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum));
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = Surface(ISurf).Class;
             // Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -292,7 +291,7 @@ namespace EnergyPlus::DaylightingManager {
             if (Surface(IWin).Class == SurfaceClass::Window) {
                 int ISurf = Surface(IWin).BaseSurf;
                 // Ratio of floor-to-window-center height and average floor-to-ceiling height
-                ETA = max(0.0, min(1.0, (SurfaceWindow(IWin).WinCenter(3) - Zone(ZoneNum).OriginZ) * Zone(ZoneNum).FloorArea / Zone(ZoneNum).Volume));
+                ETA = max(0.0, min(1.0, (SurfaceWindow(IWin).WinCenter(3) - state.dataHeatBal->Zone(ZoneNum).OriginZ) * state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).Volume));
                 AP = SurfaceWindow(ISurf).ZoneAreaMinusThisSurf;
                 ARHP = SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf;
                 // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
@@ -467,7 +466,7 @@ namespace EnergyPlus::DaylightingManager {
             // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) {
-                    ShowWarningError(state, "Detailed daylighting will not be done for zone=" + Zone(ZoneNum).Name);
+                    ShowWarningError(state, "Detailed daylighting will not be done for zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "because it has no associated exterior windows.");
                 }
             }
@@ -580,7 +579,7 @@ namespace EnergyPlus::DaylightingManager {
                             IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                             // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
                             // component will not be calculated for these windows until the time-step loop.
-                            if (Surface(IWin).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
+                            if (Surface(IWin).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
                                 // Output for each reference point, for each sky. Group by sky type first
                                 for (const DataDaylighting::SkyType& skyType: {DataDaylighting::SkyType::Clear, DataDaylighting::SkyType::ClearTurbid, DataDaylighting::SkyType::Intermediate, DataDaylighting::SkyType::Overcast}) {
                                     std::string skyTypeString;
@@ -603,7 +602,7 @@ namespace EnergyPlus::DaylightingManager {
                                               " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
                                               state.dataEnvrn->CurMnDy,
-                                              Zone(ZoneNum).Name,
+                                              state.dataHeatBal->Zone(ZoneNum).Name,
                                               Surface(IWin).Name,
                                               state.dataDaylightingData->DaylRefPt(state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylRefPtNum(refPtNum)).Name,
                                               DaylFac);
@@ -658,7 +657,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
                 // component will not be calculated for these windows until the time-step loop.
-                if (Surface(IWin).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
+                if (Surface(IWin).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
 
                     if (SurfWinMovableSlats(IWin)) {
                         // variable slat angle - MaxSlatangle sets
@@ -675,14 +674,14 @@ namespace EnergyPlus::DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            print(state.files.dfs, "{},{},{},Base Window\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Base Window\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(state.files.dfs, "{},{},{},{:.1R}\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
+                            print(state.files.dfs, "{},{},{},{:.1R}\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -787,9 +786,9 @@ namespace EnergyPlus::DaylightingManager {
                 for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                     if (state.dataDaylightingData->IllumMapCalc(MapNum).Zone != ZoneNum) continue;
                     if (state.dataGlobal->WarmupFlag) {
-                        DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
+                        DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                     } else {
-                        DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
+                        DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                     }
                 }
                 CalcDayltgCoeffsMapPoints(state, ZoneNum);
@@ -909,7 +908,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -1312,7 +1311,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -1720,7 +1719,7 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt(loopwin, iRefPoint) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPtWtd(loopwin, iRefPoint) = 0.0;
         }
-        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
+        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
             ExtWinType = DataDaylighting::iExtWinType::InZoneExtWin;
         } else {
             ExtWinType = DataDaylighting::iExtWinType::AdjZoneExtWin;
@@ -1829,7 +1828,7 @@ namespace EnergyPlus::DaylightingManager {
                     ShowSevereError(state,
                                     format("CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for zone {} because reference point "
                                            "#{} is less than 0.15m (6\") from window plane {}",
-                                           Zone(ZoneNum).Name,
+                                           state.dataHeatBal->Zone(ZoneNum).Name,
                                            iRefPoint,
                                            Surface(IWin).Name));
                     ShowContinueError(state, format("Distance=[{:.5R}]. This is too close; check position of reference point.", ALF));
@@ -1837,8 +1836,8 @@ namespace EnergyPlus::DaylightingManager {
                 }
             } else if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                 if (state.dataDaylightingManager->RefErrIndex(iRefPoint, IWin) == 0) { // only show error message once
-                    ShowWarningError(state, "CalcDaylightCoeffRefPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
-                                     "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name +
+                    ShowWarningError(state, "CalcDaylightCoeffRefPoints: For Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
+                                     "\"in Zone=\"" + state.dataHeatBal->Zone(Surface(IWin).Zone).Name +
                                      "\" reference point is less than 0.15m (6\") from window plane ");
                     ShowContinueError(state,
                                       format("Distance=[{:.1R} m] to ref point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Daylighting Calcs may result.",
@@ -1852,8 +1851,8 @@ namespace EnergyPlus::DaylightingManager {
         } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
             if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                 if (state.dataDaylightingManager->MapErrIndex(iRefPoint, IWin) == 0) { // only show error message once
-                    ShowWarningError(state, "CalcDaylightCoeffMapPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
-                                     "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name + "\" map point is less than 0.15m (6\") from window plane ");
+                    ShowWarningError(state, "CalcDaylightCoeffMapPoints: For Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
+                                     "\"in Zone=\"" + state.dataHeatBal->Zone(Surface(IWin).Zone).Name + "\" map point is less than 0.15m (6\") from window plane ");
                     ShowContinueError(state,
                                       format("Distance=[{:.1R} m] map point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Map Calcs may result.",
                                              ALF,
@@ -2241,7 +2240,7 @@ namespace EnergyPlus::DaylightingManager {
                 }
                 if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                     // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
-                    for (IntWin = Zone(ZoneNum).SurfaceFirst; IntWin <= Zone(ZoneNum).SurfaceLast; ++IntWin) {
+                    for (IntWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IntWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IntWin) {
                         if (Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1) {
                             if (Surface(Surface(IntWin).ExtBoundCond).Zone == Surface(IWin).Zone) {
                                 PierceSurface(IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
@@ -2452,7 +2451,7 @@ namespace EnergyPlus::DaylightingManager {
         DWX = Surface(IWin).Width / NWX;
         DWY = Surface(IWin).Height / NWY;
 
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
 
         // Perform necessary calculations for window coordinates and vectors.  This will be used to calculate centroids for
         // each window element
@@ -3596,7 +3595,7 @@ namespace EnergyPlus::DaylightingManager {
                         // adjacent to zones with exterior windows
                         // Does RAYCOS pass through interior window in zone containing RP?
                         // Loop over zone surfaces looking for interior windows between reference point and sun
-                        for (int IntWinDisk = Zone(ZoneNum).SurfaceFirst, IntWinDisk_end = Zone(ZoneNum).SurfaceLast; IntWinDisk <= IntWinDisk_end;
+                        for (int IntWinDisk = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, IntWinDisk_end = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; IntWinDisk <= IntWinDisk_end;
                              ++IntWinDisk) {
                             if (Surface(IntWinDisk).Class == SurfaceClass::Window && Surface(IntWinDisk).ExtBoundCond >= 1) {
                                 if (Surface(Surface(IntWinDisk).ExtBoundCond).Zone == Surface(IWin2).Zone) {
@@ -3908,7 +3907,7 @@ namespace EnergyPlus::DaylightingManager {
             // Interior window visible transmittance multiplier for exterior window in adjacent zone
             TVisIntWinMult = 1.0;
             TVisIntWinDiskMult = 1.0;
-            if (Surface(IWin).SolarEnclIndex != Zone(ZoneNum).SolarEnclosureNum) {
+            if (Surface(IWin).SolarEnclIndex != state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
                 TVisIntWinMult = TVISIntWin;
                 TVisIntWinDiskMult = TVISIntWinDisk;
             }
@@ -4395,7 +4394,7 @@ namespace EnergyPlus::DaylightingManager {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;
-                    if (state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
+                    if (state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !state.dataHeatBal->Zone(zoneOfSurf).HasInterZoneWindow &&
                         state.dataDaylightingData->ZoneDaylight(zoneOfSurf).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                         for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
                             SetupOutputVariable(state,
@@ -4423,7 +4422,7 @@ namespace EnergyPlus::DaylightingManager {
                         int refPtCount = 0;
                         for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).ZoneNums) {
                             if (DataViewFactorInformation::ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
-                                !Zone(enclZoneNum).HasInterZoneWindow && state.dataDaylightingData->ZoneDaylight(enclZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+                                !state.dataHeatBal->Zone(enclZoneNum).HasInterZoneWindow && state.dataDaylightingData->ZoneDaylight(enclZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                                 for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                     ++refPtCount; // Count reference points across each zone in the same enclosure
                                     std::string const varKey =
@@ -4608,7 +4607,7 @@ namespace EnergyPlus::DaylightingManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 state.dataDaylightingData->IllumMap(MapNum).Name = cAlphaArgs(1);
-                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
 
                 if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
@@ -4721,7 +4720,7 @@ namespace EnergyPlus::DaylightingManager {
         // Check for illuminance maps associated with this zone
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             if (state.dataDaylightingData->IllumMap(MapNum).Zone > 0) {
-                auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).Zone));
+                auto &zone(state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone));
                 // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
                 CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
                 SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
@@ -4914,7 +4913,7 @@ namespace EnergyPlus::DaylightingManager {
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) continue;
             if (state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting && !ZoneMsgDone(state.dataDaylightingData->IllumMap(MapNum).Zone)) {
-                ShowSevereError(state, "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name);
+                ShowSevereError(state, "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name);
                 ErrorsFound = true;
             }
         }
@@ -4928,7 +4927,7 @@ namespace EnergyPlus::DaylightingManager {
             print(state.files.eio,
                   "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   state.dataDaylightingData->IllumMap(MapNum).Name,
-                  Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name,
+                  state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name,
                   state.dataDaylightingData->IllumMap(MapNum).Xmin,
                   state.dataDaylightingData->IllumMap(MapNum).Xmax,
                   state.dataDaylightingData->IllumMap(MapNum).Xinc,
@@ -4979,7 +4978,7 @@ namespace EnergyPlus::DaylightingManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneFound == 0) {
                 ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
@@ -5226,7 +5225,7 @@ namespace EnergyPlus::DaylightingManager {
         for (auto &daylCntrl : state.dataDaylightingData->ZoneDaylight) {
             zoneIndex++;
             if (daylCntrl.TotalDaylRefPoints > 0) {
-                auto &zone(Zone(zoneIndex));
+                auto &zone(state.dataHeatBal->Zone(zoneIndex));
 
                 // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
                 CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
@@ -5373,7 +5372,7 @@ namespace EnergyPlus::DaylightingManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             pt.Name = cAlphaArgs(1);
-            pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (pt.ZoneNum == 0) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
@@ -5416,8 +5415,7 @@ namespace EnergyPlus::DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        // Locals
+                // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
 
@@ -5441,7 +5439,7 @@ namespace EnergyPlus::DaylightingManager {
             SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
-                int const pipeEnclNum = Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
+                int const pipeEnclNum = state.dataHeatBal->Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
                 for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(pipeEnclNum).ZoneNums) {
                     if (state.dataDaylightingData->ZoneDaylight(zoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
                         daylightControlFound = true;
@@ -6243,7 +6241,7 @@ namespace EnergyPlus::DaylightingManager {
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
         if (state.dataDaylightingManager->DayltgInteriorIllum_firstTime) {
-            int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::NumOfDayltgExtWins)));
+            int const d1(max(maxval(state.dataHeatBal->Zone, &ZoneData::NumSubSurfaces), maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
             tmpSourceLumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
@@ -7063,7 +7061,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
-        for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
+        for (IWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IWin) {
             if (Surface(IWin).Class != SurfaceClass::Window) continue;
             if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
             if (SurfWinShadingFlag(IWin) >= 10) SurfWinShadingFlag(IWin) = ShadeOff;
@@ -7090,14 +7088,14 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // The following report variables are valid only for daylit zones without interior windows
-        if (!Zone(ZoneNum).HasInterZoneWindow) {
+        if (!state.dataHeatBal->Zone(ZoneNum).HasInterZoneWindow) {
             for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
                 if (SurfWinShadingFlag(IWin) > 0 || SurfWinSolarDiffusing(IWin)) IS = 2;
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                     int refPtCount = 0;
-                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
+                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
                         for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                             ++refPtCount; // Count reference points across each zone in the same enclosure
                             SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) = state.dataDaylightingData->ZoneDaylight(enclZoneNum).IllumFromWinAtRefPt(loop, IS, refPtNum);
@@ -7639,7 +7637,7 @@ namespace EnergyPlus::DaylightingManager {
         ZoneNumThisWin = Surface(Surface(IWin).BaseSurf).Zone;
         // The inside surface area, ZoneDaylight(ZoneNum)%TotInsSurfArea was calculated in subr DayltgAveInteriorReflectance
 
-        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
+        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
             ExtWinType = DataDaylighting::iExtWinType::InZoneExtWin;
             ZoneInsideSurfArea = state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea;
             IntWinAdjZoneExtWinNum = 0;
@@ -10170,7 +10168,7 @@ namespace EnergyPlus::DaylightingManager {
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
-            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                     SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                     ++state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows;
@@ -10183,13 +10181,13 @@ namespace EnergyPlus::DaylightingManager {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones/enclosures
-            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
-                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
@@ -10197,7 +10195,7 @@ namespace EnergyPlus::DaylightingManager {
                     }
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
-                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10218,14 +10216,14 @@ namespace EnergyPlus::DaylightingManager {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones
-            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     if (ZoneNumAdj == ZoneNum) continue;
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
-                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
@@ -10233,7 +10231,7 @@ namespace EnergyPlus::DaylightingManager {
                     }
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
-                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10257,10 +10255,10 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins = 0;
                 continue;
             }
-            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
-                for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                     if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins;
                     }
@@ -10273,14 +10271,14 @@ namespace EnergyPlus::DaylightingManager {
             int ExtWinIndex = 0;
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int const ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
-                for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                     if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++ExtWinIndex;
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).SurfNum = SurfNumAdj;
 
                         // now count interior windows shared by both zones
                         int NumOfIntWindowsCount = 0;
-                        for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
+                        for (int SurfNumAdj2 = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
                             if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10293,7 +10291,7 @@ namespace EnergyPlus::DaylightingManager {
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).IntWinNum.allocate(NumOfIntWindowsCount);
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).IntWinNum = 0;
                         int IntWinIndex = 0;
-                        for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
+                        for (int SurfNumAdj2 = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
                             if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10315,7 +10313,7 @@ namespace EnergyPlus::DaylightingManager {
                 // This is a Daylighting:Detailed zone
 
                 // Get exterior windows in this zone or shared solar enclosure
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
@@ -10328,7 +10326,7 @@ namespace EnergyPlus::DaylightingManager {
                         int ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
-                        for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                        for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWin(ZoneNum);
@@ -10383,7 +10381,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 int ZoneExtWinCtr = 0;
 
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWinCtr;
@@ -10397,7 +10395,7 @@ namespace EnergyPlus::DaylightingManager {
                         int const ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
-                        for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                        for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
@@ -10464,7 +10462,7 @@ namespace EnergyPlus::DaylightingManager {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
             static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-            print(state.files.eio, Format_701, Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows,
+            print(state.files.eio, Format_701, state.dataHeatBal->Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows,
                   (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins - state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows));
         }
         static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
@@ -10473,9 +10471,9 @@ namespace EnergyPlus::DaylightingManager {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
             static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-            print(state.files.eio, Format_703, Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                print(state.files.eio, ",{}", Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
+                print(state.files.eio, ",{}", state.dataHeatBal->Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
             }
             print(state.files.eio, "\n");
         }
@@ -10531,7 +10529,7 @@ namespace EnergyPlus::DaylightingManager {
                 for (auto IWinShdOrd : listOfExtWin) {
                     ++count;
                     if (count > state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
-                        ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
+                        ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                     bool found = false;
                     for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                         int IWinLoop = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
@@ -10542,13 +10540,13 @@ namespace EnergyPlus::DaylightingManager {
                         }
                     }
                     // this should never occur.
-                    if (!found) ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
+                    if (!found) ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                 }
             }
             // double check MapShdOrdToLoopNum array, this should be unnessary but..
             for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
-                    ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
+                    ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                 }
             }
         }
@@ -10576,7 +10574,7 @@ namespace EnergyPlus::DaylightingManager {
 
         state.dataDaylightingData->ZoneDaylight(ZoneNum).InterReflIllFrIntWins = 0.0;
 
-        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
+        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
         for (int const IWin : thisEnclSurfaces) {
             if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                 // This is an interior window in ZoneNum
@@ -10665,12 +10663,12 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingData->ZoneDaylight(ZoneNum).MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi;
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones == 0) continue;
-            for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
+            for (IWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IWin) {
                 if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                     ZoneNumAdj = Surface(Surface(IWin).ExtBoundCond).Zone;
                     IntWinNextToIntWinAdjZone = false;
                     for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++loop) {
-                        if (Zone(ZoneNumAdj).SolarEnclosureNum == Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).SolarEnclosureNum) {
+                        if (state.dataHeatBal->Zone(ZoneNumAdj).SolarEnclosureNum == state.dataHeatBal->Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).SolarEnclosureNum) {
                             IntWinNextToIntWinAdjZone = true;
                             break;
                         }
@@ -10825,7 +10823,7 @@ namespace EnergyPlus::DaylightingManager {
         // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
         // must add correct number of commas at end
-        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", Zone(ZoneNum).Name, environmentName, mapName);
+        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
         print(mapFile,
               "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
               fmt::arg("Sep", state.dataDaylightingData->MapColSep),

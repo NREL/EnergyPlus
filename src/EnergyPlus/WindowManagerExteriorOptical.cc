@@ -294,7 +294,7 @@ namespace WindowManager {
         auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
         std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {
-            aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties.GlassSpectralDataPtr);
+            aSampleData = CWCESpecturmProperties::getSpectralSample(state, m_MaterialProperties.GlassSpectralDataPtr);
         } else {
             aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties);
         }

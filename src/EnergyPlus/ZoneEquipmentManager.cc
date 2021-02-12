@@ -543,15 +543,15 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         Temp = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTemp;
                         HumRat = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesHumRat;
                         DeltaTemp = Temp - Node(ZoneNode).Temp;
-                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-                            DeltaTemp = Temp - DataHeatBalance::Zone(ActualZoneNum).AdjustedReturnTempByITE;
+                        if (state.dataHeatBal->Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
+                            DeltaTemp = Temp - state.dataHeatBal->Zone(ActualZoneNum).AdjustedReturnTempByITE;
                         }
                         // If the user specify the design cooling supply air temperature difference, then
                     } else {
                         DeltaTemp = -std::abs(CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesTempDiff);
                         Temp = DeltaTemp + Node(ZoneNode).Temp;
-                        if (DataHeatBalance::Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-                            Temp = DeltaTemp + DataHeatBalance::Zone(ActualZoneNum).AdjustedReturnTempByITE;
+                        if (state.dataHeatBal->Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
+                            Temp = DeltaTemp + state.dataHeatBal->Zone(ActualZoneNum).AdjustedReturnTempByITE;
                         }
                         HumRat = CalcZoneSizing(CurOverallSimDay, ControlledZoneNum).CoolDesHumRat;
                     }
@@ -753,9 +753,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Obtains data from Zone Sizing and Zone Equipment objects already input.
 
         // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::Zone;
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using EMSManager::ManageEMS;
         using ScheduleManager::GetScheduleMaxValue;
         using ZoneTempPredictorCorrector::VerifyThermostatInZone;
@@ -783,7 +780,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
 
         for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex) {
-            ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, Zone);
+            ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
             if (ZoneIndex == 0) {
                 ShowSevereError(state, "SetUpZoneSizingArrays: Sizing:Zone=\"" + ZoneSizingInput(ZoneSizIndex).ZoneName + "\" references unknown zone");
                 ErrorsFound = true;
@@ -1258,10 +1255,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
             TotPeopleInZone = 0.0;
             ZoneIndex = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
             for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                if (People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
-                    TotPeopleInZone += (People(PeopleNum).NumberOfPeople * Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
-                                        Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
-                    SchMax = GetScheduleMaxValue(state, People(PeopleNum).NumberOfPeoplePtr);
+                if (state.dataHeatBal->People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
+                    TotPeopleInZone += (state.dataHeatBal->People(PeopleNum).NumberOfPeople * state.dataHeatBal->Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
+                                        state.dataHeatBal->Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
+                    SchMax = GetScheduleMaxValue(state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr);
                     if (SchMax > 0) {
                         FinalZoneSizing(CtrlZoneNum).ZonePeakOccupancy = TotPeopleInZone * SchMax;
                     } else {
@@ -1270,8 +1267,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 }
             }
             FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea =
-                (Zone(ZoneIndex).FloorArea * Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
-                 Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
+                (state.dataHeatBal->Zone(ZoneIndex).FloorArea * state.dataHeatBal->Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).Multiplier *
+                 state.dataHeatBal->Zone(FinalZoneSizing(CtrlZoneNum).ActualZoneNum).ListMultiplier);
             if (FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowPPer || FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowSum ||
                 FinalZoneSizing(CtrlZoneNum).OADesMethod == OAFlowMax) {
                 OAFromPeople = FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer * TotPeopleInZone;
@@ -1299,24 +1296,24 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // calculated zone design flow rates automatically take into account zone multipliers, since the zone
             // loads are multiplied (in ZoneTempPredictorCorrector.cc). Flow rates derived directly from
             // user inputs need to be explicitly multiplied by the zone multipliers.
-            FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlowPerArea * Zone(ZoneIndex).FloorArea *
-                                                              Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlowPerArea * state.dataHeatBal->Zone(ZoneIndex).FloorArea *
+                                                              state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
             CalcFinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow2 = CalcFinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlowPerArea *
-                                                                  Zone(ZoneIndex).FloorArea * Zone(ZoneIndex).Multiplier *
-                                                                  Zone(ZoneIndex).ListMultiplier;
-            FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlowPerArea * Zone(ZoneIndex).FloorArea *
-                                                              Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
+                                                                  state.dataHeatBal->Zone(ZoneIndex).FloorArea * state.dataHeatBal->Zone(ZoneIndex).Multiplier *
+                                                                  state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow2 = FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlowPerArea * state.dataHeatBal->Zone(ZoneIndex).FloorArea *
+                                                              state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
             CalcFinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow2 = CalcFinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlowPerArea *
-                                                                  Zone(ZoneIndex).FloorArea * Zone(ZoneIndex).Multiplier *
-                                                                  Zone(ZoneIndex).ListMultiplier;
-            FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            CalcFinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            CalcFinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            FinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
-            CalcFinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= Zone(ZoneIndex).Multiplier * Zone(ZoneIndex).ListMultiplier;
+                                                                  state.dataHeatBal->Zone(ZoneIndex).FloorArea * state.dataHeatBal->Zone(ZoneIndex).Multiplier *
+                                                                  state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            CalcFinalZoneSizing(CtrlZoneNum).DesCoolMinAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            CalcFinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            CalcFinalZoneSizing(CtrlZoneNum).InpDesCoolAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            FinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
+            CalcFinalZoneSizing(CtrlZoneNum).InpDesHeatAirFlow *= state.dataHeatBal->Zone(ZoneIndex).Multiplier * state.dataHeatBal->Zone(ZoneIndex).ListMultiplier;
 
             for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
                 ZoneSizing(DesDayNum, CtrlZoneNum).MinOA = FinalZoneSizing(CtrlZoneNum).MinOA;
@@ -3255,7 +3252,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // If one sequenced load is allocated, then all have been allocated in InitZoneEquipment
         if (allocated(energy.SequencedOutputRequired)) {
             // Check if controlled first, because if it's not, there is no zone equipment list
-            if (!DataHeatBalance::Zone(ZoneNum).IsControlled || state.dataGlobal->ZoneSizingCalc) {
+            if (!state.dataHeatBal->Zone(ZoneNum).IsControlled || state.dataGlobal->ZoneSizingCalc) {
                 // init each sequenced demand to the full output
                 energy.SequencedOutputRequired = energy.TotalOutputRequired;                        // array assignment
                 energy.SequencedOutputRequiredToHeatingSP = energy.OutputRequiredToHeatingSP;       // array assignment
@@ -3265,7 +3262,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP; // array assignment
                 moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
             } else if (FirstHVACIteration) {
-                auto loadDistType = state.dataZoneEquip->ZoneEquipList(DataHeatBalance::Zone(ZoneNum).ZoneEqNum).LoadDistScheme;
+                auto loadDistType = state.dataZoneEquip->ZoneEquipList(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).LoadDistScheme;
                 if ((loadDistType == DataZoneEquipment::LoadDist::SequentialLoading) ||
                     (loadDistType == DataZoneEquipment::LoadDist::UniformLoading)) {
                     // init each sequenced demand to the full output
@@ -3321,10 +3318,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Distribute zone equipment loads according to load distribution scheme
 
         // Do nothing if this zone is uncontrolled or doing zone sizing
-        if (!DataHeatBalance::Zone(ActualZoneNum).IsControlled) return;
+        if (!state.dataHeatBal->Zone(ActualZoneNum).IsControlled) return;
         if (state.dataGlobal->ZoneSizingCalc) return;
 
-        int ctrlZoneNum = DataHeatBalance::Zone(ActualZoneNum).ZoneEqNum;
+        int ctrlZoneNum = state.dataHeatBal->Zone(ActualZoneNum).ZoneEqNum;
         // Do nothing on FirstHVACIteration if not UniformLoading and not SequentialLoading
         if (FirstHVACIteration && (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading) &&
             (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading)) {
@@ -3622,12 +3619,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::SingleHeatCoolSetPoint;
         using DataHVACGlobals::SingleHeatingSetPoint;
 
-        int ctrlZoneNum = DataHeatBalance::Zone(ZoneNum).ZoneEqNum;
+        int ctrlZoneNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
         auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
         auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
 
         // If zone is uncontrolled use original method for remaining output
-        if (!DataHeatBalance::Zone(ZoneNum).IsControlled) {
+        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
             // SequentialLoading, use original method for remaining output
             energy.UnadjRemainingOutputRequired -= SysOutputProvided;
             energy.RemainingOutputRequired = energy.UnadjRemainingOutputRequired;
@@ -3831,8 +3828,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHeatBalance::Infiltration;
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::NoInfiltrationFlow;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZoneAirMassFlow;
+                using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::MixingMassFlowZone;
         using DataHeatBalFanSys::ZoneInfiltrationFlag;
         using DataHeatBalFanSys::ZoneMassBalanceFlag;
@@ -4311,8 +4307,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Using/Aliasing
         using DataHeatBalance::RefrigCaseCredit;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::SysDepZoneLoads;
+                using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
@@ -4349,13 +4344,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // the energy for the return air heat gain from the lights statements.
             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes == 0) continue;
             ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
-            ZoneMult = Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
+            ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
             for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
                 ReturnNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(nodeCount);
 
                 // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
                 // Add sensible heat gain from refrigerated cases with under case returns
-                SumAllReturnAirConvectionGains(ActualZoneNum, QRetAir, ReturnNode);
+                SumAllReturnAirConvectionGains(state, ActualZoneNum, QRetAir, ReturnNode);
 
                 // Need to add the energy to the return air from lights and from airflow windows. Where the heat
                 // is added depends on if there is system flow or not.  If there is system flow the heat is added
@@ -4383,7 +4378,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 WinGapFlowTtoRA = 0.0;
 
                 if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
-                    for (SurfNum = Zone(ActualZoneNum).SurfaceFirst; SurfNum <= Zone(ActualZoneNum).SurfaceLast; ++SurfNum) {
+                    for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).SurfaceLast; ++SurfNum) {
                         if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
@@ -4397,7 +4392,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 // the flag NoHeatToReturnAir is TRUE if the system is zonal only or is central with on/off air flow. In these
                 // cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
                 // MODULE ZoneTempPredictorCorrector.
-                if (!Zone(ActualZoneNum).NoHeatToReturnAir) {
+                if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
                     CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
                     if (MassFlowRA > 0.0) {
                         if (WinGapFlowToRA > 0.0) {
@@ -4442,9 +4437,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Node(ReturnNode).Press = Node(ZoneNode).Press;
 
                 // Include impact of under case returns for refrigerated display case when updating the return air node humidity
-                if (!Zone(ActualZoneNum).NoHeatToReturnAir) {
+                if (!state.dataHeatBal->Zone(ActualZoneNum).NoHeatToReturnAir) {
                     if (MassFlowRA > 0) {
-                        SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                        SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                         H2OHtOfVap = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ReturnNode).Temp);
                         Node(ReturnNode).HumRat = Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
                     } else {
@@ -4452,14 +4447,14 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
                         RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                         // shouldn't the HVAC term be zeroed out then?
-                        SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                        SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                         ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                     }
                 } else {
                     Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
                     RefrigCaseCredit(ActualZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ActualZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
-                    SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                     ZoneLatentGain(ActualZoneNum) += SumRetAirLatentGainRate;
                 }
 
@@ -4709,12 +4704,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // Use air node information linked to the zone if defined
             NZ = Ventilation(j).ZonePtr;
             Ventilation(j).FanPower = 0.0;
-            TempExt = Zone(NZ).OutDryBulbTemp;
-            WindSpeedExt = Zone(NZ).WindSpeed;
-            WindDirExt = Zone(NZ).WindDir;
-            if (Zone(NZ).HasLinkedOutAirNode) {
-                HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
-                EnthalpyExt = Node(Zone(NZ).LinkedOutAirNode).Enthalpy;
+            TempExt = state.dataHeatBal->Zone(NZ).OutDryBulbTemp;
+            WindSpeedExt = state.dataHeatBal->Zone(NZ).WindSpeed;
+            WindDirExt = state.dataHeatBal->Zone(NZ).WindDir;
+            if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
+                HumRatExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
+                EnthalpyExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).Enthalpy;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
                 EnthalpyExt = state.dataEnvrn->OutEnthalpy;
@@ -4984,7 +4979,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     if (TZM > MixingTmax) MixingLimitFlag = true;
                 }
                 // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-                TempExt = Zone(n).OutDryBulbTemp;
+                TempExt = state.dataHeatBal->Zone(n).OutDryBulbTemp;
                 if (Mixing(j).MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, Mixing(j).MinOutdoorTempSchedPtr);
                 if (Mixing(j).MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, Mixing(j).MaxOutdoorTempSchedPtr);
                 if (Mixing(j).MinOutdoorTempSchedPtr > 0 && Mixing(j).MaxOutdoorTempSchedPtr > 0) {
@@ -5184,7 +5179,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     if (TZM > MixingTmax) MixingLimitFlag = true;
                 }
                 // Ensure the minimum outdoor temperature <= the maximum outdoor temperature
-                TempExt = Zone(n).OutDryBulbTemp;
+                TempExt = state.dataHeatBal->Zone(n).OutDryBulbTemp;
                 if (CrossMixing(j).MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(state, CrossMixing(j).MinOutdoorTempSchedPtr);
                 if (CrossMixing(j).MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(state, CrossMixing(j).MaxOutdoorTempSchedPtr);
                 if (CrossMixing(j).MinOutdoorTempSchedPtr > 0 && CrossMixing(j).MaxOutdoorTempSchedPtr > 0) {
@@ -5337,13 +5332,13 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             NZ = Infiltration(j).ZonePtr;
 
-            TempExt = Zone(NZ).OutDryBulbTemp;
-            WindSpeedExt = Zone(NZ).WindSpeed;
+            TempExt = state.dataHeatBal->Zone(NZ).OutDryBulbTemp;
+            WindSpeedExt = state.dataHeatBal->Zone(NZ).WindSpeed;
 
             // Use air node information linked to the zone if defined
 
-            if (Zone(NZ).HasLinkedOutAirNode) {
-                HumRatExt = Node(Zone(NZ).LinkedOutAirNode).HumRat;
+            if (state.dataHeatBal->Zone(NZ).HasLinkedOutAirNode) {
+                HumRatExt = Node(state.dataHeatBal->Zone(NZ).LinkedOutAirNode).HumRat;
             } else {
                 HumRatExt = state.dataEnvrn->OutHumRat;
             }
@@ -5470,7 +5465,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     }
                 }
                 NZ = ZoneAirBalance(j).ZonePtr;
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
+                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBal->Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
                 CpAir = PsyCpAirFnW(HumRatExt);
                 ZoneAirBalance(j).ERVMassFlowRate *= AirDensity;
                 MDotOA(NZ) =
@@ -5591,8 +5586,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // Using/Aliasing
         using DataHeatBalance::MassConservation;
         using DataHeatBalance::Mixing;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MixingMassFlowZone;
+                using DataHeatBalFanSys::MixingMassFlowZone;
 
         int Loop;
         int MixingNum;

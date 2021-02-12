@@ -289,15 +289,6 @@ namespace DataHeatBalance {
 
     extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-    extern Real64 zeroPointerVal;
-    extern int NumAirBoundaryMixing;                 // Number of air boundary simple mixing objects needed
-    extern std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
-    extern std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
-    extern std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
-    extern std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
-
     struct TCGlazingsType
     {
         // Members
@@ -1829,18 +1820,6 @@ namespace DataHeatBalance {
     };
 
     // Object Data
-    extern Array1D<ZonePreDefRepType> ZonePreDefRep;
-    extern ZonePreDefRepType BuildingPreDefRep;
-    extern Array1D<ZoneSimData> ZoneIntGain;
-    extern Array1D<GapSupportPillar> SupportPillar;
-    extern Array1D<GapDeflectionState> DeflectionState;
-    extern Array1D<SpectralDataProperties> SpectralData;
-    extern Array1D<ZoneData> Zone;
-    extern Array1D<ZoneListData> ZoneList;
-    extern Array1D<ZoneGroupData> ZoneGroup;
-    extern Array1D<ZoneListData> ShadingZoneGroup;
-    extern Array1D<PeopleData> People;
-    extern Array1D<LightsData> Lights;
     extern Array1D<ZoneEquipData> ZoneElectric;
     extern Array1D<ZoneEquipData> ZoneGas;
     extern Array1D<ZoneEquipData> ZoneOtherEq;
@@ -2168,6 +2147,23 @@ struct HeatBalanceData : BaseGlobalStruct
         BackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving  beam solar radiation from a given exterior window
     Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the surfaces
                                   // listed in BackSurfaces
+    Real64 zeroPointerVal = 0.0;
+    int NumAirBoundaryMixing = 0;             // Number of air boundary simple mixing objects needed
+    std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
+    std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
+    std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
+    std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
+    Array1D<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
+    DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
+    Array1D<DataHeatBalance::ZoneSimData> ZoneIntGain;
+    Array1D<DataHeatBalance::GapSupportPillar> SupportPillar;
+    Array1D<DataHeatBalance::GapDeflectionState> DeflectionState;
+    Array1D<DataHeatBalance::SpectralDataProperties> SpectralData;
+    Array1D<DataHeatBalance::ZoneData> Zone;
+    Array1D<DataHeatBalance::ZoneListData> ZoneList;
+    Array1D<DataHeatBalance::ZoneGroupData> ZoneGroup;
+    Array1D<DataHeatBalance::PeopleData> People;
+    Array1D<DataHeatBalance::LightsData> Lights;
 
     void clear_state() override
     {
@@ -2379,6 +2375,23 @@ struct HeatBalanceData : BaseGlobalStruct
         this->CosIncAng.deallocate();
         this->BackSurfaces.deallocate();
         this->OverlapAreas.deallocate();
+        this->zeroPointerVal = 0.0;
+        this->NumAirBoundaryMixing = 0;
+        this->AirBoundaryMixingZone1.clear();
+        this->AirBoundaryMixingZone2.clear();
+        this->AirBoundaryMixingSched.clear();
+        this->AirBoundaryMixingVol.clear();
+        this->ZonePreDefRep.deallocate();
+        this->BuildingPreDefRep = DataHeatBalance::ZonePreDefRepType();
+        this->ZoneIntGain.deallocate();
+        this->SupportPillar.deallocate();
+        this->DeflectionState.deallocate();
+        this->SpectralData.deallocate();
+        this->Zone.deallocate();
+        this->ZoneList.deallocate();
+        this->ZoneGroup.deallocate();
+        this->People.deallocate();
+        this->Lights.deallocate();
     }
 };
 

@@ -424,7 +424,7 @@ namespace CrossVentMgr {
             } else {
                 ShowSevereError(state,
                     "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
-                ShowContinueError(state, "Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + Zone(ZoneNum).Name +
+                ShowContinueError(state, "Surface " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).Name + " in zone " + state.dataHeatBal->Zone(ZoneNum).Name +
                                   " uses leakage component " + AirflowNetwork::AirflowNetworkLinkageData(Ctd).CompName);
                 ShowContinueError(state, "Only leakage component types AirflowNetwork:MultiZone:Component:DetailedOpening and ");
                 ShowContinueError(state, "AirflowNetwork:MultiZone:Surface:Crack can be used with the cross ventilation room air model");
@@ -436,7 +436,7 @@ namespace CrossVentMgr {
         // Droom the distance between the average point of the base surface of the airflow network Surface (if the base surface
         // is a Window or Door it looks for the second base surface).
         // Dstar is Droom corrected for wind angle
-        Wroom = Zone(ZoneNum).Volume / Zone(ZoneNum).FloorArea;
+        Wroom = state.dataHeatBal->Zone(ZoneNum).Volume / state.dataHeatBal->Zone(ZoneNum).FloorArea;
         auto const &baseSurface(Surface(Surface(AirflowNetwork::MultizoneSurfaceData(MaxSurf).SurfNum).BaseSurf));
         if ((baseSurface.Sides == 3) || (baseSurface.Sides == 4)) {
             XX = baseSurface.Centroid.x;
@@ -486,7 +486,7 @@ namespace CrossVentMgr {
         }
 
         // Room area
-        Aroom = Zone(ZoneNum).Volume / state.dataRoomAirMod->Droom(ZoneNum);
+        Aroom = state.dataHeatBal->Zone(ZoneNum).Volume / state.dataRoomAirMod->Droom(ZoneNum);
 
         // Populate an array of inflow volume fluxes (Fin) for all apertures in the zone
         // Calculate inflow velocity (%Uin) for each aperture in the zone
@@ -755,7 +755,7 @@ namespace CrossVentMgr {
         Real64 RetAirConvGain;
 
         GainsFrac = 0.0;
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
 
         for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
             if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
@@ -763,12 +763,12 @@ namespace CrossVentMgr {
             }
         }
 
-        SumAllInternalConvectionGains(ZoneNum, ConvGains);
+        SumAllInternalConvectionGains(state, ZoneNum, ConvGains);
         ConvGains += SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum) + SysDepZoneLoadsLagged(ZoneNum) + NonAirSystemResponse(ZoneNum) / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
-        if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(ZoneNum, RetAirConvGain, 0);
+        if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
+            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
             ConvGains += RetAirConvGain;
         }
 
@@ -776,7 +776,7 @@ namespace CrossVentMgr {
         ConvGainsRec = ConvGains * (1.0 - GainsFrac);
         MCp_Total = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
         MCpT_Total =
-            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
+            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
             MCp_Total = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;

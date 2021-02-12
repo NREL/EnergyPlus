@@ -299,7 +299,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                     Tin = 0.0;
                     ShowSevereError(state,
                                     format("Illegal control type for Zone={}, Found value={}, in Schedule={}",
-                                           DataHeatBalance::Zone(zoneNum).Name,
+                                           state.dataHeatBal->Zone(zoneNum).Name,
                                            controlType,
                                            state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchedName));
                 }
@@ -1039,7 +1039,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                     ShowContinueError(state, "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\".");
                     if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Wall) {
                         ShowContinueError(state, "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\"");
-                        ShowContinueError(state, "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone(Surfaces(surfNum).Zone).Name +
+                        ShowContinueError(state, "  in a floor surface within the same Zone=\"" + state.dataHeatBal->Zone(Surfaces(surfNum).Zone).Name +
                                           "\".");
                     } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                         ShowContinueError(state, "  However, this floor was never assigned to a Kiva instance.");

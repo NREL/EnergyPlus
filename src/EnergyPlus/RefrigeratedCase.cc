@@ -594,7 +594,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 // Get the Zone node number from the zone name entered by the user
                 RefrigCase(CaseNum).ZoneName = Alphas(3);
-                RefrigCase(CaseNum).ActualZoneNum = UtilityRoutines::FindItemInList(Alphas(3), DataHeatBalance::Zone);
+                RefrigCase(CaseNum).ActualZoneNum = UtilityRoutines::FindItemInList(Alphas(3), state.dataHeatBal->Zone);
 
                 if (RefrigCase(CaseNum).ActualZoneNum == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
@@ -1064,7 +1064,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 // set flag in Zone Data if RAFrac > 0
                 if (RefrigCase(CaseNum).RAFrac > 0.0) {
-                    DataHeatBalance::Zone(RefrigCase(CaseNum).ActualZoneNum).RefrigCaseRA = true;
+                    state.dataHeatBal->Zone(RefrigCase(CaseNum).ActualZoneNum).RefrigCaseRA = true;
                 }
 
                 //   Make sure RA node exists for display cases with under case HVAC returns
@@ -1485,7 +1485,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Get the Zone node number from the zone name
                     // The Zone Node is needed to get the zone's ambient conditions, DataGlobals::NumOfZones from dataglobals
                     WalkIn(WalkInID).ZoneName(ZoneID) = Alphas(AStart);
-                    WalkIn(WalkInID).ZoneNum(ZoneID) = UtilityRoutines::FindItemInList(Alphas(AStart), DataHeatBalance::Zone);
+                    WalkIn(WalkInID).ZoneNum(ZoneID) = UtilityRoutines::FindItemInList(Alphas(AStart), state.dataHeatBal->Zone);
 
                     if (WalkIn(WalkInID).ZoneNum(ZoneID) == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
@@ -2249,7 +2249,7 @@ namespace EnergyPlus::RefrigeratedCase {
 
                 ++AlphaNum;
                 AirChillerSet(SetID).ZoneName = Alphas(AlphaNum);
-                AirChillerSet(SetID).ZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                AirChillerSet(SetID).ZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
 
                 if (AirChillerSet(SetID).ZoneNum == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\", invalid  " +
@@ -2776,7 +2776,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                             " must be input if walkins or AirChillers connected to rack and heat rejection location = zone.");
                             ErrorsFound = true;
                         } else { // alpha (15) not blank
-                            RefrigRack(RackNum).HeatRejectionZoneNum = UtilityRoutines::FindItemInList(Alphas(15), DataHeatBalance::Zone);
+                            RefrigRack(RackNum).HeatRejectionZoneNum = UtilityRoutines::FindItemInList(Alphas(15), state.dataHeatBal->Zone);
                             RefrigRack(RackNum).HeatRejectionZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(15));
                             if (RefrigRack(RackNum).HeatRejectionZoneNum == 0) {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
@@ -2914,7 +2914,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         Condenser(CondNum).InletAirNodeNum = 0;
                     } else { // see if it's an outside air node name or an indoor zone name,
                         // have to check inside first because outside check automatically generates an error message
-                        Condenser(CondNum).InletAirZoneNum = UtilityRoutines::FindItemInList(Alphas(4), DataHeatBalance::Zone);
+                        Condenser(CondNum).InletAirZoneNum = UtilityRoutines::FindItemInList(Alphas(4), state.dataHeatBal->Zone);
                         // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                         if (Condenser(CondNum).InletAirZoneNum != 0) {
                             // set condenser flag (later used to set system flag) and zone flag
@@ -3554,7 +3554,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         GasCooler(GCNum).InletAirNodeNum = 0;
                     } else { // see if it's an outside air node name or an indoor zone name,
                         // have to check inside first because outside check automatically generates an error message
-                        GasCooler(GCNum).InletAirZoneNum = UtilityRoutines::FindItemInList(Alphas(4), DataHeatBalance::Zone);
+                        GasCooler(GCNum).InletAirZoneNum = UtilityRoutines::FindItemInList(Alphas(4), state.dataHeatBal->Zone);
                         // need to clearly id node number for air inlet conditions and zone number for casecredit assignment
                         if (GasCooler(GCNum).InletAirZoneNum != 0) {
                             // set condenser flag (later used to set system flag) and zone flag
@@ -4041,7 +4041,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     NumNum = 12;
                     if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                         Secondary(SecondaryNum).SumUADistPiping = Numbers(NumNum);
-                        Secondary(SecondaryNum).DistPipeZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                        Secondary(SecondaryNum).DistPipeZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                         Secondary(SecondaryNum).DistPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
 
                         if (Secondary(SecondaryNum).DistPipeZoneNum == 0) {
@@ -4083,7 +4083,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     NumNum = 13;
                     if (!lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                         Secondary(SecondaryNum).SumUAReceiver = Numbers(NumNum);
-                        Secondary(SecondaryNum).ReceiverZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                        Secondary(SecondaryNum).ReceiverZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                         Secondary(SecondaryNum).ReceiverZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
 
                         if (Secondary(SecondaryNum).ReceiverZoneNum == 0) {
@@ -4996,7 +4996,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 System(RefrigSysNum).SumUASuctionPiping = 0.0;
                 if (!lNumericBlanks(2) && !lAlphaBlanks(AlphaNum)) {
                     System(RefrigSysNum).SumUASuctionPiping = Numbers(2);
-                    System(RefrigSysNum).SuctionPipeActualZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                    System(RefrigSysNum).SuctionPipeActualZoneNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                     System(RefrigSysNum).SuctionPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (System(RefrigSysNum).SuctionPipeZoneNodeNum == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
@@ -5826,7 +5826,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 if (!lNumericBlanks(3) && !lAlphaBlanks(AlphaNum)) {
                     TransSystem(TransRefrigSysNum).SumUASuctionPipingMT = Numbers(3);
                     TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumMT =
-                        UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                        UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                     TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumMT == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
@@ -5854,7 +5854,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 if (!lNumericBlanks(4) && !lAlphaBlanks(AlphaNum)) {
                     TransSystem(TransRefrigSysNum).SumUASuctionPipingLT = Numbers(4);
                     TransSystem(TransRefrigSysNum).SuctionPipeActualZoneNumLT =
-                        UtilityRoutines::FindItemInList(Alphas(AlphaNum), DataHeatBalance::Zone);
+                        UtilityRoutines::FindItemInList(Alphas(AlphaNum), state.dataHeatBal->Zone);
                     TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                     if (TransSystem(TransRefrigSysNum).SuctionPipeZoneNodeNumLT == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
@@ -6806,73 +6806,73 @@ namespace EnergyPlus::RefrigeratedCase {
                                         DataHeatBalance::RefrigCaseCredit(zoneID).SenCaseCreditToZone,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Sensible Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).SenCaseCreditToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Heating Rate",
                                         OutputProcessor::Unit::W,
                                         CaseWIZoneReport(zoneID).HeatingToZoneRate,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Heating Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).HeatingToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Sensible Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CaseWIZoneReport(zoneID).SenCoolingToZoneRate,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Sensible Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).SenCoolingToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Latent Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CaseWIZoneReport(zoneID).LatCoolingToZoneRate,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Latent Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).LatCoolingToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CaseWIZoneReport(zoneID).TotCoolingToZoneRate,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).TotCoolingToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         CaseWIZoneReport(zoneID).TotHtXferToZoneRate,
                                         "Zone",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Case and Walk In Total Heat Transfer Energy",
                                         OutputProcessor::Unit::J,
                                         CaseWIZoneReport(zoneID).TotHtXferToZoneEnergy,
                                         "Zone",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                 } // HaveCasesOrWalkIns
 
                 if (state.dataRefrigCase->HaveChillers) {
@@ -6881,67 +6881,67 @@ namespace EnergyPlus::RefrigeratedCase {
                                         CoilSysCredit(zoneID).SenCreditToZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Sensible Heat Transfer Energy",
                                         OutputProcessor::Unit::J,
                                         CoilSysCredit(zoneID).SenCreditToZoneEnergy,
                                         "HVAC",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Sensible Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CoilSysCredit(zoneID).ReportSenCoolingToZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Sensible Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CoilSysCredit(zoneID).ReportSenCoolingToZoneEnergy,
                                         "HVAC",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Latent Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CoilSysCredit(zoneID).ReportLatCreditToZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Latent Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CoilSysCredit(zoneID).ReportLatCreditToZoneEnergy,
                                         "HVAC",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Water Removed Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         CoilSysCredit(zoneID).ReportH2ORemovedKgPerS_FromZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Total Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         CoilSysCredit(zoneID).ReportTotCoolingToZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Total Cooling Energy",
                                         OutputProcessor::Unit::J,
                                         CoilSysCredit(zoneID).ReportTotCoolingToZoneEnergy,
                                         "HVAC",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Heating Rate",
                                         OutputProcessor::Unit::W,
                                         CoilSysCredit(zoneID).ReportHeatingToZoneRate,
                                         "HVAC",
                                         "Average",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                     SetupOutputVariable(state, "Refrigeration Zone Air Chiller Heating Energy",
                                         OutputProcessor::Unit::J,
                                         CoilSysCredit(zoneID).ReportHeatingToZoneEnergy,
                                         "HVAC",
                                         "Sum",
-                                        DataHeatBalance::Zone(zoneID).Name);
+                                        state.dataHeatBal->Zone(zoneID).Name);
                 } // HaveChillers
             }     // RefrigPresentInZone(ZoneID)
         }         // ZoneID

@@ -267,11 +267,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).SurfaceFirst = 1;
-    DataHeatBalance::Zone(1).SurfaceLast = 1;
-    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
-    DataHeatBalance::Zone(1).WindowSurfaceLast = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     DataSurfaces::TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotConstructs = 1;
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
@@ -706,8 +706,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "LIVING ZONE";
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataHeatBalance::Zone(1).IsControlled = true;
-    DataHeatBalance::Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -1242,7 +1242,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1257,7 +1257,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -1817,7 +1817,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1832,7 +1832,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -1942,7 +1942,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataSurfaces::TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotConstructs = 1;
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
@@ -2376,8 +2376,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
-    DataHeatBalance::Zone(1).IsControlled = true;
-    DataHeatBalance::Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -2391,7 +2391,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -2564,7 +2564,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     DataHeatBalSurface::EnclSolVMULT.allocate(state->dataGlobal->NumOfZones);
@@ -2594,8 +2594,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(1));
     EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(2));
 
-    DataHeatBalance::Zone(1).HasInterZoneWindow = true;
-    DataHeatBalance::Zone(2).HasInterZoneWindow = true;
+    state->dataHeatBal->Zone(1).HasInterZoneWindow = true;
+    state->dataHeatBal->Zone(2).HasInterZoneWindow = true;
 
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
@@ -2625,7 +2625,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZTAV.dimension(state->dataGlobal->NumOfZones, 0.0);
     DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(state->dataGlobal->NumOfZones, 0.0);
 
@@ -2638,11 +2638,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZoneHumidexOccuHourBins.allocate(state->dataGlobal->NumOfZones);
 
     state->dataHeatBal->TotPeople = 1;
-    DataHeatBalance::People.allocate(state->dataHeatBal->TotPeople);
-    DataHeatBalance::People(1).ZonePtr = 1;
-    DataHeatBalance::People(1).Pierce = true;
-    DataHeatBalance::People(1).NumberOfPeople = 2;
-    DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).Pierce = true;
+    state->dataHeatBal->People(1).NumberOfPeople = 2;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
     ScheduleManager::Schedule.allocate(1);
 
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);

@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     InternalHeatGains::UpdateInternalGainValues(*state);
 
     // Check total of all convective gains
-    InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);
+    InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum, totConvGains);
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
@@ -897,7 +897,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
     ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
-                     DataHeatBalance::Zone(1).AdjustedReturnTempByITE);
+                     state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
     ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
 }
 

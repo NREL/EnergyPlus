@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     state->dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 3.0;
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
 
     // run SimulateSingleDuct() function
@@ -568,7 +568,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     state->dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
@@ -579,7 +579,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     state->dataGlobal->HourOfDay = 24;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, state->dataDefineEquipment->AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, state->dataDefineEquipment->AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     state->dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 3.0;
     Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
 
     // run SimulateSingleDuct(*state, ) function
@@ -913,7 +913,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     state->dataGlobal->HourOfDay = 12;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
     expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / state->dataEnvrn->StdRhoAir;
@@ -926,7 +926,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     state->dataGlobal->HourOfDay = 24;
     ScheduleManager::UpdateScheduleValues(*state);
     // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 1.5;
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(*state, thisAirDisUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDisUnit.EquipIndex(1));
     expected_OAVolFlowRate = thisAirTerminalOutlet.AirMassFlowRate * thisAirLoop.OAFrac / state->dataEnvrn->StdRhoAir;

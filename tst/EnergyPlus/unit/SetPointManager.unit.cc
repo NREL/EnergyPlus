@@ -595,8 +595,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     bool ErrorsFound = false;
     state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "KITCHEN";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "KITCHEN";
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
 
@@ -1377,8 +1377,8 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "KITCHEN";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "KITCHEN";
 
     DataLoopNode::Node.allocate(3);
 
@@ -1444,8 +1444,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "ZSF1";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZSF1";
 
     DataLoopNode::Node.allocate(3);
 
@@ -1511,8 +1511,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "ZSF1";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZSF1";
     SetPointManager::GetSetPointManagerInputs(*state);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);

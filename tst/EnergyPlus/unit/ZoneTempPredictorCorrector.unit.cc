@@ -121,16 +121,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     Node.allocate(5);
 
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     HybridModelZone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneLatentGain.allocate(1);
     ZoneLatentGain(1) = 0.0;
     SumLatentHTRadSys.allocate(1);
@@ -142,8 +142,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZT(1) = 24.0;
     ZoneAirHumRat.allocate(1);
 
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 2;
     Surface.allocate(2);
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneW1.allocate(1);
 
     state->dataRoomAirMod->AirModel.allocate(1);
-    ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat
     ZoneW1(1) = 0.008;
@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 
     // Issue 6233
-    Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
     CorrectZoneHumRat(*state, 1);
     EXPECT_NEAR(0.008, Node(5).HumRat, 0.00001);
 }
@@ -932,7 +932,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     Real64 SumSysMCp = 0.0;  // Zone sum of air system MassFlowRate*Cp
     Real64 SumSysMCpT = 0.0; // Zone sum of air system MassFlowRate*Cp*T
 
-    DataHeatBalance::ZoneIntGain.allocate(ZoneNum);
+    state->dataHeatBal->ZoneIntGain.allocate(ZoneNum);
     DataHeatBalFanSys::SumConvHTRadSys.allocate(ZoneNum);
     DataHeatBalFanSys::SumConvPool.allocate(ZoneNum);
     DataHeatBalFanSys::MCPI.allocate(ZoneNum);
@@ -958,7 +958,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     DataHeatBalFanSys::MCPTC(ZoneNum) = 0.0;
     DataHeatBalFanSys::MDotCPOA(ZoneNum) = 0.0;
 
-    DataHeatBalance::ZoneIntGain(1).NumberOfDevices = 0;
+    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     DataHeatBalFanSys::SumConvHTRadSys(1) = 0.0;
     DataHeatBalFanSys::SumConvPool(1) = 0.0;
 
@@ -978,16 +978,16 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    Zone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
-    Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).IsControlled = true;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneLatentGain.allocate(1);
     ZoneLatentGain(1) = 0.0;
     SumLatentHTRadSys.allocate(1);
@@ -1000,8 +1000,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     ZoneAirHumRat.allocate(1);
     ZoneAirHumRat(1) = 0.001;
 
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 3;
     Surface.allocate(3);
     state->dataHeatBal->HConvIn.allocate(3);
     Node.allocate(4);
@@ -1226,7 +1226,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(1);
     state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
-    DataHeatBalance::Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
@@ -1361,7 +1361,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->TempDepZnLd.allocate(1);
     state->dataZoneTempPredictorCorrector->TempIndZnLd.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
-    DataHeatBalance::Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 

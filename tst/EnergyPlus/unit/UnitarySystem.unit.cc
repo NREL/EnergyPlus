@@ -116,13 +116,13 @@ protected:
         state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize StdRhoAir
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataGlobal->NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
-        DataHeatBalance::Zone(1).Name = "EAST ZONE";
+        state->dataHeatBal->Zone(1).Name = "EAST ZONE";
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
-        DataHeatBalance::Zone(1).IsControlled = true;
+        state->dataHeatBal->Zone(1).IsControlled = true;
         state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
         state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "EAST ZONE";
@@ -132,7 +132,7 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode.allocate(1);
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 21;
         state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
-        DataHeatBalance::Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
+        state->dataHeatBal->Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
         state->dataZoneEquip->ZoneEquipConfig(1).ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONE2EQUIPMENT";
@@ -12205,7 +12205,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ("UNITARY SYSTEM MODEL", thisSys->Name);                              // checks object name
     EXPECT_EQ(UnitarySys::ControlType::Load, thisSys->m_ControlType);              // checks control type
     EXPECT_EQ(UnitarySys::DehumCtrlType::None, thisSys->m_DehumidControlType_Num); // checks Dehumidification Control type type
-    EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone), thisSys->ControlZoneNum); // checks zone ID
+    EXPECT_EQ(UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone), thisSys->ControlZoneNum); // checks zone ID
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                                   // checks availability schedule name
     EXPECT_EQ("NODE 29", DataLoopNode::NodeID(thisSys->AirInNode));                                          // checks air inlet node name
     EXPECT_EQ("NODE 30", DataLoopNode::NodeID(thisSys->AirOutNode));                                         // checks air outlet node name
@@ -16181,8 +16181,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                    // indicate zone data is available
     DataLoopNode::NodeID.allocate(20);
     DataLoopNode::NodeID(20) = "East Zone Air Node";
-    DataHeatBalance::ZoneIntGain.allocate(1);
-    DataHeatBalance::ZoneIntGain(1).NumberOfDevices = 0;
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     DataHeatBalance::RefrigCaseCredit.allocate(1);
     DataHeatBalance::RefrigCaseCredit(1).SenCaseCreditToZone = 0;
     DataLoopNode::Node.allocate(20);

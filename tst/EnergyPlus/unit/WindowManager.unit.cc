@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
@@ -485,8 +485,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone";
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    DataHeatBalance::Zone(1).ZoneEqNum = 1;
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -539,7 +539,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->HConvIn(surfNum1) = 0.5;
     state->dataHeatBal->HConvIn(surfNum2) = 0.5;
     state->dataHeatBal->HConvIn(surfNum3) = 0.5;
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
@@ -2515,14 +2515,14 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(4);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(4);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(4) = std::cos(-DataHeatBalance::Zone(4).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(4) = std::sin(-DataHeatBalance::Zone(4).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-state->dataHeatBal->Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(4) = std::cos(-state->dataHeatBal->Zone(4).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-state->dataHeatBal->Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(4) = std::sin(-state->dataHeatBal->Zone(4).RelNorth * DataGlobalConstants::DegToRadians);
 
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
@@ -2686,7 +2686,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
@@ -2766,7 +2766,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->HConvIn(surfNum1) = 0.5;
     state->dataHeatBal->HConvIn(surfNum2) = 0.5;
     state->dataHeatBal->HConvIn(surfNum3) = 0.5;
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);

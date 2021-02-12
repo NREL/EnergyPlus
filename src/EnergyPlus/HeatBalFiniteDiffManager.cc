@@ -100,8 +100,7 @@ namespace HeatBalFiniteDiffManager {
     using namespace DataMoistureBalance;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalance::Zone;
-    using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
     using DataHeatBalFanSys::QElecBaseboardSurf;
     using DataHeatBalFanSys::QHTRadSysSurf;
@@ -2414,31 +2413,31 @@ namespace HeatBalFiniteDiffManager {
                     ShowSevereMessage(state,
                                       format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
-                                             Zone(ZoneNum).Name,
+                                             state.dataHeatBal->Zone(ZoneNum).Name,
                                              Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
-                    if (!Zone(ZoneNum).TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + Zone(ZoneNum).Name + "\", Diagnostic Details:");
-                        if (Zone(ZoneNum).FloorArea > 0.0) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
+                        ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
+                        if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
                             ShowContinueError(
-                                state, format("...Internal Heat Gain [{:.3R}] W/m2", Zone(ZoneNum).InternalHeatGains / Zone(ZoneNum).FloorArea));
+                                state, format("...Internal Heat Gain [{:.3R}] W/m2", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains / state.dataHeatBal->Zone(ZoneNum).FloorArea));
                         } else {
-                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", Zone(ZoneNum).InternalHeatGains));
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", Zone(ZoneNum).NominalInfilVent));
-                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", Zone(ZoneNum).NominalMixing));
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
-                        if (Zone(ZoneNum).IsControlled) {
+                        if (state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
                             ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
-                        Zone(ZoneNum).TempOutOfBoundsReported = true;
+                        state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2447,7 +2446,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2461,31 +2460,31 @@ namespace HeatBalFiniteDiffManager {
                     ShowSevereMessage(state,
                                       format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
-                                             Zone(ZoneNum).Name,
+                                             state.dataHeatBal->Zone(ZoneNum).Name,
                                              Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
-                    if (!Zone(ZoneNum).TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + Zone(ZoneNum).Name + "\", Diagnostic Details:");
-                        if (Zone(ZoneNum).FloorArea > 0.0) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
+                        ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
+                        if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
                             ShowContinueError(
-                                state, format("...Internal Heat Gain [{:.3R}] W/m2", Zone(ZoneNum).InternalHeatGains / Zone(ZoneNum).FloorArea));
+                                state, format("...Internal Heat Gain [{:.3R}] W/m2", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains / state.dataHeatBal->Zone(ZoneNum).FloorArea));
                         } else {
-                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", Zone(ZoneNum).InternalHeatGains));
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", Zone(ZoneNum).NominalInfilVent));
-                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", Zone(ZoneNum).NominalMixing));
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
-                        if (Zone(ZoneNum).IsControlled) {
+                        if (state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
                             ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
-                        Zone(ZoneNum).TempOutOfBoundsReported = true;
+                        state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
@@ -2494,7 +2493,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,

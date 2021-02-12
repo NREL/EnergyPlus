@@ -237,8 +237,7 @@ namespace VentilatedSlab {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         auto &GetSteamCoilMaxFlowRate(SteamCoils::GetCoilMaxWaterFlowRate);
         auto &GetHXAssistedCoilFlowRate(HVACHXAssistedCoolingCoil::GetCoilMaxWaterFlowRate);
-        using DataHeatBalance::Zone;
-        using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
+                using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataLoopNode;
         using namespace DataSurfaceLists;
@@ -337,7 +336,7 @@ namespace VentilatedSlab {
             }
 
             state.dataVentilatedSlab->VentSlab(Item).ZoneName = cAlphaArgs(3);
-            state.dataVentilatedSlab->VentSlab(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            state.dataVentilatedSlab->VentSlab(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (state.dataVentilatedSlab->VentSlab(Item).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFields(3) +
@@ -437,7 +436,7 @@ namespace VentilatedSlab {
                     if (Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Zone != state.dataVentilatedSlab->VentSlab(Item).ZonePtr) {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid surface=\"" +
                                         Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Name + "\".");
-                        ShowContinueError(state, "Surface in Zone=" + Zone(Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Zone).Name + ' ' +
+                        ShowContinueError(state, "Surface in Zone=" + state.dataHeatBal->Zone(Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).Zone).Name + ' ' +
                                           CurrentModuleObject + " in Zone=" + cAlphaArgs(3));
                         ErrorsFound = true;
                     }
@@ -1640,8 +1639,7 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::CoolingCapacitySizing;
+                using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
@@ -1762,7 +1760,7 @@ namespace VentilatedSlab {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -1816,7 +1814,7 @@ namespace VentilatedSlab {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
@@ -2017,7 +2015,7 @@ namespace VentilatedSlab {
                                         } else if (CapSizingMethod == CapacityPerFloorArea) {
                                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                                                ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                                                ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                                             DataScalableCapSizingON = true;
                                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                             DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -2130,7 +2128,7 @@ namespace VentilatedSlab {
                                         } else if (CapSizingMethod == CapacityPerFloorArea) {
                                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                                                ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                                                ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                                             DataScalableCapSizingON = true;
                                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                             DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -2265,7 +2263,7 @@ namespace VentilatedSlab {
                                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                                         ZoneEqSizing(CurZoneEqNum).DesCoolingLoad =
-                                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * Zone(DataZoneNumber).FloorArea;
+                                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                                         DataScalableCapSizingON = true;
                                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
@@ -3392,8 +3390,7 @@ namespace VentilatedSlab {
         // simulation.  Other than that, the subroutine is very straightforward.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::CTFTsrcConstPart;
+                using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
@@ -3494,7 +3491,7 @@ namespace VentilatedSlab {
 
         // Set the conditions on the air side inlet
         ZoneNum = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
-        ZoneMult = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
+        ZoneMult = double(state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
         AirMassFlow = Node(state.dataVentilatedSlab->VentSlab(Item).RadInNode).MassFlowRate / ZoneMult;
 
         if (state.dataVentilatedSlab->OperatingMode == state.dataVentilatedSlab->HeatingMode) {
@@ -4164,8 +4161,7 @@ namespace VentilatedSlab {
         // values to the running average.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
+                using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -4224,7 +4220,7 @@ namespace VentilatedSlab {
             TotalHeatSource += QRadSysSource(SurfNum);
         }
         ZoneNum = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
-        ZoneMult = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
+        ZoneMult = double(state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
         TotalHeatSource *= ZoneMult;
 
         // Update the heating side of things
@@ -4452,7 +4448,7 @@ namespace VentilatedSlab {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;
@@ -4499,8 +4495,7 @@ namespace VentilatedSlab {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::TimeStepSys;
+                using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         // unused-12/12/08  USE FluidProperties, ONLY : GetSpecificHeatGlycol
@@ -4518,7 +4513,7 @@ namespace VentilatedSlab {
             SurfNum = state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum);
             TotalVentSlabRadPower += QRadSysSource(SurfNum);
         }
-        ZoneMult = double(Zone(state.dataVentilatedSlab->VentSlab(Item).ZonePtr).Multiplier * Zone(state.dataVentilatedSlab->VentSlab(Item).ZonePtr).ListMultiplier);
+        ZoneMult = double(state.dataHeatBal->Zone(state.dataVentilatedSlab->VentSlab(Item).ZonePtr).Multiplier * state.dataHeatBal->Zone(state.dataVentilatedSlab->VentSlab(Item).ZonePtr).ListMultiplier);
         TotalVentSlabRadPower *= ZoneMult;
         state.dataVentilatedSlab->VentSlab(Item).RadHeatingPower = 0.0;
         state.dataVentilatedSlab->VentSlab(Item).RadCoolingPower = 0.0;

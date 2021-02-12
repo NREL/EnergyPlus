@@ -188,15 +188,15 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     Node.allocate(5);
 
-    Zone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
@@ -345,15 +345,15 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     Node.allocate(5);
 
-    Zone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(1);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     HybridModelZone.allocate(1);
@@ -520,27 +520,27 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     Node.allocate(10);
 
-    Zone.allocate(3);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone.allocate(3);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(3);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
-    Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
-    Zone(2).ZoneEqNum = 1;
-    Zone(2).Multiplier = 1.0;
-    Zone(2).Volume = 1000.0;
-    Zone(2).SystemZoneNodeNumber = 5;
-    Zone(2).ZoneVolCapMultpMoist = 1.0;
-    Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
-    Zone(3).ZoneEqNum = 1;
-    Zone(3).Multiplier = 1.0;
-    Zone(3).Volume = 1000.0;
-    Zone(3).SystemZoneNodeNumber = 5;
-    Zone(3).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
+    state->dataHeatBal->Zone(2).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).Volume = 1000.0;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
+    state->dataHeatBal->Zone(3).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(3).Multiplier = 1.0;
+    state->dataHeatBal->Zone(3).Volume = 1000.0;
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(3).ZoneVolCapMultpMoist = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -728,27 +728,27 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     Node.allocate(10);
 
-    Zone.allocate(3);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone.allocate(3);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     ZoneEqSizing.allocate(3);
     CurZoneEqNum = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).Volume = 1000.0;
-    Zone(1).SystemZoneNodeNumber = 5;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
-    Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
-    Zone(2).ZoneEqNum = 1;
-    Zone(2).Multiplier = 1.0;
-    Zone(2).Volume = 1000.0;
-    Zone(2).SystemZoneNodeNumber = 5;
-    Zone(2).ZoneVolCapMultpMoist = 1.0;
-    Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
-    Zone(3).ZoneEqNum = 1;
-    Zone(3).Multiplier = 1.0;
-    Zone(3).Volume = 1000.0;
-    Zone(3).SystemZoneNodeNumber = 5;
-    Zone(3).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 1000.0;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(2).Name = state->dataZoneEquip->ZoneEquipConfig(2).ZoneName;
+    state->dataHeatBal->Zone(2).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).Volume = 1000.0;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(2).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(3).Name = state->dataZoneEquip->ZoneEquipConfig(3).ZoneName;
+    state->dataHeatBal->Zone(3).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(3).Multiplier = 1.0;
+    state->dataHeatBal->Zone(3).Volume = 1000.0;
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 5;
+    state->dataHeatBal->Zone(3).ZoneVolCapMultpMoist = 1.0;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
 

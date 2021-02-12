@@ -240,8 +240,7 @@ namespace OutdoorAirUnit {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using NodeInputManager::GetOnlySingleNode;
-        using DataHeatBalance::Zone;
-        using FluidProperties::FindRefrigerant;
+                using FluidProperties::FindRefrigerant;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
         using SteamCoils::GetCoilAirOutletNode;
@@ -371,7 +370,7 @@ namespace OutdoorAirUnit {
 
             // A3
             OutAirUnit(OAUnitNum).ZoneName = cAlphaArgs(3);
-            OutAirUnit(OAUnitNum).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            OutAirUnit(OAUnitNum).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
 
             if (OutAirUnit(OAUnitNum).ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
@@ -382,7 +381,7 @@ namespace OutdoorAirUnit {
                 }
                 ErrorsFound = true;
             }
-            OutAirUnit(OAUnitNum).ZoneNodeNum = Zone(OutAirUnit(OAUnitNum).ZonePtr).SystemZoneNodeNumber;
+            OutAirUnit(OAUnitNum).ZoneNodeNum = state.dataHeatBal->Zone(OutAirUnit(OAUnitNum).ZonePtr).SystemZoneNodeNumber;
             // Outside air information:
             // N1
             OutAirUnit(OAUnitNum).OutAirVolFlow = NumArray(1);
@@ -2593,8 +2592,7 @@ namespace OutdoorAirUnit {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::TimeStepSys;
+                using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);

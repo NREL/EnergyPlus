@@ -876,8 +876,7 @@ namespace SteamBaseboardRadiator {
         using FluidProperties::GetSatSpecificHeatRefrig;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         //  USE BranchInputManager,  ONLY: MyPlantSizingIndex
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::HeatingCapacitySizing;
+                using DataHVACGlobals::HeatingCapacitySizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -961,7 +960,7 @@ namespace SteamBaseboardRadiator {
                         } else if (CapSizingMethod == CapacityPerFloorArea) {
                             ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                             ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                             TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                             DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1269,8 +1268,7 @@ namespace SteamBaseboardRadiator {
         // Note that the energy radiated to people is assumed to affect them
         // but them it is assumed to be convected to the air.
 
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MaxRadHeatFlux;
+                using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QSteamBaseboardSurf;
         using DataHeatBalFanSys::QSteamBaseboardToPerson;
         using DataSurfaces::Surface;
@@ -1374,7 +1372,7 @@ namespace SteamBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;

@@ -117,8 +117,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
     ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
-    Zone.allocate(ZoneNum);
-    Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
+    state->dataHeatBal->Zone.allocate(ZoneNum);
+    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
     // allocate surface temperature variable data
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataMaterial->Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     TH.deallocate();
     state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

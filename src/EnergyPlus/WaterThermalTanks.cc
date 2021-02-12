@@ -1338,7 +1338,7 @@ namespace WaterThermalTanks {
 
                     // Inlet Air Zone
                     if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
+                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
                         if (HPWH.AmbientTempZone == 0) {
                             ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                             ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
@@ -1358,7 +1358,7 @@ namespace WaterThermalTanks {
 
                     // Inlet Air Zone
                     if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
-                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], DataHeatBalance::Zone);
+                        HPWH.AmbientTempZone = UtilityRoutines::FindItemInList(hpwhAlpha[13 + nAlphaOffset], state.dataHeatBal->Zone);
                         if (HPWH.AmbientTempZone == 0) {
                             ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
                             ShowContinueError(state, hpwhAlphaFieldNames[13 + nAlphaOffset] + "=\"" + hpwhAlpha[13 + nAlphaOffset] + "\".");
@@ -2438,7 +2438,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "ZONE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
-                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10), DataHeatBalance::Zone);
+                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10), state.dataHeatBal->Zone);
                     if (Tank.AmbientTempZone == 0) {
                         ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Ambient Temperature Zone not found = " + DataIPShortCuts::cAlphaArgs(10));
@@ -2916,7 +2916,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "ZONE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
-                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(12), DataHeatBalance::Zone);
+                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(12), state.dataHeatBal->Zone);
                     if (Tank.AmbientTempZone == 0) {
                         ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                         ":  Ambient Temperature Zone not found = " + DataIPShortCuts::cAlphaArgs(12));
@@ -3327,7 +3327,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "ZONE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
-                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), DataHeatBalance::Zone);
+                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), state.dataHeatBal->Zone);
                     if (Tank.AmbientTempZone == 0) {
                         ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -3630,7 +3630,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == "ZONE") {
                     Tank.AmbientTempIndicator = AmbientTempEnum::TempZone;
-                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6), DataHeatBalance::Zone);
+                    Tank.AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6), state.dataHeatBal->Zone);
                     if (Tank.AmbientTempZone == 0) {
                         ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
@@ -10539,7 +10539,7 @@ namespace WaterThermalTanks {
             } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
                 // how to get number of people?
 
-                Real64 SumPeopleAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::TotOccupants);
+                Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
                 if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 
                 if (this->MaxCapacityWasAutoSized) {
@@ -10583,7 +10583,7 @@ namespace WaterThermalTanks {
                 }
             } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
 
-                Real64 SumFloorAreaAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::FloorArea);
+                Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
                 if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
                 if (this->MaxCapacityWasAutoSized) {
                     Real64 rho;
@@ -11224,7 +11224,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == SizeEnum::PerPerson) {
                     // how to get number of people?
 
-                    Real64 SumPeopleAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::TotOccupants);
+                    Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
                     if (this->VolumeWasAutoSized) {
                         tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
                     }
@@ -11246,7 +11246,7 @@ namespace WaterThermalTanks {
 
                 } else if (SELECT_CASE_var == SizeEnum::PerFloorArea) {
 
-                    Real64 SumFloorAreaAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::FloorArea);
+                    Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
                     if (this->VolumeWasAutoSized) {
                         tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
                     }

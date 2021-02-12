@@ -1894,7 +1894,7 @@ namespace HeatBalanceManager {
 
             state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
             if (state.dataHeatBal->TotSpectralData > 0 && !lAlphaFieldBlanks(3)) {
-                state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), SpectralData);
+                state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
             }
             if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
             // No need for spectral data for BSDF either
@@ -3992,7 +3992,7 @@ namespace HeatBalanceManager {
 
         CurrentModuleObject = "MaterialProperty:GlazingSpectralData";
         state.dataHeatBal->TotSpectralData = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        SpectralData.allocate(state.dataHeatBal->TotSpectralData);
+        state.dataHeatBal->SpectralData.allocate(state.dataHeatBal->TotSpectralData);
         if (state.dataHeatBal->TotSpectralData > 0) SpecDataProps.allocate(Construction::MaxSpectralDataElements * 4);
 
         for (Loop = 1; Loop <= state.dataHeatBal->TotSpectralData; ++Loop) {
@@ -4017,7 +4017,7 @@ namespace HeatBalanceManager {
             if (UtilityRoutines::IsNameEmpty(state, SpecDataNames(1), CurrentModuleObject, ErrorsFound)) continue;
 
             // Load the spectral data derived type from the input data.
-            SpectralData(Loop).Name = SpecDataNames(1);
+            state.dataHeatBal->SpectralData(Loop).Name = SpecDataNames(1);
             TotLam = SpecDataNumProp / 4;
             if (mod(SpecDataNumProp, 4) != 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
@@ -4036,38 +4036,38 @@ namespace HeatBalanceManager {
                     format("... More than max [{}] (Wavelength,Trans,ReflFront,ReflBack) entries in set.", Construction::MaxSpectralDataElements));
                 continue;
             }
-            SpectralData(Loop).NumOfWavelengths = TotLam;
+            state.dataHeatBal->SpectralData(Loop).NumOfWavelengths = TotLam;
 
-            SpectralData(Loop).WaveLength.allocate(TotLam); // Wavelength (microns)
-            SpectralData(Loop).Trans.allocate(TotLam);      // Transmittance at normal incidence
-            SpectralData(Loop).ReflFront.allocate(TotLam);  // Front reflectance at normal incidence
-            SpectralData(Loop).ReflBack.allocate(TotLam);   // Back reflectance at normal incidence
+            state.dataHeatBal->SpectralData(Loop).WaveLength.allocate(TotLam); // Wavelength (microns)
+            state.dataHeatBal->SpectralData(Loop).Trans.allocate(TotLam);      // Transmittance at normal incidence
+            state.dataHeatBal->SpectralData(Loop).ReflFront.allocate(TotLam);  // Front reflectance at normal incidence
+            state.dataHeatBal->SpectralData(Loop).ReflBack.allocate(TotLam);   // Back reflectance at normal incidence
 
             for (LamNum = 1; LamNum <= TotLam; ++LamNum) {
-                SpectralData(Loop).WaveLength(LamNum) = SpecDataProps(4 * LamNum - 3);
-                SpectralData(Loop).Trans(LamNum) = SpecDataProps(4 * LamNum - 2);
+                state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum) = SpecDataProps(4 * LamNum - 3);
+                state.dataHeatBal->SpectralData(Loop).Trans(LamNum) = SpecDataProps(4 * LamNum - 2);
                 // Following is needed since angular calculation in subr TransAndReflAtPhi
                 // fails for Trans = 0.0
-                if (SpectralData(Loop).Trans(LamNum) < 0.001) SpectralData(Loop).Trans(LamNum) = 0.001;
-                SpectralData(Loop).ReflFront(LamNum) = SpecDataProps(4 * LamNum - 1);
-                SpectralData(Loop).ReflBack(LamNum) = SpecDataProps(4 * LamNum);
+                if (state.dataHeatBal->SpectralData(Loop).Trans(LamNum) < 0.001) state.dataHeatBal->SpectralData(Loop).Trans(LamNum) = 0.001;
+                state.dataHeatBal->SpectralData(Loop).ReflFront(LamNum) = SpecDataProps(4 * LamNum - 1);
+                state.dataHeatBal->SpectralData(Loop).ReflBack(LamNum) = SpecDataProps(4 * LamNum);
             }
 
             // Check integrity of the spectral data
             for (LamNum = 1; LamNum <= TotLam; ++LamNum) {
-                Lam = SpectralData(Loop).WaveLength(LamNum);
-                Tau = SpectralData(Loop).Trans(LamNum);
-                RhoF = SpectralData(Loop).ReflFront(LamNum);
-                RhoB = SpectralData(Loop).ReflBack(LamNum);
+                Lam = state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum);
+                Tau = state.dataHeatBal->SpectralData(Loop).Trans(LamNum);
+                RhoF = state.dataHeatBal->SpectralData(Loop).ReflFront(LamNum);
+                RhoB = state.dataHeatBal->SpectralData(Loop).ReflBack(LamNum);
                 if (LamNum < TotLam) {
-                    if (SpectralData(Loop).WaveLength(LamNum + 1) <= Lam) {
+                    if (state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum + 1) <= Lam) {
                         ErrorsFound = true;
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + SpecDataNames(1) + "\" invalid set.");
                         ShowContinueError(state,
                                           format("... Wavelengths not in increasing order. at wavelength#={}, value=[{:.4T}], next is [{:.4T}].",
                                                  LamNum,
                                                  Lam,
-                                                 SpectralData(Loop).WaveLength(LamNum + 1)));
+                                                 state.dataHeatBal->SpectralData(Loop).WaveLength(LamNum + 1)));
                     }
                 }
 
@@ -4739,7 +4739,7 @@ namespace HeatBalanceManager {
         cCurrentModuleObject = "Zone";
         state.dataGlobal->NumOfZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        Zone.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
         DataViewFactorInformation::ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
         state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
@@ -4793,10 +4793,10 @@ namespace HeatBalanceManager {
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             // Check to see if "nominally" controlled -- Zone Name appears in Zone Equip Configuration
             // relies on zone name being the "name" of the Zone Controlled Equip Configuration
-            if (inputProcessor->getObjectItemNum(state, "ZoneHVAC:EquipmentConnections", "zone_name", Zone(Loop).Name) > 0) {
-                Zone(Loop).isNominalControlled = true;
+            if (inputProcessor->getObjectItemNum(state, "ZoneHVAC:EquipmentConnections", "zone_name", state.dataHeatBal->Zone(Loop).Name) > 0) {
+                state.dataHeatBal->Zone(Loop).isNominalControlled = true;
             } else {
-                Zone(Loop).isNominalControlled = false;
+                state.dataHeatBal->Zone(Loop).isNominalControlled = false;
             }
         }
 
@@ -4806,7 +4806,7 @@ namespace HeatBalanceManager {
 
         if (state.dataHeatBal->NumOfZoneLists > 0) {
 
-            ZoneList.allocate(state.dataHeatBal->NumOfZoneLists);
+            state.dataHeatBal->ZoneList.allocate(state.dataHeatBal->NumOfZoneLists);
 
             for (ListNum = 1; ListNum <= state.dataHeatBal->NumOfZoneLists; ++ListNum) {
                 inputProcessor->getObjectItem(state,
@@ -4823,27 +4823,27 @@ namespace HeatBalanceManager {
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                ZoneList(ListNum).Name = cAlphaArgs(1);
-                if (UtilityRoutines::FindItemInList(ZoneList(ListNum).Name, Zone) > 0) {
+                state.dataHeatBal->ZoneList(ListNum).Name = cAlphaArgs(1);
+                if (UtilityRoutines::FindItemInList(state.dataHeatBal->ZoneList(ListNum).Name, state.dataHeatBal->Zone) > 0) {
                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  is a duplicate of a zone name.");
                     ShowContinueError(state, "This could be a problem in places where either a Zone Name or a Zone List can be used.");
                 }
 
                 // List of zones
-                ZoneList(ListNum).NumOfZones = NumAlphas - 1;
+                state.dataHeatBal->ZoneList(ListNum).NumOfZones = NumAlphas - 1;
 
-                if (ZoneList(ListNum).NumOfZones < 1) {
+                if (state.dataHeatBal->ZoneList(ListNum).NumOfZones < 1) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  No zones specified.");
                     ErrorsFound = true;
                 } else {
-                    ZoneList(ListNum).Zone.allocate(ZoneList(ListNum).NumOfZones);
-                    ZoneList(ListNum).Zone = 0;
+                    state.dataHeatBal->ZoneList(ListNum).Zone.allocate(state.dataHeatBal->ZoneList(ListNum).NumOfZones);
+                    state.dataHeatBal->ZoneList(ListNum).Zone = 0;
 
-                    for (ZoneNum = 1; ZoneNum <= ZoneList(ListNum).NumOfZones; ++ZoneNum) {
+                    for (ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(ListNum).NumOfZones; ++ZoneNum) {
                         ZoneName = cAlphaArgs(ZoneNum + 1);
-                        ZoneList(ListNum).MaxZoneNameLength = max(ZoneList(ListNum).MaxZoneNameLength, len(ZoneName));
-                        ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, Zone);
-                        if (ZoneList(ListNum).Zone(ZoneNum) == 0) {
+                        state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength = max(state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength, len(ZoneName));
+                        state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, state.dataHeatBal->Zone);
+                        if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == 0) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
                                             ' ' + ZoneName + " not found.");
                             ErrorsFound = true;
@@ -4851,7 +4851,7 @@ namespace HeatBalanceManager {
 
                         // Check for duplicate zones
                         for (Loop = 1; Loop <= ZoneNum - 1; ++Loop) {
-                            if (ZoneList(ListNum).Zone(ZoneNum) == ZoneList(ListNum).Zone(Loop)) {
+                            if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == state.dataHeatBal->ZoneList(ListNum).Zone(Loop)) {
                                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(ZoneNum + 1) +
                                                 ' ' + ZoneName + " appears more than once in list.");
                                 ErrorsFound = true;
@@ -4868,7 +4868,7 @@ namespace HeatBalanceManager {
         state.dataHeatBal->NumOfZoneGroups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataHeatBal->NumOfZoneGroups > 0) {
-            ZoneGroup.allocate(state.dataHeatBal->NumOfZoneGroups);
+            state.dataHeatBal->ZoneGroup.allocate(state.dataHeatBal->NumOfZoneGroups);
 
             for (GroupNum = 1; GroupNum <= state.dataHeatBal->NumOfZoneGroups; ++GroupNum) {
                 inputProcessor->getObjectItem(state,
@@ -4885,14 +4885,14 @@ namespace HeatBalanceManager {
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                ZoneGroup(GroupNum).Name = cAlphaArgs(1);
+                state.dataHeatBal->ZoneGroup(GroupNum).Name = cAlphaArgs(1);
 
                 // Multiplier - checked already by IDD rules
-                ZoneGroup(GroupNum).Multiplier = rNumericArgs(1);
+                state.dataHeatBal->ZoneGroup(GroupNum).Multiplier = rNumericArgs(1);
 
                 // Zone list
-                ListNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
-                ZoneGroup(GroupNum).ZoneList = ListNum;
+                ListNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                state.dataHeatBal->ZoneGroup(GroupNum).ZoneList = ListNum;
 
                 if (ListNum == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) + " named " +
@@ -4901,26 +4901,26 @@ namespace HeatBalanceManager {
                 } else {
                     // Check to make sure list is not in use by another ZONE GROUP
                     for (Loop = 1; Loop <= GroupNum - 1; ++Loop) {
-                        if (ZoneGroup(GroupNum).ZoneList == ZoneGroup(Loop).ZoneList) {
+                        if (state.dataHeatBal->ZoneGroup(GroupNum).ZoneList == state.dataHeatBal->ZoneGroup(Loop).ZoneList) {
                             ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  " + cAlphaFieldNames(2) +
-                                            " already used by " + cCurrentModuleObject + " named " + ZoneGroup(Loop).Name + '.');
+                                            " already used by " + cCurrentModuleObject + " named " + state.dataHeatBal->ZoneGroup(Loop).Name + '.');
                             ErrorsFound = true;
                         }
                     } // Loop
 
                     // Set group multiplier for each zone in the list
-                    for (Loop = 1; Loop <= ZoneList(ListNum).NumOfZones; ++Loop) {
-                        ZoneNum = ZoneList(ListNum).Zone(Loop);
+                    for (Loop = 1; Loop <= state.dataHeatBal->ZoneList(ListNum).NumOfZones; ++Loop) {
+                        ZoneNum = state.dataHeatBal->ZoneList(ListNum).Zone(Loop);
 
                         if (ZoneNum > 0) {
                             // Check to make sure group multiplier was not already set by another ZONE GROUP
-                            if (Zone(ZoneNum).ListGroup == 0) {
-                                Zone(ZoneNum).ListMultiplier = ZoneGroup(GroupNum).Multiplier;
-                                Zone(ZoneNum).ListGroup = ListNum;
+                            if (state.dataHeatBal->Zone(ZoneNum).ListGroup == 0) {
+                                state.dataHeatBal->Zone(ZoneNum).ListMultiplier = state.dataHeatBal->ZoneGroup(GroupNum).Multiplier;
+                                state.dataHeatBal->Zone(ZoneNum).ListGroup = ListNum;
                             } else {
-                                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  Zone " + Zone(ZoneNum).Name +
+                                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\":  Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
                                                 " in ZoneList already exists in ZoneList of another ZoneGroup.");
-                                ShowContinueError(state, "Previous ZoneList=" + ZoneList(Zone(ZoneNum).ListGroup).Name);
+                                ShowContinueError(state, "Previous ZoneList=" + state.dataHeatBal->ZoneList(state.dataHeatBal->Zone(ZoneNum).ListGroup).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4933,7 +4933,7 @@ namespace HeatBalanceManager {
         GetZoneLocalEnvData(state, ErrorsFound);
 
         // allocate the array the holds the predefined report data
-        ZonePreDefRep.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZonePreDefRep.allocate(state.dataGlobal->NumOfZones);
     }
 
     void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
@@ -5013,7 +5013,7 @@ namespace HeatBalanceManager {
                 ZoneLocalEnvironment(Loop).Name = cAlphaArgs(1);
 
                 // Assign zone number
-                ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
                 if (ZoneNum == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
@@ -5043,8 +5043,8 @@ namespace HeatBalanceManager {
             for (Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        Zone(ZoneLoop).HasLinkedOutAirNode = true;
-                        Zone(ZoneLoop).LinkedOutAirNode = ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
+                        state.dataHeatBal->Zone(ZoneLoop).HasLinkedOutAirNode = true;
+                        state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                 }
             }
@@ -5099,39 +5099,39 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Zone(ZoneLoop).Name = cAlphaArgs(1);
-        if (NumNumbers >= 1) Zone(ZoneLoop).RelNorth = rNumericArgs(1);
-        if (NumNumbers >= 2) Zone(ZoneLoop).OriginX = rNumericArgs(2);
-        if (NumNumbers >= 3) Zone(ZoneLoop).OriginY = rNumericArgs(3);
-        if (NumNumbers >= 4) Zone(ZoneLoop).OriginZ = rNumericArgs(4);
-        if (NumNumbers >= 5) Zone(ZoneLoop).OfType = rNumericArgs(5);
-        Zone(ZoneLoop).OfType = StandardZone;
-        if (NumNumbers >= 6) Zone(ZoneLoop).Multiplier = rNumericArgs(6);
-        if (NumNumbers >= 7) Zone(ZoneLoop).CeilingHeight = rNumericArgs(7);
-        if (NumNumbers >= 8) Zone(ZoneLoop).Volume = rNumericArgs(8);
-        if (NumNumbers >= 9) Zone(ZoneLoop).UserEnteredFloorArea = rNumericArgs(9);
+        state.dataHeatBal->Zone(ZoneLoop).Name = cAlphaArgs(1);
+        if (NumNumbers >= 1) state.dataHeatBal->Zone(ZoneLoop).RelNorth = rNumericArgs(1);
+        if (NumNumbers >= 2) state.dataHeatBal->Zone(ZoneLoop).OriginX = rNumericArgs(2);
+        if (NumNumbers >= 3) state.dataHeatBal->Zone(ZoneLoop).OriginY = rNumericArgs(3);
+        if (NumNumbers >= 4) state.dataHeatBal->Zone(ZoneLoop).OriginZ = rNumericArgs(4);
+        if (NumNumbers >= 5) state.dataHeatBal->Zone(ZoneLoop).OfType = rNumericArgs(5);
+        state.dataHeatBal->Zone(ZoneLoop).OfType = StandardZone;
+        if (NumNumbers >= 6) state.dataHeatBal->Zone(ZoneLoop).Multiplier = rNumericArgs(6);
+        if (NumNumbers >= 7) state.dataHeatBal->Zone(ZoneLoop).CeilingHeight = rNumericArgs(7);
+        if (NumNumbers >= 8) state.dataHeatBal->Zone(ZoneLoop).Volume = rNumericArgs(8);
+        if (NumNumbers >= 9) state.dataHeatBal->Zone(ZoneLoop).UserEnteredFloorArea = rNumericArgs(9);
 
         if (NumAlphas > 1 && !lAlphaFieldBlanks(2)) {
             {
                 auto const SELECT_CASE_var(cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "SIMPLE") {
-                    Zone(ZoneLoop).InsideConvectionAlgo = ASHRAESimple;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ASHRAESimple;
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    Zone(ZoneLoop).InsideConvectionAlgo = ASHRAETARP;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = ASHRAETARP;
 
                 } else if (SELECT_CASE_var == "CEILINGDIFFUSER") {
-                    Zone(ZoneLoop).InsideConvectionAlgo = CeilingDiffuser;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = CeilingDiffuser;
 
                 } else if (SELECT_CASE_var == "TROMBEWALL") {
-                    Zone(ZoneLoop).InsideConvectionAlgo = TrombeWall;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = TrombeWall;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    Zone(ZoneLoop).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
 
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
                     ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                     // Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
@@ -5139,7 +5139,7 @@ namespace HeatBalanceManager {
             }
         } else {
             // No zone specific algorithm specified, use default Inside Convection Algorithm
-            Zone(ZoneLoop).InsideConvectionAlgo = state.dataHeatBal->DefaultInsideConvectionAlgo;
+            state.dataHeatBal->Zone(ZoneLoop).InsideConvectionAlgo = state.dataHeatBal->DefaultInsideConvectionAlgo;
         }
 
         if (NumAlphas > 2 && !lAlphaFieldBlanks(3)) {
@@ -5147,22 +5147,22 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(cAlphaArgs(3));
 
                 if ((SELECT_CASE_var == "SIMPLECOMBINED")) {
-                    Zone(ZoneLoop).OutsideConvectionAlgo = ASHRAESimple;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ASHRAESimple;
 
                 } else if ((SELECT_CASE_var == "TARP")) {
-                    Zone(ZoneLoop).OutsideConvectionAlgo = ASHRAETARP;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = ASHRAETARP;
 
                 } else if (SELECT_CASE_var == "MOWITT") {
-                    Zone(ZoneLoop).OutsideConvectionAlgo = MoWiTTHcOutside;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = MoWiTTHcOutside;
 
                 } else if (SELECT_CASE_var == "DOE-2") {
-                    Zone(ZoneLoop).OutsideConvectionAlgo = DOE2HcOutside;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = DOE2HcOutside;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
-                    Zone(ZoneLoop).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+                    state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
 
                 } else {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
                     ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
                     ErrorsFound = true;
                     // Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
@@ -5170,18 +5170,18 @@ namespace HeatBalanceManager {
             }
         } else {
             // No zone specific algorithm specified, use default Outside Convection Algorithm
-            Zone(ZoneLoop).OutsideConvectionAlgo = state.dataHeatBal->DefaultOutsideConvectionAlgo;
+            state.dataHeatBal->Zone(ZoneLoop).OutsideConvectionAlgo = state.dataHeatBal->DefaultOutsideConvectionAlgo;
         }
 
         // Process the input field:    Part of Total Floor Area
         //   The default value is YES and so only NO needs to be handled
         if (NumAlphas > 3) {
             if (UtilityRoutines::SameString("No", cAlphaArgs(4))) {
-                Zone(ZoneLoop).isPartOfTotalArea = false;
+                state.dataHeatBal->Zone(ZoneLoop).isPartOfTotalArea = false;
             } else if (UtilityRoutines::SameString("Yes", cAlphaArgs(4)) || lAlphaFieldBlanks(4)) {
-                Zone(ZoneLoop).isPartOfTotalArea = true;
+                state.dataHeatBal->Zone(ZoneLoop).isPartOfTotalArea = true;
             } else {
-                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + Zone(ZoneLoop).Name + "\".");
+                ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + state.dataHeatBal->Zone(ZoneLoop).Name + "\".");
                 ShowContinueError(state, "Invalid value for " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\".");
                 ErrorsFound = true;
             }
@@ -5189,13 +5189,13 @@ namespace HeatBalanceManager {
 
         // Zone outdoor environmental variables, used for zone infiltration/ventilation
         SetupOutputVariable(state,
-            "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, Zone(ZoneLoop).OutDryBulbTemp, "Zone", "Average", Zone(ZoneLoop).Name);
+            "Zone Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, state.dataHeatBal->Zone(ZoneLoop).OutDryBulbTemp, "Zone", "Average", state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
-            "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, Zone(ZoneLoop).OutWetBulbTemp, "Zone", "Average", Zone(ZoneLoop).Name);
+            "Zone Outdoor Air Wetbulb Temperature", OutputProcessor::Unit::C, state.dataHeatBal->Zone(ZoneLoop).OutWetBulbTemp, "Zone", "Average", state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
-            "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, Zone(ZoneLoop).WindSpeed, "Zone", "Average", Zone(ZoneLoop).Name);
+            "Zone Outdoor Air Wind Speed", OutputProcessor::Unit::m_s, state.dataHeatBal->Zone(ZoneLoop).WindSpeed, "Zone", "Average", state.dataHeatBal->Zone(ZoneLoop).Name);
         SetupOutputVariable(state,
-            "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, Zone(ZoneLoop).WindDir, "Zone", "Average", Zone(ZoneLoop).Name);
+            "Zone Outdoor Air Wind Direction", OutputProcessor::Unit::deg, state.dataHeatBal->Zone(ZoneLoop).WindDir, "Zone", "Average", state.dataHeatBal->Zone(ZoneLoop).Name);
     }
 
     // End of Get Input subroutines for the HB Module
@@ -5358,26 +5358,26 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (Zone(ZoneNum).HasLinkedOutAirNode) {
-                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
-                        Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
+                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
                     } else {
-                        Zone(ZoneNum).OutDryBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
                     }
-                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
-                        Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
                     } else {
-                        Zone(ZoneNum).OutWetBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
                     }
-                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
-                        Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
                     } else {
-                        Zone(ZoneNum).WindSpeed = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
                     }
-                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
-                        Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = GetCurrentScheduleValue(state, Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
                     } else {
-                        Zone(ZoneNum).WindDir = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
                     }
                 }
             }
@@ -5386,25 +5386,25 @@ namespace HeatBalanceManager {
         // Overwriting surface and zone level environmental data with EMS override value
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
-                    Zone(ZoneNum).OutDryBulbTemp = Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
+                if (state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideOn) {
+                    state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideValue;
                 }
-                if (Zone(ZoneNum).OutWetBulbTempEMSOverrideOn) {
-                    Zone(ZoneNum).OutWetBulbTemp = Zone(ZoneNum).OutWetBulbTempEMSOverrideValue;
+                if (state.dataHeatBal->Zone(ZoneNum).OutWetBulbTempEMSOverrideOn) {
+                    state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTempEMSOverrideValue;
                 }
-                if (Zone(ZoneNum).WindSpeedEMSOverrideOn) {
-                    Zone(ZoneNum).WindSpeed = Zone(ZoneNum).WindSpeedEMSOverrideValue;
+                if (state.dataHeatBal->Zone(ZoneNum).WindSpeedEMSOverrideOn) {
+                    state.dataHeatBal->Zone(ZoneNum).WindSpeed = state.dataHeatBal->Zone(ZoneNum).WindSpeedEMSOverrideValue;
                 }
-                if (Zone(ZoneNum).WindDirEMSOverrideOn) {
-                    Zone(ZoneNum).WindDir = Zone(ZoneNum).WindDirEMSOverrideValue;
+                if (state.dataHeatBal->Zone(ZoneNum).WindDirEMSOverrideOn) {
+                    state.dataHeatBal->Zone(ZoneNum).WindDir = state.dataHeatBal->Zone(ZoneNum).WindDirEMSOverrideValue;
                 }
             }
         }
 
         if (state.dataGlobal->BeginSimFlag) {
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     if (DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
                         DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
@@ -5638,7 +5638,7 @@ namespace HeatBalanceManager {
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(state.files.eio, Format_731, Zone(ZoneNum).Name, state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(state.files.eio, Format_731, state.dataHeatBal->Zone(ZoneNum).Name, state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5753,7 +5753,7 @@ namespace HeatBalanceManager {
                     if (sum(WarmupConvergenceValues(ZoneNum).PassFlag) != 8) { // pass=2 * 4 values for convergence
                         ShowSevereError(state,
                                         format("CheckWarmupConvergence: Loads Initialization, Zone=\"{}\" did not converge after {} warmup days.",
-                                               Zone(ZoneNum).Name,
+                                               state.dataHeatBal->Zone(ZoneNum).Name,
                                                state.dataHeatBal->MaxNumberOfWarmupDays));
                         if (!WarmupConvergenceWarning && !state.dataGlobal->DoingSizing) {
                             ShowContinueError(state, "See Warmup Convergence Information in .eio file for details.");
@@ -5920,7 +5920,7 @@ namespace HeatBalanceManager {
                 static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
                 print(state.files.eio,
                       Format_731,
-                      Zone(ZoneNum).Name,
+                      state.dataHeatBal->Zone(ZoneNum).Name,
                       EnvHeader + ' ' + state.dataEnvrn->EnvironmentName,
                       AverageZoneTemp,
                       StdDevZoneTemp,
@@ -7769,14 +7769,14 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
+        for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
             iConst = Surface(iSurf).Construction;
             if (Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
             } else {
                 SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
             }
-            if (iSurf == Zone(ZoneNum).SurfaceFirst) {
+            if (iSurf == state.dataHeatBal->Zone(ZoneNum).SurfaceFirst) {
                 if (SchedPtr != 0) {
                     ZoneScheduled = true;
                     ZoneUnscheduled = false;
@@ -7794,7 +7794,7 @@ namespace HeatBalanceManager {
 
             if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
                 // zone is nor scheduled nor unscheduled
-                ShowWarningError(state, "Zone " + Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
+                ShowWarningError(state, "Zone " + state.dataHeatBal->Zone(ZoneNum).Name + " does not have all surfaces scheduled with surface gains.");
                 ShowContinueError(state, "If at least one surface in the zone is scheduled with surface gains, then all other surfaces within the same zone "
                                   "should be scheduled as well.");
                 break;
@@ -7802,7 +7802,7 @@ namespace HeatBalanceManager {
         }
 
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = Zone(ZoneNum).SurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
+            for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
                 iConst = Surface(iSurf).Construction;
                 if (Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
@@ -8136,7 +8136,7 @@ namespace HeatBalanceManager {
         // Reading WindowGap:SupportPillar
         cCurrentModuleObject = "WindowGap:SupportPillar";
         state.dataHeatBal->W7SupportPillars = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
+        state.dataHeatBal->SupportPillar.allocate(state.dataHeatBal->W7SupportPillars);
         for (Loop = 1; Loop <= state.dataHeatBal->W7SupportPillars; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -8157,9 +8157,9 @@ namespace HeatBalanceManager {
                 continue;
             }
 
-            SupportPillar(Loop).Name = cAlphaArgs(1);
-            SupportPillar(Loop).Spacing = rNumericArgs(1);
-            SupportPillar(Loop).Radius = rNumericArgs(2);
+            state.dataHeatBal->SupportPillar(Loop).Name = cAlphaArgs(1);
+            state.dataHeatBal->SupportPillar(Loop).Spacing = rNumericArgs(1);
+            state.dataHeatBal->SupportPillar(Loop).Radius = rNumericArgs(2);
 
             if (rNumericArgs(1) <= 0.0) {
                 ErrorsFound = true;
@@ -8179,7 +8179,7 @@ namespace HeatBalanceManager {
         // Reading WindowGap:DeflectionState
         cCurrentModuleObject = "WindowGap:DeflectionState";
         state.dataHeatBal->W7DeflectionStates = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
+        state.dataHeatBal->DeflectionState.allocate(state.dataHeatBal->W7DeflectionStates);
         for (Loop = 1; Loop <= state.dataHeatBal->W7DeflectionStates; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -8200,8 +8200,8 @@ namespace HeatBalanceManager {
                 continue;
             }
 
-            DeflectionState(Loop).Name = cAlphaArgs(1);
-            DeflectionState(Loop).DeflectedThickness = rNumericArgs(1);
+            state.dataHeatBal->DeflectionState(Loop).Name = cAlphaArgs(1);
+            state.dataHeatBal->DeflectionState(Loop).DeflectedThickness = rNumericArgs(1);
             if (rNumericArgs(1) < 0.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(1) +
@@ -8264,10 +8264,10 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, cCurrentModuleObject + " does not have assigned WindowMaterial:Gas or WindowMaterial:GasMixutre.");
             }
             if (!lAlphaFieldBlanks(3)) {
-                state.dataMaterial->Material(MaterNum).DeflectionStatePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), DeflectionState);
+                state.dataMaterial->Material(MaterNum).DeflectionStatePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->DeflectionState);
             }
             if (!lAlphaFieldBlanks(4)) {
-                state.dataMaterial->Material(MaterNum).SupportPillarPtr = UtilityRoutines::FindItemInList(cAlphaArgs(4), SupportPillar);
+                state.dataMaterial->Material(MaterNum).SupportPillarPtr = UtilityRoutines::FindItemInList(cAlphaArgs(4), state.dataHeatBal->SupportPillar);
             }
         }
 

@@ -308,8 +308,7 @@ static std::string normalizeName(std::string name)
 
 static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std::string &ColorScheme)
 {
-    using DataHeatBalance::Zone;
-    using namespace DataSurfaces;
+        using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     static constexpr auto Format_800("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
                                      "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
@@ -428,14 +427,13 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
     print(of, Format_710, "Zone Names");
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        print(of, Format_710, format("Zone={}:{}", zones, normalizeName(Zone(zones).Name)));
+        print(of, Format_710, format("Zone={}:{}", zones, normalizeName(state.dataHeatBal->Zone(zones).Name)));
     }
 }
 
 static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile &of, bool const DELight)
 {
     using namespace DataSurfaceColors;
-    using DataHeatBalance::Zone;
 
     static constexpr auto Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
@@ -444,10 +442,10 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
         auto curcolorno = ColorNo_DaylSensor1;
 
         for (int refpt = 1; refpt <= state.dataDaylightingData->ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            print(of, "999\n{}:{}:{}\n", Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
+            print(of, "999\n{}:{}:{}\n", state.dataHeatBal->Zone(zones).Name, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
             print(of,
                   Format_709,
-                  normalizeName(Zone(zones).Name),
+                  normalizeName(state.dataHeatBal->Zone(zones).Name),
                   DXFcolorno(curcolorno),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt),
                   state.dataDaylightingData->ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt),
@@ -481,8 +479,7 @@ void DXFOut(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::Zone;
-    using namespace DataSurfaces;
+        using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
@@ -645,7 +642,7 @@ void DXFOut(EnergyPlusData &state,
 
     // now do zone surfaces, by zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto TempZoneName = normalizeName(Zone(zones).Name);
+        const auto TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
@@ -728,7 +725,7 @@ void DXFOut(EnergyPlusData &state,
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zones).Name) continue;
+            if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
@@ -818,10 +815,10 @@ void DXFOut(EnergyPlusData &state,
         for (int mapnum = 1; mapnum <= state.dataDaylightingData->TotIllumMaps; ++mapnum) {
             if (state.dataDaylightingData->IllumMapCalc(mapnum).Zone != zones) continue;
             for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
-                print(dxffile, Format_710, format("{}:MapRefPt:{}", Zone(zones).Name, refpt));
+                print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
                 print(dxffile,
                       Format_709,
-                      normalizeName(Zone(zones).Name),
+                      normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno(curcolorno),
                       state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
                       state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
@@ -856,8 +853,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::Zone;
-    using namespace DataSurfaces;
+        using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     using DataStringGlobals::VerString;
 
@@ -950,7 +946,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     // now do zone surfaces, by zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        auto TempZoneName = normalizeName(Zone(zones).Name);
+        auto TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -1007,7 +1003,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zones).Name) continue;
+            if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1065,8 +1061,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::Zone;
-    using namespace DataSurfaces;
+        using namespace DataSurfaces;
     using namespace DataSurfaceColors;
     using DataStringGlobals::VerString;
 
@@ -1147,7 +1142,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     // now do zone surfaces, by zone
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        const auto SaveZoneName = normalizeName(Zone(zones).Name);
+        const auto SaveZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -1184,7 +1179,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zones).Name) continue;
+            if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1396,7 +1391,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     }
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
+        *eiostream << "Zone Surfaces," << state.dataHeatBal->Zone(ZoneNum).Name << "," << (state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
@@ -1431,8 +1426,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     }
                 }
                 // Default Convection Coefficient Calculation Algorithms
-                IntConvCoeffCalc = ConvCoeffCalcs(Zone(ZoneNum).InsideConvectionAlgo);
-                ExtConvCoeffCalc = ConvCoeffCalcs(Zone(ZoneNum).OutsideConvectionAlgo);
+                IntConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
+                ExtConvCoeffCalc = ConvCoeffCalcs(state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo);
 
                 *eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << ","
                            << AlgoName << ",";
@@ -1803,8 +1798,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     // na
 
     // Using/Aliasing
-    using DataHeatBalance::Zone;
-    using namespace DataSurfaces;
+        using namespace DataSurfaces;
     using DataStringGlobals::VerString;
     using namespace DXFEarClipping;
 
@@ -1868,7 +1862,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
 
     print(wrlfile, "# Zone Names\n");
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
-        print(wrlfile, "# Zone={}:{}\n", zones, normalizeName(Zone(zones).Name));
+        print(wrlfile, "# Zone={}:{}\n", zones, normalizeName(state.dataHeatBal->Zone(zones).Name));
     }
 
     // Define the colors:
@@ -1984,7 +1978,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
-            if (Surface(surf).ZoneName != Zone(zoneNum).Name) continue;
+            if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zoneNum).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             print(wrlfile, Format_801, colorstring(colorindex), "Surf", surf);

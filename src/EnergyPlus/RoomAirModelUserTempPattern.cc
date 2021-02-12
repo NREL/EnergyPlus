@@ -431,7 +431,6 @@ namespace RoomAirModelUserTempPattern {
         // calculations vary by mode
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tmean;                        // MAT deg C
@@ -470,7 +469,7 @@ namespace RoomAirModelUserTempPattern {
 
             if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) {
 
-                Grad = OutdoorDryBulbGrad(Zone(ZoneNum).OutDryBulbTemp,
+                Grad = OutdoorDryBulbGrad(state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp,
                                           state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
                                           state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient,
                                           state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
@@ -500,7 +499,7 @@ namespace RoomAirModelUserTempPattern {
                 }
 
             } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone) {
-                DeltaT = Zone(ZoneNum).OutDryBulbTemp - Tmean;
+                DeltaT = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp - Tmean;
                 if (DeltaT >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
                     Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -671,8 +670,7 @@ namespace RoomAirModelUserTempPattern {
         // non dimensionalize surface's centroid's Z value
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
+                using DataSurfaces::Surface;
         using DataVectorTypes::Vector;
 
         // Return value
@@ -709,7 +707,7 @@ namespace RoomAirModelUserTempPattern {
         ZMax = 0.0;
         ZMin = 0.0;
         Count = 0;
-        for (SurfNum = Zone(thisZone).SurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(thisZone).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(thisZone).SurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
@@ -734,7 +732,7 @@ namespace RoomAirModelUserTempPattern {
             ZFlrAvg = ZMin;
         }
         ZoneZorig = ZFlrAvg; // Z floor  [M]
-        ZoneCeilHeight = Zone(thisZone).CeilingHeight;
+        ZoneCeilHeight = state.dataHeatBal->Zone(thisZone).CeilingHeight;
 
         // first check if some basic things are reasonable
 
@@ -744,7 +742,7 @@ namespace RoomAirModelUserTempPattern {
         if (SurfMinZ < (ZoneZorig - TolValue)) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, "too low surface: " + Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
                 ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
                 ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
             } else {
@@ -755,7 +753,7 @@ namespace RoomAirModelUserTempPattern {
         if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-                ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + Zone(thisZone).Name);
+                ShowContinueError(state, " too high surface: " + Surface(thisHBsurf).Name + " in zone: " + state.dataHeatBal->Zone(thisZone).Name);
                 ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
                 ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
             } else {
@@ -796,8 +794,7 @@ namespace RoomAirModelUserTempPattern {
 
         // Using/Aliasing
         using DataHeatBalance::RefrigCaseCredit;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MAT;
+                using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::SysDepZoneLoads;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -838,8 +835,8 @@ namespace RoomAirModelUserTempPattern {
 
 
 
-        SurfFirst = Zone(ZoneNum).SurfaceFirst;
-        SurfLast = Zone(ZoneNum).SurfaceLast;
+        SurfFirst = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst;
+        SurfLast = state.dataHeatBal->Zone(ZoneNum).SurfaceLast;
 
         // set air system leaving node conditions
         // this is not so easy.  THis task is normally done in CalcZoneLeavingConditions
@@ -852,15 +849,15 @@ namespace RoomAirModelUserTempPattern {
             Node(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID).Temp = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
         }
 
-        int zoneEquipNum = Zone(ZoneNum).ZoneEqNum;
+        int zoneEquipNum = state.dataHeatBal->Zone(ZoneNum).ZoneEqNum;
         for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).NumReturnNodes; ++nodeCount) {
             // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
             int ReturnNode = state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ReturnNode(nodeCount);
             ZoneNode = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneNodeID;
-            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+            ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
             // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
             // Add sensible heat gain from refrigerated cases with under case returns
-            SumAllReturnAirConvectionGains(ZoneNum, QRetAir, ReturnNode);
+            SumAllReturnAirConvectionGains(state, ZoneNum, QRetAir, ReturnNode);
 
             CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
 
@@ -877,7 +874,7 @@ namespace RoomAirModelUserTempPattern {
             WinGapFlowTtoRA = 0.0;
 
             if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
-                for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                         FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
@@ -889,7 +886,7 @@ namespace RoomAirModelUserTempPattern {
             }
             if (WinGapFlowToRA > 0.0) WinGapTtoRA = WinGapFlowTtoRA / WinGapFlowToRA;
 
-            if (!Zone(ZoneNum).NoHeatToReturnAir) {
+            if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0.0) {
                     if (WinGapFlowToRA > 0.0) {
                         // Add heat-to-return from window gap airflow
@@ -936,23 +933,23 @@ namespace RoomAirModelUserTempPattern {
 
             // Include impact of under case returns for refrigerated display cases when updateing return node
             // humidity ratio
-            if (!Zone(ZoneNum).NoHeatToReturnAir) {
+            if (!state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
                 if (MassFlowRA > 0) {
-                    SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                     Node(ReturnNode).HumRat = Node(ZoneNode).HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
                 } else {
                     // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
                     Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
                     RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
-                    SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, 0);
+                    SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
                     ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
                 Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
                 RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
-                SumAllReturnAirLatentGains(ZoneNum, SumRetAirLatentGainRate, ReturnNode);
+                SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
                 ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
             }
 

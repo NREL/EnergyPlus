@@ -171,12 +171,12 @@ namespace ConvectionCoefficients {
             if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled && allocated(Node)) {
                 state.dataConvectionCoefficient->NodeCheck = false;
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
-                    if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
+                    if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
+                    if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                     ShowSevereError(state, "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone=" +
-                                    Zone(ZoneNum).Name);
-                    ShowContinueError(state, "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone(ZoneNum).Name);
-                    Zone(ZoneNum).InsideConvectionAlgo = ASHRAETARP;
+                                    state.dataHeatBal->Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                    state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo = ASHRAETARP;
                 }
                 // insert one-time setup for adpative inside face
             }
@@ -191,7 +191,7 @@ namespace ConvectionCoefficients {
             if (std::any_of(Surface.begin(),
                             Surface.end(),
                             [](DataSurfaces::SurfaceData const &e) { return e.IntConvCoeff == DataHeatBalance::AdaptiveConvectionAlgorithm; }) ||
-                std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
+                std::any_of(state.dataHeatBal->Zone.begin(), state.dataHeatBal->Zone.end(), [](DataHeatBalance::ZoneData const &e) {
                     return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm;
                 })) {
                 // need to clear out node conditions because dynamic assignments will be affected
@@ -235,7 +235,7 @@ namespace ConvectionCoefficients {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             {
-                auto const SELECT_CASE_var(Zone(ZoneNum).InsideConvectionAlgo);
+                auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
                 // Ceiling Diffuser and Trombe Wall only make sense at Zone Level
                 // Interior convection coeffs are first calculated here and then at surface level
                 if (SELECT_CASE_var == CeilingDiffuser) {
@@ -250,7 +250,7 @@ namespace ConvectionCoefficients {
         }
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
@@ -266,10 +266,10 @@ namespace ConvectionCoefficients {
                     algoNum = std::abs(Surface(SurfNum).IntConvCoeff);
                     standardAlgo = true;
                 } else if (Surface(SurfNum).IntConvCoeff == 0) { // Not set by user, uses Zone Setting
-                    algoNum = Zone(ZoneNum).InsideConvectionAlgo;
+                    algoNum = state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo;
                     standardAlgo = true;
                 } else {
-                    algoNum = Zone(ZoneNum).InsideConvectionAlgo;
+                    algoNum = state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo;
                     standardAlgo = false;
                 }
 
@@ -412,10 +412,10 @@ namespace ConvectionCoefficients {
             algoNum = std::abs(Surface(SurfNum).ExtConvCoeff);
             standardAlgo = true;
         } else if (Surface(SurfNum).ExtConvCoeff == 0) { // Not set by user, uses Zone Setting
-            algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
+            algoNum = state.dataHeatBal->Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
             standardAlgo = true;
         } else {
-            algoNum = Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
+            algoNum = state.dataHeatBal->Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo;
             standardAlgo = false;
         }
 
@@ -1661,7 +1661,7 @@ namespace ConvectionCoefficients {
             ErrorsFound = true;
         }
 
-        if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ASHRAESimple || std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
+        if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ASHRAESimple || std::any_of(state.dataHeatBal->Zone.begin(), state.dataHeatBal->Zone.end(), [](DataHeatBalance::ZoneData const &e) {
                 return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple;
             })) {
             Count = 0;
@@ -1670,7 +1670,7 @@ namespace ConvectionCoefficients {
                 // Tests show that Zone will override the simple convection specification of global.
                 if (SurfNum <= 0) continue;               // ignore this error condition
                 if (Surface(SurfNum).Zone == 0) continue; // ignore this error condition
-                if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple &&
+                if (state.dataHeatBal->Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple &&
                     ((UserExtConvectionCoeffs(Loop).OverrideType == ConvCoefSpecifiedModel &&
                       UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
                      UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
@@ -2589,7 +2589,7 @@ namespace ConvectionCoefficients {
             return 0.0;
         } else {
             // Set local variables
-            Real64 ZoneVolume = Zone(ZoneNum).Volume;
+            Real64 ZoneVolume = state.dataHeatBal->Zone(ZoneNum).Volume;
             Real64 ZoneVolFlowRate = CalcZoneSystemVolFlowRate(state, ZoneNum);
 
             // Calculate ACH
@@ -2601,7 +2601,7 @@ namespace ConvectionCoefficients {
     {
         using namespace DataZoneEquipment;
 
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         int thisZoneInletNode = 0;
         if (ZoneNode > 0) {
             Real64 SumMdotTemp = 0.0;
@@ -2634,9 +2634,9 @@ namespace ConvectionCoefficients {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
-            int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+            int ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
             Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
             return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
         } else {
@@ -2652,8 +2652,8 @@ namespace ConvectionCoefficients {
         Real64 ACH = CalcZoneSystemACH(state, ZoneNum); // Air changes per hour
 
         Real64 ZoneMassFlowRate;
-        Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber; // Zone node as defined in system simulation
+        Real64 ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+        int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber; // Zone node as defined in system simulation
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
             ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
         } else { // because these are not updated yet for new environment
@@ -2729,7 +2729,7 @@ namespace ConvectionCoefficients {
 
         Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
 
-        for (auto SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (auto SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -2798,9 +2798,9 @@ namespace ConvectionCoefficients {
             ACH = 0.0;
         } else {
             // Set local variables
-            ZoneVolume = Zone(ZoneNum).Volume;
-            ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+            ZoneVolume = state.dataHeatBal->Zone(ZoneNum).Volume;
+            ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
             ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
 
@@ -2815,7 +2815,7 @@ namespace ConvectionCoefficients {
             }
         }
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             if (ACH <= 3.0) { // Use the other convection algorithm
@@ -2901,7 +2901,7 @@ namespace ConvectionCoefficients {
         Surf1 = 0;
         Surf2 = 0;
 
-        H = Zone(ZoneNum).CeilingHeight;
+        H = state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
         minorW = 100000.0; // An impossibly big width
         majorW = 0.0;
         gapW = 0.0;
@@ -2911,7 +2911,7 @@ namespace ConvectionCoefficients {
         HConvNet = 0.0;
 
         // determine major width and minor width
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
             if (Surface(SurfNum).Width > majorW) {
@@ -2924,7 +2924,7 @@ namespace ConvectionCoefficients {
         }
 
         // assign major surfaces
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
             if (Surface(SurfNum).Width == majorW) {
@@ -2966,7 +2966,7 @@ namespace ConvectionCoefficients {
         }
 
         // Assign convection coefficients
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             // Use ASHRAESimple correlation to give values for all the minor surfaces
@@ -3464,28 +3464,28 @@ namespace ConvectionCoefficients {
         RoofBoundZvals = 0.0;
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
 
-            BldgVolumeSum += Zone(ZoneLoop).Volume * Zone(ZoneLoop).Multiplier * Zone(ZoneLoop).ListMultiplier;
+            BldgVolumeSum += state.dataHeatBal->Zone(ZoneLoop).Volume * state.dataHeatBal->Zone(ZoneLoop).Multiplier * state.dataHeatBal->Zone(ZoneLoop).ListMultiplier;
             PerimExtLengthSum = 0.0; // init
             ExtWallCount = 0;        // init
             ExtWindowCount = 0;      // init
             // model perimeter of bounding horizontal rectangle from max and min x and y values
             thisZoneSimplePerim =
-                2.0 * (Zone(ZoneLoop).MaximumY - Zone(ZoneLoop).MinimumY) + 2.0 * (Zone(ZoneLoop).MaximumX - Zone(ZoneLoop).MinimumX);
+                2.0 * (state.dataHeatBal->Zone(ZoneLoop).MaximumY - state.dataHeatBal->Zone(ZoneLoop).MinimumY) + 2.0 * (state.dataHeatBal->Zone(ZoneLoop).MaximumX - state.dataHeatBal->Zone(ZoneLoop).MinimumX);
             if (thisZoneSimplePerim > 0.0) {
-                thisZoneHorizHydralicDiameter = 4.0 * Zone(ZoneLoop).FloorArea / thisZoneSimplePerim;
+                thisZoneHorizHydralicDiameter = 4.0 * state.dataHeatBal->Zone(ZoneLoop).FloorArea / thisZoneSimplePerim;
             } else {
-                if (Zone(ZoneLoop).FloorArea > 0.0) {
-                    thisZoneHorizHydralicDiameter = std::sqrt(Zone(ZoneLoop).FloorArea);
+                if (state.dataHeatBal->Zone(ZoneLoop).FloorArea > 0.0) {
+                    thisZoneHorizHydralicDiameter = std::sqrt(state.dataHeatBal->Zone(ZoneLoop).FloorArea);
                 }
             }
 
-            if (Zone(ZoneLoop).ExtGrossWallArea > 0.0) {
-                thisWWR = Zone(ZoneLoop).ExtWindowArea / Zone(ZoneLoop).ExtGrossWallArea;
+            if (state.dataHeatBal->Zone(ZoneLoop).ExtGrossWallArea > 0.0) {
+                thisWWR = state.dataHeatBal->Zone(ZoneLoop).ExtWindowArea / state.dataHeatBal->Zone(ZoneLoop).ExtGrossWallArea;
             } else {
                 thisWWR = -999.0; // throw error?
             }
             // first pass thru this zones surfaces to gather data
-            for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+            for (int SurfLoop = state.dataHeatBal->Zone(ZoneLoop).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 // first catch exterior walls and do summations
                 if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::Wall)) {
                     PerimExtLengthSum += Surface(SurfLoop).Width;
@@ -3498,9 +3498,9 @@ namespace ConvectionCoefficients {
             }
 
             // second pass thru zone surfs to fill data
-            for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+            for (int SurfLoop = state.dataHeatBal->Zone(ZoneLoop).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 // now fill values
-                Surface(SurfLoop).IntConvZoneWallHeight = Zone(ZoneLoop).CeilingHeight;
+                Surface(SurfLoop).IntConvZoneWallHeight = state.dataHeatBal->Zone(ZoneLoop).CeilingHeight;
                 Surface(SurfLoop).IntConvZonePerimLength = PerimExtLengthSum;
                 Surface(SurfLoop).IntConvZoneHorizHydrDiam = thisZoneHorizHydralicDiameter;
                 Surface(SurfLoop).IntConvWindowWallRatio = thisWWR;
@@ -3508,11 +3508,11 @@ namespace ConvectionCoefficients {
 
             // third pass for window locations
             if ((ExtWindowCount > 0) && (ExtWallCount > 0)) {
-                for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+                for (int SurfLoop = state.dataHeatBal->Zone(ZoneLoop).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                     if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) &&
                         ((Surface(SurfLoop).Class == SurfaceClass::Window) || (Surface(SurfLoop).Class == SurfaceClass::GlassDoor))) {
                         if (Surface(SurfLoop).IntConvWindowWallRatio < 0.5) {
-                            if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
+                            if (Surface(SurfLoop).Centroid.z < state.dataHeatBal->Zone(ZoneLoop).Centroid.z) {
                                 Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_LowerPartOfExteriorWall;
                             } else {
                                 Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_UpperPartOfExteriorWall;
@@ -3531,7 +3531,7 @@ namespace ConvectionCoefficients {
                     }
                     if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::Wall) &&
                         (Surface(SurfLoop).IntConvWindowLocation == InConvWinLoc_NotSet)) {
-                        if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
+                        if (Surface(SurfLoop).Centroid.z < state.dataHeatBal->Zone(ZoneLoop).Centroid.z) {
                             Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_WindowAboveThis;
                         } else {
                             Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_WindowBelowThis;
@@ -4169,7 +4169,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->ActiveFloorCount = 0;
             state.dataConvectionCoefficient->ActiveFloorArea = 0.0;
 
-            for (SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
+            for (SurfLoop = state.dataHeatBal->Zone(ZoneLoop).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                 if (Surface(SurfLoop).Class == SurfaceClass::Wall || Surface(SurfLoop).Class == SurfaceClass::Door) {
                     ++state.dataConvectionCoefficient->ActiveWallCount;
@@ -4566,7 +4566,7 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
                 }
-                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 if (ZoneNode > 0) {
                     Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
@@ -4578,7 +4578,7 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
                 }
-                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 if (ZoneNode > 0) {
                     Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
@@ -4589,7 +4589,7 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
                 }
-                int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+                int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 if (ZoneNode > 0) {
                     Surface(SurfNum).TAirRef = ZoneSupplyAirTemp;
                 } else {
@@ -5067,11 +5067,11 @@ namespace ConvectionCoefficients {
 
         EquipOnCount = 0;
         ZoneNum = Surface(SurfNum).Zone;
-        ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         FlowRegimeStack = 0;
 
         // HVAC connections
-        if (!Zone(ZoneNum).IsControlled) { // no HVAC control
+        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) { // no HVAC control
             FlowRegimeStack(0) = InConvFlowRegime_A3;
         } else { // is controlled, lets see by how and if that means is currently active
 
@@ -5153,7 +5153,7 @@ namespace ConvectionCoefficients {
                         } else if ((SELECT_CASE_var == VentilatedSlab_Num) || (SELECT_CASE_var == LoTempRadiant_Num)) {
 
                             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
-                                for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
+                                for (SurfLoop = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Floor) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
@@ -5172,7 +5172,7 @@ namespace ConvectionCoefficients {
                             }
 
                             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InCeilingActiveElement) {
-                                for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
+                                for (SurfLoop = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Roof) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
@@ -5191,7 +5191,7 @@ namespace ConvectionCoefficients {
                             }
 
                             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InWallActiveElement) {
-                                for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
+                                for (SurfLoop = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfLoop <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Wall || Surface(SurfLoop).Class == SurfaceClass::Door) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
@@ -5250,14 +5250,14 @@ namespace ConvectionCoefficients {
 
             // Calculate Grashof, Reynolds, and Richardson numbers for the zone
             // Grashof for zone air based on largest delta T between surfaces and zone height
-            Tmin = minval(TH(2, 1, {Zone(ZoneNum).SurfaceFirst, Zone(ZoneNum).SurfaceLast}));
-            Tmax = maxval(TH(2, 1, {Zone(ZoneNum).SurfaceFirst, Zone(ZoneNum).SurfaceLast}));
-            GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
+            Tmin = minval(TH(2, 1, {state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, state.dataHeatBal->Zone(ZoneNum).SurfaceLast}));
+            Tmax = maxval(TH(2, 1, {state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, state.dataHeatBal->Zone(ZoneNum).SurfaceLast}));
+            GrH = (g * (Tmax - Tmin) * pow_3(state.dataHeatBal->Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
             if (Node(ZoneNode).MassFlowRate > 0.0) {
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-                Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
+                Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(state.dataHeatBal->Zone(ZoneNum).Volume, OneThird));
             } else {
                 Re = 0.0;
             }
@@ -6045,10 +6045,10 @@ namespace ConvectionCoefficients {
         SumMdotTemp = 0.0;
         SumMdot = 0.0;
         SupplyAirTemp = MAT(ZoneNum);
-        if (Zone(ZoneNum).IsControlled) {
-            ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
+        if (state.dataHeatBal->Zone(ZoneNum).IsControlled) {
+            ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
+            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * state.dataHeatBal->Zone(ZoneNum).Volume);
             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                     if (allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
@@ -6826,7 +6826,7 @@ namespace ConvectionCoefficients {
             if (Height == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective height is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -6838,7 +6838,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedAssistedWallErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -6915,7 +6915,7 @@ namespace ConvectionCoefficients {
             if (Height == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX2 == 0) {
                     ShowSevereMessage(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective height is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -6932,7 +6932,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedOpposingWallErrorIDX1 == 0) {
                     ShowSevereMessage(state, "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -6995,7 +6995,7 @@ namespace ConvectionCoefficients {
             if (HydraulicDiameter == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7007,7 +7007,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedStableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7072,7 +7072,7 @@ namespace ConvectionCoefficients {
             if (HydraulicDiameter == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7085,7 +7085,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedUnstableFloorErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7148,7 +7148,7 @@ namespace ConvectionCoefficients {
             if (HydraulicDiameter == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7161,7 +7161,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedStableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7224,7 +7224,7 @@ namespace ConvectionCoefficients {
             if (HydraulicDiameter == 0.0) {
                 if (state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX1 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
-                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for zone named =" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7236,7 +7236,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->BMMixedUnstableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage(state, "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError(state, "The temperature difference between surface and air is zero");
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
 
@@ -7409,7 +7409,7 @@ namespace ConvectionCoefficients {
                         ShowSevereMessage(state,
                             "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)");
                         ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
-                        ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                        ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                         ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                     }
                     ShowRecurringSevereErrorAtEnd(state, "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window "
@@ -7422,7 +7422,7 @@ namespace ConvectionCoefficients {
                 ShowSevereMessage(state,
                     "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
-                ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -7484,7 +7484,7 @@ namespace ConvectionCoefficients {
                 if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 == 0) {
                     ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)");
                     ShowContinueError(state, format("Value for window location = {}", WindowLocationType));
-                    ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                    ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
                 }
                 ShowRecurringSevereErrorAtEnd(state,
@@ -7495,7 +7495,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
-                ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -7546,7 +7546,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated (zero zone exterior perimeter length)");
                 ShowContinueError(state, format("Value for zone exterior perimeter length = {:.5R}", ZoneExtPerimLength));
-                ShowContinueError(state, "Occurs for zone named = " + Zone(ZoneNum).Name);
+                ShowContinueError(state, "Occurs for zone named = " + state.dataHeatBal->Zone(ZoneNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,

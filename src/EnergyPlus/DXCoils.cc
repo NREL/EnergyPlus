@@ -741,8 +741,7 @@ namespace EnergyPlus::DXCoils {
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
         using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
         using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
-        using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
+                using DataSizing::AutoSize;
         using EMSManager::ManageEMS;
 
         using GlobalNames::VerifyUniqueCoilName;
@@ -1337,7 +1336,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A18; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:SingleSpeed",
@@ -2244,7 +2243,7 @@ namespace EnergyPlus::DXCoils {
 
             // A14, \field Zone Name for Evaporator Placement
             if (!lAlphaBlanks(14) && NumAlphas > 13) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:SingleSpeed",
@@ -2815,7 +2814,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A21; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(21) && NumAlphas > 20) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:TwoSpeed",
@@ -4132,7 +4131,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A37; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(37) && NumAlphas > 36) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:MultiSpeed",
@@ -4566,7 +4565,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A34; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(34) && NumAlphas > 33) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:MultiSpeed",
@@ -8378,8 +8377,7 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::ZoneAirHumRat;
+                using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;

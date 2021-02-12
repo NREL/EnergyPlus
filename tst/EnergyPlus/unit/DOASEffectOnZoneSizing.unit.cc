@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 
     Node.allocate(10);
     ZoneEqSizing.allocate(2);
-    Zone.allocate(2);
+    state->dataHeatBal->Zone.allocate(2);
     CalcZoneSizing.allocate(1, 2);
     CalcFinalZoneSizing.allocate(2);
     NonAirSystemResponse.allocate(2);
@@ -283,10 +283,10 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEquip->ZoneEquipConfig(2).PlenumMassFlow = 0.0;
     MassConservation(1).MixingMassFlowRate = 0.0;
     MassConservation(2).MixingMassFlowRate = 0.0;
-    Zone(1).Multiplier = 1.0;
-    Zone(2).Multiplier = 1.0;
-    Zone(1).ListMultiplier = 1;
-    Zone(2).ListMultiplier = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1;
 
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 
     Node.deallocate();
     ZoneEqSizing.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     CalcZoneSizing.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoads.deallocate();

@@ -920,11 +920,11 @@ namespace WindowComplexManager {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
             }
             if (ComplexFenInZone) {
-                NumSurfInZone = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1;
                 if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
             }
         }
@@ -2418,7 +2418,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using DataHeatBalance::GasCoeffsAir;
-        using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
@@ -2759,8 +2758,8 @@ namespace WindowComplexManager {
                     //                EXIT
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
-                    if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2803,9 +2802,9 @@ namespace WindowComplexManager {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
-                        if (!Zone(ZoneNum).IsControlled) {
+                        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           Zone(ZoneNum).Name);
+                                           state.dataHeatBal->Zone(ZoneNum).Name);
                             return;
                         }
                         // determine supply air conditions
@@ -2982,7 +2981,7 @@ namespace WindowComplexManager {
 
                 DeflectionPtr = state.dataMaterial->Material(LayPtr).DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
-                    GapDefMax(IGap) = DeflectionState(DeflectionPtr).DeflectedThickness;
+                    GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
@@ -2991,8 +2990,8 @@ namespace WindowComplexManager {
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
-                    PillarSpacing(IGap) = SupportPillar(PillarPtr).Spacing;
-                    PillarRadius(IGap) = SupportPillar(PillarPtr).Radius;
+                    PillarSpacing(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Spacing;
+                    PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
                 }
 
                 GasPointer = state.dataMaterial->Material(LayPtr).GasPointer;

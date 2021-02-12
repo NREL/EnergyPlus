@@ -824,10 +824,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -864,7 +864,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 45.;
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
@@ -872,7 +872,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 90.;
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
@@ -1338,7 +1338,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
+    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
@@ -2097,10 +2097,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -2138,7 +2138,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 45.;
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
@@ -2146,7 +2146,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
     EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 90.;
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
@@ -2842,10 +2842,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 

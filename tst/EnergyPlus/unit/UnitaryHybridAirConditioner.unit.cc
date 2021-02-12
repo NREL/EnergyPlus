@@ -168,10 +168,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
-    DataHeatBalance::Zone(1).FloorArea = 232.26;
+    state->dataHeatBal->Zone(1).FloorArea = 232.26;
     state->dataEnvrn->StdRhoAir = 1.225;
     state->dataEnvrn->OutBaroPress = 101325;
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);
@@ -1417,10 +1417,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initi
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
-    DataHeatBalance::Zone(1).FloorArea = 232.26;
+    state->dataHeatBal->Zone(1).FloorArea = 232.26;
     state->dataEnvrn->StdRhoAir = 1.225;
     state->dataEnvrn->OutBaroPress = 101325;
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);

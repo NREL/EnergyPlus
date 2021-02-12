@@ -737,7 +737,7 @@ namespace WindowEquivalentLayer {
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
-                    if (!Zone(ZoneNum).IsControlled) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                         return;
                     }
                     // determine supply air conditions
@@ -781,7 +781,7 @@ namespace WindowEquivalentLayer {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
-                        if (!Zone(ZoneNum).IsControlled) {
+                        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             return;
                         }
                         // determine supply air conditions

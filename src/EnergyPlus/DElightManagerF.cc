@@ -266,12 +266,12 @@ namespace DElightManagerF {
 
         for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
             if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
-                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, Zone);
+                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
                     rLightLevel = GetDesignLightingLevelForZone(state, izone);
                     CheckLightsReplaceableMinMaxForZone(state, izone);
-                    auto &zn(Zone(izone));
+                    auto &zn(state.dataHeatBal->Zone(izone));
 
                     // Write this Zone to the DElight input file
                     // Remove any blanks from the Zone Name for ease of input to DElight
@@ -540,7 +540,7 @@ namespace DElightManagerF {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
-                            auto &zn(Zone(izone));
+                            auto &zn(state.dataHeatBal->Zone(izone));
 
                             // Limit to maximum of 100 RefPts
                             if (znDayl.TotalDaylRefPoints <= 100) {
@@ -593,7 +593,7 @@ namespace DElightManagerF {
                                                            zn.MaximumY));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(3) < Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
+                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
                                     ShowWarningError(state, "DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name);
                                     ShowSevereError(state,
                                                     format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",

@@ -695,8 +695,7 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::HeatingCapacitySizing;
+                using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -744,7 +743,7 @@ namespace ElectricBaseboardRadiator {
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
-                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
@@ -1141,7 +1140,7 @@ namespace ElectricBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;

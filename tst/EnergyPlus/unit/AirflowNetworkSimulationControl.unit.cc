@@ -80,8 +80,8 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 {
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW 1";
@@ -107,11 +107,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
-    People.allocate(state->dataHeatBal->TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -166,16 +166,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
-    People.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 {
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW 1";
@@ -201,11 +201,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
-    People.allocate(state->dataHeatBal->TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -262,9 +262,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
-    People.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 } // namespace EnergyPlus

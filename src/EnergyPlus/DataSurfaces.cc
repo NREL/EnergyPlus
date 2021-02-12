@@ -829,9 +829,9 @@ namespace DataSurfaces {
                 //            ControlledZoneAirFlag = .FALSE.
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
-                if (!DataHeatBalance::Zone(Zone).IsControlled) {
+                if (!state.dataHeatBal->Zone(Zone).IsControlled) {
                     ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                   DataHeatBalance::Zone(Zone).Name);
+                                   state.dataHeatBal->Zone(Zone).Name);
                     // return;
                 }
                 // determine supply air conditions

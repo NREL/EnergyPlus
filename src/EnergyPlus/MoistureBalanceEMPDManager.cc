@@ -305,7 +305,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             if (!EMPDzone(Loop)) {
-                ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
+                ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + state.dataHeatBal->Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");
                 ShowContinueError(state, "..For each zone, the inside layer of at least one construction must have EMPD properties");
                 ErrorsFound = true;

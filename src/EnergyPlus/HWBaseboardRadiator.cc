@@ -950,8 +950,7 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::HeatingCapacitySizing;
+                using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
 
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -1041,7 +1040,7 @@ namespace HWBaseboardRadiator {
 
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HWBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HWBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1586,8 +1585,7 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MaxRadHeatFlux;
+                using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHWBaseboardSurf;
         using DataHeatBalFanSys::QHWBaseboardToPerson;
         using DataSurfaces::Surface;
@@ -1729,7 +1727,7 @@ namespace HWBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;

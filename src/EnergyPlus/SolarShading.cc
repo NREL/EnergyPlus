@@ -288,8 +288,8 @@ namespace EnergyPlus::SolarShading {
 
             // Surface Win
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 if (firstSurfWin == -1) continue;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
@@ -650,7 +650,7 @@ namespace EnergyPlus::SolarShading {
                 NumOfShadingGroups = NumAlphas - (aNum - 1);
                 DisableSelfShadingGroups.allocate(NumOfShadingGroups);
                 for (int i = 1; i <= NumOfShadingGroups; i++) {
-                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + (aNum - 1)), ZoneList, state.dataHeatBal->NumOfZoneLists);
+                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(i + (aNum - 1)), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
                     if (Found != 0) DisableSelfShadingGroups(i) = Found;
                 }
 
@@ -660,9 +660,9 @@ namespace EnergyPlus::SolarShading {
                         // Check the shading zone group of each exterior surface
                         for (int ZoneGroupLoop = 1; ZoneGroupLoop <= NumOfShadingGroups; ZoneGroupLoop++) { // Loop through all defined shading groups
                             CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
-                            for (int ZoneNum = 1; ZoneNum <= ZoneList(CurZoneGroup).NumOfZones;
+                            for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
                                  ZoneNum++) { // Loop through all zones in the zone list
-                                if (Surface(SurfNum).Zone == ZoneList(CurZoneGroup).Zone(ZoneNum)) {
+                                if (Surface(SurfNum).Zone == state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum)) {
                                     SurfZoneGroup = CurZoneGroup;
                                     break;
                                 }
@@ -676,13 +676,13 @@ namespace EnergyPlus::SolarShading {
                                  ZoneGroupLoop++) { // Loop through all defined shading groups
                                 CurZoneGroup = DisableSelfShadingGroups(ZoneGroupLoop);
                                 if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
-                                    for (int ZoneNum = 1; ZoneNum <= ZoneList(CurZoneGroup).NumOfZones;
+                                    for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
                                          ZoneNum++) { // Loop through all zones in the zone list
-                                        Surface(SurfNum).DisabledShadowingZoneList.push_back(ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                        Surface(SurfNum).DisabledShadowingZoneList.push_back(state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                     }
                                 } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
-                                    for (int ZoneNum = 1; ZoneNum <= ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                        Surface(SurfNum).DisabledShadowingZoneList.push_back(ZoneList(CurZoneGroup).Zone(ZoneNum));
+                                    for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
+                                        Surface(SurfNum).DisabledShadowingZoneList.push_back(state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                     }
                                 }
                             }
@@ -1027,26 +1027,26 @@ namespace EnergyPlus::SolarShading {
                                     state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneLoop),
                                     "Zone",
                                     "Average",
-                                    Zone(ZoneLoop).Name);
+                                    state.dataHeatBal->Zone(ZoneLoop).Name);
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Loss Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataHeatBal->ZoneOpaqSurfInsFaceCondLossRep(ZoneLoop),
                                     "Zone",
                                     "Average",
-                                    Zone(ZoneLoop).Name);
+                                    state.dataHeatBal->Zone(ZoneLoop).Name);
                 // Energy variables
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Gain Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(ZoneLoop),
                                     "Zone",
                                     "Sum",
-                                    Zone(ZoneLoop).Name);
+                                    state.dataHeatBal->Zone(ZoneLoop).Name);
                 SetupOutputVariable(state, "Zone Opaque Surface Inside Faces Total Conduction Heat Loss Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataHeatBal->ZnOpqSurfInsFaceCondLsRepEnrg(ZoneLoop),
                                     "Zone",
                                     "Sum",
-                                    Zone(ZoneLoop).Name);
+                                    state.dataHeatBal->Zone(ZoneLoop).Name);
             }
         }
 
@@ -2915,7 +2915,7 @@ namespace EnergyPlus::SolarShading {
             AreaSum = 0.0;
             TestFractSum = 0.0;
             for (int const SurfNum : thisEnclosure.SurfacePtr) {
-                if (Zone(Surface(SurfNum).Zone).OfType == StandardZone && Surface(SurfNum).CosTilt < -0.5) {
+                if (state.dataHeatBal->Zone(Surface(SurfNum).Zone).OfType == StandardZone && Surface(SurfNum).CosTilt < -0.5) {
                     AreaSum += Surface(SurfNum).Area;
                 }
             }
@@ -2936,8 +2936,8 @@ namespace EnergyPlus::SolarShading {
 
                 // only horizontal surfaces. !      !CR 8229, relaxed from -0.99 to -0.5  (Tilt > 154)
                 // only horizontal surfaces. !      !CR8769 use ASHRAE std of >120, -0.9 to -0.5  (Tilt > 120)
-                if ((Zone(Surface(SurfNum).Zone).OfType != StandardZone || Surface(SurfNum).CosTilt < -0.5) &&
-                    (Zone(Surface(SurfNum).Zone).OfType == StandardZone || Surface(SurfNum).ExtBoundCond > 0)) {
+                if ((state.dataHeatBal->Zone(Surface(SurfNum).Zone).OfType != StandardZone || Surface(SurfNum).CosTilt < -0.5) &&
+                    (state.dataHeatBal->Zone(Surface(SurfNum).Zone).OfType == StandardZone || Surface(SurfNum).ExtBoundCond > 0)) {
 
                     int ConstrNum = Surface(SurfNum).Construction;
                     // last minute V3.1
@@ -5992,8 +5992,8 @@ namespace EnergyPlus::SolarShading {
             EnclSolDB(zoneNum) = 0.0;
             EnclSolDBSSG(zoneNum) = 0.0;
             EnclSolDBIntWin(zoneNum) = 0.0;
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 for (int lay = 1; lay <= CFSMAXNL + 1; ++lay) {
                     SurfWinA(lay, SurfNum) = 0.0;
@@ -6001,8 +6001,8 @@ namespace EnergyPlus::SolarShading {
                 IntBeamAbsByShadFac(SurfNum) = 0.0;
                 ExtBeamAbsByShadFac(SurfNum) = 0.0;
             }
-            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 SurfOpaqAI(SurfNum) = 0.0;
                 SurfOpaqAO(SurfNum) = 0.0;
@@ -7681,7 +7681,7 @@ namespace EnergyPlus::SolarShading {
         // Calculates solar energy absorbed on exterior opaque surfaces
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 //                if (!Surface(SurfNum).HeatTransSurf) continue;
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) continue;
@@ -8663,8 +8663,8 @@ namespace EnergyPlus::SolarShading {
         int IConst; // Construction
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
                 SurfWinExtIntShadePrevTS(ISurf) = SurfWinShadingFlag(ISurf);
 
@@ -9184,8 +9184,8 @@ namespace EnergyPlus::SolarShading {
         using ScheduleManager::GetCurrentScheduleValue;
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
 
@@ -9498,8 +9498,8 @@ namespace EnergyPlus::SolarShading {
         Real64 const sin_ElevSun = std::sin(ElevSun);
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
 
                 if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment &&
@@ -9884,8 +9884,8 @@ namespace EnergyPlus::SolarShading {
         Real64 tmp_SunlitFracWithoutReveal; // Temporary variable
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // Added TH for initialization. CR 7596 inside reveal causing high cooling loads
@@ -10502,8 +10502,8 @@ namespace EnergyPlus::SolarShading {
         // USE STATEMENTS: na
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
-            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Window && Surface(SurfNum).HasShadeControl) {

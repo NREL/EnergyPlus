@@ -778,15 +778,14 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-        using DataHeatBalance::Zone;
-        using DataSurfaces::Surface;
+                using DataSurfaces::Surface;
 
         int GetPVZone(0);
 
         if (SurfNum > 0) {
             GetPVZone = Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, Zone, state.dataGlobal->NumOfZones);
+                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             }
         }
 
@@ -892,8 +891,7 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::QPVSysSource;
+                using DataHeatBalFanSys::QPVSysSource;
         using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
 
@@ -907,8 +905,8 @@ namespace Photovoltaics {
 
         thisZone = PVarray(PVnum).Zone;
         if (thisZone != 0) { // might need to apply multiplier
-            PVarray(PVnum).Report.DCEnergy *= (Zone(thisZone).Multiplier * Zone(thisZone).ListMultiplier);
-            PVarray(PVnum).Report.DCPower *= (Zone(thisZone).Multiplier * Zone(thisZone).ListMultiplier);
+            PVarray(PVnum).Report.DCEnergy *= (state.dataHeatBal->Zone(thisZone).Multiplier * state.dataHeatBal->Zone(thisZone).ListMultiplier);
+            PVarray(PVnum).Report.DCPower *= (state.dataHeatBal->Zone(thisZone).Multiplier * state.dataHeatBal->Zone(thisZone).ListMultiplier);
         }
 
         {
@@ -1249,8 +1247,7 @@ namespace Photovoltaics {
 
         using DataSurfaces::Surface;
         //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
-        using DataHeatBalance::Zone;
-        using DataHeatBalSurface::SurfTempOut;
+                using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
         Real64 const EPS(0.001);

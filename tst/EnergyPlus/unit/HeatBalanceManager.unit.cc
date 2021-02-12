@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
 
     cCurrentModuleObject = "Zone";
     state->dataGlobal->NumOfZones = 2;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     // Set up a Zone object
     NumAlphas = 2;
@@ -304,10 +304,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ProcessZoneData)
                     ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ("Zone One", Zone(1).Name);
-    EXPECT_EQ(AdaptiveConvectionAlgorithm, Zone(1).InsideConvectionAlgo);
-    EXPECT_EQ("Zone Two", Zone(2).Name);
-    EXPECT_EQ(ASHRAETARP, Zone(2).InsideConvectionAlgo);
+    EXPECT_EQ("Zone One", state->dataHeatBal->Zone(1).Name);
+    EXPECT_EQ(AdaptiveConvectionAlgorithm, state->dataHeatBal->Zone(1).InsideConvectionAlgo);
+    EXPECT_EQ("Zone Two", state->dataHeatBal->Zone(2).Name);
+    EXPECT_EQ(ASHRAETARP, state->dataHeatBal->Zone(2).InsideConvectionAlgo);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
@@ -1221,7 +1221,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     std::vector<int> controlledZoneEquipConfigNums;
     controlledZoneEquipConfigNums.push_back(1);
-    DataHeatBalance::Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).IsControlled = true;
 
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
@@ -1273,10 +1273,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     InitHeatBalance(*state);
 
     // Test if local value correctly overwritten
-    EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
-    EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
-    EXPECT_EQ(1.5, Zone(1).WindSpeed);
-    EXPECT_EQ(90.0, Zone(1).WindDir);
+    EXPECT_EQ(25.0, state->dataHeatBal->Zone(1).OutDryBulbTemp);
+    EXPECT_EQ(20.0, state->dataHeatBal->Zone(1).OutWetBulbTemp);
+    EXPECT_EQ(1.5, state->dataHeatBal->Zone(1).WindSpeed);
+    EXPECT_EQ(90.0, state->dataHeatBal->Zone(1).WindDir);
 
     // Add a test for #7308 without inputs of schedule names
     DataLoopNode::Node(1).OutAirDryBulbSchedNum = 0;
@@ -1291,10 +1291,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     InitHeatBalance(*state);
 
     // Test if local value correctly overwritten
-    EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
-    EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
-    EXPECT_EQ(1.5, Zone(1).WindSpeed);
-    EXPECT_EQ(90.0, Zone(1).WindDir);
+    EXPECT_EQ(25.0, state->dataHeatBal->Zone(1).OutDryBulbTemp);
+    EXPECT_EQ(20.0, state->dataHeatBal->Zone(1).OutWetBulbTemp);
+    EXPECT_EQ(1.5, state->dataHeatBal->Zone(1).WindSpeed);
+    EXPECT_EQ(90.0, state->dataHeatBal->Zone(1).WindDir);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest)

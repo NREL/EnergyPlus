@@ -94,16 +94,6 @@ namespace EnergyPlus::DataHeatBalance {
     using DataBSDFWindow::BSDFLayerAbsorpStruct;
     using DataBSDFWindow::BSDFWindowInputStruct;
 
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // Parameters for the definition and limitation of arrays:
-    // Parameters to indicate material group type for use with the Material
-    // derived type (see below):
-
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -249,32 +239,10 @@ namespace EnergyPlus::DataHeatBalance {
 
     //                       Air       Argon     Krypton   Xenon
     Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-    Array1D<Real64> const
-        GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas specific heat ratios.  Used for gasses in low pressure
-
-    Real64 zeroPointerVal(0.0);
-
-    int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
-    std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
-    std::vector<int> AirBoundaryMixingZone2(0);    // Air boundary simple mixing zone 2
-    std::vector<int> AirBoundaryMixingSched(0);    // Air boundary simple mixing schedule index
-    std::vector<Real64> AirBoundaryMixingVol(0.0); // Air boundary simple mixing volume flow rate [m3/s]
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
+    // Gas specific heat ratios.  Used for gasses in low pressure
+    Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Object Data
-    Array1D<ZonePreDefRepType> ZonePreDefRep;
-    ZonePreDefRepType BuildingPreDefRep;
-    Array1D<ZoneSimData> ZoneIntGain;
-    Array1D<GapSupportPillar> SupportPillar;
-    Array1D<GapDeflectionState> DeflectionState;
-    Array1D<SpectralDataProperties> SpectralData;
-    Array1D<ZoneData> Zone;
-    Array1D<ZoneListData> ZoneList;
-    Array1D<ZoneGroupData> ZoneGroup;
-    Array1D<PeopleData> People;
-    Array1D<LightsData> Lights;
     Array1D<ZoneEquipData> ZoneElectric;
     Array1D<ZoneEquipData> ZoneGas;
     Array1D<ZoneEquipData> ZoneOtherEq;
@@ -315,7 +283,6 @@ namespace EnergyPlus::DataHeatBalance {
     Array1D<ZoneReportVars> ZnRpt;
     Array1D<ZoneMassConservationData> MassConservation;
     ZoneAirMassFlowConservation ZoneAirMassFlow;
-
     Array1D<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
 
     // Functions
@@ -324,17 +291,6 @@ namespace EnergyPlus::DataHeatBalance {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ZonePreDefRep.deallocate();
-        BuildingPreDefRep = ZonePreDefRepType();
-        ZoneIntGain.deallocate();
-        SupportPillar.deallocate();
-        DeflectionState.deallocate();
-        SpectralData.deallocate();
-        Zone.deallocate();
-        ZoneList.deallocate();
-        ZoneGroup.deallocate();
-        People.deallocate();
-        Lights.deallocate();
         ZoneElectric.deallocate();
         ZoneGas.deallocate();
         ZoneOtherEq.deallocate();
@@ -376,7 +332,6 @@ namespace EnergyPlus::DataHeatBalance {
         MassConservation.deallocate();
         ZoneLocalEnvironment.deallocate();
         ZoneAirMassFlow = ZoneAirMassFlowConservation();
-        zeroPointerVal = 0;
     }
 
     void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
@@ -442,7 +397,7 @@ namespace EnergyPlus::DataHeatBalance {
 
     void SetZoneOutBulbTempAt(EnergyPlusData &state)
     {
-        for (auto &zone : Zone) {
+        for (auto &zone : state.dataHeatBal->Zone) {
             zone.SetOutBulbTempAt(state);
         }
     }
@@ -453,7 +408,7 @@ namespace EnergyPlus::DataHeatBalance {
         using DataEnvironment::SetOutBulbTempAt_error;
 
         Real64 minBulb = 0.0;
-        for (auto &zone : Zone) {
+        for (auto &zone : state.dataHeatBal->Zone) {
             minBulb = min(minBulb, zone.OutDryBulbTemp, zone.OutWetBulbTemp);
             if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Zone", zone.Centroid.z, zone.Name);
         }
@@ -462,7 +417,7 @@ namespace EnergyPlus::DataHeatBalance {
     void SetZoneWindSpeedAt(EnergyPlusData &state)
     {
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
-        for (auto &zone : Zone) {
+        for (auto &zone : state.dataHeatBal->Zone) {
             zone.SetWindSpeedAt(state, fac);
         }
     }
@@ -471,7 +426,7 @@ namespace EnergyPlus::DataHeatBalance {
     {
         // Using/Aliasing
         Real64 const fac(state.dataEnvrn->WindDir);
-        for (auto &zone : Zone) {
+        for (auto &zone : state.dataHeatBal->Zone) {
             zone.SetWindDirAt(fac);
         }
     }

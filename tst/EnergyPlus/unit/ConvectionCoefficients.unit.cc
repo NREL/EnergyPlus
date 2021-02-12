@@ -596,16 +596,16 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataGlobal->NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
     state->dataConstruction->Construct.allocate( 1 );
-    DataHeatBalance::Zone.allocate( 1 );
+    state->dataHeatBal->Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
     DataSurfaces::Surface( SurfNum ).Construction = 1;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
     state->dataConstruction->Construct( 1 ).TypeIsWindow = false;
-    DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
-    DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
-    DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone( 1 ).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone( 1 ).Multiplier = 1.0;
+    state->dataHeatBal->Zone( 1 ).ListMultiplier = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataLoopNode::Node( 1 ).Temp = 20.0;
     HeatBalanceManager::AllocateHeatBalArrays(*state);
@@ -621,8 +621,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+    state->dataHeatBal->Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
 
 
     // Test 1: Floor Diffuser Model
@@ -661,8 +661,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     // Case 2 - High ACH
     ACH = 3.1;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+    state->dataHeatBal->Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
@@ -760,14 +760,14 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     Real64 ACHAnswer;
     Real64 ACHExpected;
 
-    if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
-    DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
-    DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
+    if (!allocated(state->dataHeatBal->Zone)) state->dataHeatBal->Zone.allocate(TotalNumberofZones);
+    state->dataHeatBal->Zone(ZoneNum).Volume = 100.0;
+    state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber = 1;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
-    DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(ZoneNum).Multiplier = 1.0;
+    state->dataHeatBal->Zone(ZoneNum).ListMultiplier = 1.0;
     state->dataEnvrn->OutBaroPress = 101400.0;
-    Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
+    Real64 ZoneNode = state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
     if (allocated(DataLoopNode::Node)) DataLoopNode::Node.deallocate();
@@ -776,7 +776,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
-    DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
+    DataLoopNode::Node.allocate(state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber);
     DataLoopNode::Node(ZoneNode).Temp = 20.0;
     DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;

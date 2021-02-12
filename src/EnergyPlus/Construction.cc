@@ -1344,22 +1344,6 @@ namespace EnergyPlus::Construction {
         // REFERENCES:
         // Any linear algebra test (this is a generic routine).
 
-        // USE STATEMENTS:
-        // none
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> AMat1; // Intermediate calculation matrix equivalent at first to AMat
         int ic;                // Loop counter
@@ -1486,21 +1470,6 @@ namespace EnergyPlus::Construction {
         // "Modeling of Heat Transfer in Buildings", Department
         // of Mechanical Engineering, University of Wisconsin-
         // Madison, 1987.
-
-        // USE STATEMENTS:
-        // none
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> ATemp; // Intermediate variable equal to AExp - I

@@ -273,8 +273,7 @@ namespace HighTempRadiantSystem {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
+                using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
@@ -354,7 +353,7 @@ namespace HighTempRadiantSystem {
             }
 
             HighTempRadSys(Item).ZoneName = cAlphaArgs(3);
-            HighTempRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            HighTempRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (HighTempRadSys(Item).ZonePtr == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -781,8 +780,7 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
-        using DataHVACGlobals::HeatingCapacitySizing;
+                using DataHVACGlobals::HeatingCapacitySizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -844,7 +842,7 @@ namespace HighTempRadiantSystem {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HighTempRadSys(RadSysNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HighTempRadSys(RadSysNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1306,8 +1304,7 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MaxRadHeatFlux;
+                using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHTRadSysSurf;
         using DataHeatBalFanSys::QHTRadSysToPerson;
         using DataHeatBalFanSys::SumConvHTRadSys;
@@ -1483,7 +1480,7 @@ namespace HighTempRadiantSystem {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;
