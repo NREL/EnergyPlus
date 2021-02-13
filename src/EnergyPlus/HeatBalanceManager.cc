@@ -4513,6 +4513,8 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
+                 inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key());
+
                 auto &thisConstruct(state.dataConstruction->Construct(construction_index));
 
                 // May need some additional validation of the construction here
