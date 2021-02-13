@@ -4163,70 +4163,64 @@ namespace EnergyPlus::EconomicTariff {
                     rowHead.deallocate();
                     columnWidth.deallocate();
                     tableBody.deallocate();
-                    //---- Tariff Summary
-                    rowHead.allocate(state.dataEconTariff->numTariff);
-                    columnHead.allocate(6);
-                    columnWidth.allocate(6);
-                    tableBody.allocate(6, state.dataEconTariff->numTariff);
-                    tableBody = "";
-                    columnHead(1) = "Selected";
-                    columnHead(2) = "Qualified";
-                    columnHead(3) = "Meter";
-                    columnHead(4) = "Buy or Sell";
-                    columnHead(5) = "Group";
-                    columnHead(6) = "Annual Cost (~~$~~)";
-                    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-                        rowHead(iTariff) = tariff(iTariff).tariffName;
-                        if (tariff(iTariff).isSelected) {
-                            tableBody(1, iTariff) = "Yes";
-                        } else {
-                            tableBody(1, iTariff) = "No";
-                        }
-                        if (tariff(iTariff).isQualified) {
-                            tableBody(2, iTariff) = "Yes";
-                        } else {
-                            tableBody(2, iTariff) = "No";
-                        }
-                        tableBody(3, iTariff) = tariff(iTariff).reportMeter;
-                        {
-                            auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
-                            if (SELECT_CASE_var == buyFromUtility) {
-                                tableBody(4, iTariff) = "Buy";
-                            } else if (SELECT_CASE_var == sellToUtility) {
-                                tableBody(4, iTariff) = "Sell";
-                            } else if (SELECT_CASE_var == netMetering) {
-                                tableBody(4, iTariff) = "Net";
-                            }
-                        }
-                        if (tariff(iTariff).groupName == "") {
-                            tableBody(5, iTariff) = "(none)";
-                        } else {
-                            tableBody(5, iTariff) = tariff(iTariff).groupName;
-                        }
-                        tableBody(6, iTariff) = RealToStr(tariff(iTariff).totalAnnualCost, 2);
-                    }
-                    columnWidth = 14; // array assignment - same for all columns
-                    if (produceTabular) {
-                        WriteSubtitle(state, "Tariff Summary");
-                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    }
-                    if (produceSQLite) {
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
-                        }
-                    }
-                    if (produceTabular) {
-                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                                tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
-                        }
-                    }
-                    columnHead.deallocate();
-                    rowHead.deallocate();
-                    columnWidth.deallocate();
-                    tableBody.deallocate();
                 }
+                //---- Tariff Summary
+                rowHead.allocate(state.dataEconTariff->numTariff);
+                columnHead.allocate(6);
+                columnWidth.allocate(6);
+                tableBody.allocate(6, state.dataEconTariff->numTariff);
+                tableBody = "";
+                columnHead(1) = "Selected";
+                columnHead(2) = "Qualified";
+                columnHead(3) = "Meter";
+                columnHead(4) = "Buy or Sell";
+                columnHead(5) = "Group";
+                columnHead(6) = "Annual Cost (~~$~~)";
+                for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+                    rowHead(iTariff) = tariff(iTariff).tariffName;
+                    if (tariff(iTariff).isSelected) {
+                        tableBody(1, iTariff) = "Yes";
+                    } else {
+                        tableBody(1, iTariff) = "No";
+                    }
+                    if (tariff(iTariff).isQualified) {
+                        tableBody(2, iTariff) = "Yes";
+                    } else {
+                        tableBody(2, iTariff) = "No";
+                    }
+                    tableBody(3, iTariff) = tariff(iTariff).reportMeter;
+                    {
+                        auto const SELECT_CASE_var(tariff(iTariff).buyOrSell);
+                        if (SELECT_CASE_var == buyFromUtility) {
+                            tableBody(4, iTariff) = "Buy";
+                        } else if (SELECT_CASE_var == sellToUtility) {
+                            tableBody(4, iTariff) = "Sell";
+                        } else if (SELECT_CASE_var == netMetering) {
+                            tableBody(4, iTariff) = "Net";
+                        }
+                    }
+                    if (tariff(iTariff).groupName == "") {
+                        tableBody(5, iTariff) = "(none)";
+                    } else {
+                        tableBody(5, iTariff) = tariff(iTariff).groupName;
+                    }
+                    tableBody(6, iTariff) = RealToStr(tariff(iTariff).totalAnnualCost, 2);
+                }
+                columnWidth = 14; // array assignment - same for all columns
+                WriteSubtitle(state, "Tariff Summary");
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
+                }
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
+                }
+                columnHead.deallocate();
+                rowHead.deallocate();
+                columnWidth.deallocate();
+                tableBody.deallocate();
             }
             //---------------------------------
             // Tariff Report
