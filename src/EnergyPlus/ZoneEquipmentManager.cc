@@ -3906,7 +3906,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     state.dataAirLoop->AirLoopFlow(airLoop).ZoneRetFlow = 0.0;
                     state.dataAirLoop->AirLoopFlow(airLoop).SysRetFlow = 0.0;
                     state.dataAirLoop->AirLoopFlow(airLoop).ExcessZoneExhFlow = 0.0;
-                    state.dataAirLoop->AirLoopFlow(airLoop).ZoneMixingNetMassFlow = 0.0;
                 }
                 for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;

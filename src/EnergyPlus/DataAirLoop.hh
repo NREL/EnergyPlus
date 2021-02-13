@@ -210,13 +210,12 @@ namespace DataAirLoop {
         Real64 OAFlow;                // oa flow rate this time step
         bool FlowError;               // error flag for flow error message
         Real64 BypassMassFlow;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
-        Real64 ZoneMixingNetMassFlow; // air loop net mass outflow by zone mixing object because of zone mixing used in multiple airloops
 
         // Default Constructor
         AirLoopFlowData()
             : DesSupply(0.0), DesReturnFrac(1.0), SysToZoneDesFlowRatio(0.0), ReqSupplyFrac(1.0), MinOutAir(0.0), MaxOutAir(0.0), OAMinFrac(0.0),
               Previous(0.0), SupFlow(0.0), ZoneRetFlow(0.0), ZoneRetFlowRatio(1.0), SysRetFlow(0.0), RecircFlow(0.0), LeakFlow(0.0),
-              ExcessZoneExhFlow(0.0), FanPLR(1.0), OAFrac(0.0), OAFlow(0.0), FlowError(false), BypassMassFlow(0.0), ZoneMixingNetMassFlow(0.0)
+              ExcessZoneExhFlow(0.0), FanPLR(1.0), OAFrac(0.0), OAFlow(0.0), FlowError(false), BypassMassFlow(0.0)
         {
         }
     };
