@@ -1263,4 +1263,6 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
         // Add informative message if failed
         EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
     }
+
+    EnergyPlus::sqlite->sqliteCommit();
 }
