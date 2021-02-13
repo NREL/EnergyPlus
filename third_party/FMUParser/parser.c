@@ -222,6 +222,9 @@ int main(int argc, char *argv[])
         case opt_delete:
             printError("No FMU folder is given.\n");
             break;
+        case opt_help:
+            // we know we cannot hit this block
+            break;
         }
 
         if (IS_WINDOWS) {
@@ -311,6 +314,9 @@ int main(int argc, char *argv[])
             } else
                 printDebug("Successfully printed the idf file.\n");
         }
+        break;
+    case opt_help:
+        // Nothing to do here
         break;
     }
 
