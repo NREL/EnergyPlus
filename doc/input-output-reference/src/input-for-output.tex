@@ -2107,6 +2107,60 @@ When no unit conversions is selected the energy is reported in the form of Joule
 The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Output:Table:Monthly reports and partially to the ABUPS report. For ABUPS, the JtoKWH option changes the report but the JtoMJ and JtoGJ options do not change the report since they it is already in MJ/m2 and GJ. In addition, the JtoKWH option also changes results in the LEED Summary report changing GJ to kWh and MJW/m2 to kWh/m2. The InchPound unit conversion input option applies to all annual, monthly, timebins and
 economic reports that appear in the SQL file. 
 
+Since the Output:SQLite tabular unit conversion setting act on the Tabular reports only, the other SQLite reporting will not affected by this unit conversion setting. The table below listed the unaffected SQLite tabular tables. 
+ 
+% table X
+{\scriptsize
+\begin{longtable}[c]{p{0.5in}p{5in}p{1in}}
+% \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
+% \begin{longtable}[c]{cccccccrr}
+\caption{SQLite Tables not affected by tabular unit conversion\label{table:tabular_unit_conversion_list}} \tabularnewline
+\toprule
+Number & Table Name & 
+Affected or Not \tabularnewline
+\midrule
+\endfirsthead
+
+% 0 & ComponentSizes & Yes \tabularnewline
+1 & ConstructionLayers & No \tabularnewline
+2 & Constructions & No  \tabularnewline
+3 & DaylightMapHourlyData & No \tabularnewline
+4 & DaylightMapHourlyReports & No \tabularnewline
+5 & DaylightMaps & No \tabularnewline
+6 & EnvironmentPeriods & No \tabularnewline
+7 & Errors & No \tabularnewline
+8 & Materials & No \tabularnewline
+9 & NominalBaseboardHeaters & No \tabularnewline
+10 & NominalElectricEquipment & No \tabularnewline
+11 & NominalGasEquipment & No \tabularnewline
+12 & NominalHotwaterEquipment & No \tabularnewline
+13 & NominalInfiltration & No \tabularnewline
+14 & NominalLighting & No \tabularnewline
+15 & NominalOtherEquipment & No\tabularnewline
+16 & NominalPeople & No \tabularnewline
+17 & NominalSteamEquipment & No \tabularnewline
+18 & ReportData & No \tabularnewline
+19 & ReportDataDictionary & No \tabularnewline
+20 & ReportExtendedData & No \tabularnewline
+21 & RoomAirModels & No \tabularnewline
+22 & Schedules & No \tabularnewline
+23 & Simulations & No \tabularnewline
+24 & StringTypes & No \tabularnewline
+25 & Strings & No \tabularnewline
+26 & Surfaces & No \tabularnewline
+27 & SystemSizes & No \tabularnewline
+% 28 & TabularData & Yes \tabularnewline
+28 & Time & No \tabularnewline
+29 & ZoneGroups & No \tabularnewline
+30 & ZoneInfoZoneLists & No \tabularnewline
+31 & ZoneLists & No \tabularnewline
+32 & ZoneSizes & No \tabularnewline
+33 & Zones & No \tabularnewline
+
+\bottomrule
+\end{longtable}
+}
+
 An example IDF input object follows.
 \begin{lstlisting}
 Output:SQLite,
