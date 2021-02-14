@@ -4056,6 +4056,13 @@ namespace EnergyPlus::EconomicTariff {
         auto &chargeSimple(state.dataEconTariff->chargeSimple);
         auto &chargeBlock(state.dataEconTariff->chargeBlock);
 
+        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
+        // when ort->unitsStyle inputs should have been concretely processed and assigned.
+        // Included this here to make sure the units specifications are correctly updated. 
+        if (state.dataOutRptTab->unitsStyle_SQLite == OutputReportTabular::iUnitsStyle::NotFound) {
+            state.dataOutRptTab->unitsStyle_SQLite = state.dataOutRptTab->unitsStyle; // This is the default UseOutputControlTableStyles
+        }
+
         // compute floor area if no ABUPS
         if (state.dataOutRptTab->buildingConditionedFloorArea == 0.0) {
             DetermineBuildingFloorArea(state);
