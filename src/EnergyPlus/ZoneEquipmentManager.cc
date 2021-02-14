@@ -4380,6 +4380,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                 max(0.0, DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
                         } else {
                             DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
                         }
                     } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
                         if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
