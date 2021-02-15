@@ -4343,7 +4343,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         MaximumZoneReturnMassFlow = 0.0;
         // sets the zone return node maximum flow rate to the airloop design supply flow rate
         for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
-            int retNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode(returnNum);
             int airLoop = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(returnNum);
             if (airLoop > 0) {
                 auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
