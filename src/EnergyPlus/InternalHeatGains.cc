@@ -406,8 +406,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             PeopleObjects(Item).Name = AlphaName(1);
 
@@ -1217,8 +1216,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             LightsObjects(Item).Name = AlphaName(1);
 
@@ -1679,8 +1677,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneElectricObjects(Item).Name = AlphaName(1);
 
@@ -2084,8 +2081,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneGasObjects(Item).Name = AlphaName(1);
 
@@ -2503,8 +2499,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             HotWaterEqObjects(Item).Name = AlphaName(1);
 
@@ -2907,8 +2902,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             SteamEqObjects(Item).Name = AlphaName(1);
 
@@ -3312,8 +3306,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             OtherEqObjects(Item).Name = AlphaName(1);
 
