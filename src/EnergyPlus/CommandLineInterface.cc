@@ -307,8 +307,7 @@ namespace CommandLineInterface {
         if (opt.isSet("-p")) {
             std::string prefixOutName;
             opt.get("-p")->getString(prefixOutName);
-            fs::path prefix{prefixOutName};
-            FileSystem::makeNativePath(prefix); // Why is this needed?
+            fs::path prefix = FileSystem::makeNativePath(fs::path(prefixOutName)); // Why is this needed?
             outputFilePrefixFullPath = DataStringGlobals::outDirPath / prefixOutName;
         } else {
             outputFilePrefixFullPath = DataStringGlobals::outDirPath / "eplus";
