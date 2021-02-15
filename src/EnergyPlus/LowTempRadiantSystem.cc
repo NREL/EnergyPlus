@@ -934,18 +934,18 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.FluidToSlabHeatTransfer = thisRadSysDesign.getFluidToSlabHeatTransferInput(state,
                                                                                                         Alphas(2));
 
+            thisRadSysDesign.TubeDiameterInner                              = Numbers(1);
+            thisRadSysDesign.TubeDiameterOuter                              = Numbers(2);
+            thisRadSysDesign.ConstFlowTubeConductivity                      = Numbers(3);
+
             // Process the temperature control type
             thisRadSysDesign.ConstFlowControlType = thisRadSysDesign.processRadiantSystemControlInput(state,
                                                                                                       Alphas(3),
                                                                                                       cAlphaFields(3),
                                                                                                       LowTempRadiantSystem::SystemType::ConstantFlowSystem);
-            thisRadSysDesign.runningMeanOutdoorAirTemperatureWeightingFactor = Numbers(1);
-
-            thisRadSysDesign.TubeDiameterInner                              = Numbers(2);
-            thisRadSysDesign.TubeDiameterOuter                              = Numbers(3);
-            thisRadSysDesign.ConstFlowTubeConductivity                      = Numbers(4);
-            thisRadSysDesign.MotorEffic                                     = Numbers(5);
-            thisRadSysDesign.FracMotorLossToFluid                           = Numbers(6);
+            thisRadSysDesign.runningMeanOutdoorAirTemperatureWeightingFactor    = Numbers(4);
+            thisRadSysDesign.MotorEffic                                         = Numbers(5);
+            thisRadSysDesign.FracMotorLossToFluid                               = Numbers(6);
 
             if (UtilityRoutines::SameString(Alphas(4), Off)) {
                 thisRadSysDesign.CondCtrlType = CondCtrlNone;

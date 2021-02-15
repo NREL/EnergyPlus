@@ -2290,7 +2290,6 @@
     Until: 24:00,36.0;      !- Field 3
 
 
-
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
     West Zone Radiant Floor, !- Name 
     West Zone Radiant Floor Design, !- Design_Object_Name 
@@ -2320,11 +2319,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     West Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    OperativeTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    OperativeTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
@@ -2359,11 +2358,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     East Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    SurfaceFaceTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    SurfaceFaceTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
@@ -2398,11 +2397,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     North Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    SurfaceInteriorTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    SurfaceInteriorTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 

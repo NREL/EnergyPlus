@@ -2253,11 +2253,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     West Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    MeanAirTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
@@ -2292,11 +2292,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     East Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    MeanAirTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
@@ -2331,11 +2331,11 @@
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
     North Zone Radiant Floor Design, !- Design_Object_Name 
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.012, !- Hydronic_Tubing_Inside_Diameter 
     0.016, !- Hydronic_Tubing_Outside_Diameter 
     0.35, !- Hydronic_Tubing_Conductivity 
+    MeanAirTemperature, !- Temperature_Control_Type 
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
     0.87, !- Motor_Efficiency 
     0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
     Off, !- Condensation_Control_Type 
