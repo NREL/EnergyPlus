@@ -101,9 +101,9 @@ namespace FileSystem {
     };
 
     // Similar to fs::path::make_preferred, but also does '\\' => '/' conversion on POSIX, which make_preferred does not do
-    [[no_discard]] fs::path makeNativePath(fs::path const &path);
+    [[nodiscard]] fs::path makeNativePath(fs::path const &path);
 
-    [[no_discard]] fs::path getFileName(fs::path const &filePath);
+    [[nodiscard]] fs::path getFileName(fs::path const &filePath);
 
     // Returns the parent directory of a path. This implementation differs from filesystem::path::parent_path because it treats trailing separators
     // differently.
@@ -112,23 +112,23 @@ namespace FileSystem {
     // | a/b/c  | "a/b"                     | "a/b"                     |
     // | a/b/c/ | "a/b"                     | "a/b/c"                   |
     // | a.idf  | "./"                      | ""                        |
-    [[no_discard]] fs::path getParentDirectoryPath(fs::path const &filePath);
+    [[nodiscard]] fs::path getParentDirectoryPath(fs::path const &filePath);
 
-    [[no_discard]] fs::path getAbsolutePath(fs::path const &filePath);
+    [[nodiscard]] fs::path getAbsolutePath(fs::path const &filePath);
 
-    [[no_discard]] fs::path getProgramPath();
+    [[nodiscard]] fs::path getProgramPath();
 
     // For `a/b/c.txt.idf` it returns `idf`, i.e. anything after last dot, **not including the dot** (unlike fs::path::extension() which includes it)
-    [[no_discard]] fs::path getFileExtension(fs::path const &gc);
+    [[nodiscard]] fs::path getFileExtension(fs::path const &gc);
 
     // Returns the FileType by looking at its extension.
-    [[no_discard]] InputFileType getInputFileType(fs::path const &filePath);
+    [[nodiscard]] InputFileType getInputFileType(fs::path const &filePath);
 
     // Turns a/b/c.txt.idf into a/b/c.txt, **without mutating the original object** unlike fs::path::replace_extension
-    [[no_discard]] fs::path removeFileExtension(fs::path const &filePath);
+    [[nodiscard]] fs::path removeFileExtension(fs::path const &filePath);
 
     // Replace (or append) an extension to a path **without mutating the original object** unlike fs::path::replace_extension
-    [[no_discard]] fs::path replaceFileExtension(fs::path const &filePath, fs::path const &ext);
+    [[nodiscard]] fs::path replaceFileExtension(fs::path const &filePath, fs::path const &ext);
 
     // Creates a directory if it doesn't already exists
     void makeDirectory(fs::path const &directoryPath);
