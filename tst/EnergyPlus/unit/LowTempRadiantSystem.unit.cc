@@ -1976,7 +1976,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
 
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
