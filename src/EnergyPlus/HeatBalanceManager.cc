@@ -1282,7 +1282,7 @@ namespace HeatBalanceManager {
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(1) = "AdjustReturnThenMixing";
                     } else if (SELECT_CASE_var == "NONE") {
-                        ZoneAirMassFlow.ZoneFlowAdjustment = 5;
+                        ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                     } else {
                         ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;

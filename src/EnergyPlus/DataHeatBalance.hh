@@ -1372,7 +1372,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneAirMassFlowConservation()
-            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(1), InfiltrationTreatment(0), InfiltrationZoneType(0)
+            : EnforceZoneMassBalance(false), ZoneFlowAdjustment(0), InfiltrationTreatment(0), InfiltrationZoneType(0)
         {
         }
     };
