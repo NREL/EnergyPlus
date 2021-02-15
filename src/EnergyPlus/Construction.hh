@@ -322,6 +322,8 @@ namespace Construction {
         Real64 setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue);
 
         void setNodeSourceAndUserTemp(Array1D_int & Nodes);
+
+        void setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state);
     };
 }   // namespace Construction
 

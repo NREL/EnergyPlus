@@ -2009,4 +2009,16 @@ namespace EnergyPlus::Construction {
 
     }
 
+    void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
+    {
+        this->AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+    }
+
 }   // namespace EnergyPlus

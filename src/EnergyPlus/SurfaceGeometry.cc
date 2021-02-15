@@ -11960,15 +11960,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            // end Construct arrays dimensioned based on MaxSolidWinLayers
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
 
             int TotLayersOld = state.dataConstruction->Construct(oldConstruction).TotLayers;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint({ 1, Construction::MaxLayersInConstruct }) = 0;

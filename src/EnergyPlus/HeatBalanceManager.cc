@@ -4266,14 +4266,7 @@ namespace HeatBalanceManager {
             e.FromWindow5DataFile = false;
 
             // these Construct arrays dimensioned based on MaxSolidWinLayers
-            e.AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-            e.AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            e.setArraysBasedOnMaxSolidWinLayers(state);
         }
 
         ConstrNum = 0;
@@ -6800,14 +6793,7 @@ namespace HeatBalanceManager {
             for (int i = (state.dataHeatBal->TotConstructs - NGlSys + 1); i <= state.dataHeatBal->TotConstructs; ++i)
             {
                 auto &e(state.dataConstruction->Construct(i));
-                e.AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                e.AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.setArraysBasedOnMaxSolidWinLayers(state);
             }
 
             NextLine = W5DataFile.readLine();
