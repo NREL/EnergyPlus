@@ -174,7 +174,7 @@ namespace RoomAirModelAirflowNetwork {
         int ThisRoomAirNode;
         int RAFNNum;
 
-        // FLOW:
+
         RAFNNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
 
         if (RAFNNum == 0) {
@@ -227,7 +227,7 @@ namespace RoomAirModelAirflowNetwork {
         ////////////////////////////////////////////////////////////////////////////////////
         int RAFNNum;
 
-        // FLOW:
+
         if (LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
             RAFN.allocate(state.dataRoomAirMod->NumOfRoomAirflowNetControl);
             LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
@@ -896,7 +896,7 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumLinkM;   //               !Zone sum of MassFlowRate from the AirflowNetwork model
         Real64 SumLinkMW;  //             !Zone sum of MassFlowRate*W from the AirflowNetwork model
 
-        // FLOW
+
         SumIntGain = 0.0;
         SumHA = 0.0;
         SumHATsurf = 0.0;

@@ -274,7 +274,7 @@ namespace LowTempRadiantSystem {
         LowTempRadiantSystem::SystemType SystemType; // Type of radiant system: hydronic, constant flow, or electric
         bool InitErrorFound(false);
 
-        // FLOW:
+
         if (GetInputFlag) {
             GetLowTempRadiantSystem(state);
             GetInputFlag = false;
@@ -698,9 +698,9 @@ namespace LowTempRadiantSystem {
                 }
             } else if (UtilityRoutines::SameString(Alphas(12), "CapacityPerFloorArea")) {
                 thisRadSys.CoolingCapMethod = CapacityPerFloorArea;
-                if (!lNumericBlanks(9)) {
+                if (!lNumericBlanks(11)) {
                     thisRadSys.ScaledCoolingCapacity = Numbers(11);
-                    if (thisRadSys.CoolingCapMethod <= 0.0) {
+                    if (thisRadSys.ScaledCoolingCapacity <= 0.0) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
                         ShowContinueError(state, "Input for " + cAlphaFields(12) + " = " + Alphas(12));
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(11), Numbers(11)));

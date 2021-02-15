@@ -139,7 +139,7 @@ int mymkdir(dirname) const char *dirname;
     return ret;
 }
 
-int makedir(newdir) char *newdir;
+int makedir(newdir) const char *newdir;
 {
     char *buffer;
     char *p;

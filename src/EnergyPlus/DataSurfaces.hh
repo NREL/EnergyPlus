@@ -168,7 +168,7 @@ namespace DataSurfaces {
         ExtBlindConditionallyOff = 14,
         BGShadeConditionallyOff = 15,
         BGBlindConditionallyOff = 16
-    };
+    }; // Valid window shading types: IntShade <= Type <= BGBlind; the rest are shading status
 
     enum class WindowShadingControlType : int{
         UnControlled = 0,

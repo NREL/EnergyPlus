@@ -317,7 +317,7 @@ namespace DaylightingManager {
 
     void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    int findWinShadingIndex(int const IWin);
+    int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
                      int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt

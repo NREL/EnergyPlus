@@ -2238,7 +2238,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 DesiredDewPoint;
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
         Real64 OutdoorBaroPress;   // Barometric pressure at outdoor condenser
-        // FLOW
+
 
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;
