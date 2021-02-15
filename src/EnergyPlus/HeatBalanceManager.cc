@@ -4265,6 +4265,7 @@ namespace HeatBalanceManager {
             e.W5FrameDivider = 0;
             e.FromWindow5DataFile = false;
 
+            // these Construct arrays dimensioned based on MaxSolidWinLayers
             e.AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
             e.BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
             e.BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
@@ -6794,6 +6795,20 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+
+            // these Construct arrays dimensioned based on MaxSolidWinLayers
+            for (int i = (state.dataHeatBal->TotConstructs - NGlSys + 1); i <= state.dataHeatBal->TotConstructs; ++i)
+            {
+                auto &e(state.dataConstruction->Construct(i));
+                e.AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+                e.AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+            }
 
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
