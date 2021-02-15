@@ -6144,35 +6144,47 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // add total rows for outdoor air details
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
-            "Total", state.dataOutRptPredefined->TotalVozMax, 4);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaMvDesZnOa, "Total Facility", state.dataOutRptPredefined->TotalVozMax, 4);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total", totalVolume);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, "Total", totalArea);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, "Total", totalOccupants);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, "Total", totalAverageOccupants);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, "Total", totalVozMin, 3);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total Facility", totalVolume);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, "Total Facility", totalArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, "Total Facility", totalOccupants);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, "Total Facility", totalAverageOccupants);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, "Total Facility", totalVozMin, 3);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total", totalMechVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total", totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total", totalMechVentVol + totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total", totalInfilVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil,  "Total", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total", totalVozDyn, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total", totalMechVentRateOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total", totalNatVentRateOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, "Total", totalMechVentRateOcc + totalNatVentRateOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, "Total", totalInfilRateOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, "Total", totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total", totalVozDynOcc, 4);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total Facility", totalMechVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total Facility", totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, "Total Facility", totalMechVentRateOcc + totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, "Total Facility", totalInfilRateOcc, 4);
+        PreDefTableEntry(state,
+                         state.dataOutRptPredefined->pdchOaOccBzTotVentInfil,
+                         "Total Facility",
+                         totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc,
+                         4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total Facility", totalVozDynOcc, 4);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
 
 
         // Add the number of central air distributions system to the count report
