@@ -38,7 +38,7 @@ A unique user assigned name for an instance of a hot water baseboard heater unit
 
 \paragraph{Field: Design Object}\label{DesignObjectName}
 
-The name of the object that holds design data for this instance of hot water baseboard heater unit. Multiple input data values is taken from this object.
+The name of the object that holds design data for this instance of hot water baseboard heater unit. Multiple input data values are taken from this object.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-013}
 
@@ -254,11 +254,11 @@ A unique user assigned name for an instance of a steam baseboard heater unit. An
 
 \paragraph{Field: Design Object Name}\label{DesignObjectName}
 
-A unique user assigned name for an instance of a steam baseboard heater unit. Any reference to this unit by another object will use this name.
+The name of the object that holds design data for this instance of steam baseboard heater unit. Multiple input data values is taken from this object.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1-010}
 
-The name of the schedule (ref: Schedule) that denotes whether the steam baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
+The name of the schedule (ref: Schedule) that denotes whether the steam baseboard heater unit can run duringhot water a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1-003}
 
@@ -1136,7 +1136,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
       ;                                 !- Circuit_Length
 \end{lstlisting}
 
-\subsection{ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design}\label{zonehvaclowtemperatureradiantvariableflow}
+\subsubsection{ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design}\label{zonehvaclowtemperatureradiantvariableflow}
 
 This object contains the design fields for ZoneHVAC:LowTemperatureRadiant:VariableFlow. The information from one ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:VariableFlow objects.
 
