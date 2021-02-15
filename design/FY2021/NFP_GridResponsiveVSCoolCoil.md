@@ -1,6 +1,6 @@
 # Grid Responsive Variable-Speed Cooling Coil for Separate Sensible and Latent Cooling
 
-**Bo Shen, ORNL**
+**Bo Shen and Jian Sun, ORNL**
 
 - February 14, 2021 - Initial Draft
 

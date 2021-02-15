@@ -1,6 +1,6 @@
 # Grid Responsive Dual Source Heat Pump
 
-**Bo Shen, ORNL**
+**Bo Shen and Jian Sun, ORNL**
 
 - February 14, 2021 - Initial Draft
 
