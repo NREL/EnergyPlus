@@ -9212,7 +9212,6 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     SetupUnitConversions(*state);
     Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
     Real64 volConv = getSpecificUnitDivider(*state, "m3", "ft3");
-    Real64 enerConv = getSpecificUnitDivider(*state, "m3", "ft3");
 
     std::string SIunit = "[W/m2]";
     int unitConvIndex;
