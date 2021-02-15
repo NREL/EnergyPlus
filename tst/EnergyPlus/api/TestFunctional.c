@@ -52,6 +52,8 @@
 
 int errorsOccurred = 0;
 void errorHandler(int errortype, const char * message) {
+    (void)errortype;
+    (void)message;
     errorsOccurred++;
 }
 
@@ -88,7 +90,8 @@ int main() {
     Real64 satVapCp = refrigerantSaturatedSpecificHeat(state, refrig, temperature, 1.0); // vap = 2,080 J/kgK
     Real64 satVapEnth = refrigerantSaturatedEnthalpy(state, refrig, temperature, 1.0);
     printf("C API Test: Sat Vap at 100C: rho=%8.4f, Cp=%8.4f, h=%8.4f\n", satVapDens, satVapCp, satVapEnth);
-    Real64 enthDifference = satVapEnth - satLiqEnth; // vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+    // Real64 enthDifference = satVapEnth - satLiqEnth; // vap-liq = 2,675,570-419,170 ~ 2,256,400 J/kg
+
     // superheated properties aren't working, I think there is a bug in the FluidProperties module
     //    temperature = 150;
     //    Real64 supEnth = refrigerantSuperHeatedEnthalpy(refrig, temperature, thisPress);

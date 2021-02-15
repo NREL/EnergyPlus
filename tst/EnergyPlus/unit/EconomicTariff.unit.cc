@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
 
     // Check conversion choice
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.35314666721488586, state->dataEconTariff->tariff(1).energyConv);
 }
 
 /** Test that if a meter is a gas meter, and CCF is used, it uses the right conversion (not the water one) **/
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     // Check conversion choice
 
     EXPECT_EQ(iEconConv::CCF, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(9.4781712e-9, state->dataEconTariff->tariff(1).energyConv);
 }
 
 /** Test that if a meter is an Electric meter, and CCF is used, it still defaults to kWh (not allowed) **/
@@ -398,8 +398,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
 
     // Check conversion choice, should force back to kWh
     EXPECT_EQ(iEconConv::KWH, state->dataEconTariff->tariff(1).convChoice);
-    ASSERT_FLOAT_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
-    ASSERT_FLOAT_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
+    ASSERT_DOUBLE_EQ(0.0000002778, state->dataEconTariff->tariff(1).energyConv);
+    ASSERT_DOUBLE_EQ(0.001, state->dataEconTariff->tariff(1).demandConv);
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
@@ -676,4 +676,320 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(1, state->dataEconTariff->tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, state->dataEconTariff->tariff(1).seasonForMonth(6));
 
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Demand, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure the "Demand" UtilityCost:Variable is now processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeDemand);
+
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test1)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 1 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects1 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Energy, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+
+    ASSERT_TRUE(process_idf(idf_objects1));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Energy" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeEnergy);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test2)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 2 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects2 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Dimensionless, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects2));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Dimensionless" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeDimensionless);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
+}
+
+TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test3)
+{
+    // Tests for PR #8456 and Issue #8455 ... Case 3 of Cases 0-3
+    // to ensure UtilityCost:Variable inputs being procesed properly
+
+    std::string const idf_objects3 = delimited_string({
+
+        "Schedule:Compact,",
+        "  Electricity Season Schedule,  !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 5/31,           !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,            !- Field 3",
+        "  1,                       !- Field 4",
+        "  Through: 9/30,           !- Field 5",
+        "  For: AllDays,            !- Field 6",
+        "  Until: 24:00,            !- Field 7",
+        "  3,                       !- Field 8",
+        "  Through: 12/31,          !- Field 9",
+        "  For: AllDays,            !- Field 10",
+        "  Until: 24:00,            !- Field 11",
+        "  1;                       !- Field 12",
+
+        "UtilityCost:Tariff,",
+        "  ExampleAWithVariableMonthlyCharge,     !- Name",
+        "  ElectricityNet:Facility, !- Output Meter Name",
+        "  kWh,                     !- Conversion Factor Choice",
+        "  ,                        !- Energy Conversion Factor",
+        "  ,                        !- Demand Conversion Factor",
+        "  ,                        !- Time of Use Period Schedule Name",
+        "  Electricity Season Schedule,  !- Season Schedule Name",
+        "  ,                        !- Month Schedule Name",
+        "  ,                        !- Demand Window Length",
+        "  0,                       !- Monthly Charge or Variable Name",
+        "  ,                        !- Minimum Monthly Charge or Variable Name",
+        "  ,                        !- Real Time Pricing Charge Schedule Name",
+        "  ,                        !- Customer Baseline Load Schedule Name",
+        "  ,                        !- Group Name",
+        "  NetMetering;             !- Buy Or Sell",
+
+        "UtilityCost:Variable,",
+        "VariableFixedCharge, !-Name",
+        "ExampleAWithVariableMonthlyCharge, !-Tariff Name",
+        "Currency, !-Variable Type",
+        "1.00, !-January Value",
+        "2.00, !-February Value",
+        "3.00, !-March Value",
+        "4.00, !-April Value",
+        "5.00, !-May Value",
+        "6.00, !-June Value",
+        "7.00, !-July Value",
+        "8.00, !-August Value",
+        "9.00, !-September Value",
+        "10.00, !-October Value",
+        "11.00, !-November Value",
+        "12.00; !-December Value"});
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects3));
+    GetInputEconomicsVariable(*state, ErrorsFound);
+
+    // Make sure variable input type "Currency" is processed as expected
+    EXPECT_EQ(state->dataEconTariff->econVar(1).varUnitType, varUnitTypeCurrency);
+    // Make sure the numerical inputs after A3 is still being processed correctly
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(1), 1.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(2), 2.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(3), 3.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(4), 4.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(5), 5.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(6), 6.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(7), 7.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(8), 8.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(9), 9.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(10), 10.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(11), 11.00);
+    EXPECT_EQ(state->dataEconTariff->econVar(1).values(12), 12.00);
 }
