@@ -94,7 +94,7 @@
 !    nonres_window_east_west = Window_U_0.38_SHGC_0.30
 !    con_swingdoor_r = 0.475963827
 
-  Version,9.4;
+  Version,9.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
