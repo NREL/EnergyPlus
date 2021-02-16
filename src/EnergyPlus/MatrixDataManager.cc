@@ -179,11 +179,18 @@ namespace MatrixDataManager {
             auto &matrix(MatData(MatNum).Mat2D);
             matrix.allocate(NumCols, NumRows); // This is standard order for a NumRows X NumCols matrix
             Array2<Real64>::size_type l(0);
+// MSVC was complaining that it detected a divide by zero in the Row = (El - 1) / NumCols + 1 line, indicating it thought NumCols was zero
+// the compiler should never have been able to identify that, as NumCols is based directly on rNumericArgs, which is based on input values
+// apparently, interaction between the high level optimizer that does flow-graph transformations and backend that emits warnings can cause
+// false positives.  This doesn't need to change, but the warning needs to be muted.  The pragma disables the warning for this block only.
+#pragma warning( push )
+#pragma warning( disable : 4723 )
             for (int ElementNum = 1; ElementNum <= NumElements; ++ElementNum, l += matrix.size()) {
                 int const RowIndex = (ElementNum - 1) / NumCols + 1;
                 int const ColIndex = mod((ElementNum - 1), NumCols) + 1;
                 matrix(ColIndex, RowIndex) = rNumericArgs(ElementNum + 2); // Matrix is read in row-by-row
             }
+#pragma warning( pop )
         }
 
         if (ErrorsFound) {
