@@ -142,6 +142,7 @@ ADD_SIMULATION_TEST(IDF_FILE AirflowNetwork_Simple_SmallOffice.idf EPW_FILE USA_
 ADD_SIMULATION_TEST(IDF_FILE AirflowWindowsAndBetweenGlassBlinds.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE AirflowWindowsAndBetweenGlassShades.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ASIHPMixedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE AtticRoof_RadiantBarriers.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE BaseBoardElectric.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CVRhMinHum.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CarrollMRT-RefBldgLargeOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
