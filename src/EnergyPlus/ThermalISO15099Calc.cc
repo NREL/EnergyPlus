@@ -1301,7 +1301,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                  Real64 &ShadeHcModifiedOut,
                  Real64 &ShadeHcModifiedIn,
                  int const ThermalMod,
-                 int const Debug_mode,
+                 [[maybe_unused]] int const Debug_mode,
                  Real64 &AchievedErrorTolerance,
                  int &TotalIndex,
                  Real64 const edgeGlCorrFac)
