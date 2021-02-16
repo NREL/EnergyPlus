@@ -75,7 +75,7 @@
 ! Coils:                          Coil:Cooling:DX:SingleSpeed
 !                                 Coil:Heating:Fuel
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     House with 2 Furnace AC, !- Name

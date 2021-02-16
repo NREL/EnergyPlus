@@ -58,7 +58,7 @@
 !             the same as in SmOffPSZ.
 !
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     Small Office,            !- Name
