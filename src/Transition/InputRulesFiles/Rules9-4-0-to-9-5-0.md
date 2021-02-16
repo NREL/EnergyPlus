@@ -30,7 +30,7 @@ Field 5, previous Field 4 -  Surface Name or Radiant Surface Group Name
 
 Field 6, previous Field 8 -  Hydronic Tubing Length
 
-Field 7, previous Field 13 - Heating Capacity
+Field 7, previous Field 13 - Heating Design Capacity
 
 Field 8, previous Field 16 - Maximum Hot Water Flow
 
