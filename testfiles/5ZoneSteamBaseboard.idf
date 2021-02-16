@@ -2005,6 +2005,56 @@
     0.2237,                  !- Velocity Term Coefficient
     0;                       !- Velocity Squared Term Coefficient
 
+  ZoneHVAC:Baseboard:RadiantConvective:Steam,
+    SPACE1-1 Baseboard, !- Name
+    SPACE1-1 Baseboard Design, !- Design_Object_Name
+    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name
+    SPACE1-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name
+    SPACE1-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name
+    Autosize, !- Heating_Design_Capacity
+    5, !- Degree_of_SubCooling
+    autosize, !- Maximum_Steam_Flow_Rate
+    FRONT-1, !- Surface_1_Name
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
+    C1-1, !- Surface_2_Name
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
+    SB15, !- Surface_3_Name
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+
+  ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,
+    SPACE1-1 Baseboard Design, !- Design_Object_Name
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.001, !- Convergence_Tolerance
+    0.3, !- Fraction_Radiant
+    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People
+
+  ZoneHVAC:Baseboard:RadiantConvective:Steam,
+    SPACE3-1 Baseboard, !- Name
+    SPACE3-1 Baseboard Design, !- Design_Object_Name
+    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name
+    SPACE3-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name
+    SPACE3-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name
+    Autosize, !- Heating_Design_Capacity
+    5, !- Degree_of_SubCooling
+    autosize, !- Maximum_Steam_Flow_Rate
+    BACK-1, !- Surface_1_Name
+    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1
+    C3-1, !- Surface_2_Name
+    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2
+    SB35, !- Surface_3_Name
+    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3
+
+  ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,
+    SPACE3-1 Baseboard Design, !- Design_Object_Name
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.001, !- Convergence_Tolerance
+    0.3, !- Fraction_Radiant
+    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People
+
   ZoneInfiltration:DesignFlowRate,
     SPACE5-1 Infil 1,        !- Name
     SPACE5-1,                !- Zone or ZoneList Name
@@ -3376,54 +3426,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-
-
-  ZoneHVAC:Baseboard:RadiantConvective:Steam, 
-    SPACE1-1 Baseboard, !- Name 
-    SPACE1-1 Baseboard Design, !- Design_Object_Name 
-    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name 
-    SPACE1-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name 
-    SPACE1-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name 
-    Autosize, !- Heating_Design_Capacity 
-    5, !- Degree_of_SubCooling 
-    autosize, !- Maximum_Steam_Flow_Rate 
-    FRONT-1, !- Surface_1_Name 
-    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1 
-    C1-1, !- Surface_2_Name 
-    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2 
-    SB15, !- Surface_3_Name 
-    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3 
-
-  ZoneHVAC:Baseboard:RadiantConvective:Steam:Design, 
-    SPACE1-1 Baseboard Design, !- Design_Object_Name 
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method 
-    , !- Heating_Design_Capacity_Per_Floor_Area 
-    , !- Fraction_of_Autosized_Heating_Design_Capacity 
-    0.001, !- Convergence_Tolerance 
-    0.3, !- Fraction_Radiant 
-    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People 
-
-  ZoneHVAC:Baseboard:RadiantConvective:Steam, 
-    SPACE3-1 Baseboard, !- Name 
-    SPACE3-1 Baseboard Design, !- Design_Object_Name 
-    REHEATCOILAVAILSCHED, !- Availability_Schedule_Name 
-    SPACE3-1 Reheat Coil Steam Inlet, !- Inlet_Node_Name 
-    SPACE3-1 Reheat Coil Steam Outlet, !- Outlet_Node_Name 
-    Autosize, !- Heating_Design_Capacity 
-    5, !- Degree_of_SubCooling 
-    autosize, !- Maximum_Steam_Flow_Rate 
-    BACK-1, !- Surface_1_Name 
-    0.4, !- Fraction_of_Radiant_Energy_to_Surface_1 
-    C3-1, !- Surface_2_Name 
-    0.2, !- Fraction_of_Radiant_Energy_to_Surface_2 
-    SB35, !- Surface_3_Name 
-    0.1; !- Fraction_of_Radiant_Energy_to_Surface_3 
-
-  ZoneHVAC:Baseboard:RadiantConvective:Steam:Design, 
-    SPACE3-1 Baseboard Design, !- Design_Object_Name 
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method 
-    , !- Heating_Design_Capacity_Per_Floor_Area 
-    , !- Fraction_of_Autosized_Heating_Design_Capacity 
-    0.001, !- Convergence_Tolerance 
-    0.3, !- Fraction_Radiant 
-    0.3; !- Fraction_of_Radiant_Energy_Incident_on_People 
