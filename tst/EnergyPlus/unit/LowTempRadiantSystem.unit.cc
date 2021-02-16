@@ -1274,38 +1274,43 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
 
                         "  ZoneHVAC:LowTemperatureRadiant:VariableFlow,",
                         "    West Zone Radiant Floor, !- Name",
+                        "    West Zone Radiant Floor Design, !- Design Object Name",
                         "    RadiantSysAvailSched,    !- Availability Schedule Name",
                         "    West Zone,               !- Zone Name",
                         "    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name",
+                        "    autosize,                !- Hydronic Tubing Length {m}",
+                        "    ,                        !- Heating Design Capacity {W}",
+                        "    autosize,                !- Maximum Hot Water Flow {m3/s}",
+                        "    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name",
+                        "    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name",
+                        "    ,                        !- Cooling Design Capacity {W}",
+                        "    autosize,                !- Maximum Cold Water Flow {m3/s}",
+                        "    Zone 1 Cooling Water Inlet Node,     !- Cooling Water Inlet Node Name",
+                        "    Zone 1 Cooling Water Outlet Node,    !- Cooling Water Outlet Node Name",
+                        "    ,                        !- Number of Circuits",
+                        "    ;                        !- Circuit Length {m}",
+
+                        "  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,",
+                        "    West Zone Radiant Floor Design, !- Name",
                         "    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model",
                         "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
                         "    0.016,                   !- Hydronic Tubing Outside Diameter {m}",
-                        "    autosize,                !- Hydronic Tubing Length {m}",
                         "    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}",
                         "    MeanAirTemperature,      !- Temperature Control Type",
                         "    HalfFlowPower,           !- Setpoint Type",
                         "    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method",
-                        "    ,                        !- Heating Design Capacity {W}",
                         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
                         "    0.9,                     !- Fraction of Autosized Heating Design Capacity",
-                        "    autosize,                !- Maximum Hot Water Flow {m3/s}",
-                        "    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name",
-                        "    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name",
                         "    2.0,                     !- Heating Control Throttling Range {deltaC}",
                         "    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name",
                         "    CapacityPerFloorArea,    !- Cooling Design Capacity Method",
-                        "    ,                        !- Cooling Design Capacity {W}",
                         "    0.0,                        !- Cooling Design Capacity Per Floor Area {W/m2}",
-                        "    ,                     !- Fraction of Autosized Cooling Design Capacity",
-                        "    autosize,                !- Maximum Cold Water Flow {m3/s}",
-                        "    Zone 1 Cooling Water Inlet Node,     !- Cooling Water Inlet Node Name",
-                        "    Zone 1 Cooling Water Outlet Node,    !- Cooling Water Outlet Node Name",
+                        "    ,                        !- Fraction of Autosized Cooling Design Capacity",
                         "    2.0,                     !- Cooling Control Throttling Range {deltaC}",
                         "    Radiant Cooling Setpoints,           !- Cooling Control Temperature Schedule Name",
                         "    ,                        !- Condensation Control Type",
-                        "    ,                        !- Condensation Control Dewpoint Offset {C}",
-                        "    ,                        !- Number of Circuits",
-                        "    ;                        !- Circuit Length {m}",
+                        "    ;                        !- Condensation Control Dewpoint Offset {C}",
+
 
                         "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
 
@@ -2005,13 +2010,13 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
 
     std::string const error_string =
             delimited_string({
-                     "   ** Severe  ** ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR",
+                     "   ** Severe  ** ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design = WEST ZONE RADIANT FLOOR DESIGN",
                      "   **   ~~~   ** Input for Cooling Design Capacity Method = CAPACITYPERFLOORAREA",
                      "   **   ~~~   ** Illegal Cooling Design Capacity Per Floor Area = 0.0000000",
                      "   **  Fatal  ** GetLowTempRadiantSystem: Errors found in input. Preceding conditions cause termination.",
                      "   ...Summary of Errors that led to program termination:",
                      "   ..... Reference severe error count=1",
-                     "   ..... Last severe error=ZoneHVAC:LowTemperatureRadiant:VariableFlow = WEST ZONE RADIANT FLOOR"});
+                     "   ..... Last severe error=ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design = WEST ZONE RADIANT FLOOR DESIGN"});
     EXPECT_ANY_THROW(GetLowTempRadiantSystem(*state));
 
     compare_err_stream(error_string, true);

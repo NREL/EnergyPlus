@@ -555,12 +555,12 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(4)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(4);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                         ErrorsFound = true;
                     } else if (thisRadSysDesign.DesignScaledHeatingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
                         ShowContinueError(state, "Illegal " + cNumericFields(4) + " = Autosize");
                         ErrorsFound = true;
@@ -576,18 +576,18 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(5)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(5);
                     if (thisRadSysDesign.DesignScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(5), Numbers(5)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                     ShowContinueError(state, "Input for " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
                     ShowContinueError(state, "Blank field not allowed for " + cNumericFields(5));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                 ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + thisRadSysDesign.DesignHeatingCapMethodInput);
                 ErrorsFound = true;
             }
@@ -610,19 +610,20 @@ namespace LowTempRadiantSystem {
                 thisRadSysDesign.DesignCoolingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(7)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(7);
+                    std::string a = cNumericFields(4);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity <= 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
-                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(7), thisRadSysDesign.DesignCoolingCapMethod));
+                        ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(7), thisRadSysDesign.DesignScaledCoolingCapacity));
                         ErrorsFound = true;
                     } else if (thisRadSysDesign.DesignScaledCoolingCapacity == AutoSize) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
                         ShowContinueError(state, "Illegal " + cNumericFields(7) + " = Autosize");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                     ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
                     ShowContinueError(state, "Blank field not allowed for " + cNumericFields(7));
                     ErrorsFound = true;
@@ -632,18 +633,18 @@ namespace LowTempRadiantSystem {
                 if (!lNumericBlanks(8)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(8);
                     if (thisRadSysDesign.DesignScaledCoolingCapacity < 0.0) {
-                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                        ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                         ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(8), Numbers(8)));
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                    ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                     ShowContinueError(state, "Input for " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
                     ShowContinueError(state, "Blank field not allowed for " + cNumericFields(8));
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.Name);
+                ShowSevereError(state, CurrentModuleObject + " = " + thisRadSysDesign.designName);
                 ShowContinueError(state, "Illegal " + cAlphaFields(7) + " = " + thisRadSysDesign.DesignCoolingCapMethodInput);
                 ErrorsFound = true;
             }
