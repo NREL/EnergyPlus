@@ -2104,14 +2104,14 @@ InchPound -- convert all annual, monthly, economics and timebins tabular values 
 
 The JtoKWH, JtoMJ and JtoGJ unit conversion input option applies only to the Output:Table:Monthly reports and partially to the ABUPS report. For ABUPS, the JtoKWH option changes the report but the JtoMJ and JtoGJ options do not change the report since it is already in MJ/m2 and GJ. In addition, the JtoKWH option also changes results in the LEED Summary report changing GJ to kWh and MJW/m2 to kWh/m2. The InchPound unit conversion input option applies to all annual, monthly, timebins and economic reports that appear in the SQL file. 
 
-Since the Output:SQLite tabular unit conversion setting act on the Tabular reports only, the other SQLite reporting will not affected by this unit conversion setting. The table below lists the unaffected SQLite tabular tables. 
+Since the Output:SQLite tabular unit conversion setting act on the Tabular reports only, the other SQLite reporting will not affected by this unit conversion setting. The table below lists the affected SQLite tabular tables. 
  
 % table X
 {\scriptsize
 \begin{longtable}[c]{p{4in}p{1in}}
 % \begin{longtable}[c]{p{0.2in}p{0.4in}p{0.6in}p{0.6in}p{0.5in}p{0.5in}p{0.6in}p{0.6in}p{0.65in}}
 % \begin{longtable}[c]{cccccccrr}
-\caption{SQLite Tables not affected by tabular unit conversion\label{table:tabular_unit_conversion_list}} \tabularnewline
+\caption{SQLite Tables Affected by the Tabular Unit Conversions\label{table:tabular_unit_conversion_list}} \tabularnewline
 \toprule
 Table Name & Affected or Not \tabularnewline
 \midrule
