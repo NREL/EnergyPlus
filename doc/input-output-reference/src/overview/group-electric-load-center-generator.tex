@@ -1434,7 +1434,7 @@ Which lifetime model to use for the battery. Available choices are:
 
 \begin{itemize}
   \item None: The battery doesn't degrate over time
-  \item KandlerSmith: Use the lifetime model developed by Kandler Smith.
+  \item KandlerSmith: Use the lifetime model developed by Kandler Smith. Details at \url{https://ieeexplore.ieee.org/abstract/document/7963578}
 \end{itemize}
 
 \paragraph{Field: Number of Cells in Series}\label{liion-n-series}
@@ -1504,6 +1504,110 @@ This field is included for those who want to modify the battery chemistry. Most 
 \paragraph{Field: Battery Cell Internal Electrical Resistance}\label{liion-internal-r}
 
 This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+An example input of the ElectricLoadCenter:Storage:LiIonNMCBattery is:
+
+\begin{lstlisting}
+
+  ElectricLoadCenter:Storage:LiIonNMCBattery,
+    LiIonBattery,            !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    ,                        !- Zone Name
+    0,                       !- Radiative Fraction
+    KandlerSmith,            !- Lifetime Model
+    139,                     !- Number of Cells in Series
+    25,                      !- Number of Strings in Parallel
+    0.7,                     !- Initial Fractional State of Charge
+    ,                        !- DC to DC Charging Efficiency
+    342,                     !- Battery Mass
+    4.26,                    !- Battery Surface Area
+    ,                        !- Battery Specific Heat Capacity
+    ;                        !- Heat Transfer Coefficient Between Battery and Ambient
+
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{electricloadcenter-storageliionnmcbatttery-outputs}
+
+\begin{itemize}
+  \item
+    HVAC,Average, Electric Storage Operating Mode Index {[]}
+  \item
+    HVAC,Average,Electric Storage Charge State{[}Ah{]}
+  \item
+    HVAC,Average, Electric Storage Charge Fraction {[]}
+  \item
+    HVAC,Average,Electric Storage Charge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Charge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Discharge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Discharge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Total Current{[}A{]}
+  \item
+    HVAC,Average, Electric Storage Total Voltage {[}V{]}
+  \item
+    HVAC,Average,Electric Storage Thermal Loss Rate {[}W{]}
+  \item
+    HVAC,Average,Electric Storage Degradation Fraction {[]}
+  \item
+    HVAC,Sum,Electric Storage Production Decrement Energy {[}J{]}
+  \item
+    HVAC,Sum,Electric Storage Thermal Loss Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Battery Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Electric Storage Operating Mode Index {[]}}\label{liion-operating-mode-index}
+
+This output reports the battery mode of operation: 0 for idle; 1 for discharging; 2 for charging. It is expected that more operation modes would be added when a smart and active power dispatch controller is used in future.
+
+\paragraph{Electric Storage Charge State {[}Ah{]}}\label{liion-charge-state-ah}
+
+The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
+
+\paragraph{Electric Storage Charge Fraction {[]}}\label{liion-charge-fraction}
+
+This output is the ratio between the electrical storage state of charge and the maximum capacity.
+
+\paragraph{Electric Storage Charge Power {[}W{]}}\label{liion-charge-power-w-1}
+
+\paragraph{Electric Storage Charge Energy {[}J{]}}\label{liion-charge-energy-j-1}
+
+These outputs are total electricity power or energy fed into the battery. This is the rate of amount of charging.
+
+\paragraph{Electric Storage Production Decrement Energy {[}J{]}}\label{liion-production-decrement-energy-j-1}
+
+This output is the total electricity energy decremented from electricity production because it has fed into the battery. This output has the opposite sign of Electric Storage Charge Energy but is otherwise similar. This decrement output variable is also a meter associated with the resource type ElectricityProduced that reduces the metered electricity production to account for power that went into storage after production.
+
+\paragraph{Electric Storage Discharge Power {[}W{]}}\label{liion-discharge-power-w-1}
+
+\paragraph{Electric Storage Discharge Energy {[}J{]}}\label{liion-discharge-energy-j-1}
+
+These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
+
+\paragraph{Electric Storage Total Current {[}A{]}}\label{liion-total-current-a}
+
+This output is the current to or from the battery bank depending on whether the battery is in the state of charging or discharging. The value is positive for discharging and negative for charging.
+
+\paragraph{Electric Storage Total Voltage {[}V{]}}\label{liion-total-voltage-v}
+
+This output is the total terminal voltage of the battery bank.
+
+\paragraph{Electric Storage Thermal Loss Rate {[}W{]}}\label{liion-thermal-loss-rate-w-1}
+
+\paragraph{Electric Storage Thermal Loss Energy {[}J{]}}\label{liion-thermal-loss-energy-j-1}
+
+These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are due to the battery internal resistance in charging and discharging.
+
+\paragraph{Electric Storage Degradation Fraction {[]}}\label{liion-degradation-fraction}
+
+This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that the 40\% of the battery life is used up, so the battery needs to be replaced every two and a half years.
+
+\paragraph{HVAC,Average,Electric Storage Battery Temperature {[}C{]}}\label{liion-battery-temperature}
+
+The internal temperature of the battery.
 
 \subsection{Generator:InternalCombustionEngine}\label{generatorinternalcombustionengine}
 
