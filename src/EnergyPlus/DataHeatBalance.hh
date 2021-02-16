@@ -1859,7 +1859,8 @@ namespace DataHeatBalance {
         Real64 TotTimeOcc; // time occupied (and the mechanical ventilation volume is accumulating)
         //  - system time step [hrs]
 
-        // OA Reports
+        // OA Reports - accumulated values
+        // All Vol variables are in m3
         Real64 MechVentVolTotalOcc;       // volume for mechanical ventilation of outside air for entire simulation during occupied at current
         Real64 MechVentVolMin;            // a large number since finding minimum volume at current zone air density
         Real64 InfilVolTotalOcc;          // volume for infiltration of outside air for entire simulation during occupied at current density
@@ -1879,7 +1880,7 @@ namespace DataHeatBalance {
         Real64 SimpVentVolTotalStdDen;    // volume for simple 'ZoneVentilation' of outside air for entire simulation at std density
         Real64 SimpVentVolTotalOccStdDen; // volume for simple 'ZoneVentilation' of outside air for entire simulation during occupied std
         Real64 VozMin;                    // minimum outdoor zone ventilation
-        Real64 VozTargetTotal;            // volume for target Voz-dyn for entire simulation
+        Real64 VozTargetTotal;            // volume for target Voz-dyn for entire simulation at std density
         Real64 VozTargetTotalOcc;         // volume for target Voz-dyn for entire simulation during occupied
         Real64 VozTargetTimeBelow;        // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
         Real64 VozTargetTimeAt;           // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero

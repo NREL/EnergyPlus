@@ -1660,12 +1660,15 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->ZoneTimeAboveVozDyn.allocate(state.dataGlobal->NumOfZones);
         state.dataSysRpts->ZoneTimeVentUnocc.allocate(state.dataGlobal->NumOfZones);
 
+        state.dataSysRpts->SysMechVentFlow.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysNatVentFlow.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTargetVentilationFlowVoz.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTimeBelowVozDyn.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTimeAtVozDyn.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTimeAboveVozDyn.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTimeVentUnocc.allocate(NumPrimaryAirSys);
+        state.dataSysRpts->SysAnyZoneOccupied.allocate(NumPrimaryAirSys);
+        state.dataSysRpts->SysPreDefRep.allocate(NumPrimaryAirSys);
 
         state.dataSysRpts->SysTotZoneLoadHTNG.allocate(NumPrimaryAirSys);
         state.dataSysRpts->SysTotZoneLoadCLNG.allocate(NumPrimaryAirSys);
@@ -1749,12 +1752,14 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->ZoneTimeAboveVozDyn = 0.0;
         state.dataSysRpts->ZoneTimeVentUnocc = 0.0;
 
+        state.dataSysRpts->SysMechVentFlow = 0.0;
         state.dataSysRpts->SysNatVentFlow = 0.0;
         state.dataSysRpts->SysTargetVentilationFlowVoz = 0.0;
         state.dataSysRpts->SysTimeBelowVozDyn = 0.0;
         state.dataSysRpts->SysTimeAtVozDyn = 0.0;
         state.dataSysRpts->SysTimeAboveVozDyn = 0.0;
         state.dataSysRpts->SysTimeVentUnocc = 0.0;
+        state.dataSysRpts->SysAnyZoneOccupied = false;
 
         // SYSTEM LOADS REPORT
         state.dataSysRpts->SysTotZoneLoadHTNG = 0.0;
@@ -2028,6 +2033,14 @@ namespace EnergyPlus::SystemReports {
                 SetupOutputVariable(state, "Air System Desiccant Dehumidifier Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataSysRpts->DesDehumidElec(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+
+                SetupOutputVariable(state,
+                                    "Air System Mechanical Ventilation Flow Rate",
+                                    OutputProcessor::Unit::m3_s,
+                                    state.dataSysRpts->SysMechVentFlow(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
@@ -4228,7 +4241,6 @@ namespace EnergyPlus::SystemReports {
         int ZoneInNum;               // counter for zone air distribution inlets
         int ReturnAirNode;           // node number for return node on primary air loop
         int MixedAirNode;            // mixed air node number (right after the mixing box) on primary air loop
-        int AirLoopNum;              // index to AirloopHVAC
         int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
         int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
 
@@ -4285,12 +4297,14 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->MaxNoLoadHeatingByVent = 0.0;
         state.dataSysRpts->MaxNoLoadCoolingByVent = 0.0;
 
+        state.dataSysRpts->SysMechVentFlow = 0.0;
         state.dataSysRpts->SysNatVentFlow = 0.0;
         state.dataSysRpts->SysTargetVentilationFlowVoz = 0.0;
         state.dataSysRpts->SysTimeBelowVozDyn = 0.0;
         state.dataSysRpts->SysTimeAtVozDyn = 0.0;
         state.dataSysRpts->SysTimeAboveVozDyn = 0.0;
         state.dataSysRpts->SysTimeVentUnocc = 0.0;
+        state.dataSysRpts->SysAnyZoneOccupied = false;
         state.dataSysRpts->AnySysTimeBelowVozDyn = 0.0;
         state.dataSysRpts->AllSyssTimeAtVozDyn = 0.0;
         state.dataSysRpts->AnySysTimeAboveVozDyn = 0.0;
@@ -4556,7 +4570,7 @@ namespace EnergyPlus::SystemReports {
                 Real64 AirSysTotalMixFlowRate = 0.0; // Mixed air mass flow rate [kg/s]
                 Real64 AirSysOutAirFlow = 0.0;       // outside air flow rate for zone from primary air system [kg/s]
                 // retrieve air loop index
-                AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum);
+                int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum);
                 MixedAirNode = 0;
                 ReturnAirNode = 0;
                 AirDistCoolInletNodeNum = 0;
@@ -4600,7 +4614,11 @@ namespace EnergyPlus::SystemReports {
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                         termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
                     Real64 naturalVentVol = +ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
-                    state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
+                    state.dataSysRpts->SysMechVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
+
+                    if (ZonePreDefRep(ActualZoneNum).isOccupied) {
+                        state.dataSysRpts->SysAnyZoneOccupied(AirLoopNum) = true;
+                    }
 
                 }
 
@@ -4694,10 +4712,10 @@ namespace EnergyPlus::SystemReports {
                 ZonePreDefRep(ActualZoneNum).SimpVentVolTotalOccStdDen +=
                     ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + afnVentVol;
                 //target ventilation Voz-dyn
+                state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->AnyZoneTimeBelowVozDyn;
+                state.dataSysRpts->AllZonesTimeAtVozDynOcc = state.dataSysRpts->AllZonesTimeAtVozDyn;
+                state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = state.dataSysRpts->AnyZoneTimeAboveVozDyn;
                 ZonePreDefRep(ActualZoneNum).VozTargetTotalOcc += targetVoz;
-                state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
-                state.dataSysRpts->AllZonesTimeAtVozDynOcc = state.dataSysRpts->ZoneTimeAtVozDyn(CtrlZoneNum);
-                state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = state.dataSysRpts->ZoneTimeAboveVozDyn(CtrlZoneNum);
 
                 // time mechanical+natural ventilation is below, at, or above target Voz-dyn
                 ZonePreDefRep(ActualZoneNum).VozTargetTimeBelowOcc += state.dataSysRpts->ZoneTimeBelowVozDyn(CtrlZoneNum);
@@ -4765,23 +4783,43 @@ namespace EnergyPlus::SystemReports {
 
         // loop over air loops
         for (int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum){
+            Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir;
+            state.dataSysRpts->SysMechVentFlow(sysNum) = mechVentFlow;
+            state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow;
+            state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotal += state.dataSysRpts->SysNatVentFlow(sysNum);;
             // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
             // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
             Real64 totMechNatVentVolFlowStdRho =
-                state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir + state.dataSysRpts->SysNatVentFlow(sysNum);
+                mechVentFlow + state.dataSysRpts->SysNatVentFlow(sysNum);
+
             Real64 targetFlowVoz = state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum);
+            state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVoz += targetFlowVoz;
             // Allow 1% tolerance
             if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
                 state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = TimeStepSys;
                 state.dataSysRpts->AnySysTimeBelowVozDyn = TimeStepSys;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotal += TimeStepSys;
             }
             else if (totMechNatVentVolFlowStdRho > (1.01 * targetFlowVoz)) {
                 state.dataSysRpts->SysTimeAboveVozDyn(sysNum) = TimeStepSys;
                 state.dataSysRpts->AnySysTimeAboveVozDyn = TimeStepSys;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotal += TimeStepSys;
             }
             else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
                 state.dataSysRpts->SysTimeAtVozDyn(sysNum) = TimeStepSys;
                 state.dataSysRpts->AllSyssTimeAtVozDyn = TimeStepSys;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotal += TimeStepSys;
+            }
+            if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeOccupiedTotal += TimeStepSys;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotalOcc += mechVentFlow;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotalOcc += state.dataSysRpts->SysNatVentFlow(sysNum);
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVozOcc += targetFlowVoz;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotalOcc += state.dataSysRpts->SysTimeBelowVozDyn(sysNum);
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotalOcc += state.dataSysRpts->SysTimeAboveVozDyn(sysNum);
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotalOcc += state.dataSysRpts->SysTimeAtVozDyn(sysNum);
+            } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeVentUnoccTotal += TimeStepSys;
             }
 
         }

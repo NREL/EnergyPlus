@@ -5959,14 +5959,8 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 totalNatVentRateOcc = 0;
         Real64 totalInfilRateOcc = 0;
         Real64 totalVozDynOcc = 0;
-        //Real64 totalAirLoopsMechVentVol = 0;
-        //Real64 totalAirLoopsNatVentVol = 0;
-        //Real64 totalAirLoopsInfilVol = 0;
-        //Real64 totalAirLoopsVozDyn = 0;
-        //Real64 totalAirLoopsMechVentRateOcc = 0;
-        //Real64 totalAirLoopsNatVentRateOcc = 0;
-        //Real64 totalAirLoopsInfilRateOcc = 0;
-        //Real64 totalAirLoopsVozDynOcc = 0;
+
+        // Outdoor Air Summary and Outdoor Air Details
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
@@ -6143,6 +6137,108 @@ namespace EnergyPlus::OutputReportTabular {
             }
         }
 
+        //Real64 totalAirLoopsMechVentVol = 0.0;
+        //Real64 totalAirLoopsNatVentVol = 0.0;
+        //Real64 totalAirLoopsVozDyn = 0.0;
+        //Real64 totalAirLoopsMechVentRateOcc = 0.0;
+        //Real64 totalAirLoopsNatVentRateOcc = 0.0;
+        //Real64 totalAirLoopsVozDynOcc = 0.0;
+
+        for (int iSys = 1; iSys <= DataHVACGlobals::NumPrimaryAirSys; ++iSys) {
+            // Total Outdoor Air by Airloop
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlMechVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal,
+                0);
+            //totalAirLoopsMechVentVol += state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal;
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlNatVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
+                0);
+            //totalAirLoopsNatVentVol += state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal;
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTotVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz,
+                0);
+            //totalAirLoopsVozDyn += state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz;
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmBelow,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAt,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAbove,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal,
+                0);
+            // Average Outdoor Air During Occupancy by Airloop
+            if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlMechVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                //totalAirLoopsMechVentRateOcc += state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc /
+                    state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal;
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlNatVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                //totalAirLoopsNatVentRateOcc += state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc /
+                    state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal;
+                PreDefTableEntry(
+                    state,
+                    state.dataOutRptPredefined->pdchOaOccAlTotVent,
+                    state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                    (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
+                        state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                    4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                //totalAirLoopsVozDynOcc += state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc /
+                    state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal;
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmBelow,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc,
+                                 0);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmAt,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc,
+                                 0);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmAbove,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc,
+                                 0);
+            }
+        }
         // add total rows for outdoor air details
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchOaMvDesZnOa, "Total Facility", state.dataOutRptPredefined->TotalVozMax, 4);
@@ -6186,6 +6282,32 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
 
+
+        //// Total Outdoor Air by Airloop
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaAlMechVent, "All AirLoops", totalAirLoopsMechVentVol, 0);
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaAlNatVent, "All AirLoops", totalAirLoopsNatVentVol, 0);
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaAlTotVent, "All AirLoops", totalAirLoopsMechVentVol + totalAirLoopsNatVentVol, 0);
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent, "All AirLoops", totalAirLoopsVozDyn, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaTaAlTmBelow, "All AirLoops", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaTaAlTmAt, "All AirLoops", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaTaAlTmAbove, "All AirLoops", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc, "All AirLoops", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
+        //// Average Outdoor Air During Occupancy by Airloop
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccAlMechVent, "All AirLoops", totalAirLoopsMechVentRateOcc, 4);
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccAlNatVent, "All AirLoops", totalAirLoopsNatVentRateOcc, 4);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaOccAlTotVent, "All AirLoops", totalAirLoopsMechVentRateOcc + totalAirLoopsNatVentRateOcc, 4);
+        //PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent, "All AirLoops", totalAirLoopsVozDynOcc, 4);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaOccAlTmBelow, "All AirLoops", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaOccAlTmAt, "All AirLoops", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+        //PreDefTableEntry(
+        //    state, state.dataOutRptPredefined->pdchOaOccAlTmAbove, "All AirLoops", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
