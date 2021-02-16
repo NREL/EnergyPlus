@@ -2128,6 +2128,123 @@
     32.2,                    !- Rated Outlet Air Temperature {C}
     ;                        !- Rated Ratio for Air and Water Convection
 
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+    West Zone Radiant Floor, !- Name
+    West Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    West Zone, !- Zone_Name
+    Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    0.00008, !- Rated_Flow_Rate
+    , !- Pump_Flow_Rate_Schedule_Name
+    80000, !- Rated_Pump_Head
+    10, !- Rated_Power_Consumption
+    West Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    West Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
+    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
+    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
+    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
+    , !- Cooling_Water_Inlet_Node_Name
+    , !- Cooling_Water_Outlet_Node_Name
+    , !- Cooling_High_Water_Temperature_Schedule_Name
+    , !- Cooling_Low_Water_Temperature_Schedule_Name
+    , !- Cooling_High_Control_Temperature_Schedule_Name
+    , !- Cooling_Low_Control_Temperature_Schedule_Name
+    , !- Number_of_Circuits
+    ; !- Circuit_Length
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    West Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
+    0.87, !- Motor_Efficiency
+    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
+    , !- Condensation_Control_Type
+    ; !- Condensation_Control_Dewpoint_Offset
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+    East Zone Radiant Floor, !- Name
+    East Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    East Zone, !- Zone_Name
+    Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    0.00008, !- Rated_Flow_Rate
+    , !- Pump_Flow_Rate_Schedule_Name
+    80000, !- Rated_Pump_Head
+    10, !- Rated_Power_Consumption
+    East Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    East Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
+    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
+    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
+    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
+    , !- Cooling_Water_Inlet_Node_Name
+    , !- Cooling_Water_Outlet_Node_Name
+    , !- Cooling_High_Water_Temperature_Schedule_Name
+    , !- Cooling_Low_Water_Temperature_Schedule_Name
+    , !- Cooling_High_Control_Temperature_Schedule_Name
+    , !- Cooling_Low_Control_Temperature_Schedule_Name
+    , !- Number_of_Circuits
+    ; !- Circuit_Length
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    East Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
+    0.87, !- Motor_Efficiency
+    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
+    , !- Condensation_Control_Type
+    ; !- Condensation_Control_Dewpoint_Offset
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+    North Zone Radiant Floor, !- Name
+    North Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    North Zone, !- Zone_Name
+    Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    0.00010, !- Rated_Flow_Rate
+    , !- Pump_Flow_Rate_Schedule_Name
+    60000, !- Rated_Pump_Head
+    10, !- Rated_Power_Consumption
+    North Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    North Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name
+    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name
+    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name
+    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name
+    , !- Cooling_Water_Inlet_Node_Name
+    , !- Cooling_Water_Outlet_Node_Name
+    , !- Cooling_High_Water_Temperature_Schedule_Name
+    , !- Cooling_Low_Water_Temperature_Schedule_Name
+    , !- Cooling_High_Control_Temperature_Schedule_Name
+    , !- Cooling_Low_Control_Temperature_Schedule_Name
+    , !- Number_of_Circuits
+    ; !- Circuit_Length
+
+  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+    North Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
+    0.87, !- Motor_Efficiency
+    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
+    , !- Condensation_Control_Type
+    ; !- Condensation_Control_Dewpoint_Offset
+
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
@@ -2470,121 +2587,3 @@
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,15.00;      !- Field 3
-
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
-    West Zone Radiant Floor, !- Name 
-    West Zone Radiant Floor Design, !- Design_Object_Name 
-    RadiantSysAvailSched, !- Availability_Schedule_Name 
-    West Zone, !- Zone_Name 
-    Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name 
-    400.0, !- Hydronic_Tubing_Length 
-    0.00008, !- Rated_Flow_Rate 
-    , !- Pump_Flow_Rate_Schedule_Name 
-    80000, !- Rated_Pump_Head 
-    10, !- Rated_Power_Consumption 
-    West Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name 
-    West Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name 
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name 
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name 
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name 
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name 
-    , !- Cooling_Water_Inlet_Node_Name 
-    , !- Cooling_Water_Outlet_Node_Name 
-    , !- Cooling_High_Water_Temperature_Schedule_Name 
-    , !- Cooling_Low_Water_Temperature_Schedule_Name 
-    , !- Cooling_High_Control_Temperature_Schedule_Name 
-    , !- Cooling_Low_Control_Temperature_Schedule_Name 
-    , !- Number_of_Circuits 
-    ; !- Circuit_Length 
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
-    West Zone Radiant Floor Design, !- Design_Object_Name 
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    0.012, !- Hydronic_Tubing_Inside_Diameter 
-    0.016, !- Hydronic_Tubing_Outside_Diameter 
-    0.35, !- Hydronic_Tubing_Conductivity 
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
-    0.87, !- Motor_Efficiency 
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
-    , !- Condensation_Control_Type 
-    ; !- Condensation_Control_Dewpoint_Offset 
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
-    East Zone Radiant Floor, !- Name 
-    East Zone Radiant Floor Design, !- Design_Object_Name 
-    RadiantSysAvailSched, !- Availability_Schedule_Name 
-    East Zone, !- Zone_Name 
-    Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name 
-    400.0, !- Hydronic_Tubing_Length 
-    0.00008, !- Rated_Flow_Rate 
-    , !- Pump_Flow_Rate_Schedule_Name 
-    80000, !- Rated_Pump_Head 
-    10, !- Rated_Power_Consumption 
-    East Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name 
-    East Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name 
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name 
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name 
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name 
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name 
-    , !- Cooling_Water_Inlet_Node_Name 
-    , !- Cooling_Water_Outlet_Node_Name 
-    , !- Cooling_High_Water_Temperature_Schedule_Name 
-    , !- Cooling_Low_Water_Temperature_Schedule_Name 
-    , !- Cooling_High_Control_Temperature_Schedule_Name 
-    , !- Cooling_Low_Control_Temperature_Schedule_Name 
-    , !- Number_of_Circuits 
-    ; !- Circuit_Length 
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
-    East Zone Radiant Floor Design, !- Design_Object_Name 
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    0.012, !- Hydronic_Tubing_Inside_Diameter 
-    0.016, !- Hydronic_Tubing_Outside_Diameter 
-    0.35, !- Hydronic_Tubing_Conductivity 
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor 
-    0.87, !- Motor_Efficiency 
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
-    , !- Condensation_Control_Type 
-    ; !- Condensation_Control_Dewpoint_Offset 
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow, 
-    North Zone Radiant Floor, !- Name 
-    North Zone Radiant Floor Design, !- Design_Object_Name 
-    RadiantSysAvailSched, !- Availability_Schedule_Name 
-    North Zone, !- Zone_Name 
-    Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name 
-    400.0, !- Hydronic_Tubing_Length 
-    0.00010, !- Rated_Flow_Rate 
-    , !- Pump_Flow_Rate_Schedule_Name 
-    60000, !- Rated_Pump_Head 
-    10, !- Rated_Power_Consumption 
-    North Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name 
-    North Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name 
-    RadHeatHighWaterTemp, !- Heating_High_Water_Temperature_Schedule_Name 
-    RadHeatLowWaterTemp, !- Heating_Low_Water_Temperature_Schedule_Name 
-    RadHeatHighControlTemp, !- Heating_High_Control_Temperature_Schedule_Name 
-    RadHeatLowControlTemp, !- Heating_Low_Control_Temperature_Schedule_Name 
-    , !- Cooling_Water_Inlet_Node_Name 
-    , !- Cooling_Water_Outlet_Node_Name 
-    , !- Cooling_High_Water_Temperature_Schedule_Name 
-    , !- Cooling_Low_Water_Temperature_Schedule_Name 
-    , !- Cooling_High_Control_Temperature_Schedule_Name 
-    , !- Cooling_Low_Control_Temperature_Schedule_Name 
-    , !- Number_of_Circuits 
-    ; !- Circuit_Length 
-
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design, 
-    North Zone Radiant Floor Design, !- Design_Object_Name 
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model 
-    0.012, !- Hydronic_Tubing_Inside_Diameter 
-    0.016, !- Hydronic_Tubing_Outside_Diameter 
-    0.35, !- Hydronic_Tubing_Conductivity  
-    MeanAirTemperature, !- Temperature_Control_Type 
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency 
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream 
-    , !- Condensation_Control_Type 
-    ; !- Condensation_Control_Dewpoint_Offset 
