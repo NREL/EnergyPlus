@@ -648,6 +648,7 @@ namespace DisplacementVentMgr {
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
                                                  IntGainTypeOf_RefrigerationCase,

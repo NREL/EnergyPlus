@@ -7082,7 +7082,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
                                                  IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
                                                  IntGainTypeOf_SecHeatingDXCoilMultiSpeed});
-        static Array1D_int IntGainTypesPowerGen(9,
+        static Array1D_int IntGainTypesPowerGen(10,
                                                 {IntGainTypeOf_GeneratorFuelCell,
                                                  IntGainTypeOf_GeneratorMicroCHP,
                                                  IntGainTypeOf_ElectricLoadCenterTransformer,
@@ -7090,6 +7090,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 
