@@ -27,6 +27,8 @@ The expanded IHP object will contain three variable-speed cooling coils, i.e. Co
 
 During cooling mode, if a grid-response cooling coil object exists and indicates a request of grid-response, i.e. a grid signal falls within a range preventing the normal operation, the IHP will switch to its grid-response cooling coil, which host different sets of performance curves, capacities, efficiencies and air flow ratios than the main cooling coil. 
 If the grid-responsive coil is not responsive, but there is a call to remove latent load, e.g. a ZoneControl:Humidistat requires moisture removal, the enhanced dehumidification cooling coil will be called. If the enhanced dehumidfication coil doesn't exist, the IHP will call its main cooling coil. 
+The logic and association of an IHP containing multiple variable-speed cooling coils are given below: 
+![MultiModeCoil](.\HVACFlexFigures\MultiModeCoil.png)
 
 The IHP will comprise two variable-speed heating coils, i.e. Coil:Heating:DX:VariableSpeed, including a main heating coils and a grid-response heating coil. 
 
@@ -35,6 +37,8 @@ During cooling mode, if a grid-response heating coil object exists and indicates
 The IHP object will expand to include a variable-speed, air-source chiller, which will charge a ice storage tank defined in the IHP. The chiller can use the same compressor as the main cooling/heating coil, at different time; or a separate vapor compression unit that will operate on its own. The operating speed of the chiller is a user input. 
 
 The IHP object defines a storage tank, ice or phase change material (PCM), and a fraction below which the charging operation starts until the tank is fully charged. Additionally, the IHP object accepts inputs of a starting chiller entering temperature when the ice/PCM fraction is zero, and a curve object to correlate the temperature offset from the starting temperature as a function of the tank fraction. 
+The logic of an ice storage integrated heat pump is depicted below, 
+![IceStorageIHP](.\HVACFlexFigures\IceStorageIHP.png)
 
 Chiller Entering Coolant Temperature = Starting Entering Coolant Temperature - (a+b×frac<sub>ice</sub>+c×frac<sub>ice</sub><sup>2</sup> +d×frac<sub>ice</sub><sup>3</sup>)
 
