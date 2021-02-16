@@ -2336,7 +2336,7 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 5th independent variable after limits imposed
+        Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
@@ -2665,8 +2665,14 @@ namespace CurveManager {
                               Real64 &Var1Max,          // Maximum values of 1st independent variable
                               Optional<Real64> Var2Min, // Minimum values of 2nd independent variable
                               Optional<Real64> Var2Max, // Maximum values of 2nd independent variable
-                              Optional<Real64> Var3Min, // Minimum values of 2nd independent variable
-                              Optional<Real64> Var3Max  // Maximum values of 2nd independent variable
+                              Optional<Real64> Var3Min, // Minimum values of 3rd independent variable
+                              Optional<Real64> Var3Max, // Maximum values of 3rd independent variable
+                              Optional<Real64> Var4Min, // Minimum values of 4th independent variable
+                              Optional<Real64> Var4Max, // Maximum values of 4th independent variable
+                              Optional<Real64> Var5Min, // Minimum values of 5th independent variable
+                              Optional<Real64> Var5Max, // Maximum values of 5th independent variable
+                              Optional<Real64> Var6Min, // Minimum values of 6th independent variable
+                              Optional<Real64> Var6Max  // Maximum values of 6th independent variable
     )
     {
 
@@ -2686,6 +2692,12 @@ namespace CurveManager {
         if (present(Var2Max)) Var2Max = state.dataCurveManager->PerfCurve(CurveIndex).Var2Max;
         if (present(Var3Min)) Var3Min = state.dataCurveManager->PerfCurve(CurveIndex).Var3Min;
         if (present(Var3Max)) Var3Max = state.dataCurveManager->PerfCurve(CurveIndex).Var3Max;
+        if (present(Var4Min)) Var4Min = state.dataCurveManager->PerfCurve(CurveIndex).Var4Min;
+        if (present(Var4Max)) Var4Max = state.dataCurveManager->PerfCurve(CurveIndex).Var4Max;
+        if (present(Var5Min)) Var5Min = state.dataCurveManager->PerfCurve(CurveIndex).Var5Min;
+        if (present(Var5Max)) Var5Max = state.dataCurveManager->PerfCurve(CurveIndex).Var5Max;
+        if (present(Var6Min)) Var6Min = state.dataCurveManager->PerfCurve(CurveIndex).Var6Min;
+        if (present(Var6Max)) Var6Max = state.dataCurveManager->PerfCurve(CurveIndex).Var6Max;
     }
 
     void SetCurveOutputMinMaxValues(EnergyPlusData &state,
@@ -3038,7 +3050,8 @@ namespace CurveManager {
                                      Optional<Real64 const> Var2,         // 2nd independent variable
                                      Optional<Real64 const> Var3,         // 3rd independent variable
                                      Optional<Real64 const> Var4,         // 4th independent variable
-                                     Optional<Real64 const> Var5          // 5th independent variable
+                                     Optional<Real64 const> Var5,         // 5th independent variable
+                                     Optional<Real64 const> Var6          // 6th independent variable
     )
     {
 
@@ -3053,7 +3066,7 @@ namespace CurveManager {
         Real64 CurveVal;
 
         if (curveIndex > 0) {
-            CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5);
+            CurveVal = CurveValue(state, curveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             if (CurveVal > 1.10 || CurveVal < 0.90) {
                 ShowWarningError(state, callingRoutineObj + "=\"" + objectName + "\" curve values");
                 ShowContinueError(state, "... " + cFieldName + " = " + cFieldValue + " output is not equal to 1.0 (+ or - 10%) at rated conditions.");
