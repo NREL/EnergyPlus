@@ -36,7 +36,7 @@ The objective of this model is to calculate the convective and radiant heat tran
 
 A unique user assigned name for an instance of a hot water baseboard heater unit. Any reference to this unit by another object will use this name.
 
-\paragraph{Field: Design Object}\label{DesignObjectName}
+\paragraph{Field: Design Object}\label{HW_Baseboard_DesignObjectName}
 
 The name of the object that holds design data for this instance of hot water baseboard heater unit. Multiple input data values are taken from this object.
 
@@ -120,13 +120,9 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
 
 This object contains the design fields for ZoneHVAC:Baseboard:RadiantConvective:Water. The information from one ZoneHVAC:Baseboard:RadiantConvective:Water:Design object can be shared with several ZoneHVAC:Baseboard:RadiantConvective:Water objects.
 
-\paragraph{Field: Design Object Name}\label{DesignObjectName}
+\paragraph{Field: Design Object Name}\label{HW_BB_DesignObjectName}
 
 A unique user assigned name for an instance of a hot water baseboard heater unit design object. Any reference to this unit by another object will use this name.
-
-\paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-013}
-
-The name of the schedule (ref: Schedule) that denotes whether the hot water baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
 
 \paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-000}
 
@@ -252,7 +248,7 @@ The objective of this model is to calculate the convective and radiant heat tran
 
 A unique user assigned name for an instance of a steam baseboard heater unit. Any reference to this unit by another object will use this name.
 
-\paragraph{Field: Design Object Name}\label{DesignObjectName}
+\paragraph{Field: Design Object Name}\label{SteamBB_DesignObjectName}
 
 The name of the object that holds design data for this instance of steam baseboard heater unit. Multiple input data values is taken from this object.
 
@@ -1053,7 +1049,7 @@ This model covers a wide range of low temperature radiant systems: heating and/o
 
 This field is an unique user assigned name for an instance of a hydronic low temperature radiant system. Any reference to this unit by another object will use this name.
 
-\paragraph{Field: Design Object}\label{DesignObjectName}
+\paragraph{Field: Design Object}\label{Varflow_DesignObjectName}
 
 The name of the object that holds design data for this instance of hydronic low temperature radiant system. Multiple input data values is taken from this object.
 
