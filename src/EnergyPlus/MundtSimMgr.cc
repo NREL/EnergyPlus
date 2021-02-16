@@ -231,7 +231,7 @@ namespace MundtSimMgr {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
                 // find maximum number of surfaces in zones using the Mundt model
-                SurfFirst = Zone(ZoneIndex).SurfaceFirst;
+                SurfFirst = Zone(ZoneIndex).HTSurfaceFirst;
                 NumOfSurfs = Zone(ZoneIndex).SurfaceLast - SurfFirst + 1;
                 MaxNumOfSurfs = max(MaxNumOfSurfs, NumOfSurfs);
                 // fine maximum number of air nodes in zones using the Mundt model

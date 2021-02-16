@@ -347,13 +347,13 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneID = ZoneNum;
 
             //   figure number of surfaces for this zone
-            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+            state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).HTSurfaceFirst + 1;
             //   allocate nested derived type for surface info
             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf.allocate(state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs);
 
             //   Fill in what we know for nested structure for surfaces
             for (thisSurfinZone = 1; thisSurfinZone <= state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).totNumSurfs; ++thisSurfinZone) {
-                thisHBsurfID = Zone(ZoneNum).SurfaceFirst + thisSurfinZone - 1;
+                thisHBsurfID = Zone(ZoneNum).HTSurfaceFirst + thisSurfinZone - 1;
                 if (Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::IntMass) {
                     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
                     state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = 0.5;
@@ -665,7 +665,7 @@ namespace RoomAirModelManager {
                 ErrorsFound = true;
             } else {
                 ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+                NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).HTSurfaceFirst + 1;
                 state.dataRoomAirMod->AirNode(AirNodeNum).SurfMask.allocate(NumOfSurfs);
             }
 
@@ -751,8 +751,8 @@ namespace RoomAirModelManager {
 
                     // this air node is in this zone; hence, first get name of all surfaces in this zone
                     ZoneNum = state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr;
-                    SurfFirst = Zone(ZoneNum).SurfaceFirst;
-                    NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+                    SurfFirst = Zone(ZoneNum).HTSurfaceFirst;
+                    NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).HTSurfaceFirst + 1;
 
                     // terminate the program due to a severe error in the specified input
                     if ((NumSurfsInvolved) > NumOfSurfs) {
@@ -1435,7 +1435,7 @@ namespace RoomAirModelManager {
             } else {
                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID = AirCntrlNodeNum;
             }
-            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).totNumSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+            state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).totNumSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).HTSurfaceFirst + 1;
         } // loop thru NumOfRoomAirflowNetControl
 
         cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
@@ -1510,7 +1510,7 @@ namespace RoomAirModelManager {
                 if (RAFNNodeNum > 0) { // found it
                     foundList = true;
                     NumSurfsThisNode = NumAlphas - 1;
-                    NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+                    NumOfSurfs = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).HTSurfaceFirst + 1;
                     if (allocated(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).SurfMask)) {
                         // throw error found twice
                         ShowSevereError(state, "GetRoomAirflowNetworkData: Invalid " + cAlphaFieldNames(1) + " = " + cAlphaArgs(1));
@@ -1523,7 +1523,7 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasSurfacesAssigned = true;
                         // relate surfaces to this air node and check to see whether surface names are specified correctly or not
                         SurfCount = 0;
-                        SurfFirst = Zone(ZoneNum).SurfaceFirst - 1;
+                        SurfFirst = Zone(ZoneNum).HTSurfaceFirst - 1;
                         for (ListSurfNum = 2; ListSurfNum <= NumAlphas; ++ListSurfNum) {
                             for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                                 // IF( cAlphaArgs( ListSurfNum ) == Surface( SurfFirst + SurfNum ).Name ) THEN
@@ -1937,7 +1937,7 @@ namespace RoomAirModelManager {
                 SetZoneAux = true;
 
                 // cycle in this zone for all the surfaces
-                for (SurfNum = Zone(ZNum).SurfaceFirst; SurfNum <= Zone(ZNum).SurfaceLast; ++SurfNum) {
+                for (SurfNum = Zone(ZNum).HTSurfaceFirst; SurfNum <= Zone(ZNum).SurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class != DataSurfaces::SurfaceClass::IntMass) {
                         // Recalculate lowest and highest height for the zone
                         Z1Zone = std::numeric_limits<Real64>::max();

@@ -1925,8 +1925,8 @@ namespace SurfaceGeometry {
                         Zone(ZoneNum).AllSurfaceFirst = SurfNum;
                     }
                     if (Surface(SurfNum).IsAirBoundarySurf) continue;
-                    if (Zone(ZoneNum).SurfaceFirst == 0) {
-                        Zone(ZoneNum).SurfaceFirst = SurfNum;
+                    if (Zone(ZoneNum).HTSurfaceFirst == 0) {
+                        Zone(ZoneNum).HTSurfaceFirst = SurfNum;
                         // Non window surfaces are grouped next within each zone
                         Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
                     }
@@ -1936,7 +1936,6 @@ namespace SurfaceGeometry {
                         // Window surfaces are grouped last within each zone
                         Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
                         Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
-                        break;
                     }
                     if ((Zone(ZoneNum).TDDDomeFirst == 0) && (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
                         // Window surfaces are grouped last within each zone
@@ -1975,10 +1974,11 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).WindowSurfaceLast = -1;
                 Zone(ZoneNum).NonWindowSurfaceLast = Zone(ZoneNum).SurfaceLast;
             }
+            Zone(ZoneNum).NonDomeLast = std::max(Zone(ZoneNum).NonWindowSurfaceLast, Zone(ZoneNum).WindowSurfaceLast);
         }
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (Zone(ZoneNum).SurfaceFirst == 0) {
+            if (Zone(ZoneNum).HTSurfaceFirst == 0) {
                 ShowSevereError(state, RoutineName + "Zone has no surfaces, Zone=" + Zone(ZoneNum).Name);
                 SurfError = true;
             }
@@ -1987,7 +1987,7 @@ namespace SurfaceGeometry {
         // Set up Floor Areas for Zones
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                         Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).HasFloor = true;
@@ -2120,8 +2120,8 @@ namespace SurfaceGeometry {
             OpaqueHTSurfs = 0;
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
-            if (Zone(ZoneNum).SurfaceFirst == 0) continue; // Zone with no surfaces
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            if (Zone(ZoneNum).HTSurfaceFirst == 0) continue; // Zone with no surfaces
+            for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
                     Surface(SurfNum).Class == SurfaceClass::Roof)
                     ++OpaqueHTSurfs;
@@ -2164,6 +2164,7 @@ namespace SurfaceGeometry {
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
+//            if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).Class != DataSurfaces::SurfaceClass::TDD_Dome) {
             if (Surface(SurfNum).HeatTransSurf) {
                 DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(Surface(SurfNum).Zone);

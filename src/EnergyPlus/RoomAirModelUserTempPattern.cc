@@ -728,7 +728,7 @@ namespace RoomAirModelUserTempPattern {
         ZMax = 0.0;
         ZMin = 0.0;
         Count = 0;
-        for (SurfNum = Zone(thisZone).SurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
+        for (SurfNum = Zone(thisZone).HTSurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
@@ -858,7 +858,7 @@ namespace RoomAirModelUserTempPattern {
 
 
 
-        SurfFirst = Zone(ZoneNum).SurfaceFirst;
+        SurfFirst = Zone(ZoneNum).HTSurfaceFirst;
         SurfLast = Zone(ZoneNum).SurfaceLast;
 
         // set air system leaving node conditions
@@ -897,7 +897,7 @@ namespace RoomAirModelUserTempPattern {
             WinGapFlowTtoRA = 0.0;
 
             if (state.dataZoneEquip->ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
-                for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                     if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                         FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *

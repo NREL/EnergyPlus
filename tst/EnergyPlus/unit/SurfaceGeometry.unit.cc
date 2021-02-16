@@ -2496,7 +2496,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     Zone.dimension(state->dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 6;
 
@@ -2567,7 +2567,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     Zone.dimension(state->dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
@@ -2632,7 +2632,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     Zone.dimension(state->dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
@@ -2697,7 +2697,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     Zone.dimension(state->dataGlobal->NumOfZones);
     Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 5;
 
@@ -2761,7 +2761,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
     Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).AllSurfaceFirst = 1;
     Zone(1).SurfaceLast = 4;
 
@@ -5546,9 +5546,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(DataHeatBalance::Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
     EXPECT_EQ(DataHeatBalance::Zone(2).AllSurfaceFirst, Zone2Surface1); // no air boundary surfaces in Zone 2
     EXPECT_EQ(DataHeatBalance::Zone(3).AllSurfaceFirst, Zone3Surface1); // air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceFirst, Zone1Surface1); // first non-air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceFirst, Zone2Surface1); // first non-air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceFirst, Zone3Floor); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(1).HTSurfaceFirst, Zone1Surface1); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(2).HTSurfaceFirst, Zone2Surface1); // first non-air boundary surface
+    EXPECT_EQ(DataHeatBalance::Zone(3).HTSurfaceFirst, Zone3Floor); // first non-air boundary surface
     EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceLast, Zone1Floor);
     EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceLast, Zone2Floor);
     EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceLast, Zone3Floor);
@@ -6743,6 +6743,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      Internal Mass
     //      Doors
     //      Windows
+    //      TDD_Domes
     //
     // Reporting Order (preserving the old surface order scheme)
     //
@@ -6757,7 +6758,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      Internal Mass
     //
     // Special cases:
-    //      TubularDaylightDome is treated as a "non-window" subsurface
+    //      TubularDaylightDome is treated as a separate surface type
     //      TubularDaylightDiffuser is treated as a window subsurface
 
     // For this test, the order should be
@@ -6805,8 +6806,8 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      36. NorthRoof4 (roof)
     //      37. EastRoof (roof)
     //      38. WestRoof (roof)
-    //      39. TubularDaylightingDome1 (not a window)
-    //      40. AtticSkylight (window)
+    //      39. AtticSkylight (window)
+    //      40. TubularDaylightingDome1 (not a window)
 
     // For this test, the order should be
     // Reporting (legacy) Order (zero-based):
@@ -6847,14 +6848,15 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      29. Attic:LivingFloor (floor)
     //      30. Attic:GarageFloor (floor)
     //      31. NorthRoof1 (roof)
-    //      32.   TubularDaylightingDome1 (not a window)
-    //      33. SouthRoof (roof)
-    //      34. NorthRoof2 (roof)
-    //      35. NorthRoof3 (roof)
-    //      36. NorthRoof4 (roof)
-    //      37. EastRoof (roof)
+
+    //      32. SouthRoof (roof)
+    //      33. NorthRoof2 (roof)
+    //      34. NorthRoof3 (roof)
+    //      35. NorthRoof4 (roof)
+    //      36. EastRoof (roof)
+    //      37. WestRoof (roof)
     //      38.   AtticSkylight (window)
-    //      39. WestRoof (roof)
+    //      39.   TubularDaylightingDome1 (not a window)
 
     // Simulation Order (1-based):
     //  SHADING SURFACES:
@@ -6901,12 +6903,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorLivingFloor, 12);
     EXPECT_EQ(ceilingLivingCeiling, 13);
     EXPECT_EQ(doorWestDoor, 14);
-    EXPECT_EQ(windowTubularDaylightingDiffuser1, 15);
-    EXPECT_EQ(windowNorthWindow, 16);
-    EXPECT_EQ(windowEastWindow, 17);
-    EXPECT_EQ(windowSouthWindow, 18);
-    EXPECT_EQ(windowWestWindow, 19);
-    EXPECT_EQ(Zone(1).SurfaceFirst, 7);
+    EXPECT_EQ(windowTubularDaylightingDiffuser1, 19);
+    EXPECT_EQ(windowNorthWindow, 15);
+    EXPECT_EQ(windowEastWindow, 16);
+    EXPECT_EQ(windowSouthWindow, 17);
+    EXPECT_EQ(windowWestWindow, 18);
+    EXPECT_EQ(Zone(1).HTSurfaceFirst, 7);
     EXPECT_EQ(Zone(1).SurfaceLast, 19);
     EXPECT_EQ(Zone(1).NonWindowSurfaceFirst, 7);
     EXPECT_EQ(Zone(1).NonWindowSurfaceLast, 14);
@@ -6929,7 +6931,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorGarageFloor, 24);
     EXPECT_EQ(ceilingGarageInterior, 25);
     EXPECT_EQ(intmassEVChargingStation, 26);
-    EXPECT_EQ(Zone(2).SurfaceFirst, 20);
+    EXPECT_EQ(Zone(2).HTSurfaceFirst, 20);
     EXPECT_EQ(Zone(2).SurfaceLast, 26);
     EXPECT_EQ(Zone(2).NonWindowSurfaceFirst, 20);
     EXPECT_EQ(Zone(2).NonWindowSurfaceLast, 26);
@@ -6965,14 +6967,17 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofNorthRoof4, 36);
     EXPECT_EQ(roofEastRoof, 37);
     EXPECT_EQ(roofWestRoof, 38);
-    EXPECT_EQ(nonwindowTubularDaylightingDome1, 39);
-    EXPECT_EQ(windowAtticSkylight, 40);
-    EXPECT_EQ(Zone(3).SurfaceFirst, 27);
+    EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
+    EXPECT_EQ(windowAtticSkylight, 39);
+    EXPECT_EQ(Zone(3).HTSurfaceFirst, 27);
     EXPECT_EQ(Zone(3).SurfaceLast, 40);
     EXPECT_EQ(Zone(3).NonWindowSurfaceFirst, 27);
-    EXPECT_EQ(Zone(3).NonWindowSurfaceLast, 39);
-    EXPECT_EQ(Zone(3).WindowSurfaceFirst, 40);
-    EXPECT_EQ(Zone(3).WindowSurfaceLast, 40);
+    EXPECT_EQ(Zone(3).NonWindowSurfaceLast, 38);
+    EXPECT_EQ(Zone(3).WindowSurfaceFirst, 39);
+    EXPECT_EQ(Zone(3).WindowSurfaceLast, 39);
+    EXPECT_EQ(Zone(3).NonDomeLast, 39);
+    EXPECT_EQ(Zone(3).TDDDomeFirst, 40);
+    EXPECT_EQ(Zone(3).TDDDomeLast, 40);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:

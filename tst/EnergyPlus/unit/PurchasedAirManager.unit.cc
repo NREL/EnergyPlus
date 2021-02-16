@@ -391,7 +391,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
@@ -501,7 +501,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
@@ -623,7 +623,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
@@ -799,7 +799,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
@@ -909,7 +909,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    Zone(1).SurfaceFirst = 1;
+    Zone(1).HTSurfaceFirst = 1;
     Zone(1).SurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
