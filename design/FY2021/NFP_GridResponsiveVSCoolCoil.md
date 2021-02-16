@@ -10,11 +10,11 @@ To Develop HVAC flexibility measures in EnergyPlus and assess impact of grid-res
 ## Overview
 Present EnergyPlus is capable of modeling variable-speed DX cooling coil. It can be embededed in a parent object of AirLoopHVAC:UnitarySystem, given in the figure below. 
 
-![VSCoolingCoil](.\HVACFlexFigures\VSCoolingCoil.png)
+![VSCoolingCoil](VSCoolingCoil.png)
 
 One control schedule turns on/off the cooling coil, and can do separate sensible and latent cooling. However, the logic to limit the cooling power input during grid peak hours is missing. It is necessary to add a new logic to limit the top speed or turn off the DX cooling coil when the electricity price is high, i.e. having the variable speed DX coil responding to a grid singal input as the figure below:
 
-![GridVSCoolCoil](.\HVACFlexFigures\GridVSCoolCoil.png)
+![GridVSCoolCoil](GridVSCoolCoil.png)
 
 The variabl-speed DX cooling coil limits its running speed or shut off totally, when the grid signal (electricity price) falls within a range. Additionally, the variable speed coil operates to manage sensible or latent load selectively, where a related ZoneControl:Humidistat object is also required. To do this, we will modify the existing Coil:Cooling:DX:VariableSpeed.
 
@@ -24,7 +24,7 @@ The Coil:Cooling:DX:VariableSpeed will be embeded with five new fields to take a
 
 A grid signal schedule represents an electricity hourly price. For example, the figure and schedule below depicts hourly electricity prices (cents), respectively in summer (cooling season) and winter (heating season).
 
-![GridSignal](.\HVACFlexFigures\GridSignal.png)
+![GridSignal](GridSignal.png)
 
 A max speed level should be given to limit the cooling coil’s power input, when a grid-responsvie operation is required. When the max speed is defined a zero, the cooling coil will shut off. A lower bound and a upper bound define the grid-responsive operation logic. When the grid signal falls between the two boundary values, the grid responsive operation will run. Another flag will define the sensible or latent load control. 
 

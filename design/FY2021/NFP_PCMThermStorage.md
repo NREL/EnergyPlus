@@ -39,7 +39,7 @@ When charging is requested, the following limits are calculated to determine the
 5. The maximum charging rate which the chilled water flow can provide is determined by the entering water temperature and flow rate and an outlet temperature which is the minimum of -1◦C or the outlet setpoint temperature.
 6. The charging rate which the tank can accept is calculated based on NTU- ε method by the following equations:
 
-![PCMcharging](.\HVACFlexFigures\PCMcharging.PNG)
+![PCMcharging](PCMcharging.PNG)
 
 
 Discharging
@@ -51,7 +51,7 @@ When discharging is requested, the following limits are calculated to determine 
 4. If the requested discharge rate times the current system timestep is more than the remaining charged storage capacity, the discharge rate is limited to that required to completely deplete the solid PCM in the tank.
 5. The maximum discharge rate which the chilled water flow can accept is determined by the entering water temperature and flow rate and an outlet temperature which is the maximum of 1◦C or the outlet setpoint temperature.
 6. Similar as charge process, the discharging rate which the tank can accept is calculated based on NTU- ε method by the following equations,
-![PCMdischarging](.\HVACFlexFigures\PCMdischarging.PNG)
+![PCMdischarging](PCMdischarging.PNG)
 
 ## Testing
 

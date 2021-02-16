@@ -10,7 +10,7 @@ Although the present E+ can simulate single-speed and variable-speed heat pump w
 ## Overview
 Present EnergyPlus is capable of modeling air-source variable-speed heat pump water heater. They can be grouped in a parent object of WaterHeater:HeatPump:PumpedCondenser, associated with a water tank and supplemental heating elements. The operation of the HPWH responding to thermostat sensing the tank temperature, the HPWH turns on when the water temperature below a certain value and shuts off after the temperature rises above a value. It is necessary to add a new logic to limit the speed or turn off the HPWH when the electricity price is high, i.e. having the variable speed HPWH responding to a grid singal input as the figure below:
 
-![VSHPWH](.\HVACFlexFigures\VSHPWH.png)
+![VSHPWH](VSHPWH.png)
 
 The variabl-speed HPWH heating coil limits its running speed or shut off totally, when the grid signal (electricity price) falls within a range. To do this, we will modify the existing Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. 
 
@@ -21,7 +21,7 @@ The Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed will be embeded with four
 
 A grid signal schedule represents an electricity hourly price. For example, the figure and schedule below depicts hourly electricity prices (cents), respectively in summer (cooling season) and winter (heating season).
 
-![GridSignal](.\HVACFlexFigures\GridSignal.png)
+![GridSignal](GridSignal.png)
 
 A max speed level should be given to limit the HPWH coil’s power input, if a grid-responsvie operation is required. When the max speed is defined a zero, the HPWH coil will shut off. A lower bound and a upper bound define the grid-responsive operation logic. When the grid signal falls between the two boundary values, the grid responsive operation will run. 
 

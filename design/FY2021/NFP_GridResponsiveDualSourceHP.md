@@ -10,11 +10,11 @@ Although the present E+ can simulate multiple heating coils, i.e. variable-speed
 ## Overview
 Present EnergyPlus is capable of modeling variable-speed DX heating coils, gas heating and water heating coils. They can be grouped in a parent object of AirLoopHVAC:UnitaryHeatPump, given in the figure below. The Coil:Heating:Fuel and Coil:Heating:Water serves as the supplemental heating coil to compensate the heating capacity when the main Coil:Heating:DX:VariableSpeed coil fails to meet the indoor load. 
 
-![DualHP](.\HVACFlexFigures\DualHP.png)
+![DualHP](DualHP.png)
 
 The operation of the two heating coils basically reponds to a single unit ON/OFF schedule. It is necessary to add a new logic to limit the speed or turn off the DX heating coil when the electricity price is high, i.e. having the variable speed DX coil responding to a grid singal input as the figure below:
 
-![GridDualHP](.\HVACFlexFigures\GridDualHP.png)
+![GridDualHP](GridDualHP.png)
 
 The variabl-speed DX heating coil limits its running speed or shut off totally, when the grid signal (electricity price) falls within a range. In this way, the supplemental heating coil will automatically compensate the capacity and achieve a grid responsive dual-source operation. To do this, we will modify the existing Coil:Heating:DX:VariableSpeed
 
@@ -23,7 +23,7 @@ The variabl-speed DX heating coil limits its running speed or shut off totally, 
 The Coil:Heating:DX:VariableSpeed will be embeded with four new fields to take a grid signal input. The new codes were added to VariableSpeedCoils.cc and VariableSpeedCoils.hh.
 
 A grid signal schedule represents an electricity hourly price. For example, the figure and schedule below depicts hourly electricity prices (cents), respectively in summer (cooling season) and winter (heating season).
-![GridSignal](.\HVACFlexFigures\GridSignal.png)
+![GridSignal](GridSignal.png)
 
 A max speed level should be given to limit the heating coil’s power input, if a grid-responsvie operation is required. When the max speed is defined a zero, the heating coil will shut off. A lower bound and a upper bound define the grid-responsive operation logic. When the grid signal fails between the two boundary values, the grid responsive operation will run. 
 
