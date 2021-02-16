@@ -2442,8 +2442,6 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydronicRadiantSysDesign(DesignObjectNum).HotSetptSchedPtr = 2;
     HydronicRadiantSysDesign(DesignObjectNum).ColdSetptSchedPtr = 3;
 
-//    TODO-Jermy Check every Radiant and Const Flow item
-
     HydrRadSys(RadSysNum).HotWaterInNode = 0;
     HydrRadSys(RadSysNum).ColdWaterInNode = 0;
     HydrRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
