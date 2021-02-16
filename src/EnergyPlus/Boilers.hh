@@ -162,7 +162,7 @@ namespace Boilers {
 
         void SetupOutputVars(EnergyPlusData &state);
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 

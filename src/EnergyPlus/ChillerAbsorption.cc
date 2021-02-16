@@ -1498,7 +1498,7 @@ namespace EnergyPlus::ChillerAbsorption {
                 EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / CpFluid;
                 this->EvapOutletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp - EvapDeltaTemp;
             } else {
-                Real64 TempEvapOutSetPoint; // C - evaporator outlet temperature setpoint
+                Real64 TempEvapOutSetPoint{0}; // C - evaporator outlet temperature setpoint
 
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);

@@ -148,7 +148,7 @@ namespace BoilerSteam {
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 
