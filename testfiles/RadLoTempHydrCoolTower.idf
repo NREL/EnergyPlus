@@ -1683,7 +1683,7 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     West Zone Radiant Floor, !- Name
-    West Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     West Zone, !- Zone_Name
     Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -1699,30 +1699,9 @@
     , !- Number_of_Circuits
     ; !- Circuit_Length
 
-  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-    West Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    HalfFlowPower, !- Setpoint_Control_Type
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
-    , !- Heating_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Heating_Design_Capacity
-    2.0, !- Heating_Control_Throttling_Range
-    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
-    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
-    , !- Cooling_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Cooling_Design_Capacity
-    2.0, !- Cooling_Control_Throttling_Range
-    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
-    , !- Condensation_Control_Type
-    ; !- Condensation_Control_Dewpoint_Offset
-
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     East Zone Radiant Floor, !- Name
-    East Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     East Zone, !- Zone_Name
     Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -1738,30 +1717,9 @@
     , !- Number_of_Circuits
     ; !- Circuit_Length
 
-  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-    East Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    HalfFlowPower, !- Setpoint_Control_Type
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
-    , !- Heating_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Heating_Design_Capacity
-    2.0, !- Heating_Control_Throttling_Range
-    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
-    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
-    , !- Cooling_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Cooling_Design_Capacity
-    2.0, !- Cooling_Control_Throttling_Range
-    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
-    , !- Condensation_Control_Type
-    ; !- Condensation_Control_Dewpoint_Offset
-
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     North Zone Radiant Floor, !- Name
-    North Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     North Zone, !- Zone_Name
     Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -1778,7 +1736,7 @@
     ; !- Circuit_Length
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-    North Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
     0.012, !- Hydronic_Tubing_Inside_Diameter
     0.016, !- Hydronic_Tubing_Outside_Diameter

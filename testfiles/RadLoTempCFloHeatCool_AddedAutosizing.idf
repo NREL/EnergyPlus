@@ -1958,7 +1958,7 @@
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
-    West Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     West Zone, !- Zone_Name
     Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -1982,22 +1982,9 @@
     , !- Number_of_Circuits
     ; !- Circuit_Length
 
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    West Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
-    Off, !- Condensation_Control_Type
-    ; !- Condensation_Control_Dewpoint_Offset
-
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     East Zone Radiant Floor, !- Name
-    East Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     East Zone, !- Zone_Name
     Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -2021,22 +2008,9 @@
     , !- Number_of_Circuits
     ; !- Circuit_Length
 
-  ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    East Zone Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    0.8, !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
-    0.87, !- Motor_Efficiency
-    0.1, !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
-    Off, !- Condensation_Control_Type
-    ; !- Condensation_Control_Dewpoint_Offset
-
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     North Zone Radiant Floor, !- Name
-    North Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     RadiantSysAvailSched, !- Availability_Schedule_Name
     North Zone, !- Zone_Name
     Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
@@ -2061,7 +2035,7 @@
     ; !- Circuit_Length
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
-    North Zone Radiant Floor Design, !- Design_Object_Name
+    Radiant Floor Design, !- Design_Object_Name
     ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
     0.012, !- Hydronic_Tubing_Inside_Diameter
     0.016, !- Hydronic_Tubing_Outside_Diameter
