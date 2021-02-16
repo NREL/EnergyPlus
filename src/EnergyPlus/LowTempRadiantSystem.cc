@@ -886,17 +886,13 @@ namespace LowTempRadiantSystem {
 
             thisRadSys.CircLength = Numbers(6);
 
-
-
-            // To fix
-
-//            if ((thisRadSys.WaterVolFlowMaxCool == AutoSize) &&
-//                (lAlphaBlanks(10) || lAlphaBlanks(11) || lAlphaBlanks(12) || (thisRadSys.ColdWaterInNode <= 0) ||
-//                 (thisRadSys.ColdWaterOutNode <= 0) || (variableFlowDesignDataObject.ColdSetptSchedPtr == 0))) {
-//                ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules");
-//                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas(1));
-//                ErrorsFound = true;
-//            }
+            if ((thisRadSys.WaterVolFlowMaxCool == AutoSize) &&
+                (variableFlowDesignDataObject.DesignCoolingCapMethod == 0 || lAlphaBlanks(6) || lAlphaBlanks(7) || (thisRadSys.ColdWaterInNode <= 0) ||
+                 (thisRadSys.ColdWaterOutNode <= 0) || (variableFlowDesignDataObject.ColdSetptSchedPtr == 0))) {
+                ShowSevereError(state, "Hydronic radiant systems may not be autosized without specification of nodes or schedules");
+                ShowContinueError(state, "Occurs in " + CurrentModuleObject + " (cooling input) =" + Alphas(1));
+                ErrorsFound = true;
+            }
         }
 
         // Obtain all of the design data related to Constant flow low temperature radiant systems...

@@ -3540,7 +3540,6 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
     CflowRadiantSysDesign.allocate(1);
-//    auto &thisRadSysDesign(CflowRadiantSysDesign(1)); TODO delete auto &thisRadSysDesign(CflowRadiantSysDesign(Item));
     thisCFloSys.TubeLength = 100.0;
     DesignObjectNum = 1;
     CflowRadiantSysDesign(DesignObjectNum).TubeDiameterInner = 0.01;
