@@ -802,7 +802,7 @@ namespace LowTempRadiantSystem {
                 } else {
                     if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(8) + " = " + Alphas(8));  // To fix
+                        ShowContinueError(state, "Input for Heating Design Capacity Method = HeatingDesignCapacity");
                         ShowContinueError(state, "Blank field not allowed for " + cNumericFields(2));
                         ErrorsFound = true;
                     }
@@ -848,7 +848,7 @@ namespace LowTempRadiantSystem {
                 } else {
                     if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
                         ShowSevereError(state, CurrentModuleObject + " = " + thisRadSys.Name);
-                        ShowContinueError(state, "Input for " + cAlphaFields(4) + " = " + Alphas(4)); // To fix
+                        ShowContinueError(state, "Input for Cooling Design Capacity Method = CoolingDesignCapacity");
                         ShowContinueError(state, "Blank field not allowed for " + cNumericFields(4));
                         ErrorsFound = true;
                     }
