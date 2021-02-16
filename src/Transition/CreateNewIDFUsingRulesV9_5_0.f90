@@ -382,16 +382,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1)=InArgs(1)
-                 OutArgs(2:CurArgs+1)=InArgs(4:CurArgs)
+                 OutArgs(2:CurArgs-2)=InArgs(4:CurArgs)
+                 CurArgs = CurArgs - 2
                  IF (InArgs(2) == "InteriorWindow") THEN
-                   CALL ShowWarningError('Construction:AirBoundary='//InArgs(1)//' Solar and Daylighting Method option InteriorWindow is no longer valid.',Auditf)
+                   CALL ShowWarningError('Construction:AirBoundary='//trim(InArgs(1))//' Solar and Daylighting Method option InteriorWindow is no longer valid.',Auditf)
                    CALL ShowContinueError('The air boundary will be modeled using the GroupedZones method.',Auditf)
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//InArgs(1)//' Solar and Daylighting Method option InteriorWindow is no longer valid.')
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//trim(InArgs(1))// &
+                                                ' Solar and Daylighting Method option InteriorWindow is no longer valid. '// &
+                                                'The air boundary will be modeled using the GroupedZones method.')
                  END IF
                  IF (InArgs(3) == "IRTSurface") THEN
-                   CALL ShowWarningError('Construction:AirBoundary='//InArgs(1)//' Radiant Exchange Method option IRTSurface is no longer valid.',Auditf)
+                   CALL ShowWarningError('Construction:AirBoundary='//trim(InArgs(1))//' Radiant Exchange Method option IRTSurface is no longer valid.',Auditf)
                    CALL ShowContinueError('The air boundary will be modeled using the GroupedZones method.',Auditf)
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//InArgs(1)//' Radiant Exchange Method option IRTSurface is no longer valid.')
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//trim(InArgs(1))// &
+                                                ' Radiant Exchange Method option IRTSurface is no longer valid. '// &
+                                                'The air boundary will be modeled using the GroupedZones method.')
                  END IF
                  
               ! If your original object starts with D, insert the rules here
