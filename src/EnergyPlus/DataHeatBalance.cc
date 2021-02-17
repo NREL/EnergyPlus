@@ -256,7 +256,7 @@ namespace DataHeatBalance {
     int const MixingSourceZonesOnly(1);
     int const AllZones(2);
 
-    int const NumZoneIntGainDeviceTypes(53);
+    int const NumZoneIntGainDeviceTypes(54);
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -279,6 +279,7 @@ namespace DataHeatBalance {
                                                  "ELECTRICLOADCENTER:INVERTER:SIMPLE",
                                                  "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
                                                  "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
+                                                 "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:BATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:SIMPLE",
                                                  "PIPE:INDOOR",
@@ -313,7 +314,7 @@ namespace DataHeatBalance {
                                                  "FAN:SYSTEMMODEL"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16
                                                                       // | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 |
                                                                       // 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47
-                                                                      // | 48 | 49 | 50 | 51 | 52 | 53
+                                                                      // | 48 | 49 | 50 | 51 | 52 | 53 | 54
 
     Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                   {"People",
@@ -337,6 +338,7 @@ namespace DataHeatBalance {
                                                    "ElectricLoadCenter:Inverter:Simple",
                                                    "ElectricLoadCenter:Inverter:FunctionOfPower",
                                                    "ElectricLoadCenter:Inverter:LookUpTable",
+                                                   "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                                    "ElectricLoadCenter:Storage:Battery",
                                                    "ElectricLoadCenter:Storage:Simple",
                                                    "Pipe:Indoor",
@@ -371,7 +373,7 @@ namespace DataHeatBalance {
                                                    "Fan:SystemModel"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 |
                                                                         // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
-                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
+                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54
 
     int const IntGainTypeOf_People(1);
     int const IntGainTypeOf_Lights(2);

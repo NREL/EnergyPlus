@@ -7089,8 +7089,8 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_ElectricLoadCenterInverterSimple,
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_ElectricLoadCenterConverter});
 

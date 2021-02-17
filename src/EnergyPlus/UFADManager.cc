@@ -971,7 +971,7 @@ namespace UFADManager {
         Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
         Real64 ZoneMult;                 // total zone multiplier
         int ZoneNodeNum;                 // node number of the HVAC zone node
-        Array1D_int IntGainTypesOccupied(29,
+        Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -991,8 +991,8 @@ namespace UFADManager {
                                                  IntGainTypeOf_ElectricLoadCenterInverterSimple,
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
-                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
                                                  IntGainTypeOf_RefrigerationCase,
