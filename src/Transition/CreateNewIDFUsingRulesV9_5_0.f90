@@ -448,8 +448,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(8:10)=InArgs(16:18)
                 OutArgs(11)=InArgs(22)
                 OutArgs(12:14)=InArgs(25:27)
-                OutArgs(15:CurArgs-17)=InArgs(32:CurArgs)
-                CurArgs = CurArgs - 17
+                OutArgs(15:16)=InArgs(32:33)
+                CurArgs = 16 !CurArgs - 17
                 nodiff=.false.
 
                 CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
@@ -472,8 +472,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(6)=OutArgs(8)
                 OutArgs(7:10)=InArgs(12:15)
                 OutArgs(11:22)=InArgs(18:29)
-                OutArgs(23:CurArgs-9)=InArgs(32:CurArgs)
-                CurArgs = CurArgs - 9
+                OutArgs(23:24)=InArgs(32:33)
+                CurArgs = 24 !CurArgs - 9
                 nodiff=.false.
 
                 CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
