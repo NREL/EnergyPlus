@@ -1127,7 +1127,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
-    DataSurfaces::WorldCoordSystem = true;
+    state->dataSurface->WorldCoordSystem = true;
     GetSurfaceListsInputs(*state);
 
     ErrorsFound = false;
@@ -1992,7 +1992,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     GetPlantInput(*state);
     SetupInitialPlantCallingOrder(*state);
     SetupBranchControlTypes(*state);
-    DataSurfaces::WorldCoordSystem = true;
+    state->dataSurface->WorldCoordSystem = true;
     GetSurfaceListsInputs(*state);
     ErrorsFound = false;
     SetupZoneGeometry(*state, ErrorsFound);

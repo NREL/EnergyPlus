@@ -702,7 +702,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                 }
 
                 Kiva::Polygon floorPolygon;
-                if (DataSurfaces::CCW) {
+                if (state.dataSurface->CCW) {
                     for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
                         auto &v = surface.Vertex[i];
                         floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));

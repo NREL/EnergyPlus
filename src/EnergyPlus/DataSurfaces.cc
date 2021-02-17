@@ -107,26 +107,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    int BuildingShadingCount(0); // Total number of Building External Shades
-    int FixedShadingCount(0);    // Total number of Fixed External Shades
-    int AttachedShadingCount(0); // Total number of Shades attached to Zones
-    int ShadingSurfaceFirst(-1); // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-    int ShadingSurfaceLast(-1);  // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-
-    bool AspectTransform(false);  // Set to true when GeometryTransform object is used
-    bool CalcSolRefl(false);      // Set to true when Solar Reflection Calculations object is used
-    bool CCW(false);              // True if vertices will be entered in CounterClockWise Order
-    bool WorldCoordSystem(false); // True if vertices will be "World Coordinates"
-    // False means relative coordinates
-    bool DaylRefWorldCoordSystem(false); // True if Daylight Reference Point vertices will be "World Coordinates"
-    // False means relative coordinates
-    int MaxRecPts(0);           // Max number of receiving points on a surface for solar reflection calc
-    int MaxReflRays(0);         // Max number of rays from a receiving surface for solar reflection calc
-    Real64 GroundLevelZ(0.0);   // Z value of ground level for solar refl calc (m)
-    bool AirflowWindows(false); // TRUE if one or more airflow windows
-
-    bool ShadingTransmittanceVaries(false); // overall, shading transmittance varies for the building
-
     Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
     // 0 otherwise
     Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
@@ -915,21 +895,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        BuildingShadingCount = 0;
-        FixedShadingCount = 0;
-        AttachedShadingCount = 0;
-        ShadingSurfaceFirst = -1;
-        ShadingSurfaceLast = -1;
-        AspectTransform = false;
-        CalcSolRefl = false;
-        CCW = false;
-        WorldCoordSystem = false;
-        DaylRefWorldCoordSystem = false;
-        MaxRecPts = 0;
-        MaxReflRays = 0;
-        GroundLevelZ = 0.0;
-        AirflowWindows = false;
-        ShadingTransmittanceVaries = false;
         InsideGlassCondensationFlag.deallocate();
         InsideFrameCondensationFlag.deallocate();
         InsideDividerCondensationFlag.deallocate();

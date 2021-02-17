@@ -545,7 +545,7 @@ namespace DElightManagerF {
                             // Limit to maximum of 100 RefPts
                             if (znDayl.TotalDaylRefPoints <= 100) {
 
-                                if (DaylRefWorldCoordSystem) {
+                                if (state.dataSurface->DaylRefWorldCoordSystem) {
                                     RefPt_WCS_Coord(1) = refPt.x;
                                     RefPt_WCS_Coord(2) = refPt.y;
                                     RefPt_WCS_Coord(3) = refPt.z;
@@ -751,11 +751,7 @@ namespace DElightManagerF {
         //  change them to reflect a different aspect
         // ratio for the entire building based on user input.
 
-        // USE STATEMENTS:
-        // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::AspectTransform;
-        using DataSurfaces::WorldCoordSystem;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("GeometryTransform");
@@ -792,11 +788,11 @@ namespace DElightManagerF {
                 ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
-            AspectTransform = true;
+            state.dataSurface->AspectTransform = true;
         }
-        if (WorldCoordSystem) {
+        if (state.dataSurface->WorldCoordSystem) {
             doTransform = false;
-            AspectTransform = false;
+            state.dataSurface->AspectTransform = false;
         }
     }
 

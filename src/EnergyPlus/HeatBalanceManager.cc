@@ -145,11 +145,9 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
     using namespace DataIPShortCuts;
-    using DataSurfaces::CalcSolRefl;
     using DataSurfaces::DividedLite;
     using DataSurfaces::FrameDivider;
     using DataSurfaces::FrameDividerProperties;
-    using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::StormWindow;
     using DataSurfaces::Suspended;
     using DataWindowEquivalentLayer::TotWinEquivLayerConstructs;
@@ -768,23 +766,23 @@ namespace HeatBalanceManager {
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || lMinimalShadowing) {
                 state.dataHeatBal->SolarDistribution = MinimalShadowing;
                 AlphaName(3) = "MinimalShadowing";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
                 state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExterior";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIOR" || AlphaName(3) == "1") {
                 state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExterior";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIORWITHREFLECTIONS") {
                 state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExteriorWithReflectionsFromExteriorSurfaces";
-                CalcSolRefl = true;
+                state.dataSurface->CalcSolRefl = true;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIORWITHREFLECTIONS") {
                 state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
-                CalcSolRefl = true;
+                state.dataSurface->CalcSolRefl = true;
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(3) + " invalid=" + AlphaName(3));
                 ErrorsFound = true;

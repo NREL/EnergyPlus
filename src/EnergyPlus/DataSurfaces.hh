@@ -324,26 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    extern int BuildingShadingCount; // Total number of Building External Shades
-    extern int FixedShadingCount;    // Total number of Fixed External Shades
-    extern int AttachedShadingCount; // Total number of Shades attached to Zones
-    extern int ShadingSurfaceFirst;  // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-    extern int ShadingSurfaceLast;   // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
-
-    extern bool AspectTransform;  // Set to true when GeometryTransform object is used
-    extern bool CalcSolRefl;      // Set to true when Solar Reflection Calculations object is used
-    extern bool CCW;              // True if vertices will be entered in CounterClockWise Order
-    extern bool WorldCoordSystem; // True if vertices will be "World Coordinates"
-    // False means relative coordinates
-    extern bool DaylRefWorldCoordSystem; // True if Daylight Reference Point vertices will be "World Coordinates"
-    // False means relative coordinates
-    extern int MaxRecPts;       // Max number of receiving points on a surface for solar reflection calc
-    extern int MaxReflRays;     // Max number of rays from a receiving surface for solar reflection calc
-    extern Real64 GroundLevelZ; // Z value of ground level for solar refl calc (m)
-    extern bool AirflowWindows; // TRUE if one or more airflow windows
-
-    extern bool ShadingTransmittanceVaries; // overall, shading transmittance varies for the building
-
     extern Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
     // 0 otherwise
     extern Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
@@ -1487,6 +1467,21 @@ struct SurfacesData : BaseGlobalStruct
     int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
     int Corner = 0;                // Which corner is specified as the first vertex
     int MaxVerticesPerSurface = 4; // Maximum number of vertices allowed for a single surface (default -- can go higher)
+    int BuildingShadingCount = 0;  // Total number of Building External Shades
+    int FixedShadingCount = 0;     // Total number of Fixed External Shades
+    int AttachedShadingCount = 0;  // Total number of Shades attached to Zones
+    int ShadingSurfaceFirst = -1;  // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    int ShadingSurfaceLast = -1;   // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    bool AspectTransform = false;  // Set to true when GeometryTransform object is used
+    bool CalcSolRefl = false;      // Set to true when Solar Reflection Calculations object is used
+    bool CCW = false;              // True if vertices will be entered in CounterClockWise Order
+    bool WorldCoordSystem = false; // True if vertices will be "World Coordinates". False means relative coordinates
+    bool DaylRefWorldCoordSystem = false; // True if Daylight Reference Point vertices will be "World Coordinates". False means relative coordinates
+    int MaxRecPts = 0;                    // Max number of receiving points on a surface for solar reflection calc
+    int MaxReflRays = 0;                  // Max number of rays from a receiving surface for solar reflection calc
+    Real64 GroundLevelZ = 0.0;            // Z value of ground level for solar refl calc (m)
+    bool AirflowWindows = false;          // TRUE if one or more airflow windows
+    bool ShadingTransmittanceVaries = false; // overall, shading transmittance varies for the building
 
     void clear_state() override
     {
@@ -1505,6 +1500,21 @@ struct SurfacesData : BaseGlobalStruct
         this->TotSurfLocalEnv = 0;
         this->Corner = 0;
         this->MaxVerticesPerSurface = 4;
+        this->BuildingShadingCount = 0;
+        this->FixedShadingCount = 0;
+        this->AttachedShadingCount = 0;
+        this->ShadingSurfaceFirst = -1;
+        this->ShadingSurfaceLast = -1;
+        this->AspectTransform = false;
+        this->CalcSolRefl = false;
+        this->CCW = false;
+        this->WorldCoordSystem = false;
+        this->DaylRefWorldCoordSystem = false;
+        this->MaxRecPts = 0;
+        this->MaxReflRays = 0;
+        this->GroundLevelZ = 0.0;
+        this->AirflowWindows = false;
+        this->ShadingTransmittanceVaries = false;
     }
 };
 

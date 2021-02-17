@@ -166,9 +166,7 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-    using DataSurfaces::CalcSolRefl;
     using DataSurfaces::ExternalEnvironment;
-    using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass;
 
@@ -424,7 +422,7 @@ namespace DaylightingDevices {
         // solar reflection calculated from obstructions will not be used in daylighting shelf or tubular device
         // calculation
 
-        if (CalcSolRefl && (state.dataDaylightingDevicesData->NumOfTDDPipes > 0 || state.dataDaylightingDevicesData->NumOfShelf > 0)) {
+        if (state.dataSurface->CalcSolRefl && (state.dataDaylightingDevicesData->NumOfTDDPipes > 0 || state.dataDaylightingDevicesData->NumOfShelf > 0)) {
             ShowWarningError(state, "InitDaylightingDevices: Solar Distribution Model includes Solar Reflection calculations;");
             ShowContinueError(state, "the resulting reflected solar values will not be used in the");
             ShowContinueError(state, "DaylightingDevice:Shelf or DaylightingDevice:Tubular calculations.");
@@ -1175,7 +1173,7 @@ namespace DaylightingDevices {
 
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
-        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
             IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
             HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
         } else {

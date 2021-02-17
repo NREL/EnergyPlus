@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     //	compare_err_stream( "" ); // just for debugging
 
-    DataSurfaces::ShadingTransmittanceVaries = true;
+    state->dataSurface->ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     state->dataHeatBal->SolarDistribution = FullExterior;
 
@@ -1053,7 +1053,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     compare_err_stream(""); // just for debugging
 
-    DataSurfaces::ShadingTransmittanceVaries = true;
+    state->dataSurface->ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     state->dataHeatBal->SolarDistribution = FullExterior;
@@ -1834,7 +1834,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     //	compare_err_stream( "" ); // just for debugging
     EXPECT_FALSE(DataSystemVariables::SlaterBarsky);
 
-    DataSurfaces::ShadingTransmittanceVaries = true;
+    state->dataSurface->ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     state->dataHeatBal->SolarDistribution = FullExterior;
     DataSystemVariables::SlaterBarsky = true;

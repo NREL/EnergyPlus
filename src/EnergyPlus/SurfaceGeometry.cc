@@ -355,11 +355,11 @@ namespace SurfaceGeometry {
 
         state.dataHeatBal->CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
         // is requested for one or more exterior windows.
-        BuildingShadingCount = 0;
-        FixedShadingCount = 0;
-        AttachedShadingCount = 0;
-        ShadingSurfaceFirst = -1;
-        ShadingSurfaceLast = -1;
+        state.dataSurface->BuildingShadingCount = 0;
+        state.dataSurface->FixedShadingCount = 0;
+        state.dataSurface->AttachedShadingCount = 0;
+        state.dataSurface->ShadingSurfaceFirst = -1;
+        state.dataSurface->ShadingSurfaceLast = -1;
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
@@ -370,12 +370,12 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass::Shading || Surface(SurfNum).Class == SurfaceClass::Detached_F ||
                 Surface(SurfNum).Class == SurfaceClass::Detached_B) {
                 Surface(SurfNum).ShadowingSurf = true;
-                if (ShadingSurfaceFirst == -1) ShadingSurfaceFirst = SurfNum;
-                ShadingSurfaceLast = SurfNum;
+                if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
+                state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
-            if (Surface(SurfNum).Class == SurfaceClass::Shading) ++AttachedShadingCount;
-            if (Surface(SurfNum).Class == SurfaceClass::Detached_F) ++FixedShadingCount;
-            if (Surface(SurfNum).Class == SurfaceClass::Detached_B) ++BuildingShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Shading) ++state.dataSurface->AttachedShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Detached_F) ++state.dataSurface->FixedShadingCount;
+            if (Surface(SurfNum).Class == SurfaceClass::Detached_B) ++state.dataSurface->BuildingShadingCount;
 
             if (Surface(SurfNum).Class != SurfaceClass::IntMass) ProcessSurfaceVertices(state, SurfNum, ErrorsFound);
         }
@@ -661,7 +661,7 @@ namespace SurfaceGeometry {
         // Write number of shadings to initialization output file
         print(state.files.eio, "! <Shading Summary>, Number of Fixed Detached Shades, Number of Building Detached Shades, Number of Attached Shades\n");
 
-        print(state.files.eio, " Shading Summary,{},{},{}\n", FixedShadingCount, BuildingShadingCount, AttachedShadingCount);
+        print(state.files.eio, " Shading Summary,{},{},{}\n", state.dataSurface->FixedShadingCount, state.dataSurface->BuildingShadingCount, state.dataSurface->AttachedShadingCount);
 
         // Write number of zones header to initialization output file
         print(state.files.eio, "! <Zone Summary>, Number of Zones, Number of Zone Surfaces, Number of SubSurfaces\n");
@@ -669,7 +669,7 @@ namespace SurfaceGeometry {
         print(state.files.eio,
               " Zone Summary,{},{},{}\n",
               state.dataGlobal->NumOfZones,
-              state.dataSurface->TotSurfaces - FixedShadingCount - BuildingShadingCount - AttachedShadingCount,
+              state.dataSurface->TotSurfaces - state.dataSurface->FixedShadingCount - state.dataSurface->BuildingShadingCount - state.dataSurface->AttachedShadingCount,
               sum(state.dataHeatBal->Zone, &ZoneData::NumSubSurfaces));
 
         // Write Zone Information header to the initialization output file
@@ -1020,7 +1020,7 @@ namespace SurfaceGeometry {
 
         GetGeometryParameters(state, ErrorsFound);
 
-        if (WorldCoordSystem) {
+        if (state.dataSurface->WorldCoordSystem) {
             if (state.dataHeatBal->BuildingAzimuth != 0.0) RelWarning = true;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataHeatBal->Zone(ZoneNum).RelNorth != 0.0) RelWarning = true;
@@ -1148,7 +1148,7 @@ namespace SurfaceGeometry {
 
         GetMovableInsulationData(state, ErrorsFound);
 
-        if (CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
+        if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
 
         state.dataSurface->TotSurfaces = NumSurfs + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
@@ -2460,8 +2460,8 @@ namespace SurfaceGeometry {
                 // Even though these will be validated, set defaults in case error here -- wont
                 // cause aborts in later surface gets (hopefully)
                 state.dataSurface->Corner = UpperLeftCorner;
-                WorldCoordSystem = true;
-                CCW = true;
+                state.dataSurface->WorldCoordSystem = true;
+                state.dataSurface->CCW = true;
 
                 OK = false;
                 Found = UtilityRoutines::FindItem(GAlphas(1), FlCorners, 4);
@@ -2476,12 +2476,12 @@ namespace SurfaceGeometry {
 
                 OK = false;
                 if (UtilityRoutines::SameString(GAlphas(2), "CCW") || UtilityRoutines::SameString(GAlphas(2), "Counterclockwise")) {
-                    CCW = true;
+                    state.dataSurface->CCW = true;
                     OutMsg += "Counterclockwise,";
                     OK = true;
                 }
                 if (UtilityRoutines::SameString(GAlphas(2), "CW") || UtilityRoutines::SameString(GAlphas(2), "Clockwise")) {
-                    CCW = false;
+                    state.dataSurface->CCW = false;
                     OutMsg += "Clockwise,";
                     OK = true;
                 }
@@ -2492,37 +2492,37 @@ namespace SurfaceGeometry {
 
                 OK = false;
                 if (UtilityRoutines::SameString(GAlphas(3), "World") || UtilityRoutines::SameString(GAlphas(3), "Absolute")) {
-                    WorldCoordSystem = true;
+                    state.dataSurface->WorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
                 if (UtilityRoutines::SameString(GAlphas(3), "Relative")) {
-                    WorldCoordSystem = false;
+                    state.dataSurface->WorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
                 }
                 if (!OK) {
                     ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(3) + '=' + GAlphas(3));
                     ShowContinueError(state, cAlphaFieldNames(3) + " defaults to \"WorldCoordinateSystem\"");
-                    WorldCoordSystem = true;
+                    state.dataSurface->WorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                 }
 
                 OK = false;
                 if (UtilityRoutines::SameString(GAlphas(4), "World") || UtilityRoutines::SameString(GAlphas(4), "Absolute")) {
-                    DaylRefWorldCoordSystem = true;
+                    state.dataSurface->DaylRefWorldCoordSystem = true;
                     OutMsg += "WorldCoordinateSystem,";
                     OK = true;
                 }
                 if (UtilityRoutines::SameString(GAlphas(4), "Relative") || GAlphas(4).empty()) {
-                    DaylRefWorldCoordSystem = false;
+                    state.dataSurface->DaylRefWorldCoordSystem = false;
                     OutMsg += "RelativeCoordinateSystem,";
                     OK = true;
                 }
                 if (!OK) {
                     ShowWarningError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(4) + '=' + GAlphas(4));
                     ShowContinueError(state, cAlphaFieldNames(4) + " defaults to \"RelativeToZoneOrigin\"");
-                    DaylRefWorldCoordSystem = false;
+                    state.dataSurface->DaylRefWorldCoordSystem = false;
                     OutMsg += "RelativeToZoneOrigin,";
                 }
 
@@ -2557,8 +2557,8 @@ namespace SurfaceGeometry {
             }
         }
 
-        if (!WorldCoordSystem) {
-            if (DaylRefWorldCoordSystem) {
+        if (!state.dataSurface->WorldCoordSystem) {
+            if (state.dataSurface->DaylRefWorldCoordSystem) {
                 ShowWarningError(state, cCurrentModuleObject + ": Potential mismatch of coordinate specifications.");
                 ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
                 ShowContinueError(state, cAlphaFieldNames(4) + "=\"" + GAlphas(4) + "\".");
@@ -2770,7 +2770,7 @@ namespace SurfaceGeometry {
                     }
                     if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries = true;
-                        ShadingTransmittanceVaries = true;
+                        state.dataSurface->ShadingTransmittanceVaries = true;
                     }
                 }
                 if (lNumericFieldBlanks(1) || rNumericArgs(1) == DataGlobalConstants::AutoCalculate) {
@@ -2897,7 +2897,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = false;
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = rNumericArgs(1);
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B && !WorldCoordSystem) {
+                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B && !state.dataSurface->WorldCoordSystem) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingAzimuth;
                 }
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
@@ -3762,7 +3762,7 @@ namespace SurfaceGeometry {
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = rNumericArgs(1);
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = rNumericArgs(2);
-                if (!WorldCoordSystem) {
+                if (!state.dataSurface->WorldCoordSystem) {
                     if (ZoneNum != 0) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth += state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->Zone(ZoneNum).RelNorth;
                     }
@@ -5463,7 +5463,7 @@ namespace SurfaceGeometry {
                 }
                 if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries = true;
-                    ShadingTransmittanceVaries = true;
+                    state.dataSurface->ShadingTransmittanceVaries = true;
                 }
             }
             if (lNumericFieldBlanks(1) || rNumericArgs(1) == DataGlobalConstants::AutoCalculate) {
@@ -7618,7 +7618,7 @@ namespace SurfaceGeometry {
         }
 
         // Address changing vertices if they were put in in CW order rather than CCW
-        if (!CCW) {
+        if (!state.dataSurface->CCW) {
             // If even number of sides, this will transfer appropriately
             // If odd number, will leave the "odd" one, which is what you want.
             NSrc = NSides;
@@ -7658,7 +7658,7 @@ namespace SurfaceGeometry {
             ++ThisCorner;
             if (ThisCorner > NSides) ThisCorner = 1;
         } // Corners
-        if (!WorldCoordSystem) {
+        if (!state.dataSurface->WorldCoordSystem) {
             // Input in "relative" coordinates, use Building and Zone North Axes and Origins
             //                                  to translate each point (including rotation for Appendix G)
             ZoneNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone;
@@ -9075,7 +9075,7 @@ namespace SurfaceGeometry {
             }
 
             if (SurfNum > 0) {
-                AirflowWindows = true;
+                state.dataSurface->AirflowWindows = true;
                 if (UtilityRoutines::SameString(cAlphaArgs(2), "IndoorAir")) {
                     SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_IndoorAir;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(2), "OutdoorAir")) {
@@ -12676,11 +12676,11 @@ namespace SurfaceGeometry {
                 }
                 state.dataSurfaceGeometry->firstTime = false;
                 state.dataSurfaceGeometry->noTransform = false;
-                AspectTransform = true;
-                if (WorldCoordSystem) {
+                state.dataSurface->AspectTransform = true;
+                if (state.dataSurface->WorldCoordSystem) {
                     ShowWarningError(state, CurrentModuleObject + ": must use Relative Coordinate System.  Transform request ignored.");
                     state.dataSurfaceGeometry->noTransform = true;
-                    AspectTransform = false;
+                    state.dataSurface->AspectTransform = false;
                 }
             } else {
                 state.dataSurfaceGeometry->firstTime = false;

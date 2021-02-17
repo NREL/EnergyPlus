@@ -142,7 +142,6 @@ namespace AirflowNetworkBalanceManager {
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass;
-    using DataSurfaces::WorldCoordSystem;
     using Fans::GetFanIndex;
     using Fans::GetFanInletNode;
     using Fans::GetFanOutletNode;
@@ -4140,7 +4139,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkLinkageData(count).LinkNum = count;
             AirflowNetworkLinkageData(count).NodeHeights[0] = MultizoneSurfaceData(count).CHeight;
             AirflowNetworkLinkageData(count).NodeHeights[1] = MultizoneSurfaceData(count).CHeight;
-            if (!WorldCoordSystem) {
+            if (!state.dataSurface->WorldCoordSystem) {
                 if (AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum > 0) {
                     AirflowNetworkLinkageData(count).NodeHeights[0] -=
                         state.dataHeatBal->Zone(AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum).OriginZ;
@@ -5664,7 +5663,7 @@ namespace AirflowNetworkBalanceManager {
             if (!AirflowNetworkSimu.TExtHeightDep) AirflowNetworkNodeData(i).NodeHeight = 0.0;
             ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
             if (ZoneNum > 0) {
-                if (WorldCoordSystem) {
+                if (state.dataSurface->WorldCoordSystem) {
                     AirflowNetworkNodeData(i).NodeHeight = 0.0;
                 } else {
                     AirflowNetworkNodeData(i).NodeHeight = state.dataHeatBal->Zone(ZoneNum).OriginZ;

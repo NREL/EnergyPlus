@@ -675,7 +675,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         CalcInteriorRadExchange(state, TH(2, 1, _), 0, SurfNetLWRadToSurf, _, "Main");
 
-        if (AirflowWindows) WindowGapAirflowControl(state);
+        if (state.dataSurface->AirflowWindows) WindowGapAirflowControl(state);
 
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
@@ -2531,7 +2531,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 }
             }
 
-            if (CalcSolRefl) {
+            if (state.dataSurface->CalcSolRefl) {
                 for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     SurfBmToBmReflFacObs(SurfNum) = 0.0;
                     SurfBmToDiffReflFacObs(SurfNum) = 0.0;
@@ -2558,7 +2558,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 SurfWinSkyGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                 SurfWinBmGndSolarInc(SurfNum) = 0.0;
             }
-            if (CalcSolRefl) {
+            if (state.dataSurface->CalcSolRefl) {
                 // [ lSH ] == ( HourOfDay, SurfNum ) // [ lSP ] == ( PreviousHour, SurfNum )
                 Array1D<Real64>::size_type lSH = ReflFacBmToBmSolObs.index(state.dataGlobal->HourOfDay, 1) - 1;
                 Array1D<Real64>::size_type lSP = ReflFacBmToBmSolObs.index(state.dataGlobal->PreviousHour, 1) - 1;
@@ -2665,8 +2665,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             //        DifIncInsSurfIntensRep(SurfNum)
             //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
             //    END DO
-            if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
-                for (int SurfNum = ShadingSurfaceFirst; SurfNum <= ShadingSurfaceLast; SurfNum++) {
+            if (state.dataSurface->BuildingShadingCount || state.dataSurface->FixedShadingCount || state.dataSurface->AttachedShadingCount) {
+                for (int SurfNum = state.dataSurface->ShadingSurfaceFirst; SurfNum <= state.dataSurface->ShadingSurfaceLast; SurfNum++) {
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
                     Real64 CosInc = state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
                     state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = CosInc;
@@ -2723,7 +2723,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
                             state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
 
-                    if (CalcSolRefl) {
+                    if (state.dataSurface->CalcSolRefl) {
                         // Incident beam solar from beam-to-beam (specular) reflection from obstructions
                         state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs(SurfNum) = SurfBmToBmReflFacObs(SurfNum) * state.dataEnvrn->BeamSolarRad;
                         // Incident diffuse solar from beam-to-diffuse reflection from obstructions

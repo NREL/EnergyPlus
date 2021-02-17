@@ -2352,7 +2352,7 @@ namespace EnergyPlus::DaylightingManager {
                 }
             }
 
-            if (CalcSolRefl && PHRAY < 0.0 && ObTrans > 1.0e-6) {
+            if (state.dataSurface->CalcSolRefl && PHRAY < 0.0 && ObTrans > 1.0e-6) {
                 // Calculate effect of obstructions on shading of sky diffuse reaching the ground point hit
                 // by the ray. This effect is given by the ratio SkyObstructionMult =
                 // (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
@@ -2360,8 +2360,8 @@ namespace EnergyPlus::DaylightingManager {
                 // Ground point hit by the ray:
                 Alfa = std::acos(-Ray(3));
                 Beta = std::atan2(Ray(2), Ray(1));
-                HorDis = (RWIN2(3) - GroundLevelZ) * std::tan(Alfa);
-                GroundHitPt(3) = GroundLevelZ;
+                HorDis = (RWIN2(3) - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
+                GroundHitPt(3) = state.dataSurface->GroundLevelZ;
                 GroundHitPt(1) = RWIN2(1) + HorDis * std::cos(Beta);
                 GroundHitPt(2) = RWIN2(2) + HorDis * std::sin(Beta);
 
@@ -2789,7 +2789,7 @@ namespace EnergyPlus::DaylightingManager {
                             TmpGndPt(NGnd).z = 0.0;
 
                             // for solar reflectance calculations, need to precalculate obstruction multipliers
-                            if (CalcSolRefl) {
+                            if (state.dataSurface->CalcSolRefl) {
                                 GroundHitPt = TmpGndPt(NGnd);
                                 TmpGndMultiplier(NGnd) = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
                             }
@@ -3423,7 +3423,7 @@ namespace EnergyPlus::DaylightingManager {
         // Beam solar and sky solar reflected from nearest obstruction.
         // In the following hitIntObs == false  ==> no interior obstructions hit, and
         //                  hitExtObs == true  ==> one or more exterior obstructions hit.
-        if (CalcSolRefl && !hitIntObs && hitExtObs) {
+        if (state.dataSurface->CalcSolRefl && !hitIntObs && hitExtObs) {
             // One or more exterior obstructions was hit; get contribution of reflection
             // from nearest obstruction.
             // Find obstruction whose hit point is closest to this ray's window element
@@ -3467,7 +3467,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (Surface(NearestHitSurfNum).ShadowingSurf) {
                     if (dot(Ray, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                 }
-                if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                     SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 } else {
                     SkyReflVisLum =
@@ -3509,13 +3509,13 @@ namespace EnergyPlus::DaylightingManager {
 
             } else { // Bare window
                 // Tuned Hoisted operations out of loop and linear indexing
-                if (CalcSolRefl) { // Coordinates of ground point hit by the ray
+                if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                     Alfa = std::acos(-Ray_3);
                     Real64 const Ray_1(Ray(1));
                     Real64 const Ray_2(Ray(2));
                     //					Beta = std::atan2( Ray_2, Ray_1 ); //Unused Tuning below eliminated use
-                    Real64 HorDis((RWIN2(3) - GroundLevelZ) * std::tan(Alfa)); // Distance between ground hit point and proj'n of center
-                    GroundHitPt(3) = GroundLevelZ;
+                    Real64 HorDis((RWIN2(3) - state.dataSurface->GroundLevelZ) * std::tan(Alfa)); // Distance between ground hit point and proj'n of center
+                    GroundHitPt(3) = state.dataSurface->GroundLevelZ;
                     // Tuned Replaced by below: sqrt is faster than sincos
                     //					GroundHitPt( 1 ) = RWIN2( 1 ) + HorDis * std::cos( Beta );
                     //					GroundHitPt( 2 ) = RWIN2( 2 ) + HorDis * std::sin( Beta );
@@ -3552,7 +3552,7 @@ namespace EnergyPlus::DaylightingManager {
                         // can be obstructed [SunObstructionMult < 1.0] if CalcSolRefl = .TRUE.)
                         if (ISky == 1) {
                             // SunObstructionMult = 1.0; //Tuned
-                            if (CalcSolRefl) { // Coordinates of ground point hit by the ray
+                            if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                                 // Sun reaches ground point if vector from this point to the sun is unobstructed
                                 hitObs = false;
                                 for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
@@ -3751,7 +3751,7 @@ namespace EnergyPlus::DaylightingManager {
             // Beam solar reaching reference point after beam-beam (specular) reflection from
             // an exterior surface
 
-            if (CalcSolRefl) {
+            if (state.dataSurface->CalcSolRefl) {
                 // Receiving surface number corresponding this window
                 RecSurfNum = Surface(IWin2).ShadowSurfRecSurfNum;
                 if (RecSurfNum > 0) { // interior windows do not apply
@@ -4784,7 +4784,7 @@ namespace EnergyPlus::DaylightingManager {
                     RefPt = 1;
                     for (Y = 1; Y <= state.dataDaylightingData->IllumMap(MapNum).Ynum; ++Y) {
                         for (X = 1; X <= state.dataDaylightingData->IllumMap(MapNum).Xnum; ++X) {
-                            if (!DaylRefWorldCoordSystem) {
+                            if (!state.dataSurface->DaylRefWorldCoordSystem) {
                                 Xb = state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) * CosZoneRelNorth -
                                      state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt) * SinZoneRelNorth + zone.OriginX;
                                 Yb = state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt) * SinZoneRelNorth +
@@ -5244,7 +5244,7 @@ namespace EnergyPlus::DaylightingManager {
                     auto &curRefPt(state.dataDaylightingData->DaylRefPt(daylCntrl.DaylRefPtNum(refPtNum))); // get the active daylighting:referencepoint
                     curRefPt.indexToFracAndIllum =
                         refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
-                    if (DaylRefWorldCoordSystem) {
+                    if (state.dataSurface->DaylRefWorldCoordSystem) {
                         // transform only by appendix G rotation
                         daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
                         daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
@@ -7775,7 +7775,7 @@ namespace EnergyPlus::DaylightingManager {
                         ZSK(ISky) = DayltgSkyLuminance(state, ISky, TH, PH) * COSB * DA * ObTransM(IPH, ITH);
                     }
                 } else { // PH <= 0.0; contribution is from ground
-                    if (CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6 && ISunPos == 1) {
+                    if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6 && ISunPos == 1) {
                         // Calculate effect of obstructions on shading of sky diffuse reaching the ground point hit
                         // by the ray. This effect is given by the ratio SkyObstructionMult =
                         // (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
@@ -7783,8 +7783,8 @@ namespace EnergyPlus::DaylightingManager {
                         // Ground point hit by the ray:
                         Alfa = std::acos(-U(3));
                         Beta = std::atan2(U(2), U(1));
-                        HorDis = (SurfaceWindow(IWin).WinCenter(3) - GroundLevelZ) * std::tan(Alfa);
-                        GroundHitPt(3) = GroundLevelZ;
+                        HorDis = (SurfaceWindow(IWin).WinCenter(3) - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
+                        GroundHitPt(3) = state.dataSurface->GroundLevelZ;
                         GroundHitPt(1) = SurfaceWindow(IWin).WinCenter(1) + HorDis * std::cos(Beta);
                         GroundHitPt(2) = SurfaceWindow(IWin).WinCenter(2) + HorDis * std::sin(Beta);
 
@@ -7800,7 +7800,7 @@ namespace EnergyPlus::DaylightingManager {
                     // the building itself, is considered in determining whether sun hits the ground point.
                     // Otherwise this shading is ignored and the sun always hits the ground point.
                     SunObstructionMult = 1.0;
-                    if (CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
+                    if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
                         // Sun reaches ground point if vector from this point to the sun is unobstructed
                         hitObs = false;
                         for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
@@ -7815,7 +7815,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 // BEAM SOLAR AND SKY SOLAR REFLECTED FROM NEAREST OBSTRUCTION
 
-                if (CalcSolRefl && ObTransM(IPH, ITH) < 1.0) {
+                if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) < 1.0) {
                     // Find obstruction whose hit point is closest to the center of the window
                     DayltgClosestObstruction(state, SurfaceWindow(IWin).WinCenter, U, NearestHitSurfNum, NearestHitPt);
                     if (NearestHitSurfNum > 0) {
@@ -7858,7 +7858,7 @@ namespace EnergyPlus::DaylightingManager {
                         if (Surface(NearestHitSurfNum).ShadowingSurf) {
                             if (dot(U, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                         }
-                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                        if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                             SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         } else {
                             SkyReflVisLum =
@@ -8297,7 +8297,7 @@ namespace EnergyPlus::DaylightingManager {
         // In the following, Beam normal illuminance times ZSU1refl = illuminance on window due to
         // specular reflection from exterior surfaces
 
-        if (CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
+        if (state.dataSurface->CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
             ZSU1refl = ReflFacBmToBmSolObs(IHR, IWin);
 
             if (ZSU1refl > 0.0) {
@@ -8527,7 +8527,7 @@ namespace EnergyPlus::DaylightingManager {
 
             // direct sun disk reflect off the ground
             SunObstrMultiplier = 1.0;
-            if (CalcSolRefl) {
+            if (state.dataSurface->CalcSolRefl) {
                 // Sun reaches ground point if vector from this point to the sun is unobstructed
                 hitObs = false;
                 for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
@@ -10804,11 +10804,11 @@ namespace EnergyPlus::DaylightingManager {
                 ShowWarningError(state, CurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphas(1) + "...ignored.");
             }
             doTransform = true;
-            AspectTransform = true;
+            state.dataSurface->AspectTransform = true;
         }
-        if (WorldCoordSystem) {
+        if (state.dataSurface->WorldCoordSystem) {
             doTransform = false;
-            AspectTransform = false;
+            state.dataSurface->AspectTransform = false;
         }
     }
 
