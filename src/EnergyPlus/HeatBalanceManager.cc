@@ -7499,8 +7499,6 @@ namespace HeatBalanceManager {
         using DataSurfaces::FenLayAbsSSG;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfIncSolSSG;
-        using DataSurfaces::TotFenLayAbsSSG;
-        using DataSurfaces::TotSurfIncSolSSG;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -7534,13 +7532,13 @@ namespace HeatBalanceManager {
             ErrorsFound = true;
         }
 
-        TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (TotSurfIncSolSSG > 0) {
+        state.dataSurface->TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataSurface->TotSurfIncSolSSG > 0) {
             if (!allocated(SurfIncSolSSG)) {
-                SurfIncSolSSG.allocate(TotSurfIncSolSSG);
+                SurfIncSolSSG.allocate(state.dataSurface->TotSurfIncSolSSG);
             }
 
-            for (Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotSurfIncSolSSG; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
@@ -7604,13 +7602,13 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
         cCurrentModuleObject = "ComplexFenestrationProperty:SolarAbsorbedLayers";
 
-        TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (TotFenLayAbsSSG > 0) {
+        state.dataSurface->TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataSurface->TotFenLayAbsSSG > 0) {
             if (!allocated(FenLayAbsSSG)) {
-                FenLayAbsSSG.allocate(TotFenLayAbsSSG);
+                FenLayAbsSSG.allocate(state.dataSurface->TotFenLayAbsSSG);
             }
 
-            for (Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotFenLayAbsSSG; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
@@ -7698,7 +7696,7 @@ namespace HeatBalanceManager {
 
         // Check if scheduled surface gains are assigined to each surface in every zone.  If not then warning message to user will be
         // issued
-        if ((TotSurfIncSolSSG > 0) || (TotFenLayAbsSSG > 0)) {
+        if ((state.dataSurface->TotSurfIncSolSSG > 0) || (state.dataSurface->TotFenLayAbsSSG > 0)) {
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 CheckScheduledSurfaceGains(state, iZone);
             }
@@ -7754,9 +7752,9 @@ namespace HeatBalanceManager {
         for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
             iConst = Surface(iSurf).Construction;
             if (Surface(iSurf).Class == SurfaceClass::Window) {
-                SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
+                SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
             } else {
-                SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
+                SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
             }
             if (iSurf == state.dataHeatBal->Zone(ZoneNum).SurfaceFirst) {
                 if (SchedPtr != 0) {
@@ -7787,9 +7785,9 @@ namespace HeatBalanceManager {
             for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
                 iConst = Surface(iSurf).Construction;
                 if (Surface(iSurf).Class == SurfaceClass::Window) {
-                    SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
+                    SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
                 } else {
-                    SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
+                    SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
                 }
 
                 if (SchedPtr == 0) {

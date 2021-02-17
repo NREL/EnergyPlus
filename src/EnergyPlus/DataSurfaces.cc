@@ -107,17 +107,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    int TotIntConvCoeff(0);      // Total number of interior convection coefficient (overrides)
-    int TotExtConvCoeff(0);      // Total number of exterior convection coefficient (overrides)
-    int TotOSC(0);               // Total number of Other Side Coefficient Blocks
-    int TotOSCM(0);              // Total number of Other Side Conditions Model Blocks.
-    int TotExtVentCav(0);
-    int TotSurfIncSolSSG(0);      // Total number of scheduled surface gains for incident solar radiation on surface
-    int TotFenLayAbsSSG(0);       // Total number of scheduled surface gains for absorbed solar radiation in window layers
-    int TotSurfLocalEnv(0);       // Total number of surface level outdoor air node.
-    int Corner(0);                // Which corner is specified as the first vertice
-    int MaxVerticesPerSurface(4); // Maximum number of vertices allowed for a single surface (default -- can go higher)
-
     int BuildingShadingCount(0); // Total number of Building External Shades
     int FixedShadingCount(0);    // Total number of Fixed External Shades
     int AttachedShadingCount(0); // Total number of Shades attached to Zones
@@ -926,16 +915,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TotIntConvCoeff = 0;
-        TotExtConvCoeff = 0;
-        TotOSC = 0;
-        TotOSCM = 0;
-        TotExtVentCav = 0;
-        TotSurfIncSolSSG = 0;
-        TotFenLayAbsSSG = 0;
-        TotSurfLocalEnv = 0;
-        Corner = 0;
-        MaxVerticesPerSurface = 4;
         BuildingShadingCount = 0;
         FixedShadingCount = 0;
         AttachedShadingCount = 0;

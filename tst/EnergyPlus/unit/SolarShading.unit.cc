@@ -163,8 +163,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
 {
     int SurfSolIncPtr;
-    TotSurfIncSolSSG = 4;
-    SurfIncSolSSG.allocate(TotSurfIncSolSSG);
+    state->dataSurface->TotSurfIncSolSSG = 4;
+    SurfIncSolSSG.allocate(state->dataSurface->TotSurfIncSolSSG);
     SurfIncSolSSG(1).SurfPtr = 1;
     SurfIncSolSSG(1).ConstrPtr = 1;
     SurfIncSolSSG(2).SurfPtr = 1;
@@ -177,23 +177,23 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
     // Test retrieving pointer for surface incident solar schedule
 
     SurfSolIncPtr = -99;
-    SurfSolIncPtr = SurfaceScheduledSolarInc(1, 1);
+    SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 1, 1);
     EXPECT_EQ(1, SurfSolIncPtr);
 
     SurfSolIncPtr = -99;
-    SurfSolIncPtr = SurfaceScheduledSolarInc(1, 2);
+    SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 1, 2);
     EXPECT_EQ(2, SurfSolIncPtr);
 
     SurfSolIncPtr = -99;
-    SurfSolIncPtr = SurfaceScheduledSolarInc(1, 3);
+    SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 1, 3);
     EXPECT_EQ(0, SurfSolIncPtr);
 
     SurfSolIncPtr = -99;
-    SurfSolIncPtr = SurfaceScheduledSolarInc(5, 1);
+    SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 5, 1);
     EXPECT_EQ(4, SurfSolIncPtr);
 
     SurfSolIncPtr = -99;
-    SurfSolIncPtr = SurfaceScheduledSolarInc(5, 10);
+    SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 5, 10);
     EXPECT_EQ(0, SurfSolIncPtr);
 
     SurfIncSolSSG.deallocate();

@@ -2636,7 +2636,6 @@ namespace Photovoltaics {
         // Using/Aliasing
         using DataSurfaces::ExtVentedCavity;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotExtVentCav;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CavNum;   // temporary
@@ -2651,7 +2650,7 @@ namespace Photovoltaics {
 
         CavNum = 0;
         Found = false;
-        for (thisCav = 1; thisCav <= TotExtVentCav; ++thisCav) {
+        for (thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
             for (ThisSurf = 1; ThisSurf <= ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
                 if (SurfacePtr == ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;

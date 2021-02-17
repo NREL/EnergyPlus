@@ -235,11 +235,13 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
 
-    int WindowScheduledSolarAbs(int const SurfNum, // Surface number
+    int WindowScheduledSolarAbs(EnergyPlusData &state,
+                                int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
     );
 
-    int SurfaceScheduledSolarInc(int const SurfNum, // Surface number
+    int SurfaceScheduledSolarInc(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  int const ConstNum // Construction number
     );
 

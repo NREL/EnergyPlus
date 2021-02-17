@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
     bool errorsFound = false;
     SurfaceGeometry::GetOSCMData(*state, errorsFound);
     EXPECT_FALSE(errorsFound);
-    EXPECT_EQ(DataSurfaces::TotOSCM, 1);
+    EXPECT_EQ(state->dataSurface->TotOSCM, 1);
 
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries(*state);
@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
     bool errorsFound = false;
     SurfaceGeometry::GetOSCMData(*state, errorsFound);
     EXPECT_FALSE(errorsFound);
-    EXPECT_EQ(DataSurfaces::TotOSCM, 1);
+    EXPECT_EQ(state->dataSurface->TotOSCM, 1);
 
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries(*state);

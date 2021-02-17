@@ -1076,7 +1076,7 @@ namespace SurfaceGeometry {
         TotRectIntFloors = inputProcessor->getNumObjectsFound(state, "Floor:Adiabatic");
         TotRectIZFloors = inputProcessor->getNumObjectsFound(state, "Floor:Interzone");
 
-        TotOSC = 0;
+        state.dataSurface->TotOSC = 0;
 
         TotIntMassSurfaces = GetNumIntMassSurfaces(state);
 
@@ -2459,7 +2459,7 @@ namespace SurfaceGeometry {
 
                 // Even though these will be validated, set defaults in case error here -- wont
                 // cause aborts in later surface gets (hopefully)
-                Corner = UpperLeftCorner;
+                state.dataSurface->Corner = UpperLeftCorner;
                 WorldCoordSystem = true;
                 CCW = true;
 
@@ -2469,9 +2469,9 @@ namespace SurfaceGeometry {
                     ShowSevereError(state, cCurrentModuleObject + ": Invalid " + cAlphaFieldNames(1) + '=' + GAlphas(1));
                     ErrorsFound = true;
                 } else {
-                    Corner = Found;
+                    state.dataSurface->Corner = Found;
                     OK = true;
-                    OutMsg += FlCorners(Corner) + ',';
+                    OutMsg += FlCorners(state.dataSurface->Corner) + ',';
                 }
 
                 OK = false;
@@ -3240,7 +3240,7 @@ namespace SurfaceGeometry {
                     }
 
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "OtherSideCoefficients")) {
-                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, OSC, TotOSC);
+                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, OSC, state.dataSurface->TotOSC);
                     if (Found == 0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(ArgPointer + 1) +
                                         "=\"" + cAlphaArgs(ArgPointer + 1) + "\".");
@@ -3324,7 +3324,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = KivaFoundation;
 
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "OtherSideConditionsModel")) {
-                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, OSCM, TotOSCM);
+                    Found = UtilityRoutines::FindItemInList(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, OSCM, state.dataSurface->TotOSCM);
                     if (Found == 0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(ArgPointer + 1) +
                                         "=\"" + cAlphaArgs(ArgPointer + 1) + "\".");
@@ -4272,7 +4272,7 @@ namespace SurfaceGeometry {
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt || state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == OtherSideCoefCalcExt) {
                 if (!lAlphaFieldBlanks(5)) { // Otherside Coef special Name
-                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(5), OSC, TotOSC);
+                    Found = UtilityRoutines::FindItemInList(cAlphaArgs(5), OSC, state.dataSurface->TotOSC);
                     if (Found == 0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(5) + "=\"" +
                                         cAlphaArgs(5) + "\".");
@@ -6307,11 +6307,11 @@ namespace SurfaceGeometry {
             ErrorsFound = true;
         }
 
-        TotExtVentCav = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotExtVentCav = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        ExtVentedCavity.allocate(TotExtVentCav);
+        ExtVentedCavity.allocate(state.dataSurface->TotExtVentCav);
 
-        for (Item = 1; Item <= TotExtVentCav; ++Item) {
+        for (Item = 1; Item <= state.dataSurface->TotExtVentCav; ++Item) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Item,
@@ -6338,7 +6338,7 @@ namespace SurfaceGeometry {
 
             ExtVentedCavity(Item).OSCMName = cAlphaArgs(2);
             if (!lAlphaFieldBlanks(2)) {
-                Found = UtilityRoutines::FindItemInList(ExtVentedCavity(Item).OSCMName, OSCM, TotOSCM);
+                Found = UtilityRoutines::FindItemInList(ExtVentedCavity(Item).OSCMName, OSCM, state.dataSurface->TotOSCM);
                 if (Found == 0) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + ExtVentedCavity(Item).Name + "\", invalid " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\".");
@@ -6694,26 +6694,17 @@ namespace SurfaceGeometry {
         // PURPOSE OF THIS SUBROUTINE:
         // load input data for Outdoor Air Node for exterior surfaces
 
-        // METHODOLOGY EMPLOYED:
-        // usual E+ input processes
-
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataErrorTracking;
-
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
-
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfLocalEnv;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSurfaceLocalEnvData: ");
@@ -6736,17 +6727,17 @@ namespace SurfaceGeometry {
         //-----------------------------------------------------------------------
 
         cCurrentModuleObject = "SurfaceProperty:LocalEnvironment";
-        TotSurfLocalEnv = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSurface->TotSurfLocalEnv = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (TotSurfLocalEnv > 0) {
+        if (state.dataSurface->TotSurfLocalEnv > 0) {
 
             state.dataGlobal->AnyLocalEnvironmentsInModel = true;
 
             if (!allocated(SurfLocalEnvironment)) {
-                SurfLocalEnvironment.allocate(TotSurfLocalEnv);
+                SurfLocalEnvironment.allocate(state.dataSurface->TotSurfLocalEnv);
             }
 
-            for (Loop = 1; Loop <= TotSurfLocalEnv; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
@@ -6821,7 +6812,7 @@ namespace SurfaceGeometry {
         }
         // Link surface properties to surface object
         for (SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-            for (Loop = 1; Loop <= TotSurfLocalEnv; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotSurfLocalEnv; ++Loop) {
                 if (SurfLocalEnvironment(Loop).SurfPtr == SurfLoop) {
                     if (SurfLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
                         Surface(SurfLoop).HasLinkedOutAirNode = true;
@@ -6851,26 +6842,17 @@ namespace SurfaceGeometry {
         // PURPOSE OF THIS SUBROUTINE:
         // load input data for surrounding surfaces properties for exterior surfaces
 
-        // METHODOLOGY EMPLOYED:
-        // usual E+ input processes
-
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using namespace DataErrorTracking;
-
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
-
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfLocalEnvironment;
-        using DataSurfaces::TotSurfLocalEnv;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSurfaceSrdSurfsData: ");
@@ -6882,7 +6864,6 @@ namespace SurfaceGeometry {
         int NumNumeric;
         int Loop;
         int IOStat;
-
         int TotSrdSurfProperties;
         int TotSrdSurf;
         int SurfLoop;
@@ -7625,7 +7606,7 @@ namespace SurfaceGeometry {
         Vector const TestVector(0.0, 0.0, 1.0);
         Vector temp;
 
-        if (NSides > MaxVerticesPerSurface) MaxVerticesPerSurface = NSides;
+        if (NSides > state.dataSurface->MaxVerticesPerSurface) state.dataSurface->MaxVerticesPerSurface = NSides;
         Ptr = 1;
         for (n = 1; n <= NSides; ++n) {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x = Vertices(Ptr);
@@ -7654,7 +7635,7 @@ namespace SurfaceGeometry {
         // calculations do not care which corner is put in first.
         // 2/2011 - don't think the shading calculations have a corner preference.  Will keep this for
         // consistency (for now)
-        ThisCorner = Corner;
+        ThisCorner = state.dataSurface->Corner;
         while (ThisCorner != UpperLeftCorner) {
             if (NSides < 4) {
                 if (ThisCorner == UpperRightCorner) {
@@ -9789,11 +9770,11 @@ namespace SurfaceGeometry {
         std::string cOSCLimitsString;
 
         cCurrentModuleObject = "SurfaceProperty:OtherSideCoefficients";
-        TotOSC = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        OSC.allocate(TotOSC);
+        state.dataSurface->TotOSC = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        OSC.allocate(state.dataSurface->TotOSC);
 
         OSCNum = 0;
-        for (Loop = 1; Loop <= TotOSC; ++Loop) {
+        for (Loop = 1; Loop <= state.dataSurface->TotOSC; ++Loop) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           Loop,
@@ -9876,7 +9857,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        for (Loop = 1; Loop <= TotOSC; ++Loop) {
+        for (Loop = 1; Loop <= state.dataSurface->TotOSC; ++Loop) {
             if (Loop == 1) {
                 static constexpr auto OSCFormat1(
                     "! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected "
@@ -9982,12 +9963,12 @@ namespace SurfaceGeometry {
         bool IsBlank;
 
         cCurrentModuleObject = "SurfaceProperty:OtherSideConditionsModel";
-        TotOSCM = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        OSCM.allocate(TotOSCM);
+        state.dataSurface->TotOSCM = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        OSCM.allocate(state.dataSurface->TotOSCM);
         // OSCM is already initialized in derived type defn.
 
         OSCMNum = 0;
-        for (Loop = 1; Loop <= TotOSCM; ++Loop) {
+        for (Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
             inputProcessor->getObjectItem(state, cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat);
             ErrorInName = false;
             IsBlank = false;
@@ -10055,7 +10036,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        for (Loop = 1; Loop <= TotOSCM; ++Loop) {
+        for (Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
             if (Loop == 1) {
                 static constexpr auto OSCMFormat1("! <Other Side Conditions Model>,Name,Class\n");
                 print(state.files.eio, OSCMFormat1);
@@ -11141,9 +11122,9 @@ namespace SurfaceGeometry {
         ErrorInSurface = false;
 
         if (state.dataSurfaceGeometry->ProcessSurfaceVerticesOneTimeFlag) {
-            state.dataSurfaceGeometry->Xpsv.allocate(MaxVerticesPerSurface);
-            state.dataSurfaceGeometry->Ypsv.allocate(MaxVerticesPerSurface);
-            state.dataSurfaceGeometry->Zpsv.allocate(MaxVerticesPerSurface);
+            state.dataSurfaceGeometry->Xpsv.allocate(state.dataSurface->MaxVerticesPerSurface);
+            state.dataSurfaceGeometry->Ypsv.allocate(state.dataSurface->MaxVerticesPerSurface);
+            state.dataSurfaceGeometry->Zpsv.allocate(state.dataSurface->MaxVerticesPerSurface);
             state.dataSurfaceGeometry->Xpsv = 0.0;
             state.dataSurfaceGeometry->Ypsv = 0.0;
             state.dataSurfaceGeometry->Zpsv = 0.0;
@@ -13320,13 +13301,13 @@ namespace SurfaceGeometry {
 
         if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
             ACosZero = std::acos(0.0);
-            X.allocate(MaxVerticesPerSurface + 2);
-            Y.allocate(MaxVerticesPerSurface + 2);
-            Z.allocate(MaxVerticesPerSurface + 2);
-            A.allocate(MaxVerticesPerSurface + 2);
-            B.allocate(MaxVerticesPerSurface + 2);
-            SurfCollinearVerts.allocate(MaxVerticesPerSurface);
-            VertSize = MaxVerticesPerSurface;
+            X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            SurfCollinearVerts.allocate(state.dataSurface->MaxVerticesPerSurface);
+            VertSize = state.dataSurface->MaxVerticesPerSurface;
             state.dataSurfaceGeometry->CheckConvexityFirstTime = false;
         }
 
@@ -13337,13 +13318,13 @@ namespace SurfaceGeometry {
             A.deallocate();
             B.deallocate();
             SurfCollinearVerts.deallocate();
-            X.allocate(MaxVerticesPerSurface + 2);
-            Y.allocate(MaxVerticesPerSurface + 2);
-            Z.allocate(MaxVerticesPerSurface + 2);
-            A.allocate(MaxVerticesPerSurface + 2);
-            B.allocate(MaxVerticesPerSurface + 2);
-            SurfCollinearVerts.allocate(MaxVerticesPerSurface);
-            VertSize = MaxVerticesPerSurface;
+            X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
+            SurfCollinearVerts.allocate(state.dataSurface->MaxVerticesPerSurface);
+            VertSize = state.dataSurface->MaxVerticesPerSurface;
         }
 
         for (n = 1; n <= NSides; ++n) {

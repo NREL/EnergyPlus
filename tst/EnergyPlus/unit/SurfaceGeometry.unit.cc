@@ -76,11 +76,11 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     // Test base surfaces for rectangular shape in ProcessSurfaceVertices
 
     state->dataSurface->TotSurfaces = 5;
-    MaxVerticesPerSurface = 5;
+    state->dataSurface->MaxVerticesPerSurface = 5;
     Surface.allocate(state->dataSurface->TotSurfaces);
     ShadeV.allocate(state->dataSurface->TotSurfaces);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        Surface(SurfNum).Vertex.allocate(MaxVerticesPerSurface);
+        Surface(SurfNum).Vertex.allocate(state->dataSurface->MaxVerticesPerSurface);
     }
 
     bool ErrorsFound(false);
@@ -3025,7 +3025,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
     // Test a multiple vertex surfaces in ProcessSurfaceVertices and CalcCoordinateTransformation for #6384
 
     state->dataSurface->TotSurfaces = 2;
-    MaxVerticesPerSurface = 9;
+    state->dataSurface->MaxVerticesPerSurface = 9;
     Surface.allocate(state->dataSurface->TotSurfaces);
     ShadeV.allocate(state->dataSurface->TotSurfaces);
     Surface(1).Vertex.allocate(7);

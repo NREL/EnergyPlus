@@ -184,7 +184,7 @@ namespace EnergyPlus::SolarShading {
             if (state.dataSolarShading->GetInputFlag) {
                 GetShadowingInput(state);
                 state.dataSolarShading->GetInputFlag = false;
-                state.dataSolarShading->MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+                state.dataSolarShading->MaxHCV = (((max(15, state.dataSurface->MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((state.dataSolarShading->MaxHCV + 1) % 16 == 0);
             }
 
@@ -866,22 +866,22 @@ namespace EnergyPlus::SolarShading {
         state.dataSolarShading->WindowRevealStatus.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0);
 
         // Weiler-Atherton
-        state.dataSolarShading->MAXHCArrayBounds = 2 * (MaxVerticesPerSurface + 1);
-        state.dataSolarShading->MAXHCArrayIncrement = MaxVerticesPerSurface + 1;
-        state.dataSolarShading->XTEMP.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->YTEMP.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->XVC.dimension(MaxVerticesPerSurface + 1, 0.0);
-        state.dataSolarShading->XVS.dimension(MaxVerticesPerSurface + 1, 0.0);
-        state.dataSolarShading->YVC.dimension(MaxVerticesPerSurface + 1, 0.0);
-        state.dataSolarShading->YVS.dimension(MaxVerticesPerSurface + 1, 0.0);
-        state.dataSolarShading->ZVC.dimension(MaxVerticesPerSurface + 1, 0.0);
+        state.dataSolarShading->MAXHCArrayBounds = 2 * (state.dataSurface->MaxVerticesPerSurface + 1);
+        state.dataSolarShading->MAXHCArrayIncrement = state.dataSurface->MaxVerticesPerSurface + 1;
+        state.dataSolarShading->XTEMP.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->YTEMP.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->XVC.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        state.dataSolarShading->XVS.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        state.dataSolarShading->YVC.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        state.dataSolarShading->YVS.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        state.dataSolarShading->ZVC.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
 
         // Sutherland-Hodgman
-        state.dataSolarShading->ATEMP.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->BTEMP.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->CTEMP.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->XTEMP1.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
-        state.dataSolarShading->YTEMP1.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->ATEMP.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->BTEMP.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->CTEMP.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->XTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
+        state.dataSolarShading->YTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
 
         // energy
         SurfWinTransSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2595,9 +2595,9 @@ namespace EnergyPlus::SolarShading {
         //  INTEGER M
 
         if (state.dataSolarShading->CHKSBSOneTimeFlag) {
-            XVT.allocate(MaxVerticesPerSurface + 1);
-            YVT.allocate(MaxVerticesPerSurface + 1);
-            ZVT.allocate(MaxVerticesPerSurface + 1);
+            XVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            YVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            ZVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
@@ -4061,7 +4061,7 @@ namespace EnergyPlus::SolarShading {
                 } else {
                     HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
                     if (HFunct <= 0.0) {                                // Test vertex is not in the clipping plane
-                        if (NVTEMP < 2 * (MaxVerticesPerSurface + 1)) { // avoid assigning to element outside of XTEMP array size
+                        if (NVTEMP < 2 * (state.dataSurface->MaxVerticesPerSurface + 1)) { // avoid assigning to element outside of XTEMP array size
                             KK = NVTEMP;
                             ++NVTEMP;
                             Real64 const ATEMP_S(state.dataSolarShading->ATEMP(S));
@@ -4219,7 +4219,7 @@ namespace EnergyPlus::SolarShading {
         int P;   // Location of first slope to be sorted
 
         if (state.dataSolarShading->ORDERFirstTimeFlag) {
-            SLOPE.allocate(max(10, MaxVerticesPerSurface + 1));
+            SLOPE.allocate(max(10, state.dataSurface->MaxVerticesPerSurface + 1));
             state.dataSolarShading->ORDERFirstTimeFlag = false;
         }
         // Determine left-most vertex.
@@ -5249,9 +5249,9 @@ namespace EnergyPlus::SolarShading {
         // For windows, includes divider area
 
         if (state.dataSolarShading->ShadowOneTimeFlag) {
-            XVT.allocate(MaxVerticesPerSurface + 1);
-            YVT.allocate(MaxVerticesPerSurface + 1);
-            ZVT.allocate(MaxVerticesPerSurface + 1);
+            XVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            YVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            ZVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
@@ -5419,9 +5419,9 @@ namespace EnergyPlus::SolarShading {
         assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCA));
 
         if (state.dataSolarShading->SHDBKSOneTimeFlag) {
-            XVT.allocate(MaxVerticesPerSurface + 1);
-            YVT.allocate(MaxVerticesPerSurface + 1);
-            ZVT.allocate(MaxVerticesPerSurface + 1);
+            XVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            YVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
+            ZVT.allocate(state.dataSurface->MaxVerticesPerSurface + 1);
             XVT = 0.0;
             YVT = 0.0;
             ZVT = 0.0;
@@ -5539,9 +5539,9 @@ namespace EnergyPlus::SolarShading {
         Real64 SchValue; // Value for Schedule of shading transmittence
 
         if (state.dataSolarShading->SHDGSSOneTimeFlag) {
-            XVT.dimension(MaxVerticesPerSurface + 1, 0.0);
-            YVT.dimension(MaxVerticesPerSurface + 1, 0.0);
-            ZVT.dimension(MaxVerticesPerSurface + 1, 0.0);
+            XVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+            YVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+            ZVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
             state.dataSolarShading->SHDGSSOneTimeFlag = false;
         }
 
@@ -6088,7 +6088,7 @@ namespace EnergyPlus::SolarShading {
                     state.dataHeatBal->SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) = SunLitFract; // Frames/dividers not allow
                 int FenSolAbsPtr = 0;
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
-                    FenSolAbsPtr = WindowScheduledSolarAbs(SurfNum, ConstrNum);
+                    FenSolAbsPtr = WindowScheduledSolarAbs(state, SurfNum, ConstrNum);
                 }
 
                 if (state.dataHeatBal->SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) > 0.0) {
@@ -6758,7 +6758,7 @@ namespace EnergyPlus::SolarShading {
                     // The inside reveals receive solar (reflected part + absorbed part) from the window, this amount should be deducted from the BTOTZone, then adds the InsRevealDiffIntoZone
                     if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) { // Complex Fenestration
                         // Do not add total into zone from scheduled surface gains.  That will be added later
-                        if (SurfaceScheduledSolarInc(SurfNum, ConstrNum) == 0) {
+                        if (SurfaceScheduledSolarInc(state, SurfNum, ConstrNum) == 0) {
                             BTOTZone = BTOTZone - SurfWinBmSolRefldInsReveal(SurfNum) - SurfWinBmSolAbsdInsReveal(SurfNum) +
                                        SurfWinInsRevealDiffIntoZone(SurfNum) +
                                        SurfWinOutsRevealDiffOntoGlazing(SurfNum) * NomDiffTrans * Surface(SurfNum).Area;
@@ -7199,7 +7199,7 @@ namespace EnergyPlus::SolarShading {
                             // Get construction number which keeps transmittance properties
                             int IConst = SurfaceWindow(SurfNum).ComplexFen.State(CurCplxFenState).Konst; // Current surface construction number (it depends of state too)
                             // Solar radiation from this window will be calculated only in case when this window is not scheduled surface gained
-                            if (WindowScheduledSolarAbs(SurfNum, IConst) == 0) {
+                            if (WindowScheduledSolarAbs(state, SurfNum, IConst) == 0) {
                                 // Current incoming direction number (Sun direction)
                                 int IBm = state.dataBSDFWindow->ComplexWind(SurfNum).Geom(CurCplxFenState).SolBmIndex(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
                                 // Report variables for complex fenestration here
@@ -7237,14 +7237,14 @@ namespace EnergyPlus::SolarShading {
                                     int BackSurfaceNumber = ShadowComb(BaseSurf).BackSurf(IBack);
                                     int ConstrNumBack = Surface(BackSurfaceNumber).Construction;
                                     // Do not perform any calculation if surface is scheduled for incoming solar radiation
-                                    int SurfSolIncPtr = SurfaceScheduledSolarInc(BackSurfaceNumber, ConstrNumBack);
+                                    int SurfSolIncPtr = SurfaceScheduledSolarInc(state, BackSurfaceNumber, ConstrNumBack);
 
                                     if (SurfSolIncPtr == 0) {
                                         // Surface hit is another complex fenestration
                                         if (SurfWinWindowModelType(BackSurfaceNumber) == WindowBSDFModel) {
                                             int CurBackState = SurfaceWindow(BackSurfaceNumber).ComplexFen.CurrentState; // Current state for back surface if that surface is complex fenestration
                                             // Do not take into account this window if it is scheduled for surface gains
-                                            if (WindowScheduledSolarAbs(BackSurfaceNumber, ConstrNumBack) == 0) {
+                                            if (WindowScheduledSolarAbs(state, BackSurfaceNumber, ConstrNumBack) == 0) {
                                                 // Calculate energy loss per each outgoing orientation
                                                 for (int CurTrnDir = 1; CurTrnDir <= state.dataBSDFWindow->ComplexWind(SurfNum).Geom(CurCplxFenState).Trn.NBasis; ++CurTrnDir) {
                                                     Real64 bestDot; // complex fenestration hits other complex fenestration, it is important to find
@@ -7511,7 +7511,7 @@ namespace EnergyPlus::SolarShading {
 
             Real64 BABSZoneSSG = 0.0; // Beam radiation from exterior windows absorbed in a zone (only for scheduled surface gains)
             Real64 BTOTZoneSSG = 0.0; // Solar entering a zone in case of scheduled surface gains
-            for (int iSSG = 1; iSSG <= TotSurfIncSolSSG; ++iSSG) {
+            for (int iSSG = 1; iSSG <= state.dataSurface->TotSurfIncSolSSG; ++iSSG) {
                 int SurfNum = SurfIncSolSSG(iSSG).SurfPtr;
                 // do calculation only if construction number match.
                 if (SurfIncSolSSG(iSSG).ConstrPtr == Surface(SurfNum).Construction) {
@@ -7946,7 +7946,8 @@ namespace EnergyPlus::SolarShading {
         }
     }
 
-    int WindowScheduledSolarAbs(int const SurfNum, // Surface number
+    int WindowScheduledSolarAbs(EnergyPlusData &state,
+                                int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
     )
     {
@@ -7962,7 +7963,7 @@ namespace EnergyPlus::SolarShading {
 
         WindowScheduledSolarAbs = 0;
 
-        for (int i = 1; i <= TotFenLayAbsSSG; ++i) {
+        for (int i = 1; i <= state.dataSurface->TotFenLayAbsSSG; ++i) {
             if ((FenLayAbsSSG(i).SurfPtr == SurfNum) && (FenLayAbsSSG(i).ConstrPtr == ConstNum)) {
                 WindowScheduledSolarAbs = i;
                 return WindowScheduledSolarAbs;
@@ -7972,7 +7973,8 @@ namespace EnergyPlus::SolarShading {
         return WindowScheduledSolarAbs;
     }
 
-    int SurfaceScheduledSolarInc(int const SurfNum, // Surface number
+    int SurfaceScheduledSolarInc(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  int const ConstNum // Construction number
     )
     {
@@ -7988,7 +7990,7 @@ namespace EnergyPlus::SolarShading {
 
         SurfaceScheduledSolarInc = 0;
 
-        for (int i = 1; i <= TotSurfIncSolSSG; ++i) {
+        for (int i = 1; i <= state.dataSurface->TotSurfIncSolSSG; ++i) {
             if ((SurfIncSolSSG(i).SurfPtr == SurfNum) && (SurfIncSolSSG(i).ConstrPtr == ConstNum)) {
                 SurfaceScheduledSolarInc = i;
                 return SurfaceScheduledSolarInc;
@@ -11590,9 +11592,9 @@ namespace EnergyPlus::SolarShading {
         Real64 TotAOverlap;        // Total overlap area for given outgoing direction
         Real64 TotARhoVisOverlap;  // Total overlap area time reflectance for given outgoing direction
 
-        XVT.dimension(MaxVerticesPerSurface + 1, 0.0);
-        YVT.dimension(MaxVerticesPerSurface + 1, 0.0);
-        ZVT.dimension(MaxVerticesPerSurface + 1, 0.0);
+        XVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        YVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
+        ZVT.dimension(state.dataSurface->MaxVerticesPerSurface + 1, 0.0);
 
         Geom.AOverlap.dimension(Window.NBkSurf, Geom.Trn.NBasis, 0.0);
         Geom.ARhoVisOverlap.dimension(Window.NBkSurf, Geom.Trn.NBasis, 0.0);

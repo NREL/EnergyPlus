@@ -2019,7 +2019,7 @@ namespace SolarCollectors {
 
         int CavNum = 0;
         Found = false;
-        for (int thisCav = 1; thisCav <= DataSurfaces::TotExtVentCav; ++thisCav) {
+        for (int thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
             for (int ThisSurf = 1; ThisSurf <= DataSurfaces::ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
                 if (SurfacePtr == DataSurfaces::ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;

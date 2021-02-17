@@ -2237,8 +2237,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             QHM(2, {2, state.dataConstruction->Construct(Surface(SurfNum).Construction).NumCTFTerms + 1}, SurfNum) = QH(1, 2, SurfNum);
         }
 
-        if (TotOSCM >= 1) {
-            for (OSCMnum = 1; OSCMnum <= TotOSCM; ++OSCMnum) {
+        if (state.dataSurface->TotOSCM >= 1) {
+            for (OSCMnum = 1; OSCMnum <= state.dataSurface->TotOSCM; ++OSCMnum) {
                 OSCM(OSCMnum).TConv = 20.0;
                 OSCM(OSCMnum).HConv = 4.0;
                 OSCM(OSCMnum).TRad = 20.0;
@@ -2813,7 +2813,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                     if (ConstrNum > 0) {
-                        int SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
+                        int SurfSolIncPtr = SurfaceScheduledSolarInc(state, SurfNum, ConstrNum);
                         if (SurfSolIncPtr == 0) {
                             if (state.dataConstruction->Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                                 int ShelfNum = Surface(SurfNum).Shelf; // Daylighting shelf object number
@@ -2990,7 +2990,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 int CurrentState = SurfaceWindow(SurfNum).ComplexFen.CurrentState;
                                 // Current state for Complex Fenestration
                                 // Examine for schedule surface gain
-                                Real64 SurfSolAbs = WindowScheduledSolarAbs(SurfNum,
+                                Real64 SurfSolAbs = WindowScheduledSolarAbs(state,
+                                                                            SurfNum,
                                                                             ConstrNum); // Pointer to scheduled surface gains object for fenestration systems
 
                                 for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {

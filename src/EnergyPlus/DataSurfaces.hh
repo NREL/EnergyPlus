@@ -324,17 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    extern int TotIntConvCoeff; // Total number of interior convection coefficient (overrides)
-    extern int TotExtConvCoeff; // Total number of exterior convection coefficient (overrides)
-    extern int TotOSC;          // Total number of Other Side Coefficient Blocks
-    extern int TotOSCM;         // Total number of Other Side Conditions Model Blocks.
-    extern int TotExtVentCav;
-    extern int TotSurfLocalEnv;       // Total number of surface level outdoor air node.
-    extern int TotSurfIncSolSSG;      // Total number of scheduled surface gains for incident solar radiation on surface
-    extern int TotFenLayAbsSSG;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
-    extern int Corner;                // Which corner is specified as the first vertice
-    extern int MaxVerticesPerSurface; // Maximum number of vertices allowed for a single surface (default -- can go higher)
-
     extern int BuildingShadingCount; // Total number of Building External Shades
     extern int FixedShadingCount;    // Total number of Fixed External Shades
     extern int AttachedShadingCount; // Total number of Shades attached to Zones
@@ -1483,11 +1472,21 @@ namespace DataSurfaces {
 
 struct SurfacesData : BaseGlobalStruct
 {
-    int TotSurfaces = 0;          // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
-    int TotWindows = 0;           // Total number of windows
-    int TotComplexWin = 0;        // Total number of windows with complex optical properties
-    int TotStormWin = 0;          // Total number of storm window blocks
-    int TotWinShadingControl = 0; // Total number of window shading control blocks
+    int TotSurfaces = 0;           // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
+    int TotWindows = 0;            // Total number of windows
+    int TotComplexWin = 0;         // Total number of windows with complex optical properties
+    int TotStormWin = 0;           // Total number of storm window blocks
+    int TotWinShadingControl = 0;  // Total number of window shading control blocks
+    int TotIntConvCoeff = 0;       // Total number of interior convection coefficient (overrides)
+    int TotExtConvCoeff = 0;       // Total number of exterior convection coefficient (overrides)
+    int TotOSC = 0;                // Total number of Other Side Coefficient Blocks
+    int TotOSCM = 0;               // Total number of Other Side Conditions Model Blocks.
+    int TotExtVentCav = 0;         // Total number of ExteriorNaturalVentedCavity
+    int TotSurfIncSolSSG = 0;      // Total number of scheduled surface gains for incident solar radiation on surface
+    int TotFenLayAbsSSG = 0;       // Total number of scheduled surface gains for absorbed solar radiation in window layers
+    int TotSurfLocalEnv = 0;       // Total number of surface level outdoor air node.
+    int Corner = 0;                // Which corner is specified as the first vertex
+    int MaxVerticesPerSurface = 4; // Maximum number of vertices allowed for a single surface (default -- can go higher)
 
     void clear_state() override
     {
@@ -1496,6 +1495,16 @@ struct SurfacesData : BaseGlobalStruct
         this->TotComplexWin = 0;
         this->TotStormWin = 0;
         this->TotWinShadingControl = 0;
+        this->TotIntConvCoeff = 0;
+        this->TotExtConvCoeff = 0;
+        this->TotOSC = 0;
+        this->TotOSCM = 0;
+        this->TotExtVentCav = 0;
+        this->TotSurfIncSolSSG = 0;
+        this->TotFenLayAbsSSG = 0;
+        this->TotSurfLocalEnv = 0;
+        this->Corner = 0;
+        this->MaxVerticesPerSurface = 4;
     }
 };
 

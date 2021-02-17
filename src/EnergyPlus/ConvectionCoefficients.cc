@@ -1112,8 +1112,8 @@ namespace ConvectionCoefficients {
         } // 'SurfaceConvectionAlgorithm:Outside:UserCurve'
 
         // now get user directed overrides at the surface level.
-        TotIntConvCoeff = 0;
-        TotExtConvCoeff = 0;
+        state.dataSurface->TotIntConvCoeff = 0;
+        state.dataSurface->TotExtConvCoeff = 0;
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
@@ -1130,16 +1130,16 @@ namespace ConvectionCoefficients {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(6) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(2) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (Alphas(6) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
                 ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
@@ -1166,16 +1166,16 @@ namespace ConvectionCoefficients {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(6) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(2) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (Alphas(6) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
                 ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
@@ -1187,11 +1187,11 @@ namespace ConvectionCoefficients {
             }
         }
 
-        UserIntConvectionCoeffs.allocate(TotIntConvCoeff);
-        UserExtConvectionCoeffs.allocate(TotExtConvCoeff);
+        UserIntConvectionCoeffs.allocate(state.dataSurface->TotIntConvCoeff);
+        UserExtConvectionCoeffs.allocate(state.dataSurface->TotExtConvCoeff);
 
-        TotIntConvCoeff = 0;
-        TotExtConvCoeff = 0;
+        state.dataSurface->TotIntConvCoeff = 0;
+        state.dataSurface->TotExtConvCoeff = 0;
 
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -1239,9 +1239,9 @@ namespace ConvectionCoefficients {
                             if ((equationName == "SIMPLECOMBINED") || (equationName == "TARP") || (equationName == "MOWITT") || (equationName == "DOE-2") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 PotentialAssignedValue = -ExtValue;
                             } else if (equationName == "VALUE") {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1255,49 +1255,49 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (equationName == "SCHEDULE") { // Schedule
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (ExtValue == HcExt_UserCurve) { // User curve
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                if (UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (ExtValue > HcExt_UserCurve) {
                                 // specificmodel
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
 
                             } else {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
@@ -1322,9 +1322,9 @@ namespace ConvectionCoefficients {
                             if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1338,49 +1338,49 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (equationName == "SCHEDULE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (IntValue == HcInt_UserCurve) {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
+                                if (UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (IntValue > HcInt_UserCurve) {
                                 // specificmodel
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
 
                             } else {
                                 // treat CeilingDiffuser and TrombeWall special
@@ -1458,9 +1458,9 @@ namespace ConvectionCoefficients {
                                 ApplyConvectionValue(state, Alphas(1), "OUTSIDE", -ExtValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1474,60 +1474,60 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else if (equationName == "SCHEDULE") {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else if (ExtValue == HcExt_UserCurve) { // User curve
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                if (UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
 
                             } else if (ExtValue > HcExt_UserCurve) {
                                 // specificmodel
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ++state.dataSurface->TotExtConvCoeff;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             }
                         }
                         else {
@@ -1543,9 +1543,9 @@ namespace ConvectionCoefficients {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1559,52 +1559,52 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (equationName == "SCHEDULE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (IntValue == HcInt_UserCurve) {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
+                                if (UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
 
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (IntValue > HcInt_UserCurve) {
                                 // specificmodel
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                                PotentialAssignedValue = TotIntConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ++state.dataSurface->TotIntConvCoeff;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
 
                             } else {
                                 // treat CeilingDiffuser and TrombeWall special
@@ -1637,7 +1637,7 @@ namespace ConvectionCoefficients {
             }
         }
 
-        for (int Loop = 1; Loop <= TotIntConvCoeff; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataSurface->TotIntConvCoeff; ++Loop) {
             if (UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(state, UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
@@ -1649,7 +1649,7 @@ namespace ConvectionCoefficients {
             ErrorsFound = true;
         }
 
-        for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
             if (UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
             if (UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
             if (CheckScheduleValueMinMax(state, UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
@@ -1665,7 +1665,7 @@ namespace ConvectionCoefficients {
                 return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple;
             })) {
             Count = 0;
-            for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
                 SurfNum = UserExtConvectionCoeffs(Loop).WhichSurface;
                 // Tests show that Zone will override the simple convection specification of global.
                 if (SurfNum <= 0) continue;               // ignore this error condition

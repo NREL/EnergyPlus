@@ -1839,9 +1839,7 @@ namespace SimulationManager {
         // Using/Aliasing
         using namespace DataOutputs;
         using namespace DataRuntimeLanguage;
-
-        using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
-        using DataSurfaces::MaxVerticesPerSurface;
+        using namespace DataSystemVariables;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
@@ -1870,7 +1868,7 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", state.dataOutRptTab->maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
-        print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
+        print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", state.dataSurface->MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
         print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
         if (SutherlandHodgman) {
