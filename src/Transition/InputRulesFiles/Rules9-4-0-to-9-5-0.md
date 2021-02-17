@@ -151,15 +151,15 @@ Insert Field 1 - Name.
 
 Field 2, previous Field 5 - Fluid to Radiant Surface Heat Transfer Model
 
-Field 3, previous Field 10 - Temperature Control Type
+Field 3, previous Field 6 -  Hydronic Tubing Inside Diameter
 
-Field 4, previous Field 11 -  Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
+Field 4, previous Field 7 -  Hydronic Tubing Outside Diameter
 
-Field 5, previous Field 6 -  Hydronic Tubing Inside Diameter
+Field 5, previous Field 9 -  Hydronic Tubing Conductivity
 
-Field 6, previous Field 7 -  Hydronic Tubing Outside Diameter
+Field 6, previous Field 10 - Temperature Control Type
 
-Field 7, previous Field 9 -  Hydronic Tubing Conductivity
+Field 7, previous Field 11 -  Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
 
 Field 8, previous Field 16 - Motor Efficiency
 
