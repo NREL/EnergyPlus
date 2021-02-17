@@ -505,24 +505,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER:DESIGN',7,POutArgs,FldNames,FldUnits)
                 nodiff=.false.
 
-!              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM')
-!                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-!                OutArgs(1)=InArgs(1)
-!                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
-!                OutArgs(3:7)=InArgs(2:6)
-!                OutArgs(8)=InArgs(8)
-!                OutArgs(9)=InArgs(11)
-!                OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
-!                CurArgs = CurArgs - 5
-!                nodiff=.false.
-!
-!                CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
-!                POutArgs(1) = OutArgs(2)
-!                POutArgs(2) = InArgs(7)
-!                POutArgs(3:4) = InArgs(9:10)
-!                POutArgs(5:7) = InArgs(12:14)
-!                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',7,POutArgs,FldNames,FldUnits)
-!                nodiff=.false.
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=InArgs(6)
+                OutArgs(7:8)=InArgs(9:10)
+                OutArgs(9)=InArgs(11)
+                OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
+                CurArgs = CurArgs - 5
+                nodiff=.false.
+
+                CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2) = InArgs(5)
+                POutArgs(3:4) = InArgs(7:8)
+                POutArgs(5:7) = InArgs(11:13)
+                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',7,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
