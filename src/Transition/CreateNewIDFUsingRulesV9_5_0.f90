@@ -438,6 +438,32 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=OutArgs(8)
+                OutArgs(7)=OutArgs(13)
+                OutArgs(8:10)=InArgs(16:18)
+                OutArgs(11)=OutArgs(22)
+                OutArgs(12:14)=InArgs(25:27)
+                OutArgs(15:CurArgs-17)=InArgs(32:CurArgs)
+                CurArgs = CurArgs - 17
+                nodiff=.false.
+
+                CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2:4) = InArgs(5:7)
+                POutArgs(5:8) = InArgs(9:12)
+                POutArgs(9:10) = InArgs(14:15)
+                POutArgs(11:13) = InArgs(19:21)
+                POutArgs(14:15) = InArgs(23:24)
+                POutArgs(16:19) = InArgs(28:31)
+                POutArgs(20) = InArgs(34)
+                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW:DESIGN',20,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
+
               CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1)=InArgs(1)
