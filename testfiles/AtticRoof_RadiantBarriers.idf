@@ -3,7 +3,7 @@ Version,
   9.5;                                    !- Version Identifier
 
 Timestep,
-  1;                                      !- Number of Timesteps per Hour
+  4;                                      !- Number of Timesteps per Hour
 
 Building,
   Building 1,                             !- Name
@@ -2326,7 +2326,7 @@ SimulationControl,
   No,                                     !- Do Zone Sizing Calculation
   No,                                     !- Do System Sizing Calculation
   No,                                     !- Do Plant Sizing Calculation
-  No,                                     !- Run Simulation for Sizing Periods
+  Yes,                                     !- Run Simulation for Sizing Periods
   Yes,                                    !- Run Simulation for Weather File Run Periods
   ,                                       !- Do HVAC Sizing Simulation for Sizing Periods
   ;                                       !- Maximum Number of HVAC Sizing Simulation Passes
@@ -2335,19 +2335,36 @@ ConvergenceLimits,
   0;                                      !- Minimum System Timestep {minutes}
 
 RunPeriod,
-  Run Period 1,                           !- Name
-  1,                                      !- Begin Month
-  1,                                      !- Begin Day of Month
-  2007,                                   !- Begin Year
-  12,                                     !- End Month
-  31,                                     !- End Day of Month
-  2007,                                   !- End Year
-  Monday,                                 !- Day of Week for Start Day
-  No,                                     !- Use Weather File Holidays and Special Days
-  No,                                     !- Use Weather File Daylight Saving Period
-  No,                                     !- Apply Weekend Holiday Rule
-  Yes,                                    !- Use Weather File Rain Indicators
-  Yes;                                    !- Use Weather File Snow Indicators
+  Run Period 1,            !- Name
+  1,                       !- Begin Month
+  1,                       !- Begin Day of Month
+  ,                        !- Begin Year
+  1,                       !- End Month
+  7,                       !- End Day of Month
+  ,                        !- End Year
+  ,                        !- Day of Week for Start Day
+  No,                      !- Use Weather File Holidays and Special Days
+  No,                      !- Use Weather File Daylight Saving Period
+  No,                      !- Apply Weekend Holiday Rule
+  No,                      !- Use Weather File Rain Indicators
+  No;                      !- Use Weather File Snow Indicators
+
+!
+
+RunPeriod,
+  Run Period 2,            !- Name
+  7,                       !- Begin Month
+  1,                       !- Begin Day of Month
+  ,                        !- Begin Year
+  7,                       !- End Month
+  7,                       !- End Day of Month
+  ,                        !- End Year
+  ,                        !- Day of Week for Start Day
+  No,                      !- Use Weather File Holidays and Special Days
+  No,                      !- Use Weather File Daylight Saving Period
+  No,                      !- Apply Weekend Holiday Rule
+  No,                      !- Use Weather File Rain Indicators
+  No;                      !- Use Weather File Snow Indicators
 
 ShadowCalculation,
   PolygonClipping,                        !- Shading Calculation Method
@@ -3654,13 +3671,6 @@ Schedule:Day:Interval,
   0.0865390458827104,                     !- Value Until Time 21
   24:00,                                  !- Time 22 {hh:mm}
   0.0594955940443634;                     !- Value Until Time 22
-
-Schedule:Day:Interval,
-  cooling season allday1,                 !- Name
-  OnOff,                                  !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  1;                                      !- Value Until Time 1
 
 Schedule:Day:Interval,
   cooling season schedule allday1,        !- Name
@@ -5327,13 +5337,6 @@ Schedule:Day:Interval,
   0.88,                                   !- Value Until Time 18
   24:00,                                  !- Time 19 {hh:mm}
   0.82;                                   !- Value Until Time 19
-
-Schedule:Day:Interval,
-  heating season allday1,                 !- Name
-  OnOff,                                  !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  1;                                      !- Value Until Time 1
 
 Schedule:Day:Interval,
   heating season schedule allday1,        !- Name
@@ -7174,13 +7177,6 @@ Schedule:Day:Interval,
   1;                                      !- Value Until Time 8
 
 Schedule:Day:Interval,
-  Schedule Day 1,                         !- Name
-  OnOff,                                  !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  0;                                      !- Value Until Time 1
-
-Schedule:Day:Interval,
   Schedule Day 10,                        !- Name
   Fractional,                             !- Schedule Type Limits Name
   No,                                     !- Interpolate to Timestep
@@ -7239,13 +7235,6 @@ Schedule:Day:Interval,
 Schedule:Day:Interval,
   Schedule Day 19,                        !- Name
   Fractional,                             !- Schedule Type Limits Name
-  No,                                     !- Interpolate to Timestep
-  24:00,                                  !- Time 1 {hh:mm}
-  0;                                      !- Value Until Time 1
-
-Schedule:Day:Interval,
-  Schedule Day 2,                         !- Name
-  OnOff,                                  !- Schedule Type Limits Name
   No,                                     !- Interpolate to Timestep
   24:00,                                  !- Time 1 {hh:mm}
   0;                                      !- Value Until Time 1
@@ -7720,30 +7709,6 @@ Schedule:Year,
   2,                                      !- Start Day 15
   12,                                     !- End Month 15
   31;                                     !- End Day 15
-
-Schedule:Week:Daily,
-  cooling season Week Rule - Jan1-Dec31,  !- Name
-  cooling season allday1,                 !- Sunday Schedule:Day Name
-  cooling season allday1,                 !- Monday Schedule:Day Name
-  cooling season allday1,                 !- Tuesday Schedule:Day Name
-  cooling season allday1,                 !- Wednesday Schedule:Day Name
-  cooling season allday1,                 !- Thursday Schedule:Day Name
-  cooling season allday1,                 !- Friday Schedule:Day Name
-  cooling season allday1,                 !- Saturday Schedule:Day Name
-  Schedule Day 2,                         !- Holiday Schedule:Day Name
-  Schedule Day 2,                         !- SummerDesignDay Schedule:Day Name
-  Schedule Day 2,                         !- WinterDesignDay Schedule:Day Name
-  Schedule Day 2,                         !- CustomDay1 Schedule:Day Name
-  Schedule Day 2;                         !- CustomDay2 Schedule:Day Name
-
-Schedule:Year,
-  cooling season,                         !- Name
-  OnOff,                                  !- Schedule Type Limits Name
-  cooling season Week Rule - Jan1-Dec31,  !- Schedule:Week Name 1
-  1,                                      !- Start Month 1
-  1,                                      !- Start Day 1
-  12,                                     !- End Month 1
-  31;                                     !- End Day 1
 
 Schedule:Week:Daily,
   cooling season schedule Week Rule - Jan1-Feb24, !- Name
@@ -8604,30 +8569,6 @@ Schedule:Year,
   2,                                      !- Start Day 13
   12,                                     !- End Month 13
   31;                                     !- End Day 13
-
-Schedule:Week:Daily,
-  heating season Week Rule - Jan1-Dec31,  !- Name
-  heating season allday1,                 !- Sunday Schedule:Day Name
-  heating season allday1,                 !- Monday Schedule:Day Name
-  heating season allday1,                 !- Tuesday Schedule:Day Name
-  heating season allday1,                 !- Wednesday Schedule:Day Name
-  heating season allday1,                 !- Thursday Schedule:Day Name
-  heating season allday1,                 !- Friday Schedule:Day Name
-  heating season allday1,                 !- Saturday Schedule:Day Name
-  Schedule Day 1,                         !- Holiday Schedule:Day Name
-  Schedule Day 1,                         !- SummerDesignDay Schedule:Day Name
-  Schedule Day 1,                         !- WinterDesignDay Schedule:Day Name
-  Schedule Day 1,                         !- CustomDay1 Schedule:Day Name
-  Schedule Day 1;                         !- CustomDay2 Schedule:Day Name
-
-Schedule:Year,
-  heating season,                         !- Name
-  OnOff,                                  !- Schedule Type Limits Name
-  heating season Week Rule - Jan1-Dec31,  !- Schedule:Week Name 1
-  1,                                      !- Start Month 1
-  1,                                      !- Start Day 1
-  12,                                     !- End Month 1
-  31;                                     !- End Day 1
 
 Schedule:Week:Daily,
   heating season schedule Week Rule - Jan1-Feb24, !- Name
@@ -11690,12 +11631,73 @@ RunPeriodControl:DaylightSavingTime,
 Output:Diagnostics,
   DisplayAdvancedReportVariables;         !- Key 1
 
-Site:Location,
-  Dallas Fort Worth Intl Ap_TX_USA,       !- Name
-  32.9,                                   !- Latitude {deg}
-  -97.02,                                 !- Longitude {deg}
-  -6,                                     !- Time Zone {hr}
-  171;                                    !- Elevation {m}
+ Site:Location,
+  PHOENIX_AZ_USA TMY2-23183,  !- Name
+  33.43000,                !- Latitude {deg}
+  -112.0200,               !- Longitude {deg}
+  -7.000000,               !- Time Zone {hr}
+  339.0000;                !- Elevation {m}
+
+! PHOENIX_AZ_USA Heating 99.6%, MaxDB=   1.20 Wind Speed=   2.40 Wind Dir=  90.00
+
+SizingPeriod:DesignDay,
+  PHOENIX_AZ_USA Heating 99.6% Conditions,  !- Name
+  1,                       !- Month
+  21,                      !- Day of Month
+  WinterDesignDay,         !- Day Type
+  1.200000,                !- Maximum Dry-Bulb Temperature {C}
+  0,                       !- Daily Dry-Bulb Temperature Range {deltaC}
+  ,                        !- Dry-Bulb Temperature Range Modifier Type
+  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+  Wetbulb,                 !- Humidity Condition Type
+  1.200000,                !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                        !- Humidity Condition Day Schedule Name
+  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+  97318.24,                !- Barometric Pressure {Pa}
+  2.400000,                !- Wind Speed {m/s}
+  90.00000,                !- Wind Direction {deg}
+  No,                      !- Rain Indicator
+  No,                      !- Snow Indicator
+  No,                      !- Daylight Saving Time Indicator
+  ASHRAEClearSky,          !- Solar Model Indicator
+  ,                        !- Beam Solar Day Schedule Name
+  ,                        !- Diffuse Solar Day Schedule Name
+  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  0;                       !- Sky Clearness
+
+! PHOENIX_AZ_USA Cooling (WB=>MDB) .4%, MDB=  35.80 WB=  24.20
+
+SizingPeriod:DesignDay,
+  PHOENIX_AZ_USA Cooling .4% Conditions WB=>MDB,  !- Name
+  7,                       !- Month
+  21,                      !- Day of Month
+  SummerDesignDay,         !- Day Type
+  35.80000,                !- Maximum Dry-Bulb Temperature {C}
+  12.80000,                !- Daily Dry-Bulb Temperature Range {deltaC}
+  ,                        !- Dry-Bulb Temperature Range Modifier Type
+  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+  Wetbulb,                 !- Humidity Condition Type
+  24.20000,                !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+  ,                        !- Humidity Condition Day Schedule Name
+  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+  97318.24,                !- Barometric Pressure {Pa}
+  0,                       !- Wind Speed {m/s}
+  0,                       !- Wind Direction {deg}
+  No,                      !- Rain Indicator
+  No,                      !- Snow Indicator
+  No,                      !- Daylight Saving Time Indicator
+  ASHRAEClearSky,          !- Solar Model Indicator
+  ,                        !- Beam Solar Day Schedule Name
+  ,                        !- Diffuse Solar Day Schedule Name
+  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+  1.000000;                !- Sky Clearness
+
 
 Site:GroundTemperature:Deep,
   18.7339954337899,                       !- January Deep Ground Temperature {C}
@@ -13220,16 +13222,6 @@ Output:VariableDictionary,
 Output:SQLite,
   SimpleAndTabular;                       !- Option Type
 
-LifeCycleCost:NonrecurringCost,
-  Default Cost,                           !- Name
-  Construction,                           !- Category
-  0,                                      !- Cost
-  ServicePeriod;                          !- Start of Costs
-
-Output:Meter,
-  ElectricityProduced:Facility,           !- Key Name
-  runperiod;                              !- Reporting Frequency
-
 Output:Meter,
   Electricity:Facility,                   !- Key Name
   runperiod;                              !- Reporting Frequency
@@ -13239,31 +13231,7 @@ Output:Meter,
   runperiod;                              !- Reporting Frequency
 
 Output:Meter,
-  FuelOilNo2:Facility,                    !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Propane:Facility,                       !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  OtherFuel1:Facility,                    !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  OtherFuel2:Facility,                    !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Coal:Facility,                          !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
   interior lighting:InteriorLights:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  garage lighting:InteriorLights:Electricity, !- Key Name
   runperiod;                              !- Reporting Frequency
 
 Output:Meter,
@@ -13283,10 +13251,6 @@ Output:Meter,
   runperiod;                              !- Reporting Frequency
 
 Output:Meter,
-  freezer:InteriorEquipment:Electricity,  !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
   dishwasher:InteriorEquipment:Electricity, !- Key Name
   runperiod;                              !- Reporting Frequency
 
@@ -13303,187 +13267,11 @@ Output:Meter,
   runperiod;                              !- Reporting Frequency
 
 Output:Meter,
-  ceiling fan:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
   misc tv:InteriorEquipment:Electricity,  !- Key Name
   runperiod;                              !- Reporting Frequency
 
 Output:Meter,
   misc plug loads:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc electric vehicle charging:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc well pump:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc pool heater:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc pool pump:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc hot tub heater:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc hot tub pump:InteriorEquipment:Electricity, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Photovoltaic:ElectricityProduced,       !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  PowerConversion:ElectricityProduced,    !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Cogeneration:ElectricityProduced,       !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc pool heater:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc hot tub heater:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:NaturalGas, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Cogeneration:NaturalGas,                !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:FuelOilNo2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:FuelOilNo2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:FuelOilNo2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:FuelOilNo2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:FuelOilNo2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:Propane, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:Propane, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:Propane,   !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:Propane, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:Propane, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  Cogeneration:Propane,                   !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:OtherFuel1, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:OtherFuel1, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:OtherFuel1, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:OtherFuel1, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:OtherFuel1, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:OtherFuel2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:OtherFuel2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:OtherFuel2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:OtherFuel2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:OtherFuel2, !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  clothes dryer:InteriorEquipment:Coal,   !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  cooking range:InteriorEquipment:Coal,   !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc grill:InteriorEquipment:Coal,      !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc lighting:InteriorEquipment:Coal,   !- Key Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Meter,
-  misc fireplace:InteriorEquipment:Coal,  !- Key Name
   runperiod;                              !- Reporting Frequency
 
 Output:Variable,
@@ -13500,32 +13288,6 @@ Output:Variable,
   ideal residual,                         !- Key Value
   Zone Ideal Loads Zone Sensible Cooling Energy, !- Variable Name
   runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  ideal,                                  !- Key Value
-  Zone Ideal Loads Zone Sensible Heating Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  ideal,                                  !- Key Value
-  Zone Ideal Loads Zone Sensible Cooling Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Table:Monthly,
-  Peak Electricity Winter Total,          !- Name
-  2,                                      !- Digits After Decimal
-  Heating:EnergyTransfer,                 !- Variable or Meter Name 1
-  HoursPositive,                          !- Aggregation Type for Variable or Meter 1
-  Electricity:Facility,                   !- Variable or Meter Name 2
-  MaximumDuringHoursShown;                !- Aggregation Type for Variable or Meter 2
-
-Output:Table:Monthly,
-  Peak Electricity Summer Total,          !- Name
-  2,                                      !- Digits After Decimal
-  Cooling:EnergyTransfer,                 !- Variable or Meter Name 1
-  HoursPositive,                          !- Aggregation Type for Variable or Meter 1
-  Electricity:Facility,                   !- Variable or Meter Name 2
-  MaximumDuringHoursShown;                !- Aggregation Type for Variable or Meter 2
 
 EnergyManagementSystem:OutputVariable,
   loads_htg_roofs_annual_outvar,          !- Name
@@ -14011,36 +13773,6 @@ Output:Variable,
   runperiod;                              !- Reporting Frequency
 
 Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary NaturalGas Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary FuelOilNo2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary Propane Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary OtherFuel1 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary OtherFuel2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary Coal Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
   central ac and furnace htg coil,        !- Key Value
   Heating Coil Electricity Energy,        !- Variable Name
   runperiod;                              !- Reporting Frequency
@@ -14052,67 +13784,12 @@ Output:Variable,
 
 Output:Variable,
   central ac and furnace htg coil,        !- Key Value
-  Heating Coil FuelOilNo2 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace htg coil,        !- Key Value
-  Heating Coil Propane Energy,            !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace htg coil,        !- Key Value
-  Heating Coil OtherFuel1 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace htg coil,        !- Key Value
-  Heating Coil OtherFuel2 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace htg coil,        !- Key Value
-  Heating Coil Coal Energy,               !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace htg coil,        !- Key Value
   Heating Coil Heating Energy,            !- Variable Name
   runperiod;                              !- Reporting Frequency
 
 Output:Variable,
   central ac and furnace unitary system,  !- Key Value
   Unitary System Heating Ancillary Electricity Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary NaturalGas Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary FuelOilNo2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary Propane Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary OtherFuel1 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary OtherFuel2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  central ac and furnace unitary system,  !- Key Value
-  Unitary System Heating Ancillary Coal Energy, !- Variable Name
   runperiod;                              !- Reporting Frequency
 
 Output:Variable,
@@ -14128,96 +13805,6 @@ Output:Variable,
 Output:Variable,
   water heater,                           !- Key Value
   Water Heater On Cycle Parasitic Electricity Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater NaturalGas Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic NaturalGas Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic NaturalGas Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater FuelOilNo2 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic FuelOilNo2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic FuelOilNo2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Propane Energy,            !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic Propane Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic Propane Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater OtherFuel1 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic OtherFuel1 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic OtherFuel1 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater OtherFuel2 Energy,         !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic OtherFuel2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic OtherFuel2 Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Coal Energy,               !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater Off Cycle Parasitic Coal Energy, !- Variable Name
-  runperiod;                              !- Reporting Frequency
-
-Output:Variable,
-  water heater,                           !- Key Value
-  Water Heater On Cycle Parasitic Coal Energy, !- Variable Name
   runperiod;                              !- Reporting Frequency
 
 Output:Variable,
