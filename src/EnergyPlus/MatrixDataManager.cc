@@ -103,8 +103,13 @@ namespace MatrixDataManager {
     // Object Data
     Array1D<MatrixDataStruct> MatData;
 
-    // Functions
-
+// MSVC was complaining that it detected a divide by zero in the Row = (El - 1) / NumCols + 1 line, indicating it thought NumCols was zero
+// the compiler should never have been able to identify that, as NumCols is based directly on rNumericArgs, which is based on input values
+// Apparently, interaction between the high level optimizer that does flow-graph transformations and backend that emits warnings can cause
+// false positives.  The warning simply needs to be muted.  Placing the pragma at the statement itself was not sufficient for muting, so I
+// placed the pragma out here at this level and it worked.  Note that this warning was only showing up on release builds, not debug builds
+#pragma warning( push )
+#pragma warning( disable : 4723 )
     void GetMatrixInput(EnergyPlusData &state)
     {
 
@@ -190,6 +195,7 @@ namespace MatrixDataManager {
             ShowFatalError(state, "GetMatrixInput: Errors found in Matrix objects. Preceding condition(s) cause termination.");
         }
     }
+#pragma warning( pop )
 
     int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName)
     {
