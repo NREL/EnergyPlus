@@ -508,12 +508,12 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingManager->GILSK = 0.0;
                 state.dataDaylightingManager->GILSU = 0.0;
                 for (IHR = 1; IHR <= 24; ++IHR) {
-                    if (SUNCOSHR(IHR, 3) < DataEnvironment::SunIsUpValue) continue; // Skip if sun is below horizon //Autodesk SUNCOSHR was uninitialized here
-                    state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(SUNCOSHR(IHR, 3));
+                    if (state.dataSurface->SUNCOSHR(IHR, 3) < DataEnvironment::SunIsUpValue) continue; // Skip if sun is below horizon //Autodesk SUNCOSHR was uninitialized here
+                    state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SUNCOSHR(IHR, 3));
                     state.dataDaylightingManager->PHSUNHR(IHR) = state.dataDaylightingManager->PHSUN;
                     state.dataDaylightingManager->SPHSUNHR(IHR) = std::sin(state.dataDaylightingManager->PHSUN);
                     state.dataDaylightingManager->CPHSUNHR(IHR) = std::cos(state.dataDaylightingManager->PHSUN);
-                    state.dataDaylightingManager->THSUNHR(IHR) = std::atan2(SUNCOSHR(IHR, 2), SUNCOSHR(IHR, 1));
+                    state.dataDaylightingManager->THSUNHR(IHR) = std::atan2(state.dataSurface->SUNCOSHR(IHR, 2), state.dataSurface->SUNCOSHR(IHR, 1));
                     // Get exterior horizontal illuminance from sky and sun
                     state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(IHR);
                     state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(IHR);
@@ -533,12 +533,12 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = 0.0;
             state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, {1, 4}) = 0.0;
             state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay) = 0.0;
-            if (!(SUNCOSHR(state.dataGlobal->HourOfDay, 3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
-                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(SUNCOSHR(state.dataGlobal->HourOfDay, 3));
+            if (!(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
+                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 3));
                 state.dataDaylightingManager->PHSUNHR(state.dataGlobal->HourOfDay) = state.dataDaylightingManager->PHSUN;
                 state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay) = std::sin(state.dataDaylightingManager->PHSUN);
                 state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay) = std::cos(state.dataDaylightingManager->PHSUN);
-                state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = std::atan2(SUNCOSHR(state.dataGlobal->HourOfDay, 2), SUNCOSHR(state.dataGlobal->HourOfDay, 1));
+                state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = std::atan2(state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 2), state.dataSurface->SUNCOSHR(state.dataGlobal->HourOfDay, 1));
                 // Get exterior horizontal illuminance from sky and sun
                 state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay);
                 state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay);
@@ -3284,7 +3284,7 @@ namespace EnergyPlus::DaylightingManager {
         using General::BlindBeamBeamTrans;
         using General::POLYF;
 
-        if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+        if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
@@ -3532,7 +3532,7 @@ namespace EnergyPlus::DaylightingManager {
                 Real64 const GILSK_mult((state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi) * ObTrans * SkyObstructionMult);
                 Real64 const TVISB_ObTrans(TVISB * ObTrans);
                 Real64 const AVWLSU_add(TVISB_ObTrans * state.dataDaylightingManager->GILSU(iHour) * (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
-                Vector3<Real64> const SUNCOS_iHour(SUNCOSHR(iHour, {1, 3}));
+                Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SUNCOSHR(iHour, {1, 3}));
                 assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
                 auto l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
                 for (ISky = 1; ISky <= 4; ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
@@ -3986,7 +3986,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 VTR; // For switchable glazing, ratio of visible transmittance of
         //  fully-switched state to that of the unswitched state
 
-        if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+        if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
         ++ISunPos;
 
@@ -4134,7 +4134,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 VTR; // For switchable glazing, ratio of visible transmittance of
         //  fully-switched state to that of the unswitched state
 
-        if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+        if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
         // Altitude of sun (degrees)
         state.dataDaylightingManager->PHSUN = state.dataDaylightingManager->PHSUNHR(iHour);
@@ -7703,7 +7703,7 @@ namespace EnergyPlus::DaylightingManager {
         DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
         // Sky/ground element altitude integration
-        Vector3<Real64> const SUNCOS_IHR(SUNCOSHR(IHR, {1, 3}));
+        Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
         for (IPH = 1; IPH <= NPHMAX; ++IPH) {
             PH = PHMIN + (double(IPH) - 0.5) * DPH;
 
@@ -8205,7 +8205,7 @@ namespace EnergyPlus::DaylightingManager {
                     TransMult = 0.0;
 
                     // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
-                    if (BlindOn) ProfileAngle(IWin, SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                    if (BlindOn) ProfileAngle(IWin, state.dataSurface->SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                         if (!SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8298,7 +8298,7 @@ namespace EnergyPlus::DaylightingManager {
         // specular reflection from exterior surfaces
 
         if (state.dataSurface->CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
-            ZSU1refl = ReflFacBmToBmSolObs(IHR, IWin);
+            ZSU1refl = state.dataSurface->ReflFacBmToBmSolObs(IHR, IWin);
 
             if (ZSU1refl > 0.0) {
                 // Contribution to window luminance and downgoing flux
@@ -8509,7 +8509,7 @@ namespace EnergyPlus::DaylightingManager {
         } else {
             NGnd = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NGnd(WinEl);
         }
-        Vector3<Real64> const SUNCOS_IHR(SUNCOSHR(IHR, {1, 3}));
+        Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
         for (iGndElem = 1; iGndElem <= NGnd; ++iGndElem) {
             // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
             // were hit in the process
@@ -9317,7 +9317,7 @@ namespace EnergyPlus::DaylightingManager {
             }
         }
         // Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-        Vector3<Real64> const SUNCOS_IHR(SUNCOSHR(IHR, {1, 3}));
+        Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SUNCOSHR(IHR, {1, 3}));
         CosIncAngAtHitPt = dot(ReflNorm, SUNCOS_IHR);
         // Require that the sun be in front of this surface relative to window element
         if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
@@ -10606,7 +10606,7 @@ namespace EnergyPlus::DaylightingManager {
         // TH, CR 7873, 9/17/2009
         BmInterReflIll = 0.0;
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea > 0) {
-            BmInterReflIll = (EnclSolDBIntWin(ZoneNum) * state.dataEnvrn->BeamSolarRad * state.dataEnvrn->PDIRLW * state.dataDaylightingData->ZoneDaylight(ZoneNum).FloorVisRefl) /
+            BmInterReflIll = (state.dataSurface->EnclSolDBIntWin(ZoneNum) * state.dataEnvrn->BeamSolarRad * state.dataEnvrn->PDIRLW * state.dataDaylightingData->ZoneDaylight(ZoneNum).FloorVisRefl) /
                              (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
         }
 

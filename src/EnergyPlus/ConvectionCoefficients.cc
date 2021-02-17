@@ -597,7 +597,7 @@ namespace ConvectionCoefficients {
         } else {
             // Compute sky radiation coefficient
             HSky =
-                DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
+                DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * state.dataSurface->AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
         }
 
         if (TSurf == TAir || algoNum == ASHRAESimple) {
@@ -608,7 +608,7 @@ namespace ConvectionCoefficients {
             HGround = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
 
             // Compute air radiation coefficient
-            HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
+            HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
                    (TSurf - TAir);
         }
     }

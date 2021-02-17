@@ -351,7 +351,7 @@ namespace SurfaceGeometry {
 
         AllocateModuleArrays(state); // This needs to be moved to the main manager routine of SSG at a later date
 
-        AirSkyRadSplit.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->AirSkyRadSplit.dimension(state.dataSurface->TotSurfaces, 0.0);
 
         state.dataHeatBal->CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
         // is requested for one or more exterior windows.
@@ -363,7 +363,7 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Loop through all surfaces...
 
-            AirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + Surface(SurfNum).CosTilt));
+            state.dataSurface->AirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + Surface(SurfNum).CosTilt));
 
             // Set flag that determines whether a surface is a shadowing surface
             Surface(SurfNum).ShadowingSurf = false;
@@ -815,19 +815,19 @@ namespace SurfaceGeometry {
         state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
-        EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SurfOpaqAI.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfOpaqAO.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfBmToBmReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
-        SurfWinA.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        SurfWinADiffFront.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        SurfWinADiffBack.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
-        SurfWinACFOverlap.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfOpaqAI.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfOpaqAO.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfBmToBmReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinA.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinADiffFront.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinADiffBack.dimension(CFSMAXNL + 1, state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->SurfWinACFOverlap.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
     }
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input

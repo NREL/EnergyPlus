@@ -107,43 +107,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
-    Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
-    Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
-    Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
-    Array1D<Real64> SurfBmToBmReflFacObs; // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    Array1D<Real64> SurfSkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
-
-    Array2D<Real64> SurfWinA; // Time step value of factor for beam absorbed in window glass layers
-
-    // Time step value of factor for diffuse absorbed in window layers
-    Array2D<Real64> SurfWinADiffFront;
-    Array2D<Real64> SurfWinADiffBack;
-
-    Array2D<Real64> SurfWinACFOverlap; // Time step value of factor for beam
-    // absorbed in window glass layers which comes from other windows
-    // It happens sometimes that beam enters one window and hits back of
-    // second window. It is used in complex fenestration only
-
-    Array1D<Real64> AirSkyRadSplit; // Fractional split between the air and
-    // the sky for radiation from the surface
-    // Fraction of sky IR coming from sky itself; 1-AirSkyRadSplit comes from the atmosphere.
-
-    Array2D<Real64> SUNCOSHR( 24, 3, 0.0);      // Hourly values of SUNCOS (solar direction cosines), Autodesk: Init Zero-initialization added to avoid use uninitialized
-    Array2D<Real64> ReflFacBmToDiffSolObs;
-    Array2D<Real64> ReflFacBmToDiffSolGnd;
-    Array2D<Real64> ReflFacBmToBmSolObs;
-    Array1D<Real64> ReflFacSkySolObs;
-    Array1D<Real64> ReflFacSkySolGnd;
-    Array2D<Real64> CosIncAveBmToBmSolObs;
-    Array1D<Real64> EnclSolDBIntWin;                          // Value of factor for beam solar entering a zone through interior windows (considered to contribute to diffuse in zone)
-    Array1D<Real64> SurfSunlitArea;                        // Sunlit area by surface number
-    Array1D<Real64> SurfSunlitFrac;                        // Sunlit fraction by surface number
-    Array1D<Real64> SurfSkySolarInc;                       // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
-    Array1D<Real64> SurfGndSolarInc;                       // Incident diffuse solar from ground; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
-
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
@@ -657,7 +620,7 @@ namespace EnergyPlus::DataSurfaces {
         } else {
             Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
             value = state.dataWindowManager->sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = ViewFactorSkyIR * (state.dataSurface->AirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) + (1.0 - state.dataSurface->AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;
@@ -883,31 +846,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        EnclSolDB.deallocate();
-        EnclSolDBSSG.deallocate();
-        SurfOpaqAI.deallocate();
-        SurfOpaqAO.deallocate();
-        SurfBmToBmReflFacObs.deallocate();
-        SurfBmToDiffReflFacObs.deallocate();
-        SurfBmToDiffReflFacGnd.deallocate();
-        SurfSkyDiffReflFacGnd.deallocate();
-        SurfWinA.deallocate();
-        SurfWinADiffFront.deallocate();
-        SurfWinADiffBack.deallocate();
-        SurfWinACFOverlap.deallocate();
-        AirSkyRadSplit.deallocate();
-        SUNCOSHR.dimension(24, 3, 0.0);
-        ReflFacBmToDiffSolObs.deallocate();
-        ReflFacBmToDiffSolGnd.deallocate();
-        ReflFacBmToBmSolObs.deallocate();
-        ReflFacSkySolObs.deallocate();
-        ReflFacSkySolGnd.deallocate();
-        CosIncAveBmToBmSolObs.deallocate();
-        EnclSolDBIntWin.deallocate();
-        SurfSunlitArea.deallocate();
-        SurfSunlitFrac.deallocate();
-        SurfSkySolarInc.clear();
-        SurfGndSolarInc.clear();
         AllHTSurfaceList.clear();
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();

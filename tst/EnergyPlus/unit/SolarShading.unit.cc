@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSolarShading->CTHETA.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->CosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
     state->dataHeatBal->CosIncAng.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
-    SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
 
@@ -155,7 +155,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSolarShading->CTHETA.deallocate();
     state->dataHeatBal->CosIncAngHR.deallocate();
     state->dataHeatBal->CosIncAng.deallocate();
-    SurfOpaqAO.deallocate();
+    state->dataSurface->SurfOpaqAO.deallocate();
     state->dataHeatBal->BackSurfaces.deallocate();
     state->dataHeatBal->OverlapAreas.deallocate();
 }

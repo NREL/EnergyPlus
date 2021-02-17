@@ -847,7 +847,7 @@ namespace WindowEquivalentLayer {
                 Ebout = DataGlobalConstants::StefanBoltzmann * pow_4(Tout);
                 // ASHWAT model may be slightly different
                 outir = Surface(SurfNum).ViewFactorSkyIR *
-                            (AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
+                            (state.dataSurface->AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) + (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
                         Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
         }
