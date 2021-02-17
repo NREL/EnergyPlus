@@ -569,10 +569,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
     DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
     DataSurfaces::SurfWinSysSolReflectance.allocate(3);
-    DataSurfaces::InsideGlassCondensationFlag.allocate(3);
+    state->dataSurface->InsideGlassCondensationFlag.allocate(3);
     DataSurfaces::SurfWinGainFrameDividerToZoneRep.allocate(3);
-    DataSurfaces::InsideFrameCondensationFlag.allocate(3);
-    DataSurfaces::InsideDividerCondensationFlag.allocate(3);
+    state->dataSurface->InsideFrameCondensationFlag.allocate(3);
+    state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
     DataHeatBalSurface::QdotConvOutRep.allocate(3);
     DataHeatBalSurface::QdotConvOutRepPerArea.allocate(3);
@@ -598,10 +598,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     Real64 inSurfTemp;
     Real64 outSurfTemp;
 
-    // Claculate temperature based on supply flow rate
+    // Calculate temperature based on supply flow rate
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     EXPECT_NEAR(20.0, state->dataHeatBal->TempEffBulkAir(surfNum2), 0.0001);
-    // Claculate temperature based on zone temperature with supply flow rate = 0
+    // Calculate temperature based on zone temperature with supply flow rate = 0
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBal->HConvIn(surfNum2), inSurfTemp, outSurfTemp);
@@ -2796,10 +2796,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
     DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
     DataSurfaces::SurfWinSysSolReflectance.allocate(3);
-    DataSurfaces::InsideGlassCondensationFlag.allocate(3);
+    state->dataSurface->InsideGlassCondensationFlag.allocate(3);
     DataSurfaces::SurfWinGainFrameDividerToZoneRep.allocate(3);
-    DataSurfaces::InsideFrameCondensationFlag.allocate(3);
-    DataSurfaces::InsideDividerCondensationFlag.allocate(3);
+    state->dataSurface->InsideFrameCondensationFlag.allocate(3);
+    state->dataSurface->InsideDividerCondensationFlag.allocate(3);
 
     DataHeatBalSurface::QdotConvOutRep.allocate(3);
     DataHeatBalSurface::QdotConvOutRepPerArea.allocate(3);

@@ -234,9 +234,9 @@ namespace EnergyPlus::SolarShading {
             state.dataHeatBal->MultCircumSolar = 0.0;
             state.dataHeatBal->MultHorizonZenith = 0.0;
 
-            InsideGlassCondensationFlag = 0;
-            InsideFrameCondensationFlag = 0;
-            InsideDividerCondensationFlag = 0;
+            state.dataSurface->InsideGlassCondensationFlag = 0;
+            state.dataSurface->InsideFrameCondensationFlag = 0;
+            state.dataSurface->InsideDividerCondensationFlag = 0;
             state.dataHeatBal->ZoneTransSolar = 0.0;
             state.dataHeatBal->ZoneBmSolFrExtWinsRep = 0.0;
             state.dataHeatBal->ZoneBmSolFrIntWinsRep = 0.0;
@@ -807,9 +807,9 @@ namespace EnergyPlus::SolarShading {
         SurfWinSysSolTransmittance.dimension(state.dataSurface->TotSurfaces, 0.0);
         SurfWinSysSolReflectance.dimension(state.dataSurface->TotSurfaces, 0.0);
         SurfWinSysSolAbsorptance.dimension(state.dataSurface->TotSurfaces, 0.0);
-        InsideGlassCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
-        InsideFrameCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
-        InsideDividerCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->InsideGlassCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->InsideFrameCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->InsideDividerCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
         state.dataHeatBal->ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -1508,19 +1508,19 @@ namespace EnergyPlus::SolarShading {
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable(state, "Surface Window Inside Face Glazing Condensation Status",
                                         OutputProcessor::Unit::None,
-                                        InsideGlassCondensationFlag(SurfLoop),
+                                        state.dataSurface->InsideGlassCondensationFlag(SurfLoop),
                                         "Zone",
                                         "State",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable(state, "Surface Window Inside Face Frame Condensation Status",
                                         OutputProcessor::Unit::None,
-                                        InsideFrameCondensationFlag(SurfLoop),
+                                        state.dataSurface->InsideFrameCondensationFlag(SurfLoop),
                                         "Zone",
                                         "State",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable(state, "Surface Window Inside Face Divider Condensation Status",
                                         OutputProcessor::Unit::None,
-                                        InsideDividerCondensationFlag(SurfLoop),
+                                        state.dataSurface->InsideDividerCondensationFlag(SurfLoop),
                                         "Zone",
                                         "State",
                                         Surface(SurfLoop).Name);
@@ -1912,19 +1912,19 @@ namespace EnergyPlus::SolarShading {
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable(state, "Surface Window Inside Face Glazing Condensation Status",
                                             OutputProcessor::Unit::None,
-                                            InsideGlassCondensationFlag(SurfLoop),
+                                            state.dataSurface->InsideGlassCondensationFlag(SurfLoop),
                                             "Zone",
                                             "State",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable(state, "Surface Window Inside Face Frame Condensation Status",
                                             OutputProcessor::Unit::None,
-                                            InsideFrameCondensationFlag(SurfLoop),
+                                            state.dataSurface->InsideFrameCondensationFlag(SurfLoop),
                                             "Zone",
                                             "State",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable(state, "Surface Window Inside Face Divider Condensation Status",
                                             OutputProcessor::Unit::None,
-                                            InsideDividerCondensationFlag(SurfLoop),
+                                            state.dataSurface->InsideDividerCondensationFlag(SurfLoop),
                                             "Zone",
                                             "State",
                                             Surface(SurfLoop).Name);
@@ -2617,7 +2617,7 @@ namespace EnergyPlus::SolarShading {
         ZVT = 0.0;
         state.dataSolarShading->XVS = 0.0;
         state.dataSolarShading->YVS = 0.0;
-        CTRANS(GRSNR, HTS, NVT, XVT, YVT, ZVT);
+        CTRANS(state, GRSNR, HTS, NVT, XVT, YVT, ZVT);
         for (N = 1; N <= NVT; ++N) {
             state.dataSolarShading->XVS(N) = XVT(NVT + 1 - N);
             state.dataSolarShading->YVS(N) = YVT(NVT + 1 - N);
@@ -3104,7 +3104,8 @@ namespace EnergyPlus::SolarShading {
         }
     }
 
-    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+    void CTRANS(EnergyPlusData &state,
+                int const NS,         // Surface number whose vertex coordinates are being transformed
                 int const NGRS,       // Base surface number for surface NS
                 int &NVT,             // Number of vertices for surface NS
                 Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
@@ -3137,9 +3138,9 @@ namespace EnergyPlus::SolarShading {
         auto const &base_lcsx(base_surface.lcsx);
         auto const &base_lcsy(base_surface.lcsy);
         auto const &base_lcsz(base_surface.lcsz);
-        Real64 const base_X0(X0(NGRS));
-        Real64 const base_Y0(Y0(NGRS));
-        Real64 const base_Z0(Z0(NGRS));
+        Real64 const base_X0(state.dataSurface->X0(NGRS));
+        Real64 const base_Y0(state.dataSurface->Y0(NGRS));
+        Real64 const base_Z0(state.dataSurface->Z0(NGRS));
 
         NVT = surface.Sides;
 
@@ -5344,7 +5345,7 @@ namespace EnergyPlus::SolarShading {
                         state.dataSolarShading->YShadowProjection = 0.0;
                     }
 
-                    CTRANS(GRSNR, NGRS, NVT, XVT, YVT, ZVT); // Transform coordinates of the receiving surface to 2-D form
+                    CTRANS(state, GRSNR, NGRS, NVT, XVT, YVT, ZVT); // Transform coordinates of the receiving surface to 2-D form
 
                     // Re-order its vertices to clockwise sequential.
                     for (N = 1; N <= NVT; ++N) {
@@ -5442,7 +5443,7 @@ namespace EnergyPlus::SolarShading {
             // Transform coordinates of back surface from general system to the
             // plane of the receiving surface
 
-            CTRANS(BackSurfaceNumber, NGRS, NVT, XVT, YVT, ZVT);
+            CTRANS(state, BackSurfaceNumber, NGRS, NVT, XVT, YVT, ZVT);
 
             // Project "shadow" from back surface along sun's rays to receiving surface.  Back surface vertices
             // become clockwise sequential.
@@ -5622,7 +5623,7 @@ namespace EnergyPlus::SolarShading {
                 } else {
                     // Transform coordinates of shadow casting surface from general system to the system relative to the receiving surface
                     int NVT;
-                    CTRANS(GSSNR, NGRS, NVT, XVT, YVT, ZVT);
+                    CTRANS(state, GSSNR, NGRS, NVT, XVT, YVT, ZVT);
                     CLIP(state, NVT, XVT, YVT, ZVT); // Clip portions of the shadow casting surface which are behind the receiving surface
 
                     if (state.dataSolarShading->NumVertInShadowOrClippedSurface <= 2) continue;
@@ -11607,7 +11608,7 @@ namespace EnergyPlus::SolarShading {
         // Base surface contains current window surface (ISurf).
         // Since that is case, below transformation should always return ZVT = 0.0
         // for every possible transformation
-        CTRANS(ISurf, BaseSurf, NVT, XVT, YVT, ZVT);
+        CTRANS(state, ISurf, BaseSurf, NVT, XVT, YVT, ZVT);
 
         // HTRANS routine is using coordinates stored in XVS and YVS in order to calculate
         // surface area.  Since both projections are equal to zero, then simply
@@ -11649,7 +11650,7 @@ namespace EnergyPlus::SolarShading {
 
                 // Transform coordinates of back surface from general system to the
                 // plane of the receiving surface
-                CTRANS(BackSurfaceNumber, BaseSurf, NVT, XVT, YVT, ZVT);
+                CTRANS(state, BackSurfaceNumber, BaseSurf, NVT, XVT, YVT, ZVT);
 
                 // Project "shadow" from back surface along sun's rays to receiving surface.  Back surface vertices
                 // become clockwise sequential.

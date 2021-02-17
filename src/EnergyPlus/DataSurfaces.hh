@@ -324,17 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    extern Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
-    // 0 otherwise
-    extern Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
-    // 0 otherwise
-    extern Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
-    // 0 otherwise
-    extern Array1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
-
-    extern Array1D<Real64> X0; // X-component of translation vector
-    extern Array1D<Real64> Y0; // Y-component of translation vector
-    extern Array1D<Real64> Z0; // Z-component of translation vector
     extern Array1D<Real64>
         EnclSolDBSSG; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
     extern Array1D<Real64> EnclSolDB;              // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
@@ -1481,7 +1470,14 @@ struct SurfacesData : BaseGlobalStruct
     int MaxReflRays = 0;                  // Max number of rays from a receiving surface for solar reflection calc
     Real64 GroundLevelZ = 0.0;            // Z value of ground level for solar refl calc (m)
     bool AirflowWindows = false;          // TRUE if one or more airflow windows
-    bool ShadingTransmittanceVaries = false; // overall, shading transmittance varies for the building
+    bool ShadingTransmittanceVaries = false;   // overall, shading transmittance varies for the building
+    Array1D_int InsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int InsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
+    Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int AdjacentZoneToSurface;         // Array of adjacent zones to each surface
+    Array1D<Real64> X0;                        // X-component of translation vector
+    Array1D<Real64> Y0;                        // Y-component of translation vector
+    Array1D<Real64> Z0;                        // Z-component of translation vector
 
     void clear_state() override
     {
@@ -1515,6 +1511,13 @@ struct SurfacesData : BaseGlobalStruct
         this->GroundLevelZ = 0.0;
         this->AirflowWindows = false;
         this->ShadingTransmittanceVaries = false;
+        this->InsideGlassCondensationFlag.deallocate();
+        this->InsideFrameCondensationFlag.deallocate();
+        this->InsideDividerCondensationFlag.deallocate();
+        this->AdjacentZoneToSurface.deallocate();
+        this->X0.deallocate();
+        this->Y0.deallocate();
+        this->Z0.deallocate();
     }
 };
 

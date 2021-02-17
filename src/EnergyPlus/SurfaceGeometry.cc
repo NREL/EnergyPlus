@@ -591,11 +591,11 @@ namespace SurfaceGeometry {
         ZoneCeilingHeightEntered.deallocate();
         ZoneCeilingArea.deallocate();
 
-        AdjacentZoneToSurface.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->AdjacentZoneToSurface.dimension(state.dataSurface->TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond <= 0) continue;
-            AdjacentZoneToSurface(SurfNum) = Surface(Surface(SurfNum).ExtBoundCond).Zone;
+            state.dataSurface->AdjacentZoneToSurface(SurfNum) = Surface(Surface(SurfNum).ExtBoundCond).Zone;
         }
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -811,9 +811,9 @@ namespace SurfaceGeometry {
         for (auto &e : ShadeV)
             e.NVert = 0;
         // Individual components (XV,YV,ZV) allocated in routine ProcessSurfaceVertices
-        X0.dimension(state.dataSurface->TotSurfaces, 0.0);
-        Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
-        Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->X0.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
 
         EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
         EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -11551,9 +11551,9 @@ namespace SurfaceGeometry {
             if (HeatTransSurf) { // This is a general surface but not detached shading surface
 
                 // RECORD COORDINATE TRANSFORMATION FOR BASE SURFACES.
-                X0(ThisBaseSurface) = CoordinateTransVector.x;
-                Y0(ThisBaseSurface) = CoordinateTransVector.y;
-                Z0(ThisBaseSurface) = CoordinateTransVector.z;
+                state.dataSurface->X0(ThisBaseSurface) = CoordinateTransVector.x;
+                state.dataSurface->Y0(ThisBaseSurface) = CoordinateTransVector.y;
+                state.dataSurface->Z0(ThisBaseSurface) = CoordinateTransVector.z;
 
                 // COMPUTE INVERSE TRANSFORMATION.
                 X1 = state.dataSurfaceGeometry->Xpsv(2) - CoordinateTransVector.x;
@@ -11613,17 +11613,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace Vectors;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int I;        // Loop Control

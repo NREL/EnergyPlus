@@ -2599,28 +2599,28 @@ namespace WindowManager {
             InsideGlassTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
             RoomHumRat = ZoneAirHumRat(surface.Zone);
             RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, state.dataEnvrn->OutBaroPress);
-            InsideGlassCondensationFlag(SurfNum) = 0;
-            if (InsideGlassTemp < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
+            state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 0;
+            if (InsideGlassTemp < RoomDewPoint) state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
             // If airflow window, is there condensation on either glass face of the airflow gap?
             if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 Tleft = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 2) - state.dataWindowManager->TKelvin;
                 Tright = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) - state.dataWindowManager->TKelvin;
                 if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
-                    if (Tleft < RoomDewPoint || Tright < RoomDewPoint) InsideGlassCondensationFlag(SurfNum) = 1;
+                    if (Tleft < RoomDewPoint || Tright < RoomDewPoint) state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
                 } else if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_OutdoorAir) {
-                    if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp) InsideGlassCondensationFlag(SurfNum) = 1;
+                    if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp) state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
                 }
             }
 
             // Do frame and divider calculation
             if (SurfWinFrameArea(SurfNum) > 0.0 || SurfWinDividerArea(SurfNum) > 0.0) CalcWinFrameAndDividerTemps(state, SurfNum, state.dataWindowManager->tout, state.dataWindowManager->tin, state.dataWindowManager->hcout, state.dataWindowManager->hcin, state.dataWindowManager->Outir, ConstrNum);
             if (SurfWinFrameArea(SurfNum) > 0.0) {
-                InsideFrameCondensationFlag(SurfNum) = 0;
-                if (SurfWinFrameTempSurfIn(SurfNum) < RoomDewPoint) InsideFrameCondensationFlag(SurfNum) = 1;
+                state.dataSurface->InsideFrameCondensationFlag(SurfNum) = 0;
+                if (SurfWinFrameTempSurfIn(SurfNum) < RoomDewPoint) state.dataSurface->InsideFrameCondensationFlag(SurfNum) = 1;
             }
             if (SurfWinDividerArea(SurfNum) > 0.0) {
-                InsideDividerCondensationFlag(SurfNum) = 0;
-                if (SurfWinDividerTempSurfIn(SurfNum) < RoomDewPoint) InsideDividerCondensationFlag(SurfNum) = 1;
+                state.dataSurface->InsideDividerCondensationFlag(SurfNum) = 0;
+                if (SurfWinDividerTempSurfIn(SurfNum) < RoomDewPoint) state.dataSurface->InsideDividerCondensationFlag(SurfNum) = 1;
             }
         }
         // update exterior environment surface heat loss reporting

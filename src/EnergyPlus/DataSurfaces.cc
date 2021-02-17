@@ -107,19 +107,7 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
-    // 0 otherwise
-    Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
-    // 0 otherwise
-    Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
-    // 0 otherwise
-    Array1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
-
-    Array1D<Real64> X0;     // X-component of translation vector
-    Array1D<Real64> Y0;     // Y-component of translation vector
-    Array1D<Real64> Z0;     // Z-component of translation vector
-    Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from
-                            // beam reflecting from inside surfaces
+    Array1D<Real64> EnclSolDB; // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
     Array1D<Real64> EnclSolDBSSG;          // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces. Used only for scheduled surface gains
     Array1D<Real64> SurfOpaqAI; // Time step value of factor for beam absorbed on inside of opaque surface
     Array1D<Real64> SurfOpaqAO; // Time step value of factor for beam absorbed on outside of opaque surface
@@ -895,13 +883,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        InsideGlassCondensationFlag.deallocate();
-        InsideFrameCondensationFlag.deallocate();
-        InsideDividerCondensationFlag.deallocate();
-        AdjacentZoneToSurface.deallocate();
-        X0.deallocate();
-        Y0.deallocate();
-        Z0.deallocate();
         EnclSolDB.deallocate();
         EnclSolDBSSG.deallocate();
         SurfOpaqAI.deallocate();

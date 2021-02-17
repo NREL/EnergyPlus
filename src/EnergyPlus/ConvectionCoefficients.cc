@@ -255,7 +255,7 @@ namespace ConvectionCoefficients {
                 if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
                 if (present(ZoneToResimulate)) {
-                    if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                    if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
                     }
                 }

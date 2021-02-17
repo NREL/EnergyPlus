@@ -5570,7 +5570,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
 
                 if (present(ZoneToResimulate)) {
-                    if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                    if ((zoneNum != ZoneToResimulate) && (state.dataSurface->AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
                     }
                 }
