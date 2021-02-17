@@ -99,6 +99,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL LatestVersion
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
@@ -235,6 +236,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF(ALLOCATED(NwFldNames)) DEALLOCATE(NwFldNames)
           IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
           IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
+          IF(ALLOCATED(POutArgs)) DEALLOCATE(POutArgs)
           IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
@@ -242,6 +244,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
+          ALLOCATE(POutArgs(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
           DeleteThisRecord=.false.
 
@@ -434,6 +437,30 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=OutArgs(8)
+                OutArgs(7:10)=InArgs(12:15)
+                OutArgs(11:22)=InArgs(18:29)
+                OutArgs(23:CurArgs-9)=InArgs(32:CurArgs)
+                CurArgs = CurArgs - 9
+                nodiff=.false.
+
+                CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2:4) = InArgs(5:7)
+                POutArgs(5:7) = InArgs(9:11)
+                POutArgs(8:9) = InArgs(16:17)
+                POutArgs(10:11) = InArgs(30:31)
+                POutArgs(12) = InArgs(34)
+                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW:DESIGN',12,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
+
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
