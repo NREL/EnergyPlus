@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     state->dataEnvrn->TotDesDays = 2;
     state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
-    TotSurfaces = 7;
+    state->dataSurface->TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     AllocateLoadComponentArrays(*state);
@@ -6052,8 +6052,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
     Surface(1).Class = SurfaceClass::Wall;
@@ -6162,8 +6162,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
     Surface(1).Class = SurfaceClass::Wall;
@@ -6797,8 +6797,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataHeatBal->Zone(iZone).SurfaceLast = 1;
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    Surface.allocate(state->dataSurface->TotSurfaces);
     Surface(1).HeatTransSurf = true;
     Surface(1).Class = SurfaceClass::Window;
 
@@ -6835,7 +6835,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);
@@ -7388,10 +7388,10 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct
 
-    DataSurfaces::TotSurfaces = 2 * nTests ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 2 * nTests ;
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(state->dataSurface->TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 
@@ -7505,11 +7505,11 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
 
-    DataSurfaces::TotSurfaces = 4 ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 4 ;
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
 
     // first surface, interzonal walls and doors
-    for (int i = 1; i <= TotSurfaces; i++){
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
         DataSurfaces::Surface(i).HeatTransSurf = true;
         DataSurfaces::Surface(i).Azimuth = 180.;
         DataSurfaces::Surface(i).Tilt = 90.;
@@ -7553,7 +7553,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
     // SubTable 'Opaque Interior' (pdstIntOpaque)
 
-    for (int i = 1; i <= TotSurfaces; i++){
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
         if (i % 2 == 1){
 
             /****************************************************************************
@@ -7632,8 +7632,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
     Surface(1).Class = SurfaceClass::Wall;
@@ -8130,8 +8130,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -8166,7 +8166,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);

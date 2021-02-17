@@ -530,7 +530,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     state->dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
@@ -885,7 +885,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     state->dataGlobal->CurrentTime = 12.0;
     WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get equivalent layer window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
@@ -1943,7 +1943,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     int VBMatNum(0);
     int ConstrNum(0);
 
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;

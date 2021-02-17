@@ -1782,7 +1782,6 @@ namespace ThermalComfort {
         // Using/Aliasing
         using DataHeatBalSurface::TH;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
 
         // Return value
         Real64 CalcSurfaceWeightedMRT = 0.0;
@@ -1799,11 +1798,11 @@ namespace ThermalComfort {
         if (state.dataThermalComforts->FirstTimeSurfaceWeightedFlag) {
             FirstTimeError = true;
             state.dataThermalComforts->FirstTimeSurfaceWeightedFlag = false;
-            SurfaceAE.allocate(TotSurfaces);
+            SurfaceAE.allocate(state.dataSurface->TotSurfaces);
             ZoneAESum.allocate(state.dataGlobal->NumOfZones);
             SurfaceAE = 0.0;
             ZoneAESum = 0.0;
-            for (SurfNum2 = 1; SurfNum2 <= TotSurfaces; ++SurfNum2) {
+            for (SurfNum2 = 1; SurfNum2 <= state.dataSurface->TotSurfaces; ++SurfNum2) {
                 if (Surface(SurfNum2).HeatTransSurf) {
                     SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                     ZoneNum2 = Surface(SurfNum2).Zone;

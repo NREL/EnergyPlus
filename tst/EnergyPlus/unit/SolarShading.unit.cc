@@ -91,21 +91,21 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     int NumTimeSteps(6);
 
     state->dataGlobal->TimeStep = 1;
-    TotSurfaces = 3;
+    state->dataSurface->TotSurfaces = 3;
     state->dataBSDFWindow->MaxBkSurf = 3;
-    SurfaceWindow.allocate(TotSurfaces);
-    state->dataHeatBal->SunlitFracHR.allocate(24, TotSurfaces);
-    state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, TotSurfaces);
-    state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, TotSurfaces);
-    state->dataSolarShading->CTHETA.allocate(TotSurfaces);
-    state->dataHeatBal->CosIncAngHR.allocate(24, TotSurfaces);
-    state->dataHeatBal->CosIncAng.allocate(NumTimeSteps, 24, TotSurfaces);
-    SurfOpaqAO.allocate(TotSurfaces);
-    state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, TotSurfaces);
-    state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, TotSurfaces);
+    SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataSolarShading->CTHETA.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->CosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->CosIncAng.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
 
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
             SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
             SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     DetailedSolarTimestepIntegration = false;
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
             EXPECT_EQ(1.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
             EXPECT_EQ(1.0, SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     // Test integrated option, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 only for the specified hour
     // Re-initialize to new values
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
             SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
             SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataGlobal->HourOfDay = 23;
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
                 EXPECT_EQ(1.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
@@ -1456,7 +1456,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::GetShadowingInput(*state);
 
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
             int ZoneSize = Surface(SurfNum).DisabledShadowingZoneList.size();
             EXPECT_EQ(1, ZoneSize);
@@ -2565,8 +2565,8 @@ if (state->dataSolarShading->penumbra) {
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
 {
-    TotSurfaces = 2;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 2;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     int curSurface = 1;
     Surface(curSurface).windowShadingControlList.push_back(57);

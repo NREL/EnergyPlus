@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
     // Dummy surface
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     Surface.allocate(1);
     Surface(1).OSCMPtr = 1;
     Surface(1).Area = 100;

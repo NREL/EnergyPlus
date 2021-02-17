@@ -253,10 +253,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
-    int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
+    int TotHTSurfs = state->dataSurface->TotSurfaces = 1;
     Array1D_string const BaseSurfCls(1, {"WALL"});
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
     int NeedToAddSurfaces;

@@ -125,7 +125,6 @@ namespace HeatBalFiniteDiffManager {
     using DataSurfaces::Ground;
     using DataSurfaces::HeatTransferModel_CondFD;
     using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
     using DataHeatBalFanSys::QPVSysSource;
     using DataHeatBalFanSys::QRadSysSource;
@@ -514,7 +513,7 @@ namespace HeatBalFiniteDiffManager {
 
         // now do begin environment inits.
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
                 if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = Surface(SurfNum).Construction;
@@ -565,7 +564,7 @@ namespace HeatBalFiniteDiffManager {
 
         // now do every timestep inits
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
             if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
             ConstrNum = Surface(SurfNum).Construction;
@@ -639,9 +638,9 @@ namespace HeatBalFiniteDiffManager {
         SigmaR.allocate(state.dataHeatBal->TotConstructs);
         SigmaC.allocate(state.dataHeatBal->TotConstructs);
 
-        SurfaceFD.allocate(TotSurfaces);
-        QHeatInFlux.allocate(TotSurfaces);
-        QHeatOutFlux.allocate(TotSurfaces);
+        SurfaceFD.allocate(state.dataSurface->TotSurfaces);
+        QHeatInFlux.allocate(state.dataSurface->TotSurfaces);
+        QHeatOutFlux.allocate(state.dataSurface->TotSurfaces);
 
         // And then initialize
         QHeatInFlux = 0.0;
@@ -857,7 +856,7 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (Surf = 1; Surf <= TotSurfaces; ++Surf) {
+        for (Surf = 1; Surf <= state.dataSurface->TotSurfaces; ++Surf) {
             if (!Surface(Surf).HeatTransSurf) continue;
             if (Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(Surf).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
@@ -934,7 +933,7 @@ namespace HeatBalFiniteDiffManager {
 
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;

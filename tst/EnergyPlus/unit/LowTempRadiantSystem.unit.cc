@@ -2279,7 +2279,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     state->dataHeatBal->Zone(1).Name = "WEST ZONE";
     state->dataHeatBal->Zone(2).Name = "EAST ZONE";
 
-    DataSurfaces::TotSurfaces = 4;
+    state->dataSurface->TotSurfaces = 4;
     Surface.allocate(4);
     Surface(1).Name = "ZN001:FLR001";
     Surface(1).ZoneName = "WEST ZONE";

@@ -70,13 +70,16 @@ using Surfaces = SurfaceOctreeCube::Surfaces;
 
 TEST(SurfaceOctreeTest, Basic)
 {
+
+    auto state = new EnergyPlusData;
+
     // Surfaces: Simple Unit Cube
-    TotSurfaces = 6;
+    state->dataSurface->TotSurfaces = 6;
     SurfaceData surface;
     surface.Area = 1.0;
     surface.Sides = 4;
     surface.Vertex.dimension(4);
-    Surface.dimension(TotSurfaces, surface);
+    Surface.dimension(state->dataSurface->TotSurfaces, surface);
     Surface(1).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 0, 1), Vertex(0, 0, 1)};
     Surface(2).Vertex = {Vertex(0, 1, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(0, 1, 1)};
     Surface(3).Vertex = {Vertex(0, 0, 0), Vertex(0, 1, 0), Vertex(0, 1, 1), Vertex(0, 0, 1)};
@@ -271,18 +274,18 @@ TEST(SurfaceOctreeTest, Basic)
 
     // Clean up
     Surface.deallocate();
-    TotSurfaces = 0;
+    state->dataSurface->TotSurfaces = 0;
 }
 
 TEST_F(EnergyPlusFixture, Composite)
 {
     // Surfaces: Unit Cube in 2-Unit Cube
-    TotSurfaces = 12;
+    state->dataSurface->TotSurfaces = 12;
     SurfaceData surface;
     surface.Area = 1.0;
     surface.Sides = 4;
     surface.Vertex.dimension(4);
-    Surface.dimension(TotSurfaces, surface);
+    Surface.dimension(state->dataSurface->TotSurfaces, surface);
     // Outer [0,2] cube
     Surface(1).Vertex = {2 * Vertex(0, 0, 0), 2 * Vertex(1, 0, 0), 2 * Vertex(1, 0, 1), 2 * Vertex(0, 0, 1)};
     Surface(2).Vertex = {2 * Vertex(0, 1, 0), 2 * Vertex(1, 1, 0), 2 * Vertex(1, 1, 1), 2 * Vertex(0, 1, 1)};
@@ -297,7 +300,7 @@ TEST_F(EnergyPlusFixture, Composite)
     Surface(10).Vertex = {Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(1, 1, 1), Vertex(1, 0, 1)};
     Surface(11).Vertex = {Vertex(0, 0, 0), Vertex(1, 0, 0), Vertex(1, 1, 0), Vertex(0, 1, 0)};
     Surface(12).Vertex = {Vertex(0, 0, 1), Vertex(1, 0, 1), Vertex(1, 1, 1), Vertex(0, 1, 1)};
-    for (int i = 1; i <= TotSurfaces; ++i)
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; ++i)
         Surface(i).Shape = SurfaceShape::Rectangle;
 
     // SurfaceOctreeCube
@@ -435,7 +438,4 @@ TEST_F(EnergyPlusFixture, Composite)
         EXPECT_EQ(8u, n);
     }
 
-    // Clean up
-    Surface.deallocate();
-    TotSurfaces = 0;
 }

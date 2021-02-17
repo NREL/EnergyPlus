@@ -210,7 +210,7 @@ namespace WindowManager {
         // shade. These are used to calculate zone MRT contribution from window when
         // interior blind/shade is deployed.
 
-        for (auto SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (auto SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen

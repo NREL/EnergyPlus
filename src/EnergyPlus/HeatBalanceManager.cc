@@ -152,8 +152,6 @@ namespace HeatBalanceManager {
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::StormWindow;
     using DataSurfaces::Suspended;
-    using DataSurfaces::TotStormWin;
-    using DataSurfaces::TotSurfaces;
     using DataWindowEquivalentLayer::TotWinEquivLayerConstructs;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -161,10 +159,6 @@ namespace HeatBalanceManager {
     using WindowManager::W5LsqFit;
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -324,7 +318,7 @@ namespace HeatBalanceManager {
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
-            if (TotSurfaces >= DaylightingManager::octreeCrossover) {                 // Octree can be active
+            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                 // Octree can be active
                 if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
                     surfaceOctree.init(DataSurfaces::Surface);                        // Set up surface octree
                 }
@@ -449,7 +443,7 @@ namespace HeatBalanceManager {
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
-        if (TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
+        if (state.dataSurface->TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
             ValidSimulationWithNoZones = CheckValidSimulationObjects(state);
             if (!ValidSimulationWithNoZones) {
                 ShowSevereError(state, "GetHeatBalanceInput: There are surfaces in input but no zones found.  Invalid simulation.");
@@ -5262,7 +5256,7 @@ namespace HeatBalanceManager {
             MaxLoadZoneRpt = 0.0;
             CountWarmupDayPoints = 0;
 
-            for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
                 DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
                 DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
@@ -5273,13 +5267,13 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
-        if (TotStormWin > 0) {
+        if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
                 ChangeSet = false;
             } else if (!ChangeSet) {
                 state.dataHeatBal->StormWinChangeThisDay = false;
-                for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
+                for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
                     SurfNum = StormWindow(StormWinNum).BaseWindowNum;
                     DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
                 }
@@ -5318,7 +5312,7 @@ namespace HeatBalanceManager {
                         } else {
                             print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour - 1, (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                         }
-                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
                         print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
                     }
@@ -5628,7 +5622,7 @@ namespace HeatBalanceManager {
 
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
 
@@ -5922,7 +5916,7 @@ namespace HeatBalanceManager {
 
         int SurfNum;
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
@@ -6055,7 +6049,7 @@ namespace HeatBalanceManager {
 
         state.files.shade.ensure_open(state, "OpenOutputFiles", state.files.outputControl.extshd);
         print(state.files.shade, "Surface Name,");
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             print(state.files.shade, "{},", Surface(SurfNum).Name);
         }
         print(state.files.shade, "()\n");
@@ -7152,7 +7146,7 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->StormWinChangeThisDay = false;
 
-        for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
+        for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
             SurfNum = StormWindow(StormWinNum).BaseWindowNum;
             SurfWinStormWinFlagPrevDay(SurfNum) = SurfWinStormWinFlag(SurfNum);
             DateOff = StormWindow(StormWinNum).DateOff - 1;
@@ -7506,9 +7500,7 @@ namespace HeatBalanceManager {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfIncSolSSG;
         using DataSurfaces::TotFenLayAbsSSG;
-        using DataSurfaces::TotSurfaces;
         using DataSurfaces::TotSurfIncSolSSG;
-
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

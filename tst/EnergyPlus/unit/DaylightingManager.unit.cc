@@ -934,8 +934,8 @@ TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
     state->dataDaylightingData->ZoneDaylight(3).Name = "ZD3";
     state->dataDaylightingData->ZoneDaylight(4).Name = "ZD4";
 
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
 
     WindowShadingControl(1).Name = "WSC1";
     WindowShadingControl(1).DaylightingControlName = "ZD3";
@@ -955,8 +955,8 @@ TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 
 TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
     WindowShadingControl(1).Name = "WSC1";
@@ -1026,8 +1026,8 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 
 TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
     WindowShadingControl(1).Name = "WSC1";

@@ -143,7 +143,6 @@ namespace LowTempRadiantSystem {
     using DataHVACGlobals::SmallLoad;
     using DataSurfaces::HeatTransferModel_CTF;
     using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     using Psychrometrics::PsyTdpFnWPb;
 
     // Data
@@ -1225,7 +1224,7 @@ namespace LowTempRadiantSystem {
         // and thus indicative that there is an error in the input file.  This is to make sure that two
         // different radiant systems are competing for the same surface.  Allowing this to happen would
         // result in lost energy somewhere and the situation really is not physically possible anyway.
-        AssignedAsRadiantSurface.dimension(TotSurfaces, false);
+        AssignedAsRadiantSurface.dimension(state.dataSurface->TotSurfaces, false);
 
         for (Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item) {
             for (SurfNum = 1; SurfNum <= HydrRadSys(Item).NumOfSurfaces; ++SurfNum) {
@@ -1757,10 +1756,10 @@ namespace LowTempRadiantSystem {
         if (FirstTimeInit) {
 
             ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
-            LastQRadSysSrc.dimension(TotSurfaces, 0.0);
-            LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
-            LastTimeStepSys.dimension(TotSurfaces, 0.0);
+            QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
+            LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
+            LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
+            LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
             MySizeFlagHydr.allocate(NumOfHydrLowTempRadSys);
             MySizeFlagCFlo.allocate(NumOfCFloLowTempRadSys);
             MySizeFlagElec.allocate(NumOfElecLowTempRadSys);
@@ -5474,7 +5473,7 @@ namespace LowTempRadiantSystem {
         return calculateUFromISOStandard;
     }
 
-    void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn) // .TRUE. if the radiant system has run this zone time step
+    void UpdateRadSysSourceValAvg(EnergyPlusData &state, bool &LowTempRadSysOn) // .TRUE. if the radiant system has run this zone time step
     {
 
         // SUBROUTINE INFORMATION:
@@ -5506,7 +5505,7 @@ namespace LowTempRadiantSystem {
         if (!allocated(QRadSysSrcAvg)) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (QRadSysSrcAvg(SurfNum) != 0.0) {
                 LowTempRadSysOn = true;
                 break; // DO loop
@@ -5517,7 +5516,7 @@ namespace LowTempRadiantSystem {
 
         // For interzone surfaces, QRadSysSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(QRadSysSource(SurfNum) - QRadSysSource(Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
                     if (std::abs(QRadSysSource(SurfNum)) > std::abs(QRadSysSource(Surface(SurfNum).ExtBoundCond))) {

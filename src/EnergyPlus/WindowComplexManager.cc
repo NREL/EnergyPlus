@@ -167,16 +167,16 @@ namespace WindowComplexManager {
         }
         state.dataWindowComplexManager->BasisList.redimension(state.dataWindowComplexManager->NumBasis);
         //  Proceed to set up geometry for complex fenestration states
-        state.dataBSDFWindow->ComplexWind.allocate(TotSurfaces); // Set up companion array to SurfaceWindow to hold window
+        state.dataBSDFWindow->ComplexWind.allocate(state.dataSurface->TotSurfaces); // Set up companion array to SurfaceWindow to hold window
         //     geometry for each state.  This is an allocatable array of
         //     geometries for the window states but only the complex
         //     fenestration surfaces will have the arrays allocated
         //  Search Thru Surfaces for Complex Fenestration State references
         //  This will define the first complex fenestration state for that window, others will follow if there are
         //     control specifications
-        state.dataWindowComplexManager->WindowList.allocate(TotSurfaces);                           // Temporary allocation
-        state.dataWindowComplexManager->WindowStateList.allocate(state.dataBSDFWindow->TotComplexFenStates, TotSurfaces); // Temporary allocation
-        for (int ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+        state.dataWindowComplexManager->WindowList.allocate(state.dataSurface->TotSurfaces);                           // Temporary allocation
+        state.dataWindowComplexManager->WindowStateList.allocate(state.dataBSDFWindow->TotComplexFenStates, state.dataSurface->TotSurfaces); // Temporary allocation
+        for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
             int IConst = Surface(ISurf).Construction;
             if (IConst == 0) continue; // This is true for overhangs (Shading:Zone:Detailed)
             if (!(state.dataConstruction->Construct(IConst).TypeIsWindow && (state.dataConstruction->Construct(IConst).WindowTypeBSDF))) continue; // Only BSDF windows
@@ -588,7 +588,7 @@ namespace WindowComplexManager {
                     for (int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI) { // Gnd pt loop
                         TotHits = 0;
                         Vector const gndPt(complexWindowGeom.GndPt(I));
-                        for (int JSurf = 1, eSurf = TotSurfaces; JSurf <= eSurf; ++JSurf) {
+                        for (int JSurf = 1, eSurf = state.dataSurface->TotSurfaces; JSurf <= eSurf; ++JSurf) {
                             // the following test will cycle on anything except exterior surfaces and shading surfaces
                             if (Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond != ExternalEnvironment) continue;
                             // skip surfaces that face away from the ground point
@@ -638,7 +638,7 @@ namespace WindowComplexManager {
             for (int I = 1, nGnd = complexWindowGeom.NGnd; I <= nGnd; ++I, ++lHTI) {      // Gnd pt loop
                 TotHits = 0;
                 Vector const gndPt(complexWindowGeom.GndPt(I));
-                for (int JSurf = 1; JSurf <= TotSurfaces; ++JSurf) {
+                for (int JSurf = 1; JSurf <= state.dataSurface->TotSurfaces; ++JSurf) {
                     // the following test will cycle on anything except exterior surfaces and shading surfaces
                     if (Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond != ExternalEnvironment) continue;
                     // skip surfaces that face away from the ground point
@@ -1310,9 +1310,9 @@ namespace WindowComplexManager {
         // Sky, and ground ray index maps, and rays that are potentially beam radiation reflected from exterior surfaces
         TmpRfSfInd.allocate(Geom.Inc.NBasis);
         TmpRfRyNH.allocate(Geom.Inc.NBasis);
-        TmpHSurfNo.allocate(TotSurfaces, Geom.Inc.NBasis);
-        TmpHSurfDSq.allocate(TotSurfaces, Geom.Inc.NBasis);
-        TmpHitPt.allocate(TotSurfaces, Geom.Inc.NBasis);
+        TmpHSurfNo.allocate(state.dataSurface->TotSurfaces, Geom.Inc.NBasis);
+        TmpHSurfDSq.allocate(state.dataSurface->TotSurfaces, Geom.Inc.NBasis);
+        TmpHitPt.allocate(state.dataSurface->TotSurfaces, Geom.Inc.NBasis);
         TmpSkyInd.allocate(Geom.Inc.NBasis);
         TmpGndInd.allocate(Geom.Inc.NBasis);
         TmpGndPt.allocate(Geom.Inc.NBasis);
@@ -1334,7 +1334,7 @@ namespace WindowComplexManager {
             }
             // Exterior reveal shadowing/reflection treatment should be inserted here
             TotHits = 0;
-            for (JSurf = 1; JSurf <= TotSurfaces; ++JSurf) {
+            for (JSurf = 1; JSurf <= state.dataSurface->TotSurfaces; ++JSurf) {
                 // the following test will cycle on anything except exterior surfaces and shading surfaces
                 if (Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond != ExternalEnvironment) continue;
                 //  skip the base surface containing the window and any other subsurfaces of that surface

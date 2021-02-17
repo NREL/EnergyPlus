@@ -227,7 +227,7 @@ namespace HeatBalanceIntRadExchange {
             }
         } else {
             NetLWRadToSurf = 0.0;
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++)
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++)
                 SurfWinIRfromParentZone(SurfNum) = 0.0;
         }
 

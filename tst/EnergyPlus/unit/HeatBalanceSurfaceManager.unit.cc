@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFactors)
 {
 
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
@@ -272,9 +272,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->Zone(1).SurfaceLast = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
 
@@ -297,12 +297,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
 {
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyConstructInternalSourceInInput = true;
 
@@ -1939,12 +1939,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
 
     state->dataGlobal->DisplayAdvancedReportVariables = true;
 
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyConstructInternalSourceInInput = true;
 
@@ -2493,11 +2493,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
     DataSurfaces::clear_state();
     DataHeatBalSurface::clear_state();
 
-    DataSurfaces::TotSurfaces = 3;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataHeatBalSurface::TempSurfIn.allocate(DataSurfaces::TotSurfaces);
-    DataHeatBalSurface::TempSurfInTmp.allocate(DataSurfaces::TotSurfaces);
-    DataHeatBalSurface::TempSurfInMovInsRep.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 3;
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
+    DataHeatBalSurface::TempSurfIn.allocate(state->dataSurface->TotSurfaces);
+    DataHeatBalSurface::TempSurfInTmp.allocate(state->dataSurface->TotSurfaces);
+    DataHeatBalSurface::TempSurfInMovInsRep.allocate(state->dataSurface->TotSurfaces);
 
     // Test 1 Data: Surface does NOT have movable insulation
     DataSurfaces::Surface(1).MaterialMovInsulInt = 0; // No material means no movable insulation
@@ -2559,13 +2559,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 {
 
-    DataSurfaces::TotSurfaces = 2;
+    state->dataSurface->TotSurfaces = 2;
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     DataHeatBalSurface::EnclSolVMULT.allocate(state->dataGlobal->NumOfZones);
     state->dataConstruction->Construct(1).TransDiff = 0.1;

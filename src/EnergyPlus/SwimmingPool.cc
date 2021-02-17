@@ -223,7 +223,7 @@ namespace EnergyPlus::SwimmingPool {
 
             state.dataSwimmingPools->Pool(Item).SurfaceName = Alphas(2);
             state.dataSwimmingPools->Pool(Item).SurfacePtr = 0;
-            for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (UtilityRoutines::SameString(DataSurfaces::Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
                     state.dataSwimmingPools->Pool(Item).SurfacePtr = SurfNum;
                     break;
@@ -468,17 +468,17 @@ namespace EnergyPlus::SwimmingPool {
             this->setupOutputVars(state); // Set up the output variables once here
             this->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
             this->ZeroSourceSumHATsurf = 0.0;
-            this->QPoolSrcAvg.allocate(DataSurfaces::TotSurfaces);
+            this->QPoolSrcAvg.allocate(state.dataSurface->TotSurfaces);
             this->QPoolSrcAvg = 0.0;
-            this->HeatTransCoefsAvg.allocate(DataSurfaces::TotSurfaces);
+            this->HeatTransCoefsAvg.allocate(state.dataSurface->TotSurfaces);
             this->HeatTransCoefsAvg = 0.0;
-            this->LastQPoolSrc.allocate(DataSurfaces::TotSurfaces);
+            this->LastQPoolSrc.allocate(state.dataSurface->TotSurfaces);
             this->LastQPoolSrc = 0.0;
-            this->LastHeatTransCoefs.allocate(DataSurfaces::TotSurfaces);
+            this->LastHeatTransCoefs.allocate(state.dataSurface->TotSurfaces);
             this->LastHeatTransCoefs = 0.0;
-            this->LastSysTimeElapsed.allocate(DataSurfaces::TotSurfaces);
+            this->LastSysTimeElapsed.allocate(state.dataSurface->TotSurfaces);
             this->LastSysTimeElapsed = 0.0;
-            this->LastTimeStepSys.allocate(DataSurfaces::TotSurfaces);
+            this->LastTimeStepSys.allocate(state.dataSurface->TotSurfaces);
             this->LastTimeStepSys = 0.0;
             this->MyOneTimeFlag = false;
         }
@@ -942,7 +942,7 @@ namespace EnergyPlus::SwimmingPool {
             if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
 
             // If it was allocated, then we have to check to see if this was running at all
-            for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
                     SwimmingPoolOn = true;
                     break; // DO loop
@@ -955,7 +955,7 @@ namespace EnergyPlus::SwimmingPool {
 
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) -
                              DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
@@ -972,7 +972,7 @@ namespace EnergyPlus::SwimmingPool {
         }
         // For interzone surfaces, PoolHeatTransCoefs was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (int SurfNum = 1; SurfNum <= DataSurfaces::TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) -
                              DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ

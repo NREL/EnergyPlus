@@ -755,11 +755,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
-    TotSurfaces = 3;
+    state->dataSurface->TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
-    TH.allocate(2, 2, TotSurfaces);
-    Surface.allocate(TotSurfaces);
-    state->dataConstruction->Construct.allocate(TotSurfaces);
+    TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->Zone.allocate(1);
 
     Surface(1).Area = 20.0;
@@ -817,12 +817,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
     state->dataThermalComforts->AngleFactorList(1).AngleFactor(3) = 0.2;
 
     TH.deallocate();
-    TotSurfaces = state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces;
-    TH.allocate(2, 2, TotSurfaces);
+    state->dataSurface->TotSurfaces = state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces;
+    TH.allocate(2, 2, state->dataSurface->TotSurfaces);
     Surface.deallocate();
     state->dataConstruction->Construct.deallocate();
-    Surface.allocate(TotSurfaces);
-    state->dataConstruction->Construct.allocate(TotSurfaces);
+    Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
 
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;

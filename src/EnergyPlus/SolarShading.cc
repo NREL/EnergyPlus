@@ -589,7 +589,7 @@ namespace EnergyPlus::SolarShading {
         }
         int ExtShadingSchedNum;
         if (shadingMethod == ShadingMethod::Imported) {
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
                     Surface(SurfNum).SchedExternalShadingFrac = true;
@@ -654,7 +654,7 @@ namespace EnergyPlus::SolarShading {
                     if (Found != 0) DisableSelfShadingGroups(i) = Found;
                 }
 
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
                     if (Surface(SurfNum).ExtBoundCond == 0) { // Loop through all exterior surfaces
                         SurfZoneGroup = 0;
                         // Check the shading zone group of each exterior surface
@@ -757,18 +757,18 @@ namespace EnergyPlus::SolarShading {
 
 
 
-        state.dataSolarShading->CTHETA.dimension(TotSurfaces, 0.0);
-        state.dataSolarShading->SAREA.dimension(TotSurfaces, 0.0);
-        SurfSunlitArea.dimension(TotSurfaces, 0.0);
-        SurfSunlitFrac.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SunlitFracHR.dimension(24, TotSurfaces, 0.0);
-        state.dataHeatBal->SunlitFrac.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces, 0.0);
-        state.dataHeatBal->SunlitFracWithoutReveal.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces, 0.0);
-        state.dataHeatBal->BackSurfaces.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, TotSurfaces, 0);
-        state.dataHeatBal->OverlapAreas.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, TotSurfaces, 0.0);
-        state.dataHeatBal->CosIncAngHR.dimension(24, TotSurfaces, 0.0);
-        state.dataHeatBal->CosIncAng.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces, 0.0);
-        state.dataHeatBal->AnisoSkyMult.dimension(TotSurfaces, 1.0); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
+        state.dataSolarShading->CTHETA.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSolarShading->SAREA.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SunlitFracHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SunlitFrac.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SunlitFracWithoutReveal.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->BackSurfaces.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, state.dataSurface->TotSurfaces, 0);
+        state.dataHeatBal->OverlapAreas.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataBSDFWindow->MaxBkSurf, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->CosIncAngHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->CosIncAng.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->AnisoSkyMult.dimension(state.dataSurface->TotSurfaces, 1.0); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
         //  ALLOCATE(WithShdgIsoSky(TotSurfaces))
         //  WithShdgIsoSky=0.0
         //  ALLOCATE(WoShdgIsoSky(TotSurfaces))
@@ -781,35 +781,35 @@ namespace EnergyPlus::SolarShading {
         //  DifShdgRatioIsoSky=0.0
         //  ALLOCATE(DifShdgRatioHoriz(TotSurfaces))
         //  DifShdgRatioHoriz=0.0
-        state.dataHeatBal->MultIsoSky.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->MultCircumSolar.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->MultHorizonZenith.dimension(TotSurfaces, 0.0);
-        SurfWinTransSolar.dimension(TotSurfaces, 0.0);
-        SurfWinBmSolar.dimension(TotSurfaces, 0.0);
-        SurfWinBmBmSolar.dimension(TotSurfaces, 0.0);
-        SurfWinBmDifSolar.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->MultIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->MultCircumSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->MultHorizonZenith.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinTransSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinBmSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinBmBmSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinBmDifSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        SurfWinDifSolar.dimension(TotSurfaces, 0.0);
-        SurfWinHeatGain.dimension(TotSurfaces, 0.0);
-        SurfWinHeatTransfer.dimension(TotSurfaces, 0.0);
-        SurfWinHeatGainRep.dimension(TotSurfaces, 0.0);
-        SurfWinHeatLossRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainConvGlazToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainIRGlazToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinLossSWZoneToOutWinRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainFrameDividerToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainConvGlazShadGapToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainConvShadeToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinOtherConvGainInsideFaceToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinGainIRShadeToZoneRep.dimension(TotSurfaces, 0.0);
-        SurfWinGapConvHtFlowRep.dimension(TotSurfaces, 0.0);
-        SurfWinShadingAbsorbedSolar.dimension(TotSurfaces, 0.0);
-        SurfWinSysSolTransmittance.dimension(TotSurfaces, 0.0);
-        SurfWinSysSolReflectance.dimension(TotSurfaces, 0.0);
-        SurfWinSysSolAbsorptance.dimension(TotSurfaces, 0.0);
-        InsideGlassCondensationFlag.dimension(TotSurfaces, 0);
-        InsideFrameCondensationFlag.dimension(TotSurfaces, 0);
-        InsideDividerCondensationFlag.dimension(TotSurfaces, 0);
+        SurfWinDifSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatGain.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatTransfer.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatGainRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatLossRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainConvGlazToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainIRGlazToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinLossSWZoneToOutWinRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainFrameDividerToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainConvGlazShadGapToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainConvShadeToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinOtherConvGainInsideFaceToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGainIRShadeToZoneRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGapConvHtFlowRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinShadingAbsorbedSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinSysSolTransmittance.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinSysSolReflectance.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinSysSolAbsorptance.dimension(state.dataSurface->TotSurfaces, 0.0);
+        InsideGlassCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+        InsideFrameCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+        InsideDividerCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
         state.dataHeatBal->ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -826,44 +826,44 @@ namespace EnergyPlus::SolarShading {
         state.dataHeatBal->ZoneOpaqSurfExtFaceCondGainRep.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-        state.dataHeatBal->SurfQRadSWOutIncident.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncidentBeam.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfBmIncInsSurfIntensRep.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfBmIncInsSurfAmountRep.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncident.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncidentBeam.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfBmIncInsSurfIntensRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfBmIncInsSurfAmountRep.dimension(state.dataSurface->TotSurfaces, 0.0);
         //  ALLOCATE(DifIncInsSurfIntensRep(TotSurfaces))
         //  DifIncInsSurfIntensRep=0.0
         //  ALLOCATE(DifIncInsSurfAmountRep(TotSurfaces))
         //  DifIncInsSurfAmountRep=0.0
-        state.dataHeatBal->SurfIntBmIncInsSurfIntensRep.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfIntBmIncInsSurfAmountRep.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfIntBmIncInsSurfIntensRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfIntBmIncInsSurfAmountRep.dimension(state.dataSurface->TotSurfaces, 0.0);
         //  ALLOCATE(IntDifIncInsSurfIntensRep(TotSurfaces))
         //  IntDifIncInsSurfIntensRep=0.0
         //  ALLOCATE(IntDifIncInsSurfAmountRep(TotSurfaces))
         //  IntDifIncInsSurfAmountRep=0.0
-        state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfCosIncidenceAngle.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncBmToBmReflObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncBmToDiffReflObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfQRadSWOutIncSkyDiffReflObs.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfCosIncidenceAngle.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        state.dataHeatBal->SurfWinBSDFBeamDirectionRep.dimension(TotSurfaces, 0);
-        state.dataHeatBal->SurfWinBSDFBeamThetaRep.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfWinBSDFBeamPhiRep.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfWinQRadSWwinAbsTot.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinBSDFBeamDirectionRep.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataHeatBal->SurfWinBSDFBeamThetaRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinBSDFBeamPhiRep.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinQRadSWwinAbsTot.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        state.dataHeatBal->SurfWinQRadSWwinAbsLayer.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinQRadSWwinAbsLayer.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
 
-        state.dataHeatBal->SurfWinFenLaySurfTempFront.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
-        state.dataHeatBal->SurfWinFenLaySurfTempBack.dimension(state.dataHeatBal->MaxSolidWinLayers, TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinFenLaySurfTempFront.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinFenLaySurfTempBack.dimension(state.dataHeatBal->MaxSolidWinLayers, state.dataSurface->TotSurfaces, 0.0);
 
-        state.dataHeatBal->SurfWinSWwinAbsTotalReport.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfInitialDifSolInAbsReport.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfWinInitialDifSolInTransReport.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfSWInAbsTotalReport.dimension(TotSurfaces, 0.0);
-        state.dataSolarShading->WindowRevealStatus.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces, 0);
+        state.dataHeatBal->SurfWinSWwinAbsTotalReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfInitialDifSolInAbsReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinInitialDifSolInTransReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfSWInAbsTotalReport.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSolarShading->WindowRevealStatus.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0);
 
         // Weiler-Atherton
         state.dataSolarShading->MAXHCArrayBounds = 2 * (MaxVerticesPerSurface + 1);
@@ -884,18 +884,18 @@ namespace EnergyPlus::SolarShading {
         state.dataSolarShading->YTEMP1.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
 
         // energy
-        SurfWinTransSolarEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinBmSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinTransSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinBmSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        SurfWinBmBmSolarEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinBmDifSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinBmBmSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinBmDifSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        SurfWinDifSolarEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinHeatGainRepEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinHeatLossRepEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinGapConvHtFlowRepEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinHeatTransferRepEnergy.dimension(TotSurfaces, 0.0);
-        SurfWinShadingAbsorbedSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinDifSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatGainRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatLossRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinGapConvHtFlowRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinHeatTransferRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        SurfWinShadingAbsorbedSolarEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
 
         state.dataHeatBal->ZoneTransSolarEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -911,13 +911,13 @@ namespace EnergyPlus::SolarShading {
         state.dataHeatBal->ZnOpqSurfExtFaceCondLsRepEnrg.dimension(state.dataGlobal->NumOfZones, 0.0);
         //  ALLOCATE(DifIncInsSurfAmountRepEnergy(TotSurfaces))
         //  DifIncInsSurfAmountRepEnergy=0.0
-        state.dataHeatBal->SurfBmIncInsSurfAmountRepEnergy.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->SurfIntBmIncInsSurfAmountRepEnergy.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfBmIncInsSurfAmountRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->SurfIntBmIncInsSurfAmountRepEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
         //  ALLOCATE(IntDifIncInsSurfAmountRepEnergy(TotSurfaces))
         //  IntDifIncInsSurfAmountRepEnergy=0.0
-        state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy.dimension(TotSurfaces, 0.0);
+        state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0;
             SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0;
             SurfWinBmSolAbsdInsReveal(SurfNum) = 0.0;
@@ -931,7 +931,7 @@ namespace EnergyPlus::SolarShading {
         }
 
         // Added report variables for inside reveal to debug CR 7596. TH 5/26/2009
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             SurfWinInsRevealDiffOntoGlazingReport(SurfNum) = 0.0;
             SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
             SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
@@ -1052,7 +1052,7 @@ namespace EnergyPlus::SolarShading {
 
         DisplayString(state, "Initializing Surface (Shading) Report Variables");
         // CurrentModuleObject='Surfaces'
-        for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             SetupOutputVariable(state, "Surface Outside Normal Azimuth Angle",
                                 OutputProcessor::Unit::deg,
                                 Surface(SurfLoop).Azimuth,
@@ -2142,7 +2142,7 @@ namespace EnergyPlus::SolarShading {
             }
         }
 
-        for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             // CurrentModuleObject='Surfaces'
             SetupOutputVariable(state, "Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area",
@@ -2311,7 +2311,7 @@ namespace EnergyPlus::SolarShading {
         F1 = max(0.0, F11R(EpsilonBin) + F12R(EpsilonBin) * Delta + F13R(EpsilonBin) * ZenithAng);
         F2 = F21R(EpsilonBin) + F22R(EpsilonBin) * Delta + F23R(EpsilonBin) * ZenithAng;
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).ExtSolar) continue;
 
             CosIncAngBeamOnSurface =
@@ -2905,7 +2905,7 @@ namespace EnergyPlus::SolarShading {
         Real64 HorizAreaSum;
 
         if (!allocated(state.dataSolarShading->ISABSF)) {
-            state.dataSolarShading->ISABSF.allocate(TotSurfaces);
+            state.dataSolarShading->ISABSF.allocate(state.dataSurface->TotSurfaces);
         }
         state.dataSolarShading->ISABSF = 0.0;
 
@@ -4531,16 +4531,16 @@ namespace EnergyPlus::SolarShading {
                 e.InOutProjSLFracMult = 1.0;
             }
         } else {
-            state.dataHeatBal->SunlitFracHR(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            state.dataHeatBal->SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            state.dataSolarShading->CTHETA({1, TotSurfaces}) = 0.0;
-            state.dataHeatBal->CosIncAngHR(state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, TotSurfaces}) = 0.0;
-            SurfOpaqAO({1, TotSurfaces}) = 0.0;
-            state.dataHeatBal->BackSurfaces(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataBSDFWindow->MaxBkSurf}, {1, TotSurfaces}) = 0;
-            state.dataHeatBal->OverlapAreas(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataBSDFWindow->MaxBkSurf}, {1, TotSurfaces}) = 0.0;
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            state.dataHeatBal->SunlitFracHR(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataHeatBal->SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataSolarShading->CTHETA({1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataHeatBal->CosIncAngHR(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            SurfOpaqAO({1, state.dataSurface->TotSurfaces}) = 0.0;
+            state.dataHeatBal->BackSurfaces(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataBSDFWindow->MaxBkSurf}, {1, state.dataSurface->TotSurfaces}) = 0;
+            state.dataHeatBal->OverlapAreas(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataBSDFWindow->MaxBkSurf}, {1, state.dataSurface->TotSurfaces}) = 0.0;
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 SurfaceWindow(SurfNum).OutProjSLFracMult(state.dataGlobal->HourOfDay) = 1.0;
                 SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay) = 1.0;
             }
@@ -4642,7 +4642,7 @@ namespace EnergyPlus::SolarShading {
 
         if (state.dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue) return;
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSolarShading->CTHETA(SurfNum) =
                 state.dataSolarShading->SUNCOS(1) * Surface(SurfNum).OutNormVec(1) + state.dataSolarShading->SUNCOS(2) * Surface(SurfNum).OutNormVec(2) + state.dataSolarShading->SUNCOS(3) * Surface(SurfNum).OutNormVec(3);
             if (!DetailedSolarTimestepIntegration) {
@@ -4654,7 +4654,7 @@ namespace EnergyPlus::SolarShading {
         }
 
         if ((shadingMethod == ShadingMethod::Scheduled || shadingMethod == ShadingMethod::Imported) && !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather){
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
                     state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(state, Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
                 } else {
@@ -4663,7 +4663,7 @@ namespace EnergyPlus::SolarShading {
             }
         } else {
             SHADOW(state, iHour, iTimeStep); // Determine sunlit areas and solar multipliers for all surfaces.
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Area >= 1.e-10) {
                     SurfArea = Surface(SurfNum).NetAreaShadowCalc;
                     if (!DetailedSolarTimestepIntegration) {
@@ -4694,7 +4694,7 @@ namespace EnergyPlus::SolarShading {
                     state.dataSolarShading->SUNCOS(1) = cos_Phi[IPhi] * cos_Theta[ITheta];
                     state.dataSolarShading->SUNCOS(2) = cos_Phi[IPhi] * sin_Theta[ITheta];
 
-                    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         if (!Surface(SurfNum).ShadowingSurf && !Surface(SurfNum).HeatTransSurf) continue;
                         state.dataSolarShading->CTHETA(SurfNum) = state.dataSolarShading->SUNCOS(1) * Surface(SurfNum).OutNormVec(1) + state.dataSolarShading->SUNCOS(2) * Surface(SurfNum).OutNormVec(2) +
                                           state.dataSolarShading->SUNCOS(3) * Surface(SurfNum).OutNormVec(3);
@@ -4702,7 +4702,7 @@ namespace EnergyPlus::SolarShading {
 
                     SHADOW(state, iHour, iTimeStep); // Determine sunlit areas and solar multipliers for all surfaces.
 
-                    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
                         if (!Surface(SurfNum).ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                             continue;
@@ -4729,7 +4729,7 @@ namespace EnergyPlus::SolarShading {
                 }     // End of Theta loop
             }         // End of Phi loop
 
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
                 if (!Surface(SurfNum).ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
                     continue;
@@ -4761,7 +4761,7 @@ namespace EnergyPlus::SolarShading {
 
         } // test for shading surfaces
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // For exterior windows with frame/divider that are partially or fully sunlit,
             // correct SunlitFrac due to shadowing of frame and divider projections onto window glass.
             // Note: if SunlitFrac = 0.0 the window is either completely shaded or the sun is in back
@@ -4826,9 +4826,9 @@ namespace EnergyPlus::SolarShading {
         ++NumDetShadowCombs_Calls;
 #endif
 
-        ShadowComb.dimension(TotSurfaces, ShadowingCombinations{}); // Set all elements to default constructed state
+        ShadowComb.dimension(state.dataSurface->TotSurfaces, ShadowingCombinations{}); // Set all elements to default constructed state
 
-        CastingSurface.dimension(TotSurfaces, false);
+        CastingSurface.dimension(state.dataSurface->TotSurfaces, false);
 
         state.dataSolarShading->HCA.dimension(2 * state.dataSolarShading->MaxHCS, state.dataSolarShading->MaxHCV + 1, 0);
         state.dataSolarShading->HCB.dimension(2 * state.dataSolarShading->MaxHCS, state.dataSolarShading->MaxHCV + 1, 0);
@@ -4853,7 +4853,7 @@ namespace EnergyPlus::SolarShading {
             return;
         }
 
-        for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) { // Loop through all surfaces (looking for potential receiving surfaces)...
+        for (GRSNR = 1; GRSNR <= state.dataSurface->TotSurfaces; ++GRSNR) { // Loop through all surfaces (looking for potential receiving surfaces)...
 
             ShadowingSurf = Surface(GRSNR).ShadowingSurf;
             NGSS = 0;
@@ -4929,7 +4929,7 @@ namespace EnergyPlus::SolarShading {
 
                     // Punch holes for subsurfaces
                     if (Surface(GRSNR).BaseSurf == GRSNR) {  // Only look for subsurfaces on base surfaces
-                        for (int subSurface = 1; subSurface <= TotSurfaces; ++subSurface) {
+                        for (int subSurface = 1; subSurface <= state.dataSurface->TotSurfaces; ++subSurface) {
                             if (Surface(subSurface).BaseSurf != GRSNR) continue; // Ignore subsurfaces of other surfaces
                             if (!Surface(subSurface).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
                             if (subSurface == GRSNR) continue;                   // Surface itself cannot be its own subsurface
@@ -4973,7 +4973,7 @@ namespace EnergyPlus::SolarShading {
             NGSS = 0;
             if (state.dataHeatBal->SolarDistribution != MinimalShadowing) { // Except when doing simplified exterior shadowing.
 
-                for (GSSNR = 1; GSSNR <= TotSurfaces; ++GSSNR) { // Loop through all surfaces, looking for ones that could shade GRSNR
+                for (GSSNR = 1; GSSNR <= state.dataSurface->TotSurfaces; ++GSSNR) { // Loop through all surfaces, looking for ones that could shade GRSNR
 
                     if (GSSNR == GRSNR) continue; // Receiving surface cannot shade itself
                     if ((Surface(GSSNR).HeatTransSurf) && (Surface(GSSNR).BaseSurf == GRSNR))
@@ -5013,7 +5013,7 @@ namespace EnergyPlus::SolarShading {
                 }    // ...end of surfaces DO loop (GSSNR)
             } else { // Simplified Distribution -- still check for Shading Subsurfaces
 
-                for (GSSNR = 1; GSSNR <= TotSurfaces; ++GSSNR) { // Loop through all surfaces (looking for surfaces which could shade GRSNR) ...
+                for (GSSNR = 1; GSSNR <= state.dataSurface->TotSurfaces; ++GSSNR) { // Loop through all surfaces (looking for surfaces which could shade GRSNR) ...
 
                     if (GSSNR == GRSNR) continue; // Receiving surface cannot shade itself
                     if ((Surface(GSSNR).HeatTransSurf) && (Surface(GSSNR).BaseSurf == GRSNR))
@@ -5033,7 +5033,7 @@ namespace EnergyPlus::SolarShading {
             NSBS = 0;
             HasWindow = false;
             // legacy: IF (OSENV(HTS) > 10) WINDOW=.TRUE. -->Note: WINDOW was set true for roof ponds, solar walls, or other zones
-            for (SBSNR = 1; SBSNR <= TotSurfaces; ++SBSNR) { // Loop through the surfaces yet again (looking for subsurfaces of GRSNR)...
+            for (SBSNR = 1; SBSNR <= state.dataSurface->TotSurfaces; ++SBSNR) { // Loop through the surfaces yet again (looking for subsurfaces of GRSNR)...
 
                 if (!Surface(SBSNR).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
                 if (SBSNR == GRSNR) continue;                   // Surface itself cannot be its own subsurface
@@ -5057,7 +5057,7 @@ namespace EnergyPlus::SolarShading {
             if ((state.dataHeatBal->SolarDistribution == FullInteriorExterior) &&
                 (HasWindow)) { // For full interior solar distribution | and a window present on base surface (GRSNR)
 
-                for (BackSurfaceNumber = 1; BackSurfaceNumber <= TotSurfaces;
+                for (BackSurfaceNumber = 1; BackSurfaceNumber <= state.dataSurface->TotSurfaces;
                      ++BackSurfaceNumber) { // Loop through surfaces yet again, looking for back surfaces to GRSNR
 
                     if (!Surface(BackSurfaceNumber).HeatTransSurf) continue;              // Skip non-heat transfer surfaces
@@ -5173,7 +5173,7 @@ namespace EnergyPlus::SolarShading {
                 }
             }
 
-            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+            for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
                 if (CastingSurface(HTS) && !Surface(HTS).IsConvex) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowSevereError(state, "DetermineShadowingCombinations: Surface=\"" + Surface(HTS).Name + "\" is a casting surface and is non-convex.");
@@ -5277,7 +5277,7 @@ namespace EnergyPlus::SolarShading {
         }
 #endif
 
-        for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
+        for (GRSNR = 1; GRSNR <= state.dataSurface->TotSurfaces; ++GRSNR) {
 
             if (!ShadowComb(GRSNR).UseThisSurf) continue;
 
@@ -5974,14 +5974,14 @@ namespace EnergyPlus::SolarShading {
 
         if (state.dataSolarShading->MustAllocSolarShading) {
             EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
-            IntBeamAbsByShadFac.allocate(TotSurfaces);
-            ExtBeamAbsByShadFac.allocate(TotSurfaces);
-            WinTransBmSolar.allocate(TotSurfaces);
-            WinTransDifSolar.allocate(TotSurfaces);
-            WinTransDifSolarGnd.allocate(TotSurfaces);
-            WinTransDifSolarSky.allocate(TotSurfaces);
-            WinTransBmBmSolar.allocate(TotSurfaces);
-            WinTransBmDifSolar.allocate(TotSurfaces);
+            IntBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
+            ExtBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
+            WinTransBmSolar.allocate(state.dataSurface->TotSurfaces);
+            WinTransDifSolar.allocate(state.dataSurface->TotSurfaces);
+            WinTransDifSolarGnd.allocate(state.dataSurface->TotSurfaces);
+            WinTransDifSolarSky.allocate(state.dataSurface->TotSurfaces);
+            WinTransBmBmSolar.allocate(state.dataSurface->TotSurfaces);
+            WinTransBmDifSolar.allocate(state.dataSurface->TotSurfaces);
             state.dataSolarShading->MustAllocSolarShading = false;
         }
 
@@ -8129,7 +8129,7 @@ namespace EnergyPlus::SolarShading {
 
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
-        if (state.dataDaylightingManager->TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag && !state.dataGlobal->WarmupFlag && TotStormWin > 0 && state.dataHeatBal->StormWinChangeThisDay) {
+        if (state.dataDaylightingManager->TotWindowsWithDayl > 0 && !state.dataGlobal->BeginSimFlag && !state.dataGlobal->BeginEnvrnFlag && !state.dataGlobal->WarmupFlag && state.dataSurface->TotStormWin > 0 && state.dataHeatBal->StormWinChangeThisDay) {
             CalcDayltgCoefficients(state);
         }
     }
@@ -9289,28 +9289,28 @@ namespace EnergyPlus::SolarShading {
 
         // Initialize Surfaces Arrays
         state.dataSolarShading->SAREA = 0.0;
-        state.dataHeatBal->WithShdgIsoSky.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->WoShdgIsoSky.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->WithShdgHoriz.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->WoShdgHoriz.dimension(TotSurfaces, 0.0);
-        state.dataHeatBal->DifShdgRatioIsoSky.allocate(TotSurfaces);
-        state.dataHeatBal->DifShdgRatioHoriz.allocate(TotSurfaces);
+        state.dataHeatBal->WithShdgIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->WoShdgIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->WithShdgHoriz.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->WoShdgHoriz.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataHeatBal->DifShdgRatioIsoSky.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBal->DifShdgRatioHoriz.allocate(state.dataSurface->TotSurfaces);
         // initialized as no shading
         state.dataHeatBal->DifShdgRatioIsoSky = 1.0;
         state.dataHeatBal->DifShdgRatioHoriz = 1.0;
         if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
-            state.dataHeatBal->curDifShdgRatioIsoSky.dimension(TotSurfaces, 1.0);
+            state.dataHeatBal->curDifShdgRatioIsoSky.dimension(state.dataSurface->TotSurfaces, 1.0);
         }
 
         // only for detailed.
         if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
-            state.dataHeatBal->DifShdgRatioIsoSkyHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces);
+            state.dataHeatBal->DifShdgRatioIsoSkyHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces);
             state.dataHeatBal->DifShdgRatioIsoSkyHRTS = 1.0;
-            state.dataHeatBal->DifShdgRatioHorizHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, TotSurfaces);
+            state.dataHeatBal->DifShdgRatioHorizHRTS.allocate(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces);
             state.dataHeatBal->DifShdgRatioHorizHRTS = 1.0;
         }
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).ExtSolar) continue;
 
             // CurrentModuleObject='Surfaces'
@@ -9356,7 +9356,7 @@ namespace EnergyPlus::SolarShading {
                 state.dataSolarShading->SUNCOS(1) = cos_Phi[IPhi] * cos_Theta[ITheta];
                 state.dataSolarShading->SUNCOS(2) = cos_Phi[IPhi] * sin_Theta[ITheta];
 
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Cosine of angle of incidence on surface of solar
+                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Cosine of angle of incidence on surface of solar
                     // radiation from patch
                     ShadowingSurf = Surface(SurfNum).ShadowingSurf;
 
@@ -9368,7 +9368,7 @@ namespace EnergyPlus::SolarShading {
 
                 SHADOW(state, 24, 0);
 
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     ShadowingSurf = Surface(SurfNum).ShadowingSurf;
 
                     if (!ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
@@ -9396,7 +9396,7 @@ namespace EnergyPlus::SolarShading {
             }     // End of Theta loop
         }         // End of Phi loop
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ShadowingSurf = Surface(SurfNum).ShadowingSurf;
 
             if (!ShadowingSurf && (!Surface(SurfNum).HeatTransSurf || !Surface(SurfNum).ExtSolar))
@@ -9422,7 +9422,7 @@ namespace EnergyPlus::SolarShading {
         // surfaces are assumed to be opaque to IR so they totally "shade" IR from
         // sky or ground.
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                 Surface(SurfNum).ViewFactorSkyIR *= state.dataHeatBal->DifShdgRatioIsoSky(SurfNum);
             } else {
@@ -9447,7 +9447,7 @@ namespace EnergyPlus::SolarShading {
         //  DEALLOCATE(WoShdgHoriz)
 
         if (DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && state.dataHeatBal->SolarDistribution != MinimalShadowing) {
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 state.dataHeatBal->DifShdgRatioIsoSkyHRTS({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}, SurfNum) = state.dataHeatBal->DifShdgRatioIsoSky(SurfNum);
                 state.dataHeatBal->DifShdgRatioHorizHRTS({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}, SurfNum) = state.dataHeatBal->DifShdgRatioHoriz(SurfNum);
             }
@@ -10289,7 +10289,7 @@ namespace EnergyPlus::SolarShading {
         int SurfNum; // Loop Counter
         int RepCol;  // the column of the predefined report
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             SurfSunlitFrac(SurfNum) = state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum);
             SurfSunlitArea(SurfNum) = state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) * Surface(SurfNum).Area;
         }
@@ -10321,7 +10321,7 @@ namespace EnergyPlus::SolarShading {
             }
         }
         if (RepCol != 0) {
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Window) {
                     PreDefTableEntry(state, RepCol, Surface(SurfNum).Name, SurfSunlitFrac(SurfNum));
                 }
@@ -10366,7 +10366,7 @@ namespace EnergyPlus::SolarShading {
                 ShowMessage(state, "");
             }
 
-            SurfErrorReported.dimension(TotSurfaces, false);
+            SurfErrorReported.dimension(state.dataSurface->TotSurfaces, false);
             TotCount = 0;
             for (Loop1 = 1; Loop1 <= state.dataSolarShading->NumBaseSubSurround; ++Loop1) {
                 Count = 0;
@@ -10398,7 +10398,7 @@ namespace EnergyPlus::SolarShading {
                 ShowMessage(state, "");
             }
 
-            SurfErrorReported2.allocate(TotSurfaces);
+            SurfErrorReported2.allocate(state.dataSurface->TotSurfaces);
             SurfErrorReported = false;
             TotCount = 0;
             if (state.dataSolarShading->NumTooManyVertices > 0) {
@@ -11750,7 +11750,7 @@ namespace EnergyPlus::SolarShading {
         int iState;      // current state number
         int NumOfStates; // number of states for current window
 
-        for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+        for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
             if (SurfWinWindowModelType(iSurf) == WindowBSDFModel) {
                 // This will check complex fenestrations state and add new one if necessary (EMS case)
                 CheckCFSStates(state, iSurf);

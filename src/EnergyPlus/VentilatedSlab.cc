@@ -125,7 +125,6 @@ namespace VentilatedSlab {
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
     using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -1348,10 +1347,10 @@ namespace VentilatedSlab {
             MyPlantScanFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataVentilatedSlab->QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastQRadSysSrc.dimension(TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastTimeStepSys.dimension(TotSurfaces, 0.0);
+            state.dataVentilatedSlab->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataVentilatedSlab->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataVentilatedSlab->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataVentilatedSlab->LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
 
             // Initialize total areas for all radiant systems
             for (RadNum = 1; RadNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++RadNum) {

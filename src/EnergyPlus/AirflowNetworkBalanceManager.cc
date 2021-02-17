@@ -142,7 +142,6 @@ namespace AirflowNetworkBalanceManager {
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass;
-    using DataSurfaces::TotSurfaces;
     using DataSurfaces::WorldCoordSystem;
     using Fans::GetFanIndex;
     using Fans::GetFanInletNode;

@@ -157,7 +157,7 @@ namespace WindowEquivalentLayer {
 
         } //  end do for TotConstructs
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
 

@@ -492,7 +492,6 @@ namespace CostEstimateManager {
         using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
 
@@ -532,9 +531,9 @@ namespace CostEstimateManager {
                     ThisConstructStr = state.dataCostEstimateManager->CostLineItem(Item).ParentObjName;
                     ThisConstructID = UtilityRoutines::FindItem(ThisConstructStr, state.dataConstruction->Construct);
                     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
-                    uniqueSurfMask.dimension(TotSurfaces, true); // init to true and change duplicates to false
-                    SurfMultipleARR.dimension(TotSurfaces, 1.0);
-                    for (surf = 1; surf <= TotSurfaces; ++surf) {
+                    uniqueSurfMask.dimension(state.dataSurface->TotSurfaces, true); // init to true and change duplicates to false
+                    SurfMultipleARR.dimension(state.dataSurface->TotSurfaces, 1.0);
+                    for (surf = 1; surf <= state.dataSurface->TotSurfaces; ++surf) {
                         if (Surface(surf).ExtBoundCond >= 1) {
                             if (Surface(surf).ExtBoundCond < surf) { // already cycled through
                                 uniqueSurfMask(surf) = false;
@@ -549,7 +548,7 @@ namespace CostEstimateManager {
                     }
                     // determine which surfaces have the construction type  and if any are duplicates..
                     Real64 Qty(0.0);
-                    for (int i = 1; i <= TotSurfaces; ++i) {
+                    for (int i = 1; i <= state.dataSurface->TotSurfaces; ++i) {
                         auto const &s(Surface(i));
                         if (uniqueSurfMask(i) && (s.Construction == ThisConstructID)) Qty += s.Area * SurfMultipleARR(i);
                     }

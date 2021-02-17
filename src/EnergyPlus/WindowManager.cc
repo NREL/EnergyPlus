@@ -1395,7 +1395,7 @@ namespace WindowManager {
         // interior blind/shade is deployed.
 
         // Loop for ordinary windows
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
@@ -1443,7 +1443,7 @@ namespace WindowManager {
             }     // End of check if interior shade or interior blind
         }         // End of surface loop
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Construction <= 0) continue;
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             ConstrNum = Surface(SurfNum).Construction;
@@ -1538,7 +1538,7 @@ namespace WindowManager {
             state.dataConstruction->Construct(ConstrNum).AbsDiffBack = 0.0;
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // For a window with shading device, get number of shaded construction and, if window
             // has a blind (interior, exterior or between glass), get blind data pointer.
 
@@ -1557,7 +1557,7 @@ namespace WindowManager {
 
         // Set some static exterior-window frame and divider SurfaceWindow values
         // from values in FrameDivider derived type
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             FrDivNum = Surface(SurfNum).FrameDivider;
             if (FrDivNum > 0) { // Surface is a window with a frame and/or divider
                 FrWidth = FrameDivider(FrDivNum).FrameWidth;
@@ -1605,7 +1605,7 @@ namespace WindowManager {
 
         // Set SolarDiffusing to true for exterior windows that have a construction with an innermost diffusing glass layer
         DifOverrideCount = 0;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             SurfWinSolarDiffusing(SurfNum) = false;
             if (Surface(SurfNum).Class == SurfaceClass::Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
                 Surface(SurfNum).StormWinConstruction == 0) {
@@ -7464,7 +7464,7 @@ namespace WindowManager {
         }
 
         PrintTransMap = false;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
             if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).activeShadedConstruction;

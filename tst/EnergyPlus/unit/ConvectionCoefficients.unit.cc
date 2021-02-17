@@ -479,7 +479,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     // Surface 15 is a horizontal roof facing down (interior faces up) - this gets automatically flipped over so interior faces down
 
     // Surface temps are 20C
-    for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
+    for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
         DataHeatBalSurface::TH(2, 1, surf) = 20.0;
     }
 
@@ -592,7 +592,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     SurfNum = 1;
 
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
     state->dataConstruction->Construct.allocate( 1 );
@@ -611,7 +611,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
+    for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
         DataHeatBalSurface::TH(2, 1, surf) = 20.0;
     }
 

@@ -145,7 +145,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
                                     ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
                                     ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
-        for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
+        for (int surfaceNumber = 1; surfaceNumber <= state.dataSurface->TotSurfaces; ++surfaceNumber) {
             auto const &surface = DataSurfaces::Surface(surfaceNumber);
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }

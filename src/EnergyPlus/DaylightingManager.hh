@@ -209,7 +209,8 @@ namespace DaylightingManager {
                                 DataDaylighting::iCalledFor const CalledFrom,
                                 Optional_int_const MapNum = _);
 
-    void AllocateForCFSRefPointsState(DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
+    void AllocateForCFSRefPointsState(
+        EnergyPlusData &state, DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
 
     void AllocateForCFSRefPointsGeometry(DataBSDFWindow::BSDFRefPointsGeomDescr &RefPointsGeomDescr, int const NumOfWinEl);
 
@@ -226,9 +227,15 @@ namespace DaylightingManager {
                                Real64 const WinElArea);
 
     void CFSRefPointPosFactor(EnergyPlusData &state,
-        Vector3<Real64> const &RefPoint, DataBSDFWindow::BSDFRefPoints &RefPointMap, int const iWin, int const CurFenState, int const NTrnBasis, Real64 const AZVIEW);
+                              Vector3<Real64> const &RefPoint,
+                              DataBSDFWindow::BSDFRefPoints &RefPointMap,
+                              int const iWin,
+                              int const CurFenState,
+                              int const NTrnBasis,
+                              Real64 const AZVIEW);
 
-    Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
+    Real64 CalcObstrMultiplier(EnergyPlusData &state,
+                               Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
                                int const AltSteps,                 // Number of steps in altitude angle for solar reflection calc
                                int const AzimSteps                 // Number of steps in azimuth angle of solar reflection calc
     );
@@ -342,13 +349,15 @@ namespace DaylightingManager {
                               Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
     );
 
-    void DayltgHitInteriorObstruction(int const IWin,            // Window index
+    void DayltgHitInteriorObstruction(EnergyPlusData &state,
+                                      int const IWin,            // Window index
                                       Vector3<Real64> const &R1, // Origin of ray (m)
                                       Vector3<Real64> const &R2, // Destination of ray (m)
                                       bool &hit                  // True iff ray hits an obstruction
     );
 
-    void DayltgHitBetWinObstruction(int const IWin1,           // Surface number of origin window
+    void DayltgHitBetWinObstruction(EnergyPlusData &state,
+                                    int const IWin1,           // Surface number of origin window
                                     int const IWin2,           // Surface number of destination window
                                     Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
                                     Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
@@ -423,7 +432,8 @@ namespace DaylightingManager {
                       Real64 &ProfileAng                // Solar profile angle (radians).
     );
 
-    void DayltgClosestObstruction(Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
+    void DayltgClosestObstruction(EnergyPlusData &state,
+                                  Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
                                   Vector3<Real64> const &RayVec, // Unit vector along ray pointing away from window (m)
                                   int &NearestHitSurfNum,        // Surface number of nearest obstruction that is hit by ray;
                                   Vector3<Real64> &NearestHitPt  // Ray's hit point on nearest obstruction (m)

@@ -1871,24 +1871,24 @@ namespace RoomAirModelManager {
 
             MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
-            APos_Wall.allocate(TotSurfaces);
-            APos_Floor.allocate(TotSurfaces);
-            APos_Ceiling.allocate(TotSurfaces);
+            APos_Wall.allocate(state.dataSurface->TotSurfaces);
+            APos_Floor.allocate(state.dataSurface->TotSurfaces);
+            APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
             PosZ_Wall.allocate(state.dataGlobal->NumOfZones * 2);
             PosZ_Floor.allocate(state.dataGlobal->NumOfZones * 2);
             PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones * 2);
-            APos_Window.allocate(TotSurfaces);
-            APos_Door.allocate(TotSurfaces);
-            APos_Internal.allocate(TotSurfaces);
+            APos_Window.allocate(state.dataSurface->TotSurfaces);
+            APos_Door.allocate(state.dataSurface->TotSurfaces);
+            APos_Internal.allocate(state.dataSurface->TotSurfaces);
             PosZ_Window.allocate(state.dataGlobal->NumOfZones * 2);
             PosZ_Door.allocate(state.dataGlobal->NumOfZones * 2);
             PosZ_Internal.allocate(state.dataGlobal->NumOfZones * 2);
-            HCeiling.allocate(TotSurfaces);
-            HWall.allocate(TotSurfaces);
-            HFloor.allocate(TotSurfaces);
-            HInternal.allocate(TotSurfaces);
-            HWindow.allocate(TotSurfaces);
-            HDoor.allocate(TotSurfaces);
+            HCeiling.allocate(state.dataSurface->TotSurfaces);
+            HWall.allocate(state.dataSurface->TotSurfaces);
+            HFloor.allocate(state.dataSurface->TotSurfaces);
+            HInternal.allocate(state.dataSurface->TotSurfaces);
+            HWindow.allocate(state.dataSurface->TotSurfaces);
+            HDoor.allocate(state.dataSurface->TotSurfaces);
 
             AuxSurf.allocate(state.dataGlobal->NumOfZones);
 
@@ -2271,7 +2271,7 @@ namespace RoomAirModelManager {
 
             if (any(state.dataRoomAirMod->IsZoneDV)) {
 
-                state.dataRoomAirMod->DVHcIn.allocate(TotSurfaces);
+                state.dataRoomAirMod->DVHcIn.allocate(state.dataSurface->TotSurfaces);
                 state.dataRoomAirMod->ZoneDVMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZoneDVMixedFlag.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DVHcIn = 0.0;
@@ -2323,7 +2323,7 @@ namespace RoomAirModelManager {
             if (any(state.dataRoomAirMod->IsZoneUI)) {
                 state.dataRoomAirMod->ZoneUFMixedFlag.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZoneUFMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->UFHcIn.allocate(TotSurfaces);
+                state.dataRoomAirMod->UFHcIn.allocate(state.dataSurface->TotSurfaces);
                 state.dataRoomAirMod->ZoneUFGamma.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZoneUFPowInPlumes.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZoneUFPowInPlumesfromWindows.allocate(state.dataGlobal->NumOfZones);
@@ -2438,7 +2438,7 @@ namespace RoomAirModelManager {
             }
 
             if (any(state.dataRoomAirMod->IsZoneCV)) {
-                state.dataRoomAirMod->CVHcIn.allocate(TotSurfaces);
+                state.dataRoomAirMod->CVHcIn.allocate(state.dataSurface->TotSurfaces);
                 state.dataRoomAirMod->ZTJET.allocate(state.dataGlobal->NumOfZones);
                 // Most ZTJet takes defaults
                 state.dataRoomAirMod->ZTREC.allocate(state.dataGlobal->NumOfZones);

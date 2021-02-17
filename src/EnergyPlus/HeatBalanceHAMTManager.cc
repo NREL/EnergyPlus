@@ -286,28 +286,28 @@ namespace HeatBalanceHAMTManager {
         bool isoerrrise;
         bool ErrorsFound;
 
-        watertot.allocate(TotSurfaces);
-        surfrh.allocate(TotSurfaces);
-        surfextrh.allocate(TotSurfaces);
-        surftemp.allocate(TotSurfaces);
-        surfexttemp.allocate(TotSurfaces);
-        surfvp.allocate(TotSurfaces);
+        watertot.allocate(state.dataSurface->TotSurfaces);
+        surfrh.allocate(state.dataSurface->TotSurfaces);
+        surfextrh.allocate(state.dataSurface->TotSurfaces);
+        surftemp.allocate(state.dataSurface->TotSurfaces);
+        surfexttemp.allocate(state.dataSurface->TotSurfaces);
+        surfvp.allocate(state.dataSurface->TotSurfaces);
 
-        firstcell.allocate(TotSurfaces);
-        lastcell.allocate(TotSurfaces);
-        Extcell.allocate(TotSurfaces);
-        ExtRadcell.allocate(TotSurfaces);
-        ExtConcell.allocate(TotSurfaces);
-        ExtSkycell.allocate(TotSurfaces);
-        ExtGrncell.allocate(TotSurfaces);
-        Intcell.allocate(TotSurfaces);
-        IntConcell.allocate(TotSurfaces);
+        firstcell.allocate(state.dataSurface->TotSurfaces);
+        lastcell.allocate(state.dataSurface->TotSurfaces);
+        Extcell.allocate(state.dataSurface->TotSurfaces);
+        ExtRadcell.allocate(state.dataSurface->TotSurfaces);
+        ExtConcell.allocate(state.dataSurface->TotSurfaces);
+        ExtSkycell.allocate(state.dataSurface->TotSurfaces);
+        ExtGrncell.allocate(state.dataSurface->TotSurfaces);
+        Intcell.allocate(state.dataSurface->TotSurfaces);
+        IntConcell.allocate(state.dataSurface->TotSurfaces);
 
-        extvtc.allocate(TotSurfaces);
-        intvtc.allocate(TotSurfaces);
-        extvtcflag.allocate(TotSurfaces);
-        intvtcflag.allocate(TotSurfaces);
-        MyEnvrnFlag.allocate(TotSurfaces);
+        extvtc.allocate(state.dataSurface->TotSurfaces);
+        intvtc.allocate(state.dataSurface->TotSurfaces);
+        extvtcflag.allocate(state.dataSurface->TotSurfaces);
+        intvtcflag.allocate(state.dataSurface->TotSurfaces);
+        MyEnvrnFlag.allocate(state.dataSurface->TotSurfaces);
 
         extvtc = -1.0;
         intvtc = -1.0;
@@ -753,7 +753,7 @@ namespace HeatBalanceHAMTManager {
         // Check the materials information and work out how many cells are required.
         errorCount = 0;
         TotCellsMax = 0;
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             conid = Surface(sid).Construction;
@@ -850,7 +850,7 @@ namespace HeatBalanceHAMTManager {
         cid = 0;
 
         // Set up surface cell structure
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
             if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
@@ -991,7 +991,7 @@ namespace HeatBalanceHAMTManager {
         static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
         print(state.files.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
             if (Surface(sid).Class == SurfaceClass::Window) continue;
             if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;

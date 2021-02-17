@@ -902,7 +902,7 @@ namespace EnergyPlus::DaylightingManager {
 
         if (state.dataDaylightingManager->refFirstTime &&
             std::any_of(state.dataDaylightingData->ZoneDaylight.begin(), state.dataDaylightingData->ZoneDaylight.end(), [](DataDaylighting::ZoneDaylightCalc const &e) { return e.TotalDaylRefPoints > 0; })) {
-            state.dataDaylightingManager->RefErrIndex.allocate(maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints), TotSurfaces);
+            state.dataDaylightingManager->RefErrIndex.allocate(maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints), state.dataSurface->TotSurfaces);
             state.dataDaylightingManager->RefErrIndex = 0;
             state.dataDaylightingManager->refFirstTime = false;
         }
@@ -1306,7 +1306,7 @@ namespace EnergyPlus::DaylightingManager {
             for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                 IL = max(IL, state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints);
             }
-            state.dataDaylightingManager->MapErrIndex.dimension(IL, TotSurfaces, 0);
+            state.dataDaylightingManager->MapErrIndex.dimension(IL, state.dataSurface->TotSurfaces, 0);
             state.dataDaylightingManager->mapFirstTime = false;
         }
 
@@ -2274,15 +2274,15 @@ namespace EnergyPlus::DaylightingManager {
                 // Returns hitIntObs = true iff obstruction is hit
                 // (Example of interior obstruction is a wall in an L-shaped room that lies
                 // between reference point and window.)
-                DayltgHitInteriorObstruction(IWin, RREF, RWIN, hitIntObs);
+                DayltgHitInteriorObstruction(state, IWin, RREF, RWIN, hitIntObs);
             }
 
             if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin && IntWinHitNum > 0 && !hitIntObs) {
                 // Check for obstruction between ref point and interior window through which ray passes
-                DayltgHitInteriorObstruction(IntWinHitNum, RREF, HitPtIntWin, hitIntObs);
+                DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin, hitIntObs);
                 if (!hitIntObs) {
                     // Check for obstruction between intersection point on int window and ext win element
-                    DayltgHitBetWinObstruction(IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs);
+                    DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs);
                 }
             }
             if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
@@ -2365,7 +2365,7 @@ namespace EnergyPlus::DaylightingManager {
                 GroundHitPt(1) = RWIN2(1) + HorDis * std::cos(Beta);
                 GroundHitPt(2) = RWIN2(2) + HorDis * std::sin(Beta);
 
-                SkyObstructionMult = CalcObstrMultiplier(GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+                SkyObstructionMult = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
             } // End of check if solar reflection calculation is in effect
 
         } // End of check if COSB > 0
@@ -2517,8 +2517,11 @@ namespace EnergyPlus::DaylightingManager {
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap.allocate(NRefPts, state.dataDaylightingData->TotIllumMaps);
                     }
 
-                    AllocateForCFSRefPointsState(
-                        state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum), NumOfWinEl, NBasis, NTrnBasis);
+                    AllocateForCFSRefPointsState(state,
+                                                 state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum),
+                                                 NumOfWinEl,
+                                                 NBasis,
+                                                 NTrnBasis);
 
                     InitializeCFSStateData(state,
                                            state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).IlluminanceMap(iRefPoint, MapNum),
@@ -2548,7 +2551,8 @@ namespace EnergyPlus::DaylightingManager {
                     state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint.allocate(NRefPts);
                 }
 
-                AllocateForCFSRefPointsState(state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), NumOfWinEl, NBasis, NTrnBasis);
+                AllocateForCFSRefPointsState(
+                    state, state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint), NumOfWinEl, NBasis, NTrnBasis);
 
                 InitializeCFSStateData(state,
                                        state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurFenState).RefPoint(iRefPoint),
@@ -2651,14 +2655,14 @@ namespace EnergyPlus::DaylightingManager {
         Array1D<Real64> TmpGndMultiplier(NBasis, 0.0);         // Temporary ground obstruction multiplier
         Array1D_int TmpRfSfInd(NBasis, 0);                     // Temporary RefSurfIndex
         Array1D_int TmpRfRyNH(NBasis, 0);                      // Temporary RefRayNHits
-        Array2D_int TmpHSurfNo(TotSurfaces, NBasis, 0);        // Temporary HitSurfNo
-        Array2D<Real64> TmpHSurfDSq(TotSurfaces, NBasis, 0.0); // Temporary HitSurfDSq
+        Array2D_int TmpHSurfNo(state.dataSurface->TotSurfaces, NBasis, 0);        // Temporary HitSurfNo
+        Array2D<Real64> TmpHSurfDSq(state.dataSurface->TotSurfaces, NBasis, 0.0); // Temporary HitSurfDSq
 
         // Object Data
         Vector Centroid;                                                      // current window element centroid
         Vector HitPt;                                                         // surface hit point
         Array1D<Vector> TmpGndPt(NBasis, Vector(0.0, 0.0, 0.0));              // Temporary ground intersection list
-        Array2D<Vector> TmpHitPt(TotSurfaces, NBasis, Vector(0.0, 0.0, 0.0)); // Temporary HitPt
+        Array2D<Vector> TmpHitPt(state.dataSurface->TotSurfaces, NBasis, Vector(0.0, 0.0, 0.0)); // Temporary HitPt
 
         CFSRefPointPosFactor(state, RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
 
@@ -2684,7 +2688,7 @@ namespace EnergyPlus::DaylightingManager {
 
                     hit = false;
                     TotHits = 0;
-                    for (JSurf = 1; JSurf <= TotSurfaces; ++JSurf) {
+                    for (JSurf = 1; JSurf <= state.dataSurface->TotSurfaces; ++JSurf) {
                         // the following test will cycle on anything except exterior surfaces and shading surfaces
                         if (Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond != ExternalEnvironment) continue;
                         //  skip the base surface containing the window and any other subsurfaces of that surface
@@ -2787,7 +2791,7 @@ namespace EnergyPlus::DaylightingManager {
                             // for solar reflectance calculations, need to precalculate obstruction multipliers
                             if (CalcSolRefl) {
                                 GroundHitPt = TmpGndPt(NGnd);
-                                TmpGndMultiplier(NGnd) = CalcObstrMultiplier(GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+                                TmpGndMultiplier(NGnd) = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
                             }
                         } else {
                             // A sky ray
@@ -2820,7 +2824,8 @@ namespace EnergyPlus::DaylightingManager {
         }     // do IX = 1, NWX
     }
 
-    void AllocateForCFSRefPointsState(DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis)
+    void AllocateForCFSRefPointsState(
+        EnergyPlusData &state, DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -2895,17 +2900,17 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         if (!allocated(StateRefPoint.HitSurfNo)) {
-            StateRefPoint.HitSurfNo.allocate(TotSurfaces, NBasis, NumOfWinEl);
+            StateRefPoint.HitSurfNo.allocate(state.dataSurface->TotSurfaces, NBasis, NumOfWinEl);
             StateRefPoint.HitSurfNo = 0;
         }
 
         if (!allocated(StateRefPoint.HitSurfDSq)) {
-            StateRefPoint.HitSurfDSq.allocate(TotSurfaces, NBasis, NumOfWinEl);
+            StateRefPoint.HitSurfDSq.allocate(state.dataSurface->TotSurfaces, NBasis, NumOfWinEl);
             StateRefPoint.HitSurfDSq = 0.0;
         }
 
         if (!allocated(StateRefPoint.HitPt)) {
-            StateRefPoint.HitPt.allocate(TotSurfaces, NBasis, NumOfWinEl);
+            StateRefPoint.HitPt.allocate(state.dataSurface->TotSurfaces, NBasis, NumOfWinEl);
             StateRefPoint.HitPt = Vector(0.0, 0.0, 0.0);
         }
 
@@ -3079,7 +3084,8 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    Real64 CalcObstrMultiplier(Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
+    Real64 CalcObstrMultiplier(EnergyPlusData &state,
+                               Vector3<Real64> const &GroundHitPt, // Coordinates of point that ray hits ground (m)
                                int const AltSteps,                 // Number of steps in altitude angle for solar reflection calc
                                int const AzimSteps                 // Number of steps in azimuth angle of solar reflection calc
     )
@@ -3178,9 +3184,9 @@ namespace EnergyPlus::DaylightingManager {
                 SkyGndUnObs += IncAngSolidAngFac;
                 // Does this ground ray hit an obstruction?
                 hitObs = false;
-                if (TotSurfaces < octreeCrossover) { // Linear search through surfaces
+                if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-                    for (int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+                    for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                         if (Surface(ObsSurfNum).ShadowSurfPossibleObstruction) {
                             PierceSurface(ObsSurfNum, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                             if (hitObs) break;
@@ -3421,7 +3427,7 @@ namespace EnergyPlus::DaylightingManager {
             // One or more exterior obstructions was hit; get contribution of reflection
             // from nearest obstruction.
             // Find obstruction whose hit point is closest to this ray's window element
-            DayltgClosestObstruction(RWIN2, Ray, NearestHitSurfNum, NearestHitPt);
+            DayltgClosestObstruction(state, RWIN2, Ray, NearestHitSurfNum, NearestHitPt);
             if (NearestHitSurfNum > 0) {
 
                 // Beam solar reflected from nearest obstruction
@@ -3549,7 +3555,7 @@ namespace EnergyPlus::DaylightingManager {
                             if (CalcSolRefl) { // Coordinates of ground point hit by the ray
                                 // Sun reaches ground point if vector from this point to the sun is unobstructed
                                 hitObs = false;
-                                for (int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+                                for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                                     if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
                                     PierceSurface(ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
                                     if (hitObs) break;
@@ -3586,7 +3592,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (hitWin) {
                     if (ExtWinType == DataDaylighting::iExtWinType::InZoneExtWin) {
                         // Check for interior obstructions between reference point and HP.
-                        DayltgHitInteriorObstruction(IWin2, RREF2, HP, hitIntObsDisk);
+                        DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hitIntObsDisk);
                     }
                     ObTransDisk = 0.0; // Init value
                     // Init flag for vector from RP to sun passing through interior window
@@ -3623,11 +3629,11 @@ namespace EnergyPlus::DaylightingManager {
                         // Check for interior obstructions between ref point and interior window
                         hitIntObsDisk = false;
                         if (hitIntWinDisk) {
-                            DayltgHitInteriorObstruction(IntWinDiskHitNum, RREF, HitPtIntWinDisk, hitIntObsDisk);
+                            DayltgHitInteriorObstruction(state, IntWinDiskHitNum, RREF, HitPtIntWinDisk, hitIntObsDisk);
                             // If no obstruction between RP and hit int win, check for obstruction
                             // between int win and ext win
                             if (!hitIntObsDisk) {
-                                DayltgHitBetWinObstruction(IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, hitIntObsDisk);
+                                DayltgHitBetWinObstruction(state, IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, hitIntObsDisk);
                             }
                         }
                         if (hitIntObsDisk) ObTransDisk = 0.0;
@@ -3776,7 +3782,7 @@ namespace EnergyPlus::DaylightingManager {
                                 PierceSurface(IWin2, RREF2, SunVecMir, HP, hitWin);
                                 if (!hitWin) continue; // Ray did not pass through window
                                 // Check if this ray hits interior obstructions
-                                DayltgHitInteriorObstruction(IWin2, RREF2, HP, hit);
+                                DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hit);
                                 if (hit) continue; // Interior obstruction was hit
                                 // Does ray hit this reflecting surface?
                                 PierceSurface(ReflSurfNum, RREF2, SunVecMir, HitPtRefl, hitRefl);
@@ -3814,7 +3820,7 @@ namespace EnergyPlus::DaylightingManager {
                                     }
                                 } else {
                                     // Reflecting surface is a building shade
-                                    for (int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+                                    for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                                         if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
                                         if (ObsSurfNum == ReflSurfNum) continue;
                                         PierceSurface(ObsSurfNum, HitPtRefl, RAYCOS, HitPtObs, hitObs);
@@ -4266,7 +4272,7 @@ namespace EnergyPlus::DaylightingManager {
 
         state.dataDaylightingManager->maxNumRefPtInAnyZone = 0;
         state.dataDaylightingManager->maxNumRefPtInAnyEncl = 0;
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass::Window) continue;
             // Loop through all zones in the same enclosure to find total reference points
             int numEnclRefPoints = 0;
@@ -4391,7 +4397,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         if (!state.dataHeatBal->AnyAirBoundary) {
-            for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+            for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;
                     if (state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !state.dataHeatBal->Zone(zoneOfSurf).HasInterZoneWindow &&
@@ -5470,7 +5476,7 @@ namespace EnergyPlus::DaylightingManager {
 
     void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
     {
-        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+        for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
             int found = -1;
             for (int jZone = 1; jZone <= state.dataGlobal->NumOfZones; ++jZone) {
                 if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, state.dataDaylightingData->ZoneDaylight(jZone).Name)) {
@@ -5885,9 +5891,9 @@ namespace EnergyPlus::DaylightingManager {
         // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
         // Building elements are assumed to be opaque
         // A shadowing surface is opaque unless its transmittance schedule value is non-zero
-        if (TotSurfaces < octreeCrossover) { // Linear search through surfaces
+        if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-            for (int ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+            for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
                 auto const &surface(Surface(ISurf));
                 if (!surface.ShadowSurfPossibleObstruction) continue;
                 IType = surface.Class;
@@ -5950,7 +5956,8 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgHitInteriorObstruction(int const IWin,            // Window index
+    void DayltgHitInteriorObstruction(EnergyPlusData &state,
+                                      int const IWin,            // Window index
                                       Vector3<Real64> const &R1, // Origin of ray (m)
                                       Vector3<Real64> const &R2, // Destination of ray (m)
                                       bool &hit                  // True iff ray hits an obstruction
@@ -5985,9 +5992,9 @@ namespace EnergyPlus::DaylightingManager {
         auto const window_base_iExtBoundCond(window_base.ExtBoundCond);
 
         // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-        if (TotSurfaces < octreeCrossover) { // Linear search through surfaces
+        if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-            for (int ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+            for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
                 auto const &surface(Surface(ISurf));
                 IType = surface.Class;
                 if ((surface.ShadowingSurf) ||        // Shadowing surface
@@ -6026,7 +6033,8 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgHitBetWinObstruction(int const IWin1,           // Surface number of origin window
+    void DayltgHitBetWinObstruction(EnergyPlusData &state,
+                                    int const IWin1,           // Surface number of origin window
                                     int const IWin2,           // Surface number of destination window
                                     Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
                                     Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
@@ -6072,9 +6080,9 @@ namespace EnergyPlus::DaylightingManager {
         // of  only checking for wall/roof/floor for window2 zone below?
 
         // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
-        if (TotSurfaces < octreeCrossover) { // Linear search through surfaces
+        if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-            for (int ISurf = 1; ISurf <= TotSurfaces; ++ISurf) {
+            for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
                 auto const &surface(Surface(ISurf));
                 IType = surface.Class;
                 if ((surface.ShadowingSurf) ||         // Shadowing surface
@@ -7780,7 +7788,7 @@ namespace EnergyPlus::DaylightingManager {
                         GroundHitPt(1) = SurfaceWindow(IWin).WinCenter(1) + HorDis * std::cos(Beta);
                         GroundHitPt(2) = SurfaceWindow(IWin).WinCenter(2) + HorDis * std::sin(Beta);
 
-                        SkyObstructionMult(IPH, ITH) = CalcObstrMultiplier(GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
+                        SkyObstructionMult(IPH, ITH) = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc);
                     } // End of check if solar reflection calc is in effect
                     for (ISky = 1; ISky <= 4; ++ISky) {
                         // Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
@@ -7795,7 +7803,7 @@ namespace EnergyPlus::DaylightingManager {
                     if (CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
                         // Sun reaches ground point if vector from this point to the sun is unobstructed
                         hitObs = false;
-                        for (ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+                        for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                             if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
                             PierceSurface(ObsSurfNum, GroundHitPt, SUNCOS_IHR, ObsHitPt, hitObs);
                             if (hitObs) break;
@@ -7809,7 +7817,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 if (CalcSolRefl && ObTransM(IPH, ITH) < 1.0) {
                     // Find obstruction whose hit point is closest to the center of the window
-                    DayltgClosestObstruction(SurfaceWindow(IWin).WinCenter, U, NearestHitSurfNum, NearestHitPt);
+                    DayltgClosestObstruction(state, SurfaceWindow(IWin).WinCenter, U, NearestHitSurfNum, NearestHitPt);
                     if (NearestHitSurfNum > 0) {
 
                         // Beam solar reflected from nearest obstruction.
@@ -8522,7 +8530,7 @@ namespace EnergyPlus::DaylightingManager {
             if (CalcSolRefl) {
                 // Sun reaches ground point if vector from this point to the sun is unobstructed
                 hitObs = false;
-                for (ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+                for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                     if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
                     if (CalledFrom == DataDaylighting::iCalledFor::RefPoint) {
                         GroundHitPt(1) = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).RefPoint(iRefPoint).GndPt(iGndElem, WinEl).x;
@@ -9135,7 +9143,8 @@ namespace EnergyPlus::DaylightingManager {
         }
     }
 
-    void DayltgClosestObstruction(Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
+    void DayltgClosestObstruction(EnergyPlusData &state,
+                                  Vector3<Real64> const &RecPt,  // Point on window from which ray emanates (m)
                                   Vector3<Real64> const &RayVec, // Unit vector along ray pointing away from window (m)
                                   int &NearestHitSurfNum,        // Surface number of nearest obstruction that is hit by ray;
                                   Vector3<Real64> &NearestHitPt  // Ray's hit point on nearest obstruction (m)
@@ -9182,9 +9191,9 @@ namespace EnergyPlus::DaylightingManager {
         Real64 NearestHitDistance_sq(
             std::numeric_limits<Real64>::max()); // Distance squared from receiving point to nearest hit point for a ray (m^2)
         NearestHitPt = 0.0;
-        if (TotSurfaces < octreeCrossover) { // Linear search through surfaces
+        if (state.dataSurface->TotSurfaces < octreeCrossover) { // Linear search through surfaces
 
-            for (int ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+            for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
                 if (Surface(ObsSurfNum).ShadowSurfPossibleObstruction) {
                     // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                     PierceSurface(ObsSurfNum, RecPt, RayVec, HitPt, hit);
@@ -9239,7 +9248,7 @@ namespace EnergyPlus::DaylightingManager {
             Vector3<Real64> const RayVec_inv(SurfaceOctreeCube::safe_inverse(RayVec));
             surfaceOctree.processSurfaceRayIntersectsCube(RecPt, RayVec, RayVec_inv, surfaceHit);
             if (nearestHitSurface != nullptr) { // Find surface number: This is inefficient: Improve when surfaces know their own number
-                for (int i = 1; i <= TotSurfaces; ++i) {
+                for (int i = 1; i <= state.dataSurface->TotSurfaces; ++i) {
                     if (&Surface(i) == nearestHitSurface) {
                         NearestHitSurfNum = i;
                         break;
@@ -9314,7 +9323,7 @@ namespace EnergyPlus::DaylightingManager {
         if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface
         // Sun reaches ReflHitPt if vector from ReflHitPt to sun is unobstructed
         hitObs = false;
-        for (ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum) {
+        for (ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
             if (!Surface(ObsSurfNum).ShadowSurfPossibleObstruction) continue;
             // Exclude as a possible obstructor ReflSurfNum and its base surface (if it has one)
             if (ObsSurfNum == ReflSurfNum || ObsSurfNum == Surface(ReflSurfNum).BaseSurf) continue;
@@ -10451,7 +10460,7 @@ namespace EnergyPlus::DaylightingManager {
 
             } // End of check if a Daylighting:Detailed zone
 
-            if (TotWinShadingControl > 0) {
+            if (state.dataSurface->TotWinShadingControl > 0) {
                 CreateShadeDeploymentOrder(state, ZoneNum);
                 MapShadeDeploymentOrderToLoopNumber(state, ZoneNum);
             }
@@ -10487,7 +10496,7 @@ namespace EnergyPlus::DaylightingManager {
         // create sorted list for shade deployment order
         // first step is to create a sortable list of WindowShadingControl objects by sequence
         std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
-        for (int iShadeCtrl = 1; iShadeCtrl <= TotWinShadingControl; ++iShadeCtrl) {
+        for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
             if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
                 shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
             }

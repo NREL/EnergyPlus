@@ -1875,8 +1875,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 {
 
-    DataSurfaces::TotSurfaces = 3;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 3;
+    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->TotConstructs = 3;
     state->dataConstruction->Construct.allocate( state->dataHeatBal->TotConstructs);
 
@@ -1894,9 +1894,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state->dataConstruction->Construct(3).TotLayers = 1;
 
-    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, state->dataSurface->TotSurfaces, 0.0);
+    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
     DataHeatBalSurface::TH(1,1,2) = 22.0;

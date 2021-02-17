@@ -107,7 +107,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
     using namespace DataHeatBalance;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;
     using DataMoistureBalance::HMassConvInFD;
@@ -260,7 +259,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         // Ensure at least one interior EMPD surface for each zone
         EMPDzone.dimension(state.dataGlobal->NumOfZones, false);
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
                 continue; // Heat transfer surface only and not a window
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
@@ -343,18 +342,18 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int SurfNum;
 
         if (state.dataMoistureBalEMPD->InitEnvrnFlag) {
-            RVSurfaceOld.allocate(TotSurfaces);
-            RVSurface.allocate(TotSurfaces);
-            HeatFluxLatent.allocate(TotSurfaces);
-            state.dataMoistureBalEMPD->EMPDReportVars.allocate(TotSurfaces);
-            RVSurfLayer.allocate(TotSurfaces);
-            RVSurfLayerOld.allocate(TotSurfaces);
-            RVDeepLayer.allocate(TotSurfaces);
-            RVdeepOld.allocate(TotSurfaces);
-            RVwall.allocate(TotSurfaces);
+            RVSurfaceOld.allocate(state.dataSurface->TotSurfaces);
+            RVSurface.allocate(state.dataSurface->TotSurfaces);
+            HeatFluxLatent.allocate(state.dataSurface->TotSurfaces);
+            state.dataMoistureBalEMPD->EMPDReportVars.allocate(state.dataSurface->TotSurfaces);
+            RVSurfLayer.allocate(state.dataSurface->TotSurfaces);
+            RVSurfLayerOld.allocate(state.dataSurface->TotSurfaces);
+            RVDeepLayer.allocate(state.dataSurface->TotSurfaces);
+            RVdeepOld.allocate(state.dataSurface->TotSurfaces);
+            RVwall.allocate(state.dataSurface->TotSurfaces);
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf) continue;
             Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
@@ -372,7 +371,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         GetMoistureBalanceEMPDInput(state);
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);

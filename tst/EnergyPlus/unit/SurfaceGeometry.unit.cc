@@ -75,11 +75,11 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     // Test base surfaces for rectangular shape in ProcessSurfaceVertices
 
-    TotSurfaces = 5;
+    state->dataSurface->TotSurfaces = 5;
     MaxVerticesPerSurface = 5;
-    Surface.allocate(TotSurfaces);
-    ShadeV.allocate(TotSurfaces);
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+    Surface.allocate(state->dataSurface->TotSurfaces);
+    ShadeV.allocate(state->dataSurface->TotSurfaces);
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         Surface(SurfNum).Vertex.allocate(MaxVerticesPerSurface);
     }
 
@@ -700,57 +700,57 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     EXPECT_FALSE(FoundError);
 
     // test coordinate on existing surface
-    EXPECT_EQ(TotSurfaces, 1);
+    EXPECT_EQ(state->dataSurface->TotSurfaces, 1);
 
-    EXPECT_EQ(Surface(TotSurfaces).Name, "FRONT-1");
+    EXPECT_EQ(Surface(state->dataSurface->TotSurfaces).Name, "FRONT-1");
 
     // move surface to SurfaceTmp since MakeMirrorSurface uses that array
     state->dataSurfaceGeometry->SurfaceTmp.allocate(10);
-    state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces) = Surface(TotSurfaces);
+    state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces) = Surface(state->dataSurface->TotSurfaces);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Name, "FRONT-1");
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Name, "FRONT-1");
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).x, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).z, 2.4);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).x, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).z, 0.);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).x, 30.5);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).z, 0.);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).x, 30.5);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).z, 2.4);
 
-    MakeMirrorSurface(*state, TotSurfaces); // This call increments TotSurfaces so the references after this are for the created mirror surface
+    MakeMirrorSurface(*state, state->dataSurface->TotSurfaces); // This call increments TotSurfaces so the references after this are for the created mirror surface
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Name, "Mir-FRONT-1");
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Name, "Mir-FRONT-1");
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).x, 30.5);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(1).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).z, 2.4);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).x, 30.5);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(2).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).z, 0.);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).x, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(3).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).z, 0.);
 
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).x, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).y, 0.);
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(TotSurfaces).Vertex(4).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).z, 2.4);
 }
 
 TEST_F(EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisticZ)
 {
-    TotSurfaces = 10;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 10;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
     Surface(1).GrossArea = 1000.;
@@ -3024,13 +3024,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
 
     // Test a multiple vertex surfaces in ProcessSurfaceVertices and CalcCoordinateTransformation for #6384
 
-    TotSurfaces = 2;
+    state->dataSurface->TotSurfaces = 2;
     MaxVerticesPerSurface = 9;
-    Surface.allocate(TotSurfaces);
-    ShadeV.allocate(TotSurfaces);
+    Surface.allocate(state->dataSurface->TotSurfaces);
+    ShadeV.allocate(state->dataSurface->TotSurfaces);
     Surface(1).Vertex.allocate(7);
     Surface(2).Vertex.allocate(9);
-    state->dataSurfaceGeometry->SurfaceTmp.allocate(TotSurfaces);
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
     state->dataSurfaceGeometry->SurfaceTmp(1).Vertex.allocate(7);
     state->dataSurfaceGeometry->SurfaceTmp(2).Vertex.allocate(9);
 
@@ -3135,8 +3135,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
 
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
     WindowShadingControl(1).Name = "WSC1";
@@ -3269,8 +3269,8 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
     WindowShadingControl(1).Name = "WSC1";
@@ -3372,8 +3372,8 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
 
 TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
     WindowShadingControl(1).Name = "WSC1";
@@ -3409,8 +3409,8 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
     WindowShadingControl(3).FenestrationName(1) = "Fene-08";
     WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-    TotSurfaces = 12;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 12;
+    Surface.allocate(state->dataSurface->TotSurfaces);
 
     Surface(1).Name = "Fene-07";
     Surface(1).windowShadingControlList.push_back(2);
@@ -4701,8 +4701,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(*state);
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 
-    DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
-    state->dataSurfaceGeometry->SurfaceTmp.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = TotalNumOfInternalMassSurfaces;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
 
     int SurfNum = 0;
     GetIntMassSurfaceData(*state, ErrorsFound, SurfNum);
@@ -4716,7 +4716,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ(8, DataSurfaces::IntMassObjects(3).NumOfZones);
     EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
     // check total count of internal surfaces created
-    EXPECT_EQ(24, TotSurfaces);
+    EXPECT_EQ(24, state->dataSurface->TotSurfaces);
 
     // check unique internal surface name created created from a combination
     // of zone name and internal mass object name represented in the zone

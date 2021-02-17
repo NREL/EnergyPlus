@@ -1412,7 +1412,6 @@ namespace EnergyPlus::DataHeatBalance {
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // surface index
@@ -1421,7 +1420,7 @@ namespace EnergyPlus::DataHeatBalance {
         static int Layer(0);       // construction material layer index
         static int MaterNum(0);    // construction material index
 
-        for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
+        for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
             if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;

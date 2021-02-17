@@ -1858,7 +1858,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     SurfacesOfType = true;
@@ -1902,7 +1902,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
@@ -1947,7 +1947,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
@@ -1992,7 +1992,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
@@ -2037,7 +2037,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
@@ -2082,7 +2082,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     SurfacesOfType = true;
@@ -2126,7 +2126,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
@@ -2171,7 +2171,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
@@ -2216,7 +2216,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
@@ -2261,7 +2261,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
@@ -3544,7 +3544,7 @@ namespace ConvectionCoefficients {
         state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, OneThird);
 
         // first pass over surfaces for outside face params
-        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;
@@ -3871,7 +3871,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = 0.0; // flat roofs don't really have azimuth
         }
 
-        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;

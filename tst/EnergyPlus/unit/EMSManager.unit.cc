@@ -1624,7 +1624,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::WindowShadingControl(1).ShadingType = 0;
     DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
 
-    DataSurfaces::TotSurfaces = 2;
+    state->dataSurface->TotSurfaces = 2;
 
     DataSurfaces::Surface(1).activeWindowShadingControl =
         DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];

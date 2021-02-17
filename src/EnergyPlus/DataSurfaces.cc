@@ -64,9 +64,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowManager.hh>
 
-namespace EnergyPlus {
-
-namespace DataSurfaces {
+namespace EnergyPlus::DataSurfaces {
 
     // MODULE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -76,19 +74,6 @@ namespace DataSurfaces {
     //                      Dec 2008, TH added new properties to SurfaceWindowCalc for thermochromic windows
     //                      Jul 2011, M.J. Witte and C.O. Pedersen, add new fields to OSC for last T, max and min
     //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // This data-only module contains derived types and other variables
-    // associated with Surfaces, their shading calculations, etc.
-
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
 
     // Using/Aliasing
     using namespace DataVectorTypes;
@@ -101,48 +86,7 @@ namespace DataSurfaces {
     using namespace DataEnvironment;
     using namespace WindowManager;
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    int const MaxSlatAngs(19);
-
-    // Parameters to indicate exterior boundary conditions for use with
-    // the Surface derived type (see below):
-    // Note:  Positive values correspond to an interzone adjacent surface
-
-    int const ExternalEnvironment(0);
-    int const Ground(-1);
-    int const OtherSideCoefNoCalcExt(-2);
-    int const OtherSideCoefCalcExt(-3);
-    int const OtherSideCondModeledExt(-4);
-    int const GroundFCfactorMethod(-5);
-    int const KivaFoundation(-6);
-
     Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
-
-    // Parameters to indicate the first "corner" of a surface
-    // Currently, these are used only during input of surfaces
-    // They are here in order to facilitate later use in shading setup/calculations.
-    int const UpperLeftCorner(1);
-    int const LowerLeftCorner(2);
-    int const LowerRightCorner(3);
-    int const UpperRightCorner(4);
-
-    // Parameters to indicate user specified convection coefficients (for surface)
-    int const ConvCoefValue(1);          // User specified "value" as the override type
-    int const ConvCoefSchedule(2);       // User specified "schedule" as the override type
-    int const ConvCoefUserCurve(3);      // User specified "UserCurve" as the override type
-    int const ConvCoefSpecifiedModel(4); // one of the direct named model equation keys
-
-    // Parameters to indicate reference air temperatures for inside surface temperature calculations
-    int const ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
-    int const AdjacentAirTemp(2);   // air temperature adjacent ot surface => TempEffBulkAir
-    int const ZoneSupplyAirTemp(3); // supply air temperature of the zone
-
-    int const AltAngStepsForSolReflCalc(10); // Number of steps in altitude angle for solar reflection calc
-    int const AzimAngStepsForSolReflCalc(9); // Number of steps in azimuth angle of solar reflection calc
 
     // Parameters to indicate surface classes
     // Surface Class (FLOOR, WALL, ROOF (incl's CEILING), WINDOW, DOOR, GLASSDOOR,
@@ -163,168 +107,6 @@ namespace DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    // Parameters for classification of outside face of surfaces
-    int const OutConvClass_WindwardVertWall(101);
-    int const OutConvClass_LeewardVertWall(102);
-    int const OutConvClass_RoofStable(103);
-    int const OutConvClass_RoofUnstable(104);
-
-    // Parameters for adpative convection algorithm's classification of inside face of surfaces
-    int const InConvClass_A1_VertWalls(1);           // flow regime A1, vertical walls
-    int const InConvClass_A1_StableHoriz(2);         // flow regime A1
-    int const InConvClass_A1_UnstableHoriz(3);       // flow regime A1
-    int const InConvClass_A1_HeatedFloor(4);         // flow regime A1
-    int const InConvClass_A1_ChilledCeil(5);         // flow regime A1
-    int const InConvClass_A1_StableTilted(6);        // flow regime A1
-    int const InConvClass_A1_UnstableTilted(7);      // flow regime A1
-    int const InConvClass_A1_Windows(8);             // flow regime A1
-    int const InConvClass_A2_VertWallsNonHeated(9);  // flow regime A2
-    int const InConvClass_A2_HeatedVerticalWall(10); // flow regime A2
-    int const InConvClass_A2_StableHoriz(11);        // flow regime A2
-    int const InConvClass_A2_UnstableHoriz(12);      // flow regime A2
-    int const InConvClass_A2_StableTilted(13);       // flow regime A2
-    int const InConvClass_A2_UnstableTilted(14);     // flow regime A2
-    int const InConvClass_A2_Windows(15);            // flow regime A2
-    int const InConvClass_A3_VertWalls(16);          // flow regime A3
-    int const InConvClass_A3_StableHoriz(17);        // flow regime A3
-    int const InConvClass_A3_UnstableHoriz(18);      // flow regime A3
-    int const InConvClass_A3_StableTilted(19);       // flow regime A3
-    int const InConvClass_A3_UnstableTilted(20);     // flow regime A3
-    int const InConvClass_A3_Windows(21);            // flow regime A3
-    int const InConvClass_B_VertWalls(22);           // flow regime B
-    int const InConvClass_B_VertWallsNearHeat(23);   // flow regime B
-    int const InConvClass_B_StableHoriz(24);         // flow regime B
-    int const InConvClass_B_UnstableHoriz(25);       // flow regime B
-    int const InConvClass_B_StableTilted(26);        // flow regime B
-    int const InConvClass_B_UnstableTilted(27);      // flow regime B
-    int const InConvClass_B_Windows(28);             // flow regime B
-    int const InConvClass_C_Walls(29);               // flow regime C
-    int const InConvClass_C_Ceiling(30);             // flow regime C
-    int const InConvClass_C_Floor(31);               // flow regime C
-    int const InConvClass_C_Windows(32);             // flow regime C
-    int const InConvClass_D_Walls(33);               // flow regime D
-    int const InConvClass_D_StableHoriz(34);         // flow regime D
-    int const InConvClass_D_UnstableHoriz(35);       // flow regime D
-    int const InConvClass_D_StableTilted(36);        // flow regime D
-    int const InConvClass_D_UnstableTilted(37);      // flow regime D
-    int const InConvClass_D_Windows(38);             // flow regime D
-    int const InConvClass_E_AssistFlowWalls(39);     // flow regime E
-    int const InConvClass_E_OpposFlowWalls(40);      // flow regime E
-    int const InConvClass_E_StableFloor(41);         // flow regime E
-    int const InConvClass_E_UnstableFloor(42);       // flow regime E
-    int const InConvClass_E_StableCeiling(43);       // flow regime E
-    int const InConvClass_E_UnstableCieling(44);     // flow regime E
-    int const InConvClass_E_Windows(45);             // flow regime E
-
-    // Parameters for fenestration relative location in zone
-    int const InConvWinLoc_NotSet(0);
-    int const InConvWinLoc_LowerPartOfExteriorWall(1); // this is a window in the lower part of wall
-    int const InConvWinLoc_UpperPartOfExteriorWall(2); // this is a window in the upper part of wall
-    int const InConvWinLoc_WindowAboveThis(3);         // this is a wall with window above it
-    int const InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
-    int const InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
-
-    // Parameters for window shade status
-    int const NoShade(-1);
-    int const ShadeOff(0);
-    int const IntShadeOn(1); // Interior shade on
-    int const SwitchableGlazing(2);
-    int const ExtShadeOn(3);  // Exterior shade on
-    int const ExtScreenOn(4); // Exterior screen on
-    int const IntBlindOn(6);  // Interior blind on
-    int const ExtBlindOn(7);  // Exterior blind on
-    int const BGShadeOn(8);   // Between-glass shade on
-    int const BGBlindOn(9);   // Between-glass blind on
-    int const IntShadeConditionallyOff(10);
-    int const GlassConditionallyLightened(20);
-    int const ExtShadeConditionallyOff(30);
-    int const IntBlindConditionallyOff(60);
-    int const ExtBlindConditionallyOff(70);
-
-    // WindowShadingControl Shading Types
-    int const WSC_ST_NoShade(0);
-    int const WSC_ST_InteriorShade(1);
-    int const WSC_ST_SwitchableGlazing(2);
-    int const WSC_ST_ExteriorShade(3);
-    int const WSC_ST_InteriorBlind(4);
-    int const WSC_ST_ExteriorBlind(5);
-    int const WSC_ST_BetweenGlassShade(6);
-    int const WSC_ST_BetweenGlassBlind(7);
-    int const WSC_ST_ExteriorScreen(8);
-
-    // WindowShadingControl Control Types
-    int const WSCT_AlwaysOn(1);                       // AlwaysOn
-    int const WSCT_AlwaysOff(2);                      // AlwaysOff
-    int const WSCT_OnIfScheduled(3);                  // OnIfScheduleAllows
-    int const WSCT_HiSolar(4);                        // OnIfHighSolarOnWindow
-    int const WSCT_HiHorzSolar(5);                    // OnIfHighHorizontalSolar
-    int const WSCT_HiOutAirTemp(6);                   // OnIfHighOutsideAirTemp
-    int const WSCT_HiZoneAirTemp(7);                  // OnIfHighZoneAirTemp
-    int const WSCT_HiZoneCooling(8);                  // OnIfHighZoneCooling
-    int const WSCT_HiGlare(9);                        // OnIfHighGlare
-    int const WSCT_MeetDaylIlumSetp(10);              // MeetDaylightIlluminanceSetpoint
-    int const WSCT_OnNightLoOutTemp_OffDay(11);       // OnNightIfLowOutsideTemp/OffDay
-    int const WSCT_OnNightLoInTemp_OffDay(12);        // OnNightIfLowInsideTemp/OffDay
-    int const WSCT_OnNightIfHeating_OffDay(13);       // OnNightIfHeating/OffDay
-    int const WSCT_OnNightLoOutTemp_OnDayCooling(14); // OnNightIfLowOutsideTemp/OnDayIfCooling
-    int const WSCT_OnNightIfHeating_OnDayCooling(15); // OnNightIfHeating/OnDayIfCooling
-    int const WSCT_OffNight_OnDay_HiSolarWindow(16);  // OffNight/OnDayIfCoolingAndHighSolarOnWindow
-    int const WSCT_OnNight_OnDay_HiSolarWindow(17);   // OnNight/OnDayIfCoolingAndHighSolarOnWindow
-    int const WSCT_OnHiOutTemp_HiSolarWindow(18);     // OnIfHighOutsideAirTempAndHighSolarOnWindow
-    int const WSCT_OnHiOutTemp_HiHorzSolar(19);       // OnIfHighOutsideAirTempAndHighHorizontalSolar
-    int const WSCT_OnHiZoneTemp_HiSolarWindow(20);    // OnIfHighZoneAirTempAndHighSolarOnWindow
-    int const WSCT_OnHiZoneTemp_HiHorzSolar(21);      // OnIfHighZoneAirTempAndHighHorizontalSolar
-
-    // WindowShadingControl Slat Angle Control for Blinds
-    int const WSC_SAC_FixedSlatAngle(1);
-    int const WSC_SAC_ScheduledSlatAngle(2);
-    int const WSC_SAC_BlockBeamSolar(3);
-
-    // Parameter for window screens beam reflectance accounting
-    int const DoNotModel(0);
-    int const ModelAsDirectBeam(1);
-    int const ModelAsDiffuse(2);
-
-    // Parameters for window divider type
-    int const DividedLite(1);
-    int const Suspended(2);
-
-    // Parameters for air flow window source
-    int const AirFlowWindow_Source_IndoorAir(1);
-    int const AirFlowWindow_Source_OutdoorAir(2);
-
-    // Parameters for air flow window destination
-    int const AirFlowWindow_Destination_IndoorAir(1);
-    int const AirFlowWindow_Destination_OutdoorAir(2);
-    int const AirFlowWindow_Destination_ReturnAir(3);
-
-    // Parameters for air flow window control
-    int const AirFlowWindow_ControlType_MaxFlow(1);
-    int const AirFlowWindow_ControlType_AlwaysOff(2);
-    int const AirFlowWindow_ControlType_Schedule(3);
-
-    // Parameters for window model selection
-    int const Window5DetailedModel(100); // indicates original winkelmann window 5 implementation
-    int const WindowBSDFModel(101);      // indicates complex fenestration window 6 implementation
-    int const WindowEQLModel(102);       // indicates equivalent layer winodw model implementation
-
-    // Parameters for PierceSurface
-    std::size_t const nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // Definitions used for scheduled surface gains
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int TotSurfaces(0);          // Total number of surfaces (walls, floors, roofs, windows, shading surfaces, etc.--everything)
-    int TotWindows(0);           // Total number of windows
-    int TotComplexWin(0);        // Total number of windows with complex optical properties
-    int TotStormWin(0);          // Total number of storm window blocks
-    int TotWinShadingControl(0); // Total number of window shading control blocks
     int TotIntConvCoeff(0);      // Total number of interior convection coefficient (overrides)
     int TotExtConvCoeff(0);      // Total number of exterior convection coefficient (overrides)
     int TotOSC(0);               // Total number of Other Side Coefficient Blocks
@@ -1144,11 +926,6 @@ namespace DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        TotSurfaces = 0;
-        TotWindows = 0;
-        TotComplexWin = 0;
-        TotStormWin = 0;
-        TotWinShadingControl = 0;
         TotIntConvCoeff = 0;
         TotExtConvCoeff = 0;
         TotOSC = 0;
@@ -1537,7 +1314,5 @@ namespace DataSurfaces {
         Real64 AbsorptanceFromExteriorBackSide = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) * SurfWinShadeAbsFacFace2(SurfNum);
         return AbsorptanceFromExteriorBackSide + AbsorptanceFromInteriorBackSide;
     }
-
-} // namespace DataSurfaces
 
 } // namespace EnergyPlus

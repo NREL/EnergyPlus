@@ -1835,34 +1835,17 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // Loop thru SurfaceWindow and register any shading controls
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
         using DataSurfaces::WSC_ST_ExteriorScreen;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // local do loop index
 
-        for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
+        for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
             if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
@@ -2001,30 +1984,13 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // access public data and loop over it.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             SetupEMSActuator(state, "Surface",
                              Surface(SurfNum).Name,
                              "Interior Surface Convection Heat Transfer Coefficient",
@@ -2054,12 +2020,11 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue;
 
@@ -2073,10 +2038,10 @@ namespace EMSManager {
 
         // Setup error checking storage
 
-        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorChecked)) state.dataRuntimeLang->EMSConstructActuatorChecked.allocate(state.dataHeatBal->TotConstructs, TotSurfaces);
+        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorChecked)) state.dataRuntimeLang->EMSConstructActuatorChecked.allocate(state.dataHeatBal->TotConstructs, state.dataSurface->TotSurfaces);
         state.dataRuntimeLang->EMSConstructActuatorChecked = false;
 
-        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorIsOkay)) state.dataRuntimeLang->EMSConstructActuatorIsOkay.allocate(state.dataHeatBal->TotConstructs, TotSurfaces);
+        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorIsOkay)) state.dataRuntimeLang->EMSConstructActuatorIsOkay.allocate(state.dataHeatBal->TotConstructs, state.dataSurface->TotSurfaces);
         state.dataRuntimeLang->EMSConstructActuatorIsOkay = false;
     }
 
@@ -2095,31 +2060,14 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // loop through all surfaces, cycle if not heat transfer or outdoors BC
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue;
             if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) continue;

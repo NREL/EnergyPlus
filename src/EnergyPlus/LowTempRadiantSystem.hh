@@ -505,11 +505,12 @@ namespace LowTempRadiantSystem {
                                   bool &InitErrorFound  // Set to true when a severe or worse error is discovered during initialization
     );
 
-    void SizeLowTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void SizeLowTempRadiantSystem(EnergyPlusData &state,
+                                  int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                   LowTempRadiantSystem::SystemType const SystemType // Type of radiant system: hydronic, constant flow, or electric
     );
 
-    void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateRadSysSourceValAvg(EnergyPlusData &state, bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
     Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 

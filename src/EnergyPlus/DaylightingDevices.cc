@@ -166,12 +166,11 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-        using DataSurfaces::CalcSolRefl;
+    using DataSurfaces::CalcSolRefl;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceClass;
-    using DataSurfaces::TotSurfaces;
 
     void InitDaylightingDevices(EnergyPlusData &state)
     {

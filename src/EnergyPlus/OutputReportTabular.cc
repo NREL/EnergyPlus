@@ -9608,14 +9608,9 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
-        using DataSurfaces::TotSurfaces;
-
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const wwrcTotal(1);
@@ -9882,7 +9877,7 @@ namespace EnergyPlus::OutputReportTabular {
                 print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
             }
 
-            for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+            for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
                 // only exterior surfaces including underground
                 if (!Surface(iSurf).HeatTransSurf) continue;
                 isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
@@ -11179,26 +11174,9 @@ namespace EnergyPlus::OutputReportTabular {
         //   Create arrays for the call to WriteTable and then call it.
         //   Use <br> tag to put multiple rows into a single cell.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
         using namespace DataShadowingCombinations;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
@@ -11221,14 +11199,14 @@ namespace EnergyPlus::OutputReportTabular {
         // displaySurfaceShadowing = false  for debugging
         if (ort->displaySurfaceShadowing) {
             numreceivingfields = 0;
-            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+            for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
                 numreceivingfields += ShadowComb(HTS).NumGenSurf;
                 numreceivingfields += ShadowComb(HTS).NumSubSurf;
             }
 
             state.dataOutRptPredefined->ShadowRelate.allocate(numreceivingfields);
             state.dataOutRptPredefined->numShadowRelate = 0;
-            for (HTS = 1; HTS <= TotSurfaces; ++HTS) {
+            for (HTS = 1; HTS <= state.dataSurface->TotSurfaces; ++HTS) {
                 for (NGSS = 1; NGSS <= ShadowComb(HTS).NumGenSurf; ++NGSS) {
                     ++state.dataOutRptPredefined->numShadowRelate;
                     state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).castSurf = ShadowComb(HTS).GenSurf(NGSS);
@@ -11543,30 +11521,6 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Allocate the arrays related to the load component report
 
-        // METHODOLOGY EMPLOYED:
-        //   Use the ALLOCATE command
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &ort(state.dataOutRptTab);
 
@@ -11574,19 +11528,19 @@ namespace EnergyPlus::OutputReportTabular {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
             ort->radiantPulseTimestep.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataGlobal->NumOfZones);
             ort->radiantPulseTimestep = 0;
-            ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, TotSurfaces);
+            ort->radiantPulseReceived.allocate({0, state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays}, state.dataSurface->TotSurfaces);
             ort->radiantPulseReceived = 0.0;
-            ort->loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            ort->loadConvectedNormal.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, state.dataSurface->TotSurfaces);
             ort->loadConvectedNormal = 0.0;
-            ort->loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, TotSurfaces);
+            ort->loadConvectedWithPulse.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, {0, state.dataGlobal->NumOfTimeStepInHour * 24}, state.dataSurface->TotSurfaces);
             ort->loadConvectedWithPulse = 0.0;
-            ort->netSurfRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->netSurfRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->netSurfRadSeq = 0.0;
-            ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->decayCurveCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->decayCurveCool = 0.0;
-            ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->decayCurveHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->decayCurveHeat = 0.0;
-            ort->ITABSFseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->ITABSFseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->ITABSFseq = 0.0;
             ort->TMULTseq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->TMULTseq = 0.0;
@@ -11602,7 +11556,7 @@ namespace EnergyPlus::OutputReportTabular {
             ort->lightRetAirSeq = 0.0;
             ort->lightLWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->lightLWRadSeq = 0.0;
-            ort->lightSWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->lightSWRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->lightSWRadSeq = 0.0;
             ort->equipInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->equipInstantSeq = 0.0;
@@ -11642,7 +11596,7 @@ namespace EnergyPlus::OutputReportTabular {
             ort->interZoneMixLatentSeq = 0.0;
             ort->feneCondInstantSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataGlobal->NumOfZones);
             ort->feneCondInstantSeq = 0.0;
-            ort->feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            ort->feneSolarRadSeq.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
             ort->feneSolarRadSeq = 0.0;
             ort->AllocateLoadComponentArraysDoAllocate = false;
         }
@@ -11659,29 +11613,6 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Deallocate the arrays related to the load component report that will not
         //   be needed in the reporting.
-
-        // METHODOLOGY EMPLOYED:
-        //   Use the DEALLOCATE command
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-        // Using/Aliasing
-        using DataSurfaces::TotSurfaces;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &ort(state.dataOutRptTab);
@@ -11706,26 +11637,9 @@ namespace EnergyPlus::OutputReportTabular {
         // Decay curve is the fraction of the heat convected from a surface over the initial radiant heat
         // absorbed by the surface.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSizing::CalcFinalZoneSizing;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int ZoneNum(0);
@@ -11738,7 +11652,7 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 diff;
         auto &ort(state.dataOutRptTab);
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ZoneNum = Surface(SurfNum).Zone;
             if (ZoneNum == 0) continue;
             if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
@@ -11842,7 +11756,6 @@ namespace EnergyPlus::OutputReportTabular {
         // Using/Aliasing
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
-        using DataSurfaces::TotSurfaces;
         using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
         using DataSurfaces::SurfWinGainConvGlazToZoneRep;
         using DataSurfaces::SurfWinGainConvShadeToZoneRep;
@@ -11871,7 +11784,7 @@ namespace EnergyPlus::OutputReportTabular {
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
-            for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+            for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
                 ZoneNum = Surface(iSurf).Zone;
                 if (ZoneNum == 0) continue;
                 if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
@@ -12026,7 +11939,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSizing::CalcFinalFacilitySizing;
         using DataSizing::CalcFinalZoneSizing;
         using DataSizing::SysSizPeakDDNum;
-        using DataSurfaces::TotSurfaces;
         auto &ort(state.dataOutRptTab);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
@@ -12079,9 +11991,9 @@ namespace EnergyPlus::OutputReportTabular {
         feneSolarDelaySeqHeat = 0.0;
         feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         feneSolarDelaySeqCool = 0.0;
-        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
         surfDelaySeqHeat = 0.0;
-        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, state.dataSurface->TotSurfaces);
         surfDelaySeqCool = 0.0;
 
         Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
@@ -12746,7 +12658,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
-        using DataSurfaces::TotSurfaces;
         using General::MovingAvg;
 
         Array1D<Real64> seqData;     // raw data sequence that has not been averaged yet

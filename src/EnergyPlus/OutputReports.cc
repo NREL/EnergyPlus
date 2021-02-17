@@ -228,7 +228,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     static bool optiondone(false);
     static std::string lastoption;
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
@@ -545,7 +545,7 @@ void DXFOut(EnergyPlusData &state,
         ThickPolyline = false;
     }
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
@@ -884,7 +884,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     constexpr auto Format_711("  0\nLINE\n  8\n{}\n 62\n{:3}\n");
     constexpr auto Format_712(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 11\n{:15.5F}\n 21\n{:15.5F}\n 31\n{:15.5F}\n");
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
@@ -1092,7 +1092,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     constexpr auto Format_706("  0\nENDSEC\n  0\nEOF\n");
     constexpr auto Format_710("999\n{}\n");
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
@@ -1265,7 +1265,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     int fd;
     std::string AlgoName;
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
@@ -1732,13 +1732,13 @@ void CostInfoOut(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_bool uniqueSurf;
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
 
     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
-    uniqueSurf.dimension(TotSurfaces, true);
+    uniqueSurf.dimension(state.dataSurface->TotSurfaces, true);
 
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         if (Surface(surf).ExtBoundCond > 0) {
@@ -1753,7 +1753,7 @@ void CostInfoOut(EnergyPlusData &state)
 
     auto scifile = state.files.sci.open(state, "CostInfoOut", state.files.outputControl.sci);
 
-    print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
+    print(scifile, "{:12}{:12}\n", state.dataSurface->TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
     print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
@@ -1845,7 +1845,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         TriangulateFace = true;
     }
 
-    if (TotSurfaces > 0 && !allocated(Surface)) {
+    if (state.dataSurface->TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
         return;
     }
