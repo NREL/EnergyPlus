@@ -142,12 +142,12 @@ This field cannot be blank, and it should point to one  `ZoneHVAC:LowTemperature
 This `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object is referenced in the `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  object. Multiple `ZoneHVAC:LowTemperatureRadiant:ConstantFlow`  objects can be mapped to a single `ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design` object.
 
 *Field: Name*
-*Field: Fluid to Radiant Surface Heat Transfer Model*  
-*Field: Temperature Control Type*  
-*Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor*  
+*Field: Fluid to Radiant Surface Heat Transfer Model* 
 *Field: Hydronic Tubing Inside Diameter*  
 *Field: Hydronic Tubing Outside Diameter*  
-*Field: Hydronic Tubing Conductivity*  
+*Field: Hydronic Tubing Conductivity*   
+*Field: Temperature Control Type*  
+*Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor*  
 *Field: Motor Efficiency*  
 *Field: Fraction of Motor Inefficiencies to Fluid Stream*  
 *Field: Condensation Control Type*  
@@ -282,11 +282,11 @@ The metadata to remain same, so it was taken out to improve readability.
 
        A1 , \field Name
        A2 , \field Fluid to Radiant Surface Heat Transfer Model
+       N1 , \field Hydronic Tubing Inside Diameter
+       N2 , \field Hydronic Tubing Outside Diameter
+       N3 , \field Hydronic Tubing Conductivity
        A3 , \field Temperature Control Type
-       N1 , \field Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
-       N2 , \field Hydronic Tubing Inside Diameter
-       N3 , \field Hydronic Tubing Outside Diameter
-       N4 , \field Hydronic Tubing Conductivity
+       N4 , \field Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
        N5 , \field Motor Efficiency
        N6 , \field Fraction of Motor Inefficiencies to Fluid Stream
        A4 , \field Condensation Control Type
