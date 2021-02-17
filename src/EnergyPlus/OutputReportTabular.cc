@@ -14188,7 +14188,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iCol = 1; iCol <= colsColumnLabels; ++iCol) {
                     outputLine = "    <td align=\"right\">";
                     for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
-                        outputLine += colLabelMulti(iCol, jRow);
+                        outputLine += ConvertToEscaped(colLabelMulti(iCol, jRow), false);
                         if (jRow < maxNumColLabelRows) {
                             outputLine += "<br>";
                         }
@@ -14200,13 +14200,13 @@ namespace EnergyPlus::OutputReportTabular {
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
                     tbl_stream << "  <tr>\n";
                     if (rowLabels(jRow) != "") {
-                        tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, rowLabels(jRow), true) << "</td>\n";
+                        tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, rowLabels(jRow), true), false) << "</td>\n";
                     } else {
                         tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                     }
                     for (iCol = 1; iCol <= colsBody; ++iCol) {
                         if (body(iCol, jRow) != "") {
-                            tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, body(iCol, jRow), true) << "</td>\n";
+                            tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, body(iCol, jRow), true), false) << "</td>\n";
                         } else {
                             tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                         }
@@ -14541,7 +14541,7 @@ namespace EnergyPlus::OutputReportTabular {
         return s;
     }
 
-    std::string ConvertToEscaped(std::string const &inString) // Input String
+    std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input String
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -14552,7 +14552,10 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Convert to XML safe escaped character string
         //   so it excludes:
-        //               " ' < > &
+        //               " ' < > & degree-sign
+        //   If isXML=false, it does an HTML conversion, so only ` < > & ` and degree sign
+        //   Technically HTML4 doesn't support &quot, though most browsers would anyways.
+        //   Also, escaping single and double quotes is only needed inside attributes
 
         if (inString.empty()) return "";
 
@@ -14565,11 +14568,11 @@ namespace EnergyPlus::OutputReportTabular {
         while (true) {
             if (index == inputSize) break;
             c = inString[index++];
-            if (c == '\"') {
+            if ((c == '\"') && isXML) {
                 s += "&quot;";
             } else if (c == '&') {
                 s += "&amp;";
-            } else if (c == '\'') {
+            } else if ((c == '\'') && isXML) {
                 s += "&apos;";
             } else if (c == '<') {
                 s += "&lt;";
@@ -14594,9 +14597,9 @@ namespace EnergyPlus::OutputReportTabular {
             } else if (c == '\\') {
                 if (index == inputSize) break;
                 c = inString[index++];
-                if (c == '"') {
+                if ((c == '"')  && isXML) {
                     s += "&quot;";
-                } else if (c == '\'') {
+                } else if ((c == '\'') && isXML) {
                     s += "&apos;";
                 } else if (c == 'u' || c == 'x') {
                     int remainingLen = inputSize - index;
