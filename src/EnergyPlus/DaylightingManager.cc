@@ -849,7 +849,7 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> U2;     // Second vertex of window for TDD:DOME (if exists)
         static Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
         static Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-                                       //		static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
+                                       // static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
 
         static Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
         int IHR;                        // Hour of day counter
@@ -1249,7 +1249,7 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> WNORM2;  // Unit vector normal to TDD:DOME (if exists)
         static Vector3<Real64> VIEWVC;  // View vector in absolute coordinate system
         static Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
-                                        //		static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
+                                        // static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
         //  In the following four variables, I=1 for clear sky, 2 for overcast.
         int IHR;       // Hour of day counter
         int NRF;       // Number of daylighting reference points in a zone
@@ -1295,8 +1295,8 @@ namespace EnergyPlus::DaylightingManager {
         bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
         Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-        //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
-        //		Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
+        // Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
+        // Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
@@ -1360,8 +1360,8 @@ namespace EnergyPlus::DaylightingManager {
             }
             NRF = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
 
-            //			MapWindowSolidAngAtRefPt.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); //Inactive
-            //			MapWindowSolidAngAtRefPtWtd.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); // Not an array anymore
+            // MapWindowSolidAngAtRefPt.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); //Inactive
+            // MapWindowSolidAngAtRefPtWtd.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins ); // Not an array anymore
 
             for (IL = 1; IL <= NRF; ++IL) {
 
@@ -1371,7 +1371,7 @@ namespace EnergyPlus::DaylightingManager {
                 // ---------- WINDOW LOOP ----------
                 //           -------------
 
-                //				MapWindowSolidAngAtRefPt = 0.0; //Inactive
+                // MapWindowSolidAngAtRefPt = 0.0; //Inactive
                 MapWindowSolidAngAtRefPtWtd = 0.0;
 
                 for (loopwin = 1; loopwin <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loopwin) {
@@ -1627,7 +1627,7 @@ namespace EnergyPlus::DaylightingManager {
                                                   bool &is_Rectangle,       // True if window is rectangular
                                                   bool &is_Triangle,        // True if window is triangular
                                                   Optional_int_const MapNum,
-                                                  //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
+                                                  // Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
                                                   Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
         // SUBROUTINE INFORMATION:
@@ -1671,7 +1671,7 @@ namespace EnergyPlus::DaylightingManager {
         // counter-clockwise starting at upper left as viewed
         // from inside of room
         int IConstShaded;             // Shaded construction counter
-                                      //		int ScNum; // Window screen number //Unused Set but never used
+                                      // int ScNum; // Window screen number //Unused Set but never used
         Real64 WW;                    // Window width (m)
         Real64 HW;                    // Window height (m)
         static Vector3<Real64> WC;    // Center point of window
@@ -1696,18 +1696,18 @@ namespace EnergyPlus::DaylightingManager {
         Real64 SinCornerAng;           // For triangle, sine of corner angle of window element
 
         // Complex fenestration variables
-        //		int CplxFenState; // Current complex fenestration state //Unused Set but never used
-        //		int NReflSurf; // Number of blocked beams for complex fenestration //Unused Set but never used
+        // int CplxFenState; // Current complex fenestration state //Unused Set but never used
+        // int NReflSurf; // Number of blocked beams for complex fenestration //Unused Set but never used
         int NRefPts; // number of reference points
-                     //		int WinEl; // Current window element //Unused Set but never used
+                     // int WinEl; // Current window element //Unused Set but never used
         static Vector3<Real64> RayVector;
-        //		Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable) //Unused Set but never used
+        // Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable) //Unused Set but never used
 
         // Complex fenestration variables
-        //		CplxFenState = 0; //Unused Set but never used
-        //		NReflSurf = 0; //Unused Set but never used
-        //		WinEl = 0; //Unused Set but never used
-        //		TransBeam = 0.0; //Unused Set but never used
+        // CplxFenState = 0; //Unused Set but never used
+        // NReflSurf = 0; //Unused Set but never used
+        // WinEl = 0; //Unused Set but never used
+        // TransBeam = 0.0; //Unused Set but never used
         NRefPts = 0;
 
         IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loopwin);
@@ -1741,10 +1741,10 @@ namespace EnergyPlus::DaylightingManager {
         ICtrl = Surface(IWin).activeWindowShadingControl;
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
-        //		ScNum = 0; //Unused Set but never used
+        // ScNum = 0; //Unused Set but never used
         if (Surface(IWin).HasShadeControl) ShType = WindowShadingControl(ICtrl).ShadingType;
         BlNum = SurfWinBlindNumber(IWin);
-        //		ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
+        // ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
         ShelfNum = Surface(IWin).Shelf;
         if (ShelfNum > 0) {
@@ -2033,7 +2033,7 @@ namespace EnergyPlus::DaylightingManager {
         } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
             // Initialize solid angle subtended by window wrt ref pt
             // and solid angle weighted by glare position factor
-            //			if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt = 0.0; //Inactive
+            //            if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt = 0.0; //Inactive
             MapWindowSolidAngAtRefPtWtd = 0.0;
         }
         // Area of window element
@@ -2089,7 +2089,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
         Optional_int_const MapNum,
-        //		Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
+        //        Optional< Real64 > MapWindowSolidAngAtRefPt, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd)
     {
 
@@ -2299,7 +2299,7 @@ namespace EnergyPlus::DaylightingManager {
             } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
                 if (!hitIntObs) {
                     if (ExtWinType == DataDaylighting::iExtWinType::InZoneExtWin || (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin && hitIntWin)) {
-                        //						if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt += DOMEGA;
+                        //                        if ( MapWindowSolidAngAtRefPt.present() ) MapWindowSolidAngAtRefPt += DOMEGA;
                         ////Inactive
                         state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt(loopwin, iRefPoint) += DOMEGA;
                         MapWindowSolidAngAtRefPtWtd += DOMEGA * POSFAC;
@@ -3290,7 +3290,7 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
                                                 // Never set here // Made static for performance and const for now until issue addressed
         static Vector4<Real64> XEDIRSK;         // Illuminance contribution from luminance element, sky-related
-        //		Real64 XEDIRSU; // Illuminance contribution from luminance element, sun-related //Unused Set but never used
+        //        Real64 XEDIRSU; // Illuminance contribution from luminance element, sun-related //Unused Set but never used
         static Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
         static Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
         int JB;                                                // Slat angle counter
@@ -3321,9 +3321,9 @@ namespace EnergyPlus::DaylightingManager {
         int NearestHitSurfNum;               // Surface number of nearest obstruction
         int NearestHitSurfNumX;              // Surface number to use when obstruction is a shadowing surface
         static Vector3<Real64> NearestHitPt; // Hit point of ray on nearest obstruction
-                                             //		Real64 SunObstructionMult; // = 1.0 if sun hits a ground point; otherwise = 0.0
+                                             //        Real64 SunObstructionMult; // = 1.0 if sun hits a ground point; otherwise = 0.0
         Real64 Alfa;                         // Intermediate variables
-                                             //		Real64 Beta; //Unused
+                                             //        Real64 Beta; //Unused
         static Vector3<Real64> GroundHitPt;  // Coordinates of point that ray hits ground (m)
         bool hitObs;                         // True iff obstruction is hit
         static Vector3<Real64> ObsHitPt;     // Coordinates of hit point on an obstruction (m)
@@ -3354,7 +3354,7 @@ namespace EnergyPlus::DaylightingManager {
 
         bool hitIntWinDisk; // True iff ray from ref pt to sun passes thru an int window
         bool hitIntObsDisk; // True iff ray from ref pt to sun hits an interior obstruction
-                            //		bool hitExtObsDisk; // True iff ray from ref pt to sun hits an exterior obstruction //Unused Set but never
+                            //        bool hitExtObsDisk; // True iff ray from ref pt to sun hits an exterior obstruction //Unused Set but never
                             // used
 
         static Vector3<Real64> HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
@@ -3403,7 +3403,7 @@ namespace EnergyPlus::DaylightingManager {
         if (COSB <= 0.0) return;
 
         XEDIRSK = 0.0;
-        //		XEDIRSU = 0.0; //Unused Set but never used
+        //        XEDIRSU = 0.0; //Unused Set but never used
         XAVWLSK = 0.0;
         Real64 const Ray_3(Ray(3));
         Real64 const DOMEGA_Ray_3(DOMEGA * Ray_3);
@@ -3513,12 +3513,12 @@ namespace EnergyPlus::DaylightingManager {
                     Alfa = std::acos(-Ray_3);
                     Real64 const Ray_1(Ray(1));
                     Real64 const Ray_2(Ray(2));
-                    //					Beta = std::atan2( Ray_2, Ray_1 ); //Unused Tuning below eliminated use
+                    //                    Beta = std::atan2( Ray_2, Ray_1 ); //Unused Tuning below eliminated use
                     Real64 HorDis((RWIN2(3) - state.dataSurface->GroundLevelZ) * std::tan(Alfa)); // Distance between ground hit point and proj'n of center
                     GroundHitPt(3) = state.dataSurface->GroundLevelZ;
                     // Tuned Replaced by below: sqrt is faster than sincos
-                    //					GroundHitPt( 1 ) = RWIN2( 1 ) + HorDis * std::cos( Beta );
-                    //					GroundHitPt( 2 ) = RWIN2( 2 ) + HorDis * std::sin( Beta );
+                    //                    GroundHitPt( 1 ) = RWIN2( 1 ) + HorDis * std::cos( Beta );
+                    //                    GroundHitPt( 2 ) = RWIN2( 2 ) + HorDis * std::sin( Beta );
                     Real64 const Ray_r(std::sqrt(square(Ray_1) + square(Ray_2)));
                     if (Ray_r > 0.0) {
                         HorDis /= Ray_r;
@@ -3639,7 +3639,7 @@ namespace EnergyPlus::DaylightingManager {
                         if (hitIntObsDisk) ObTransDisk = 0.0;
                     } // case where RP is in zone with interior window adjacent to zone with exterior window
 
-                    //					hitExtObsDisk = false; //Unused Set but never used
+                    //                    hitExtObsDisk = false; //Unused Set but never used
                     // RJH 08-25-07 hitIntWinDisk should not be reset to false here, and should be tested below.
                     // This is to correct logic flaw causing direct solar to reach adjacent zone refpt
                     // when vector to sun does not pass through interior window
@@ -3648,7 +3648,7 @@ namespace EnergyPlus::DaylightingManager {
                         // Net transmittance of exterior obstructions encountered by RAYCOS
                         // ObTransDisk = 1.0 will be returned if no exterior obstructions are hit.
                         DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS, ObTransDisk);
-                        //						if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
+                        //                        if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
                         // RJH 08-26-07 However, if this is a case of interior window
                         // and vector to sun does not pass through interior window
                         // then reset ObTransDisk to 0.0 since it is the key test for adding
@@ -6076,7 +6076,7 @@ namespace EnergyPlus::DaylightingManager {
         auto const window2_base_iExtBoundCond(window2_base.ExtBoundCond);
 
         // Preconditions
-        //		assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry
+        //        assert( window1.Zone == window2_Zone ); //? This is violated in PurchAirWithDoubleFacadeDaylighting so then why the asymmetry
         // of  only checking for wall/roof/floor for window2 zone below?
 
         // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
@@ -6231,7 +6231,7 @@ namespace EnergyPlus::DaylightingManager {
         static Real64 tmpSWSL1(0.0);
         static Real64 tmpSWSL2(0.0);
         static Real64 tmpSWFactor(0.0); // new switching factor to meet glare criteria
-        //		static Real64 tmpSWFactor0( 0.0 ); // original switching factor to meet daylight illuminance //Unused Set but never used
+        //        static Real64 tmpSWFactor0( 0.0 ); // original switching factor to meet daylight illuminance //Unused Set but never used
         static Real64 tmpMult(0.0);
         static bool GlareOK(false);
         static Array3D<Real64> tmpIllumFromWinAtRefPt;
@@ -7573,7 +7573,7 @@ namespace EnergyPlus::DaylightingManager {
         bool BlindOn;                // True if exterior or interior window blind present
         bool ScreenOn;               // True if exterior window screen present
         int BlNum;                   // Blind number
-                                     //		int ScNum; // Screen number //Unused Set but never used
+                                     //        int ScNum; // Screen number //Unused Set but never used
         int PipeNum;                 // TDD pipe object number
         int ShelfNum;                // Daylighting shelf object number
         int InShelfSurf;             // Inside daylighting shelf surface number
@@ -7961,7 +7961,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (Surface(IWin).HasShadeControl) {
                     ShType = WindowShadingControl(ICtrl).ShadingType;
                     BlNum = SurfWinBlindNumber(IWin);
-                    //					ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
+                    //                    ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
                     ShadeOn = (ShType == WSC_ST_InteriorShade || ShType == WSC_ST_ExteriorShade || ShType == WSC_ST_BetweenGlassShade);
                     BlindOn = (ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_BetweenGlassBlind);
@@ -8596,7 +8596,7 @@ namespace EnergyPlus::DaylightingManager {
         Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
         Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
         // Total transmitted flux
-        //		static Vector4< Real64 > FLSKTot; //Unused
+        //        static Vector4< Real64 > FLSKTot; //Unused
         Real64 FLSUTot;
         Real64 FLSUdiskTot;
 
@@ -8658,7 +8658,7 @@ namespace EnergyPlus::DaylightingManager {
         }
         ElementLuminanceSunDisk *= state.dataHeatBal->SunlitFracHR(IHR, IWin) * COSIncSun;
 
-        //		FLSKTot = 0.0;
+        //        FLSKTot = 0.0;
         FLSUTot = 0.0;
         FLSUdiskTot = 0.0;
         FFSKTot = 0.0;
@@ -8681,7 +8681,7 @@ namespace EnergyPlus::DaylightingManager {
             for (iSky = 1; iSky <= 4; ++iSky) {
                 FirstFluxSK(iSky, iBackElem) = FLSK(iSky, iBackElem) * state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
                 FFSKTot(iSky) += FirstFluxSK(iSky, iBackElem);
-                //				FLSKTot( iSky ) += FLSK( iSky, iBackElem );
+                //                FLSKTot( iSky ) += FLSK( iSky, iBackElem );
             }
             FirstFluxSU(iBackElem) = FLSU(iBackElem) * state.dataBSDFWindow->ComplexWind(IWin).Geom(CurCplxFenState).AveRhoVisOverlap(iBackElem);
             FFSUTot += FirstFluxSU(iBackElem);
@@ -8758,7 +8758,7 @@ namespace EnergyPlus::DaylightingManager {
 
         static Vector4<Real64> EDirSky; // Sky related direct illuminance
         Real64 EDirSun;                 // Sun related direct illuminance, excluding entering beam
-                                        //		Real64 EDirSunDisk; // Sun related direct illuminance, due to entering beam //Unused Set but never used
+                                        //        Real64 EDirSunDisk; // Sun related direct illuminance, due to entering beam //Unused Set but never used
 
         int CurCplxFenState;
         int NIncBasis;
@@ -8802,7 +8802,7 @@ namespace EnergyPlus::DaylightingManager {
         // WinLumSUdisk = 0.0d0
         EDirSky = 0.0;
         EDirSun = 0.0;
-        //		EDirSunDisk = 0.0; //Unused Set but never used
+        //        EDirSunDisk = 0.0; //Unused Set but never used
 
         for (iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem) {
             // LambdaInc = ComplexWind(IWin)%Geom(CurCplxFenState)%Inc%Lamda(iIncElem)
@@ -9888,7 +9888,7 @@ namespace EnergyPlus::DaylightingManager {
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
-        //		static bool CommaDelimited( true ); //Unused Set but never used
+        //        static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
 
@@ -9912,13 +9912,13 @@ namespace EnergyPlus::DaylightingManager {
             };
             if (state.dataDaylightingData->MapColSep == CharTab) {
                 if (!openMapFile(state.files.outputMapTabFileName).good()) return;
-                //				CommaDelimited = false; //Unused Set but never used
+                //                CommaDelimited = false; //Unused Set but never used
             } else if (state.dataDaylightingData->MapColSep == CharComma) {
                 if (!openMapFile(state.files.outputMapCsvFileName).good()) return;
-                //				CommaDelimited = true; //Unused Set but never used
+                //                CommaDelimited = true; //Unused Set but never used
             } else {
                 if (!openMapFile(state.files.outputMapTxtFileName).good()) return;
-                //				CommaDelimited = false; //Unused Set but never used
+                //                CommaDelimited = false; //Unused Set but never used
             }
 
             SavedMnDy(MapNum) = state.dataEnvrn->CurMnDyHr.substr(0, 5);

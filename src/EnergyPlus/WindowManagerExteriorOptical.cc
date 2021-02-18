@@ -122,43 +122,43 @@ namespace WindowManager {
     }
 
     // void InitWCE_BSDFOpticalData() {
-    // 	// SUBROUTINE INFORMATION:
-    // 	//       AUTHOR         Simon Vidanovic
-    // 	//       DATE WRITTEN   September 2016
-    // 	//       MODIFIED       na
-    // 	//       RE-ENGINEERED  na
+    //     // SUBROUTINE INFORMATION:
+    //     //       AUTHOR         Simon Vidanovic
+    //     //       DATE WRITTEN   September 2016
+    //     //       MODIFIED       na
+    //     //       RE-ENGINEERED  na
     //
-    // 	// PURPOSE OF THIS SUBROUTINE:
-    // 	// Initialize BSDF construction layers in Solar and Visible spectrum.
+    //     // PURPOSE OF THIS SUBROUTINE:
+    //     // Initialize BSDF construction layers in Solar and Visible spectrum.
     //
-    // 	auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
-    // 	for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-    // 		auto& construction( Construct( ConstrNum ) );
-    // 		if ( construction.isGlazingConstruction() ) {
-    // 			for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
-    // 				auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
-    // 				if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
-    // 					material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
-    // 					auto aMaterial = std::make_shared< Material::MaterialProperties >();
-    // 					*aMaterial = material;
+    //     auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
+    //     for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
+    //         auto& construction( Construct( ConstrNum ) );
+    //         if ( construction.isGlazingConstruction() ) {
+    //             for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
+    //                 auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
+    //                 if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
+    //                     material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
+    //                     auto aMaterial = std::make_shared< Material::MaterialProperties >();
+    //                     *aMaterial = material;
     //
-    // 					// This is necessary because rest of EnergyPlus code relies on TransDiff property
-    // 					// of construction. It will basically trigger Window optical calculations if this
-    // 					// property is >0.
-    // 					construction.TransDiff = 0.1;
+    //                     // This is necessary because rest of EnergyPlus code relies on TransDiff property
+    //                     // of construction. It will basically trigger Window optical calculations if this
+    //                     // property is >0.
+    //                     construction.TransDiff = 0.1;
     //
-    // 					auto aRange = WavelengthRange::Solar;
-    // 					auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+    //                     auto aRange = WavelengthRange::Solar;
+    //                     auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
     //
-    // 					aRange = WavelengthRange::Visible;
-    // 					auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
-    // 				}
+    //                     aRange = WavelengthRange::Visible;
+    //                     auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+    //                 }
     //
-    // 			}
-    // 		}
-    // 	}
+    //             }
+    //         }
+    //     }
     // }
 
     void InitWCE_SimplifiedOpticalData(EnergyPlusData &state)

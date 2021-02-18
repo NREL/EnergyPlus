@@ -7391,7 +7391,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     state->dataSurface->TotSurfaces = 2 * nTests ;
     DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 

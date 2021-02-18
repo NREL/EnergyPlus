@@ -148,7 +148,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
@@ -271,7 +271,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(2).z = 1.0;
     Surface(3).Vertex(3).z = 1.0;
 
-    SurfaceGeometry::AllocateSurfaceWindows(3);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 3);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
@@ -2420,7 +2420,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
@@ -2837,7 +2837,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(2).z = 2.4384;
     Surface(11).Vertex(3).z = 2.4384;
 
-    SurfaceGeometry::AllocateSurfaceWindows(14);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 14);
     SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
@@ -20044,7 +20044,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     Surface(3).Tilt = 90.0;
     Surface(3).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;

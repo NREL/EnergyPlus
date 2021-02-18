@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
     DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
 

@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     DataSurfaces::Surface(winNum).OutDryBulbTemp = T_out;
     state->dataHeatBal->TempEffBulkAir(winNum) = T_in;
-    DataSurfaces::SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
+    state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
     DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(1, 0.01);
     DataHeatBalFanSys::ZoneAirHumRat.dimension(1, 0.01);
     DataHeatBalFanSys::MAT.dimension(1, T_in);
@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
-    DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
+    state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
     state->dataHeatBal->QS.allocate(1);
     state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
     state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
@@ -2790,7 +2790,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
-    DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
+    state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
     state->dataHeatBal->QS.allocate(1);
     state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
     state->dataSurface->SurfWinSysSolTransmittance.allocate(3);

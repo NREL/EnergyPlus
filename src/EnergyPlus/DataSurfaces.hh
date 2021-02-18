@@ -324,36 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    // Surface Window Energy
-    extern Array1D<Real64> SurfWinTransSolarEnergy; // Energy of WinTransSolar [J]
-    extern Array1D<Real64> SurfWinBmSolarEnergy;    // Energy of WinBmSolar [J]
-
-    extern Array1D<Real64> SurfWinBmBmSolarEnergy;  // Beam-to-beam energy of WinBmSolar [J]
-    extern Array1D<Real64> SurfWinBmDifSolarEnergy; // Beam-to-diffuse energy of WinBmSolar [J]
-
-    extern Array1D<Real64> SurfWinDifSolarEnergy;             // Energy of WinDifSolar [J]
-    extern Array1D<Real64> SurfWinHeatGainRepEnergy;          // Energy of WinHeatGainRep [J]
-    extern Array1D<Real64> SurfWinHeatLossRepEnergy;          // Energy of WinHeatLossRep [J]
-    extern Array1D<Real64> SurfWinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
-    extern Array1D<Real64> SurfWinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
-    extern Array1D<Real64> SurfWinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
-
-    // SurfaceWindow Struct
-    extern Array1D<Real64> SurfWinIRfromParentZone;
-    extern Array1D<Real64> SurfWinFrameQRadOutAbs;
-    extern Array1D<Real64> SurfWinFrameQRadInAbs;
-    extern Array1D<Real64> SurfWinDividerQRadOutAbs;
-    extern Array1D<Real64> SurfWinDividerQRadInAbs;
-    extern Array1D<Real64> SurfWinExtBeamAbsByShade;       // Exterior beam solar absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinExtDiffAbsByShade;       // Exterior diffuse solar absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinIntBeamAbsByShade;       // Interior beam solar absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinIntSWAbsByShade;         // Interior diffuse solar plus short-wave from lights absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinInitialDifSolAbsByShade; // Initial diffuse solar from ext and int windows absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinIntLWAbsByShade;         // Interior long-wave from zone lights and equipment absorbed by window shade (W/m2)
-    extern Array1D<Real64> SurfWinConvHeatFlowNatural;     // Convective heat flow from gap between glass and interior shade or blind (W)
-    extern Array1D<Real64> SurfWinConvHeatGainToZoneAir;   // Convective heat gain to zone air from window gap airflow (W)
-    extern Array1D<Real64> SurfWinRetHeatGainToZoneAir;    // Convective heat gain to return air sent to zone [W]
-    extern Array1D<Real64> SurfWinDividerHeatGain;
     extern Array1D<Real64> SurfWinBlTsolBmBm;                 // Time-step value of blind beam-beam solar transmittance (-)
     extern Array1D<Real64> SurfWinBlTsolBmDif;                // Time-step value of blind beam-diffuse solar transmittance (-)
     extern Array1D<Real64> SurfWinBlTsolDifDif;               // Time-step value of blind diffuse-diffuse solar transmittance (-)
@@ -858,7 +828,7 @@ namespace DataSurfaces {
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
-        static Real64 getInsideIR(const int t_SurfNum);
+        static Real64 getInsideIR(EnergyPlusData &state, const int t_SurfNum);
 
         Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
@@ -1353,9 +1323,9 @@ namespace DataSurfaces {
 
     void SetSurfaceWindDirAt(EnergyPlusData &state);
 
-    Real64 AbsFrontSide(int SurfNum);
+    Real64 AbsFrontSide(EnergyPlusData &state, int SurfNum);
 
-    Real64 AbsBackSide(int SurfNum);
+    Real64 AbsBackSide(EnergyPlusData &state, int SurfNum);
 
     std::string cSurfaceClass(SurfaceClass ClassNo);
 
@@ -1475,6 +1445,33 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinSysSolReflectance;    // Effective solar reflectance of window + shading device, if present
     Array1D<Real64> SurfWinSysSolAbsorptance;    // Effective solar absorptance of window + shading device, if present
 
+    // Surface Window Energy
+    Array1D<Real64> SurfWinTransSolarEnergy;           // Energy of WinTransSolar [J]
+    Array1D<Real64> SurfWinBmSolarEnergy;              // Energy of WinBmSolar [J]
+    Array1D<Real64> SurfWinBmBmSolarEnergy;            // Beam-to-beam energy of WinBmSolar [J]
+    Array1D<Real64> SurfWinBmDifSolarEnergy;           // Beam-to-diffuse energy of WinBmSolar [J]
+    Array1D<Real64> SurfWinDifSolarEnergy;             // Energy of WinDifSolar [J]
+    Array1D<Real64> SurfWinHeatGainRepEnergy;          // Energy of WinHeatGainRep [J]
+    Array1D<Real64> SurfWinHeatLossRepEnergy;          // Energy of WinHeatLossRep [J]
+    Array1D<Real64> SurfWinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
+    Array1D<Real64> SurfWinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
+    Array1D<Real64> SurfWinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
+    Array1D<Real64> SurfWinIRfromParentZone;
+    Array1D<Real64> SurfWinFrameQRadOutAbs;
+    Array1D<Real64> SurfWinFrameQRadInAbs;
+    Array1D<Real64> SurfWinDividerQRadOutAbs;
+    Array1D<Real64> SurfWinDividerQRadInAbs;
+    Array1D<Real64> SurfWinExtBeamAbsByShade;       // Exterior beam solar absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinExtDiffAbsByShade;       // Exterior diffuse solar absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinIntBeamAbsByShade;       // Interior beam solar absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinIntSWAbsByShade;         // Interior diffuse solar plus short-wave from lights absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinInitialDifSolAbsByShade; // Initial diffuse solar from ext and int windows absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinIntLWAbsByShade;         // Interior long-wave from zone lights and equipment absorbed by window shade (W/m2)
+    Array1D<Real64> SurfWinConvHeatFlowNatural;     // Convective heat flow from gap between glass and interior shade or blind (W)
+    Array1D<Real64> SurfWinConvHeatGainToZoneAir;   // Convective heat gain to zone air from window gap airflow (W)
+    Array1D<Real64> SurfWinRetHeatGainToZoneAir;    // Convective heat gain to return air sent to zone [W]
+    Array1D<Real64> SurfWinDividerHeatGain;
+
     void clear_state() override
     {
         this->TotSurfaces = 0;
@@ -1566,6 +1563,31 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinSysSolTransmittance.deallocate();
         this->SurfWinSysSolReflectance.deallocate();
         this->SurfWinSysSolAbsorptance.deallocate();
+        this->SurfWinTransSolarEnergy.deallocate();
+        this->SurfWinBmSolarEnergy.deallocate();
+        this->SurfWinBmBmSolarEnergy.deallocate();
+        this->SurfWinBmDifSolarEnergy.deallocate();
+        this->SurfWinDifSolarEnergy.deallocate();
+        this->SurfWinHeatGainRepEnergy.deallocate();
+        this->SurfWinHeatLossRepEnergy.deallocate();
+        this->SurfWinShadingAbsorbedSolarEnergy.deallocate();
+        this->SurfWinGapConvHtFlowRepEnergy.deallocate();
+        this->SurfWinHeatTransferRepEnergy.deallocate();
+        this->SurfWinIRfromParentZone.deallocate();
+        this->SurfWinFrameQRadOutAbs.deallocate();
+        this->SurfWinFrameQRadInAbs.deallocate();
+        this->SurfWinDividerQRadOutAbs.deallocate();
+        this->SurfWinDividerQRadInAbs.deallocate();
+        this->SurfWinExtBeamAbsByShade.deallocate();
+        this->SurfWinExtDiffAbsByShade.deallocate();
+        this->SurfWinIntBeamAbsByShade.deallocate();
+        this->SurfWinIntSWAbsByShade.deallocate();
+        this->SurfWinInitialDifSolAbsByShade.deallocate();
+        this->SurfWinIntLWAbsByShade.deallocate();
+        this->SurfWinConvHeatFlowNatural.deallocate();
+        this->SurfWinConvHeatGainToZoneAir.deallocate();
+        this->SurfWinRetHeatGainToZoneAir.deallocate();
+        this->SurfWinDividerHeatGain.deallocate();
     }
 };
 

@@ -429,7 +429,7 @@ namespace OutputReportPredefined {
         s->pdchSysSizUserHeatFlowRatio = newPreDefColumn(state, s->pdstSystemSize, "User Heating Air Flow Ratio []");
 
         s->pdstPlantSize = newPreDefSubTable(state, s->pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments");
-        //		s->pdchPlantSizPass = newPreDefColumn(state,  s->pdstPlantSize, "Sizing Pass" );
+        //        s->pdchPlantSizPass = newPreDefColumn(state,  s->pdstPlantSize, "Sizing Pass" );
         s->pdchPlantSizPrevVdot = newPreDefColumn(state, s->pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]");
         s->pdchPlantSizMeasVdot = newPreDefColumn(state, s->pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]");
         s->pdchPlantSizCalcVdot = newPreDefColumn(state, s->pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]");
@@ -441,7 +441,7 @@ namespace OutputReportPredefined {
 
         s->pdst2CoilSummaryCoilSelection = newPreDefSubTable(state, s->pdrSizing, "Coil Sizing Summary");
         // coil meta data information
-        //	the first column will be the coil name, the unique user name from input. It has no header or column definition
+        //    the first column will be the coil name, the unique user name from input. It has no header or column definition
         s->pdch2CoilType = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "Coil Type");
         s->pdch2CoilHVACType = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "HVAC Type");
         s->pdch2CoilHVACName = newPreDefColumn(state, s->pdst2CoilSummaryCoilSelection, "HVAC Name");
@@ -487,7 +487,7 @@ namespace OutputReportPredefined {
         s->pdrCoilSizingDetailsTable = newPreDefReport(state, "CoilSizingDetails", "Coil", "Coil Sizing Details");
         s->pdstCoilSummaryCoilSelection = newPreDefSubTable(state, s->pdrCoilSizingDetailsTable, "Coils");
         // coil meta data information
-        //	the first column will be the coil name, the unique user name from input. It has no header or column definition
+        //    the first column will be the coil name, the unique user name from input. It has no header or column definition
         s->pdchCoilType = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Type");
         s->pdchCoilLocation = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Location");
         s->pdchCoilHVACType = newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "HVAC Type");

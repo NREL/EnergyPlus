@@ -3338,7 +3338,7 @@ namespace VentilatedSlab {
         FanOutletNode = state.dataVentilatedSlab->VentSlab(Item).FanOutletNode;
         AirMassFlow = Node(OutletNode).MassFlowRate;
 
-        //		QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( FanOutletNode ).Enthalpy );
+        //        QTotUnitOut = AirMassFlow * ( Node( OutletNode ).Enthalpy - Node( FanOutletNode ).Enthalpy );
         QTotUnitOut = AirMassFlow *
                       (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) - PsyHFnTdbW(Node(FanOutletNode).Temp, Node(FanOutletNode).HumRat));
         QUnitOut = AirMassFlow *

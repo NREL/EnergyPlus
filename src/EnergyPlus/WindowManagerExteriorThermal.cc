@@ -171,7 +171,7 @@ namespace WindowManager {
             auto glassEmiss = aGlassLayer->getSurface(Side::Back)->getEmissivity();
             auto RhoGlIR2 = 1.0 - glassEmiss;
             auto ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            auto rmir = surface.getInsideIR(SurfNum);
+            auto rmir = surface.getInsideIR(state, SurfNum);
             auto NetIRHeatGainShade = ShadeArea * EpsShIR2 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep), 4) - rmir) +
                                       EpsShIR1 * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1), 4) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
             auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
@@ -207,7 +207,7 @@ namespace WindowManager {
             auto ConvHeatGainFrZoneSideOfGlass =
                 surface.Area * h_cin * (backSurface->getTemperature() - aSystem->getAirTemperature(Environment::Indoor));
 
-            auto rmir = surface.getInsideIR(SurfNum);
+            auto rmir = surface.getInsideIR(state, SurfNum);
             auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
             SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - state.dataWindowManager->TKelvin;
@@ -595,7 +595,7 @@ namespace WindowManager {
         auto tin = m_Surface.getInsideAirTemperature(state, m_SurfNum) + DataGlobalConstants::KelvinConv;
         auto hcin = state.dataHeatBal->HConvIn(m_SurfNum);
 
-        auto IR = m_Surface.getInsideIR(m_SurfNum);
+        auto IR = m_Surface.getInsideIR(state, m_SurfNum);
 
         std::shared_ptr<CEnvironment> Indoor = std::make_shared<CIndoorEnvironment>(tin, state.dataEnvrn->OutBaroPress);
         Indoor->setHCoeffModel(BoundaryConditionsCoeffModel::CalculateH, hcin);

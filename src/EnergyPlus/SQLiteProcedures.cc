@@ -2752,12 +2752,12 @@ bool SQLiteProcedures::sqliteWithinTransaction()
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_clear_bindings(stmt);
+//     return sqlite3_clear_bindings(stmt);
 // }
 
 // int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_finalize(stmt);
+//     return sqlite3_finalize(stmt);
 // }
 
 } // namespace EnergyPlus

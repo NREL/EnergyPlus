@@ -5558,7 +5558,7 @@ namespace HeatBalanceManager {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
         //       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-        //       				July 2016, Rick Strand for movable insulation bug fix
+        //                       July 2016, Rick Strand for movable insulation bug fix
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver for record keeping within the

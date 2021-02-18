@@ -96,7 +96,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
     //       RE-ENGINEERED  na
 
     //       MODIFIED
-    //			Aug.  2014, Rongpeng Zhang, added An additional part-load performance curve type
+    //       Aug.  2014, Rongpeng Zhang, added An additional part-load performance curve type
 
     // PURPOSE OF THIS MODULE:
     //  This module simulates the performance of the electric vapor compression
@@ -220,7 +220,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
         //       DATE WRITTEN:    July 2006
 
         //       MODIFIED
-        //			Aug.  2014, Rongpeng Zhang, added an additional part-load performance curve type
+        //       Aug.  2014, Rongpeng Zhang, added an additional part-load performance curve type
 
         // PURPOSE OF THIS SUBROUTINE:
         //  This routine will get the input required by the Reformulated Electric EIR Chiller model
@@ -1799,9 +1799,9 @@ namespace EnergyPlus::ChillerReformulatedEIR {
         //       RE-ENGINEERED  na
 
         //       MODIFIED
-        //			Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type
-        //			Jun. 2016, Rongpeng Zhang, applied the chiller supply water temperature sensor fault model
-        //			Nov. 2016, Rongpeng Zhang, added fouling chiller fault
+        //       Aug. 2014, Rongpeng Zhang, added an additional part-load performance curve type
+        //       Jun. 2016, Rongpeng Zhang, applied the chiller supply water temperature sensor fault model
+        //       Nov. 2016, Rongpeng Zhang, added fouling chiller fault
 
         // PURPOSE OF THIS SUBROUTINE:
         //  Simulate a vapor compression chiller using the reformulated model developed by Mark Hydeman

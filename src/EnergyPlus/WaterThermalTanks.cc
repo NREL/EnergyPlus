@@ -5390,7 +5390,7 @@ namespace WaterThermalTanks {
         //       DATE WRITTEN   February 2004
         //       MODIFIED       FSEC, July 2005
         //                      Brent Griffith, October 2007 indirect fired water heater
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                        B. Shen 12/2014, add air-source variable-speed heat pump water heating
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -6059,7 +6059,7 @@ namespace WaterThermalTanks {
             {
                 IntegratedHeatPump::SizeIHP(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum); //
                 // IntegratedHeatPump::SimIHP(modBlankString, HPWaterHeater(HPNum).DXCoilNum,
-                //	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
+                //    0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
                 int VSCoilID = state.dataIntegratedHP->IntegratedHeatPumps(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
                 state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
 
@@ -6801,10 +6801,10 @@ namespace WaterThermalTanks {
     )
     {
         // Function Information:
-        //		Author: Noel Merket
-        //		Date Written: January 2015
-        //		Modified: na
-        //		Re-engineered: na
+        //        Author: Noel Merket
+        //        Date Written: January 2015
+        //        Modified: na
+        //        Re-engineered: na
 
         // Purpose of this function:
         // Determines if the source side heat transfer is coming from a heat pump.
@@ -8349,7 +8349,7 @@ namespace WaterThermalTanks {
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   March 2005
         //       MODIFIED       B. Griffith, Jan 2012 for stratified tank
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                        B. Shen 12/2014, add air-source variable-speed heat pump water heating
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

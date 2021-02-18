@@ -223,12 +223,12 @@ namespace HeatBalanceIntRadExchange {
             auto const &enclosure(ZoneRadiantInfo(startEnclosure));
             for (int i : enclosure.SurfacePtr) {
                 NetLWRadToSurf(i) = 0.0;
-                SurfWinIRfromParentZone(i) = 0.0;
+                state.dataSurface->SurfWinIRfromParentZone(i) = 0.0;
             }
         } else {
             NetLWRadToSurf = 0.0;
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++)
-                SurfWinIRfromParentZone(SurfNum) = 0.0;
+                state.dataSurface->SurfWinIRfromParentZone(SurfNum) = 0.0;
         }
 
         for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
@@ -397,7 +397,7 @@ namespace HeatBalanceIntRadExchange {
                         if (CarrollMRTDenominatorWin > 0.0) {
                             CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin / CarrollMRTDenominatorWin + DataGlobalConstants::KelvinConv);
                         }
-                        SurfWinIRfromParentZone(RecSurfNum) += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
+                        state.dataSurface->SurfWinIRfromParentZone(RecSurfNum) += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / SurfaceEmiss[RecZoneSurfNum];
                     }
                     netLWRadToRecSurf += zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - SurfaceTempInKto4th[RecZoneSurfNum]);
                 }
@@ -438,7 +438,7 @@ namespace HeatBalanceIntRadExchange {
                             //          ENDIF
                         }
                         netLWRadToRecSurf += IRfromParentZone_acc - netLWRadToRecSurf_cor - (scriptF_acc * SurfaceTempInKto4th[RecZoneSurfNum]);
-                        SurfWinIRfromParentZone(RecSurfNum) += IRfromParentZone_acc / SurfaceEmiss[RecZoneSurfNum];
+                        state.dataSurface->SurfWinIRfromParentZone(RecSurfNum) += IRfromParentZone_acc / SurfaceEmiss[RecZoneSurfNum];
                     } else {
                         Real64 netLWRadToRecSurf_acc(0.0); // Local accumulator
                         for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum, ++lSR) {

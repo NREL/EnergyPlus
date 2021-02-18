@@ -1051,29 +1051,29 @@ namespace RoomAirModelAirflowNetwork {
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
-                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
-                    SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
                 if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        state.dataSurface->SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                         if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
                             state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         } else {
                             state.dataSurface->SurfWinHeatLossRep(SurfNum) = - state.dataSurface->SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         }
                         state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-                        SurfWinHeatTransferRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                 }
 

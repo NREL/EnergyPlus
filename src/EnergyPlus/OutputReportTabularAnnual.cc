@@ -357,7 +357,7 @@ namespace OutputReportTabularAnnual {
                             timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                         // perform the selected aggregation type
                         // the following types of aggregations are not gathered at this point:
-                        // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown, 	maximumDuringHoursShown, minimumDuringHoursShown:
+                        // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown,     maximumDuringHoursShown, minimumDuringHoursShown:
                         switch (fldStIt->m_aggregate) {
                         case AnnualFieldSet::AggregationKind::sumOrAvg:
                             if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable

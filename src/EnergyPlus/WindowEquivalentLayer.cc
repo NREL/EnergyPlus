@@ -811,7 +811,7 @@ namespace WindowEquivalentLayer {
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
-                outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
+                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
                         QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
@@ -859,7 +859,7 @@ namespace WindowEquivalentLayer {
         SurfOutsideEmiss = LWAbsOut;
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
-        rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
+        rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
@@ -893,7 +893,7 @@ namespace WindowEquivalentLayer {
         // Window heat gain (or loss) is calculated here
         state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
         state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
-        SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
+        state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
         // store for component reporting
         state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
         state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;

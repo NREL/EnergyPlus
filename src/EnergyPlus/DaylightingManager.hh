@@ -126,7 +126,7 @@ namespace DaylightingManager {
                                                   bool &Rectangle,          // True if window is rectangular
                                                   bool &Triangle,           // True if window is triangular
                                                   Optional_int_const MapNum = _,
-                                                  //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+                                                  //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
                                                   Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
@@ -173,7 +173,7 @@ namespace DaylightingManager {
         Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
         Optional_int_const MapNum = _,
-        //		Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
+        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
         Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,

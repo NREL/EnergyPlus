@@ -83,7 +83,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
-    void AllocateSurfaceWindows(int NumSurfaces);
+    void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 

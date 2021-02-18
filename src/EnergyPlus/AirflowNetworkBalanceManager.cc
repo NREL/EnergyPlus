@@ -240,7 +240,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
             }
-            //			Revised to meet heat exchanger requirement
+            //            Revised to meet heat exchanger requirement
             if ((FanMassFlowRate > VerySmallMassFlow) && (!FirstHVACIteration)) {
                 if (AFNSupplyFanType == FanType_SimpleOnOff && FanOperModeCyc == CycFanCycCoil) {
                     AirflowNetworkFanActivated = true;
@@ -4123,7 +4123,7 @@ namespace AirflowNetworkBalanceManager {
             AirflowNetworkNumOfLinks = NumOfLinksMultiZone + state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks;
             AirflowNetworkLinkageData.allocate(state.dataAirflowNetworkBalanceManager->DisSysNumOfLinks + AirflowNetworkNumOfSurfaces);
         } else { // Multizone + IntraZone only
-            //	AirflowNetworkLinkageData.allocate( AirflowNetworkNumOfSurfaces );
+            //    AirflowNetworkLinkageData.allocate( AirflowNetworkNumOfSurfaces );
             AirflowNetworkLinkageData.allocate(AirflowNetworkNumOfLinks);
         }
 
@@ -5951,7 +5951,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 } else {
-                    //	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+                    //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
                     TempSolveRoot::SolveRoot(state,
                         ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par);
@@ -6031,7 +6031,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                     }
                 } else {
-                    //	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
+                    //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
                     TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par);
                     if (SolFla == -1) {
@@ -6713,7 +6713,7 @@ namespace AirflowNetworkBalanceManager {
                                           "and stack effect).");
                         ShowContinueError(state, "Please check wind speed or reduce values of \"Window/Door Opening Factor, or Crack Factor\" defined in "
                                           "AirflowNetwork:MultiZone:Surface objects.");
-                        //					ShowFatalError(state,  "AirflowNetwork: The previous error causes termination." );
+                        //                    ShowFatalError(state,  "AirflowNetwork: The previous error causes termination." );
                     }
                 }
 
@@ -9629,19 +9629,19 @@ namespace AirflowNetworkBalanceManager {
             if (!NodeFound(i)) {
                 // Check if this node is the OA relief node. For the time being, OA relief node is not used
                 if (GetNumOAMixers(state) > 1) {
-                    //						ShowSevereError(state,  RoutineName + "Only one OutdoorAir:Mixer is allowed in the
-                    // AirflowNetwork model." ); 						ErrorsFound = true;
+                    //                        ShowSevereError(state,  RoutineName + "Only one OutdoorAir:Mixer is allowed in the
+                    // AirflowNetwork model." );                         ErrorsFound = true;
                     int OAFanNum;
                     int OARelNum;
                     int OAMixerNum;
 
                     for (OAFanNum = 1; OAFanNum <= state.dataAirflowNetworkBalanceManager->NumOfOAFans; ++OAFanNum) {
                         DisSysCompOutdoorAirData(OAFanNum).InletNode = GetOAMixerInletNodeNumber(state, DisSysCompOutdoorAirData(OAFanNum).OAMixerNum);
-                        //							NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
+                        //                            NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
                     }
                     for (OARelNum = 1; OARelNum <= state.dataAirflowNetworkBalanceManager->NumOfReliefFans; ++OARelNum) {
                         DisSysCompReliefAirData(OARelNum).OutletNode = GetOAMixerInletNodeNumber(state, DisSysCompReliefAirData(OARelNum).OAMixerNum);
-                        //							NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
+                        //                            NodeFound( DisSysCompOutdoorAirData( OAFanNum ).InletNode ) = true;
                     }
                     // Check NodeFound status
                     for (OAMixerNum = 1; OAMixerNum <= GetNumOAMixers(state); ++OAMixerNum) {

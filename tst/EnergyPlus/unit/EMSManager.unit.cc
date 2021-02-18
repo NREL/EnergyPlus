@@ -1597,7 +1597,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
-    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
     state->dataDaylightingData->ZoneDaylight.allocate(1);

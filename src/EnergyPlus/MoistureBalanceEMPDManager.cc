@@ -575,7 +575,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         RH_surf_layer_tmp =
             RH_surf_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
 
-        //	RH_surf_layer = RH_surf_layer_tmp;
+        //    RH_surf_layer = RH_surf_layer_tmp;
 
         if (RH_surf_layer_old < RH_deep_layer_old && RH_surf_layer_old < RHZone) {
             if (RHZone > RH_deep_layer_old) {

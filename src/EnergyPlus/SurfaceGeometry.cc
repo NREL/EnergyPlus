@@ -110,21 +110,21 @@ namespace SurfaceGeometry {
 
     static std::string const BlankString;
 
-    void AllocateSurfaceWindows(int NumSurfaces) {
-        SurfWinFrameQRadOutAbs.dimension(NumSurfaces, 0);
-        SurfWinFrameQRadInAbs.dimension(NumSurfaces, 0);
-        SurfWinDividerQRadOutAbs.dimension(NumSurfaces, 0);
-        SurfWinDividerQRadInAbs.dimension(NumSurfaces, 0);
-        SurfWinExtBeamAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinExtDiffAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinIntBeamAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinIntSWAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinInitialDifSolAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinIntLWAbsByShade.dimension(NumSurfaces, 0);
-        SurfWinConvHeatFlowNatural.dimension(NumSurfaces, 0);
-        SurfWinConvHeatGainToZoneAir.dimension(NumSurfaces, 0);
-        SurfWinRetHeatGainToZoneAir.dimension(NumSurfaces, 0);
-        SurfWinDividerHeatGain.dimension(NumSurfaces, 0);
+    void AllocateSurfaceWindows(EnergyPlusData &state, int NumSurfaces) {
+        state.dataSurface->SurfWinFrameQRadOutAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameQRadInAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerQRadOutAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerQRadInAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinExtBeamAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinExtDiffAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinIntBeamAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinIntSWAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInitialDifSolAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinIntLWAbsByShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinConvHeatFlowNatural.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinConvHeatGainToZoneAir.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinRetHeatGainToZoneAir.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerHeatGain.dimension(NumSurfaces, 0);
         SurfWinBlTsolBmBm.dimension(NumSurfaces, 0);
         SurfWinBlTsolBmDif.dimension(NumSurfaces, 0);
         SurfWinBlTsolDifDif.dimension(NumSurfaces, 0);
@@ -177,7 +177,7 @@ namespace SurfaceGeometry {
         SurfWinRhoFloorWall.dimension(NumSurfaces, 0);
         SurfWinFractionUpgoing.dimension(NumSurfaces, 0);
         SurfWinVisTransRatio.dimension(NumSurfaces, 0);
-        SurfWinIRfromParentZone.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinIRfromParentZone.dimension(NumSurfaces, 0);
         SurfWinFrameArea.dimension(NumSurfaces, 0);
         SurfWinFrameConductance.dimension(NumSurfaces, 0);
         SurfWinFrameSolAbsorp.dimension(NumSurfaces, 0);
@@ -1164,7 +1164,7 @@ namespace SurfaceGeometry {
 
         SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
 
-        AllocateSurfaceWindows(state.dataSurface->TotSurfaces);
+        AllocateSurfaceWindows(state, state.dataSurface->TotSurfaces);
 
         // add the "need to add" surfaces
         // Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
@@ -6428,13 +6428,13 @@ namespace SurfaceGeometry {
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
             Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs));
-            //			AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs
+            //            AvgAzimuth = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Azimuth * Surface( ExtVentedCavity( Item ).SurfPtrs
             //).Area
             //)
             ///  sum(  Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgAzimuth = sum_product_sub(Surface, &SurfaceData::Azimuth, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            //			AvgTilt = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Tilt * Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ) /
+            //            AvgTilt = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Tilt * Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ) /
             // sum(  Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             AvgTilt = sum_product_sub(Surface, &SurfaceData::Tilt, &SurfaceData::Area, ExtVentedCavity(Item).SurfPtrs) /
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
@@ -6459,7 +6459,7 @@ namespace SurfaceGeometry {
             ExtVentedCavity(Item).Azimuth = AvgAzimuth;
 
             // find area weighted centroid.
-            //			ExtVentedCavity( Item ).Centroid.z = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Centroid.z * Surface(
+            //            ExtVentedCavity( Item ).Centroid.z = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Centroid.z * Surface(
             // ExtVentedCavity(  Item
             //).SurfPtrs ).Area ) / sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
             ExtVentedCavity(Item).Centroid.z =
@@ -6485,7 +6485,7 @@ namespace SurfaceGeometry {
 
             // Fill out data we now know
             // sum areas of HT surface areas
-            //			ExtVentedCavity( Item ).ProjArea = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array
+            //            ExtVentedCavity( Item ).ProjArea = sum( Surface( ExtVentedCavity( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array
             // subscript  usage: Replaced by below
             ExtVentedCavity(Item).ProjArea = surfaceArea;
             if (ExtVentedCavity(Item).ProjArea <= 0.0) {

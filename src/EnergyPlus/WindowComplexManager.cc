@@ -857,7 +857,7 @@ namespace WindowComplexManager {
         using namespace Vectors;
 
 //       ISurf(0);     // Index for sorting thru Surface array
-//                     //		static int IConst( 0 ); // Index for accessing Construct array
+//                     //        static int IConst( 0 ); // Index for accessing Construct array
 //       IState(0);    // Index identifying the window state for a particular window
 //       IWind(0);     // Index identifying a window in the WindowList
 //       NumStates(0); // local copy of no of states
@@ -2647,7 +2647,7 @@ namespace WindowComplexManager {
         Real64 CondHeatGainShade;   // Conduction through shade/blind, outside to inside (W)
 
         Real64 ShGlReflFacIR; // Factor for long-wave inter-reflection between shade/blind and adjacent glass
-                              //		Real64 RhoGlIR1; // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
+                              //        Real64 RhoGlIR1; // Long-wave reflectance of glass surface facing shade/blind; 1=exterior shade/blind,
         Real64 RhoGlIR2;
         //  2=interior shade/blind
         Real64 RhoShIR1; // Long-wave reflectance of shade/blind surface facing glass; 1=interior shade/blind,
@@ -2673,7 +2673,7 @@ namespace WindowComplexManager {
         Real64 CpAirOutlet;           // Heat capacity of air from window gap (J/kg-K)
         Real64 CpAirZone;             // Heat capacity of zone air (J/kg-K)
         Real64 ConvHeatGainToZoneAir; // Convective heat gain to zone air from window gap airflow (W)
-                                      //		int ConstrNumSh; // Construction number with shading device
+                                      //        int ConstrNumSh; // Construction number with shading device
         static int CalcSHGC(0);       // SHGC calculations are not necessary for E+ run
         static int NumOfIterations(0);
 
@@ -2837,7 +2837,7 @@ namespace WindowComplexManager {
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
                 //  ! The IR radiance of this window's "exterior" surround is the IR radiance
                 //  ! from surfaces and high-temp radiant sources in the adjacent zone
-                outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
+                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
                         QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
@@ -2889,7 +2889,7 @@ namespace WindowComplexManager {
 
             // indoor mean radiant temperature.
             // IR incident on window from zone surfaces and high-temp radiant sources
-            rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
+            rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                    QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
             trmin = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
@@ -3297,9 +3297,9 @@ namespace WindowComplexManager {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
 
-                SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
+                state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
                 state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
-                SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Window heat gain from glazing and shade/blind to zone. Consists of transmitted solar, convection
                 //   from air exiting gap, convection from zone-side of shade/blind, net IR to zone from shade and net IR to
                 //   zone from the glass adjacent to the shade/blind (zero if shade/blind IR transmittance is zero).
@@ -3343,7 +3343,7 @@ namespace WindowComplexManager {
                     ConvHeatFlowNatural = -qv(2) * height * width; // qv(1) is exterior environment
 
                     state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
-                    SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                    state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
             }
 
@@ -3361,7 +3361,7 @@ namespace WindowComplexManager {
                 ConvHeatFlowForced = sum(qv); // TODO.  figure forced ventilation heat flow in Watts
 
                 state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
-                SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
@@ -3376,11 +3376,11 @@ namespace WindowComplexManager {
                     CpAirZone = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
-                        SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
+                        state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
                     } else {
-                        SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
+                        state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                     }
                 }
                 // For AirflowDestination = ReturnAir in a controlled (i.e., conditioned) zone with return air, see CalcZoneLeavingConditions
@@ -3413,9 +3413,9 @@ namespace WindowComplexManager {
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) {
-                state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
+                state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) = (state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) + state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
-                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfNum) = state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
             if (state.dataEnvrn->SunIsUp) {
                 state.dataSurface->SurfWinSysSolTransmittance(SurfNum) =
