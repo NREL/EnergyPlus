@@ -81,6 +81,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -2880,3 +2881,160 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
     EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatCurve, 0, 1e-5);
     }
+
+TEST_F(EnergyPlusFixture, SolveForWindowTemperaturesTest)
+{
+    // Compare simulation results between LU decomposition and new solver of tridiagonal matrix 
+    Array1D_int indx(10);          // Vector of row permutations in LU decomposition //Tuned Made static
+    Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface //Tuned Made static
+    Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface //Tuned Made static
+    Real64 d;
+
+    Aface = 0.0;
+    Bface = 0.0;
+
+    Bface(1) = 4164.271745;
+    Bface(2) = 6.446999024;
+    Bface(3) = 4.66549098;
+    Bface(4) = 1296.099719;
+
+    Aface(1, 1) = 313.724200883726;
+    Aface(2, 1) = -300;
+
+    Aface(1, 2) = -300;
+    Aface(2, 2) = 303.208159646577;
+    Aface(3, 2) = -3.18639430585577;
+
+    Aface(2, 3) = -3.20815964657744;
+    Aface(3, 3) = 303.186394305855;
+    Aface(4, 3) = -300;
+
+    Aface(3, 4) = -300;
+    Aface(4, 4) = 304.370411019141;
+
+    int N = 4;
+    Array1D<Real64> A(6);
+    Array1D<Real64> B(6);
+    Array1D<Real64> C(6);
+    Array1D<Real64> D(6);
+    Array1D<Real64> X(6);
+
+    A(1) = 0.0;
+    A(2) = Aface(2, 1);
+    //    A(3) = Aface(3, 2);
+    A(3) = Aface(2, 3);
+    A(4) = Aface(4, 3);
+
+    B(1) = Aface(1, 1);
+    B(2) = Aface(2, 2);
+    B(3) = Aface(3, 3);
+    B(4) = Aface(4, 4);
+
+    C(1) = Aface(1, 2);
+    //    C(2) = Aface(2, 3);
+    C(2) = Aface(3, 2);
+    C(3) = Aface(3, 4);
+    C(4) = 0.0;
+
+    D(1) = Bface(1);
+    D(2) = Bface(2);
+    D(3) = Bface(3);
+    D(4) = Bface(4);
+
+    LUdecomposition(*state, Aface, 4, indx, d); // Note that these routines change Aface;
+    LUsolution(Aface, 4, indx, Bface);  // face temperatures are returned in Bface
+
+    WindowManager::TriDiagonal_Matrix_Algorithm(N, A, B, C, D, X);
+
+    EXPECT_NEAR(Bface(1), X(1), 1e-5);
+    EXPECT_NEAR(Bface(2), X(2), 1e-5);
+    EXPECT_NEAR(Bface(3), X(3), 1e-5);
+    EXPECT_NEAR(Bface(4), X(4), 1e-5);
+
+    // 6x6 TriDiagonal
+    Bface(1) = 8.0;
+    Bface(2) = 74.0;
+    Bface(3) = 182.0;
+    Bface(4) = 332.0;
+    Bface(5) = 524.0;
+    Bface(6) = 462.0;
+
+    Aface(1, 1) = 1.0;
+    Aface(2, 1) = 2.0;
+    Aface(3, 1) = 0.0;
+    Aface(4, 1) = 0.0;
+    Aface(5, 1) = 0.0;
+    Aface(6, 1) = 0.0;
+
+    Aface(1, 2) = 7.0;
+    Aface(2, 2) = 8.0;
+    Aface(3, 2) = 9.0;
+    Aface(4, 2) = 0.0;
+    Aface(5, 2) = 0.0;
+    Aface(6, 2) = 0.0;
+    Aface(1, 3) = 0.0;
+    Aface(2, 3) = 14.0;
+    Aface(3, 3) = 15.0;
+    Aface(4, 3) = 16.0;
+    Aface(5, 3) = 0.0;
+    Aface(6, 3) = 0.0;
+    Aface(1, 4) = 0.0;
+    Aface(2, 4) = 0.0;
+    Aface(3, 4) = 21.0;
+    Aface(4, 4) = 22.0;
+    Aface(5, 4) = 23.0;
+    Aface(6, 4) = 0.0;
+    Aface(1, 5) = 0.0;
+    Aface(2, 5) = 0.0;
+    Aface(3, 5) = 0.0;
+    Aface(4, 5) = 28.0;
+    Aface(5, 5) = 29.0;
+    Aface(6, 5) = 30.0;
+    Aface(1, 6) = 0.0;
+    Aface(2, 6) = 0.0;
+    Aface(3, 6) = 0.0;
+    Aface(4, 6) = 0.0;
+    Aface(5, 6) = 35.0;
+    Aface(6, 6) = 36.0;
+
+    LUdecomposition(*state, Aface, 6, indx, d); // Note that these routines change Aface;
+    LUsolution(Aface, 6, indx, Bface);  // face temperatures are returned in Bface
+
+    A(1) = 0.0;
+    A(2) = 7.0;
+    A(3) = 14.0;
+    A(4) = 21.0;
+    A(5) = 28.0;
+    A(6) = 35.0;
+
+    B(1) = 1.0;
+    B(2) = 8.0;
+    B(3) = 15.0;
+    B(4) = 22.0;
+    B(5) = 29.0;
+    B(6) = 36.0;
+
+    C(1) = 2.0;
+    C(2) = 9.0;
+    C(3) = 16.0;
+    C(4) = 23.0;
+    C(5) = 30.0;
+    C(6) = 0.0;
+
+    D(1) = 8.0;
+    D(2) = 74.0;
+    D(3) = 182.0;
+    D(4) = 332.0;
+    D(5) = 524.0;
+    D(6) = 462.0;
+
+    N = 6;
+
+    WindowManager::TriDiagonal_Matrix_Algorithm(N, A, B, C, D, X);
+    EXPECT_NEAR(Bface(1), X(1), 1e-5);
+    EXPECT_NEAR(Bface(2), X(2), 1e-5);
+    EXPECT_NEAR(Bface(3), X(3), 1e-5);
+    EXPECT_NEAR(Bface(4), X(4), 1e-5);
+    EXPECT_NEAR(Bface(5), X(5), 1e-5);
+    EXPECT_NEAR(Bface(6), X(6), 1e-5);
+}
