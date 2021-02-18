@@ -452,7 +452,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(15:16)=InArgs(32:33)
                 CurArgs = 16
 
-                CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                CALL GetNewObjectDefInIDD('ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
                 POutArgs(2:4) = InArgs(5:7)
                 POutArgs(5:8) = InArgs(9:12)
@@ -467,7 +467,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (InArgs(34) == Blank) THEN
                   CurVarIterator = 19
                 END IF
-                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW:DESIGN',CurVarIterator,POutArgs,FldNames,FldUnits)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design',CurVarIterator,POutArgs,FldNames,FldUnits)
                 nodiff=.false.
 
               CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
@@ -479,9 +479,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(7:10)=InArgs(12:15)
                 OutArgs(11:22)=InArgs(18:29)
                 OutArgs(23:24)=InArgs(32:33)
-                CurArgs = 24 !CurArgs - 9
+                CurArgs = 24
 
-                CALL GetNewObjectDefInIDD('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                CALL GetNewObjectDefInIDD('ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
                 POutArgs(2:4) = InArgs(5:7)
                 POutArgs(5:7) = InArgs(9:11)
@@ -494,7 +494,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 IF (InArgs(34) == Blank) THEN
                   CurVarIterator = 11
                 END IF
-                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW:DESIGN',CurVarIterator,POutArgs,FldNames,FldUnits)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design',CurVarIterator,POutArgs,FldNames,FldUnits)
                 nodiff=.false.
 
               CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER')
@@ -506,7 +506,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(9)=InArgs(11)
                 OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
                 CurArgs = CurArgs - 5
-                nodiff=.false.
 
                 CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
@@ -526,7 +525,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(9)=InArgs(11)
                 OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
                 CurArgs = CurArgs - 5
-                nodiff=.false.
 
                 CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
