@@ -2300,7 +2300,7 @@ namespace CurveManager {
                                   Optional<Real64 const> Var3, // 3rd independent variable
                                   Optional<Real64 const> Var4,  // 4th independent variable
                                   Optional<Real64 const> Var5,  // 5th independent variable
-                                  Optional<Real64 const> Var6  // 6th independent variable
+                                  [[maybe_unused]] Optional<Real64 const> Var6  // 6th independent variable
     )
     {
 
@@ -2336,7 +2336,7 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
+        //Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
