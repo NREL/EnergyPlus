@@ -54,6 +54,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import shlex
+import tempfile
 import unittest
 
 from pyenergyplus.api import EnergyPlusAPI
@@ -81,9 +82,10 @@ class TestAPISysExit(unittest.TestCase):
         """
         Test for #8483 - system exit called when energyplus can't run
         """
-        cmd_args = shlex.split('-d out -w empty.epw doesntexist.idf')
-        return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
-        self.assertEqual(return_code, 1)
+        with tempfile.TemporaryDirectory() as tempdir:
+            cmd_args = shlex.split(f'-d {tempdir} -w empty.epw doesntexist.idf')
+            return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
+            self.assertEqual(return_code, 1)
 
 
 if __name__ == '__main__':
