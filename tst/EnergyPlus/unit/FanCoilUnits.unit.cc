@@ -122,7 +122,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -412,7 +412,6 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     {
@@ -433,7 +432,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -725,7 +724,6 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     {
@@ -746,7 +744,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1133,7 +1131,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1420,7 +1418,6 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     {
@@ -1441,7 +1438,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1793,7 +1790,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2174,7 +2171,6 @@ namespace EnergyPlus {
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
         Zone.deallocate();
-        CoilNames.clear();
     }
 
     Real64 ResidualFancoil(EnergyPlusData &state, Real64 const mdot,
@@ -2211,7 +2207,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2496,7 +2492,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2901,7 +2897,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3305,7 +3301,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3672,7 +3668,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
@@ -4039,7 +4035,7 @@ namespace EnergyPlus {
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = 1.20;
         state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-        NumCoils = 0;
+        state->dataGlobalNames->NumCoils = 0;
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;

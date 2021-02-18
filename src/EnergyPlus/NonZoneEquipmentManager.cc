@@ -114,7 +114,7 @@ namespace NonZoneEquipmentManager {
         static int NumOfWaterHeater;
         static bool CountNonZoneEquip(true);
 
-        // FLOW:
+
         if (CountNonZoneEquip) {
             NumOfWaterHeater = inputProcessor->getNumObjectsFound(state, "WaterHeater:Mixed") + inputProcessor->getNumObjectsFound(state, "WaterHeater:Stratified");
             CountNonZoneEquip = false;

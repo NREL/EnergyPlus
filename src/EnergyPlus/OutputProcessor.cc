@@ -5020,6 +5020,9 @@ namespace OutputProcessor {
         case OutputProcessor::Unit::clo:
             return "clo";
             break;
+        case OutputProcessor::Unit::W_mK:
+            return "W/m-K";
+            break;
         case OutputProcessor::Unit::W_K:
             return "W/K";
             break;
@@ -5173,6 +5176,8 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::J_m2;
         } else if (unitUpper == "CLO") {
             return OutputProcessor::Unit::clo;
+        } else if (unitUpper == "W/M-K") {
+            return OutputProcessor::Unit::W_mK;
         } else if (unitUpper == "W/K") {
             return OutputProcessor::Unit::W_K;
         } else if (unitUpper == "K/W") {

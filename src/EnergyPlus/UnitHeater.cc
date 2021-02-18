@@ -158,7 +158,7 @@ namespace UnitHeater {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UnitHeatNum; // index of unit heater being simulated
 
-        // FLOW:
+
         if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
             GetUnitHeaterInput(state);
             state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
@@ -271,7 +271,7 @@ namespace UnitHeater {
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
 
-        // FLOW:
+
 
         // Figure out how many unit heaters there are in the input file
         CurrentModuleObject = state.dataUnitHeaters->cMO_UnitHeater;
@@ -720,7 +720,7 @@ namespace UnitHeater {
         Real64 SteamDensity;
         Real64 rho; // local fluid density
         bool errFlag;
-        // FLOW:
+
 
         // Do the one time initializations
         if (state.dataUnitHeaters->InitUnitHeaterOneTimeFlag) {
@@ -1695,7 +1695,7 @@ namespace UnitHeater {
         Real64 mdot;         // local temporary for fluid mass flow rate
         int FanOpMode;       // Fan operting mode or fan type
         Real64 PartLoadFrac; // part-load ratio
-        // FLOW:
+
 
         InletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
         OutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;

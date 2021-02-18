@@ -45,8 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <map>
-
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -1247,7 +1245,7 @@ namespace EnergyPlus::PluginManagement {
     }
 #endif
 
-    void PluginManager::updatePluginValues(EnergyPlusData &state)
+    void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         for (auto &trend : state.dataPluginManager->trends) {

@@ -805,7 +805,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         ShadeV.allocate(TotSurfaces);
         for (auto &e : ShadeV)
@@ -8263,7 +8263,7 @@ namespace SurfaceGeometry {
         // shade or blind
         int Found;
 
-        // FLOW:
+
         // Get the total number of window shading control blocks
         cCurrentModuleObject = "WindowShadingControl";
         TotWinShadingControl = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -8787,7 +8787,7 @@ namespace SurfaceGeometry {
         int SurfNum;          // Surface number
         int MatNum;           // Material number
 
-        // FLOW:
+
 
         // Get the total number of storm window input objects
         cCurrentModuleObject = "WindowProperty:StormWindow";

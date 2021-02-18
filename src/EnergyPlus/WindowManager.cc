@@ -1681,7 +1681,7 @@ namespace WindowManager {
         int MatNum;           // Material number
         int DifOverrideCount; // Count the number of SolarDiffusing material overrides
 
-        // FLOW
+
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).FromWindow5DataFile) continue;
@@ -2035,7 +2035,7 @@ namespace WindowManager {
         int i;       // Wavelength counter
         Real64 esol; // Solar spectrum value times delta wavelength
 
-        // FLOW
+
 
         up = 0.0;
         down = 0.0;
@@ -6101,7 +6101,7 @@ namespace WindowManager {
         Real64 const DPhiR(10.0 * DataGlobalConstants::DegToRadians); // Half of 10-deg incidence angle increment (radians)
         int IPhi;                                                     // Incidence angle counter
 
-        // FLOW
+
 
         DiffuseAverage = 0.0;
         for (IPhi = 1; IPhi <= 9; ++IPhi) {

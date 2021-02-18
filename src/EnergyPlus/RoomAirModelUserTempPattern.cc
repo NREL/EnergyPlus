@@ -856,7 +856,7 @@ namespace RoomAirModelUserTempPattern {
         Real64 ZoneMult;
         Real64 SumRetAirLatentGainRate;
 
-        // FLOW:
+
 
         SurfFirst = Zone(ZoneNum).SurfaceFirst;
         SurfLast = Zone(ZoneNum).SurfaceLast;
