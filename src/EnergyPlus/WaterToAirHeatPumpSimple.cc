@@ -80,6 +80,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/CurveManager.hh>
 
 namespace EnergyPlus {
 
@@ -280,6 +281,7 @@ namespace WaterToAirHeatPumpSimple {
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueCoilName;
         using namespace OutputReportPredefined;
+        using CurveManager::GetCurveIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
@@ -363,24 +365,39 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal = NumArray(3);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens = NumArray(4);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPCool = NumArray(5);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1 = NumArray(6);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap2 = NumArray(7);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap3 = NumArray(8);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap4 = NumArray(9);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap5 = NumArray(10);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1 = NumArray(11);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap2 = NumArray(12);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap3 = NumArray(13);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap4 = NumArray(14);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap5 = NumArray(15);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6 = NumArray(16);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower1 = NumArray(17);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower2 = NumArray(18);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower3 = NumArray(19);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower4 = NumArray(20);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower5 = NumArray(21);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(22);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(23);
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex = GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex = GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex = GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Total Cooling Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,
+                                                            {5},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Sensible Cooling Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Cooling Power Consumption Curve Name");                                                       
+            }
+            
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(6);
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(7);
             DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
             DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
@@ -488,16 +505,26 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = NumArray(2);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapHeat = NumArray(3);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPHeat = NumArray(4);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap1 = NumArray(5);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap2 = NumArray(6);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap3 = NumArray(7);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap4 = NumArray(8);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap5 = NumArray(9);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower1 = NumArray(10);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower2 = NumArray(11);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower3 = NumArray(12);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower4 = NumArray(13);
-            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower5 = NumArray(14);
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex = GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex = GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Heating Capacity Curve Name");                                                       
+            }
+            if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex,
+                                                            {4},
+                                                            RoutineName,
+                                                            CurrentModuleObject,
+                                                            state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
+                                                            "Heating Power Consumption Curve Name");                                                       
+            }
 
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(state,
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
@@ -1103,6 +1130,7 @@ namespace WaterToAirHeatPumpSimple {
         using namespace OutputReportPredefined;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using CurveManager::CurveValue;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1136,17 +1164,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 TotCapTempModFac = 1.0;
         Real64 SensCapAtPeak;
         Real64 SensCapTempModFac;
-        Real64 TotalCapCoeff1; // 1st coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff2; // 2nd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff3; // 3rd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff4; // 4th coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff5; // 5th coefficient of the total cooling capacity performance curve
-        Real64 SensCapCoeff1;  // 1st coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff2;  // 2nd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff3;  // 3rd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff4;  // 4th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff5;  // 5th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff6;  // 6th coefficient of the sensible cooling capacity performance curve
         int TimeStepNumAtMax;
         int DDNum;
         int PltSizNum;
@@ -1327,11 +1344,6 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                        TotalCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1;
-                        TotalCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap2;
-                        TotalCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap3;
-                        TotalCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap4;
-                        TotalCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap5;
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1361,8 +1373,8 @@ namespace WaterToAirHeatPumpSimple {
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
-                                           (1.0 * TotalCapCoeff5);
+                        TotCapTempModFac = CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
+
                         if (TotCapTempModFac > 0.0) {
                             RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
                         } else {
@@ -1417,11 +1429,6 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
-                        TotalCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1;
-                        TotalCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap2;
-                        TotalCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap3;
-                        TotalCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap4;
-                        TotalCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap5;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
                             case DataAirSystems::structArrayLegacyFanModels: {
@@ -1450,8 +1457,7 @@ namespace WaterToAirHeatPumpSimple {
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        TotCapTempModFac = TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (1.0 * TotalCapCoeff4) +
-                                           (1.0 * TotalCapCoeff5);
+                        TotCapTempModFac = CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex, ratioTWB, ratioTS, 1.0, 1.0);
                         if (TotCapTempModFac > 0.0) {
                             RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
                         } else {
@@ -1519,12 +1525,6 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
-                        SensCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1;
-                        SensCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap2;
-                        SensCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap3;
-                        SensCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap4;
-                        SensCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap5;
-                        SensCapCoeff6 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6;
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1558,8 +1558,8 @@ namespace WaterToAirHeatPumpSimple {
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
-                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
+                        
+                        SensCapTempModFac = CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);
                         RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
                     } else {
                         RatedCapCoolSensDes = 0.0;
@@ -1606,12 +1606,6 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                         MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = PsyHFnTdbW(SupTemp, MixHumRat);
-                        SensCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1;
-                        SensCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap2;
-                        SensCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap3;
-                        SensCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap4;
-                        SensCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap5;
-                        SensCapCoeff6 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6;
                         Real64 FanCoolLoad = 0.0;
                         if (DataFanEnumType > -1 && DataFanIndex > -1) { // add fan heat to coil load
                             switch (DataFanEnumType) {
@@ -1645,8 +1639,7 @@ namespace WaterToAirHeatPumpSimple {
                         ratioTWB = (MixWetBulb + 273.15) / 283.15;
                         // rated condenser water inlet temperature of 85F
                         ratioTS = (((85.0 - 32.0) / 1.8) + 273.15) / 283.15;
-                        SensCapTempModFac = SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
-                                            (1.0 * SensCapCoeff5) + (1.0 * SensCapCoeff6);
+                        SensCapTempModFac = CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,ratioTDB, ratioTWB, ratioTS, 1.0, 1.0);;
                         if (SensCapTempModFac > 0.0) {
                             RatedCapCoolSensDes = SensCapAtPeak / SensCapTempModFac;
                         } else {
@@ -1784,7 +1777,7 @@ namespace WaterToAirHeatPumpSimple {
                                       format("Rated Total Cooling Capacity    = {:.2T} W",
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal));
                     ShowContinueError(state, "See eio file for further details.");
-                    ShowContinueError(state, "Check Total and Sensible Cooling Capacity Coefficients to ensure they are accurate.");
+                    ShowContinueError(state, "Check Total and Sensible Cooling Capacity Coefficients in curves to ensure they are accurate.");
                     ShowContinueError(state, "Check Zone and System Sizing objects to verify sizing inputs.");
                     ShowContinueError(state, "Sizing statistics:");
                     ShowContinueError(state, format("Entering Air Dry-Bulb Temperature = {:.3T} C", MixTemp));
@@ -2064,7 +2057,7 @@ namespace WaterToAirHeatPumpSimple {
         // This subroutine is for simulating the cooling mode of the Water to Air HP Simple
 
         // METHODOLOGY EMPLOYED:
-        // Simulate the heat pump performance using the coefficients and rated conditions
+        // Simulate the heat pump performance using the coefficients in quadlinear and quintlinear curves and rated conditions
         // If the LatDegradModelSimFlag is enabled, the coil will be simulated twice:
         // (1)first simulation at the rated conditions (2) second simulation at the
         // actual operating conditions. Then call CalcEffectiveSHR and the effective SHR
@@ -2099,6 +2092,7 @@ namespace WaterToAirHeatPumpSimple {
         using Psychrometrics::PsyTwbFnTdbWPb;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
+        using CurveManager::CurveValue;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2121,22 +2115,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 CoolPowerRated;        // Rated Cooling Power Input[W]
         Real64 AirVolFlowRateRated;   // Rated Air Volumetric Flow Rate [m3/s]
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
-        Real64 TotalCapCoeff1;        // 1st coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff2;        // 2nd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff3;        // 3rd coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff4;        // 4th coefficient of the total cooling capacity performance curve
-        Real64 TotalCapCoeff5;        // 5th coefficient of the total cooling capacity performance curve
-        Real64 SensCapCoeff1;         // 1st coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff2;         // 2nd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff3;         // 3rd coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff4;         // 4th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff5;         // 5th coefficient of the sensible cooling capacity performance curve
-        Real64 SensCapCoeff6;         // 6th coefficient of the sensible cooling capacity performance curve
-        Real64 CoolPowerCoeff1;       // 1st coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff2;       // 2nd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff3;       // 3rd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff4;       // 4th coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff5;       // 5th coefficient of the cooling power consumption curve
         Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
         Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
 
@@ -2185,22 +2163,6 @@ namespace WaterToAirHeatPumpSimple {
         AirVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate;
         WaterVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate;
 
-        TotalCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap1;
-        TotalCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap2;
-        TotalCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap3;
-        TotalCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap4;
-        TotalCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCap5;
-        SensCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap1;
-        SensCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap2;
-        SensCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap3;
-        SensCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap4;
-        SensCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap5;
-        SensCapCoeff6 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCap6;
-        CoolPowerCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower1;
-        CoolPowerCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower2;
-        CoolPowerCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower3;
-        CoolPowerCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower4;
-        CoolPowerCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPower5;
         Twet_Rated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Twet_Rated;
         Gamma_Rated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Gamma_Rated;
 
@@ -2276,12 +2238,9 @@ namespace WaterToAirHeatPumpSimple {
                 ratioVS = 0.0;
             }
 
-            state.dataWaterToAirHeatPumpSimple->QLoadTotal = TotalCapRated * (TotalCapCoeff1 + (ratioTWB * TotalCapCoeff2) + (ratioTS * TotalCapCoeff3) + (ratioVL * TotalCapCoeff4) +
-                                          (ratioVS * TotalCapCoeff5));
-            state.dataWaterToAirHeatPumpSimple->QSensible = SensCapRated * (SensCapCoeff1 + (ratioTDB * SensCapCoeff2) + (ratioTWB * SensCapCoeff3) + (ratioTS * SensCapCoeff4) +
-                                        (ratioVL * SensCapCoeff5) + (ratioVS * SensCapCoeff6));
-            state.dataWaterToAirHeatPumpSimple->Winput = CoolPowerRated * (CoolPowerCoeff1 + (ratioTWB * CoolPowerCoeff2) + (ratioTS * CoolPowerCoeff3) + (ratioVL * CoolPowerCoeff4) +
-                                       (ratioVS * CoolPowerCoeff5));
+            state.dataWaterToAirHeatPumpSimple->QLoadTotal = TotalCapRated * CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).TotalCoolCapCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
+            state.dataWaterToAirHeatPumpSimple->QSensible = SensCapRated * CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).SensCoolCapCurveIndex,ratioTDB, ratioTWB, ratioTS, ratioVL, ratioVS);
+            state.dataWaterToAirHeatPumpSimple->Winput =  CoolPowerRated * CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).CoolPowCurveIndex, ratioTWB, ratioTS, ratioVL, ratioVS);
 
             // Check if the Sensible Load is greater than the Total Cooling Load
             if (state.dataWaterToAirHeatPumpSimple->QSensible > state.dataWaterToAirHeatPumpSimple->QLoadTotal) {
@@ -2424,7 +2383,7 @@ namespace WaterToAirHeatPumpSimple {
         // This subroutine is for simulating the heating mode of the Water to Air HP Simple
 
         // METHODOLOGY EMPLOYED:
-        // Simulate the heat pump performance using the coefficients and rated conditions
+        // Simulate the heat pump performance using the coefficients in quadlinear and quintlinear curves and rated conditions
         // Finally, adjust the heat pump outlet conditions based on the PartLoadRatio
         // and RuntimeFrac.
 
@@ -2449,6 +2408,7 @@ namespace WaterToAirHeatPumpSimple {
         using Psychrometrics::PsyTwbFnTdbWPb;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
+        using CurveManager::CurveValue;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2470,16 +2430,6 @@ namespace WaterToAirHeatPumpSimple {
         Real64 HeatPowerRated;        // Rated Heating Power Input[W]
         Real64 AirVolFlowRateRated;   // Rated Air Volumetric Flow Rate [m3/s]
         Real64 WaterVolFlowRateRated; // Rated Water Volumetric Flow Rate [m3/s]
-        Real64 HeatCapCoeff1;         // 1st coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff2;         // 2nd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff3;         // 3rd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff4;         // 4th coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff5;         // 5th coefficient of the heating capacity performance curve
-        Real64 HeatPowerCoeff1;       // 1st coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff2;       // 2nd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff3;       // 3rd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff4;       // 4th coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff5;       // 5th coefficient of the heating power consumption curve
 
         //  REAL(r64) :: PartLoadRatio          ! Part load ratio
         Real64 ratioTDB; // Ratio of the inlet air dry bulb temperature to the rated conditions
@@ -2496,16 +2446,6 @@ namespace WaterToAirHeatPumpSimple {
         HeatPowerRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedPowerHeat;
         AirVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate;
         WaterVolFlowRateRated = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate;
-        HeatCapCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap1;
-        HeatCapCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap2;
-        HeatCapCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap3;
-        HeatCapCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap4;
-        HeatCapCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCap5;
-        HeatPowerCoeff1 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower1;
-        HeatPowerCoeff2 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower2;
-        HeatPowerCoeff3 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower3;
-        HeatPowerCoeff4 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower4;
-        HeatPowerCoeff5 = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPower5;
 
         state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirMassFlowRate;
         state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).InletAirDBTemp;
@@ -2545,11 +2485,9 @@ namespace WaterToAirHeatPumpSimple {
             ratioVS = 0.0;
         }
 
-        state.dataWaterToAirHeatPumpSimple->QLoadTotal = HeatCapRated *
-                     (HeatCapCoeff1 + (ratioTDB * HeatCapCoeff2) + (ratioTS * HeatCapCoeff3) + (ratioVL * HeatCapCoeff4) + (ratioVS * HeatCapCoeff5));
+        state.dataWaterToAirHeatPumpSimple->QLoadTotal = HeatCapRated * CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatCapCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
         state.dataWaterToAirHeatPumpSimple->QSensible = state.dataWaterToAirHeatPumpSimple->QLoadTotal;
-        state.dataWaterToAirHeatPumpSimple->Winput = HeatPowerRated * (HeatPowerCoeff1 + (ratioTDB * HeatPowerCoeff2) + (ratioTS * HeatPowerCoeff3) + (ratioVL * HeatPowerCoeff4) +
-                                   (ratioVS * HeatPowerCoeff5));
+        state.dataWaterToAirHeatPumpSimple->Winput =  HeatPowerRated * CurveValue(state, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).HeatPowCurveIndex, ratioTDB, ratioTS, ratioVL, ratioVS);
 
         // calculate coil outlet state variables
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletEnth = state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth + state.dataWaterToAirHeatPumpSimple->QLoadTotal / state.dataWaterToAirHeatPumpSimple->LoadSideMassFlowRate;

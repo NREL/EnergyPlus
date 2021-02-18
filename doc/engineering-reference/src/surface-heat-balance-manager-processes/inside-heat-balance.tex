@@ -938,6 +938,84 @@ Convection coefficient applied to each wall separately and actually used in the 
 {h_c} = 2{h_{net}}
 \end{equation}
 
+\subsubsection{ASTM C1340 Algorithm}\label{ASTM-C1340-algorithm}
+
+The algorithm is based on ASTM C1340 Standard. This algorithm specifies to simulate heat flows in attic zone. The correlations account for the effects of surface-to-air temperature difference, heat flow direction, surface length along the heat flow direction, surface tilt angle, air speed past surface, and surface orientation. The correlations are in the form of a Nusselt number, Nu, as a function of a Rayleigh number, Ra, Grashof number, Gr, or a Reynolds number, Re. 
+
+\begin{equation}
+Nu = hL/k
+\end{equation}
+\begin{equation}
+Ra = g \beta \rho C_p \Delta TL^3 / \nu k
+\end{equation}
+\begin{equation}
+Gr = Ra / Pr
+\end{equation}
+\begin{equation}
+Pr = \nu / \alpha
+\end{equation}
+\begin{equation}
+Re = VL/ \nu
+\end{equation}
+
+\noindent 
+\emph{h} = convection heat transfer coefficient \\
+\emph{L} = characteristic length of surface \\
+\emph{k} = thermal conductivity of air \\
+\emph{g} = acceleration of gravity \\
+$\beta$ = volume coefficient of expansion of air\\
+$\rho$ = density of air\\
+$C_p$ = specific heat of air\\
+\emph{$\Delta$T} = temperature difference between surface and air\\
+$\nu$ = kinematic viscosity of air\\
+\emph{Pr} = Prandtl number for air\\
+$\alpha$ = thermal diffusivity of air\\
+\emph{V} = velocity of air stream\\
+
+The correlations used in the model are as below. (reference: Table 1 of ASTM C1340 standard)
+
+\begin{enumerate}
+   \item Natural Convection:
+   \begin{enumerate}
+     \item Horizontal surface, heat flow up \\
+     $Nu_n = 0.54 \: Ra^{1/4} \enspace for \enspace Ra < 8 * 10^6$ \\
+     $Nu_n = 0.15 \: Ra^{1/3} \enspace for \enspace Ra > 8 * 10^6$ 
+     \item Horizontal surface, heat flow down \\
+     $Nu_n = 0.58 \: Ra^{0.2}$
+     \item Vertical surface \\
+     $Nu_n = 0.59 \: Ra^{1/4} \enspace for \enspace Ra < 1 * 10^9$ \\
+     $Nu_n = 0.10 \: Ra^{1/3} \enspace for \enspace Ra > 1 * 10^9$ 
+     \item Nearly horizontal surface (tilt angle less than $2^o$), heat flow down \\
+     $Nu_n = 0.58 \: Ra^{0.2}$ 
+     \item Tilted surfaces (greater than $2^o$ tilt), heat flow down \\
+     $Nu_n = 0.56 \: (Ra \, sin (\Phi))^{1/4} \qquad  \Phi = tilt \: angle$ 
+     \item Tilted surfaces, heat flow up \\
+     $Nu_n = 0.56 \: (Ra \, sin (\Phi))^{1/4} \enspace for \enspace Ra/Pr < Gr_c$ \\
+     $Nu_n = 0.14 \: (Ra^{1/3}- (Gr_c\,Pr)^{1/3}) \\
+     \enspace + 0.56\,(Gr_c \, Pr \, sin (\Phi))^{1/4} \enspace for \enspace Ra/Pr > Gr_c$ \\
+     $Gr_c = 1 * 10^6 \enspace for \enspace \Phi < 15^o $ \\
+     $Gr_c = 10^{(\Phi / (1.1870\:+\:0.0870*\Phi))} \enspace for \enspace 15^o < \Phi < 75^o $ \\
+     $Gr_c = 5 * 10^9 \enspace for \enspace \Phi > 75^o $
+   \end{enumerate}
+   \item Forced Convection: \\
+   $Nu_f = 0.664 \: Pr^{1/3} \: Re^{1/2} \enspace for \enspace Re < 5 * 10^5$ \\
+   $Nu_f = Pr^{1/3} \: (0.037 \: Re^{0.8} \: - 850) \enspace for \enspace Re > 5 * 10^5$
+\end{enumerate}
+
+Separate coefficients are calculated for natural and forced flow, and a mixed coefficient is calculated by taking the third root of the sum of the cubes of the two separate coefficients.
+
+\begin{equation}
+h_n = Nu_n * k / L
+\end{equation}
+\begin{equation}
+h_f = Nu_f * k / L
+\end{equation}
+\begin{equation}
+h_c = {(h_n^3 + h_f^3)}^{1/3}
+\end{equation}
+
+More information regarding the implemented equations in the code is provided in detail in Appendix A, section 7.7 and 7.8 of the reference: Fontanini, A. D., Aguilar, J. L. C., Mitchell, M. S., Kosny, J., Merket, N., DeGraw, J. W., & Lee, E. (2018). Predicting the performance of radiant technologies in attics: Reducing the discrepancies between attic specific and whole-building energy models. Energy and Buildings, 169, 69-83.
+
 \subsection{Additional Heat Balance Source}\label{additional-heat-balance-source}
 
 EnergyPlus also enables importing the pre-calculated results of other heat transfer processes to be considered in the inside heat balance calculation. An additional heat source term defined as a surface property would enable the consideration of these processes to be imported as schedules in the interior surface heat balance calculation in EnergyPlus.
@@ -959,6 +1037,8 @@ ASHRAE. 1985. 1985 ASHRAE Handbook -- Fundamentals, Atlanta: American Society of
 
 ASHRAE. 2001. 2001 ASHRAE Handbook -- Fundamentals, Atlanta: American Society of Heating, Refrigerating, and Air-Conditioning Engineers, Inc.
 
+ASTM International. 2015. ASTM C1340 Standard Practice for Estimation of Heat Gain or Loss Through Ceilings Under Attics Containing Radiant Barriers by Use of a Computer Program
+
 Awbi, H.B. and A. Hatton. 1999. Natural convection from heated room surfaces. Energy and Buildings 30 (1999) 233-244.
 
 Beausoleil-Morrison, I. 2000. The adaptive coupling of heat and air flow modeling within dynamic whole-building simulations. PhD. Thesis. University of Strathclyde, Glasgow, UK.
@@ -968,6 +1048,8 @@ Ellis, Peter G. 2003. Development and Validation of the Unvented Trombe Wall Mod
 Fisher, D.E. and C.O. Pedersen. 1997. ``Convective Heat Transfer in Building Energy and Thermal Load Calculations'', ASHRAE Transactions, Vol. 103, Pt. 2.
 
 Fohanno, S., and G. Polidori. 2006. Modelling of natural convective heat transfer at an internal surface. Energy and Buildings 38 (2006) 548 - 553
+
+Fontanini, A. D., Aguilar, J. L. C., Mitchell, M. S., Kosny, J., Merket, N., DeGraw, J. W., & Lee, E. (2018). Predicting the performance of radiant technologies in attics: Reducing the discrepancies between attic specific and whole-building energy models. Energy and Buildings, 169, 69-83.
 
 Goldstein, K. and A. Novoselac. 2010. Convective Heat Transfer in Rooms With Ceiling Slot Diffusers (RP-1416). \emph{HVAC\&R Research Journal} TBD
 

@@ -697,6 +697,8 @@ namespace SurfaceGeometry {
                     String1 = "TrombeWall";
                 } else if (SELECT_CASE_var == AdaptiveConvectionAlgorithm) {
                     String1 = "AdaptiveConvectionAlgorithm";
+                } else if (SELECT_CASE_var == ASTMC1340) {
+                    String1 = "ASTMC1340";
                 }
             }
 
