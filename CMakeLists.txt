@@ -318,8 +318,8 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V9-3-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-4-0-Energy+.idd")
+  file(COPY "idd/V9-4-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-5-0-Energy+.idd")
   file(COPY "src/Transition/SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
