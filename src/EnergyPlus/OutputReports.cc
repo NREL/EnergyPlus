@@ -245,7 +245,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     auto slnfile = state.files.sln.open(state, "LinesOut", state.files.outputControl.sln);
 
     if (option != "IDF") {
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
@@ -276,7 +276,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
     } else {
         print(slnfile, "{}\n", " Building North Axis = 0");
         print(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
@@ -351,7 +351,7 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 
     Real64 minx = 99999.0;
     Real64 miny = 99999.0;
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         if (Surface(surf).Class == SurfaceClass::IntMass) continue;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minx = min(minx, Surface(surf).Vertex(vert).x);
@@ -568,7 +568,7 @@ void DXFOut(EnergyPlusData &state,
 
     auto colorindex = ColorNo_ShdDetFix;
     //  Do all detached shading surfaces first
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -644,7 +644,7 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Sides == 0) continue;
             if (Surface(surf).Class == SurfaceClass::IntMass) continue;
@@ -722,7 +722,7 @@ void DXFOut(EnergyPlusData &state,
             }
         }
         // still have to do shading surfaces for zone
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
             if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
@@ -904,7 +904,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).Class == SurfaceClass::Shading) continue;
@@ -949,7 +949,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         auto TempZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo_Wall;
@@ -1000,7 +1000,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
             if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
@@ -1111,7 +1111,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
     //  Do all detached shading surfaces first
     int surfcount = 0;
     int colorindex = 0;
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
@@ -1145,7 +1145,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         const auto SaveZoneName = normalizeName(state.dataHeatBal->Zone(zones).Name);
 
         surfcount = 0;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Class == SurfaceClass::IntMass) continue;
             if (Surface(surf).Class == SurfaceClass::Wall) colorindex = ColorNo_Wall;
@@ -1176,7 +1176,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         }
         // still have to do shading surfaces for zone
         surfcount = 0;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
             if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
@@ -1330,14 +1330,14 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
 
     // Do just "detached" shading first
     int surf2 = 0;
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         surf2 = surf;
         if (Surface(surf).Zone != 0) break;
     }
     if ((surf2 - 1) > 0) {
         *eiostream << "Shading Surfaces,"
                    << "Number of Shading Surfaces," << surf2 - 1 << '\n';
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != 0) break;
             AlgoName = "None";
             *eiostream << "Shading Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << Surface(surf).BaseSurfName
@@ -1392,7 +1392,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << state.dataHeatBal->Zone(ZoneNum).Name << "," << (state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
             if (RptType == 10 || RptType == 11) { // Details and Details with Vertices
@@ -1740,7 +1740,7 @@ void CostInfoOut(EnergyPlusData &state)
     // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
     uniqueSurf.dimension(state.dataSurface->TotSurfaces, true);
 
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         if (Surface(surf).ExtBoundCond > 0) {
             if (Surface(surf).ExtBoundCond < surf) { // already cycled through
                 uniqueSurf(surf) = false;
@@ -1757,7 +1757,7 @@ void CostInfoOut(EnergyPlusData &state)
     print(scifile, "{}\n", " data for surfaces useful for cost information");
     print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         // if (surface(surf)%class .eq. SurfaceClass::IntMass) CYCLE
         if (!uniqueSurf(surf)) continue;
         // why the heck are constructions == 0 ?
@@ -1881,7 +1881,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     int colorindex = 0;
 
     //  Do all detached shading surfaces first
-    for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+    for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         if (Surface(surf).HeatTransSurf) continue;
         if (Surface(surf).IsAirBoundarySurf) continue;
         if (Surface(surf).Class == SurfaceClass::Shading) continue;
@@ -1929,7 +1929,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     //  ! now do zone surfaces, by zone
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int oldSurfNum = 0;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             ++oldSurfNum;
             if (Surface(surf).Zone != zoneNum) continue;
             if (Surface(surf).Sides == 0) continue;
@@ -1975,7 +1975,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
         }
         // still have to do shading surfaces for zone
         colorindex = 4;
-        for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (Surface(surf).Class != SurfaceClass::Shading) continue;
             if (Surface(surf).ZoneName != state.dataHeatBal->Zone(zoneNum).Name) continue;

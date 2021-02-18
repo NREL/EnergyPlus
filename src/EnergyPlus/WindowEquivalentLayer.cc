@@ -891,23 +891,23 @@ namespace WindowEquivalentLayer {
         NetIRHeatGainWindow = Surface(SurfNum).Area * LWAbsIn * (DataGlobalConstants::StefanBoltzmann * pow_4(SurfInsideTemp + DataGlobalConstants::KelvinConv) - rmir);
         ConvHeatGainWindow = Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
         // Window heat gain (or loss) is calculated here
-        SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
-        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
+        state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+        state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
         SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
         // store for component reporting
-        SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-        SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
-        SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
-        SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
+        state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
+        state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
         if (InSideLayerType == ltyGLAZE) {
             // no interior sade
-            SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
+            state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
         } else {
             // Interior shade exists
-            SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
+            state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
         }
         // Advanced report variable (DisplayAdvancedReportVariables)
-        SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
+        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
     }
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)

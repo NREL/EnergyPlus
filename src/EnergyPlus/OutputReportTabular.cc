@@ -11711,7 +11711,7 @@ namespace EnergyPlus::OutputReportTabular {
                   "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36\n");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
+                for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
                     print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", state.dataHeatBal->Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
@@ -11721,7 +11721,7 @@ namespace EnergyPlus::OutputReportTabular {
                     print(state.files.eio, "\n");
                 }
 
-                for (int kSurf : DataSurfaces::AllSurfaceListReportOrder) {
+                for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
                     if (Surface(kSurf).Zone != iZone) continue;
                     print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", state.dataHeatBal->Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
@@ -11748,31 +11748,9 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using DataSizing::CurOverallSimDay;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
-        using DataSurfaces::SurfWinGainConvGlazToZoneRep;
-        using DataSurfaces::SurfWinGainConvShadeToZoneRep;
-        using DataSurfaces::SurfWinGainFrameDividerToZoneRep;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iSurf(0);
@@ -11790,8 +11768,8 @@ namespace EnergyPlus::OutputReportTabular {
                 if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
                 ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
-                    SurfWinGainConvGlazToZoneRep(iSurf) + SurfWinGainConvGlazShadGapToZoneRep(iSurf) + SurfWinGainConvShadeToZoneRep(iSurf) +
-                            SurfWinGainFrameDividerToZoneRep(iSurf);
+                    state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurf) +
+                            state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurf);
                 // for now assume zero instant solar - may change related
                 // to how blinds and shades absorb solar radiation and
                 // convect that heat that timestep.

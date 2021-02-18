@@ -1401,18 +1401,13 @@ namespace DaylightingDevices {
         //   3. Inward absorbed solar in dome and diffuser glass
         // This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.cc.
 
-        // Using/Aliasing
-        using DataSurfaces::SurfWinTransSolar;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;  // TDD pipe object number
         int DiffSurf; // Surface number of TDD:DIFFUSER
         int TZoneNum; // Transition zone index
-        //  INTEGER :: ActualZone     ! Actual transition zone number
         Real64 transDiff;      // Diffuse transmittance of TDD:DIFFUSER
         Real64 QRefl;          // Diffuse radiation reflected back up the pipe
         Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
-
 
         for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
             DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
@@ -1420,12 +1415,12 @@ namespace DaylightingDevices {
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) - state.dataHeatBal->SurfWinQRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
+            QRefl = (state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) - state.dataHeatBal->SurfWinQRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - state.dataSurface->SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl += state.dataHeatBal->QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) - state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
+            TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) - state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / transDiff) +
                              state.dataHeatBal->SurfWinQRadSWwinAbs(1, state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
                              state.dataHeatBal->SurfWinQRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to

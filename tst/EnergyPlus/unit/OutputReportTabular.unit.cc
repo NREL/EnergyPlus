@@ -7401,7 +7401,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         DataSurfaces::Surface(i).Tilt = 90.;
         DataSurfaces::Surface(i).Zone = 1;
         DataSurfaces::Surface(i).Construction = 1;
-        DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        state->dataSurface->AllSurfaceListReportOrder.push_back(i);
 
         // Actual interesting stuff
         int entryIndex = (i-1) / 2;
@@ -7519,14 +7519,14 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
             DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).GrossArea = 200.;
             DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }else{
             DataSurfaces::Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
             DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
             DataSurfaces::Surface(i).BaseSurf = i - 1;
             DataSurfaces::Surface(i).GrossArea = 50.;
             DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Door;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }
         if ((i + 1) / 2 == 1) {
             // first pair of wall and door

@@ -578,9 +578,9 @@ namespace HeatBalanceIntRadExchange {
                 }
                 // Store SurfaceReportNums to maintain original reporting order
                 for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
-                    if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
+                    if (!Surface(state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs+1; enclSNum <= enclosureSurfNum; ++enclSNum) {
-                        if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {
+                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
                             break;
                         }
@@ -881,9 +881,9 @@ namespace HeatBalanceIntRadExchange {
                 }
                 // Store SurfaceReportNums to maintain original reporting order
                 for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
-                    if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
+                    if (!Surface(state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
-                        if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {
+                        if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
                             break;
                         }

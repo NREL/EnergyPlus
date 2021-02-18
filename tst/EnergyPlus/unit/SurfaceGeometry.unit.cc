@@ -3933,8 +3933,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     // Check heat balance surface lists
     // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
-    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
-    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
+    EXPECT_EQ(state->dataSurface->AllHTSurfaceList.size(), 4u);
+    EXPECT_EQ(state->dataSurface->AllIZSurfaceList.size(), 2u);
 
     int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", state->dataHeatBal->Zone);
     EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
@@ -6976,50 +6976,50 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:
-    EXPECT_EQ(siteShadeShadeFlatShadeSurface, DataSurfaces::AllSurfaceListReportOrder[0]);
-    EXPECT_EQ(mirSiteShadeFlatShadeSurface, DataSurfaces::AllSurfaceListReportOrder[1]);
-    EXPECT_EQ(buildingShadeTiltedShadeSurface, DataSurfaces::AllSurfaceListReportOrder[2]);
-    EXPECT_EQ(mirBuildingShadeTiltedShadeSurface, DataSurfaces::AllSurfaceListReportOrder[3]);
-    EXPECT_EQ(zoneShadeLivingSouthShade001, DataSurfaces::AllSurfaceListReportOrder[4]);
-    EXPECT_EQ(mirZoneShadeLivingSouthShade001, DataSurfaces::AllSurfaceListReportOrder[5]);
+    EXPECT_EQ(siteShadeShadeFlatShadeSurface, state->dataSurface->AllSurfaceListReportOrder[0]);
+    EXPECT_EQ(mirSiteShadeFlatShadeSurface, state->dataSurface->AllSurfaceListReportOrder[1]);
+    EXPECT_EQ(buildingShadeTiltedShadeSurface, state->dataSurface->AllSurfaceListReportOrder[2]);
+    EXPECT_EQ(mirBuildingShadeTiltedShadeSurface, state->dataSurface->AllSurfaceListReportOrder[3]);
+    EXPECT_EQ(zoneShadeLivingSouthShade001, state->dataSurface->AllSurfaceListReportOrder[4]);
+    EXPECT_EQ(mirZoneShadeLivingSouthShade001, state->dataSurface->AllSurfaceListReportOrder[5]);
 
     //  LIVING ZONE:
-    EXPECT_EQ(wallLivingNorth, DataSurfaces::AllSurfaceListReportOrder[6]);
-    EXPECT_EQ(windowNorthWindow, DataSurfaces::AllSurfaceListReportOrder[7]);
-    EXPECT_EQ(wallLivingEast, DataSurfaces::AllSurfaceListReportOrder[8]);
-    EXPECT_EQ(windowEastWindow, DataSurfaces::AllSurfaceListReportOrder[9]);
-    EXPECT_EQ(wallLivingSouth, DataSurfaces::AllSurfaceListReportOrder[10]);
-    EXPECT_EQ(windowSouthWindow, DataSurfaces::AllSurfaceListReportOrder[11]);
-    EXPECT_EQ(wallLivingWest, DataSurfaces::AllSurfaceListReportOrder[12]);
-    EXPECT_EQ(windowWestWindow, DataSurfaces::AllSurfaceListReportOrder[13]);
-    EXPECT_EQ(doorWestDoor, DataSurfaces::AllSurfaceListReportOrder[14]);
-    EXPECT_EQ(wallLivingInterior, DataSurfaces::AllSurfaceListReportOrder[15]);
-    EXPECT_EQ(floorLivingFloor, DataSurfaces::AllSurfaceListReportOrder[16]);
-    EXPECT_EQ(ceilingLivingCeiling, DataSurfaces::AllSurfaceListReportOrder[17]);
-    EXPECT_EQ(windowTubularDaylightingDiffuser1, DataSurfaces::AllSurfaceListReportOrder[18]);
+    EXPECT_EQ(wallLivingNorth, state->dataSurface->AllSurfaceListReportOrder[6]);
+    EXPECT_EQ(windowNorthWindow, state->dataSurface->AllSurfaceListReportOrder[7]);
+    EXPECT_EQ(wallLivingEast, state->dataSurface->AllSurfaceListReportOrder[8]);
+    EXPECT_EQ(windowEastWindow, state->dataSurface->AllSurfaceListReportOrder[9]);
+    EXPECT_EQ(wallLivingSouth, state->dataSurface->AllSurfaceListReportOrder[10]);
+    EXPECT_EQ(windowSouthWindow, state->dataSurface->AllSurfaceListReportOrder[11]);
+    EXPECT_EQ(wallLivingWest, state->dataSurface->AllSurfaceListReportOrder[12]);
+    EXPECT_EQ(windowWestWindow, state->dataSurface->AllSurfaceListReportOrder[13]);
+    EXPECT_EQ(doorWestDoor, state->dataSurface->AllSurfaceListReportOrder[14]);
+    EXPECT_EQ(wallLivingInterior, state->dataSurface->AllSurfaceListReportOrder[15]);
+    EXPECT_EQ(floorLivingFloor, state->dataSurface->AllSurfaceListReportOrder[16]);
+    EXPECT_EQ(ceilingLivingCeiling, state->dataSurface->AllSurfaceListReportOrder[17]);
+    EXPECT_EQ(windowTubularDaylightingDiffuser1, state->dataSurface->AllSurfaceListReportOrder[18]);
 
     //  GARAGE ZONE:
-    EXPECT_EQ(wallGarageInterior, DataSurfaces::AllSurfaceListReportOrder[19]);
-    EXPECT_EQ(wallGarageEast, DataSurfaces::AllSurfaceListReportOrder[20]);
-    EXPECT_EQ(wallGarageWest, DataSurfaces::AllSurfaceListReportOrder[21]);
-    EXPECT_EQ(wallGarageFrontDoor, DataSurfaces::AllSurfaceListReportOrder[22]);
-    EXPECT_EQ(floorGarageFloor, DataSurfaces::AllSurfaceListReportOrder[23]);
-    EXPECT_EQ(ceilingGarageInterior, DataSurfaces::AllSurfaceListReportOrder[24]);
-    EXPECT_EQ(intmassEVChargingStation, DataSurfaces::AllSurfaceListReportOrder[25]);
+    EXPECT_EQ(wallGarageInterior, state->dataSurface->AllSurfaceListReportOrder[19]);
+    EXPECT_EQ(wallGarageEast, state->dataSurface->AllSurfaceListReportOrder[20]);
+    EXPECT_EQ(wallGarageWest, state->dataSurface->AllSurfaceListReportOrder[21]);
+    EXPECT_EQ(wallGarageFrontDoor, state->dataSurface->AllSurfaceListReportOrder[22]);
+    EXPECT_EQ(floorGarageFloor, state->dataSurface->AllSurfaceListReportOrder[23]);
+    EXPECT_EQ(ceilingGarageInterior, state->dataSurface->AllSurfaceListReportOrder[24]);
+    EXPECT_EQ(intmassEVChargingStation, state->dataSurface->AllSurfaceListReportOrder[25]);
 
     //  ATTIC ZONE:
-    EXPECT_EQ(wallEastGable, DataSurfaces::AllSurfaceListReportOrder[26]);
-    EXPECT_EQ(wallWestGable, DataSurfaces::AllSurfaceListReportOrder[27]);
-    EXPECT_EQ(wallNorthGable, DataSurfaces::AllSurfaceListReportOrder[28]);
-    EXPECT_EQ(floorAtticLivingFloor, DataSurfaces::AllSurfaceListReportOrder[29]);
-    EXPECT_EQ(floorAtticGarageFloor, DataSurfaces::AllSurfaceListReportOrder[30]);
-    EXPECT_EQ(roofNorthRoof1, DataSurfaces::AllSurfaceListReportOrder[31]);
-    EXPECT_EQ(nonwindowTubularDaylightingDome1, DataSurfaces::AllSurfaceListReportOrder[32]);
-    EXPECT_EQ(roofSouthRoof, DataSurfaces::AllSurfaceListReportOrder[33]);
-    EXPECT_EQ(roofNorthRoof2, DataSurfaces::AllSurfaceListReportOrder[34]);
-    EXPECT_EQ(roofNorthRoof3, DataSurfaces::AllSurfaceListReportOrder[35]);
-    EXPECT_EQ(roofNorthRoof4, DataSurfaces::AllSurfaceListReportOrder[36]);
-    EXPECT_EQ(roofEastRoof, DataSurfaces::AllSurfaceListReportOrder[37]);
-    EXPECT_EQ(windowAtticSkylight, DataSurfaces::AllSurfaceListReportOrder[38]);
-    EXPECT_EQ(roofWestRoof, DataSurfaces::AllSurfaceListReportOrder[39]);
+    EXPECT_EQ(wallEastGable, state->dataSurface->AllSurfaceListReportOrder[26]);
+    EXPECT_EQ(wallWestGable, state->dataSurface->AllSurfaceListReportOrder[27]);
+    EXPECT_EQ(wallNorthGable, state->dataSurface->AllSurfaceListReportOrder[28]);
+    EXPECT_EQ(floorAtticLivingFloor, state->dataSurface->AllSurfaceListReportOrder[29]);
+    EXPECT_EQ(floorAtticGarageFloor, state->dataSurface->AllSurfaceListReportOrder[30]);
+    EXPECT_EQ(roofNorthRoof1, state->dataSurface->AllSurfaceListReportOrder[31]);
+    EXPECT_EQ(nonwindowTubularDaylightingDome1, state->dataSurface->AllSurfaceListReportOrder[32]);
+    EXPECT_EQ(roofSouthRoof, state->dataSurface->AllSurfaceListReportOrder[33]);
+    EXPECT_EQ(roofNorthRoof2, state->dataSurface->AllSurfaceListReportOrder[34]);
+    EXPECT_EQ(roofNorthRoof3, state->dataSurface->AllSurfaceListReportOrder[35]);
+    EXPECT_EQ(roofNorthRoof4, state->dataSurface->AllSurfaceListReportOrder[36]);
+    EXPECT_EQ(roofEastRoof, state->dataSurface->AllSurfaceListReportOrder[37]);
+    EXPECT_EQ(windowAtticSkylight, state->dataSurface->AllSurfaceListReportOrder[38]);
+    EXPECT_EQ(roofWestRoof, state->dataSurface->AllSurfaceListReportOrder[39]);
 }

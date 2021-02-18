@@ -85,9 +85,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 
-namespace EnergyPlus {
-
-namespace ConvectionCoefficients {
+namespace EnergyPlus::ConvectionCoefficients {
 
     // Module containing the routines dealing with the convection coefficients
 
@@ -100,8 +98,7 @@ namespace ConvectionCoefficients {
     // PURPOSE OF THIS MODULE:
     // This module contain the routines dealing with convection coefficients.
     // This module collects correlations/calculations for both the interior and exterior
-    // Manages a portion of the input and calculations for Hc values for use in surface heat balances
-    // .
+    // Manages a portion of the input and calculations for Hc values for use in surface heat balances.
 
     // METHODOLOGY EMPLOYED:
     // Subroutines are called to fill the variable HConvIn with the convection coefficient at
@@ -3934,7 +3931,7 @@ namespace ConvectionCoefficients {
                 "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
                 "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
             print(state.files.eio, Format_900); // header
-            for (int SurfLoop : DataSurfaces::AllSurfaceListReportOrder) {
+            for (int SurfLoop : state.dataSurface->AllSurfaceListReportOrder) {
                 if (!Surface(SurfLoop).HeatTransSurf) continue;
                 if (Surface(SurfLoop).IntConvSurfGetsRadiantHeat) {
                     YesNo1 = "Yes";
@@ -8133,7 +8130,5 @@ namespace ConvectionCoefficients {
             return 9.9999; // safe but noticeable
         }
     }
-
-} // namespace ConvectionCoefficients
 
 } // namespace EnergyPlus

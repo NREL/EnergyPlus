@@ -617,7 +617,7 @@ namespace SurfaceGeometry {
             } // surfaces
         }     // zones
 
-        for (int SurfNum : DataSurfaces::AllSurfaceListReportOrder) {
+        for (int SurfNum : state.dataSurface->AllSurfaceListReportOrder) {
             if (Surface(SurfNum).Construction > 0 && Surface(SurfNum).Construction <= state.dataHeatBal->TotConstructs) {
                 NominalUwithConvCoeffs = ComputeNominalUwithConvCoeffs(state, SurfNum, isWithConvCoefValid);
                 if (isWithConvCoefValid) {
@@ -1358,7 +1358,7 @@ namespace SurfaceGeometry {
             // Store list of moved surface numbers in reporting order
             Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
             SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
-            DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+            state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
         }
 
         //  For each zone
@@ -1385,7 +1385,7 @@ namespace SurfaceGeometry {
                 }
                 SurfaceTmpClassMoved(SurfNum) = true; //'Moved'
                 // Store list of moved surface numbers in reporting order
-                DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+                state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
             //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
@@ -1407,7 +1407,7 @@ namespace SurfaceGeometry {
                     BaseSurfNum = MovedSurfs;
                     Surface(MovedSurfs).BaseSurf = BaseSurfNum;
                     // Store list of moved surface numbers in order reporting order (subsurfaces follow their base surface)
-                    DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+                    state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
 
                     //  Find all subsurfaces to this surface - just to update the base surface number - don't move these yet
                     for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
@@ -1417,7 +1417,7 @@ namespace SurfaceGeometry {
                         // Set BaseSurf to negative of new BaseSurfNum (to avoid confusion with other base surfaces)
                         state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -BaseSurfNum;
                         // Add original sub-surface numbers as placeholders in surface list for reporting
-                        DataSurfaces::AllSurfaceListReportOrder.push_back(-SubSurfNum);
+                        state.dataSurface->AllSurfaceListReportOrder.push_back(-SubSurfNum);
                     }
                 }
             }
@@ -1433,7 +1433,7 @@ namespace SurfaceGeometry {
                 Surface(MovedSurfs).BaseSurf = MovedSurfs;
                 SurfaceTmpClassMoved(SurfNum) = true; // 'Moved'
                 // Store list of moved surface numbers in reporting order
-                DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
+                state.dataSurface->AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
             // Non-window) subsurfaces are next (anything left in this zone that's not a window or a glass door)
@@ -1454,7 +1454,7 @@ namespace SurfaceGeometry {
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
                 // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
+                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(), state.dataSurface->AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
             // Last but not least, the window subsurfaces (includes SurfaceClass::TDD_Diffuser)
@@ -1473,7 +1473,7 @@ namespace SurfaceGeometry {
                 Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
                 state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
                 // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
+                std::replace(state.dataSurface->AllSurfaceListReportOrder.begin(), state.dataSurface->AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
         }
 
@@ -2126,16 +2126,16 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
             if (Surface(SurfNum).HeatTransSurf) {
-                DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
+                state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(Surface(SurfNum).Zone);
                 auto &surfZone(state.dataHeatBal->Zone(zoneNum));
                 surfZone.ZoneHTSurfaceList.push_back(SurfNum);
                 // Sort window vs non-window surfaces
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                    DataSurfaces::AllHTWindowSurfaceList.push_back(SurfNum);
+                    state.dataSurface->AllHTWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
                 } else {
-                    DataSurfaces::AllHTNonWindowSurfaceList.push_back(SurfNum);
+                    state.dataSurface->AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                 }
                 if (Surface(SurfNum).ExtSolar) {
@@ -2144,7 +2144,7 @@ namespace SurfaceGeometry {
                 int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
                 // Build zone and interzone surface lists
                 if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
-                    DataSurfaces::AllIZSurfaceList.push_back(SurfNum);
+                    state.dataSurface->AllIZSurfaceList.push_back(SurfNum);
                     surfZone.ZoneIZSurfaceList.push_back(SurfNum);
                     auto &adjZone(state.dataHeatBal->Zone(Surface(surfExtBoundCond).Zone));
                     adjZone.ZoneHTSurfaceList.push_back(SurfNum);
