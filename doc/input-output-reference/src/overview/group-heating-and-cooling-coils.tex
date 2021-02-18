@@ -6775,17 +6775,17 @@ This numeric field contains the gross rated sensible capacity of the heat pump i
 
 This numeric field contains the rated cooling coefficient of performance of the heat pump.
 
-\paragraph{Field: Total Cooling Capacity Coefficient 1 to 5}\label{field-total-cooling-capacity-coefficient-1-to-5}
+\paragraph{Field: Total Cooling Capacity Curve Name}\label{field-total-cooling-capacity-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump total cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump total cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
-\paragraph{Field: Sensible Cooling Capacity Coefficient 1 to 6}\label{field-sensible-cooling-capacity-coefficient-1-to-6}
+\paragraph{Field: Sensible Cooling Capacity Curve Name}\label{field-sensible-cooling-capacity-curve-name}
 
-These numeric fields contain the first to sixth coefficient for the heat pump sensible cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quintlinear} performance curve object (ref: Performance Curves) for the heat pump sensible cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
-\paragraph{Field: Cooling Power Consumption Coefficient 1 to 5}\label{field-cooling-power-consumption-coefficient-1-to-5}
+\paragraph{Field: Cooling Power Consumption Curve Name}\label{field-cooling-power-consumption-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-4}
 
@@ -6800,34 +6800,78 @@ Following is an example of the input for Coil:WaterToAirHP:EquationFit:Cooling c
 \begin{lstlisting}
 
 Coil:Cooling:WaterToAirHeatPump:EquationFit,
-  Heat Pump Cooling Mode,!- Name of Coil
-  Water to Air Heat Pump Source Side1 Inlet Node,!- Coil Water Inlet Node Name
+  Heat Pump Cooling Mode,                         !- Name of Coil
+  Water to Air Heat Pump Source Side1 Inlet Node, !- Coil Water Inlet Node Name
   Water to Air Heat Pump Source Side1 Outlet Node,!- Coil Water Outlet Node Name
-  Cooling Coil Air Inlet Node,!- Coil Air Inlet Node Name
-  Heating Coil Air Inlet Node,!- Coil Air Outlet Node Name
-  4.6015E-01,!- Rated Air Volumetric Flow Rate
-  2.8391E-04,!- Rated Water Volumetric Flow Rate
-  23125.59,!- Gross Rated Total Cooling Capacity
-  16267.05,!- Gross Rated Sensible Cooling Capacity
-  4.7,!- Rated Cooling Coefficient of Performance
-  -0.68126221,!- Total Cooling Capacity Coefficient 1
-  1.99529297,!- Total Cooling Capacity Coefficient 2
-  -0.93611888,!- Total Cooling Capacity Coefficient 3
-  0.02081177,!- Total Cooling Capacity Coefficient 4
-  0.008438868,!- Total Cooling Capacity Coefficient 5
-  2.24209455,!- Sensible Cooling Capacity Coefficient 1
-  7.28913391,!- Sensible Cooling Capacity Coefficient 2
-  -9.06079896,!- Sensible Cooling Capacity Coefficient 3
-  -0.36729404,!- Sensible Cooling Capacity Coefficient 4
-  0.218826161,!- Sensible Cooling Capacity Coefficient 5
-  0.00901534,!- Sensible Cooling Capacity Coefficient 6
-  -3.20456384,!- Cooling Power Consumption Coefficient 1
-  0.47656454,!- Cooling Power Consumption Coefficient 2
-  3.16734236,!- Cooling Power Consumption Coefficient 3
-  0.10244637,!- Cooling Power Consumption Coefficient 4
-  -0.038132556,!- Cooling Power Consumption Coefficient 5
-  0,!- Nominal Time for Condensate Removal to Begin
-  0;!- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  Cooling Coil Air Inlet Node,                    !- Coil Air Inlet Node Name
+  Heating Coil Air Inlet Node,                    !- Coil Air Outlet Node Name
+  4.6015E-01,                                     !- Rated Air Volumetric Flow Rate
+  2.8391E-04,                                     !- Rated Water Volumetric Flow Rate
+  23125.59,                                       !- Gross Rated Total Cooling Capacity
+  16267.05,                                       !- Gross Rated Sensible Cooling Capacity
+  4.7,                                            !- Rated Cooling Coefficient of Performance
+  TotCoolCapCurve,                                !- Total Cooling Capacity Curve Name
+  CoolSensCapCurve,                               !- Sensible Cooling Capacity Curve Name
+  CoolPowCurve,                                   !- Cooling Power Consumption Curve Name
+  0,                                              !- Nominal Time for Condensate Removal to Begin
+  0;                                              !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  
+  Curve:QuadLinear,
+  TotCoolCapCurve,     ! Curve Name
+  -0.68126221,         ! CoefficientC1
+  1.99529297,          ! CoefficientC2
+  -0.93611888,         ! CoefficientC3
+  0.02081177,          ! CoefficientC4
+  0.008438868,         ! CoefficientC5
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
+
+  Curve:QuintLinear,
+  CoolSensCapCurve,    ! Curve Name
+  2.24209455,          ! CoefficientC1
+  7.28913391,          ! CoefficientC2
+  -9.06079896,         ! CoefficientC3
+  -0.36729404,         ! CoefficientC4
+  0.218826161,         ! CoefficientC5
+  0.00901534,          ! CoefficientC6
+  -100,                ! Minimum Value of v
+  100,                 ! Maximum Value of v
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+  CoolPowCurve,        ! Curve Name
+  -3.20456384,         ! CoefficientC1
+  0.47656454,          ! CoefficientC2
+  3.16734236,          ! CoefficientC3
+  0.10244637,          ! CoefficientC4
+  -0.038132556,        ! CoefficientC5
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-25}
@@ -7661,13 +7705,13 @@ This numeric field contains the gross heating capacity of the heat pump at the r
 
 This numeric field contains the gross rated heating coefficient of performance of the heat pump. The gross rated COP of the heat pump should not account for the effect of supply air fan heat.
 
-\paragraph{Field: Heating Capacity Coefficient 1-5}\label{field-heating-capacity-coefficient-1-5}
+\paragraph{Field: Heating Capacity Curve Name}\label{field-heating-capacity-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding these coefficients.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding these coefficients.
 
-\paragraph{Field: Heating Power Consumption Coefficient 1-5}\label{field-heating-power-consumption-coefficient-1-5}
+\paragraph{Field: Heating Power Consumption Curve Name}\label{field-heating-power-consumption-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
 \subsubsection{Outputs}\label{outputs-27}
 
