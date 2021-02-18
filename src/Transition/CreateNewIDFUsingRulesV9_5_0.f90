@@ -507,12 +507,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
                 CurArgs = CurArgs - 5
 
-                CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Water:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
                 POutArgs(2) = InArgs(7)
                 POutArgs(3:4) = InArgs(9:10)
                 POutArgs(5:7) = InArgs(12:14)
-                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER:DESIGN',7,POutArgs,FldNames,FldUnits)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:Baseboard:RadiantConvective:Water:Design',7,POutArgs,FldNames,FldUnits)
                 nodiff=.false.
 
               CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM')
@@ -526,12 +526,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
                 CurArgs = CurArgs - 5
 
-                CALL GetNewObjectDefInIDD('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Steam:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
                 POutArgs(1) = OutArgs(2)
                 POutArgs(2) = InArgs(5)
                 POutArgs(3:4) = InArgs(7:8)
                 POutArgs(5:7) = InArgs(11:13)
-                CALL WriteOutIDFLines(DifLfn,'ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM:DESIGN',7,POutArgs,FldNames,FldUnits)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:Baseboard:RadiantConvective:Steam:Design',7,POutArgs,FldNames,FldUnits)
                 nodiff=.false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
