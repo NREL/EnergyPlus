@@ -107,40 +107,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    Array1D<Real64> SurfWinBlTsolBmBm;                     // Time-step value of blind beam-beam solar transmittance (-)
-    Array1D<Real64> SurfWinBlTsolBmDif;                    // Time-step value of blind beam-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinBlTsolDifDif;                   // Time-step value of blind diffuse-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinBlGlSysTsolBmBm;                // Time-step value of blind/glass system beam-beam solar transmittance (-)
-    Array1D<Real64> SurfWinBlGlSysTsolDifDif;              // Time-step value of blind/glass system diffuse-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinScTsolBmBm;                     // Time-step value of screen beam-beam solar transmittance (-)
-    Array1D<Real64> SurfWinScTsolBmDif;                    // Time-step value of screen beam-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinScTsolDifDif;                   // Time-step value of screen diffuse-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinScGlSysTsolBmBm;                // Time-step value of screen/glass system beam-beam solar transmittance (-)
-    Array1D<Real64> SurfWinScGlSysTsolDifDif;              // Time-step value of screen/glass system diffuse-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinGlTsolBmBm;                     // Time-step value of glass beam-beam solar transmittance (-)
-    Array1D<Real64> SurfWinGlTsolBmDif;                    // Time-step value of glass beam-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinGlTsolDifDif;                   // Time-step value of glass diffuse-diffuse solar transmittance (-)
-    Array1D<Real64> SurfWinBmSolTransThruIntWinRep;        // Beam solar transmitted through interior window [W]
-    Array1D<Real64> SurfWinBmSolAbsdOutsReveal;            // Multiplied by BeamSolarRad, gives beam solar absorbed by outside reveal surfaces (m2)
-    Array1D<Real64> SurfWinBmSolRefldOutsRevealReport;     // Beam solar reflected by outside reveal surfaces, for reporting (m2)
-    Array1D<Real64> SurfWinBmSolAbsdInsReveal;             // Multiplied by BeamSolarRad, gives beam solar absorbed by inside reveal surfaces (m2)
-    Array1D<Real64> SurfWinBmSolRefldInsReveal;            // Multiplied by BeamSolarRad, gives beam solar reflected by inside reveal surfaces (m2)
-    Array1D<Real64> SurfWinBmSolRefldInsRevealReport;      // Beam solar reflected by inside reveal surfaces, for reporting (W)
-    Array1D<Real64> SurfWinOutsRevealDiffOntoGlazing;      // Multiplied by BeamSolarRad, gives diffuse from beam reflection from outside reveal that is incident on the glazing per m2 of glazing (-)
-    Array1D<Real64> SurfWinInsRevealDiffOntoGlazing;       // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal that is incident on the glazing per m2 of glazing (-)
-    Array1D<Real64> SurfWinInsRevealDiffIntoZone;          // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal that goes into zone directly or reflected from glazing (m2)
-    Array1D<Real64> SurfWinOutsRevealDiffOntoFrame;        // Multiplied by BeamSolarRad, gives diffuse from beam reflection from outside reveal that is incident on the outside of the frame per m2 of frame (-)
-    Array1D<Real64> SurfWinInsRevealDiffOntoFrame;         // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal that is incident on the outside of the frame per m2 of frame (-) for debugging CR 7596. TH 5/26/2009
-    Array1D<Real64> SurfWinInsRevealDiffOntoGlazingReport; // Diffuse solar from beam reflection from inside reveal that is incident on the glazing (W)
-    Array1D<Real64> SurfWinInsRevealDiffIntoZoneReport;    // Diffuse from beam reflection from inside reveal that goes into zone directly or reflected from glazing (W)
-    Array1D<Real64> SurfWinInsRevealDiffOntoFrameReport;   // Diffuse from beam reflection from inside reveal that is incident on the frame (W)
-    Array1D<Real64> SurfWinBmSolAbsdInsRevealReport;       // Beam solar absorbed by inside reveal (W)  energy
-    Array1D<Real64> SurfWinBmSolTransThruIntWinRepEnergy;  // energy of BmSolTransThruIntWinRep [J]
-    Array1D<Real64> SurfWinBmSolRefldOutsRevealRepEnergy;  // energy of BmSolRefldOutsRevealReport [J]
-    Array1D<Real64> SurfWinBmSolRefldInsRevealRepEnergy;   // energy of BmSolRefldInsRevealReport [J]
-    Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
-    Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
-
     Array1D<int> SurfWinShadingFlag;                        // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
@@ -805,39 +771,6 @@ namespace EnergyPlus::DataSurfaces {
         SurfLocalEnvironment.deallocate();
         SurroundingSurfsProperty.deallocate();
         IntMassObjects.deallocate();
-        SurfWinBlTsolBmBm.clear();
-        SurfWinBlTsolBmDif.clear();
-        SurfWinBlTsolDifDif.clear();
-        SurfWinBlGlSysTsolBmBm.clear();
-        SurfWinBlGlSysTsolDifDif.clear();
-        SurfWinScTsolBmBm.clear();
-        SurfWinScTsolBmDif.clear();
-        SurfWinScTsolDifDif.clear();
-        SurfWinScGlSysTsolBmBm.clear();
-        SurfWinScGlSysTsolDifDif.clear();
-        SurfWinGlTsolBmBm.clear();
-        SurfWinGlTsolBmDif.clear();
-        SurfWinGlTsolDifDif.clear();
-        SurfWinBmSolTransThruIntWinRep.clear();
-        SurfWinBmSolAbsdOutsReveal.clear();
-        SurfWinBmSolRefldOutsRevealReport.clear();
-        SurfWinBmSolAbsdInsReveal.clear();
-        SurfWinBmSolRefldInsReveal.clear();
-        SurfWinBmSolRefldInsRevealReport.clear();
-        SurfWinOutsRevealDiffOntoGlazing.clear();
-        SurfWinInsRevealDiffOntoGlazing.clear();
-        SurfWinInsRevealDiffIntoZone.clear();
-        SurfWinOutsRevealDiffOntoFrame.clear();
-        SurfWinInsRevealDiffOntoFrame.clear();
-        SurfWinInsRevealDiffOntoGlazingReport.clear();
-        SurfWinInsRevealDiffIntoZoneReport.clear();
-        SurfWinInsRevealDiffOntoFrameReport.clear();
-        SurfWinBmSolAbsdInsRevealReport.clear();
-        SurfWinBmSolTransThruIntWinRepEnergy.clear();
-        SurfWinBmSolRefldOutsRevealRepEnergy.clear();
-        SurfWinBmSolRefldInsRevealRepEnergy.clear();
-        SurfWinProfileAngHor.clear();
-        SurfWinProfileAngVert.clear();
         SurfWinShadingFlag.clear();
         SurfWinShadingFlagEMSOn.clear();
         SurfWinShadingFlagEMSValue.clear();

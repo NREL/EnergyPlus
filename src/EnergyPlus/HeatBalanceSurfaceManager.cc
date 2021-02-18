@@ -2443,41 +2443,41 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBlTsolBmBm(SurfNum) = 0.0;
-                    SurfWinBlTsolBmDif(SurfNum) = 0.0;
-                    SurfWinBlTsolDifDif(SurfNum) = 0.0;
-                    SurfWinBlGlSysTsolBmBm(SurfNum) = 0.0;
-                    SurfWinBlGlSysTsolDifDif(SurfNum) = 0.0;
-                    SurfWinScTsolBmBm(SurfNum) = 0.0;
-                    SurfWinScTsolBmDif(SurfNum) = 0.0;
-                    SurfWinScTsolDifDif(SurfNum) = 0.0;
-                    SurfWinScGlSysTsolBmBm(SurfNum) = 0.0;
-                    SurfWinScGlSysTsolDifDif(SurfNum) = 0.0;
-                    SurfWinGlTsolBmBm(SurfNum) = 0.0;
-                    SurfWinGlTsolBmDif(SurfNum) = 0.0;
-                    SurfWinGlTsolDifDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBlTsolBmBm(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBlTsolBmDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBlTsolDifDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBlGlSysTsolBmBm(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBlGlSysTsolDifDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinScTsolBmBm(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinScTsolBmDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinScTsolDifDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinScGlSysTsolBmBm(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinScGlSysTsolDifDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinGlTsolBmBm(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinGlTsolBmDif(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinGlTsolDifDif(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
-                    SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0;
-                    SurfWinBmSolAbsdInsReveal(SurfNum) = 0.0;
-                    SurfWinBmSolRefldInsReveal(SurfNum) = 0.0;
-                    SurfWinOutsRevealDiffOntoGlazing(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffOntoGlazing(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffIntoZone(SurfNum) = 0.0;
-                    SurfWinOutsRevealDiffOntoFrame(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffOntoFrame(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolAbsdInsReveal(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolRefldInsReveal(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffOntoGlazing(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffIntoZone(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinOutsRevealDiffOntoFrame(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffOntoFrame(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0;
-                    SurfWinBmSolRefldInsRevealReport(SurfNum) = 0.0;
-                    SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffOntoGlazingReport(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
-                    SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
-                    SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
-                    SurfWinBmSolRefldOutsRevealRepEnergy(SurfNum) = 0.0;
-                    SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolRefldInsRevealReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolAbsdInsRevealReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffOntoGlazingReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffIntoZoneReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinInsRevealDiffOntoFrameReport(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolRefldOutsRevealRepEnergy(SurfNum) = 0.0;
+                    state.dataSurface->SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0;
                 }
 
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -2542,8 +2542,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 state.dataHeatBal->SurfInitialDifSolInAbsReport(SurfNum) = 0.0;
                 state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = 0.0;
                 state.dataHeatBal->SurfSWInAbsTotalReport(SurfNum) = 0.0;
-                SurfWinProfileAngHor(SurfNum) = 0.0;
-                SurfWinProfileAngVert(SurfNum) = 0.0;
+                state.dataSurface->SurfWinProfileAngHor(SurfNum) = 0.0;
+                state.dataSurface->SurfWinProfileAngVert(SurfNum) = 0.0;
                 state.dataSurface->SurfWinSysSolReflectance(SurfNum) = 0.0;
                 state.dataSurface->SurfWinSysSolAbsorptance(SurfNum) = 0.0;
             }
@@ -3169,7 +3169,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                             FrIncSolarOut * SurfWinFrameSolAbsorp(SurfNum);
                                     // Add diffuse from beam reflected from window outside reveal surfaces
                                     state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) +=
-                                            state.dataEnvrn->BeamSolarRad * SurfWinOutsRevealDiffOntoFrame(SurfNum) *
+                                            state.dataEnvrn->BeamSolarRad * state.dataSurface->SurfWinOutsRevealDiffOntoFrame(SurfNum) *
                                             SurfWinFrameSolAbsorp(SurfNum);
 
                                     // Beam plus diffuse solar on inside of frame
@@ -3179,7 +3179,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                             FrIncSolarIn * SurfWinFrameSolAbsorp(SurfNum);
                                     // Add diffuse from beam reflected from window inside reveal surfaces
                                     state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) +=
-                                            state.dataEnvrn->BeamSolarRad * SurfWinInsRevealDiffOntoFrame(SurfNum) *
+                                            state.dataEnvrn->BeamSolarRad * state.dataSurface->SurfWinInsRevealDiffOntoFrame(SurfNum) *
                                             SurfWinFrameSolAbsorp(SurfNum);
                                 }
 
