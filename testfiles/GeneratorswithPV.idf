@@ -21,7 +21,7 @@
 ! Note, this file was completely changed from Ver. 1.1.1 to 1.2 to add tests for different PV generators
 ! note  this file was changed for Ver. 1.2.2 to add new strategies for ventilated mounting configurations
 
-  Version,9.4;
+  Version,9.5;
 
   Timestep,4;
 
@@ -176,13 +176,17 @@
     0.9200000,               !- Solar Absorptance
     0.9200000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    PVSpandrlPanel,          !- Name
+  ConstructionProperty:InternalHeatSource,
+    PanelSource,             !- Name
+    PVSpandrlPanel,          !- Construction Name
     1,                       !- Source Present After Layer Number
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.0,                     !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  Construction,
+    PVSpandrlPanel,          !- Name
     PVModule(glass),         !- Outside Layer
     PVModule(glass),         !- Layer 2
     B4 - 3 IN INSULATION,    !- Layer 3

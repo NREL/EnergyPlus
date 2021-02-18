@@ -84,12 +84,14 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
+    HWBaseboardDesignObject.allocate(1);
 
     Node(1).MassFlowRate = 0.40;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
     BBNum = 1;
     LoadMet = 0.0;
+    HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).ZonePtr = 1;
     HWBaseboard(1).AirInletTemp = 21.;
     HWBaseboard(1).WaterInletTemp = 82.;
@@ -133,10 +135,13 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
+    HWBaseboardDesignObject.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
 
+
+    HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
     HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
     HWBaseboard(1).ZonePtr = 1;
