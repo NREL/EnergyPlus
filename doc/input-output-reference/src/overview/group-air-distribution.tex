@@ -191,7 +191,7 @@ The time that any zone's total ventilation rate (mechanical ventilation plus nat
 The current airloop mechanical ventilation flow rate at standard density.
 
 \paragraph{Air System Natural Ventilation Flow Rate {[}m3/s{]}}\label{air-system-natural-ventilation-flow-rate}
-The sum of the natural ventilation flow rate at standard density at the current timestep for each zone on the airloop.
+The sum of the natural ventilation flow rate at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the natural ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
 
 \paragraph{Air System Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{air-system-target-voz-ventilation-flow-rate}
 The sum of the target ventilation flow rates \(V_{oz-dyn}\) at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the target ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
