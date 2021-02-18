@@ -1182,8 +1182,21 @@ This field specifies along with setpoint (control) and water schedules how the u
   OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
   SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
-\item
-  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item SurfaceInteriorTemperature - This option will allow the user to control
+      the radiant system using a surface temperature that is calculated inside
+      the radiant system.  This point will be defined by the
+      \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource}
+      description for the system.  In that input, the user has the option to
+      calculate a temperature at a particular point in the construction.  The
+      radiant system will then use this information for controlling the slab
+      not just producing temperatures for outputting at that point.  Users
+      should consult the input for Field: Temperature Calculation Requested
+      After Layer Number for more information.  Note that for the
+      SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
+      used for control is the surface listed above in the field for Surface
+      Name.  If the user enters a group of surfaces for that input, the
+      \emph{first} surface in the radiant group is the surface for control
+      purposes.
 \end{itemize}
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
@@ -1798,8 +1811,21 @@ This field specifies along with setpoint (control) and water schedules how the u
   OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
   SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
-\item
-  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item SurfaceInteriorTemperature - This option will allow the user to control
+      the radiant system using a surface temperature that is calculated inside
+      the radiant system.  This point will be defined by the
+      \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource}
+      description for the system.  In that input, the user has the option to
+      calculate a temperature at a particular point in the construction.  The
+      radiant system will then use this information for controlling the slab
+      not just producing temperatures for outputting at that point.  Users
+      should consult the input for Field: Temperature Calculation Requested
+      After Layer Number for more information.  Note that for the
+      SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
+      used for control is the surface listed above in the field for Surface
+      Name.  If the user enters a group of surfaces for that input, the
+      \emph{first} surface in the radiant group is the surface for control
+      purposes.
 \end{itemize}
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
