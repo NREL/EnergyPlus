@@ -4614,7 +4614,7 @@ namespace EnergyPlus::SystemReports {
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=
                         termUnitOAFrac * state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum);
                     Real64 naturalVentVol = +ZnAirRpt(ActualZoneNum).VentilVolumeStdDensity + ZonePreDefRep(ActualZoneNum).AFNVentVolTotalStdDen;
-                    state.dataSysRpts->SysMechVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
+                    state.dataSysRpts->SysNatVentFlow(AirLoopNum) += termUnitOAFrac * naturalVentVol;
 
                     if (ZonePreDefRep(ActualZoneNum).isOccupied) {
                         state.dataSysRpts->SysAnyZoneOccupied(AirLoopNum) = true;
