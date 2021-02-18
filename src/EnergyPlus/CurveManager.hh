@@ -101,6 +101,7 @@ namespace CurveManager {
         ExponentialDecay,
         DoubleExponentialDecay,
         QuadLinear,
+        QuintLinear,
         CubicLinear,
         ChillerPartLoadWithLift
     };
@@ -310,7 +311,9 @@ namespace CurveManager {
                                   Real64 Var1,               // 1st independent variable
                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
-                                  Optional<Real64 const> Var4 = _  // 4th independent variable
+                                  Optional<Real64 const> Var4 = _,  // 4th independent variable
+                                  Optional<Real64 const> Var5 = _,  // 5th independent variable
+                                  Optional<Real64 const> Var6 = _  // 6th independent variable
     );
 
     Real64 BtwxtTableInterpolation(EnergyPlusData &state,
@@ -355,8 +358,14 @@ namespace CurveManager {
                               Real64 &Var1Max,              // Maximum values of 1st independent variable
                               Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
                               Optional<Real64> Var2Max = _, // Maximum values of 2nd independent variable
-                              Optional<Real64> Var3Min = _, // Minimum values of 2nd independent variable
-                              Optional<Real64> Var3Max = _  // Maximum values of 2nd independent variable
+                              Optional<Real64> Var3Min = _, // Minimum values of 3rd independent variable
+                              Optional<Real64> Var3Max = _, // Maximum values of 3rd independent variable
+                              Optional<Real64> Var4Min = _, // Minimum values of 4th independent variable
+                              Optional<Real64> Var4Max = _, // Maximum values of 4th independent variable
+                              Optional<Real64> Var5Min = _, // Minimum values of 5th independent variable
+                              Optional<Real64> Var5Max = _, // Maximum values of 5th independent variable
+                              Optional<Real64> Var6Min = _, // Minimum values of 6th independent variable
+                              Optional<Real64> Var6Max = _  // Maximum values of 6th independent variable
     );
 
     void SetCurveOutputMinMaxValues(EnergyPlusData &state,
@@ -387,7 +396,8 @@ namespace CurveManager {
                                      Optional<Real64 const> Var2 = _,     // 2nd independent variable
                                      Optional<Real64 const> Var3 = _,     // 3rd independent variable
                                      Optional<Real64 const> Var4 = _,     // 4th independent variable
-                                     Optional<Real64 const> Var5 = _      // 5th independent variable
+                                     Optional<Real64 const> Var5 = _,     // 5th independent variable
+                                     Optional<Real64 const> Var6 = _      // 6th independent variable
     );
 
 } // namespace CurveManager

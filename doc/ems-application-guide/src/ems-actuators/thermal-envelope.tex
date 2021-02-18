@@ -51,7 +51,25 @@ An actuator is available for controlling the construction assigned to a surface 
 
 When using surface construction state to change window properties in combination with daylighting calculations, then the Calculation Method in the ShadowCalculation object must be set to TimestepFrequency. This will cause the daylighting factor calculations to be updated every timestep.
 
-Using the surface construction state actuator brings with it a high degree of risk when it comes to modeling thermal heat capacity and transient heat transfer in opaque surfaces.~ If this actuator is used inappropriately, for example to assign different constructions, to a single surface, that have radically different heat storage capacities, then the heat transfer modeling results may not be physically accurate.~ When a construction state is overridden using this actuator, the thermal history data that evolved while using the previous construction are reused for the new construction. When this actuator is used, the program attempts to detect if incompatible constructions are being assigned. In some cases it issues a warning and allows the assignments to proceed, in others it warns and doesn't allow the assignment to proceed.~ If the original construction assigned to a surface has internal source/sink (defined using Construction:InternalSource) then any assignments to the surface must also be internal source constructions.~ If using the heat transfer algorithm called ConductionFiniteDifference, then the constructions must have the same number of finite difference nodes or the assignment is not allowed.~ The construction state actuator cannot be used in conjunction with the heat transfer algorithms called ConductionFiniteDifferenceSimplified or CombinedHeatAndMoistureFiniteElement.
+Using the surface construction state actuator brings with it a high degree of
+risk when it comes to modeling thermal heat capacity and transient heat
+transfer in opaque surfaces. If this actuator is used inappropriately, for
+example to assign different constructions, to a single surface, that have
+radically different heat storage capacities, then the heat transfer modeling
+results may not be physically accurate. When a construction state is overridden
+using this actuator, the thermal history data that evolved while using the
+previous construction are reused for the new construction. When this actuator
+is used, the program attempts to detect if incompatible constructions are being
+assigned. In some cases it issues a warning and allows the assignments to
+proceed, in others it warns and doesn't allow the assignment to proceed. If the
+original construction assigned to a surface has internal source/sink (defined
+using ConstructionProperty:InternalHeatSource) then any assignments to the
+surface must also be internal source constructions. If using the heat transfer
+algorithm called ConductionFiniteDifference, then the constructions must have
+the same number of finite difference nodes or the assignment is not allowed.
+The construction state actuator cannot be used in conjunction with the heat
+transfer algorithms called ConductionFiniteDifferenceSimplified or
+CombinedHeatAndMoistureFiniteElement.
 
 \subsection{Surface Boundary Conditions}\label{surface-boundary-conditions}
 
