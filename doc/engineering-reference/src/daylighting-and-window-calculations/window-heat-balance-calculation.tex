@@ -207,7 +207,7 @@ The equations are solved as follows:
 
 6)~~~~Using the \({\theta_i}\)~to evaluate the radiative conductances \({h_{r,i}}\)
 
-7)~~~~Find the solution \(\theta = {A^{ - 1}}B\) by LU decomposition
+7)~~~~Find the solution \(\theta = {A^{ - 1}}B\) by either LU decomposition or TriDiagonal Solver
 
 8)~~~~Perform relaxation on the the new \({\theta_i}\) \textbf{:} \({\theta_i} \to \left( {{\theta_i} + {\theta_{prev,i}}} \right)/2\)
 
@@ -222,6 +222,9 @@ Repeat steps 4 to 9 until the difference, \(\Delta {\theta_i}\), between values 
 If this test does not pass after 100 iterations, the tolerance is increased to 0.2K. If the test still fails the program stops and an error message is issued.
 
 The value of the inside face temperature, \({\theta_{2N}}\), determined in this way participates in the zone heat balance solution (see Outdoor/Exterior Convection) and thermal comfort calculation (see Occupant Thermal Comfort).
+
+Note: When A is a tridiagonal matrix, the \href{https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm}{TriDiagonal Solver} is a faster and simpler solver, compared to LU decomposition. The TriDiagonal Solver is used to find the solution for a single glazing with all shading conditions, and a double glazing with no shading, interior and exterior shadings. The between-glass shading is excluded, because the matrix is not a tridiagonal one. The LU decomposition is used for other cases.
+
 
 \subsection{Edge-Of-Glass Effects}\label{edge-of-glass-effects}
 
