@@ -722,14 +722,6 @@ namespace HeatBalanceSurfaceManager {
             InitHeatBalFiniteDiff(state);
         }
 
-        // TODO - not necessary
-        CTFConstOutPart = 0.0;
-        CTFConstInPart = 0.0;
-        if (AnyConstructInternalSourceInInput) {
-            CTFTsrcConstPart = 0.0;
-            CTFTuserConstPart = 0.0;
-        }
-
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
@@ -2266,7 +2258,6 @@ namespace HeatBalanceSurfaceManager {
         // (I)BLAST legacy routine QSUN
 
         // TODO: InterpSlatAng (XL)
-        // TODO: TDD in Zone
 
         // Using/Aliasing
         using SolarShading::CalcInteriorSolarDistribution;
@@ -4584,7 +4575,6 @@ namespace HeatBalanceSurfaceManager {
 
         int HistTermNum; // DO loop counter for history terms
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
-        int SurfNum;     // Surface number DO loop counter
 
         static Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
         static Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
@@ -4624,33 +4614,34 @@ namespace HeatBalanceSurfaceManager {
 
         auto const l111(TH.index(1, 1, 1));
         auto const l211(TH.index(2, 1, 1));
-        auto l11(l111);
-        auto l21(l211);
-        for (SurfNum = 1; SurfNum <= TotSurfaces;
-             ++SurfNum, ++l11, ++l21) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            auto const &surface(Surface(SurfNum));
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+            // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
+                int l11 = l111 + SurfNum - 1;
+                int l21 = l211 + SurfNum - 1;
+                auto const &surface(Surface(SurfNum));
 
-            if (surface.Class == SurfaceClass::Window || !surface.HeatTransSurf) continue;
+                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)) continue;
 
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)) continue;
+                int const ConstrNum(surface.Construction);
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
-            int const ConstrNum(surface.Construction);
-            auto const &construct(state.dataConstruction->Construct(ConstrNum));
+                if (construct.NumCTFTerms == 0) continue; // Skip surfaces with no history terms
 
-            if (construct.NumCTFTerms == 0) continue; // Skip surfaces with no history terms
+                // Sign convention for the various terms in the following two equations
+                // is based on the form of the Conduction Transfer Function equation
+                // given by:
+                // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old) + (Sum of)(V Qsrc)
+                // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old) + (Sum of)(W Qsrc)
+                // In both equations, flux is positive from outside to inside.  The V and W terms are for radiant systems only.
 
-            // Sign convention for the various terms in the following two equations
-            // is based on the form of the Conduction Transfer Function equation
-            // given by:
-            // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old) + (Sum of)(V Qsrc)
-            // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old) + (Sum of)(W Qsrc)
-            // In both equations, flux is positive from outside to inside.  The V and W terms are for radiant systems only.
-
-            // Set current inside flux:
-            Real64 const QH_12 = QH[l21] = TH[l11] * construct.CTFCross(0) - TempSurfIn(SurfNum) * construct.CTFInside(0) +
-                                           CTFConstInPart(SurfNum); // Heat source/sink term for radiant systems
-            if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
-                surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) {
+                // Set current inside flux:
+                Real64 const QH_12 = QH[l21] = TH[l11] * construct.CTFCross(0) - TempSurfIn(SurfNum) * construct.CTFInside(0) +
+                                               CTFConstInPart(SurfNum); // Heat source/sink term for radiant systems
+                // Only HT opaq surfaces are evaluated, previous if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
+                // surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) checks are reduncant.
                 if (construct.SourceSinkPresent) {
                     Real64 const QH_12s = QH[l21] = QH_12 + QsrcHist(SurfNum, 1) * construct.CTFSourceIn(0);
                     SurfOpaqInsFaceConduction(SurfNum) = surface.Area * QH_12s;
@@ -4669,52 +4660,48 @@ namespace HeatBalanceSurfaceManager {
                 } else {
                     SurfOpaqInsFaceCondLossRep(SurfNum) = - SurfOpaqInsFaceConduction(SurfNum);
                 }
-            }
 
-            // Update the temperature at the source/sink location (if one is present)
-            if (construct.SourceSinkPresent) {
-                TempSource(SurfNum) = TsrcHist(SurfNum, 1) = TH[l11] * construct.CTFTSourceOut(0) + TempSurfIn(SurfNum) * construct.CTFTSourceIn(0) +
-                                                             QsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + CTFTsrcConstPart(SurfNum);
-                TempUserLoc(SurfNum) = TuserHist(SurfNum, 1) = TH[l11] * construct.CTFTUserOut(0) + TempSurfIn(SurfNum) * construct.CTFTUserIn(0) +
-                                                               QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + CTFTuserConstPart(SurfNum);
-            }
+                // Update the temperature at the source/sink location (if one is present)
+                if (construct.SourceSinkPresent) {
+                    TempSource(SurfNum) = TsrcHist(SurfNum, 1) = TH[l11] * construct.CTFTSourceOut(0) + TempSurfIn(SurfNum) * construct.CTFTSourceIn(0) +
+                                                                 QsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + CTFTsrcConstPart(SurfNum);
+                    TempUserLoc(SurfNum) = TuserHist(SurfNum, 1) = TH[l11] * construct.CTFTUserOut(0) + TempSurfIn(SurfNum) * construct.CTFTUserIn(0) +
+                                                                   QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + CTFTuserConstPart(SurfNum);
+                }
 
-            if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
+                if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
 
-            // Set current outside flux:
-            if (construct.SourceSinkPresent) {
-                QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) +
-                          QsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) + CTFConstOutPart(SurfNum); // Heat source/sink term for radiant systems
-            } else {
-                QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) + CTFConstOutPart(SurfNum);
-            }
-            if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
-                surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) {
+                // Set current outside flux:
+                if (construct.SourceSinkPresent) {
+                    QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) +
+                              QsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) + CTFConstOutPart(SurfNum); // Heat source/sink term for radiant systems
+                } else {
+                    QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) + CTFConstOutPart(SurfNum);
+                }
                 SurfOpaqOutsideFaceConductionFlux(SurfNum) = -QH[l11]; // switch sign for balance at outside face
                 SurfOpaqOutsideFaceConduction(SurfNum) = surface.Area * SurfOpaqOutsideFaceConductionFlux(SurfNum);
             }
-
         } // ...end of loop over all (heat transfer) surfaces...
 
-        l11 = l111;
-        l21 = l211;
-        for (SurfNum = 1; SurfNum <= TotSurfaces;
-             ++SurfNum, ++l11, ++l21) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            auto const &surface(Surface(SurfNum));
-
-            if (surface.Class == SurfaceClass::Window || !surface.HeatTransSurf) continue;
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD) &&
-                (surface.HeatTransferAlgorithm != HeatTransferModel_TDD))
-                continue;
-            if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
-                TempExt1(SurfNum) = TH[l11];
-                TempInt1(SurfNum) = TempSurfIn(SurfNum);
-                QExt1(SurfNum) = QH[l11];
-                QInt1(SurfNum) = QH[l21];
-                if (AnyConstructInternalSourceInInput) {
-                    Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
-                    Tuser1(SurfNum) = TuserHist(SurfNum, 1);
-                    Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
+                int l11 = l111 + SurfNum - 1;
+                int l21 = l211 + SurfNum - 1;
+                if ((Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF) && (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                    continue;
+                if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
+                    TempExt1(SurfNum) = TH[l11];
+                    TempInt1(SurfNum) = TempSurfIn(SurfNum);
+                    QExt1(SurfNum) = QH[l11];
+                    QInt1(SurfNum) = QH[l21];
+                    if (AnyConstructInternalSourceInInput) {
+                        Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
+                        Tuser1(SurfNum) = TuserHist(SurfNum, 1);
+                        Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
+                    }
                 }
             }
 
@@ -4722,150 +4709,152 @@ namespace HeatBalanceSurfaceManager {
 
         // SHIFT TEMPERATURE AND FLUX HISTORIES:
         // SHIFT AIR TEMP AND FLUX SHIFT VALUES WHEN AT BOTTOM OF ARRAY SPACE.
-        // TODO: zone surface
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all (heat transfer) surfaces...
-            auto const &surface(Surface(SurfNum));
 
-            if (surface.Class == SurfaceClass::Window || surface.Class == SurfaceClass::TDD_Dome || !surface.HeatTransSurf) continue;
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD) &&
-                (surface.HeatTransferAlgorithm != HeatTransferModel_TDD))
-                continue;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+//        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all (heat transfer) surfaces...
+                auto const &surface(Surface(SurfNum));
 
-            int const ConstrNum(surface.Construction);
-            auto const &construct(state.dataConstruction->Construct(ConstrNum));
+                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                    continue;
 
-            ++SUMH(SurfNum);
-            SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
+                int const ConstrNum(surface.Construction);
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
-            if (SUMH(SurfNum) == construct.NumHistories) {
+                ++SUMH(SurfNum);
+                SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
 
-                SUMH(SurfNum) = 0;
+                if (SUMH(SurfNum) == construct.NumHistories) {
 
-                if (construct.NumCTFTerms > 1) {
-                    int const numCTFTerms(construct.NumCTFTerms);
-                    for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
-                        auto l(THM.index(SideNum, numCTFTerms, SurfNum));
-                        auto const li(THM.size3());
-                        auto l1(l + li);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= li) { // Tuned Linear indexing
-                            // TH( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum - 1, SurfNum );
-                            // QH( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum - 1, SurfNum );
-                            TH[l1] = THM[l1] = THM[l];
-                            QH[l1] = QHM[l1] = QHM[l];
+                    SUMH(SurfNum) = 0;
+
+                    if (construct.NumCTFTerms > 1) {
+                        int const numCTFTerms(construct.NumCTFTerms);
+                        for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
+                            auto l(THM.index(SideNum, numCTFTerms, SurfNum));
+                            auto const li(THM.size3());
+                            auto l1(l + li);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= li) { // Tuned Linear indexing
+                                // TH( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum - 1, SurfNum );
+                                // QH( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum - 1, SurfNum );
+                                TH[l1] = THM[l1] = THM[l];
+                                QH[l1] = QHM[l1] = QHM[l];
+                            }
+                        }
+                        if (construct.SourceSinkPresent) {
+                            auto m(TsrcHistM.index(SurfNum, numCTFTerms));
+                            auto m1(m + 1);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
+                                // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
+                                // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
+                                TsrcHist[m1] = TsrcHistM[m1] = TsrcHistM[m];
+                                QsrcHist[m1] = QsrcHistM[m1] = QsrcHistM[m];
+                                TuserHist[m1] = TuserHistM[m1] = TuserHistM[m];
+                            }
                         }
                     }
+
+                    // Tuned Linear indexing
+                    // THM( 1, 2, SurfNum ) = TempExt1( SurfNum );
+                    // THM( 2, 2, SurfNum ) = TempInt1( SurfNum );
+                    // TsrcHistM( SurfNum, 2 ) = Tsrc1( SurfNum );
+                    // QHM( 1, 2, SurfNum ) = QExt1( SurfNum );
+                    // QHM( 2, 2, SurfNum ) = QInt1( SurfNum );
+                    // QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
+                    //
+                    // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum );
+                    // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum );
+                    // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
+                    // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum );
+                    // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum );
+                    // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 );
+
+                    auto const l21(TH.index(1, 2, SurfNum)); // Linear index
+                    auto const l22(TH.index(2, 2, SurfNum)); // Linear index
+                    THM[l21] = TempExt1(SurfNum);
+                    THM[l22] = TempInt1(SurfNum);
+                    QHM[l21] = QExt1(SurfNum);
+                    QHM[l22] = QInt1(SurfNum);
+
+                    TH[l21] = THM[l21];
+                    TH[l22] = THM(2, 2, SurfNum);
+                    QH[l21] = QHM[l21];
+                    QH[l22] = QHM(2, 2, SurfNum);
+
                     if (construct.SourceSinkPresent) {
-                        auto m(TsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
-                            // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
-                            // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
-                            TsrcHist[m1] = TsrcHistM[m1] = TsrcHistM[m];
-                            QsrcHist[m1] = QsrcHistM[m1] = QsrcHistM[m];
-                            TuserHist[m1] = TuserHistM[m1] = TuserHistM[m];
+                        TsrcHistM(SurfNum, 2) = Tsrc1(SurfNum);
+                        TuserHistM(SurfNum, 2) = Tuser1(SurfNum);
+                        QsrcHistM(SurfNum, 2) = Qsrc1(SurfNum);
+                        TsrcHist(SurfNum, 2) = TsrcHistM(SurfNum, 2);
+                        TuserHist(SurfNum, 2) = TuserHistM(SurfNum, 2);
+                        QsrcHist(SurfNum, 2) = QsrcHistM(SurfNum, 2);
+                    }
+
+                } else {
+
+                    Real64 const sum_steps(SumTime(SurfNum) / construct.CTFTimeStep);
+                    if (construct.NumCTFTerms > 1) {
+                        int const numCTFTerms(construct.NumCTFTerms);
+                        for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
+                            auto l(THM.index(SideNum, numCTFTerms, SurfNum));
+                            auto const s3(THM.size3());
+                            auto l1(l + s3);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s3) { // Tuned Linear indexing
+                                // Real64 const THM_l1( THM( SideNum, HistTermNum, SurfNum ) );
+                                // TH( SideNum, HistTermNum, SurfNum ) = THM_l1 - ( THM_l1 - THM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
+                                // Real64 const QHM_l1( QHM( SideNum, HistTermNum, SurfNum ) );
+                                // QH( SideNum, HistTermNum, SurfNum ) = QHM_l1 - ( QHM_l1 - QHM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
+                                Real64 const THM_l1(THM[l1]);
+                                TH[l1] = THM_l1 - (THM_l1 - THM[l]) * sum_steps;
+                                Real64 const QHM_l1(QHM[l1]);
+                                QH[l1] = QHM_l1 - (QHM_l1 - QHM[l]) * sum_steps;
+                            }
+                        }
+                        if (construct.SourceSinkPresent) {
+                            auto m(TsrcHistM.index(SurfNum, numCTFTerms));
+                            auto m1(m + 1);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
+                                // Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
+                                // TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) *
+                                // sum_steps;  Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );  QsrcHist( SurfNum, HistTermNum ) =
+                                // QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
+                                Real64 const TsrcHistM_m1(TsrcHistM[m1]);
+                                TsrcHist[m1] = TsrcHistM_m1 - (TsrcHistM_m1 - TsrcHistM[m]) * sum_steps;
+                                Real64 const QsrcHistM_m1(QsrcHistM[m1]);
+                                QsrcHist[m1] = QsrcHistM_m1 - (QsrcHistM_m1 - QsrcHistM[m]) * sum_steps;
+                                Real64 const TuserHistM_m1(TuserHistM[m1]);
+                                TuserHist[m1] = TuserHistM_m1 - (TuserHistM_m1 - TuserHistM[m]) * sum_steps;
+                            }
                         }
                     }
-                }
 
-                // Tuned Linear indexing
-                // THM( 1, 2, SurfNum ) = TempExt1( SurfNum );
-                // THM( 2, 2, SurfNum ) = TempInt1( SurfNum );
-                // TsrcHistM( SurfNum, 2 ) = Tsrc1( SurfNum );
-                // QHM( 1, 2, SurfNum ) = QExt1( SurfNum );
-                // QHM( 2, 2, SurfNum ) = QInt1( SurfNum );
-                // QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
-                //
-                // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum );
-                // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum );
-                // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
-                // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum );
-                // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum );
-                // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 );
+                    // Tuned Linear indexing
+                    // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
+                    // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum ) - ( THM( 2, 2, SurfNum ) - TempInt1( SurfNum ) ) * sum_steps;
+                    // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum ) - ( QHM( 1, 2, SurfNum ) - QExt1( SurfNum ) ) * sum_steps;
+                    // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum ) - ( QHM( 2, 2, SurfNum ) - QInt1( SurfNum ) ) * sum_steps;
 
-                auto const l21(TH.index(1, 2, SurfNum)); // Linear index
-                auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                THM[l21] = TempExt1(SurfNum);
-                THM[l22] = TempInt1(SurfNum);
-                QHM[l21] = QExt1(SurfNum);
-                QHM[l22] = QInt1(SurfNum);
+                    auto const l21(TH.index(1, 2, SurfNum)); // Linear index
+                    auto const l22(TH.index(2, 2, SurfNum)); // Linear index
+                    TH[l21] = THM[l21] - (THM[l21] - TempExt1(SurfNum)) * sum_steps;
+                    TH[l22] = THM[l22] - (THM[l22] - TempInt1(SurfNum)) * sum_steps;
+                    QH[l21] = QHM[l21] - (QHM[l21] - QExt1(SurfNum)) * sum_steps;
+                    QH[l22] = QHM[l22] - (QHM[l22] - QInt1(SurfNum)) * sum_steps;
 
-                TH[l21] = THM[l21];
-                TH[l22] = THM(2, 2, SurfNum);
-                QH[l21] = QHM[l21];
-                QH[l22] = QHM(2, 2, SurfNum);
+                    // Tuned Linear indexing
+                    // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
+                    // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
 
-                if (construct.SourceSinkPresent) {
-                    TsrcHistM(SurfNum, 2) = Tsrc1(SurfNum);
-                    TuserHistM(SurfNum, 2) = Tuser1(SurfNum);
-                    QsrcHistM(SurfNum, 2) = Qsrc1(SurfNum);
-                    TsrcHist(SurfNum, 2) = TsrcHistM(SurfNum, 2);
-                    TuserHist(SurfNum, 2) = TuserHistM(SurfNum, 2);
-                    QsrcHist(SurfNum, 2) = QsrcHistM(SurfNum, 2);
-                }
-
-            } else {
-
-                Real64 const sum_steps(SumTime(SurfNum) / construct.CTFTimeStep);
-                if (construct.NumCTFTerms > 1) {
-                    int const numCTFTerms(construct.NumCTFTerms);
-                    for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
-                        auto l(THM.index(SideNum, numCTFTerms, SurfNum));
-                        auto const s3(THM.size3());
-                        auto l1(l + s3);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s3) { // Tuned Linear indexing
-                            // Real64 const THM_l1( THM( SideNum, HistTermNum, SurfNum ) );
-                            // TH( SideNum, HistTermNum, SurfNum ) = THM_l1 - ( THM_l1 - THM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
-                            // Real64 const QHM_l1( QHM( SideNum, HistTermNum, SurfNum ) );
-                            // QH( SideNum, HistTermNum, SurfNum ) = QHM_l1 - ( QHM_l1 - QHM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
-                            Real64 const THM_l1(THM[l1]);
-                            TH[l1] = THM_l1 - (THM_l1 - THM[l]) * sum_steps;
-                            Real64 const QHM_l1(QHM[l1]);
-                            QH[l1] = QHM_l1 - (QHM_l1 - QHM[l]) * sum_steps;
-                        }
-                    }
                     if (construct.SourceSinkPresent) {
-                        auto m(TsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
-                            // Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
-                            // TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) *
-                            // sum_steps;  Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );  QsrcHist( SurfNum, HistTermNum ) =
-                            // QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
-                            Real64 const TsrcHistM_m1(TsrcHistM[m1]);
-                            TsrcHist[m1] = TsrcHistM_m1 - (TsrcHistM_m1 - TsrcHistM[m]) * sum_steps;
-                            Real64 const QsrcHistM_m1(QsrcHistM[m1]);
-                            QsrcHist[m1] = QsrcHistM_m1 - (QsrcHistM_m1 - QsrcHistM[m]) * sum_steps;
-                            Real64 const TuserHistM_m1(TuserHistM[m1]);
-                            TuserHist[m1] = TuserHistM_m1 - (TuserHistM_m1 - TuserHistM[m]) * sum_steps;
-                        }
+                        auto const l2(TsrcHist.index(SurfNum, 2));
+                        TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - Tsrc1(SurfNum)) * sum_steps;
+                        QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - Qsrc1(SurfNum)) * sum_steps;
+                        TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - Tuser1(SurfNum)) * sum_steps;
                     }
-                }
-
-                // Tuned Linear indexing
-                // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
-                // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum ) - ( THM( 2, 2, SurfNum ) - TempInt1( SurfNum ) ) * sum_steps;
-                // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum ) - ( QHM( 1, 2, SurfNum ) - QExt1( SurfNum ) ) * sum_steps;
-                // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum ) - ( QHM( 2, 2, SurfNum ) - QInt1( SurfNum ) ) * sum_steps;
-
-                auto const l21(TH.index(1, 2, SurfNum)); // Linear index
-                auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                TH[l21] = THM[l21] - (THM[l21] - TempExt1(SurfNum)) * sum_steps;
-                TH[l22] = THM[l22] - (THM[l22] - TempInt1(SurfNum)) * sum_steps;
-                QH[l21] = QHM[l21] - (QHM[l21] - QExt1(SurfNum)) * sum_steps;
-                QH[l22] = QHM[l22] - (QHM[l22] - QInt1(SurfNum)) * sum_steps;
-
-                // Tuned Linear indexing
-                // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
-                // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
-
-                if (construct.SourceSinkPresent) {
-                    auto const l2(TsrcHist.index(SurfNum, 2));
-                    TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - Tsrc1(SurfNum)) * sum_steps;
-                    QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - Qsrc1(SurfNum)) * sum_steps;
-                    TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - Tuser1(SurfNum)) * sum_steps;
                 }
             }
-
         } // ...end of loop over all (heat transfer) surfaces
     }
 

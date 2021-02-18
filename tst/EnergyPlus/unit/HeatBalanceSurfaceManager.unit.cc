@@ -313,6 +313,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     DataSurfaces::Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     DataSurfaces::Surface(1).ExtBoundCond = 1;
     DataSurfaces::Surface(1).Construction = 1;
+    DataHeatBalance::Zone(1).NonWindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).NonWindowSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
