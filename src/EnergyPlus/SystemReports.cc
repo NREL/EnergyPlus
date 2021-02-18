@@ -2265,7 +2265,7 @@ namespace EnergyPlus::SystemReports {
             "Sum",
             "Facility");
 
-        SetupOutputVariable(state, "Facility any Zone Ventilation When Unoccupied Time",
+        SetupOutputVariable(state, "Facility Any Zone Ventilation When Unoccupied Time",
             OutputProcessor::Unit::hr,
             state.dataSysRpts->AnyZoneTimeVentUnocc,
             "HVAC",
