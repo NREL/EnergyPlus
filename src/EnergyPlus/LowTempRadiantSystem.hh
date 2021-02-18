@@ -91,7 +91,7 @@ namespace LowTempRadiantSystem {
       ODBControl,           // Controls system using outside air dry-bulb temperature
       OWBControl,           // Controls system using outside air wet-bulb temperature
       SurfFaceTempControl,  // Controls system using the surface inside face temperature
-      SurfIntTempControl,   // Controls system using a temperature inside the radiant system construction as defined by the Construction:InternalSource input
+      SurfIntTempControl,   // Controls system using a temperature inside the radiant system construction as defined by the Construction + ConstructionProperty:InternalHeatSource inputs
       RunningMeanODBControl // Controls system using the running mean outdoor dry-bulb temperature
     };
     // Setpoint Types:
