@@ -87,6 +87,30 @@ class TestAPISysExit(unittest.TestCase):
             return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
             self.assertEqual(return_code, 1)
 
+    def test_version(self):
+        """
+        Related #8483 - When we call ProcessArgssystem exit called when energyplus can't run
+        """
+        cmd_args = shlex.split('-v')
+
+        def message_handler(message: bytes) -> None:
+            """
+            Asserts energyplus doesn't try to run
+            """
+            self.assertNotIn("EnergyPlus Starting", message.decode('utf-8'))
+
+        def error_handler(severity: int, message: bytes) -> None:
+            """
+            Same, we shouldn't run, but this checks stderr instead
+            """
+            self.assertNotIn("Input file path", message.decode('utf-8'))
+
+        self.api.runtime.callback_message(self.state, message_handler)
+        self.api.functional.callback_error(self.state, error_handler)
+        return_code = self.api.runtime.run_energyplus(self.state, cmd_args)
+        # Finally, asserts that the return code indicates success
+        self.assertEqual(return_code, 0)
+
 
 if __name__ == '__main__':
     unittest.main()
