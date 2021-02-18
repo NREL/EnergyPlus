@@ -430,7 +430,10 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    if (return_code != EXIT_SUCCESS) {
+        return return_code;
+    }
 
     int status = initializeAsLibrary(state);
     if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;
