@@ -87,16 +87,8 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedCapCoolWasAutoSized;           // true if RatedCapCool was autosize on input
         Real64 RatedPowerCool;                   // Rated Cooling Power Consumption[W]
         bool ratedPowerCoolWasAutoSized;         // ture if RatedPowerCool was autosize on input
-        Real64 CoolCap1;                         // 1st coefficient of the Cooling capacity performance curve
-        Real64 CoolCap2;                         // 2nd coefficient of the Cooling capacity performance curve
-        Real64 CoolCap3;                         // 3rd coefficient of the Cooling capacity performance curve
-        Real64 CoolCap4;                         // 4th coefficient of the Cooling capacity performance curve
-        Real64 CoolCap5;                         // 5th coefficient of the Cooling capacity performance curve
-        Real64 CoolPower1;                       // 1st coefficient of the Cooling power consumption curve
-        Real64 CoolPower2;                       // 2nd coefficient of the Cooling power consumption curve
-        Real64 CoolPower3;                       // 3rd coefficient of the Cooling power consumption curve
-        Real64 CoolPower4;                       // 4th coefficient of the Cooling power consumption curve
-        Real64 CoolPower5;                       // 5th coefficient of the Cooling power consumption curve
+        int CoolCapCurveIndex;                   // Index of the Cooling capacity performance curve
+        int CoolPowCurveIndex;                   // Index of the Cooling power consumption curve
         int CoolCapNegativeCounter;              // Counter for number of times cooling capacity curve is <= 0.0
         int CoolCapNegativeIndex;                // Index for recurring warning message regarding cooling capacity curve is <= 0.0
         int CoolPowerNegativeCounter;            // Counter for number of times cooling power curve is <= 0.0
@@ -109,16 +101,8 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedCapHeatWasAutoSized;           // true if RatedCapHeat was autosize on input
         Real64 RatedPowerHeat;                   // Rated Heating Compressor Power[W]
         bool ratedPowerHeatWasAutoSized;         // true if RatedPowerHeat was autosize on input
-        Real64 HeatCap1;                         // 1st coefficient of the Heating capacity performance curve
-        Real64 HeatCap2;                         // 2nd coefficient of the Heating capacity performance curve
-        Real64 HeatCap3;                         // 3rd coefficient of the Heating capacity performance curve
-        Real64 HeatCap4;                         // 4th coefficient of the Heating capacity performance curve
-        Real64 HeatCap5;                         // 5th coefficient of the Heating capacity performance curve
-        Real64 HeatPower1;                       // 1st coefficient of the Heating power consumption curve
-        Real64 HeatPower2;                       // 2nd coefficient of the Heating power consumption curve
-        Real64 HeatPower3;                       // 3rd coefficient of the Heating power consumption curve
-        Real64 HeatPower4;                       // 4th coefficient of the Heating power consumption curve
-        Real64 HeatPower5;                       // 5th coefficient of the Heating power consumption curve
+        int HeatCapCurveIndex;                  // Index of the Heating capacity performance curve
+        int HeatPowCurveIndex;                  // Index of the Heating power consumption curve
         int LoadSideInletNodeNum;                // Load Side Inlet Node
         int LoadSideOutletNodeNum;               // Load Side Outlet Node
         int SourceSideInletNodeNum;              // Source Side Inlet Node
@@ -169,12 +153,10 @@ namespace HeatPumpWaterToWaterSimple {
             : checkEquipName(true), WWHPPlantTypeOfNum(0), Available(false), ON(false), IsOn(false), MustRun(false), SourceSideDesignMassFlow(0.0),
               LoadSideDesignMassFlow(0.0), RatedLoadVolFlowCool(0.0), ratedLoadVolFlowCoolWasAutoSized(false), RatedSourceVolFlowCool(0.0),
               ratedSourceVolFlowCoolWasAutoSized(false), RatedCapCool(0.0), ratedCapCoolWasAutoSized(false), RatedPowerCool(0.0),
-              ratedPowerCoolWasAutoSized(false), CoolCap1(0.0), CoolCap2(0.0), CoolCap3(0.0), CoolCap4(0.0), CoolCap5(0.0), CoolPower1(0.0),
-              CoolPower2(0.0), CoolPower3(0.0), CoolPower4(0.0), CoolPower5(0.0), CoolCapNegativeCounter(0), CoolCapNegativeIndex(0),
+              ratedPowerCoolWasAutoSized(false), CoolCapCurveIndex(0), CoolPowCurveIndex(0), CoolCapNegativeCounter(0), CoolCapNegativeIndex(0),
               CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0), ratedLoadVolFlowHeatWasAutoSized(false),
               RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0), ratedCapHeatWasAutoSized(false),
-              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCap1(0.0), HeatCap2(0.0), HeatCap3(0.0), HeatCap4(0.0), HeatCap5(0.0),
-              HeatPower1(0.0), HeatPower2(0.0), HeatPower3(0.0), HeatPower4(0.0), HeatPower5(0.0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
+              RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
               SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0), HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0),
               HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0), SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0),
               LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0), refCOP(0.0), sizFac(0.0), companionIndex(0),
