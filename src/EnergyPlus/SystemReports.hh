@@ -347,13 +347,6 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D<Real64> SysTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
     Array1D<Real64> SysTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
     Array1D<bool> SysAnyZoneOccupied;            // true if any zone on system is occupied
-    Real64 AnySysTimeBelowVozDyn = 0.0;          // time [hrs] that any air loop mechanical+natural ventilation is < VozTarget - 1%
-    Real64 AllSyssTimeAtVozDyn = 0.0;            // time [hrs] that all air loops mechanical+natural ventilation is = VozTarget within 1% and > zero
-    Real64 AnySysTimeAboveVozDyn = 0.0;          // time [hrs] that any air loop mechanical+natural ventilation is > VozTarget + 1%
-    Real64 AnySysTimeVentUnocc = 0.0;            // time [hrs] that any air loop mechanical+natural ventilation is > zero during unoccupied
-    Real64 AnySysTimeBelowVozDynOcc = 0.0;       // time [hrs] that any air loop mechanical+natural ventilation is < VozTarget - 1% during occupied
-    Real64 AllSyssTimeAtVozDynOcc = 0.0;         // time [hrs] that all air loops mech+nat vent is = VozTarget within 1% and > zero during occupied
-    Real64 AnySysTimeAboveVozDynOcc = 0.0;       // time [hrs] that any air loop mechanical+natural ventilation is > VozTarget + 1% during occupied
 
     bool AirLoopLoadsReportEnabled = true;
     bool VentLoadsReportEnabled = true;
@@ -474,13 +467,6 @@ struct SystemReportsData : BaseGlobalStruct {
         this->SysTimeAboveVozDyn.deallocate();
         this->SysTimeVentUnocc.deallocate();
         this->SysAnyZoneOccupied.deallocate();
-        this->AnySysTimeBelowVozDyn = 0.0;
-        this->AllSyssTimeAtVozDyn = 0.0;
-        this->AnySysTimeAboveVozDyn = 0.0;
-        this->AnySysTimeVentUnocc = 0.0;
-        this->AnySysTimeBelowVozDynOcc = 0.0;
-        this->AllSyssTimeAtVozDynOcc = 0.0;
-        this->AnySysTimeAboveVozDynOcc = 0.0;
         this->AirLoopLoadsReportEnabled = true;
         this->VentLoadsReportEnabled = true;
         this->VentEnergyReportEnabled = false;

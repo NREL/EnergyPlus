@@ -4313,14 +4313,6 @@ namespace EnergyPlus::SystemReports {
             state.dataSysRpts->SysAnyZoneOccupied(sysNum) = false;
         }
 
-        state.dataSysRpts->AnySysTimeBelowVozDyn = 0.0;
-        state.dataSysRpts->AllSyssTimeAtVozDyn = 0.0;
-        state.dataSysRpts->AnySysTimeAboveVozDyn = 0.0;
-        state.dataSysRpts->AnySysTimeVentUnocc = 0.0;
-        state.dataSysRpts->AnySysTimeBelowVozDynOcc = 0.0;
-        state.dataSysRpts->AllSyssTimeAtVozDynOcc = 0.0;
-        state.dataSysRpts->AnySysTimeAboveVozDynOcc = 0.0;
-
         for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             Real64 ZAirSysZoneVentLoad = 0.0; // ventilation load attributed to a particular zone from all primary air systems serving the zone [J]
@@ -4805,17 +4797,14 @@ namespace EnergyPlus::SystemReports {
             // Allow 1% tolerance
             if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
                 state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = TimeStepSys;
-                state.dataSysRpts->AnySysTimeBelowVozDyn = TimeStepSys;
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotal += TimeStepSys;
             }
             else if (totMechNatVentVolFlowStdRho > (1.01 * targetFlowVoz)) {
                 state.dataSysRpts->SysTimeAboveVozDyn(sysNum) = TimeStepSys;
-                state.dataSysRpts->AnySysTimeAboveVozDyn = TimeStepSys;
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotal += TimeStepSys;
             }
             else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
                 state.dataSysRpts->SysTimeAtVozDyn(sysNum) = TimeStepSys;
-                state.dataSysRpts->AllSyssTimeAtVozDyn = TimeStepSys;
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotal += TimeStepSys;
             }
             if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
