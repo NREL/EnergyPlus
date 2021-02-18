@@ -216,6 +216,8 @@ namespace ChillerGasAbsorption {
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
         void initialize(EnergyPlusData &state);
 
         void setupOutputVariables(EnergyPlusData &state);

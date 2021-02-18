@@ -64,19 +64,6 @@ struct EnergyPlusData;
 
 namespace PlantManager {
 
-    // MODULE PARAMETER DEFINITIONS
-    extern int const TempSetPt;
-    extern int const FlowSetPt;
-
-    extern bool InitLoopEquip;
-    extern bool GetCompSizFac;
-
-    extern Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-    extern Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-    extern Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-
-    void clear_state();
-
     void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
@@ -122,9 +109,13 @@ namespace PlantManager {
 
 struct PlantMgrData : BaseGlobalStruct {
 
+    bool InitLoopEquip = true;
+    bool GetCompSizFac = true;
+
     void clear_state() override
     {
-
+        this->InitLoopEquip = true;
+        this->GetCompSizFac = true;
     }
 };
 

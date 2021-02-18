@@ -135,7 +135,7 @@ namespace RoomAirModelManager {
         using RoomAirModelUserTempPattern::ManageUserDefinedPatterns;
         using UFADManager::ManageUCSDUFModels;
 
-        // FLOW:
+
         if (GetAirModelData) {
             GetAirModelDatas(state);
             GetAirModelData = false;
@@ -615,7 +615,7 @@ namespace RoomAirModelManager {
         int ListSurfNum; // Index number of surfaces listed in the air node object
         bool SurfNeeded;
 
-        // FLOW:
+
 
         if (!state.dataRoomAirMod->MundtModelUsed) return;
 
@@ -827,7 +827,7 @@ namespace RoomAirModelManager {
         int NumOfMundtContrl; // Number of Mundt Model Controls
         int ZoneNum;          // Index number for zones
 
-        // FLOW:
+
 
         if (!state.dataRoomAirMod->MundtModelUsed) return;
 

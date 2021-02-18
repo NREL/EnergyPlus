@@ -74,7 +74,7 @@
 !    LPD_Ctrl = 0.02
 !    con_swingdoor_r = 0.475963827
 
-  Version,9.4;
+  Version,9.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

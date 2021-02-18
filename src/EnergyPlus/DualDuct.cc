@@ -171,7 +171,7 @@ namespace DualDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DDNum; // The Damper that you are currently loading input into
 
-        // FLOW:
+
 
         // Obtains and Allocates Damper related parameters from input file
         if (GetDualDuctInputFlag) { // First time subroutine has been entered
@@ -863,7 +863,7 @@ namespace DualDuct {
         // static Array1D_bool MyAirLoopFlag;
         int Loop;          // Loop checking control variable
         Real64 PeopleFlow; // local sum variable, m3/s
-        // FLOW:
+
 
         // Do the Begin Simulation initializations
         if (InitDualDuctMyOneTimeFlag) {
