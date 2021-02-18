@@ -4269,18 +4269,31 @@ namespace EnergyPlus::SystemReports {
         if (!state.dataSysRpts->VentReportStructureCreated) return;
         if (!state.dataSysRpts->VentLoadsReportEnabled) return;
         // following inits are array assignments across all controlled zones.
-        state.dataSysRpts->ZoneOAMassFlow = 0.0;
-        state.dataSysRpts->ZoneOAMass = 0.0;
-        state.dataSysRpts->ZoneOAVolFlowStdRho = 0.0;
-        state.dataSysRpts->ZoneOAVolStdRho = 0.0;
-        state.dataSysRpts->ZoneOAVolFlowCrntRho = 0.0;
-        state.dataSysRpts->ZoneOAVolCrntRho = 0.0;
-        state.dataSysRpts->ZoneMechACH = 0.0;
-        state.dataSysRpts->ZoneTargetVentilationFlowVoz = 0.0;
-        state.dataSysRpts->ZoneTimeBelowVozDyn = 0.0;
-        state.dataSysRpts->ZoneTimeAtVozDyn = 0.0;
-        state.dataSysRpts->ZoneTimeAboveVozDyn = 0.0;
-        state.dataSysRpts->ZoneTimeVentUnocc = 0.0;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataSysRpts->ZoneOAMassFlow(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneOAMass(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneOAVolFlowStdRho(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneOAVolStdRho(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneOAVolFlowCrntRho(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneOAVolCrntRho(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneMechACH(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneTargetVentilationFlowVoz(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneTimeBelowVozDyn(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneTimeAtVozDyn(zoneNum) = 0.0;
+        }
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataSysRpts->ZoneTimeAboveVozDyn(zoneNum) = 0.0;
+            state.dataSysRpts->ZoneTimeVentUnocc(zoneNum) = 0.0;
+            state.dataSysRpts->MaxCoolingLoadMetByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxCoolingLoadAddedByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxOvercoolingByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxHeatingLoadMetByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxHeatingLoadAddedByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxOverheatingByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxNoLoadHeatingByVent(zoneNum) = 0.0;
+            state.dataSysRpts->MaxNoLoadCoolingByVent(zoneNum) = 0.0;
+        }
+
         state.dataSysRpts->AnyZoneTimeBelowVozDyn = 0.0;
         state.dataSysRpts->AllZonesTimeAtVozDyn = 0.0;
         state.dataSysRpts->AnyZoneTimeAboveVozDyn = 0.0;
@@ -4288,23 +4301,18 @@ namespace EnergyPlus::SystemReports {
         state.dataSysRpts->AnyZoneTimeBelowVozDynOcc = 0.0;
         state.dataSysRpts->AllZonesTimeAtVozDynOcc = 0.0;
         state.dataSysRpts->AnyZoneTimeAboveVozDynOcc = 0.0;
-        state.dataSysRpts->MaxCoolingLoadMetByVent = 0.0;
-        state.dataSysRpts->MaxCoolingLoadAddedByVent = 0.0;
-        state.dataSysRpts->MaxOvercoolingByVent = 0.0;
-        state.dataSysRpts->MaxHeatingLoadMetByVent = 0.0;
-        state.dataSysRpts->MaxHeatingLoadAddedByVent = 0.0;
-        state.dataSysRpts->MaxOverheatingByVent = 0.0;
-        state.dataSysRpts->MaxNoLoadHeatingByVent = 0.0;
-        state.dataSysRpts->MaxNoLoadCoolingByVent = 0.0;
 
-        state.dataSysRpts->SysMechVentFlow = 0.0;
-        state.dataSysRpts->SysNatVentFlow = 0.0;
-        state.dataSysRpts->SysTargetVentilationFlowVoz = 0.0;
-        state.dataSysRpts->SysTimeBelowVozDyn = 0.0;
-        state.dataSysRpts->SysTimeAtVozDyn = 0.0;
-        state.dataSysRpts->SysTimeAboveVozDyn = 0.0;
-        state.dataSysRpts->SysTimeVentUnocc = 0.0;
-        state.dataSysRpts->SysAnyZoneOccupied = false;
+        for (int sysNum = 1; sysNum <= DataHVACGlobals::NumPrimaryAirSys; ++sysNum) {
+            state.dataSysRpts->SysMechVentFlow(sysNum) = 0.0;
+            state.dataSysRpts->SysNatVentFlow(sysNum) = 0.0;
+            state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum) = 0.0;
+            state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = 0.0;
+            state.dataSysRpts->SysTimeAtVozDyn(sysNum) = 0.0;
+            state.dataSysRpts->SysTimeAboveVozDyn(sysNum) = 0.0;
+            state.dataSysRpts->SysTimeVentUnocc(sysNum) = 0.0;
+            state.dataSysRpts->SysAnyZoneOccupied(sysNum) = false;
+        }
+
         state.dataSysRpts->AnySysTimeBelowVozDyn = 0.0;
         state.dataSysRpts->AllSyssTimeAtVozDyn = 0.0;
         state.dataSysRpts->AnySysTimeAboveVozDyn = 0.0;
