@@ -182,7 +182,12 @@ public:
     *
     * \param[in] schedule_loss vector (size 0 for constant or per timestep) containing battery system losses
     */
-    explicit losses_t(const std::vector<double>& schedule_loss = std::vector<double>(1, 0));
+    explicit losses_t(const std::vector<double>& schedule_loss = std::vector<double>(1, 0)) {
+        params = std::make_shared<losses_params>();
+        params->loss_choice = losses_params::SCHEDULE;
+        params->schedule_loss = schedule_loss;
+        initialize();
+    }
 
     explicit losses_t(std::shared_ptr<losses_params> p);
 
