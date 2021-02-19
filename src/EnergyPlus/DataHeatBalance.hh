@@ -154,6 +154,7 @@ namespace DataHeatBalance {
     extern int const DOE2HcOutside;   // Only valid for outside use
     extern int const BLASTHcOutside;  // Only valid for outside use
     extern int const AdaptiveConvectionAlgorithm;
+    extern int const ASTMC1340;
 
     // Parameters for WarmupDays
     extern int const DefaultMaxNumberOfWarmupDays; // Default maximum number of warmup days allowed
@@ -423,7 +424,7 @@ namespace DataHeatBalance {
     extern bool StormWinChangeThisDay; // True if a storm window has been added or removed from any
     // window during the current day; can only be true for first
     // time step of the day.
-    extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
+    extern bool AnyInternalHeatSourceInInput; // true if the user has entered any constructions with internal sources
     extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
     extern bool AdaptiveComfortRequested_ASH55;    // true if people objects have adaptive comfort requests. ASH55
 

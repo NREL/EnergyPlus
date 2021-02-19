@@ -86,6 +86,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL DelThis
   INTEGER pos
   INTEGER pos2
+  INTEGER CurVarIterator
   LOGICAL ExitBecauseBadFile
   LOGICAL StillWorking
   LOGICAL NoDiff
@@ -99,6 +100,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL LatestVersion
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
@@ -124,6 +126,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: TotRunPeriods = 0
   INTEGER :: runPeriodNum = 0
   INTEGER :: iterateRunPeriod = 0
+  INTEGER :: wwhpEqFtCoolIndex = 0
+  INTEGER :: wwhpEqFtHeatIndex = 0
+  INTEGER :: wahpEqFtCoolIndex = 0
+  INTEGER :: wahpEqFtHeatIndex = 0
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
   CHARACTER(len=20) :: PotentialRunPeriodName
   ! END OF TODO
@@ -235,6 +241,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF(ALLOCATED(NwFldNames)) DEALLOCATE(NwFldNames)
           IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
           IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
+          IF(ALLOCATED(POutArgs)) DEALLOCATE(POutArgs)
           IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
@@ -242,6 +249,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
           ALLOCATE(NwAorN(MaxTotalArgs),NwReqFld(MaxTotalArgs),NwFldNames(MaxTotalArgs),NwFldDefaults(MaxTotalArgs),NwFldUnits(MaxTotalArgs))
           ALLOCATE(OutArgs(MaxTotalArgs))
+          ALLOCATE(POutArgs(MaxTotalArgs))
           ALLOCATE(DeleteThisRecord(NumIDFRecords))
           DeleteThisRecord=.false.
 
@@ -382,17 +390,130 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1)=InArgs(1)
-                 OutArgs(2:CurArgs+1)=InArgs(4:CurArgs)
+                 OutArgs(2:CurArgs-2)=InArgs(4:CurArgs)
+                 CurArgs = CurArgs - 2
                  IF (InArgs(2) == "InteriorWindow") THEN
-                   CALL ShowWarningError('Construction:AirBoundary='//InArgs(1)//' Solar and Daylighting Method option InteriorWindow is no longer valid.',Auditf)
+                   CALL ShowWarningError('Construction:AirBoundary='//trim(InArgs(1))//' Solar and Daylighting Method option InteriorWindow is no longer valid.',Auditf)
                    CALL ShowContinueError('The air boundary will be modeled using the GroupedZones method.',Auditf)
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//InArgs(1)//' Solar and Daylighting Method option InteriorWindow is no longer valid.')
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//trim(InArgs(1))// &
+                                                ' Solar and Daylighting Method option InteriorWindow is no longer valid. '// &
+                                                'The air boundary will be modeled using the GroupedZones method.')
                  END IF
                  IF (InArgs(3) == "IRTSurface") THEN
-                   CALL ShowWarningError('Construction:AirBoundary='//InArgs(1)//' Radiant Exchange Method option IRTSurface is no longer valid.',Auditf)
+                   CALL ShowWarningError('Construction:AirBoundary='//trim(InArgs(1))//' Radiant Exchange Method option IRTSurface is no longer valid.',Auditf)
                    CALL ShowContinueError('The air boundary will be modeled using the GroupedZones method.',Auditf)
-                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//InArgs(1)//' Radiant Exchange Method option IRTSurface is no longer valid.')
+                   CALL writePreprocessorObject(DifLfn,PrognameConversion, 'Warning', 'Construction:AirBoundary='//trim(InArgs(1))// &
+                                                ' Radiant Exchange Method option IRTSurface is no longer valid. '// &
+                                                'The air boundary will be modeled using the GroupedZones method.')
                  END IF
+
+             CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:10)=InArgs(1:10)
+                 OutArgs(14:CurArgs-13)=InArgs(27:CurArgs)
+                 wahpEqFtCoolIndex = wahpEqFtCoolIndex + 1
+                 write(OutArgs(11),'(A19,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
+                 write(OutArgs(12),'(A20,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
+                 write(OutArgs(13),'(A16,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
+                 CurArgs = CurArgs - 13
+                 ! Write the now truncated equationfit coil object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for total capacity
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A19,I2)') "WAHPCoolCapCurveTot", wahpEqFtCoolIndex
+                 ! Now copy things over from the coil object
+                 OutArgs(2:6)=InArgs(11:15)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quintlinear curve for sensible capacity
+                 ObjectName='Curve:QuintLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A20,I2)') "WAHPCoolCapCurveSens", wahpEqFtCoolIndex
+                 ! Now copy things over from the coil object
+                 OutArgs(2:7)=InArgs(16:21)
+                 DO i = 8, 17, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,17,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for power consumption
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WAHPCoolPowCurve", wahpEqFtCoolIndex
+                 ! Now copy things over from the coil object
+                 OutArgs(2:6)=InArgs(22:26)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
+                 
+             CASE('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:9)=InArgs(1:9)
+                 wahpEqFtHeatIndex = wahpEqFtHeatIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
+                 write(OutArgs(11),'(A16,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
+                 CurArgs = CurArgs - 8
+                 ! Write the now truncated equationfit coil object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for capacity
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WAHPHeatCapCurve", wahpEqFtHeatIndex
+                 ! Now copy things over from the coil object
+                 OutArgs(2:6)=InArgs(10:14)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                                  
+                 ! Build new quadlinear curve for power consumption
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WAHPHeatPowCurve", wahpEqFtHeatIndex
+                 ! Now copy things over from the coil object
+                 OutArgs(2:6)=InArgs(15:19)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
+                 
+             CASE('CONSTRUCTION:INTERNALSOURCE')
+                 ! Do not write the old object
+                 Written=.true.
+                 
+                CALL GetNewObjectDefInIDD('ConstructionProperty:InternalHeatSource',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = TRIM(InArgs(1)) // ' Heat Source'
+                OutArgs(2) = InArgs(1)
+                OutArgs(3:7) =  InArgs(2:6)
+                CALL WriteOutIDFLines(DifLfn,'ConstructionProperty:InternalHeatSource',NwNumArgs,OutArgs,NwFldNames,NwFldUnits)
+                
+                CALL GetNewObjectDefInIDD('Construction',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Construction object has five fewer fields than the incoming Construction:InternalSource object
+                NwNumArgs = CurArgs - 5
+                OutArgs(1) = InArgs(1)
+                OutArgs(2:NwNumArgs) = InArgs(7:CurArgs)
+                CALL WriteOutIDFLines(DifLfn,'Construction',NwNumArgs,OutArgs,NwFldNames,NwFldUnits)
                  
               ! If your original object starts with D, insert the rules here
 
@@ -403,6 +524,85 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with G, insert the rules here
 
               ! If your original object starts with H, insert the rules here
+             CASE('HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:9)=InArgs(1:9)
+                 OutArgs(12:CurArgs-8)=InArgs(20:CurArgs)
+                 wwhpEqFtCoolIndex = wwhpEqFtCoolIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
+                 write(OutArgs(11),'(A16,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
+                 CurArgs = CurArgs - 8
+                 ! Write the now truncated equationfit heat pump object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for capacity
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WWHPCoolCapCurve", wwhpEqFtCoolIndex
+                 ! Now copy things over from the heatpump object
+                 OutArgs(2:6)=InArgs(10:14)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for power consumption
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WWHPCoolPowCurve", wwhpEqFtCoolIndex
+                 ! Now copy things over from the heatpump object
+                 OutArgs(2:6)=InArgs(15:19)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
+                 
+             CASE('HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:9)=InArgs(1:9)
+                 OutArgs(12:CurArgs-8)=InArgs(20:CurArgs)
+                 wwhpEqFtHeatIndex = wwhpEqFtHeatIndex + 1
+                 write(OutArgs(10),'(A16,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
+                 write(OutArgs(11),'(A16,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
+                 CurArgs = CurArgs - 8
+                 ! Write the now truncated equationfit heat pump object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for capacity
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WWHPHeatCapCurve", wwhpEqFtHeatIndex
+                 ! Now copy things over from the heatpump object
+                 OutArgs(2:6)=InArgs(10:14)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 CurArgs = 14
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 
+                 ! Build new quadlinear curve for power consumption
+                 ObjectName='Curve:QuadLinear'
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 write(OutArgs(1),'(A16,I2)') "WWHPHeatPowCurve", wwhpEqFtHeatIndex
+                 ! Now copy things over from the heatpump object
+                 OutArgs(2:6)=InArgs(15:19)
+                 DO i = 7, 14, 2
+                   OutArgs(i)="-100"
+                   OutArgs(i+1)="100"
+                 END DO
+                 CurArgs = 14
+                 ! Write the new curve object
+                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
+                 Written = .true.
 
               ! If your original object starts with I, insert the rules here
 
@@ -429,6 +629,101 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=InArgs(8)
+                OutArgs(7)=InArgs(13)
+                OutArgs(8:10)=InArgs(16:18)
+                OutArgs(11)=InArgs(22)
+                OutArgs(12:14)=InArgs(25:27)
+                OutArgs(15:16)=InArgs(32:33)
+                CurArgs = 16
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2:4) = InArgs(5:7)
+                POutArgs(5:8) = InArgs(9:12)
+                POutArgs(9:10) = InArgs(14:15)
+                POutArgs(11:13) = InArgs(19:21)
+                POutArgs(14:15) = InArgs(23:24)
+                POutArgs(16:19) = InArgs(28:31)
+                IF (InArgs(34) /= Blank) THEN
+                  CurVarIterator = 20
+                  POutArgs(CurVarIterator) = InArgs(34)
+                END IF
+                IF (InArgs(34) == Blank) THEN
+                  CurVarIterator = 19
+                END IF
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design',CurVarIterator,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=OutArgs(8)
+                OutArgs(7:10)=InArgs(12:15)
+                OutArgs(11:22)=InArgs(18:29)
+                OutArgs(23:24)=InArgs(32:33)
+                CurArgs = 24
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2:4) = InArgs(5:7)
+                POutArgs(5:7) = InArgs(9:11)
+                POutArgs(8:9) = InArgs(16:17)
+                POutArgs(10:11) = InArgs(30:31)
+                IF (InArgs(34) /= Blank) THEN
+                  CurVarIterator = 12
+                  POutArgs(CurVarIterator) = InArgs(34)
+                END IF
+                IF (InArgs(34) == Blank) THEN
+                  CurVarIterator = 11
+                END IF
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design',CurVarIterator,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
+
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:7)=InArgs(2:6)
+                OutArgs(8)=InArgs(8)
+                OutArgs(9)=InArgs(11)
+                OutArgs(10:CurArgs-5)=InArgs(15:CurArgs)
+                CurArgs = CurArgs - 5
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Water:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2) = InArgs(7)
+                POutArgs(3:4) = InArgs(9:10)
+                POutArgs(5:7) = InArgs(12:14)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:Baseboard:RadiantConvective:Water:Design',7,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
+
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1)=InArgs(1)
+                OutArgs(2)=TRIM(InArgs(1))//(' Design Object')
+                OutArgs(3:5)=InArgs(2:4)
+                OutArgs(6)=InArgs(6)
+                OutArgs(7:8)=InArgs(9:10)
+                OutArgs(9)=InArgs(11)
+                OutArgs(9:CurArgs-5)=InArgs(14:CurArgs)
+                CurArgs = CurArgs - 5
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:Baseboard:RadiantConvective:Steam:Design',NumArgs,AorN,ReqFld,ObjMinFlds,FldNames,FldDefaults,FldUnits)
+                POutArgs(1) = OutArgs(2)
+                POutArgs(2) = InArgs(5)
+                POutArgs(3:4) = InArgs(7:8)
+                POutArgs(5:7) = InArgs(11:13)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:Baseboard:RadiantConvective:Steam:Design',7,POutArgs,FldNames,FldUnits)
+                nodiff=.false.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !

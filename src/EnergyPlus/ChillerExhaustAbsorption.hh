@@ -224,7 +224,7 @@ namespace ChillerExhaustAbsorption {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 

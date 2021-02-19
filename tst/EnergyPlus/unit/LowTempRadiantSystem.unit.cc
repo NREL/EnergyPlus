@@ -106,6 +106,8 @@ public:
     Real64 const CpWater = 4180.0;  // For estimating the expected result
     Real64 const RhoWater = 1000.0; // For estimating the expected result
 
+    int DesignObjectNum;
+
 protected:
     virtual void SetUp()
     {
@@ -490,38 +492,42 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
         "  ZoneHVAC:LowTemperatureRadiant:VariableFlow,",
         "    West Zone Radiant Floor, !- Name",
+        "    West Zone Radiant Floor Design,    	!- Design Object Name",
         "    RadiantSysAvailSched,    !- Availability Schedule Name",
         "    West Zone,               !- Zone Name",
         "    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name",
+        "    autosize,                !- Hydronic Tubing Length {m}",
+        "    ,                        !- Heating Design Capacity {W}",
+        "    autosize,                !- Maximum Hot Water Flow {m3/s}",
+        "    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name",
+        "    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name",
+        "    ,                        !- Cooling Design Capacity {W}",
+        "    autosize,                !- Maximum Cold Water Flow {m3/s}",
+        "    Zone 1 Cooling Water Inlet Node,     !- Cooling Water Inlet Node Name",
+        "    Zone 1 Cooling Water Outlet Node,    !- Cooling Water Outlet Node Name",
+        "    ,                        !- Number of Circuits",
+        "    ;                        !- Circuit Length {m}",
+
+        "  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,",
+        "    West Zone Radiant Floor Design, !- Name",
         "    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model",
         "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
         "    0.016,                   !- Hydronic Tubing Outside Diameter {m}",
-        "    autosize,                !- Hydronic Tubing Length {m}",
         "    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}",
         "    MeanAirTemperature,      !- Temperature Control Type",
         "    HalfFlowPower,           !- Setpoint Type",
         "    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method",
-        "    ,                        !- Heating Design Capacity {W}",
         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
         "    0.9,                     !- Fraction of Autosized Heating Design Capacity",
-        "    autosize,                !- Maximum Hot Water Flow {m3/s}",
-        "    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name",
-        "    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name",
         "    2.0,                     !- Heating Control Throttling Range {deltaC}",
         "    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name",
         "    FractionOfAutosizedCoolingCapacity,   !- Cooling Design Capacity Method",
-        "    ,                        !- Cooling Design Capacity {W}",
         "    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}",
         "    1.2,                     !- Fraction of Autosized Cooling Design Capacity",
-        "    autosize,                !- Maximum Cold Water Flow {m3/s}",
-        "    Zone 1 Cooling Water Inlet Node,     !- Cooling Water Inlet Node Name",
-        "    Zone 1 Cooling Water Outlet Node,    !- Cooling Water Outlet Node Name",
         "    2.0,                     !- Cooling Control Throttling Range {deltaC}",
         "    Radiant Cooling Setpoints,           !- Cooling Control Temperature Schedule Name",
         "    ,                        !- Condensation Control Type",
-        "    ,                        !- Condensation Control Dewpoint Offset {C}",
-        "    ,                        !- Number of Circuits",
-        "    ;                        !- Circuit Length {m}",
+        "    ;                        !- Condensation Control Dewpoint Offset {C}",
 
         "  BuildingSurface:Detailed,",
         "    Zn001:Flr001,            !- Name",
@@ -539,13 +545,17 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "    6.096000,6.096000,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
         "    6.096000, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
 
-        "  Construction:InternalSource,",
-        "    Slab Floor with Radiant, !- Name",
+        "  ConstructionProperty:InternalHeatSource,",
+        "    Radiant Source,          !- Name",
+        "    Slab Floor with Radiant, !- Construction Name",
         "    4,                       !- Source Present After Layer Number",
         "    4,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
-        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request"
+        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+        "  Construction,",
+        "    Slab Floor with Radiant, !- Name",
         "    CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
         "    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
         "    GYP1,                    !- Layer 3",
@@ -1208,9 +1218,8 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     // tuble length sizing calculation
     HydrRadSys(RadSysNum).TotalSurfaceArea = Surface(HydrRadSys(RadSysNum).SurfacePtr(1)).Area;
     TubeLengthDes = HydrRadSys(RadSysNum).TotalSurfaceArea / 0.1524; // tube length uses the construction perpendicular spacing
-
     // do autosize calculations
-    SizeLowTempRadiantSystem(*state, RadSysNum, RadSysTypes(1).SystemType);
+    SizeLowTempRadiantSystem(*state, RadSysNum, RadSysTypes(RadSysNum).SystemType);
     // Test autosized heat/cool capacity
     EXPECT_EQ(HeatingCapacity, HydrRadSys(RadSysNum).ScaledHeatingCapacity);
     EXPECT_EQ(CoolingCapacity, HydrRadSys(RadSysNum).ScaledCoolingCapacity);
@@ -1219,6 +1228,807 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ(ChilledWaterFlowRate, HydrRadSys(RadSysNum).WaterVolFlowMaxCool);
     // Test autosized tube length
     EXPECT_EQ(TubeLengthDes, HydrRadSys(RadSysNum).TubeLength);
+}
+
+TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
+{
+
+    bool ErrorsFound = false;
+    std::string const idf_objects = delimited_string({
+
+                "  Building,",
+                        "    NONE,                    !- Name",
+                        "    0.0000000E+00,           !- North Axis {deg}",
+                        "    Suburbs,                 !- Terrain",
+                        "    3.9999999E-02,           !- Loads Convergence Tolerance Value",
+                        "    0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}",
+                        "    FullInteriorAndExterior, !- Solar Distribution",
+                        "    25,                      !- Maximum Number of Warmup Days",
+                        "    6;                       !- Minimum Number of Warmup Days",
+
+                        "  ScheduleTypeLimits,Fraction, 0.0 , 1.0 ,CONTINUOUS;",
+                        "  ScheduleTypeLimits,Temperature,-60,200,CONTINUOUS;",
+
+                        "  Zone,",
+                        "    West Zone,               !- Name",
+                        "    0.0000000E+00,           !- Direction of Relative North {deg}",
+                        "    0.0000000E+00,           !- X Origin {m}",
+                        "    0.0000000E+00,           !- Y Origin {m}",
+                        "    0.0000000E+00,           !- Z Origin {m}",
+                        "    1,                       !- Type",
+                        "    1,                       !- Multiplier",
+                        "    2.5,                     !- Ceiling Height {m}",
+                        "    autocalculate;              !- Volume {m3}",
+
+                        "  ZoneHVAC:EquipmentConnections,",
+                        "    West Zone,               !- Zone Name",
+                        "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
+                        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+                        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+                        "    Zone 1 Node,             !- Zone Air Node Name",
+                        "    Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+
+                        "  ZoneHVAC:EquipmentList,",
+                        "    Zone1Equipment,          !- Name",
+                        "    SequentialLoad,          !- Load Distribution Scheme",
+                        "    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Zone Equipment 1 Object Type",
+                        "    West Zone Radiant Floor, !- Zone Equipment 1 Name",
+                        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+                        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+                        "  ZoneHVAC:LowTemperatureRadiant:VariableFlow,",
+                        "    West Zone Radiant Floor, !- Name",
+                        "    West Zone Radiant Floor Design, !- Design Object Name",
+                        "    RadiantSysAvailSched,    !- Availability Schedule Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name",
+                        "    autosize,                !- Hydronic Tubing Length {m}",
+                        "    ,                        !- Heating Design Capacity {W}",
+                        "    autosize,                !- Maximum Hot Water Flow {m3/s}",
+                        "    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name",
+                        "    West Zone Radiant Water Outlet Node, !- Heating Water Outlet Node Name",
+                        "    ,                        !- Cooling Design Capacity {W}",
+                        "    autosize,                !- Maximum Cold Water Flow {m3/s}",
+                        "    Zone 1 Cooling Water Inlet Node,     !- Cooling Water Inlet Node Name",
+                        "    Zone 1 Cooling Water Outlet Node,    !- Cooling Water Outlet Node Name",
+                        "    ,                        !- Number of Circuits",
+                        "    ;                        !- Circuit Length {m}",
+
+                        "  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,",
+                        "    West Zone Radiant Floor Design, !- Name",
+                        "    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model",
+                        "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
+                        "    0.016,                   !- Hydronic Tubing Outside Diameter {m}",
+                        "    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}",
+                        "    MeanAirTemperature,      !- Temperature Control Type",
+                        "    HalfFlowPower,           !- Setpoint Type",
+                        "    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method",
+                        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+                        "    0.9,                     !- Fraction of Autosized Heating Design Capacity",
+                        "    2.0,                     !- Heating Control Throttling Range {deltaC}",
+                        "    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name",
+                        "    CapacityPerFloorArea,    !- Cooling Design Capacity Method",
+                        "    0.0,                        !- Cooling Design Capacity Per Floor Area {W/m2}",
+                        "    ,                        !- Fraction of Autosized Cooling Design Capacity",
+                        "    2.0,                     !- Cooling Control Throttling Range {deltaC}",
+                        "    Radiant Cooling Setpoints,           !- Cooling Control Temperature Schedule Name",
+                        "    ,                        !- Condensation Control Type",
+                        "    ;                        !- Condensation Control Dewpoint Offset {C}",
+
+
+                        "  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:Flr001,            !- Name",
+                        "    Floor,                   !- Surface Type",
+                        "    Slab Floor with Radiant, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    1.000000,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    0.0, 0.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    0.0, 6.0,0.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    6.0,6.0,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    6.0, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:Wall001,            !- Name",
+                        "    Wall,                   !- Surface Type",
+                        "    Slab Floor with Radiant, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    ,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    0.0, 0.0, 6.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    6.0, 0.0, 6.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    6.0, 0.0,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    0.0, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:Wall002,            !- Name",
+                        "    Wall,                   !- Surface Type",
+                        "    Slab, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    ,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    0.0, 6.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    0.0, 6.0, 6.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    0.0, 0.0, 6.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    0.0, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:Wall003,            !- Name",
+                        "    Wall,                   !- Surface Type",
+                        "    Slab, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    ,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    6.0, 6.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    6.0, 6.0, 6.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    6.0, 0.0, 6.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    6.0, 0.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:Wall004,            !- Name",
+                        "    Wall,                   !- Surface Type",
+                        "    Slab, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    ,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    0.0, 6.0, 0.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    0.0, 6.0, 6.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    6.0, 6.0, 6.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    6.0, 6.0, 0.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  BuildingSurface:Detailed,",
+                        "    Zn001:C001,            !- Name",
+                        "    CEILING,                   !- Surface Type",
+                        "    Slab, !- Construction Name",
+                        "    West Zone,               !- Zone Name",
+                        "    Adiabatic,                  !- Outside Boundary Condition",
+                        "    ,                        !- Outside Boundary Condition Object",
+                        "    NoSun,                   !- Sun Exposure",
+                        "    NoWind,                  !- Wind Exposure",
+                        "    ,                !- View Factor to Ground",
+                        "    4,                       !- Number of Vertices",
+                        "    0.0, 0.0, 6.0,           !- X,Y,Z ==> Vertex 1 {m}",
+                        "    6.0, 0.0, 6.0,       !- X,Y,Z ==> Vertex 2 {m}",
+                        "    6.0, 6.0, 6.0,   !- X,Y,Z ==> Vertex 3 {m}",
+                        "    0.0, 6.0, 6.0;      !- X,Y,Z ==> Vertex 4 {m}",
+
+                        "  ConstructionProperty:InternalHeatSource,",
+                        "    Radiant Source,          !- Name",
+                        "    Slab Floor with Radiant, !- Construction Name",
+                        "    3,                       !- Source Present After Layer Number",
+                        "    3,                       !- Temperature Calculation Requested After Layer Number",
+                        "    1,                       !- Dimensions for the CTF Calculation",
+                        "    0.1524,                  !- Tube Spacing {m}",
+                        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+                        "  Construction,",
+                        "    Slab Floor with Radiant, !- Name",
+                        "    CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
+                        "    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
+                        "    GYP1,                    !- Layer 3",
+                        "    GYP2,                    !- Layer 4",
+                        "    FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
+
+                        "Construction,",
+                        "Slab,              !- Name",
+                        "CONCRETE - DRIED SAND AND GRAVEL 4 IN,                    !- Outside Layer",
+                        "GYP1,                    !- Layer 2",
+                        "FINISH FLOORING - TILE 1 / 16 IN;                    !- Layer 3",
+
+                        "  Material,",
+                        "    CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Name",
+                        "    MediumRough,             !- Roughness",
+                        "    0.1000000,               !- Thickness {m}",
+                        "    1.290000,                !- Conductivity {W/m-K}",
+                        "    2242.580,                !- Density {kg/m3}",
+                        "    830.00000,               !- Specific Heat {J/kg-K}",
+                        "    0.9000000,               !- Thermal Absorptance",
+                        "    0.6000000,               !- Solar Absorptance",
+                        "    0.6000000;               !- Visible Absorptance",
+
+                        "  Material,",
+                        "    INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Name",
+                        "    Rough,                   !- Roughness",
+                        "    5.0000001E-02,           !- Thickness {m}",
+                        "    2.0000000E-02,           !- Conductivity {W/m-K}",
+                        "    56.06000,                !- Density {kg/m3}",
+                        "    1210.000,                !- Specific Heat {J/kg-K}",
+                        "    0.9000000,               !- Thermal Absorptance",
+                        "    0.5000000,               !- Solar Absorptance",
+                        "    0.5000000;               !- Visible Absorptance",
+
+                        "  Material,",
+                        "    GYP1,                    !- Name",
+                        "    MediumRough,             !- Roughness",
+                        "    1.2700000E-02,           !- Thickness {m}",
+                        "    7.8450000E-01,           !- Conductivity {W/m-K}",
+                        "    1842.1221,               !- Density {kg/m3}",
+                        "    988.000,                 !- Specific Heat {J/kg-K}",
+                        "    0.9000000,               !- Thermal Absorptance",
+                        "    0.5000000,               !- Solar Absorptance",
+                        "    0.5000000;               !- Visible Absorptance",
+
+                        "  Material,",
+                        "    GYP2,                    !- Name",
+                        "    MediumRough,             !- Roughness",
+                        "    1.9050000E-02,           !- Thickness {m}",
+                        "    7.8450000E-01,           !- Conductivity {W/m-K}",
+                        "    1842.1221,               !- Density {kg/m3}",
+                        "    988.000,                 !- Specific Heat {J/kg-K}",
+                        "    0.9000000,               !- Thermal Absorptance",
+                        "    0.5000000,               !- Solar Absorptance",
+                        "    0.5000000;               !- Visible Absorptance",
+
+                        "  Material,",
+                        "    FINISH FLOORING - TILE 1 / 16 IN,  !- Name",
+                        "    Smooth,                  !- Roughness",
+                        "    1.6000000E-03,           !- Thickness {m}",
+                        "    0.1700000,               !- Conductivity {W/m-K}",
+                        "    1922.210,                !- Density {kg/m3}",
+                        "    1250.000,                !- Specific Heat {J/kg-K}",
+                        "    0.9000000,               !- Thermal Absorptance",
+                        "    0.5000000,               !- Solar Absorptance",
+                        "    0.5000000;               !- Visible Absorptance",
+
+                        "  Schedule:Compact,",
+                        "    RADIANTSYSAVAILSCHED,    !- Name",
+                        "    FRACTION,                !- Schedule Type Limits Name",
+                        "    Through: 3/31,           !- Field 1",
+                        "    For: Alldays,            !- Field 2",
+                        "    Until: 24:00,1.00,       !- Field 3",
+                        "    Through: 9/30,           !- Field 5",
+                        "    For: Alldays,            !- Field 6",
+                        "    Until: 24:00,0.00,       !- Field 7",
+                        "    Through: 12/31,          !- Field 9",
+                        "    For: Alldays,            !- Field 10",
+                        "    Until: 24:00,1.00;       !- Field 11",
+
+                        "  Schedule:Compact,",
+                        "    HW LOOP TEMP SCHEDULE,   !- Name",
+                        "    TEMPERATURE,             !- Schedule Type Limits Name",
+                        "    Through: 12/31,          !- Field 1",
+                        "    For: Alldays,            !- Field 2",
+                        "    Until: 24:00,60.00;      !- Field 3",
+
+                        "  Schedule:Compact,",
+                        "    RADIANT HEATING SETPOINTS,  !- Name",
+                        "    TEMPERATURE,             !- Schedule Type Limits Name",
+                        "    Through: 12/31,          !- Field 1",
+                        "    For: Alldays,            !- Field 2",
+                        "    Until: 7:00,12.00,       !- Field 3",
+                        "    Until: 17:00,17.00,      !- Field 5",
+                        "    Until: 24:00,12.00;      !- Field 7",
+
+                        "  Sizing:Plant,",
+                        "    Hot Water Loop,          !- Plant or Condenser Loop Name",
+                        "    heating,                 !- Loop Type",
+                        "    60.,                     !- Design Loop Exit Temperature {C}",
+                        "    10;                      !- Loop Design Temperature Difference {deltaC}",
+
+                        "  PlantLoop,",
+                        "    Hot Water Loop,          !- Name",
+                        "    Water,                   !- Fluid Type",
+                        "    ,                        !- User Defined Fluid Type",
+                        "    Hot Loop Operation,      !- Plant Equipment Operation Scheme Name",
+                        "    HW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name",
+                        "    100,                     !- Maximum Loop Temperature {C}",
+                        "    10,                      !- Minimum Loop Temperature {C}",
+                        "    0.0043,                  !- Maximum Loop Flow Rate {m3/s}",
+                        "    0,                       !- Minimum Loop Flow Rate {m3/s}",
+                        "    autocalculate,           !- Plant Loop Volume {m3}",
+                        "    HW Supply Inlet Node,    !- Plant Side Inlet Node Name",
+                        "    HW Supply Outlet Node,   !- Plant Side Outlet Node Name",
+                        "    Heating Supply Side Branches,  !- Plant Side Branch List Name",
+                        "    Heating Supply Side Connectors,  !- Plant Side Connector List Name",
+                        "    HW Demand Inlet Node,    !- Demand Side Inlet Node Name",
+                        "    HW Demand Outlet Node,   !- Demand Side Outlet Node Name",
+                        "    Heating Demand Side Branches,  !- Demand Side Branch List Name",
+                        "    Heating Demand Side Connectors,  !- Demand Side Connector List Name",
+                        "    Optimal,                 !- Load Distribution Scheme",
+                        "    ,                        !- Availability Manager List Name",
+                        "    ,                        !- Plant Loop Demand Calculation Scheme",
+                        "    ,                        !- Common Pipe Simulation",
+                        "    ,                        !- Pressure Simulation Type",
+                        "    2.0;                     !- Loop Circulation Time {minutes}",
+
+                        "  SetpointManager:Scheduled,",
+                        "    Hot Water Loop Setpoint Manager,  !- Name",
+                        "    Temperature,             !- Control Variable",
+                        "    HW Loop Temp Schedule,   !- Schedule Name",
+                        "    Hot Water Loop Setpoint Node List;  !- Setpoint Node or NodeList Name",
+
+                        "  NodeList,",
+                        "    Hot Water Loop Setpoint Node List,  !- Name",
+                        "    HW Supply Outlet Node;   !- Node 1 Name",
+
+                        "  BranchList,",
+                        "    Heating Supply Side Branches,  !- Name",
+                        "    Heating Supply Inlet Branch,  !- Branch 1 Name",
+                        "    Heating Purchased Hot Water Branch,  !- Branch 2 Name",
+                        "    Heating Supply Bypass Branch,  !- Branch 3 Name",
+                        "    Heating Supply Outlet Branch;  !- Branch 4 Name",
+
+                        "  ConnectorList,",
+                        "    Heating Supply Side Connectors,  !- Name",
+                        "    Connector:Splitter,      !- Connector 1 Object Type",
+                        "    Heating Supply Splitter, !- Connector 1 Name",
+                        "    Connector:Mixer,         !- Connector 2 Object Type",
+                        "    Heating Supply Mixer;    !- Connector 2 Name",
+
+                        "  Branch,",
+                        "    Heating Supply Inlet Branch,  !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pump:VariableSpeed,      !- Component 1 Object Type",
+                        "    HW Circ Pump,            !- Component 1 Name",
+                        "    HW Supply Inlet Node,    !- Component 1 Inlet Node Name",
+                        "    HW Pump Outlet Node;     !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Heating Purchased Hot Water Branch,  !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    DistrictHeating,         !- Component 1 Object Type",
+                        "    Purchased Heating,       !- Component 1 Name",
+                        "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Heating Supply Bypass Branch,  !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Heating Supply Side Bypass,  !- Component 1 Name",
+                        "    Heating Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    Heating Supply Bypass Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Heating Supply Side Bypass,  !- Name",
+                        "    Heating Supply Bypass Inlet Node,  !- Inlet Node Name",
+                        "    Heating Supply Bypass Outlet Node;  !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Heating Supply Outlet Branch,  !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Heating Supply Outlet,   !- Component 1 Name",
+                        "    Heating Supply Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    HW Supply Outlet Node;   !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Heating Supply Outlet,   !- Name",
+                        "    Heating Supply Exit Pipe Inlet Node,  !- Inlet Node Name",
+                        "    HW Supply Outlet Node;   !- Outlet Node Name",
+
+                        "  BranchList,",
+                        "    Heating Demand Side Branches,  !- Name",
+                        "    Reheat Inlet Branch,     !- Branch 1 Name",
+                        "    Zone 1 Radiant Branch,   !- Branch 5 Name",
+                        "    Reheat Bypass Branch,    !- Branch 8 Name",
+                        "    Reheat Outlet Branch;    !- Branch 9 Name",
+
+                        "  ConnectorList,",
+                        "    Heating Demand Side Connectors,  !- Name",
+                        "    Connector:Splitter,      !- Connector 1 Object Type",
+                        "    Reheat Splitter,         !- Connector 1 Name",
+                        "    Connector:Mixer,         !- Connector 2 Object Type",
+                        "    Reheat Mixer;            !- Connector 2 Name",
+
+                        "  Branch,",
+                        "    Reheat Inlet Branch,     !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Reheat Inlet Pipe,       !- Component 1 Name",
+                        "    HW Demand Inlet Node,    !- Component 1 Inlet Node Name",
+                        "    HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Reheat Inlet Pipe,       !- Name",
+                        "    HW Demand Inlet Node,    !- Inlet Node Name",
+                        "    HW Demand Entrance Pipe Outlet Node;  !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Reheat Outlet Branch,    !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Reheat Outlet Pipe,      !- Component 1 Name",
+                        "    HW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    HW Demand Outlet Node;   !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Reheat Outlet Pipe,      !- Name",
+                        "    HW Demand Exit Pipe Inlet Node,  !- Inlet Node Name",
+                        "    HW Demand Outlet Node;   !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Zone 1 Radiant Branch,   !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
+                        "    West Zone Radiant Floor, !- Component 1 Name",
+                        "    West Zone Radiant Water Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    West Zone Radiant Water Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Reheat Bypass Branch,    !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Reheat Bypass,           !- Component 1 Name",
+                        "    Reheat Bypass Inlet Node,!- Component 1 Inlet Node Name",
+                        "    Reheat Bypass Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Reheat Bypass,           !- Name",
+                        "    Reheat Bypass Inlet Node,!- Inlet Node Name",
+                        "    Reheat Bypass Outlet Node;  !- Outlet Node Name",
+
+                        "  Connector:Splitter,",
+                        "    Reheat Splitter,         !- Name",
+                        "    Reheat Inlet Branch,     !- Inlet Branch Name",
+                        "    Zone 1 Radiant Branch,   !- Outlet Branch 4 Name",
+                        "    Reheat Bypass Branch;    !- Outlet Branch 7 Name",
+
+                        "  Connector:Mixer,",
+                        "    Reheat Mixer,            !- Name",
+                        "    Reheat Outlet Branch,    !- Outlet Branch Name",
+                        "    Zone 1 Radiant Branch,   !- Inlet Branch 4 Name",
+                        "    Reheat Bypass Branch;    !- Inlet Branch 7 Name",
+
+                        "  Connector:Splitter,",
+                        "    Heating Supply Splitter, !- Name",
+                        "    Heating Supply Inlet Branch,  !- Inlet Branch Name",
+                        "    Heating Purchased Hot Water Branch,  !- Outlet Branch 1 Name",
+                        "    Heating Supply Bypass Branch;  !- Outlet Branch 2 Name",
+
+                        "  Connector:Mixer,",
+                        "    Heating Supply Mixer,    !- Name",
+                        "    Heating Supply Outlet Branch,  !- Outlet Branch Name",
+                        "    Heating Purchased Hot Water Branch,  !- Inlet Branch 1 Name",
+                        "    Heating Supply Bypass Branch;  !- Inlet Branch 2 Name",
+
+                        "  PlantEquipmentOperationSchemes,",
+                        "    Hot Loop Operation,      !- Name",
+                        "    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type",
+                        "    Purchased Only,          !- Control Scheme 1 Name",
+                        "    ON;                      !- Control Scheme 1 Schedule Name",
+
+                        "  PlantEquipmentOperation:HeatingLoad,",
+                        "    Purchased Only,          !- Name",
+                        "    0,                       !- Load Range 1 Lower Limit {W}",
+                        "    1000000,                 !- Load Range 1 Upper Limit {W}",
+                        "    heating plant;           !- Range 1 Equipment List Name",
+
+                        "  PlantEquipmentList,",
+                        "    heating plant,           !- Name",
+                        "    DistrictHeating,         !- Equipment 1 Object Type",
+                        "    Purchased Heating;       !- Equipment 1 Name",
+
+                        "  Pump:VariableSpeed,",
+                        "    HW Circ Pump,            !- Name",
+                        "    HW Supply Inlet Node,    !- Inlet Node Name",
+                        "    HW Pump Outlet Node,     !- Outlet Node Name",
+                        "    .0043,                   !- Rated Flow Rate {m3/s}",
+                        "    300000,                  !- Rated Pump Head {Pa}",
+                        "    2000,                    !- Rated Power Consumption {W}",
+                        "    .87,                     !- Motor Efficiency",
+                        "    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream",
+                        "    0,                       !- Coefficient 1 of the Part Load Performance Curve",
+                        "    1,                       !- Coefficient 2 of the Part Load Performance Curve",
+                        "    0,                       !- Coefficient 3 of the Part Load Performance Curve",
+                        "    0,                       !- Coefficient 4 of the Part Load Performance Curve",
+                        "    0,                       !- Minimum Flow Rate {m3/s}",
+                        "    INTERMITTENT;            !- Pump Control Type",
+
+                        "  DistrictHeating,",
+                        "    Purchased Heating,       !- Name",
+                        "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
+                        "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
+                        "    1000000;                 !- Nominal Capacity {W}",
+
+                        "  Sizing:Plant,",
+                        "    Chilled Water Loop,      !- Plant or Condenser Loop Name",
+                        "    cooling,                 !- Loop Type",
+                        "    6.7,                     !- Design Loop Exit Temperature {C}",
+                        "    2;                       !- Loop Design Temperature Difference {deltaC}",
+
+                        "  PlantLoop,",
+                        "    Chilled Water Loop,      !- Name",
+                        "    Water,                   !- Fluid Type",
+                        "    ,                        !- User Defined Fluid Type",
+                        "    CW Loop Operation,       !- Plant Equipment Operation Scheme Name",
+                        "    CW Supply Outlet Node,   !- Loop Temperature Setpoint Node Name",
+                        "    98,                      !- Maximum Loop Temperature {C}",
+                        "    1,                       !- Minimum Loop Temperature {C}",
+                        "    0.0011,                  !- Maximum Loop Flow Rate {m3/s}",
+                        "    0,                       !- Minimum Loop Flow Rate {m3/s}",
+                        "    autocalculate,           !- Plant Loop Volume {m3}",
+                        "    CW Supply Inlet Node,    !- Plant Side Inlet Node Name",
+                        "    CW Supply Outlet Node,   !- Plant Side Outlet Node Name",
+                        "    Cooling Supply Side Branches,  !- Plant Side Branch List Name",
+                        "    Cooling Supply Side Connectors,  !- Plant Side Connector List Name",
+                        "    CW Demand Inlet Node,    !- Demand Side Inlet Node Name",
+                        "    CW Demand Outlet Node,   !- Demand Side Outlet Node Name",
+                        "    Cooling Demand Side Branches,  !- Demand Side Branch List Name",
+                        "    Cooling Demand Side Connectors,  !- Demand Side Connector List Name",
+                        "    Optimal,                 !- Load Distribution Scheme",
+                        "    ,                        !- Availability Manager List Name",
+                        "    ,                        !- Plant Loop Demand Calculation Scheme",
+                        "    ,                        !- Common Pipe Simulation",
+                        "    ,                        !- Pressure Simulation Type",
+                        "    2.0;                     !- Loop Circulation Time {minutes}",
+
+                        "  SetpointManager:Scheduled,",
+                        "    Chilled Water Loop Setpoint Manager,  !- Name",
+                        "    Temperature,             !- Control Variable",
+                        "    CW Loop Temp Schedule,   !- Schedule Name",
+                        "    Chilled Water Loop Setpoint Node List;  !- Setpoint Node or NodeList Name",
+
+                        "	Schedule:Compact,",
+                        "	 CW LOOP TEMP SCHEDULE, !- Name",
+                        "	 TEMPERATURE,           !- Schedule Type Limits Name",
+                        "	 Through: 12/31,        !- Field 1",
+                        "	 For: Alldays,          !- Field 2",
+                        "	 Until: 24:00, 10.0;    !- Field 3",
+
+                        "  NodeList,",
+                        "    Chilled Water Loop Setpoint Node List,  !- Name",
+                        "    CW Supply Outlet Node;   !- Node 1 Name",
+
+                        "  BranchList,",
+                        "    Cooling Supply Side Branches,  !- Name",
+                        "    CW Pump Branch,          !- Branch 1 Name",
+                        "    Purchased Cooling Branch,!- Branch 4 Name",
+                        "    Supply Bypass Branch,    !- Branch 5 Name",
+                        "    Cooling Supply Outlet;   !- Branch 6 Name",
+
+                        "  BranchList,",
+                        "    Cooling Demand Side Branches,  !- Name",
+                        "    Cooling Demand Inlet,    !- Branch 1 Name",
+                        "    Zone 1 Cooling Branch,   !- Branch 2 Name",
+                        "    Demand Bypass Branch,    !- Branch 3 Name",
+                        "    Cooling Demand Outlet;   !- Branch 4 Name",
+
+                        "  ConnectorList,",
+                        "    Cooling Supply Side Connectors,  !- Name",
+                        "    Connector:Splitter,      !- Connector 1 Object Type",
+                        "    CW Loop Splitter,        !- Connector 1 Name",
+                        "    Connector:Mixer,         !- Connector 2 Object Type",
+                        "    CW Loop Mixer;           !- Connector 2 Name",
+
+                        "  ConnectorList,",
+                        "    Cooling Demand Side Connectors,  !- Name",
+                        "    Connector:Splitter,      !- Connector 1 Object Type",
+                        "    CW Demand Splitter,      !- Connector 1 Name",
+                        "    Connector:Mixer,         !- Connector 2 Object Type",
+                        "    CW Demand Mixer;         !- Connector 2 Name",
+
+                        "  Branch,",
+                        "    Cooling Demand Inlet,    !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Demand Side Inlet Pipe,  !- Component 1 Name",
+                        "    CW Demand Inlet Node,    !- Component 1 Inlet Node Name",
+                        "    CW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Schedule:Compact,",
+                        "    RADIANT COOLING SETPOINTS,  !- Name",
+                        "    TEMPERATURE,             !- Schedule Type Limits Name",
+                        "    Through: 12/31,          !- Field 1",
+                        "    For: Alldays,            !- Field 2",
+                        "    Until: 24:00,26.0;       !- Field 3",
+
+                        "  Pipe:Adiabatic,",
+                        "    Demand Side Inlet Pipe,  !- Name",
+                        "    CW Demand Inlet Node,    !- Inlet Node Name",
+                        "    CW Demand Entrance Pipe Outlet Node;  !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Zone 1 Cooling Branch,   !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    ZoneHVAC:LowTemperatureRadiant:VariableFlow,  !- Component 1 Object Type",
+                        "    West Zone Radiant Floor,   !- Component 1 Name",
+                        "    Zone 1 Cooling Water Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    Zone 1 Cooling Water Outlet Node; !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Demand Bypass Branch,    !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Demand Side Bypass,      !- Component 1 Name",
+                        "    CW Demand Bypass Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    CW Demand Bypass Outlet Node;  !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Demand Side Bypass,      !- Name",
+                        "    CW Demand Bypass Inlet Node,  !- Inlet Node Name",
+                        "    CW Demand Bypass Outlet Node;  !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Cooling Demand Outlet,   !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    CW Demand Side Outlet Pipe,  !- Component 1 Name",
+                        "    CW Demand Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    CW Demand Outlet Node;   !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    CW Demand Side Outlet Pipe,  !- Name",
+                        "    CW Demand Exit Pipe Inlet Node,  !- Inlet Node Name",
+                        "    CW Demand Outlet Node;   !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    Cooling Supply Outlet,   !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Supply Side Outlet Pipe, !- Component 1 Name",
+                        "    Supply Side Exit Pipe Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    CW Supply Outlet Node;   !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Supply Side Outlet Pipe, !- Name",
+                        "    Supply Side Exit Pipe Inlet Node,  !- Inlet Node Name",
+                        "    CW Supply Outlet Node;   !- Outlet Node Name",
+
+                        "  Branch,",
+                        "    CW Pump Branch,          !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pump:VariableSpeed,      !- Component 1 Object Type",
+                        "    Circ Pump,               !- Component 1 Name",
+                        "    CW Supply Inlet Node,    !- Component 1 Inlet Node Name",
+                        "    CW Pump Outlet Node;     !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Purchased Cooling Branch,!- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    DistrictCooling,         !- Component 1 Object Type",
+                        "    Purchased Cooling,       !- Component 1 Name",
+                        "    Purchased Cooling Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    Purchased Cooling Outlet Node; !- Component 1 Outlet Node Name",
+
+                        "  Branch,",
+                        "    Supply Bypass Branch,    !- Name",
+                        "    ,                        !- Pressure Drop Curve Name",
+                        "    Pipe:Adiabatic,          !- Component 1 Object Type",
+                        "    Supply Side Bypass,      !- Component 1 Name",
+                        "    CW Supply Bypass Inlet Node,  !- Component 1 Inlet Node Name",
+                        "    CW Supply Bypass Outlet Node; !- Component 1 Outlet Node Name",
+
+                        "  Pipe:Adiabatic,",
+                        "    Supply Side Bypass,      !- Name",
+                        "    CW Supply Bypass Inlet Node,  !- Inlet Node Name",
+                        "    CW Supply Bypass Outlet Node; !- Outlet Node Name",
+
+                        "  Connector:Splitter,",
+                        "    CW Loop Splitter,        !- Name",
+                        "    CW Pump Branch,          !- Inlet Branch Name",
+                        "    Purchased Cooling Branch,!- Outlet Branch 3 Name",
+                        "    Supply Bypass Branch;    !- Outlet Branch 4 Name",
+
+                        "  Connector:Mixer,",
+                        "    CW Loop Mixer,           !- Name",
+                        "    Cooling Supply Outlet,   !- Outlet Branch Name",
+                        "    Purchased Cooling Branch,!- Inlet Branch 3 Name",
+                        "    Supply Bypass Branch;    !- Inlet Branch 4 Name",
+
+                        "  Connector:Splitter,",
+                        "    CW Demand Splitter,      !- Name",
+                        "    Cooling Demand Inlet,    !- Inlet Branch Name",
+                        "    Demand Bypass Branch,    !- Outlet Branch 1 Name",
+                        "    Zone 1 Cooling Branch;   !- Outlet Branch 2 Name",
+
+                        "  Connector:Mixer,",
+                        "    CW Demand Mixer,         !- Name",
+                        "    Cooling Demand Outlet,   !- Outlet Branch Name",
+                        "    Zone 1 Cooling Branch,   !- Inlet Branch 1 Name",
+                        "    Demand Bypass Branch;    !- Inlet Branch 2 Name",
+
+                        "  PlantEquipmentOperationSchemes,",
+                        "    CW Loop Operation,       !- Name",
+                        "    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type",
+                        "    Always Operation,        !- Control Scheme 1 Name",
+                        "    Always;                  !- Control Scheme 1 Schedule Name",
+
+                        "  Schedule:Compact,",
+                        "    Always,                  !- Name",
+                        "    FRACTION,                !- Schedule Type Limits Name",
+                        "    Through: 12/31,          !- Field 1",
+                        "    For: Alldays,            !- Field 2",
+                        "    Until: 24:00,1.0;        !- Field 3",
+
+                        "  PlantEquipmentOperation:CoolingLoad,",
+                        "    Always Operation,        !- Name",
+                        "    0,                       !- Load Range 1 Lower Limit {W}",
+                        "    70000,                   !- Load Range 1 Upper Limit {W}",
+                        "    Purchased Only;          !- Range 3 Equipment List Name",
+
+                        "  PlantEquipmentList,",
+                        "    Purchased Only,          !- Name",
+                        "    DistrictCooling,         !- Equipment 1 Object Type",
+                        "    Purchased Cooling;       !- Equipment 1 Name",
+
+                        "  DistrictCooling,",
+                        "    Purchased Cooling,             !- Name",
+                        "    Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name",
+                        "    Purchased Cooling Outlet Node, !- Chilled Water Outlet Node Name",
+                        "    680000;                        !- Nominal Capacity {W}",
+
+                        "  Pump:VariableSpeed,",
+                        "    Circ Pump,               !- Name",
+                        "    CW Supply Inlet Node,    !- Inlet Node Name",
+                        "    CW Pump Outlet Node,     !- Outlet Node Name",
+                        "    .0011,                   !- Rated Flow Rate {m3/s}",
+                        "    300000,                  !- Rated Pump Head {Pa}",
+                        "    500,                     !- Rated Power Consumption {W}",
+                        "    .87,                     !- Motor Efficiency",
+                        "    0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream",
+                        "    0,                       !- Coefficient 1 of the Part Load Performance Curve",
+                        "    1,                       !- Coefficient 2 of the Part Load Performance Curve",
+                        "    0,                       !- Coefficient 3 of the Part Load Performance Curve",
+                        "    0,                       !- Coefficient 4 of the Part Load Performance Curve",
+                        "    0,                       !- Minimum Flow Rate {m3/s}",
+                        "    INTERMITTENT;            !- Pump Control Type",
+
+                                                     });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+
+    GetZoneEquipmentData(*state);
+    ProcessScheduleInput(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetPlantSizingInput(*state);
+    GetPlantLoopData(*state);
+    GetPlantInput(*state);
+    SetupInitialPlantCallingOrder(*state);
+    SetupBranchControlTypes(*state);
+    DataSurfaces::WorldCoordSystem = true;
+    GetSurfaceListsInputs(*state);
+    ErrorsFound = false;
+    SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    std::string const error_string =
+            delimited_string({
+                     "   ** Severe  ** ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design = WEST ZONE RADIANT FLOOR DESIGN",
+                     "   **   ~~~   ** Input for Cooling Design Capacity Method = CAPACITYPERFLOORAREA",
+                     "   **   ~~~   ** Illegal Cooling Design Capacity Per Floor Area = 0.0000000",
+                     "   **  Fatal  ** GetLowTempRadiantSystem: Errors found in input. Preceding conditions cause termination.",
+                     "   ...Summary of Errors that led to program termination:",
+                     "   ..... Reference severe error count=1",
+                     "   ..... Last severe error=ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design = WEST ZONE RADIANT FLOOR DESIGN"});
+    EXPECT_ANY_THROW(GetLowTempRadiantSystem(*state));
+
+    compare_err_stream(error_string, true);
+
 }
 
 TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
@@ -1245,7 +2055,12 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
     CFloRadSys(RadSysNum).WaterVolFlowMax = 1.0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.2;
+
+    DesignObjectNum = 1;
+    NumOfCFloLowTempRadSysDes = 1;
+    CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.2;
 
     CFloRadSys(RadSysNum).CoolingSystem = true;
     CFloRadSys(RadSysNum).HeatingSystem = false;
@@ -1289,10 +2104,15 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HWLoopNum = 0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.0;
     CFloRadSys(RadSysNum).PumpEffic = 0.0;
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = false;
+
+    DesignObjectNum = 1;
+    NumOfCFloLowTempRadSysDes = 1;
+    CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = AutoSize;
     InitLowTempRadiantSystem(*state, false, RadSysNum, SystemType, InitErrorFound);
@@ -1322,10 +2142,13 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HWLoopNum = 0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.0;
     CFloRadSys(RadSysNum).PumpEffic = 0.0;
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = false;
+
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 0.4; // because of how other parameters are set, this value is equal to the pump efficiency
     InitLowTempRadiantSystem(*state, false, RadSysNum, SystemType, InitErrorFound);
@@ -1361,10 +2184,13 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HWLoopNum = 0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.0;
     CFloRadSys(RadSysNum).PumpEffic = 0.0;
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = false;
+
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 0.98; // because of how other parameters are set, this value is equal to the pump efficiency
     InitLowTempRadiantSystem(*state, false, RadSysNum, SystemType, InitErrorFound);
@@ -1400,10 +2226,13 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     CFloRadSys(RadSysNum).HWLoopNum = 0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.0;
     CFloRadSys(RadSysNum).PumpEffic = 0.0;
     CFloRadSys(RadSysNum).CoolingSystem = false;
     CFloRadSys(RadSysNum).HeatingSystem = false;
+
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.0;
 
     CFloRadSys(RadSysNum).WaterVolFlowMax = 1.23; // because of how other parameters are set, this value is equal to the pump efficiency
     InitLowTempRadiantSystem(*state, false, RadSysNum, SystemType, InitErrorFound);
@@ -1536,6 +2365,8 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     NumOfCFloLowTempRadSys = 1;
     CFloRadSys.allocate(NumOfCFloLowTempRadSys);
     CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
+    NumOfCFloLowTempRadSysDes = 1;
+    CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
     Schedule.allocate(3);
     DataHeatBalFanSys::MAT.allocate(1);
     Schedule(1).CurrentValue = 1;
@@ -1563,7 +2394,9 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     CFloRadSys(RadSysNum).WaterVolFlowMax = 1.0;
     CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     CFloRadSys(RadSysNum).NomPowerUse = 1.0;
-    CFloRadSys(RadSysNum).MotorEffic = 1.2;
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).MotorEffic = 1.2;
 
     // heating
     CFloRadSys(RadSysNum).CoolingSystem = true;
@@ -1596,6 +2429,8 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     //	SystemType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     NumOfHydrLowTempRadSys = 1;
     HydrRadSys.allocate(NumOfHydrLowTempRadSys);
+    NumOfHydrLowTempRadSysDes = 1;
+    HydronicRadiantSysDesign.allocate(NumOfHydrLowTempRadSys);
     HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
     HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
     Schedule.allocate(3);
@@ -1609,8 +2444,11 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     HydrRadSys(RadSysNum).ZonePtr = 1;
     HydrRadSys(RadSysNum).SchedPtr = 1;
     HydrRadSys(RadSysNum).ControlType = LowTempRadiantControlTypes::MATControl;
-    HydrRadSys(RadSysNum).HotSetptSchedPtr = 2;
-    HydrRadSys(RadSysNum).ColdSetptSchedPtr = 3;
+
+    DesignObjectNum = 1;
+    HydrRadSys(RadSysNum).DesignObjectPtr = 1;
+    HydronicRadiantSysDesign(DesignObjectNum).HotSetptSchedPtr = 2;
+    HydronicRadiantSysDesign(DesignObjectNum).ColdSetptSchedPtr = 3;
 
     HydrRadSys(RadSysNum).HotWaterInNode = 0;
     HydrRadSys(RadSysNum).ColdWaterInNode = 0;
@@ -1838,11 +2676,19 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     TubeDiameter = 0.05;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     HydrRadSys(RadSysNum).TubeLength = TubeLength;
-    HydrRadSys(RadSysNum).TubeDiameterInner = TubeDiameter;
-    HydrRadSys(RadSysNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
+
+    DesignObjectNum = 1;
+    HydrRadSys(RadSysNum).DesignObjectPtr = 1;
+    HydronicRadiantSysDesign.allocate(1);
+    HydronicRadiantSysDesign(DesignObjectNum).TubeDiameterInner = TubeDiameter;
+    HydronicRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
+
     CFloRadSys(RadSysNum).TubeLength = TubeLength;
-    CFloRadSys(RadSysNum).TubeDiameterInner = TubeDiameter;
-    CFloRadSys(RadSysNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign.allocate(1);
+    CflowRadiantSysDesign(DesignObjectNum).TubeDiameterInner = TubeDiameter;
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
 
     // Test 1: Heating for Hydronic System
     HXEffectFuncResult = 0.0;
@@ -1850,7 +2696,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = LowTempRadiantSystem::SystemType::HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs, HydrRadSys(RadSysNum).DesignObjectPtr, RadSysType);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 2: Cooling for Hydronic System
@@ -1859,7 +2705,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = LowTempRadiantSystem::SystemType::HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs, HydrRadSys(RadSysNum).DesignObjectPtr, RadSysType);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 3: Heating for Constant Flow System
@@ -1868,7 +2714,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs, CFloRadSys(RadSysNum).DesignObjectPtr, RadSysType);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 4: Cooling for Constant Flow System
@@ -1877,7 +2723,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(*state, SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs, CFloRadSys(RadSysNum).DesignObjectPtr, RadSysType);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
 }
@@ -2034,119 +2880,119 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
     expectedResult = DataHeatBalFanSys::MAT(1);
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
     expectedResult = DataHeatBalFanSys::MAT(1);
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MATControl;
     expectedResult = DataHeatBalFanSys::MAT(1);
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 2: MRT Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
     expectedResult = MRT(1);
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
     expectedResult = MRT(1);
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
     expectedResult = MRT(1);
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 3: Operative Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
     expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
     expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
     expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 4: ODB Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
     expectedResult = Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
     expectedResult = Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
     expectedResult = Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 5: OWB Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
     expectedResult = Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
     expectedResult = Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
     expectedResult = Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 6: Surface Inside Face Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
     expectedResult = DataHeatBalSurface::TempSurfIn(1);
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
     expectedResult = DataHeatBalSurface::TempSurfIn(1);
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
     expectedResult = DataHeatBalSurface::TempSurfIn(1);
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 7: Surface Inside (within the slab) Temperature Control
     HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
     expectedResult = DataHeatBalSurface::TempUserLoc(1);
     actualResult = 0.0; // reset
-    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = HydrRadSys(1).setRadiantSystemControlTemperature(*state, HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
     expectedResult = DataHeatBalSurface::TempUserLoc(1);
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
     expectedResult = DataHeatBalSurface::TempUserLoc(1);
     actualResult = 0.0; // reset
-    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = ElecRadSys(1).setRadiantSystemControlTemperature(*state, ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 8: Running Mean Outdoor Air Temperature Control (Constant Flow System Only)
@@ -2154,7 +3000,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     CFloRadSys(1).todayRunningMeanOutdoorDryBulbTemperature = 12.345;
     expectedResult = CFloRadSys(1).todayRunningMeanOutdoorDryBulbTemperature;
     actualResult = 0.0; // reset
-    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state);
+    actualResult = CFloRadSys(1).setRadiantSystemControlTemperature(*state, CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
 }
@@ -2270,7 +3116,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = 0.0;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
     expectedResult = 1.0;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 2: zeroFlow and positive throttling range
@@ -2278,7 +3124,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = 0.5;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
     expectedResult = 1.0;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 3: zeroFlow and negative throttling range (cooling situation)
@@ -2286,7 +3132,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = -0.5;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
     expectedResult = 1.0;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 4: halfFlow and no throttling range
@@ -2294,7 +3140,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = 0.0;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
     expectedResult = 1.0;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 5: halfFlow and positive throttling range
@@ -2302,7 +3148,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = 0.5;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
     expectedResult = 1.25;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 5: halfFlow and negative throttling range (cooling situation)
@@ -2310,7 +3156,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     throttlingRange = -0.5;
     HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
     expectedResult = 0.75;
-    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange);
+    actualResult = HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(*state, scheduleIndex,throttlingRange, HydrRadSys(1).SetpointType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
 }
@@ -2419,7 +3265,8 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
 
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
-
+    CflowRadiantSysDesign.allocate(1);
+    auto &thisRadSysDesign(CflowRadiantSysDesign(1));
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataWeatherManager->TodayOutDryBulbTemp.allocate(state->dataGlobal->NumOfTimeStepInHour, DataGlobalConstants::HoursInDay);
     state->dataWeatherManager->TodayOutDryBulbTemp = 0.0;
@@ -2435,9 +3282,10 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
-    thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    thisRadSysDesign.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
+    thisCFloSys.DesignObjectPtr = 1;
     expectedResult = 12.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature(*state);
+    thisCFloSys.calculateRunningMeanAverageTemperature(*state, 1);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2453,7 +3301,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = -9999.9;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = -9999.9;
-    thisCFloSys.calculateRunningMeanAverageTemperature(*state);
+    thisCFloSys.calculateRunningMeanAverageTemperature(*state, 1);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2469,7 +3317,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 12.345;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
     expectedResult = 12.345;
-    thisCFloSys.calculateRunningMeanAverageTemperature(*state);
+    thisCFloSys.calculateRunningMeanAverageTemperature(*state, 1);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayAverageOutdoorDryBulbTemperature, acceptibleError);
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
@@ -2484,7 +3332,7 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature = 14.5;
     thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature = 5.0;
     thisCFloSys.runningMeanOutdoorAirTemperatureWeightingFactor = 0.5;
-    thisCFloSys.calculateRunningMeanAverageTemperature(*state);
+    thisCFloSys.calculateRunningMeanAverageTemperature(*state, 1);
     expectedResult = 12.5;  // Average of TodayOutDryBulbTemp(firstTimeStepIndex,hourNumber)
     EXPECT_NEAR(expectedResult, thisCFloSys.todayAverageOutdoorDryBulbTemperature, acceptibleError);
     expectedResult = 15.0;  // Should transfer what was todayAverageOutdoorDryBulbTemperature (see above)
@@ -2658,25 +3506,29 @@ TEST_F(LowTempRadiantSystemTest, getFluidToSlabHeatTransferInputTest)
 {
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
+    CflowRadiantSysDesign.allocate(1);
+//    auto &thisRadSysDesign(CflowRadiantSysDesign(1));
     std::string userInput;
 
     //Test 1: Input is ConvectionOnly--so this field needs to get reset to ConvectionOnly
     userInput = "ConvectionOnly";
-    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
-    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, thisCFloSys.FluidToSlabHeatTransfer);
+    DesignObjectNum = 1;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly,     CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
 
     //Test 2: Input is ISOStandard--so this field needs to get reset to ISOStandard
     userInput = "ISOStandard";
-    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
-    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ISOStandard, thisCFloSys.FluidToSlabHeatTransfer);
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ISOStandard, CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
 
     //Test 3: Input is ISOStandard--so this field needs to get reset to ConvectionOnly (the default)
     userInput = "WeWantSomethingElse!";
-    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
-    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
-    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, thisCFloSys.FluidToSlabHeatTransfer);
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
+    CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(*state, userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, CflowRadiantSysDesign(DesignObjectNum).FluidToSlabHeatTransfer);
 
 }
 
@@ -2693,15 +3545,21 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.5;
     CFloRadSys.allocate(1);
     auto &thisCFloSys (CFloRadSys(1));
-    thisCFloSys.TubeDiameterInner = 0.01;
-    thisCFloSys.TubeDiameterOuter = 0.011;
+    CflowRadiantSysDesign.allocate(1);
     thisCFloSys.TubeLength = 100.0;
-    thisCFloSys.TubeConductivity = 0.5;
+    DesignObjectNum = 1;
+    CflowRadiantSysDesign(DesignObjectNum).TubeDiameterInner = 0.01;
+    CflowRadiantSysDesign(DesignObjectNum).TubeDiameterOuter = 0.011;
+    CflowRadiantSysDesign(DesignObjectNum).ConstFlowTubeConductivity = 0.5;
+    CFloRadSys(RadSysNum).DesignObjectPtr = 1;
     Real64 WaterMassFlow = 0.001;
 
     Real64 expectedResult = 28.00687;
     Real64 allowedDifference = 0.00001;
-    Real64 actualResult = thisCFloSys.calculateUFromISOStandard(*state, SurfNum, WaterMassFlow);
+    Real64 actualResult = thisCFloSys.calculateUFromISOStandard(*state, SurfNum,
+                                                                WaterMassFlow,
+                                                                SystemType::ConstantFlowSystem,
+                                                                CFloRadSys(RadSysNum).DesignObjectPtr);
     EXPECT_NEAR(expectedResult, actualResult, allowedDifference);
 
 }

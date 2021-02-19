@@ -196,6 +196,7 @@ namespace DataHeatBalance {
     int const DOE2HcOutside(7);   // Only valid for outside use
     int const BLASTHcOutside(8);  // Only valid for outside use
     int const AdaptiveConvectionAlgorithm(9);
+    int const ASTMC1340(10);
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
@@ -573,7 +574,7 @@ namespace DataHeatBalance {
     bool StormWinChangeThisDay(false); // True if a storm window has been added or removed from any
     // window during the current day; can only be true for first
     // time step of the day.
-    bool AnyConstructInternalSourceInInput(false); // true if the user has entered any constructions with internal sources
+    bool AnyInternalHeatSourceInInput(false); // true if the user has entered any constructions with internal sources
     bool AdaptiveComfortRequested_CEN15251(false); // true if people objects have adaptive comfort requests. CEN15251
     bool AdaptiveComfortRequested_ASH55(false);    // true if people objects have adaptive comfort requests. ASH55
 
@@ -929,7 +930,7 @@ namespace DataHeatBalance {
         TotCO2Gen = 0;
         CalcWindowRevealReflection = false;
         StormWinChangeThisDay = false;
-        AnyConstructInternalSourceInInput = false;
+        AnyInternalHeatSourceInInput = false;
         AdaptiveComfortRequested_CEN15251 = false;
         AdaptiveComfortRequested_ASH55 = false;
         NoFfactorConstructionsUsed = true;
