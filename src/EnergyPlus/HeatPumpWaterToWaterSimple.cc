@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -83,7 +84,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
     // This module simulates a Water-to-Water Heat Pump Simple (Equation-Fit Model)
 
     // METHODOLOGY EMPLOYED:
-    // This simulation is based on a set of coefficients generated from
+    // This simulation is based on a set of coefficients in quadlinear curves generated from
     // the manufacturer catalog data using the generalized least square method
 
     // REFERENCES:
@@ -231,6 +232,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         using DataPlant::TypeOf_HPWaterEFHeating;
         using NodeInputManager::GetOnlySingleNode;
         using PlantUtilities::RegisterPlantCompDesignFlow;
+        using CurveManager::GetCurveIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int GSHPNum;     // GSHP number
@@ -291,20 +293,30 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool == DataSizing::AutoSize) {
                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerCoolWasAutoSized = true;
             }
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCap1 = DataIPShortCuts::rNumericArgs(5);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCap2 = DataIPShortCuts::rNumericArgs(6);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCap3 = DataIPShortCuts::rNumericArgs(7);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCap4 = DataIPShortCuts::rNumericArgs(8);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCap5 = DataIPShortCuts::rNumericArgs(9);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPower1 = DataIPShortCuts::rNumericArgs(10);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPower2 = DataIPShortCuts::rNumericArgs(11);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPower3 = DataIPShortCuts::rNumericArgs(12);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPower4 = DataIPShortCuts::rNumericArgs(13);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPower5 = DataIPShortCuts::rNumericArgs(14);
+            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
+            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
+            if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitCoolingUC,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                            "Cooling Capacity Curve Name");                                                       
+            }
+            if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitCoolingUC,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                            "Cooling Compressor Power Curve Name");                                                       
+            }
 
-            if (NumNums > 14) {
-                if (!DataIPShortCuts::lNumericFieldBlanks(15)) {
-                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = DataIPShortCuts::rNumericArgs(15);
+            if (NumNums > 4) {
+                if (!DataIPShortCuts::lNumericFieldBlanks(5)) {
+                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = DataIPShortCuts::rNumericArgs(5);
                 } else {
                     state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 8.0;
                 }
@@ -318,9 +330,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapCool / state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool;
             }
 
-            if (NumNums > 15) {
-                if (!DataIPShortCuts::lNumericFieldBlanks(16)) {
-                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = DataIPShortCuts::rNumericArgs(16);
+            if (NumNums > 5) {
+                if (!DataIPShortCuts::lNumericFieldBlanks(6)) {
+                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = DataIPShortCuts::rNumericArgs(6);
                 } else {
                     state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
                 }
@@ -376,8 +388,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                         DataIPShortCuts::cAlphaArgs(5),
                         "Chilled Water Nodes");
 
-            if (NumAlphas > 5 && !DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = DataIPShortCuts::cAlphaArgs(6);
+            if (NumAlphas > 7 && !DataIPShortCuts::lAlphaFieldBlanks(8)) {
+                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = DataIPShortCuts::cAlphaArgs(8);
             }
 
             // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
@@ -441,20 +453,29 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerHeatWasAutoSized = true;
             }
 
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCap1 = DataIPShortCuts::rNumericArgs(5);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCap2 = DataIPShortCuts::rNumericArgs(6);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCap3 = DataIPShortCuts::rNumericArgs(7);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCap4 = DataIPShortCuts::rNumericArgs(8);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCap5 = DataIPShortCuts::rNumericArgs(9);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPower1 = DataIPShortCuts::rNumericArgs(10);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPower2 = DataIPShortCuts::rNumericArgs(11);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPower3 = DataIPShortCuts::rNumericArgs(12);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPower4 = DataIPShortCuts::rNumericArgs(13);
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPower5 = DataIPShortCuts::rNumericArgs(14);
-
-            if (NumNums > 14) {
-                if (!DataIPShortCuts::lNumericFieldBlanks(15)) {
-                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = DataIPShortCuts::rNumericArgs(15);
+            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
+            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
+            if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitHeatingUC,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                            "Heating Capacity Curve Name");                                                       
+            }
+            if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex > 0) {
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
+                                                            {4},
+                                                            "GetWatertoWaterHPInput",
+                                                            HPEqFitHeatingUC,
+                                                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                            "Heating Compressor Power Curve Name");                                                       
+            }
+            if (NumNums > 4) {
+                if (!DataIPShortCuts::lNumericFieldBlanks(5)) {
+                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = DataIPShortCuts::rNumericArgs(5);
                 } else {
                     state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 7.5;
                 }
@@ -468,9 +489,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapHeat / state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerHeat;
             }
 
-            if (NumNums > 15) {
-                if (!DataIPShortCuts::lNumericFieldBlanks(16)) {
-                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = DataIPShortCuts::rNumericArgs(16);
+            if (NumNums > 5) {
+                if (!DataIPShortCuts::lNumericFieldBlanks(6)) {
+                    state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = DataIPShortCuts::rNumericArgs(6);
                 } else {
                     state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
                 }
@@ -514,8 +535,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                     2,
                                                                     ObjectIsNotParent);
 
-            if (NumAlphas > 5 && !DataIPShortCuts::lAlphaFieldBlanks(6)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = DataIPShortCuts::cAlphaArgs(6);
+            if (NumAlphas > 7 && !DataIPShortCuts::lAlphaFieldBlanks(8)) {
+                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = DataIPShortCuts::cAlphaArgs(8);
             }
 
             // Test node sets
@@ -1602,6 +1623,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using CurveManager::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
@@ -1613,16 +1635,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         Real64 CoolPowerRated;             // Rated Cooling Power Consumption[W]
         Real64 LoadSideVolFlowRateRated;   // Rated Load Side Volumetric Flow Rate [m3/s]
         Real64 SourceSideVolFlowRateRated; // Rated Source Side Volumetric Flow Rate [m3/s]
-        Real64 CoolCapCoeff1;              // 1st coefficient of the cooling capacity performance curve
-        Real64 CoolCapCoeff2;              // 2nd coefficient of the cooling capacity performance curve
-        Real64 CoolCapCoeff3;              // 3rd coefficient of the cooling capacity performance curve
-        Real64 CoolCapCoeff4;              // 4th coefficient of the cooling capacity performance curve
-        Real64 CoolCapCoeff5;              // 5th coefficient of the cooling capacity performance curve
-        Real64 CoolPowerCoeff1;            // 1st coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff2;            // 2nd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff3;            // 3rd coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff4;            // 4th coefficient of the cooling power consumption curve
-        Real64 CoolPowerCoeff5;            // 5th coefficient of the cooling power consumption curve
 
         Real64 LoadSideMassFlowRate;   // Load Side Mass Flow Rate [kg/s]
         Real64 LoadSideInletTemp;      // Load Side Inlet Temperature [C]
@@ -1650,16 +1662,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         SourceSideVolFlowRateRated = this->RatedSourceVolFlowCool;
         CoolCapRated = this->RatedCapCool;
         CoolPowerRated = this->RatedPowerCool;
-        CoolCapCoeff1 = this->CoolCap1;
-        CoolCapCoeff2 = this->CoolCap2;
-        CoolCapCoeff3 = this->CoolCap3;
-        CoolCapCoeff4 = this->CoolCap4;
-        CoolCapCoeff5 = this->CoolCap5;
-        CoolPowerCoeff1 = this->CoolPower1;
-        CoolPowerCoeff2 = this->CoolPower2;
-        CoolPowerCoeff3 = this->CoolPower3;
-        CoolPowerCoeff4 = this->CoolPower4;
-        CoolPowerCoeff5 = this->CoolPower5;
 
         LoadSideMassFlowRate = this->reportLoadSideMassFlowRate;
         LoadSideInletTemp = this->reportLoadSideInletTemp;
@@ -1682,11 +1684,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         func3 = (LoadSideMassFlowRate / (LoadSideVolFlowRateRated * rhoLoadSide));
         func4 = (SourceSideMassFlowRate / (SourceSideVolFlowRateRated * rhoSourceSide));
 
-        QLoad =
-            CoolCapRated * (CoolCapCoeff1 + (func1 * CoolCapCoeff2) + (func2 * CoolCapCoeff3) + (func3 * CoolCapCoeff4) + (func4 * CoolCapCoeff5));
+        QLoad = CoolCapRated * CurveValue(state, this->CoolCapCurveIndex, func1, func2, func3, func4);
 
-        Power = CoolPowerRated *
-                (CoolPowerCoeff1 + (func1 * CoolPowerCoeff2) + (func2 * CoolPowerCoeff3) + (func3 * CoolPowerCoeff4) + (func4 * CoolPowerCoeff5));
+        Power = CoolPowerRated * CurveValue(state, this->CoolPowCurveIndex, func1, func2, func3, func4);
 
         if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
@@ -1783,6 +1783,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using CurveManager::CurveValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const CelsiustoKelvin(DataGlobalConstants::KelvinConv); // Conversion from Celsius to Kelvin
@@ -1795,16 +1796,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         Real64 HeatPowerRated;             // Rated Heating Compressor Power[W]
         Real64 LoadSideVolFlowRateRated;   // Rated Load Side Volumetric Flow Rate [m3/s]
         Real64 SourceSideVolFlowRateRated; // Rated Source Side Volumetric Flow Rate [m3/s]
-        Real64 HeatCapCoeff1;              // 1st coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff2;              // 2nd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff3;              // 3rd coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff4;              // 4th coefficient of the heating capacity performance curve
-        Real64 HeatCapCoeff5;              // 5th coefficient of the heating capacity performance curve
-        Real64 HeatPowerCoeff1;            // 1st coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff2;            // 2nd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff3;            // 3rd coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff4;            // 4th coefficient of the heating power consumption curve
-        Real64 HeatPowerCoeff5;            // 5th coefficient of the heating power consumption curve
         Real64 LoadSideMassFlowRate;       // Load Side Mass Flow Rate [kg/s]
         Real64 LoadSideInletTemp;          // Load Side Inlet Temperature [C]
         Real64 LoadSideOutletTemp;         // Load side Outlet Temperature [C]
@@ -1830,16 +1821,6 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         SourceSideVolFlowRateRated = this->RatedSourceVolFlowHeat;
         HeatCapRated = this->RatedCapHeat;
         HeatPowerRated = this->RatedPowerHeat;
-        HeatCapCoeff1 = this->HeatCap1;
-        HeatCapCoeff2 = this->HeatCap2;
-        HeatCapCoeff3 = this->HeatCap3;
-        HeatCapCoeff4 = this->HeatCap4;
-        HeatCapCoeff5 = this->HeatCap5;
-        HeatPowerCoeff1 = this->HeatPower1;
-        HeatPowerCoeff2 = this->HeatPower2;
-        HeatPowerCoeff3 = this->HeatPower3;
-        HeatPowerCoeff4 = this->HeatPower4;
-        HeatPowerCoeff5 = this->HeatPower5;
 
         LoadSideMassFlowRate = this->reportLoadSideMassFlowRate;
         LoadSideInletTemp = this->reportLoadSideInletTemp;
@@ -1861,10 +1842,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         func3 = (LoadSideMassFlowRate / (LoadSideVolFlowRateRated * rhoLoadSide));
         func4 = (SourceSideMassFlowRate / (SourceSideVolFlowRateRated * rhoSourceSide));
 
-        QLoad =
-            HeatCapRated * (HeatCapCoeff1 + (func1 * HeatCapCoeff2) + (func2 * HeatCapCoeff3) + (func3 * HeatCapCoeff4) + (func4 * HeatCapCoeff5));
-        Power = HeatPowerRated *
-                (HeatPowerCoeff1 + (func1 * HeatPowerCoeff2) + (func2 * HeatPowerCoeff3) + (func3 * HeatPowerCoeff4) + (func4 * HeatPowerCoeff5));
+        QLoad = HeatCapRated * CurveValue(state, this->HeatCapCurveIndex, func1, func2, func3, func4);
+        Power = HeatPowerRated * CurveValue(state, this->HeatPowCurveIndex, func1, func2, func3, func4);
 
         if ((QLoad <= 0.0 || Power <= 0.0) && !state.dataGlobal->WarmupFlag) {
             if (QLoad <= 0.0) {
