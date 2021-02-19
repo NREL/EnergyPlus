@@ -192,7 +192,7 @@ CHECKED_AND_OKED = {
             "charging",
             "discharging"
         ],
-        "simulateLiIonNmcBatteryModel", [
+        "simulateLiIonNmcBatteryModel": [
             "charging",
             "discharging"
         ]
