@@ -2553,10 +2553,6 @@ namespace WindowComplexManager {
         //                 0 - ISO15099
         //                 1 - Scaled Cavity Width (SCW)
         //                 2 - Convective Scalar Model (CSM)
-        static int Debug_mode(0); // Switch for debug output files:
-        //                 0 - don't create debug output files
-        //                 1 - append results to existing debug output file (where applicable)
-        //                 2 - store results in a new debug output file
         static std::string Debug_dir;          // Target directory for debug files (pointer to a character array)
         static std::string Debug_file("Test"); // Template file name used to create debug output files
         static std::int32_t Window_ID(-1);     // ID of the window (long integer value, passed by W6)
@@ -3056,7 +3052,6 @@ namespace WindowComplexManager {
         }
 
         // ThermalMod = 0
-        Debug_mode = 0;
         CalcSHGC = 0;
 
         Window_ID = ConstrNum;
@@ -3134,7 +3129,8 @@ namespace WindowComplexManager {
             edgeGlCorrFac = 1;
 
         //  call TARCOG
-        TARCOG90(nlayer,
+        int constexpr Debug_mode = 0;
+        TARCOG90(state, nlayer,
                  iwd,
                  tout,
                  tind,

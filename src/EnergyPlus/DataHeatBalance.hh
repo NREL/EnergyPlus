@@ -154,6 +154,7 @@ namespace DataHeatBalance {
     extern int const DOE2HcOutside;   // Only valid for outside use
     extern int const BLASTHcOutside;  // Only valid for outside use
     extern int const AdaptiveConvectionAlgorithm;
+    extern int const ASTMC1340;
 
     // Parameters for WarmupDays
     extern int const DefaultMaxNumberOfWarmupDays; // Default maximum number of warmup days allowed
@@ -423,9 +424,13 @@ namespace DataHeatBalance {
     extern bool StormWinChangeThisDay; // True if a storm window has been added or removed from any
     // window during the current day; can only be true for first
     // time step of the day.
-    extern bool AnyConstructInternalSourceInInput; // true if the user has entered any constructions with internal sources
+    extern bool AnyInternalHeatSourceInInput; // true if the user has entered any constructions with internal sources
     extern bool AdaptiveComfortRequested_CEN15251; // true if people objects have adaptive comfort requests. CEN15251
     extern bool AdaptiveComfortRequested_ASH55;    // true if people objects have adaptive comfort requests. ASH55
+    extern bool AnyThermalComfortPierceModel;      // true if people objects use pierce thermal comfort model
+    extern bool AnyThermalComfortKSUModel;         // true if people objects use KSU thermal comfort model
+    extern bool AnyThermalComfortCoolingEffectModel;  // true if people objects use ASH55 cooling effect adjusted thermal comfort model
+    extern bool AnyThermalComfortAnkleDraftModel;     // true if people objects use ASH55 ankle draft thermal comfort model
 
     extern bool NoFfactorConstructionsUsed;
     extern bool NoCfactorConstructionsUsed;
@@ -882,6 +887,7 @@ namespace DataHeatBalance {
         int ClothingMethodPtr;
         int ClothingType;   // Name of clothing type
         int AirVelocityPtr; // Pointer to schedule for air velocity in zone
+        int AnkleAirVelocityPtr; // Pointer to schedule for air velocity in zone
         bool Fanger;        // True when Fanger calculation to be performed
         bool Pierce;        // True when Pierce 2-node calculation to be performed
         bool KSU;           // True when KSU 2-node calculation to be performed
@@ -889,6 +895,8 @@ namespace DataHeatBalance {
         //   to be performed
         bool AdaptiveCEN15251; // True when CEN Standard 15251 adaptive comfort calculation
         //   to be performed
+        bool CoolingEffectASH55; // True when ASHRAE Standard 55 cooling effect calculation to be performed
+        bool AnkleDraftASH55;    // True when ASHRAE Standard 55 ankle draft calculation to be performed
         int MRTCalcType;                 // MRT calculation type (See MRT Calculation type parameters)
         int SurfacePtr;                  // Pointer to the name of surface
         std::string AngleFactorListName; // Name of angle factor list
@@ -924,8 +932,8 @@ namespace DataHeatBalance {
         PeopleData()
             : ZonePtr(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
-              ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false), AdaptiveASH55(false),
-              AdaptiveCEN15251(false), MRTCalcType(0), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
+              ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false), AdaptiveASH55(false),
+              AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false), MRTCalcType(0), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
               CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0),
               SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
               LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),

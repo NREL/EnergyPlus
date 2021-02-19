@@ -1950,3 +1950,71 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 
     DataHeatBalSurface::TempSurfInTmp.deallocate();
 }
+
+TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
+{
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 AirStreamV;
+    Real64 Tilt;
+    Real64 Hin;
+
+    DataSurfaces::Surface.allocate(3);
+    DataHeatBalance::Zone.allocate(3);
+
+    // Horizontal Roof, heat flow down
+    DataSurfaces::Surface(1).Zone = 1;
+    DataHeatBalance::Zone(1).Volume = 1000;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
+    DataSurfaces::Surface(1).Tilt = 0;
+    DataSurfaces::Surface(1).Area = 100;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).WindSpeed = 1;
+
+    Tsurf = 18.0;
+    Tair = 15.0;
+    AirStreamV = 2.0;
+    Tilt = DataSurfaces::Surface(1).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(1, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.977, 0.001);
+
+    //Pitched Roof, heat flow up
+    DataSurfaces::Surface(2).Zone = 2;
+    DataHeatBalance::Zone(2).Volume = 1000;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Roof;
+    DataSurfaces::Surface(2).Tilt = 20;
+    DataSurfaces::Surface(2).Area = 100;
+    DataSurfaces::Surface(2).ExtBoundCond = 0;
+    DataSurfaces::Surface(2).WindSpeed = 1;
+    DataSurfaces::Surface(2).Height = 8;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 2.0;
+    Tilt = DataSurfaces::Surface(2).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(2, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 2.666, 0.001);
+    
+    // Vertical Wall
+    DataSurfaces::Surface(3).Zone = 3;
+    DataHeatBalance::Zone(3).Volume = 1000;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Wall;
+    DataSurfaces::Surface(3).Tilt = 90;
+    DataSurfaces::Surface(3).Area = 100;
+    DataSurfaces::Surface(3).ExtBoundCond = 1;
+    DataSurfaces::Surface(3).Height = 3;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 0.0055;
+    Tilt = DataSurfaces::Surface(3).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(3, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.756, 0.001);
+
+}

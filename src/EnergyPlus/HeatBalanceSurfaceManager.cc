@@ -443,6 +443,9 @@ namespace HeatBalanceSurfaceManager {
                 if (Surface(SurfNum).WindDirEMSOverrideOn) {
                     Surface(SurfNum).WindDir = Surface(SurfNum).WindDirEMSOverrideValue;
                 }
+                if (Surface(SurfNum).ViewFactorGroundEMSOverrideOn) {
+                    Surface(SurfNum).ViewFactorGround = Surface(SurfNum).ViewFactorGroundEMSOverrideValue;
+                }
             }
         }
 
@@ -723,7 +726,7 @@ namespace HeatBalanceSurfaceManager {
 
         CTFConstOutPart = 0.0;
         CTFConstInPart = 0.0;
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
         }
@@ -1384,7 +1387,7 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Use the total number of surfaces to allocate variables to avoid a surface number limit
         CTFConstInPart.dimension(TotSurfaces, 0.0);
@@ -1402,7 +1405,7 @@ namespace HeatBalanceSurfaceManager {
         IsNotPoolSurf.dimension(TotSurfaces, 0);
         TempTermSurf.dimension(TotSurfaces, 0);
         TempDivSurf.dimension(TotSurfaces, 0);
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             CTFTsrcConstPart.dimension(TotSurfaces, 0.0);
             CTFTuserConstPart.dimension(TotSurfaces, 0.0);
         }
@@ -1505,7 +1508,7 @@ namespace HeatBalanceSurfaceManager {
         QH.dimension(2, Construction::MaxCTFTerms, TotSurfaces, 0.0);
         THM.dimension(2, Construction::MaxCTFTerms, TotSurfaces, 0.0);
         QHM.dimension(2, Construction::MaxCTFTerms, TotSurfaces, 0.0);
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             TempSource.dimension(TotSurfaces, 0.0);
             TempUserLoc.dimension(TotSurfaces, 0.0);
             TsrcHist.dimension(TotSurfaces, Construction::MaxCTFTerms, 0.0);
@@ -2097,7 +2100,7 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surfaces
         int OSCMnum; // DO loop counter for Other side conditions modeled (OSCM)
-        // FLOW:
+
 
         // First do the "bulk" initializations of arrays sized to NumOfZones
         MRT = 23.0; // module level array
@@ -2203,7 +2206,7 @@ namespace HeatBalanceSurfaceManager {
         THM = 23.0; // module level array
         QH = 0.0;
         QHM = 0.0;
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             TsrcHist = 23.0;
             TsrcHistM = 23.0;
             TuserHist = 23.0;
@@ -3432,7 +3435,7 @@ namespace HeatBalanceSurfaceManager {
         static Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
         static Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
 
-        // FLOW:
+
         if (!allocated(QS)) QS.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
         if (!allocated(QSLights)) QSLights.allocate(DataViewFactorInformation::NumOfSolarEnclosures);
 
@@ -4010,7 +4013,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 const SmallestAreaAbsProductAllowed(0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
         static Array1D_bool FirstCalcZone; // for error message
 
-        // FLOW:
+
         if (!allocated(EnclSolVMULT)) {
             EnclSolVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
         }
@@ -4595,7 +4598,7 @@ namespace HeatBalanceSurfaceManager {
         bool CoolingPanelSysOn;   // true if a simple cooling panel is running
         bool SwimmingPoolOn;      // true if a pool is present (running)
 
-        // FLOW:
+
         UpdateRadSysSourceValAvg(LowTempRadSysOn);
         UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
         UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
@@ -4655,7 +4658,7 @@ namespace HeatBalanceSurfaceManager {
         assert(equal_dimensions(TH, THM));
         assert(equal_dimensions(TH, QH));
         assert(equal_dimensions(TH, QHM));
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             assert(equal_dimensions(TsrcHist, QsrcHist));
             assert(equal_dimensions(TsrcHist, TsrcHistM));
             assert(equal_dimensions(TsrcHistM, QsrcHistM));
@@ -4670,7 +4673,7 @@ namespace HeatBalanceSurfaceManager {
             TempInt1.dimension(TotSurfaces, 0.0);
             TempExt1.dimension(TotSurfaces, 0.0);
             SumTime.dimension(TotSurfaces, 0.0);
-            if (AnyConstructInternalSourceInInput) {
+            if (AnyInternalHeatSourceInInput) {
                 Qsrc1.dimension(TotSurfaces, 0.0);
                 Tsrc1.dimension(TotSurfaces, 0.0);
                 Tuser1.dimension(TotSurfaces, 0.0);
@@ -4767,7 +4770,7 @@ namespace HeatBalanceSurfaceManager {
                 TempInt1(SurfNum) = TempSurfIn(SurfNum);
                 QExt1(SurfNum) = QH[l11];
                 QInt1(SurfNum) = QH[l21];
-                if (AnyConstructInternalSourceInInput) {
+                if (AnyInternalHeatSourceInInput) {
                     Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
                     Tuser1(SurfNum) = TuserHist(SurfNum, 1);
                     Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
@@ -4943,7 +4946,7 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
         int ZoneNum;                      // Zone number
 
-        // FLOW:
+
         if (CalculateZoneMRTfirstTime) {
             SurfaceAE.allocate(TotSurfaces);
             ZoneAESum.allocate(state.dataGlobal->NumOfZones);
@@ -5560,10 +5563,10 @@ namespace HeatBalanceSurfaceManager {
         static std::string const Outside("Outside");
         static std::string const BlankString;
 
-        // FLOW:
+
         bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
-        if (AnyConstructInternalSourceInInput) {
+        if (AnyInternalHeatSourceInInput) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 // Need to transfer any source/sink for a surface to the local array.  Note that
                 // the local array is flux (W/m2) while the QRadSysSource is heat transfer (W).
@@ -7383,7 +7386,7 @@ namespace HeatBalanceSurfaceManager {
                                                  (HMovInsul);
                     }
 
-                    if (AnyConstructInternalSourceInInput) {
+                    if (AnyInternalHeatSourceInInput) {
                         if (state.dataConstruction->Construct(Surface(surfNum).Construction).SourceSinkPresent) {
                             // Set the appropriate parameters for the radiant system
                             // Radiant system does not need the damping coefficient terms (hopefully)

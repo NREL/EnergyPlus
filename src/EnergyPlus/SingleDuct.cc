@@ -151,7 +151,7 @@ namespace EnergyPlus::SingleDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SysNum; // The Sys that you are currently loading input into
 
-        // FLOW:
+
 
         // Obtains and Allocates Sys related parameters from input file
         if (state.dataSingleDuct->GetInputFlag) { // First time subroutine has been entered
@@ -2028,7 +2028,7 @@ namespace EnergyPlus::SingleDuct {
 
         // static Array1D_bool PlantLoopScanFlag;
 
-        // FLOW:
+
 
         // Do the Begin Simulation initializations
         if (state.dataSingleDuct->InitSysFlag) {
@@ -5885,7 +5885,6 @@ namespace EnergyPlus::SingleDuct {
         int ATMixerIndex; // local air terminal mixer index
 
         if (state.dataSingleDuct->GetATMixerFlag) {
-            // CALL GetZoneAirLoopEquipment
             GetATMixers(state);
             state.dataSingleDuct->GetATMixerFlag = false;
         }
