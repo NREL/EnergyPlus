@@ -1001,6 +1001,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 FinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 FinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
+                FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
                 FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
                 FinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(ZoneSizNum).OADesMethod;
                 FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
@@ -1034,6 +1035,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(ZoneSizNum).HeatDesTempDiff;
                 CalcFinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(ZoneSizNum).CoolDesHumRat;
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(ZoneSizNum).HeatDesHumRat;
+                CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(ZoneSizNum).ZoneAirDistributionIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(ZoneSizNum).ZoneDesignSpecOAIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(ZoneSizNum).OADesMethod;
                 CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(ZoneSizNum).DesOAFlowPPer;
@@ -1066,6 +1068,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 FinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(1).HeatDesTempDiff;
                 FinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(1).CoolDesHumRat;
                 FinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(1).HeatDesHumRat;
+                FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(1).ZoneAirDistributionIndex;
                 FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(1).ZoneDesignSpecOAIndex;
                 FinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(1).OADesMethod;
                 FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(1).DesOAFlowPPer;
@@ -1099,6 +1102,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesTempDiff = ZoneSizingInput(1).HeatDesTempDiff;
                 CalcFinalZoneSizing(CtrlZoneNum).CoolDesHumRat = ZoneSizingInput(1).CoolDesHumRat;
                 CalcFinalZoneSizing(CtrlZoneNum).HeatDesHumRat = ZoneSizingInput(1).HeatDesHumRat;
+                CalcFinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex = ZoneSizingInput(1).ZoneAirDistributionIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex = ZoneSizingInput(1).ZoneDesignSpecOAIndex;
                 CalcFinalZoneSizing(CtrlZoneNum).OADesMethod = ZoneSizingInput(1).OADesMethod;
                 CalcFinalZoneSizing(CtrlZoneNum).DesOAFlowPPer = ZoneSizingInput(1).DesOAFlowPPer;
@@ -1257,6 +1261,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
             // Use the max occupancy data from the PEOPLE structure to calculate design min OA for each zone
             // from the outside air flow per person input
             TotPeopleInZone = 0.0;
+            Real64 ZoneMinOccupancy = 0.;
             ZoneIndex = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
             for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
                 if (People(PeopleNum).ZonePtr == FinalZoneSizing(CtrlZoneNum).ActualZoneNum) {
@@ -1268,6 +1273,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     } else {
                         FinalZoneSizing(CtrlZoneNum).ZonePeakOccupancy = TotPeopleInZone;
                     }
+                    ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(state, People(PeopleNum).NumberOfPeoplePtr);
                 }
             }
             FinalZoneSizing(CtrlZoneNum).TotalZoneFloorArea =
@@ -1283,10 +1289,20 @@ namespace EnergyPlus::ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).TotPeopleInZone = TotPeopleInZone;
             FinalZoneSizing(CtrlZoneNum).TotalOAFromPeople = OAFromPeople;
             FinalZoneSizing(CtrlZoneNum).TotalOAFromArea = OAFromArea;
+
+            // save Voz for predefined outdoor air summary report
+            Real64 MinEz = std::min(FinalZoneSizing(CtrlZoneNum).ZoneADEffCooling, FinalZoneSizing(CtrlZoneNum).ZoneADEffHeating);
+            if (MinEz == 0) {
+                MinEz = 1.0; // if not calculated assume 1.0 ventilation effectiveness
+            }
+            DataHeatBalance::ZonePreDefRep(ZoneIndex).VozMin = (ZoneMinOccupancy * FinalZoneSizing(CtrlZoneNum).DesOAFlowPPer + OAFromArea) / MinEz;
+
             // Calculate the design min OA flow rate for this zone
             UseOccSchFlag = false;
             UseMinOASchFlag = false;
             DSOAPtr = FinalZoneSizing(CtrlZoneNum).ZoneDesignSpecOAIndex;
+            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneDesignSpecOAIndex = DSOAPtr; // store for later use
+            state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex = FinalZoneSizing(CtrlZoneNum).ZoneAirDistributionIndex; // store for later use
             OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state, DSOAPtr, ZoneIndex, UseOccSchFlag, UseMinOASchFlag);
 
             // Zone(ZoneIndex)%Multiplier and Zone(ZoneIndex)%ListMultiplier applied in CalcDesignSpecificationOutdoorAir
