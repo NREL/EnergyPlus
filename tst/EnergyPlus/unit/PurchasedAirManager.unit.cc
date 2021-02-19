@@ -65,11 +65,13 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/SizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -518,6 +520,173 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     // Ideal loads air system found the plenum it is attached to
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneSupplyAirNodeNum).MassFlowRate);
     EXPECT_EQ(PurchAir(1).SupplyAirMassFlowRate, Node(PurchAir(1).ZoneExhaustAirNodeNum).MassFlowRate);
+}
+
+TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+
+     "Zone,",
+     "  EAST ZONE,                      !- Name",
+     "  0,                              !- Direction of Relative North{ deg }",
+     "  0,                              !- X Origin{ m }",
+     "  0,                              !- Y Origin{ m }",
+     "  0,                              !- Z Origin{ m }",
+     "  1,                              !- Type",
+     "  1,                              !- Multiplier",
+     "  autocalculate,                  !- Ceiling Height{ m }",
+     "  autocalculate;                  !- Volume{ m3 }",
+
+     "ZoneHVAC:IdealLoadsAirSystem,",
+     "  ZONE 1 IDEAL LOADS,             !- Name",
+     "  ,                               !- Availability Schedule Name",
+     "  Zone Inlet Node,                !- Zone Supply Air Node Name",
+     "  Zone Exhaust Node,              !- Zone Exhaust Air Node Name",
+     "  ,                               !- System Inlet Air Node Name",
+     "  50,                             !- Maximum Heating Supply Air Temperature{ C }",
+     "  13,                             !- Minimum Cooling Supply Air Temperature{ C }",
+     "  0.015,                          !- Maximum Heating Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+     "  0.009,                          !- Minimum Cooling Supply Air Humidity Ratio{ kgWater / kgDryAir }",
+     "  NoLimit,                        !- Heating Limit",
+     "  autosize,                       !- Maximum Heating Air Flow Rate{ m3 / s }",
+     "  ,                               !- Maximum Sensible Heating Capacity{ W }",
+     "  NoLimit,                        !- Cooling Limit",
+     "  autosize,                       !- Maximum Cooling Air Flow Rate{ m3 / s }",
+     "  ,                               !- Maximum Total Cooling Capacity{ W }",
+     "  ,                               !- Heating Availability Schedule Name",
+     "  ,                               !- Cooling Availability Schedule Name",
+     "  ConstantSupplyHumidityRatio,    !- Dehumidification Control Type",
+     "  ,                               !- Cooling Sensible Heat Ratio{ dimensionless }",
+     "  ConstantSupplyHumidityRatio,    !- Humidification Control Type",
+     "  Office Outdoor Air Spec,        !- Design Specification Outdoor Air Object Name",
+     "  ,                               !- Outdoor Air Inlet Node Name",
+     "  ,                               !- Demand Controlled Ventilation Type",
+     "  NoEconomizer,                   !- Outdoor Air Economizer Type",
+     "  Sensible,                       !- Heat Recovery Type",
+     "  0.7,                            !- Sensible Heat Recovery Effectiveness{ dimensionless }",
+     "  0.65;                           !- Latent Heat Recovery Effectiveness{ dimensionless }",
+
+     "DesignSpecification:OutdoorAir,",
+     "  Office Outdoor Air Spec,        !- Name",
+     "  Flow/Zone,                      !- Outdoor Air Method",
+     "  0.0,                            !- Outdoor Air Flow per Person {m3/s-person}",
+     "  0.00305,                        !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+     "  0.0,                            !- Outdoor Air Flow per Zone {m3/s}",
+     "  0.0,                            !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+     "  Min OA Sched;                   !- Outdoor Air Schedule Name",
+
+     "Schedule:Compact,",
+     "  Min OA Sched,                   !- Name",
+     "  Fraction,                       !- Schedule Type Limits Name",
+     "  Through: 12/31,                 !- Field 1",
+     "  For: WeekDays CustomDay1 CustomDay2, !- Field 2",
+     "  Until: 8:00,0.0,                !- Field 3",
+     "  Until: 21:00,1.0,               !- Field 5",
+     "  Until: 24:00,0.0,               !- Field 7",
+     "  For: Weekends Holiday,          !- Field 9",
+     "  Until: 24:00,0.0,               !- Field 10",
+     "  For: SummerDesignDay,           !- Field 12",
+     "  Until: 24:00,1.0,               !- Field 13",
+     "  For: WinterDesignDay,           !- Field 15",
+     "  Until: 24:00,1.0;               !- Field 16",
+
+     "ZoneHVAC:EquipmentConnections,",
+     "  EAST ZONE,                      !- Zone Name",
+     "  ZoneEquipment,                  !- Zone Conditioning Equipment List Name",
+     "  Zone Inlet Node,                !- Zone Air Inlet Node or NodeList Name",
+     "  Zone Exhaust Node,              !- Zone Air Exhaust Node or NodeList Name",
+     "  Zone Node,                      !- Zone Air Node Name",
+     "  Zone Outlet Node;               !- Zone Return Air Node Name",
+
+     "ZoneHVAC:EquipmentList,",
+     "  ZoneEquipment,                  !- Name",
+     "  SequentialLoad,                 !- Load Distribution Scheme",
+     "  ZoneHVAC:IdealLoadsAirSystem,   !- Zone Equipment 1 Object Type",
+     "  ZONE 1 IDEAL LOADS,             !- Zone Equipment 1 Name",
+     "  1,                              !- Zone Equipment 1 Cooling Sequence",
+     "  1;                              !- Zone Equipment 1 Heating or No - Load Sequence",
+
+     "AirLoopHVAC:ReturnPlenum,",
+     "  DOAS Zone Return Plenum,        !- Name",
+     "  PLENUM ZONE,                    !- Zone Name",
+     "  Plenum Node,                    !- Zone Node Name", // illegal use of non-unique zone node name
+     "  Plenum Outlet Node,             !- Outlet Node Name",
+     "  ,                               !- Induced Air Outlet Node or NodeList Name",
+     "  Zone Exhaust Node;              !- Inlet 1 Node Name",
+
+     });
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataGlobal->DoWeathSim = true;
+
+    bool ErrorsFound = false;
+    GetZoneData(*state, ErrorsFound);
+    Zone(1).SurfaceFirst = 1;
+    Zone(1).SurfaceLast = 1;
+    ScheduleManager::Schedule.allocate(1);
+    AllocateHeatBalArrays(*state);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+    auto & PurchAir(state->dataPurchasedAirMgr->PurchAir);
+
+
+    bool FirstHVACIteration(true);
+    bool SimZone(true);
+    bool SimAir(false);
+
+    EnergyPlus::SizingManager::GetOARequirements(*state);
+    ManageZoneEquipment(*state,
+                        FirstHVACIteration,
+                        SimZone,
+                        SimAir); // read zone equipment configuration and list objects and simulate ideal loads air system
+
+
+    EXPECT_EQ(PurchAir(1).Name, "ZONE 1 IDEAL LOADS");
+    // Expecting SupplyTemp to be the same as Zone supply temp
+    EXPECT_EQ(PurchAir(1).SupplyTemp, Node(PurchAir(1).ZoneSupplyAirNodeNum).Temp);
+    EXPECT_EQ(PurchAir(1).SupplyHumRat, Node(PurchAir(1).ZoneSupplyAirNodeNum).HumRat);
+
+    // Test for intermediate variables, MixedAirTemp, MixedAirHumRat
+    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp = 24;
+    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat = 0.00929;
+    Node(PurchAir(1).ZoneRecircAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).Temp,
+                                                                    Node(PurchAir(1).ZoneRecircAirNodeNum).HumRat
+                                                                    );
+    Node(PurchAir(1).OutdoorAirNodeNum).Temp = 3;
+    Node(PurchAir(1).OutdoorAirNodeNum).HumRat = 0.004586;
+    Node(PurchAir(1).OutdoorAirNodeNum).Enthalpy =  Psychrometrics::PsyHFnTdbW(
+                                                                    Node(PurchAir(1).OutdoorAirNodeNum).Temp,
+                                                                    Node(PurchAir(1).OutdoorAirNodeNum).HumRat
+                                                                    );
+    PurchAir(1).MixedAirTemp = 0;
+    PurchAir(1).MixedAirHumRat = 0;
+    Real64 MixedAirEnthalpy = 0;
+    Real64 OAMassFlowRate = 10;
+    Real64 SupplyMassFlowRate = 11;
+    CalcPurchAirMixedAir(*state,
+                         1,                                 // index to ideal loads unit
+                         OAMassFlowRate,                                // outside air mass flow rate [kg/s]
+                         SupplyMassFlowRate,                            // supply air mass flow rate [kg/s]
+                         PurchAir(1).MixedAirTemp,                // Mixed air dry bulb temperature [C]
+                         PurchAir(1).MixedAirHumRat,              // Mixed air humidity ratio [kgWater/kgDryAir]
+                         MixedAirEnthalpy,                           // Mixed air enthalpy [J/kg]
+                         OpMode::Cool                      // current operating mode, Off, Heating, Cooling, or DeadBand
+                         );
+// Calculations:
+// Stream 1: Recirc stream:         T1: 24 C; W1: 0.00929 kg/kg; h1: 47764.36 J/kg; m_dot1: 11 kg/s
+// Stream 2: Outdoor Air stream:    T2:  3 C; W2:0.004586 kg/kg; h2: 14509.40 J/kg; m_dot2: 10 kg/s
+
+// Mixed stream:
+// When SupplyMassFlowRate > OAMassFlowRate
+// RecircMassFlowRate = SupplyMassFlowRate - OAMassFlowRate = 1 kg/s
+// h_mix_stream = (RecircMassFlowRate X h_Recirc + m_dotOA X h_OA)/SupplyFlowRate = 17532.58 J/kg
+// W_mix_stream = (RecircMassFlowRate X W_Recirc + m_dotOA X W_OA)/SupplyFlowRate = 0.005013 kg/kg
+// T_mix_stream = T as fn (h_mix_stream,W_mix_stream) = 4.924 C
+
+    EXPECT_EQ(PurchAir(1).MixedAirTemp,4.9240554165264818);
+    EXPECT_EQ(PurchAir(1).MixedAirHumRat,0.0050136363636363633);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)

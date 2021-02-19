@@ -4762,7 +4762,7 @@ When using EpMacro with a typical installation of EnergyPlus, the above entry ca
 
 \subsection{Generator:PVWatts}\label{generatorpvwatts}
 
-PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}.
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. The PVWatts:Generator uses SAM 2020.11.29 Revision 0, SSC Revision 250.
 
 \subsubsection{Inputs}\label{input-description}
 
@@ -4908,6 +4908,8 @@ Default: 0.4
   HVAC,Average,Plane of Array Irradiance $\left [\frac{\text{W}}{\text{m}^2} \right ]$
 \item
   HVAC,Average,Generator PV Cell Temperature {[}C{]}
+\item
+  HVAC,Average,Shaded Percent {[}\%{]}
 \end{itemize}
 
 

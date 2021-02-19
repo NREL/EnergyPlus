@@ -215,7 +215,7 @@ namespace HeatingCoils {
         Real64 PartLoadFrac;  // part-load fraction of heating coil
         Real64 QCoilRequired; // local variable for optional argument
 
-        // FLOW:
+
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetHeatingCoilInput(state);
@@ -1932,7 +1932,7 @@ namespace HeatingCoils {
         Real64 HSElecHeatingPower;   // Full load power at high stage
         Real64 PartLoadRat;          // part load ratio
 
-        // FLOW
+
         if (StageNum > 1) {
             StageNumLS = StageNum - 1;
             StageNumHS = StageNum;
@@ -2360,7 +2360,7 @@ namespace HeatingCoils {
         Real64 PartLoadRat(0.0);     // part load ratio
         Real64 PLF;                  // part load factor used to calculate RTF
 
-        // FLOW
+
         if (StageNum > 1) {
             StageNumLS = StageNum - 1;
             StageNumHS = StageNum;

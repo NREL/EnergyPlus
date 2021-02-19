@@ -1142,7 +1142,7 @@ namespace Construction {
         // the significant figure limit for REAL(r64)
         // variables reached)
 
-        // FLOW:
+
         AMat1.allocate(this->rcmax, this->rcmax);
         AMato.allocate(this->rcmax, this->rcmax);
         AMatN.allocate(this->rcmax, this->rcmax);
@@ -1368,7 +1368,7 @@ namespace Construction {
         int ir;                // Loop counter
         int irr;               // Loop counter
 
-        // FLOW:
+
 
         // Subroutine initializations ...
         AMat1.allocate(this->rcmax, this->rcmax);
@@ -1511,7 +1511,7 @@ namespace Construction {
         int j;                 // Loop counter
         int SurfNode;          // Loop counter
 
-        // FLOW:
+
 
         // Compute Gamma1 from equation (2.1.12) in Seem's dissertation which
         // states that:  Gamma1  =  [AInv] * ([AExp]-[I]) * [BMat]
@@ -2008,11 +2008,11 @@ namespace Construction {
     Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
     {
         if (userValue < 0.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
+            ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is less than zero.");
             ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
             return 0.0;
         } else if (userValue > 1.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
+            ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is greater than one.");
             ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
             return 1.0;
         } else {    // Valid value between 0 and 1

@@ -81,9 +81,6 @@ namespace EnergyPlus::PlantPressureSystem {
     // METHODOLOGY EMPLOYED:
     // General EnergyPlus Methodology:
 
-    // REFERENCES:
-    // na
-
     // OTHER NOTES:
     //  Phase 1: Pump Power Correction: -Loop/Parallel flows are not resolved based on pressure drop
     //                                  -Every flow path must see at least one branch with pressure information
@@ -98,15 +95,6 @@ namespace EnergyPlus::PlantPressureSystem {
 
     // Using/Aliasing
     using namespace DataBranchAirLoopPlant;
-
-    namespace {
-        bool InitPressureDropOneTimeInit(true);
-    }
-
-    void clear_state()
-    {
-        InitPressureDropOneTimeInit = true;
-    }
 
     void SimPressureDropSystem(EnergyPlusData &state,
                                int const LoopNum,                       // Plant Loop to update pressure information
@@ -177,11 +165,11 @@ namespace EnergyPlus::PlantPressureSystem {
         static Array1D_bool FullParallelBranchSetFound(2);
         static bool CommonPipeErrorEncountered(false);
 
-        if (InitPressureDropOneTimeInit) {
+        if (state.dataPlantPressureSys->InitPressureDropOneTimeInit) {
             // First allocate the initialization array to each plant loop
             LoopInit.allocate(size(state.dataPlnt->PlantLoop));
             LoopInit = true;
-            InitPressureDropOneTimeInit = false;
+            state.dataPlantPressureSys->InitPressureDropOneTimeInit = false;
         }
 
         auto &loop(state.dataPlnt->PlantLoop(LoopNum));

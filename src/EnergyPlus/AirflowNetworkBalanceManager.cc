@@ -8518,8 +8518,15 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
+            Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
+                                        ReportingConstant; // compute volume using standard density air
+            // MJWToDo - Separate AFN Vent and InfilVolFlow
+            ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
+            ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
             if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNInfilVolTotal += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
+                ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
+                ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
                     ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }

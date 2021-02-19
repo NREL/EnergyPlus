@@ -205,9 +205,9 @@ namespace HVACControllers {
         int ActuatedNode;                   // The node that is acted upon by the controller
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
-        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node DSU3
-        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node DSU3
-        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node DSU3
+        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node
+        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node
+        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node
         // --------------------
         // Sensed variable
         // --------------------
