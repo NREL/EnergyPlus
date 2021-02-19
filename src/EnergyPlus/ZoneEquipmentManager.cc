@@ -2632,7 +2632,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Determine flow rate and temperature of supply air based on type of damper
 
-        bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
+        //bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
+
+        bool AdjustZoneMixingFlowFlag(true); // holds zone mixing air flow calc status
+        bool AdjustZoneInfiltrationFlowFlag(true); // holds zone infiltration air flow calc status
+
         FirstCall = true;
         ErrorFlag = false;
 
@@ -2681,7 +2685,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            CalcAirFlowSimple(state, 0, AdjustZoneMassFlowFlag);
+            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoAdjustReturnAndMixing) AdjustZoneMixingFlowFlag = false;
+            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoInfiltrationFlow) AdjustZoneInfiltrationFlowFlag = false;
+            CalcAirFlowSimple(state, 0, AdjustZoneMixingFlowFlag, AdjustZoneInfiltrationFlowFlag);
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -3842,12 +3848,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         using DataLoopNode::Node;
         using namespace DataRoomAirModel; // UCSD
-        using DataHeatBalance::AddInfiltrationFlow;
-        using DataHeatBalance::AdjustInfiltrationFlow;
-        using DataHeatBalance::AllZones;
-        using DataHeatBalance::Infiltration;
         using DataHeatBalance::MassConservation;
-        using DataHeatBalance::NoInfiltrationFlow;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::MixingMassFlowZone;
@@ -3868,6 +3869,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 TotInletAirMassFlowRateMaxAvail;
         Real64 TotInletAirMassFlowRateMin;
         Real64 TotInletAirMassFlowRateMinAvail;
+        Real64 TotInletAirMassFlowRate;
+        Real64 TotExhaustAirMassFlowRate;
 
         Real64 ZoneMixingAirMassFlowRate;
         Real64 ZoneMixingNetAirMassFlowRate;
@@ -3881,10 +3884,16 @@ namespace EnergyPlus::ZoneEquipmentManager {
         int Iteration;
         int ZoneNum1;
 
+        Real64 BuildingZoneReturnFlow;
+        Real64 BuildingZoneReturnFlowOld;
+
         ZoneMassBalanceHVACReSim = false;
         Iteration = 0;
         BuildingZoneMixingFlow = 0.0;
         BuildingZoneMixingFlowOld = 0.0;
+        BuildingZoneReturnFlow = 0.0;
+        BuildingZoneReturnFlowOld = 0.0;
+
 
         // Total loop supply and recirc flows (these have been zeroed earlier in InitZoneEquipment
         for (int airDistUnit = 1; airDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++airDistUnit) {
@@ -3925,6 +3934,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
             BuildingZoneMixingFlowOld = BuildingZoneMixingFlow;
             BuildingZoneMixingFlow = 0.0;
 
+            BuildingZoneReturnFlowOld = BuildingZoneReturnFlow;
+            BuildingZoneReturnFlow = 0.0;
+
             for (ZoneNum1 = 1; ZoneNum1 <= state.dataGlobal->NumOfZones; ++ZoneNum1) {
                 int ZoneNum = ZoneNum1;
                 if (ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = ZoneReOrder(ZoneNum1);
@@ -3936,6 +3948,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 TotInletAirMassFlowRateMaxAvail = 0.0;
                 TotInletAirMassFlowRateMin = 0.0;
                 TotInletAirMassFlowRateMinAvail = 0.0;
+                TotInletAirMassFlowRate = 0.0;
+                TotExhaustAirMassFlowRate = 0.0;
+
                 state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate = 0.0;
 
                 ZoneMixingAirMassFlowRate = 0.0;
@@ -3956,12 +3971,15 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     }
                 }
 
+                TotInletAirMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
+
                 for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
 
                     if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate += Node(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
                     }
                 }
+                TotExhaustAirMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
 
                 // Include zone mixing mass flow rate
                 if (ZoneMassBalanceFlag(ZoneNum)) {
@@ -3973,29 +3991,27 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         }
                     }
                     // Set zone mixing incoming mass flow rate
-                    if ((Iteration == 0) || !ZoneAirMassFlow.BalanceMixing) {
+                    if ((Iteration == 0) || ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnOnly || 
+                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
                         ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
                     } else {
-                        ZoneMixingAirMassFlowRate =
-                            max(0.0,
-                                ZoneReturnAirMassFlowRate + state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate -
-                                    state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
+                        ZoneMixingAirMassFlowRate = max(0.0, ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate -
+                                TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
                     CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
                     ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
-
                 }
 
                 ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
-                Node(ZoneNode).MassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
+                Node(ZoneNode).MassFlowRate = TotInletAirMassFlowRate;
                 Node(ZoneNode).MassFlowRateMax = TotInletAirMassFlowRateMax;
                 Node(ZoneNode).MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
                 Node(ZoneNode).MassFlowRateMin = TotInletAirMassFlowRateMin;
                 Node(ZoneNode).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
 
                 // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
-                StdTotalReturnMassFlow = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
-                                         (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+                StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
+                                         (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
@@ -4010,61 +4026,78 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 Real64 FinalTotalReturnMassFlow = 0;
                 CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
-                MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+                if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+                    // set mass conservation variables
+                    MassConservation(ZoneNum).InMassFlowRate = TotInletAirMassFlowRate;
+                    MassConservation(ZoneNum).ExhMassFlowRate = TotExhaustAirMassFlowRate;
 
-                // Set zone infiltration flow rate
-                if (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
-                    if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
-                        if (MassConservation(ZoneNum).IsOnlySourceZone || (ZoneAirMassFlow.InfiltrationZoneType == AllZones)) {
-                            ZoneInfiltrationMassFlowRate = MassConservation(ZoneNum).MixingSourceMassFlowRate - MassConservation(ZoneNum).MixingMassFlowRate +
-                                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
-                                                           state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                            if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-                                if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
-                                    ZoneInfiltrationFlag(ZoneNum) = true;
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
-                                        max(0.0, Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
-                                } else {
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                                }
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
-                                if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
-                                    ZoneInfiltrationFlag(ZoneNum) = true;
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
-                                    MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate += ZoneInfiltrationMassFlowRate;
-                                } else {
-                                    MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                                }
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            }
-                        } else {
-                            if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate =
-                                    Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            } else if (ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
-                                MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                            }
+                    if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingOnly ||
+                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
+                        ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
+                        Real64 AdjustedTotalReturnMassFlow = 0;
+                        MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+                        ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
+                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
+
+                            // Calculate return air flow rate using mass conservation equation
+                            AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
+                            AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
+                            Real64 zoneReturnFlowMax = 0.0;
+                            ZoneReturnFlowsMaximum(state, ZoneNum, zoneReturnFlowMax);
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+                            // add adjust zone return node air flow calc
+                            CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                            MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+                            ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                         }
+                        // Set zone infiltration air flow rate
+                        CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
+
+                    } else if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnOnly ||
+                               ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
+
+                        Real64 zoneReturnFlowMax = 0.0;
+                        Real64 AdjustedTotalReturnMassFlow = 0;
+                        // Calculate return air flow rate using mass conservation equation
+                        AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
+                        AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
+                        ZoneReturnFlowsMaximum(state, ZoneNum, zoneReturnFlowMax);
+                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+
+                        // add adjust zone return node air flow calculation
+                        CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                        MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+                        ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
+
+                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
+                            ZoneMixingAirMassFlowRate = max(0.0,
+                                                            ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate +
+                                                                MassConservation(ZoneNum).MixingSourceMassFlowRate);
+                            CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+                            ZoneMixingNetAirMassFlowRate =
+                                MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
+
+                            // Calculate return air flow rate using mass conservation equation
+                            AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
+                            AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+                            // add adjust zone return node air flow calc
+                            CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
+                            MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
+                            ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
+                        }
+
+                        // Set zone infiltration air flow rate
+                        CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
                     } else {
-                        // Zone has no infiltration objects
-                        MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                        // if infiltration treatment method is not None
+                        // Set zone infiltration air flow rate
+                        CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
                     }
-                }
-                //
-                if (ZoneMassBalanceFlag(ZoneNum)) {
-                    MassConservation(ZoneNum).InMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                    MassConservation(ZoneNum).ExhMassFlowRate = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate;
                 }
 
                 BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
+                BuildingZoneReturnFlow += MassConservation(ZoneNum).RetMassFlowRate;
 
                 // Accumulate airloop total return flows and allocate excess exhaust flows
                 for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
@@ -4161,7 +4194,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
             // update the
             if (Iteration > 0) {
-                if (std::abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance) {
+                Real64 totalResidual = 0.0;
+                totalResidual = std::abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) + std::abs(BuildingZoneReturnFlow - BuildingZoneReturnFlowOld);
+                if (totalResidual < ConvergenceTolerance) {
                     ZoneMassBalanceHVACReSim = false;
                     break;
                 } else {
@@ -4246,7 +4281,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         returnNodeMassFlow = inletMassFlow;
                         thisZoneEquip.FixedReturnFlow(returnNum) = true;
                     }
-                    // if zone mass balance true, set to expected return flow
+                    // if zone mass balance true, set totReturnFlow to expected return flow
                     if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
                         returnNodeMassFlow = ExpTotalReturnMassFlow;
                     }
@@ -4280,9 +4315,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                 returnNodeMassFlow = max(0.0, (ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac));
                             }
                         }
-                        // if zone mass balance true, set to expected return flow
+                        // if zone mass balance true, set totReturnFlow to expected return flow
                         if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
-                            returnNodeMassFlow = ExpTotalReturnMassFlow; 
+                            returnNodeMassFlow = ExpTotalReturnMassFlow;
                         }
                     }
                 }
@@ -4312,6 +4347,83 @@ namespace EnergyPlus::ZoneEquipmentManager {
             }
         } else {
             FinalTotalReturnMassFlow = totReturnFlow;
+        }
+    }
+
+
+    void ZoneReturnFlowsMaximum(EnergyPlusData &state,
+        int const ZoneNum,
+        Real64 &MaximumZoneReturnMassFlow // maximum zone total return air mass flow rate
+    )
+    {
+        MaximumZoneReturnMassFlow = 0.0;
+        // sets the zone return node maximum flow rate to the airloop design supply flow rate
+        for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
+            int airLoop = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(returnNum);
+            if (airLoop > 0) {
+                auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
+                MaximumZoneReturnMassFlow = thisAirLoopFlow.DesSupply;
+            }
+        }
+    }
+
+    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                                   int const ZoneNum,                // current zone index
+                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+    )
+    {
+        Real64 const ConvergenceTolerance(0.000010);
+        Real64 ZoneInfiltrationMassFlowRate = 0.0;
+
+        // Set zone infiltration flow rate
+        if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) {
+            if (DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr > 0) {
+                if (DataHeatBalance::MassConservation(ZoneNum).IsOnlySourceZone ||
+                    (DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::AllZones)) {
+                    ZoneInfiltrationMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate - 
+                                                   DataHeatBalance::MassConservation(ZoneNum).MixingMassFlowRate +
+                                                   state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate +
+                                                   ZoneReturnAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
+                    if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                        if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
+                            DataHeatBalFanSys::ZoneInfiltrationFlag(ZoneNum) = true;
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                                ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate =
+                                max(0.0, DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate);
+                        } else {
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
+                        }
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                        if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+                            DataHeatBalFanSys::ZoneInfiltrationFlag(ZoneNum) = true;
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+                            DataHeatBalance::MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate +=
+                                ZoneInfiltrationMassFlowRate;
+                        } else {
+                            DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                        }
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    }
+                } else {
+                    if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate =
+                            DataHeatBalance::Infiltration(DataHeatBalance::MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    } else if (DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                        DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+                    }
+                }
+            } else {
+                // Zone has no infiltration objects
+                DataHeatBalance::MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+            }
         }
     }
 
@@ -4532,7 +4644,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
     }
 
     void CalcAirFlowSimple(EnergyPlusData &state, int const SysTimestepLoop,        // System time step index
-                           bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
+                           bool const AdjustZoneMixingFlowFlag, // holds zone mixing air flow calc status
+                           bool const AdjustZoneInfiltrationFlowFlag // holds zone mixing air flow calc status
     )
     {
 
@@ -5050,7 +5163,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0); // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                    if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                    if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                         if (Mixing(j).MixingMassFlowRate > 0.0) {
                             Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                         }
@@ -5081,7 +5194,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                             // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                    if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                    if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                         if (Mixing(j).MixingMassFlowRate > 0.0) {
                             Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                         }
@@ -5111,7 +5224,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 CpAir = PsyCpAirFnW((state.dataZoneEquip->ZHumRat(n) + state.dataZoneEquip->ZHumRat(m)) / 2.0);                                                       // Use average conditions
 
                 Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
-                if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
+                if (ZoneMassBalanceFlag(n) && AdjustZoneMixingFlowFlag) {
                     if (Mixing(j).MixingMassFlowRate > 0.0) {
                         Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
                     }
@@ -5389,7 +5502,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             // if ( Infiltration(j).MassFlowRate > 0.0 ) {
                             Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -5413,7 +5526,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MCpI_temp = IVF * AirDensity * CpAir;
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             if (Infiltration(j).MassFlowRate > 0.0) {
                                 Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -5438,7 +5551,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MCpI_temp = IVF * AirDensity * CpAir;
                     if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                     Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
-                    if (AdjustZoneMassFlowFlag && ZoneInfiltrationFlag(NZ)) {
+                    if (AdjustZoneInfiltrationFlowFlag && ZoneInfiltrationFlag(NZ)) {
                         if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
                             if (Infiltration(j).MassFlowRate > 0.0) {
                                 Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
@@ -5571,29 +5684,23 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // This subroutine updates the receiving zone mixing flow rate to ensures the zone
         // air mass balance.
 
-        // Using/Aliasing
-        using DataHeatBalance::MassConservation;
-        using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalFanSys::MixingMassFlowZone;
-
         int Loop;
         int MixingNum;
         int NumOfReceivingZoneMixingObjects;
         Real64 MixingMassFlowRate; // current zone mixing mass flow rate, [kg/s]
 
         MixingMassFlowRate = 0.0;
-        // distribute the total zone mixing flow rate to the source zones
-        NumOfReceivingZoneMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+        NumOfReceivingZoneMixingObjects = DataHeatBalance::MassConservation(ZoneNum).NumReceivingZonesMixingObject;
         if (NumOfReceivingZoneMixingObjects > 0) {
-            for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
-                MixingNum = MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
-                Mixing(MixingNum).MixingMassFlowRate = MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
-                MixingMassFlowRate += Mixing(MixingNum).MixingMassFlowRate;
-                CalcZoneMixingFlowRateOfSourceZone(Mixing(MixingNum).FromZone);
-            }
+                // distribute the total zone mixing flow rate to the source zones
+                for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
+                    MixingNum = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
+                    DataHeatBalance::Mixing(MixingNum).MixingMassFlowRate = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
+                    MixingMassFlowRate += DataHeatBalance::Mixing(MixingNum).MixingMassFlowRate;
+                    CalcZoneMixingFlowRateOfSourceZone(DataHeatBalance::Mixing(MixingNum).FromZone);
+                }
         }
-        MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
+        DataHeatBalance::MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
         ZoneMixingMassFlowRate = MixingMassFlowRate;
     }
 
@@ -5609,14 +5716,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates the zone mixing flow rate such that it ensures the zone
         // air mass balance.
-
-        // Using/Aliasing
-        using DataHeatBalance::MassConservation;
-        using DataHeatBalance::Mixing;
-        using DataHeatBalance::TotMixing;
-        using DataHeatBalance::Zone;
-        using DataHeatBalFanSys::MixingMassFlowZone;
-
+        ;
         int Loop;
         int MixingNum;
         int ZoneMixingNum;
@@ -5624,18 +5724,18 @@ namespace EnergyPlus::ZoneEquipmentManager {
         Real64 ZoneSourceMassFlowRate; // current zone as a source mass flow rate for zone mixing in other zones, [kg/s]
 
         ZoneSourceMassFlowRate = 0.0;
-        NumOfSourceZoneMixingObjects = MassConservation(ZoneNum).NumSourceZonesMixingObject;
+        NumOfSourceZoneMixingObjects = DataHeatBalance::MassConservation(ZoneNum).NumSourceZonesMixingObject;
         if (NumOfSourceZoneMixingObjects > 0) {
             for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
-                MixingNum = MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
-                for (Loop = 1; Loop <= TotMixing; ++Loop) {
+                MixingNum = DataHeatBalance::MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
+                for (Loop = 1; Loop <= DataHeatBalance::TotMixing; ++Loop) {
                     if (Loop == MixingNum) {
-                        ZoneSourceMassFlowRate += Mixing(Loop).MixingMassFlowRate;
+                        ZoneSourceMassFlowRate += DataHeatBalance::Mixing(Loop).MixingMassFlowRate;
                     }
                 }
             }
         }
-        MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+        DataHeatBalance::MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
     void AutoCalcDOASControlStrategy(EnergyPlusData &state)
